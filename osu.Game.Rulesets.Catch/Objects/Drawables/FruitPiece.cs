@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// <summary>
         /// Because we're adding a border around the fruit, we need to scale down some.
         /// </summary>
-        private const float radius_adjust = 1.1f;
+        public const float RADIUS_ADJUST = 1.1f;
 
         private Circle border;
 
@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             AddRangeInternal(new[]
             {
-                createPulp(drawableCatchObject.HitObject.VisualRepresentation),
+                getFruitFor(drawableCatchObject.HitObject.VisualRepresentation),
                 border = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
-                    BorderThickness = 6f * radius_adjust,
+                    BorderThickness = 6f * RADIUS_ADJUST,
                     Children = new Drawable[]
                     {
                         new Box
@@ -80,195 +80,30 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         protected override void Update()
         {
             base.Update();
-
             border.Alpha = (float)Math.Clamp((hitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
-        private Drawable createPulp(FruitVisualRepresentation representation)
+        private Drawable getFruitFor(FruitVisualRepresentation representation)
         {
-            const float large_pulp_3 = 16f * radius_adjust;
-            const float distance_from_centre_3 = 0.15f;
-
-            const float large_pulp_4 = large_pulp_3 * 0.925f;
-            const float distance_from_centre_4 = distance_from_centre_3 / 0.925f;
-
-            const float small_pulp = large_pulp_3 / 2;
-
-            static Vector2 positionAt(float angle, float distance) => new Vector2(
-                distance * MathF.Sin(angle * MathF.PI / 180),
-                distance * MathF.Cos(angle * MathF.PI / 180));
-
             switch (representation)
             {
-                default:
-                    return new Container();
-
-                case FruitVisualRepresentation.Raspberry:
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(small_pulp),
-                                Y = -0.34f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(0, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(90, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(180, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_4),
-                                AccentColour = { BindTarget = accentColour },
-                                Position = positionAt(270, distance_from_centre_4),
-                            },
-                        }
-                    };
-
-                case FruitVisualRepresentation.Pineapple:
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(small_pulp),
-                                Y = -0.3f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(45, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(135, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(225, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_4),
-                                AccentColour = { BindTarget = accentColour },
-                                Position = positionAt(315, distance_from_centre_4),
-                            },
-                        }
-                    };
-
                 case FruitVisualRepresentation.Pear:
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(small_pulp),
-                                Y = -0.33f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(60, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(180, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_3),
-                                AccentColour = { BindTarget = accentColour },
-                                Position = positionAt(300, distance_from_centre_3),
-                            },
-                        }
-                    };
+                    return new PearPiece();
 
                 case FruitVisualRepresentation.Grape:
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(small_pulp),
-                                Y = -0.25f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(0, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(120, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_3),
-                                AccentColour = { BindTarget = accentColour },
-                                Position = positionAt(240, distance_from_centre_3),
-                            },
-                        }
-                    };
+                    return new GrapePiece();
+
+                case FruitVisualRepresentation.Pineapple:
+                    return new PineapplePiece();
 
                 case FruitVisualRepresentation.Banana:
+                    return new BananaPiece();
 
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(small_pulp),
-                                Y = -0.3f
-                            },
-                            new Pulp
-                            {
-                                AccentColour = { BindTarget = accentColour },
-                                Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
-                                Y = 0.05f,
-                            },
-                        }
-                    };
+                case FruitVisualRepresentation.Raspberry:
+                    return new RaspberryPiece();
             }
+
+            return Empty();
         }
     }
 }
