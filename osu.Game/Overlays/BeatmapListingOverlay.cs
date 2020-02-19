@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -31,6 +34,8 @@ namespace osu.Game.Overlays
         private RulesetStore rulesets { get; set; }
 
         private SearchBeatmapSetsRequest getSetsRequest;
+        private CancellationTokenSource cancellationToken;
+
         private Container panelsPlaceholder;
         private BeatmapListingSearchSection searchSection;
         private BeatmapListingSortTabControl sortControl;
@@ -121,7 +126,7 @@ namespace osu.Game.Overlays
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,
-                                                Padding = new MarginPadding { Vertical = 15, Horizontal = 20 },
+                                                Padding = new MarginPadding { Horizontal = 20 },
                                             }
                                         }
                                     }
@@ -167,6 +172,7 @@ namespace osu.Game.Overlays
                 return;
 
             getSetsRequest?.Cancel();
+            cancellationToken?.Cancel();
             previewTrackManager.StopAnyPlaying(this);
 
             panelsPlaceholder.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
@@ -185,23 +191,20 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(SearchBeatmapSetsResponse response)
         {
-            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
-
             var hasError = !string.IsNullOrEmpty(response.Error);
 
             if (response.Total == 0 || hasError)
             {
                 searchSection.BeatmapSet = null;
-                panelsPlaceholder.Clear();
-                panelsPlaceholder.FadeColour(Color4.White);
-                panelsPlaceholder.Add(new OsuSpriteText
+
+                LoadComponentAsync(new DrawableErrorHandler(hasError ? response.Error : @"... nope, nothing found."), loaded =>
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = hasError ? response.Error : @"... nope, nothing found."
-                });
+                    addContentToPlaceholder(loaded);
+                }, (cancellationToken = new CancellationTokenSource()).Token);
                 return;
             }
+
+            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
             var newPanels = new FillFlowContainer<DirectPanel>
             {
@@ -209,6 +212,7 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
                 Alpha = 0,
+                Margin = new MarginPadding { Vertical = 15 },
                 ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
                 {
                     Anchor = Anchor.TopCentre,
@@ -218,12 +222,70 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, loaded =>
             {
-                panelsPlaceholder.Clear();
-                panelsPlaceholder.FadeColour(Color4.White);
-                panelsPlaceholder.Add(loaded);
+                addContentToPlaceholder(loaded);
                 loaded.FadeIn(600, Easing.OutQuint);
                 searchSection.BeatmapSet = beatmaps.First();
-            });
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private void addContentToPlaceholder(Drawable content)
+        {
+            panelsPlaceholder.Clear();
+            panelsPlaceholder.FadeColour(Color4.White);
+            panelsPlaceholder.Add(content);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            getSetsRequest?.Cancel();
+            cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
+        }
+
+        private class DrawableErrorHandler : CompositeDrawable
+        {
+            private readonly string error;
+
+            public DrawableErrorHandler(string error)
+            {
+                this.error = error;
+
+                RelativeSizeAxes = Axes.X;
+                Height = 250;
+                Margin = new MarginPadding { Top = 15 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                AddInternal(new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(10, 0),
+                    Children = new Drawable[]
+                    {
+                        new Sprite
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Texture = textures.Get(@"Online/not-found")
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = error,
+                        }
+                    }
+                });
+            }
         }
     }
 }
