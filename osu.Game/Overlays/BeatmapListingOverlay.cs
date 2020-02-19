@@ -189,15 +189,11 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(SearchBeatmapSetsResponse response)
         {
-            var hasError = !string.IsNullOrEmpty(response.Error);
-
-            if (response.Total == 0 || hasError)
+            if (response.Total == 0)
             {
                 searchSection.BeatmapSet = null;
 
-                LoadComponentAsync(new DrawableErrorHandler(hasError ? response.Error : @"... nope, nothing found."),
-                    addContentToPlaceholder,
-                    (cancellationToken = new CancellationTokenSource()).Token);
+                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
                 return;
             }
 
@@ -240,14 +236,10 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        private class DrawableErrorHandler : CompositeDrawable
+        private class NotFoundDrawable : CompositeDrawable
         {
-            private readonly string error;
-
-            public DrawableErrorHandler(string error)
+            public NotFoundDrawable()
             {
-                this.error = error;
-
                 RelativeSizeAxes = Axes.X;
                 Height = 250;
                 Margin = new MarginPadding { Top = 15 };
@@ -278,7 +270,7 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = error,
+                            Text = @"... nope, nothing found.",
                         }
                     }
                 });

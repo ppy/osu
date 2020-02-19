@@ -12,9 +12,6 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("beatmapsets")]
         public IEnumerable<APIBeatmapSet> BeatmapSets;
 
-        [JsonProperty("error")]
-        public string Error;
-
         [JsonProperty("total")]
         public int Total;
     }
