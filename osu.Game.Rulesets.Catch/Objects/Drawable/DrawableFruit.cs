@@ -16,11 +16,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private Container scaleContainer;
 
-        /// <summary>
-        /// Because we're adding a border around the fruit, we need to scale down some.
-        /// </summary>
-        public const float RADIUS_ADJUST = 1.1f;
-
         public DrawableFruit(Fruit h)
             : base(h)
         {
