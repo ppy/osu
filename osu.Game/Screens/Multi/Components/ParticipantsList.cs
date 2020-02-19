@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class ParticipantsList : MultiplayerComposite
     {
-        public const float TILE_SIZE = 70;
+        public const float TILE_SIZE = 35;
 
         public override Axes RelativeSizeAxes
         {
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Multi.Components
             public UserTile(User user)
             {
                 this.user = user;
-                Size = new Vector2(70f);
+                Size = new Vector2(TILE_SIZE);
                 CornerRadius = 5f;
                 Masking = true;
 
