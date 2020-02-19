@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject is IHasComboInformation combo)
             {
                 comboIndexBindable = combo.ComboIndexBindable.GetBoundCopy();
-                comboIndexBindable.BindValueChanged(_ => updateAccentColour(), true);
+                comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
@@ -336,7 +336,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            updateAccentColour();
+            updateComboColour();
 
             ApplySkin(skin, allowFallback);
 
@@ -344,13 +344,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 updateState(State.Value, true);
         }
 
-        private void updateAccentColour()
+        private void updateComboColour()
         {
             if (HitObject is IHasComboInformation combo)
             {
                 var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
-                AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+                UpdateComboColour(comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White);
             }
+        }
+
+        protected virtual void UpdateComboColour(Color4 comboColour)
+        {
         }
 
         /// <summary>

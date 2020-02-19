@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -53,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
         }
+
+        protected override void UpdateComboColour(Color4 comboColour) => AccentColour.Value = comboColour;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
