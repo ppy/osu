@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -250,8 +249,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
                 case FruitVisualRepresentation.Banana:
 
-                    Color4 bananaColour = getBananaColour();
-
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -259,33 +256,18 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                AccentColour = { Value = bananaColour },
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(small_pulp),
                                 Y = -0.3f
                             },
                             new Pulp
                             {
-                                AccentColour = { Value = bananaColour },
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
                                 Y = 0.05f,
                             },
                         }
                     };
-            }
-        }
-
-        private Color4 getBananaColour()
-        {
-            switch (RNG.Next(0, 3))
-            {
-                default:
-                    return new Color4(255, 240, 0, 255);
-
-                case 1:
-                    return new Color4(255, 192, 0, 255);
-
-                case 2:
-                    return new Color4(214, 221, 28, 255);
             }
         }
     }
