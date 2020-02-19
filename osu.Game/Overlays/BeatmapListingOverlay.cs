@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -196,10 +195,9 @@ namespace osu.Game.Overlays
             {
                 searchSection.BeatmapSet = null;
 
-                LoadComponentAsync(new DrawableErrorHandler(hasError ? response.Error : @"... nope, nothing found."), loaded =>
-                {
-                    addContentToPlaceholder(loaded);
-                }, (cancellationToken = new CancellationTokenSource()).Token);
+                LoadComponentAsync(new DrawableErrorHandler(hasError ? response.Error : @"... nope, nothing found."),
+                    addContentToPlaceholder,
+                    (cancellationToken = new CancellationTokenSource()).Token);
                 return;
             }
 
