@@ -35,6 +35,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
             {
                 obj.IndexInBeatmap = index++;
+                foreach (var nested in obj.NestedHitObjects.OfType<CatchHitObject>())
+                    nested.IndexInBeatmap = obj.IndexInBeatmap;
+
                 if (obj.LastInCombo && obj.NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
                     lastNested.LastInCombo = true;
             }
