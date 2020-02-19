@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         new SkinnableDrawable(
                             new CatchSkinComponent(CatchSkinComponents.Droplet), _ => new Pulp
                             {
-                                Size = Size,
+                                Size = Size / 4,
                                 AccentColour = { Value = Color4.White }
                             })
                     }
