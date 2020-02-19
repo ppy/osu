@@ -442,6 +442,8 @@
 *   翻译补全
     *   编辑器补全
         *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)
+            *   附带更改
+                *   [osu.Game/Screens/Edit/Timing/RowAttribute.cs](osu.Game/Screens/Edit/Timing/RowAttribute.cs)
         *   工具栏(TOOLBOX)
             *   [osu.Game/Rulesets/Edit/ToolboxGroup.cs](osu.Game/Rulesets/Edit/ToolboxGroup.cs)
             *   [osu.Game/Rulesets/Edit/Tools/SelectTool.cs](osu.Game/Rulesets/Edit/Tools/SelectTool.cs)
@@ -450,3 +452,8 @@
             *   [osu.Game.Rulesets.Osu/Edit/SpinnerCompositionTool.cs](osu.Game.Rulesets.Osu/Edit/SpinnerCompositionTool.cs)
             *   [osu.Game.Rulesets.Mania/Edit/HoldNoteCompositionTool.cs](osu.Game.Rulesets.Mania/Edit/HoldNoteCompositionTool.cs)
             *   [osu.Game.Rulesets.Mania/Edit/NoteCompositionTool.cs](osu.Game.Rulesets.Mania/Edit/NoteCompositionTool.cs)
+
+*   翻译失败
+    *   [osu.Game/Screens/Edit/Timing/Section.cs](osu.Game/Screens/Edit/Timing/Section.cs)
+        *   原因:
+            *   DifficultySection,TimingSection等的标题用的是Section下的`LabelText = typeof(T).Name.Replace(typeof(ControlPoint).Name, string.Empty)`语句，然而 `typeof(T)` , `typeof(ControlPoint)` 相关文本未找到, 或许在`osu.Framework`中?

@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal class DifficultySection : Section<DifficultyControlPoint>
     {
-        private SettingsSlider<double> multiplier;
+        private SettingsSlider<double> multiplier; 
 
         [BackgroundDependencyLoader]
         private void load()

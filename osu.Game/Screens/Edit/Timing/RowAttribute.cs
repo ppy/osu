@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Padding = new MarginPadding(2),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
+                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 15),
                     Text = header,
                     Colour = colours.Gray3
                 },
