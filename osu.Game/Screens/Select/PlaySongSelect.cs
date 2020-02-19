@@ -29,7 +29,11 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Edit();
             }, Key.Number4);
+
+            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
         }
+
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
         public override void OnResuming(IScreen last)
         {

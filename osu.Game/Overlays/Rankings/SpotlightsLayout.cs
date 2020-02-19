@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Rankings
         private void getSpotlights()
         {
             spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => selector.Spotlights = response.Spotlights;
+            spotlightsRequest.Success += response => Schedule(() => selector.Spotlights = response.Spotlights);
             api.Queue(spotlightsRequest);
         }
 

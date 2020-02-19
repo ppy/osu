@@ -105,9 +105,10 @@ namespace osu.Game.Database
 
             void triggerFailure(Exception error)
             {
+                currentDownloads.Remove(request);
+
                 DownloadFailed?.Invoke(request);
 
-                currentDownloads.Remove(request);
                 notification.State = ProgressNotificationState.Cancelled;
 
                 if (!(error is OperationCanceledException))
