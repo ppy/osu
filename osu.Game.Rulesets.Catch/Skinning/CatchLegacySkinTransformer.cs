@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
                 case CatchSkinComponents.Droplet:
                     if (GetTexture("fruit-drop") != null)
-                        return new LegacyFruitPiece("fruit-drop");
+                        return new LegacyFruitPiece("fruit-drop") { Scale = new Vector2(0.8f) };
 
                     break;
             }
