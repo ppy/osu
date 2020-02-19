@@ -6,11 +6,13 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 {
-    class HitProbabilities
+    public class HitProbabilities
     {
         public static int cacheHit = 0;
         public static int cacheMiss = 0;
-        List<MapSectionCache> sections = new List<MapSectionCache>();
+
+        private List<MapSectionCache> sections = new List<MapSectionCache>();
+
         public HitProbabilities(List<OsuMovement> movements, double cheeseLevel, int difficultyCount = 20)
         {
             for (int i = 0; i < difficultyCount; ++i)
@@ -31,15 +33,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 
             return count;
         }
-        public bool IsNull(int sectionCount)
+
+        public bool IsEmpty(int sectionCount)
         {
-            bool isNull = false;
+            bool isEmpty = false;
             for (int i = 0; i <= sections.Count - sectionCount; i++)
             {
-                isNull = isNull || Count(i, sectionCount) == 0;
+                isEmpty = isEmpty || Count(i, sectionCount) == 0;
             }
 
-            return isNull;
+            return isEmpty;
         }
 
         public double Length(int start, int sectionCount)
@@ -113,14 +116,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return FittsLaw.CalculateHitProb(movement.D, cheeseMT, tp);
         }
 
-        public struct SkillData
+        private struct SkillData
         {
             public double ExpectedTime;
             public double FcProbability;
         }
 
 
-        class MapSectionCache
+        private class MapSectionCache
         {
             private Dictionary<double, SkillData> cache = new Dictionary<double, SkillData>();
             private readonly double cheeseLevel;

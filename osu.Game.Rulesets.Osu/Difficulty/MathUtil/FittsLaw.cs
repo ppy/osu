@@ -29,6 +29,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return SpecialFunctions.Erf(2.066 / d * (Power2(mt * tp) - 1) / Math.Sqrt(2));
         }
 
+        private readonly static double[] coeffs = {
+            1.0000000060371126,
+            0.693146840098149,
+            0.2402310826131064,
+            0.05547894683131716,
+            0.009686150703032881,
+            0.0012382531241478965,
+            0.00021871427263121524,
+        };
+
         /// <summary>
         /// Fast approximation of 2^x. Accurate to around 9-10 significant figures, around 6x faster than Math.Pow or Math.Exp
         /// Calculates the integer part using a bit shift and fraction part using a polynomial approximation
@@ -56,15 +66,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                 + coeffs[3] * frac3 + coeffs[4] * frac4 + coeffs[5] * frac5 + coeffs[6] * frac6);
         }
 
-        readonly static double[] coeffs = {
-            1.0000000060371126,
-            0.693146840098149,
-            0.2402310826131064,
-            0.05547894683131716,
-            0.009686150703032881,
-            0.0012382531241478965,
-            0.00021871427263121524,
-        };
     }
 
 
