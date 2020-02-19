@@ -72,13 +72,7 @@ namespace osu.Game.Overlays.SearchableList
                 },
             };
 
-            Disabled.ValueChanged += disabled =>
-            {
-                if (disabled.NewValue)
-                    Tabs.Current.Disabled = true;
-                else
-                    Tabs.Current.Disabled = false;
-            };
+            Disabled.ValueChanged += disabled => Tabs.Current.Disabled = disabled.NewValue;
 
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();

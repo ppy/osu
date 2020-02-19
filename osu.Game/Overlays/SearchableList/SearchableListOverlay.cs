@@ -125,7 +125,8 @@ namespace osu.Game.Overlays.SearchableList
                     disabled.Value = false;
                     break;
             }
-            base.APIStateChanged(api, state);   
+
+            base.APIStateChanged(api, state);
         }
 
         protected override void Update()

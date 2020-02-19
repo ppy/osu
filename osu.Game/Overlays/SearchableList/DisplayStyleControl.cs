@@ -55,13 +55,7 @@ namespace osu.Game.Overlays.SearchableList
             };
 
             DisplayStyle.Value = PanelDisplayStyle.Grid;
-            DisplayStyle.DisabledChanged += disabled =>
-            {
-                if (disabled)
-                    Dropdown.Current.Disabled = true;
-                else
-                    Dropdown.Current.Disabled = false;
-            };
+            DisplayStyle.DisabledChanged += disabled => Dropdown.Current.Disabled = disabled;
         }
 
         private class DisplayStyleToggleButton : OsuClickableContainer
