@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Sections;
 
 namespace osu.Game.Tests.Visual.Online
@@ -16,6 +18,9 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(CounterPill)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Red);
 
         private readonly CounterPill pill;
         private readonly BindableInt value = new BindableInt();
