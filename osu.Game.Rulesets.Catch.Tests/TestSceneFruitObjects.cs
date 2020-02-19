@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             typeof(CatchHitObject),
             typeof(Fruit),
+            typeof(FruitPiece),
             typeof(Droplet),
             typeof(Banana),
             typeof(BananaShower),
