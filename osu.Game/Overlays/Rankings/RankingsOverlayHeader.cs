@@ -11,23 +11,21 @@ namespace osu.Game.Overlays.Rankings
 {
     public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-        public readonly Bindable<Country> Country = new Bindable<Country>();
+        public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
+
+        public Bindable<Country> Country => countryFilter.Current;
+
+        private OverlayRulesetSelector rulesetSelector;
+        private CountryFilter countryFilter;
 
         protected override ScreenTitle CreateTitle() => new RankingsTitle
         {
             Scope = { BindTarget = Current }
         };
 
-        protected override Drawable CreateTitleContent() => new OverlayRulesetSelector
-        {
-            Current = Ruleset
-        };
+        protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector();
 
-        protected override Drawable CreateContent() => new CountryFilter
-        {
-            Current = Country
-        };
+        protected override Drawable CreateContent() => countryFilter = new CountryFilter();
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
 

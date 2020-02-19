@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
-            startTimeBindable.BindValueChanged(_ => updateState(ArmedState.Idle, true));
+            startTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -125,8 +125,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
-            samplesBindable.ItemsAdded += _ => loadSamples();
-            samplesBindable.ItemsRemoved += _ => loadSamples();
+            samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
             onDefaultsApplied();
@@ -250,8 +249,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
-                base.ApplyTransformsAt(transformTime, true);
-                base.ClearTransformsAfter(transformTime, true);
+                base.ApplyTransformsAt(double.MinValue, true);
+                base.ClearTransformsAfter(double.MinValue, true);
 
                 using (BeginAbsoluteSequence(transformTime, true))
                 {

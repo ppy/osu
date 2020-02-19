@@ -51,8 +51,7 @@ namespace osu.Game.Screens.Multi.Components
                 }
             };
 
-            Playlist.ItemsAdded += _ => updateInfo();
-            Playlist.ItemsRemoved += _ => updateInfo();
+            Playlist.CollectionChanged += (_, __) => updateInfo();
 
             updateInfo();
         }

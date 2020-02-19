@@ -17,18 +17,16 @@ namespace osu.Game.Graphics.UserInterface
         public SearchTextBox()
         {
             Height = 35;
-            AddRange(new Drawable[]
+            Add(new SpriteIcon
             {
-                new SpriteIcon
-                {
-                    Icon = FontAwesome.Solid.Search,
-                    Origin = Anchor.CentreRight,
-                    Anchor = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = 10 },
-                    Size = new Vector2(20),
-                }
+                Icon = FontAwesome.Solid.Search,
+                Origin = Anchor.CentreRight,
+                Anchor = Anchor.CentreRight,
+                Margin = new MarginPadding { Right = 10 },
+                Size = new Vector2(20),
             });
 
+            TextFlow.Padding = new MarginPadding { Right = 35 };
             PlaceholderText = "type to search";
         }
 

@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -45,7 +45,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            Room.Type.Value = new GameTypeTimeshift();
+            Room.Name.Value = "A very awesome room";
+            Room.Host.Value = new User { Id = 2, Username = "peppy" };
 
             Child = new Header();
         }

@@ -117,6 +117,8 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 base.LoadComplete();
                 API.Login("Rhythm Champion", "osu!");
+
+                Dependencies.Get<SessionStatics>().Set(Static.MutedAudioNotificationShownOnce, true);
             }
         }
 

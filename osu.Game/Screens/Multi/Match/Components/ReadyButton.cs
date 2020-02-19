@@ -5,16 +5,15 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class ReadyButton : HeaderButton
+    public class ReadyButton : OsuButton
     {
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         [Resolved(typeof(Room), nameof(Room.EndDate))]
         private Bindable<DateTimeOffset> endDate { get; set; }
@@ -29,9 +28,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public ReadyButton()
         {
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(200, 1);
-
             Text = "Start";
         }
 
@@ -41,31 +37,37 @@ namespace osu.Game.Screens.Multi.Match.Components
             beatmaps.ItemAdded += beatmapAdded;
             beatmaps.ItemRemoved += beatmapRemoved;
 
-            Beatmap.BindValueChanged(b => updateBeatmap(b.NewValue), true);
+            SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
         }
 
-        private void updateBeatmap(BeatmapInfo beatmap)
+        private void updateSelectedItem(PlaylistItem item)
         {
             hasBeatmap = false;
 
-            if (beatmap?.OnlineBeatmapID == null)
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
                 return;
 
-            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID) != null;
+            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId) != null;
         }
 
         private void beatmapAdded(BeatmapSetInfo model)
         {
-            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == Beatmap.Value.OnlineBeatmapID))
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
+                return;
+
+            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
                 Schedule(() => hasBeatmap = true);
         }
 
         private void beatmapRemoved(BeatmapSetInfo model)
         {
-            if (Beatmap.Value == null)
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
                 return;
 
-            if (model.OnlineBeatmapSetID == Beatmap.Value.BeatmapSet.OnlineBeatmapSetID)
+            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
                 Schedule(() => hasBeatmap = false);
         }
 
@@ -78,7 +80,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void updateEnabledState()
         {
-            if (gameBeatmap.Value == null)
+            if (gameBeatmap.Value == null || SelectedItem.Value == null)
             {
                 Enabled.Value = false;
                 return;
@@ -94,7 +96,10 @@ namespace osu.Game.Screens.Multi.Match.Components
             base.Dispose(isDisposing);
 
             if (beatmaps != null)
+            {
                 beatmaps.ItemAdded -= beatmapAdded;
+                beatmaps.ItemRemoved -= beatmapRemoved;
+            }
         }
     }
 }
