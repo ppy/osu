@@ -52,11 +52,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 case FruitVisualRepresentation.Grape:
                     return CatchSkinComponents.FruitGrapes;
 
-                case FruitVisualRepresentation.Raspberry:
-                    return CatchSkinComponents.FruitOrange;
-
                 case FruitVisualRepresentation.Pineapple:
                     return CatchSkinComponents.FruitApple;
+
+                case FruitVisualRepresentation.Raspberry:
+                    return CatchSkinComponents.FruitOrange;
 
                 case FruitVisualRepresentation.Banana:
                     return CatchSkinComponents.FruitBananas;
