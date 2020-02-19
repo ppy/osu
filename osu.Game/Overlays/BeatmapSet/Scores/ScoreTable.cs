@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 new OsuSpriteText
                 {
-                    Text = $@"{score.PP:N0}",
+                    Text = $@"{score.PP ?? 0:N0}",
                     Font = OsuFont.GetFont(size: text_size)
                 },
                 new FillFlowContainer

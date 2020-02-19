@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 totalScoreColumn.Text = $@"{value.TotalScore:N0}";
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
-                ppColumn.Text = $@"{value.PP:N0}";
+                ppColumn.Text = $@"{value.PP ?? 0:N0}";
 
                 statisticsColumns.ChildrenEnumerable = value.SortedStatistics.Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
                 modsColumn.Mods = value.Mods;
