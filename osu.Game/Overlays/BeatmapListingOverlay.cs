@@ -1,0 +1,229 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
+using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Overlays.Direct;
+using osu.Game.Rulesets;
+using osuTK;
+using osuTK.Graphics;
+
+namespace osu.Game.Overlays
+{
+    public class BeatmapListingOverlay : FullscreenOverlay
+    {
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        private SearchBeatmapSetsRequest getSetsRequest;
+        private Container panelsPlaceholder;
+        private BeatmapListingSearchSection searchSection;
+        private BeatmapListingSortTabControl sortControl;
+
+        public BeatmapListingOverlay()
+            : base(OverlayColourScheme.Blue)
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourProvider.Background6
+                },
+                new BasicScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ScrollbarVisible = false,
+                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 10),
+                        Children = new Drawable[]
+                        {
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Direction = FillDirection.Vertical,
+                                Masking = true,
+                                EdgeEffect = new EdgeEffectParameters
+                                {
+                                    Colour = Color4.Black.Opacity(0.25f),
+                                    Type = EdgeEffectType.Shadow,
+                                    Radius = 3,
+                                    Offset = new Vector2(0f, 1f),
+                                },
+                                Children = new Drawable[]
+                                {
+                                    new BeatmapListingHeader(),
+                                    searchSection = new BeatmapListingSearchSection(),
+                                }
+                            },
+                            new Container
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = ColourProvider.Background4,
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Children = new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 40,
+                                                Children = new Drawable[]
+                                                {
+                                                    new Box
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Colour = ColourProvider.Background5
+                                                    },
+                                                    sortControl = new BeatmapListingSortTabControl
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                        Margin = new MarginPadding { Left = 20 }
+                                                    }
+                                                }
+                                            },
+                                            panelsPlaceholder = new Container
+                                            {
+                                                AutoSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.X,
+                                                Padding = new MarginPadding { Vertical = 15, Horizontal = 20 },
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var sortCriteria = sortControl.Current;
+            var sortDirection = sortControl.SortDirection;
+
+            searchSection.Query.BindValueChanged(query =>
+            {
+                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
+                sortDirection.Value = SortDirection.Descending;
+
+                Scheduler.AddOnce(updateSearch);
+            });
+
+            searchSection.Query.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
+            searchSection.Ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
+            searchSection.Category.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
+            sortCriteria.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
+            sortDirection.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
+        }
+
+        private void updateSearch()
+        {
+            if (!IsLoaded)
+                return;
+
+            if (State.Value == Visibility.Hidden)
+                return;
+
+            if (API == null)
+                return;
+
+            getSetsRequest?.Cancel();
+            previewTrackManager.StopAnyPlaying(this);
+
+            panelsPlaceholder.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
+
+            getSetsRequest = new SearchBeatmapSetsRequest(
+                searchSection.Query.Value,
+                searchSection.Ruleset.Value,
+                searchSection.Category.Value,
+                sortControl.Current.Value,
+                sortControl.SortDirection.Value);
+
+            getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
+
+            API.Queue(getSetsRequest);
+        }
+
+        private void recreatePanels(SearchBeatmapSetsResponse response)
+        {
+            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+
+            var hasError = !string.IsNullOrEmpty(response.Error);
+
+            if (response.Total == 0 || hasError)
+            {
+                searchSection.BeatmapSet = null;
+                panelsPlaceholder.Clear();
+                panelsPlaceholder.FadeColour(Color4.White);
+                panelsPlaceholder.Add(new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Text = hasError ? response.Error : @"... nope, nothing found."
+                });
+                return;
+            }
+
+            var newPanels = new FillFlowContainer<DirectPanel>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(10),
+                Alpha = 0,
+                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                })
+            };
+
+            LoadComponentAsync(newPanels, loaded =>
+            {
+                panelsPlaceholder.Clear();
+                panelsPlaceholder.FadeColour(Color4.White);
+                panelsPlaceholder.Add(loaded);
+                loaded.FadeIn(600, Easing.OutQuint);
+                searchSection.BeatmapSet = beatmaps.First();
+            });
+        }
+    }
+}
