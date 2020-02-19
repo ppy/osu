@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
         where TObject : CatchHitObject
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Framework.Graphics.Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 ScaleContainer = new Container
                 {
