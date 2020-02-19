@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Multi.Match
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Padding = new MarginPadding { Right = 5 },
-                                                                Child = new OverlinedParticipants { RelativeSizeAxes = Axes.Both }
+                                                                Child = new OverlinedParticipants(Direction.Vertical) { RelativeSizeAxes = Axes.Both }
                                                             },
                                                             new Container
                                                             {

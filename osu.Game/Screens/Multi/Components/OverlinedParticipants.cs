@@ -3,15 +3,43 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Multi.Components
 {
     public class OverlinedParticipants : OverlinedDisplay
     {
-        public OverlinedParticipants()
+        public new Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            set => base.AutoSizeAxes = value;
+        }
+
+        public OverlinedParticipants(Direction direction)
             : base("Participants")
         {
-            Content.Add(new ParticipantsList { RelativeSizeAxes = Axes.Both });
+            OsuScrollContainer scroll;
+            ParticipantsList list;
+
+            Content.Add(scroll = new OsuScrollContainer(direction)
+            {
+                Child = list = new ParticipantsList()
+            });
+
+            switch (direction)
+            {
+                case Direction.Horizontal:
+                    scroll.RelativeSizeAxes = Axes.X;
+                    scroll.Height = ParticipantsList.TILE_SIZE + OsuScrollContainer.SCROLL_BAR_HEIGHT + OsuScrollContainer.SCROLL_BAR_PADDING * 2;
+                    list.AutoSizeAxes = Axes.Both;
+                    break;
+
+                case Direction.Vertical:
+                    scroll.RelativeSizeAxes = Axes.Both;
+                    list.RelativeSizeAxes = Axes.X;
+                    list.AutoSizeAxes = Axes.Y;
+                    break;
+            }
         }
 
         [BackgroundDependencyLoader]
