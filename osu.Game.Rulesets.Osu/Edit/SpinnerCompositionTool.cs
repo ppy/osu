@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Edit
     public class SpinnerCompositionTool : HitObjectCompositionTool
     {
         public SpinnerCompositionTool()
-            : base(nameof(Spinner))
+            //: base(nameof(Spinner))
+            : base("转盘")
         {
         }
 

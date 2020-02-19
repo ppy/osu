@@ -418,15 +418,35 @@
     *   [o] [Display a login placeholder in direct when user isn't logged in. #7854]
 
 ### 2020/02/19:
-*   统一以下界面的字体大小为19号:
+*   统一以下界面的部分字体大小为19号:
     *   [休息时段下方显示](osu.Game/Screens/Play/Break/BreakInfo.cs)
     *   ["/ 不计入排名 /"的显示字号](osu.Game/Screens/Play/HUD/ModDisplay.cs)
     *   [回放hud右侧工具栏](osu.Game/Screens/Play/PlayerSettings/PlayerSettingsGroup.cs)
-*   统一以下界面的字体大小为17号:
+*   统一以下界面的部分字体大小为17号:
     *   [osu.Game/Overlays/Direct/DirectGridPanel.cs](osu.Game/Overlays/Direct/DirectGridPanel.cs)
     *   [osu.Game/Screens/Select/BeatmapInfoWedge.cs](osu.Game/Screens/Select/BeatmapInfoWedge.cs)
     *   [osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs](osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs)
-*   统一以下界面的字体大小为18号:
+*   更改以下界面的部分字体大小为16号
+    *   [92行左右　osu.Game/Overlays/Profile/Sections/Ranks/DrawableProfileScore.cs](osu.Game/Overlays/Profile/Sections/Ranks/DrawableProfileScore.cs)
+*   统一以下界面的部分字体大小为18号:
     *   [osu.Game/Overlays/BeatmapSet/LeaderboardScopeSelector.cs](osu.Game/Overlays/BeatmapSet/LeaderboardScopeSelector.cs)
 *   翻译修正
     *   [osu.Game/Overlays/Profile/Sections/BeatmapsSection.cs](osu.Game/Overlays/Profile/Sections/BeatmapsSection.cs)
+
+*   整合更新
+    *   [m] [Implement BeatmapListingSearchSection component #7892]
+        *   前置pr
+            *   [Implement BeatmapSearchFilter component #7858]
+    *   [m] [Refactor RankingsOverlay to improve edge-case conditions #7893]
+
+*   翻译补全
+    *   编辑器补全
+        *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)
+        *   工具栏(TOOLBOX)
+            *   [osu.Game/Rulesets/Edit/ToolboxGroup.cs](osu.Game/Rulesets/Edit/ToolboxGroup.cs)
+            *   [osu.Game/Rulesets/Edit/Tools/SelectTool.cs](osu.Game/Rulesets/Edit/Tools/SelectTool.cs)
+            *   [osu.Game.Rulesets.Osu/Edit/HitCircleCompositionTool.cs](osu.Game.Rulesets.Osu/Edit/HitCircleCompositionTool.cs)
+            *   [osu.Game.Rulesets.Osu/Edit/SliderCompositionTool.cs](osu.Game.Rulesets.Osu/Edit/SliderCompositionTool.cs)
+            *   [osu.Game.Rulesets.Osu/Edit/SpinnerCompositionTool.cs](osu.Game.Rulesets.Osu/Edit/SpinnerCompositionTool.cs)
+            *   [osu.Game.Rulesets.Mania/Edit/HoldNoteCompositionTool.cs](osu.Game.Rulesets.Mania/Edit/HoldNoteCompositionTool.cs)
+            *   [osu.Game.Rulesets.Mania/Edit/NoteCompositionTool.cs](osu.Game.Rulesets.Mania/Edit/NoteCompositionTool.cs)

@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Edit
     public class HitCircleCompositionTool : HitObjectCompositionTool
     {
         public HitCircleCompositionTool()
-            : base(nameof(HitCircle))
+           // : base(nameof(HitCircle))
+           : base("打击圈")
         {
         }
 

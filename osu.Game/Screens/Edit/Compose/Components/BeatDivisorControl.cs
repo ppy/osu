@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
+                            new TextFlowContainer(s => s.Font = s.Font.With(size: 18))
                             {
                                 Padding = new MarginPadding { Horizontal = 15 },
                                 Text = "节拍细分",

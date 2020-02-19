@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Edit
     public class SliderCompositionTool : HitObjectCompositionTool
     {
         public SliderCompositionTool()
-            : base(nameof(Slider))
+           // : base(nameof(Slider))
+           : base("滑条")
         {
         }
 

@@ -89,10 +89,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                     new OsuSpriteText
                                                     {
                                                         Text = $"{Score.Beatmap.Version}",
-                                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
+                                                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
-                                                    new DrawableDate(Score.Date, 12)
+                                                    new DrawableDate(Score.Date, 16)
                                                     {
                                                         Colour = colourProvider.Foreground1
                                                     }

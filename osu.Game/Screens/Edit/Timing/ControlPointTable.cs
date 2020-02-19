@@ -132,13 +132,13 @@ namespace osu.Game.Screens.Edit.Timing
 
                     case DifficultyControlPoint difficulty:
 
-                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x");
+                        return new RowAttribute("难度", () => $"{difficulty.SpeedMultiplier:n2}x");
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
+                        return new RowAttribute("效果", () => $"{(effect.KiaiMode ? "+高潮 " : "")}{(effect.OmitFirstBarLine ? "+越过第一条线 " : "")}");
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("音频采样", () => $"{sample.SampleBank} {sample.SampleVolume}%");
                 }
 
                 return null;
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Timing
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black);
+                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Black);
             }
         }
 

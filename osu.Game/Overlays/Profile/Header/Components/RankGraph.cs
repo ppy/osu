@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "最近什么也没玩(°ー°〃)",
-                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular)
+                    Font = OsuFont.GetFont(size: 17, weight: FontWeight.Regular)
                 },
                 graph = new RankChartLineGraph
                 {
