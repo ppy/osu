@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
 
-            Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
+            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
