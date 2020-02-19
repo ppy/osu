@@ -75,6 +75,8 @@ namespace osu.Game.Screens.Multi
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
+            var backgroundColour = OsuColour.FromHex(@"3e3a44");
+
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -83,7 +85,7 @@ namespace osu.Game.Screens.Multi
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex(@"3e3a44"),
+                        Colour = backgroundColour,
                     },
                     new Container
                     {
@@ -118,7 +120,7 @@ namespace osu.Game.Screens.Multi
                                         Child = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(OsuColour.FromHex(@"3e3a44").Opacity(0.6f), OsuColour.FromHex(@"3e3a44"))
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
                                         },
                                     }
                                 }
