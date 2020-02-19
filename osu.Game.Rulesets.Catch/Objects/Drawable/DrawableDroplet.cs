@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
         {
             // ignore the incoming combo colour as we use a custom lookup
-            AccentColour.Value = comboColours[HitObject.IndexInBeatmap % comboColours.Count];
+            AccentColour.Value = comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
         }
     }
 }
