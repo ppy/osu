@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableDroplet : PalpableCatchHitObject<Droplet>
     {
-        private Pulp pulp;
-
         public override bool StaysOnPlate => false;
 
         public DrawableDroplet(Droplet h)
@@ -25,9 +23,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(pulp = new Pulp { Size = Size });
-
-            AccentColour.BindValueChanged(colour => { pulp.AccentColour = colour.NewValue; }, true);
+            AddInternal(new Pulp
+            {
+                Size = Size,
+                AccentColour = { BindTarget = AccentColour }
+            });
         }
     }
 }
