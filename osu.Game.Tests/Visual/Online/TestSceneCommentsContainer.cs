@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(CommentsHeader),
             typeof(DrawableComment),
             typeof(HeaderButton),
-            typeof(SortTabControl),
+            typeof(OverlaySortTabControl<>),
             typeof(ShowChildrenButton),
             typeof(DeletedCommentsCounter),
             typeof(VotePill),

@@ -26,8 +26,9 @@ namespace osu.Game.Overlays.Music
 
         private TextFlowContainer text;
         private IEnumerable<Drawable> titleSprites;
-        private ILocalisedBindableString titleBind;
-        private ILocalisedBindableString artistBind;
+
+        private ILocalisedBindableString title;
+        private ILocalisedBindableString artist;
 
         private Color4 selectedColour;
         private Color4 artistColour;
@@ -47,24 +48,24 @@ namespace osu.Game.Overlays.Music
             artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
 
-            titleBind = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));
-            artistBind = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.ArtistUnicode, Model.Metadata.Artist)));
+            title = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));
+            artist = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.ArtistUnicode, Model.Metadata.Artist)));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            artist.BindValueChanged(_ => recreateText(), true);
+
             SelectedSet.BindValueChanged(set =>
             {
-                if (set.OldValue != Model && set.NewValue != Model)
+                if (set.OldValue?.Equals(Model) != true && set.NewValue?.Equals(Model) != true)
                     return;
 
                 foreach (Drawable s in titleSprites)
-                    s.FadeColour(set.NewValue == Model ? selectedColour : Color4.White, FADE_DURATION);
+                    s.FadeColour(set.NewValue.Equals(Model) ? selectedColour : Color4.White, FADE_DURATION);
             }, true);
-
-            artistBind.BindValueChanged(_ => recreateText(), true);
         }
 
         protected override Drawable CreateContent() => text = new OsuTextFlowContainer
@@ -78,9 +79,9 @@ namespace osu.Game.Overlays.Music
             text.Clear();
 
             //space after the title to put a space between the title and artist
-            titleSprites = text.AddText(titleBind.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
+            titleSprites = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
 
-            text.AddText(artistBind.Value, sprite =>
+            text.AddText(artist.Value, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;

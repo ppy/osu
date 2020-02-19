@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -90,8 +91,19 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 foreach (var r in rounds.Prepend(new TournamentRound()))
                     add(r);
 
-                rounds.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
-                rounds.ItemsAdded += items => items.ForEach(add);
+                rounds.CollectionChanged += (_, args) =>
+                {
+                    switch (args.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            args.NewItems.Cast<TournamentRound>().ForEach(add);
+                            break;
+
+                        case NotifyCollectionChangedAction.Remove:
+                            args.OldItems.Cast<TournamentRound>().ForEach(i => Control.RemoveDropdownItem(i));
+                            break;
+                    }
+                };
             }
 
             private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
@@ -122,8 +134,19 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 foreach (var t in teams.Prepend(new TournamentTeam()))
                     add(t);
 
-                teams.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
-                teams.ItemsAdded += items => items.ForEach(add);
+                teams.CollectionChanged += (_, args) =>
+                {
+                    switch (args.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            args.NewItems.Cast<TournamentTeam>().ForEach(add);
+                            break;
+
+                        case NotifyCollectionChangedAction.Remove:
+                            args.OldItems.Cast<TournamentTeam>().ForEach(i => Control.RemoveDropdownItem(i));
+                            break;
+                    }
+                };
             }
 
             private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
