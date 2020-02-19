@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Multi.Components;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
