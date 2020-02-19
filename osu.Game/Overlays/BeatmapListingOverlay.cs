@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,6 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -33,7 +33,6 @@ namespace osu.Game.Overlays
         private RulesetStore rulesets { get; set; }
 
         private SearchBeatmapSetsRequest getSetsRequest;
-        private CancellationTokenSource cancellationToken;
 
         private Container panelsPlaceholder;
         private BeatmapListingSearchSection searchSection;
@@ -149,13 +148,23 @@ namespace osu.Game.Overlays
                 sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
                 sortDirection.Value = SortDirection.Descending;
 
-                Scheduler.AddOnce(updateSearch);
+                queueUpdateSearch(true);
             });
 
-            searchSection.Ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
-            searchSection.Category.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
-            sortCriteria.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
-            sortDirection.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
+            searchSection.Ruleset.BindValueChanged(_ => queueUpdateSearch());
+            searchSection.Category.BindValueChanged(_ => queueUpdateSearch());
+            sortCriteria.BindValueChanged(_ => queueUpdateSearch());
+            sortDirection.BindValueChanged(_ => queueUpdateSearch());
+        }
+
+        private ScheduledDelegate queryChangedDebounce;
+
+        private void queueUpdateSearch(bool queryTextChanged = false)
+        {
+            getSetsRequest?.Cancel();
+
+            queryChangedDebounce?.Cancel();
+            queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
         }
 
         private void updateSearch()
@@ -169,8 +178,6 @@ namespace osu.Game.Overlays
             if (API == null)
                 return;
 
-            getSetsRequest?.Cancel();
-            cancellationToken?.Cancel();
             previewTrackManager.StopAnyPlaying(this);
 
             panelsPlaceholder.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
@@ -192,8 +199,7 @@ namespace osu.Game.Overlays
             if (response.Total == 0)
             {
                 searchSection.BeatmapSet = null;
-
-                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder);
                 return;
             }
 
@@ -218,7 +224,7 @@ namespace osu.Game.Overlays
                 addContentToPlaceholder(loaded);
                 loaded.FadeIn(600, Easing.OutQuint);
                 searchSection.BeatmapSet = beatmaps.First();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+            });
         }
 
         private void addContentToPlaceholder(Drawable content)
@@ -231,7 +237,7 @@ namespace osu.Game.Overlays
         protected override void Dispose(bool isDisposing)
         {
             getSetsRequest?.Cancel();
-            cancellationToken?.Cancel();
+            queryChangedDebounce?.Cancel();
 
             base.Dispose(isDisposing);
         }
