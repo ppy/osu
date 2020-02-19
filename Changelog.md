@@ -408,7 +408,7 @@
     *   [m] [Bump Sentry from 2.0.2 to 2.0.3 #7877]
     *   [m] [Bump ppy.osu.Framework.NativeLibs from 2019.1104.0 to 2020.213.0 #7878]
 
-## 2020/02/18:
+### 2020/02/18:
 *   整合更新
     *   [m] [Restructure readme to better define prerequisites that are required for development only #7885]
     *   [m] [Fix osu!catch fruit exploding/dropping multiple timed is skin is changed during explode animation #7888]
@@ -416,3 +416,17 @@
     *   [m] [Fix playlist items potentially not updating to the correct selected state #7891]
 *   跟踪更新
     *   [o] [Display a login placeholder in direct when user isn't logged in. #7854]
+
+### 2020/02/19:
+*   统一以下界面的字体大小为19号:
+    *   [休息时段下方显示](osu.Game/Screens/Play/Break/BreakInfo.cs)
+    *   ["/ 不计入排名 /"的显示字号](osu.Game/Screens/Play/HUD/ModDisplay.cs)
+    *   [回放hud右侧工具栏](osu.Game/Screens/Play/PlayerSettings/PlayerSettingsGroup.cs)
+*   统一以下界面的字体大小为17号:
+    *   [osu.Game/Overlays/Direct/DirectGridPanel.cs](osu.Game/Overlays/Direct/DirectGridPanel.cs)
+    *   [osu.Game/Screens/Select/BeatmapInfoWedge.cs](osu.Game/Screens/Select/BeatmapInfoWedge.cs)
+    *   [osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs](osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs)
+*   统一以下界面的字体大小为18号:
+    *   [osu.Game/Overlays/BeatmapSet/LeaderboardScopeSelector.cs](osu.Game/Overlays/BeatmapSet/LeaderboardScopeSelector.cs)
+*   翻译修正
+    *   [osu.Game/Overlays/Profile/Sections/BeatmapsSection.cs](osu.Game/Overlays/Profile/Sections/BeatmapsSection.cs)

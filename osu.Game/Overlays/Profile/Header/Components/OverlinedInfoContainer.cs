@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     content = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 44 : 16, weight: FontWeight.Light)
+                        Font = OsuFont.GetFont(size: big ? 44 : 18, weight: FontWeight.Light)
                     },
                     new Container //Add a minimum size to the FillFlowContainer
                     {

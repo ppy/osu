@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Play
                 },
                 new OsuSpriteText
                 {
-                    Text = " ".ToQuantity(retries),
+                    Text = " ".ToQuantity(retries, ShowQuantityAs.Numeric),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),

@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.BeatmapSet
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
                 : base(value)
             {
-                Text.Font = OsuFont.GetFont(size: 16);
+                Text.Font = OsuFont.GetFont(size: 18);
             }
 
             protected override bool OnHover(HoverEvent e)

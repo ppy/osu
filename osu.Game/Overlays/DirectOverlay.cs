@@ -100,11 +100,11 @@ namespace osu.Game.Overlays
                         new OsuSpriteText
                         {
                             Text = "已找到",
-                            Font = OsuFont.GetFont(size: 15)
+                            Font = OsuFont.GetFont(size: 19)
                         },
                         resultCountsText = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 19, weight: FontWeight.Bold)
                         },
                     }
                 },

@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ 不计入排名 /",
-                    Font = OsuFont.Numeric.With(size: 16)
+                    Font = OsuFont.Numeric.With(size: 19)
                 }
             };
 

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.SearchableList
             public HeaderTabItem(T value)
                 : base(value)
             {
-                Text.Font = Text.Font.With(size: 16);
+                Text.Font = Text.Font.With(size: 18);
             }
         }
     }

@@ -351,12 +351,12 @@ namespace osu.Game.Screens.Select
                     new OsuSpriteText
                     {
                         Text = "作图者 ",
-                        Font = OsuFont.GetFont(size: 15),
+                        Font = OsuFont.GetFont(size: 17),
                     },
                     new OsuSpriteText
                     {
                         Text = metadata.Author.Username,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                     }
                 };
             }

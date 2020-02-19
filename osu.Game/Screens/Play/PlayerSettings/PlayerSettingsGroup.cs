@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
                                     Text = Title.ToUpperInvariant(),
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 19),
                                     Margin = new MarginPadding { Left = 10 },
                                 },
                                 button = new IconButton
