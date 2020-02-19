@@ -16,6 +16,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     internal class FruitPiece : CompositeDrawable
     {
+        /// <summary>
+        /// Because we're adding a border around the fruit, we need to scale down some.
+        /// </summary>
+        private const float radius_adjust = 1.1f;
+
         private Circle border;
 
         private CatchHitObject hitObject;
@@ -44,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
-                    BorderThickness = 6f * DrawableFruit.RADIUS_ADJUST,
+                    BorderThickness = 6f * radius_adjust,
                     Children = new Framework.Graphics.Drawable[]
                     {
                         new Box
@@ -82,7 +87,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private Framework.Graphics.Drawable createPulp(FruitVisualRepresentation representation)
         {
-            const float large_pulp_3 = 16f * DrawableFruit.RADIUS_ADJUST;
+            const float large_pulp_3 = 16f * radius_adjust;
             const float distance_from_centre_3 = 0.15f;
 
             const float large_pulp_4 = large_pulp_3 * 0.925f;
