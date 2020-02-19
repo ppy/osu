@@ -3,9 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Multi.Components;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.Multi.Components
 {
     public class OverlinedParticipants : OverlinedDisplay
     {
