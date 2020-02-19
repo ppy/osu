@@ -100,8 +100,8 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         Pear,
         Grape,
-        Raspberry,
         Pineapple,
+        Raspberry,
         Banana // banananananannaanana
     }
 }
