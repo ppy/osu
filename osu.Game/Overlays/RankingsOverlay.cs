@@ -135,9 +135,6 @@ namespace osu.Game.Overlays
 
         private void loadNewContent()
         {
-            if (ruleset.Value == null)
-                return;
-
             loading.Show();
 
             cancellationToken?.Cancel();
