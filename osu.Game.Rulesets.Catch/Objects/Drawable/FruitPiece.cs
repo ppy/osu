@@ -56,7 +56,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         new Box
                         {
                             AlwaysPresent = true,
-                            Colour = drawableCatchObject.AccentColour.Value,
                             Alpha = 0,
                             RelativeSizeAxes = Axes.Both
                         }
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     RelativePositionAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AccentColour = Color4.Red,
+                    AccentColour = { Value = Color4.Red },
                     Blending = BlendingParameters.Additive,
                     Alpha = 0.5f,
                     Scale = new Vector2(1.333f)
@@ -113,32 +112,32 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(small_pulp),
                                 Y = -0.34f,
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4),
                                 Position = positionAt(0, distance_from_centre_4),
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4),
                                 Position = positionAt(90, distance_from_centre_4),
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4),
                                 Position = positionAt(180, distance_from_centre_4),
                             },
                             new Pulp
                             {
                                 Size = new Vector2(large_pulp_4),
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Position = positionAt(270, distance_from_centre_4),
                             },
                         }
@@ -152,32 +151,32 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(small_pulp),
                                 Y = -0.3f,
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4),
                                 Position = positionAt(45, distance_from_centre_4),
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4),
                                 Position = positionAt(135, distance_from_centre_4),
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_4),
                                 Position = positionAt(225, distance_from_centre_4),
                             },
                             new Pulp
                             {
                                 Size = new Vector2(large_pulp_4),
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Position = positionAt(315, distance_from_centre_4),
                             },
                         }
@@ -191,26 +190,26 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(small_pulp),
                                 Y = -0.33f,
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_3),
                                 Position = positionAt(60, distance_from_centre_3),
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_3),
                                 Position = positionAt(180, distance_from_centre_3),
                             },
                             new Pulp
                             {
                                 Size = new Vector2(large_pulp_3),
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Position = positionAt(300, distance_from_centre_3),
                             },
                         }
@@ -224,26 +223,26 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(small_pulp),
                                 Y = -0.25f,
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_3),
                                 Position = positionAt(0, distance_from_centre_3),
                             },
                             new Pulp
                             {
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Size = new Vector2(large_pulp_3),
                                 Position = positionAt(120, distance_from_centre_3),
                             },
                             new Pulp
                             {
                                 Size = new Vector2(large_pulp_3),
-                                AccentColour = accentColour.Value,
+                                AccentColour = { BindTarget = accentColour },
                                 Position = positionAt(240, distance_from_centre_3),
                             },
                         }
@@ -260,13 +259,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                AccentColour = bananaColour,
+                                AccentColour = { Value = bananaColour },
                                 Size = new Vector2(small_pulp),
                                 Y = -0.3f
                             },
                             new Pulp
                             {
-                                AccentColour = bananaColour,
+                                AccentColour = { Value = bananaColour },
                                 Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
                                 Y = 0.05f,
                             },

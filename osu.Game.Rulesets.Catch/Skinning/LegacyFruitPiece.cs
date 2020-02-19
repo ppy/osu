@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
         private readonly string lookupName;
 
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private Sprite colouredSprite;
 
         public LegacyFruitPiece(string lookupName)
         {
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
             InternalChildren = new Drawable[]
             {
-                new Sprite
+                colouredSprite = new Sprite
                 {
                     Texture = skin.GetTexture(lookupName),
                     Colour = drawableObject.AccentColour.Value,
@@ -48,6 +49,13 @@ namespace osu.Game.Rulesets.Catch.Skinning
                     Origin = Anchor.Centre,
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            accentColour.BindValueChanged(colour => colouredSprite.Colour = colour.NewValue, true);
         }
     }
 }

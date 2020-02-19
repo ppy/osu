@@ -42,10 +42,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             switch (hitObject)
             {
                 case CatchHitObject catchObject:
-                    return createDrawableRepresentation?.Invoke(catchObject)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
+                    return createDrawableRepresentation?.Invoke(catchObject)?.With(o =>
+                        ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
             }
 
-            return base.CreateNestedHitObject(hitObject);
+            return null;
         }
     }
 }
