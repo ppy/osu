@@ -349,11 +349,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject is IHasComboInformation combo)
             {
                 var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
-                UpdateComboColour(comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White);
+                UpdateComboColour(comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White, comboColours);
             }
         }
 
-        protected virtual void UpdateComboColour(Color4 comboColour)
+        /// <summary>
+        /// Called when a combo colour change is proposed.
+        /// </summary>
+        /// <param name="proposedColour">The proposed combo colour, based off the combo index.</param>
+        /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
+        protected virtual void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
         {
         }
 
