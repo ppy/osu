@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko
             HandleInputStateChange(evt);
         }
 
-        public class TaikoKeyBindingContainer : RulesetKeyBindingContainer
+        protected class TaikoKeyBindingContainer : RulesetKeyBindingContainer
         {
             public event Func<UIEvent, IEnumerable<KeyBinding>, bool> BlockConditions;
 

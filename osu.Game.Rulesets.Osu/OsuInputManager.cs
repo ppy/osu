@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
-        private class OsuKeyBindingContainer : RulesetKeyBindingContainer
+        protected class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
             public bool AllowUserPresses = true;
 
