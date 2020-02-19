@@ -15,6 +15,26 @@ namespace osu.Game.Screens.Multi.Components
     {
         protected readonly Container Content;
 
+        public override Axes RelativeSizeAxes
+        {
+            get => base.RelativeSizeAxes;
+            set
+            {
+                base.RelativeSizeAxes = value;
+                updateDimensions();
+            }
+        }
+
+        public override Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            protected set
+            {
+                base.AutoSizeAxes = value;
+                updateDimensions();
+            }
+        }
+
         protected string Details
         {
             set => details.Text = value;
@@ -22,14 +42,12 @@ namespace osu.Game.Screens.Multi.Components
 
         private readonly Circle line;
         private readonly OsuSpriteText details;
+        private readonly GridContainer grid;
 
         protected OverlinedDisplay(string title)
         {
-            RelativeSizeAxes = Axes.Both;
-
-            InternalChild = new GridContainer
+            InternalChild = grid = new GridContainer
             {
-                RelativeSizeAxes = Axes.Both,
                 Content = new[]
                 {
                     new Drawable[]
@@ -62,19 +80,12 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new Drawable[]
                     {
-                        Content = new Container
-                        {
-                            Margin = new MarginPadding { Top = 5 },
-                            RelativeSizeAxes = Axes.Both
-                        }
+                        Content = new Container { Margin = new MarginPadding { Top = 5 } }
                     }
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.AutoSize),
                 }
             };
+
+            updateDimensions();
         }
 
         [BackgroundDependencyLoader]
@@ -82,6 +93,26 @@ namespace osu.Game.Screens.Multi.Components
         {
             line.Colour = colours.Yellow;
             details.Colour = colours.Yellow;
+        }
+
+        private void updateDimensions()
+        {
+            grid.RowDimensions = new[]
+            {
+                new Dimension(GridSizeMode.AutoSize),
+                new Dimension(GridSizeMode.AutoSize),
+                new Dimension(AutoSizeAxes.HasFlag(Axes.Y) ? GridSizeMode.AutoSize : GridSizeMode.Distributed),
+            };
+
+            grid.AutoSizeAxes = Axes.None;
+            grid.RelativeSizeAxes = Axes.None;
+            grid.AutoSizeAxes = AutoSizeAxes;
+            grid.RelativeSizeAxes = ~AutoSizeAxes;
+
+            Content.AutoSizeAxes = Axes.None;
+            Content.RelativeSizeAxes = Axes.None;
+            Content.AutoSizeAxes = grid.AutoSizeAxes;
+            Content.RelativeSizeAxes = grid.RelativeSizeAxes;
         }
     }
 }
