@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -40,6 +42,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             });
 
             scaleContainer.Scale = new Vector2(HitObject.Scale);
+        }
+
+        protected override void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
+        {
+            // ignore the incoming combo colour as we use a custom lookup
+            AccentColour.Value = comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
         }
 
         private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)

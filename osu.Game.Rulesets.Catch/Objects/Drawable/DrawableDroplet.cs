@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,12 +16,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         public override bool StaysOnPlate => false;
 
+        protected Container ScaleContainer;
+
         public DrawableDroplet(Droplet h)
             : base(h)
         {
         }
-
-        protected Container ScaleContainer;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -45,6 +46,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             });
 
             ScaleContainer.Scale = new Vector2(HitObject.Scale);
+        }
+
+        protected override void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
+        {
+            // ignore the incoming combo colour as we use a custom lookup
+            AccentColour.Value = comboColours[HitObject.IndexInBeatmap % comboColours.Count];
         }
     }
 }
