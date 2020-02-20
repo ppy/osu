@@ -144,68 +144,41 @@ namespace osu.Game.Overlays
             var sortCriteria = sortControl.Current;
             var sortDirection = sortControl.SortDirection;
 
-            searchSection.Query.BindValueChanged(query =>
+            searchSection.SearchParameters.BindValueChanged(parameters =>
             {
-                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
-                sortDirection.Value = SortDirection.Descending;
+                if (parameters.OldValue.Query != parameters.NewValue.Query)
+                {
+                    sortCriteria.Value = string.IsNullOrEmpty(parameters.NewValue.Query) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
+                    sortDirection.Value = SortDirection.Descending;
 
-                queueUpdateSearch(true);
+                    queueUpdateSearch(true);
+                }
+                else
+                {
+                    queueUpdateSearch();
+                }
             });
 
-            searchSection.Ruleset.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Category.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Genre.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Language.BindValueChanged(_ => queueUpdateSearch());
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
         }
 
         public void ShowTag(string tag)
         {
-            var currentQuery = searchSection.Query.Value;
-
-            if (currentQuery != tag)
-            {
-                setDefaultSearchValues();
-                searchSection.Query.Value = tag;
-            }
-
+            searchSection.SetTag(tag);
             Show();
         }
 
         public void ShowGenre(BeatmapSearchGenre genre)
         {
-            var currentGenre = searchSection.Genre.Value;
-
-            if (currentGenre != genre)
-            {
-                setDefaultSearchValues();
-                searchSection.Genre.Value = genre;
-            }
-
+            searchSection.SetGenre(genre);
             Show();
         }
 
         public void ShowLanguage(BeatmapSearchLanguage language)
         {
-            var currentLanguage = searchSection.Language.Value;
-
-            if (currentLanguage != language)
-            {
-                setDefaultSearchValues();
-                searchSection.Language.Value = language;
-            }
-
+            searchSection.SetLanguage(language);
             Show();
-        }
-
-        private void setDefaultSearchValues()
-        {
-            searchSection.Query.Value = string.Empty;
-            searchSection.Ruleset.Value = new RulesetInfo { Name = @"Any" };
-            searchSection.Category.Value = BeatmapSearchCategory.Leaderboard;
-            searchSection.Genre.Value = BeatmapSearchGenre.Any;
-            searchSection.Language.Value = BeatmapSearchLanguage.Any;
         }
 
         private ScheduledDelegate queryChangedDebounce;
@@ -233,13 +206,13 @@ namespace osu.Game.Overlays
 
             currentContent?.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
 
-            getSetsRequest = new SearchBeatmapSetsRequest(searchSection.Query.Value, searchSection.Ruleset.Value)
+            getSetsRequest = new SearchBeatmapSetsRequest(searchSection.SearchParameters.Value.Query, searchSection.SearchParameters.Value.Ruleset)
             {
-                SearchCategory = searchSection.Category.Value,
+                SearchCategory = searchSection.SearchParameters.Value.Category,
                 SortCriteria = sortControl.Current.Value,
                 SortDirection = sortControl.SortDirection.Value,
-                Genre = searchSection.Genre.Value,
-                Language = searchSection.Language.Value,
+                Genre = searchSection.SearchParameters.Value.Genre,
+                Language = searchSection.SearchParameters.Value.Language
             };
 
             getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
