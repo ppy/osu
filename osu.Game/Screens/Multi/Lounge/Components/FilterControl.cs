@@ -3,9 +3,9 @@
 
 using System.ComponentModel;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
     {
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
+        protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
         protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
         protected override SecondaryFilter DefaultCategory => SecondaryFilter.Public;
 

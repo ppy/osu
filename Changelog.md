@@ -470,3 +470,6 @@
     *   [m] [Make country names in RankingsOverlay clickable #7910]
     *   [m] [Fix osu!catch not cycling fruit as often as it should be #7898]
     *   [m] [Refactor overlined displays to support different sizing modes #7899]
+    *   [m] [Add a global multiplayer background header #7909]
+    *   [m] [Improve consistency of buttons in multiplayer #7921]
+    *   [m] [Update the multiplayer room inspector design #7900]
