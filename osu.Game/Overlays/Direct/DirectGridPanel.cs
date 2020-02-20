@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Direct
                                         new LinkFlowContainer(s =>
                                         {
                                             s.Shadow = false;
-                                            s.Font = OsuFont.GetFont(size: 17);
+                                            s.Font = OsuFont.GetFont(size: 14);
                                         }).With(d =>
                                         {
                                             d.AutoSizeAxes = Axes.Both;
@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Source,
-                                                    Font = OsuFont.GetFont(size: 17),
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                     Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,

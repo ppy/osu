@@ -35,14 +35,10 @@ namespace osu.Game.Overlays.Direct
 
     public enum DirectSortCriteria
     {
-        [Description("相关性")]
-        Relevance,
         [Description("标题")]
         Title,
         [Description("艺术家")]
         Artist,
-        [Description("作图者")]
-        Creator,
         [Description("难度较高的")]
         Difficulty,
         [Description("计入排行的")]
@@ -53,5 +49,7 @@ namespace osu.Game.Overlays.Direct
         Plays,
         [Description("我喜欢的")]
         Favourites,
+        [Description("相关性")]
+        Relevance,
     }
 }

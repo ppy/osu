@@ -457,3 +457,14 @@
     *   [osu.Game/Screens/Edit/Timing/Section.cs](osu.Game/Screens/Edit/Timing/Section.cs)
         *   原因:
             *   DifficultySection,TimingSection等的标题用的是Section下的`LabelText = typeof(T).Name.Replace(typeof(ControlPoint).Name, string.Empty)`语句，然而 `typeof(T)` , `typeof(ControlPoint)` 相关文本未找到, 或许在`osu.Framework`中?
+
+### 2020/02/20
+*   未整合
+    *   [m] [Fix possible test failures due to async loads #7917]
+        *   等待下一个lazer发布后整合
+    *   [m] [Implement BeatmapListingOverlay #7912]
+        *   存在前置pr
+*   整合更新
+    *   [m] [Fix music playlist being enumerated asynchronously #7875]
+    *   [m] [Highlight max combo on beatmap leaderboards #7913]
+    *   [m] [Make country names in RankingsOverlay clickable #7910]
