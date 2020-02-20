@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.Multi.Components
 {
     public class OverlinedPlaylist : OverlinedDisplay
     {

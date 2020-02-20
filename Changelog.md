@@ -468,3 +468,5 @@
     *   [m] [Fix music playlist being enumerated asynchronously #7875]
     *   [m] [Highlight max combo on beatmap leaderboards #7913]
     *   [m] [Make country names in RankingsOverlay clickable #7910]
+    *   [m] [Fix osu!catch not cycling fruit as often as it should be #7898]
+    *   [m] [Refactor overlined displays to support different sizing modes #7899]

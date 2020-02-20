@@ -41,7 +41,7 @@ namespace osu.Game.Online.Leaderboards
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
-        private readonly int rank;
+        private readonly int? rank;
         private readonly bool allowHighlight;
 
         private Box background;
@@ -58,7 +58,7 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
-        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
             this.rank = rank;
@@ -90,7 +90,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },
@@ -276,8 +276,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "最大连击", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "准确率", model.DisplayAccuracy)
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy)
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -374,7 +374,7 @@ namespace osu.Game.Online.Leaderboards
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (score.ID != 0)
-                    items.Add(new OsuMenuItem("删除该成绩", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+                    items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
 
                 return items.ToArray();
             }

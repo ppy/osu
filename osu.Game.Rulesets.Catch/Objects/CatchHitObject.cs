@@ -15,10 +15,16 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const double OBJECT_RADIUS = 44;
 
-        public float X { get; set; }
+        private float x;
+
+        public float X
+        {
+            get => x + XOffset;
+            set => x = value;
+        }
 
         internal bool XOffsetReversed { get; set; }
-
+        
         /// <summary>
         /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
         /// </summary>
@@ -33,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int IndexInBeatmap { get; set; }
 
-        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(ComboIndex % 4);
+        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
 
         public virtual bool NewCombo { get; set; }
 
@@ -101,8 +107,8 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         Pear,
         Grape,
-        Raspberry,
         Pineapple,
+        Raspberry,
         Banana // banananananannaanana
     }
 }

@@ -9,11 +9,31 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.Multi.Components
 {
     public abstract class OverlinedDisplay : MultiplayerComposite
     {
         protected readonly Container Content;
+
+        public override Axes RelativeSizeAxes
+        {
+            get => base.RelativeSizeAxes;
+            set
+            {
+                base.RelativeSizeAxes = value;
+                updateDimensions();
+            }
+        }
+
+        public override Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            protected set
+            {
+                base.AutoSizeAxes = value;
+                updateDimensions();
+            }
+        }
 
         protected string Details
         {
@@ -22,14 +42,12 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private readonly Circle line;
         private readonly OsuSpriteText details;
+        private readonly GridContainer grid;
 
         protected OverlinedDisplay(string title)
         {
-            RelativeSizeAxes = Axes.Both;
-
-            InternalChild = new GridContainer
+            InternalChild = grid = new GridContainer
             {
-                RelativeSizeAxes = Axes.Both,
                 Content = new[]
                 {
                     new Drawable[]
@@ -62,19 +80,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                     },
                     new Drawable[]
                     {
-                        Content = new Container
-                        {
-                            Margin = new MarginPadding { Top = 5 },
-                            RelativeSizeAxes = Axes.Both
-                        }
+                        Content = new Container { Margin = new MarginPadding { Top = 5 } }
                     }
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.AutoSize),
                 }
             };
+
+            updateDimensions();
         }
 
         [BackgroundDependencyLoader]
@@ -82,6 +93,24 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             line.Colour = colours.Yellow;
             details.Colour = colours.Yellow;
+        }
+
+        private void updateDimensions()
+        {
+            grid.RowDimensions = new[]
+            {
+                new Dimension(GridSizeMode.AutoSize),
+                new Dimension(GridSizeMode.AutoSize),
+                new Dimension(AutoSizeAxes.HasFlag(Axes.Y) ? GridSizeMode.AutoSize : GridSizeMode.Distributed),
+            };
+
+            // Assigning to none is done so that setting auto and relative size modes doesn't cause exceptions to be thrown
+            grid.AutoSizeAxes = Content.AutoSizeAxes = Axes.None;
+            grid.RelativeSizeAxes = Content.RelativeSizeAxes = Axes.None;
+
+            // Auto-size when required, otherwise eagerly relative-size
+            grid.AutoSizeAxes = Content.AutoSizeAxes = AutoSizeAxes;
+            grid.RelativeSizeAxes = Content.RelativeSizeAxes = ~AutoSizeAxes;
         }
     }
 }
