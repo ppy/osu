@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     },
                                                                     new Drawable[]
                                                                     {
-                                                                        new OsuButton
+                                                                        new PurpleTriangleButton
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
@@ -447,10 +447,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 Menu.MaxHeight = 100;
             }
 
-            protected override string GenerateItemText(TimeSpan item)
-            {
-                return item.Humanize();
-            }
+            protected override string GenerateItemText(TimeSpan item) => item.Humanize();
         }
     }
 }
