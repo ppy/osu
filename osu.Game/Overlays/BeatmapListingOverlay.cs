@@ -233,14 +233,14 @@ namespace osu.Game.Overlays
 
             currentContent?.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
 
-            getSetsRequest = new SearchBeatmapSetsRequest(
-                searchSection.Query.Value,
-                searchSection.Ruleset.Value,
-                searchSection.Category.Value,
-                sortControl.Current.Value,
-                sortControl.SortDirection.Value,
-                searchSection.Genre.Value,
-                searchSection.Language.Value);
+            getSetsRequest = new SearchBeatmapSetsRequest(searchSection.Query.Value, searchSection.Ruleset.Value)
+            {
+                SearchCategory = searchSection.Category.Value,
+                SortCriteria = sortControl.Current.Value,
+                SortDirection = sortControl.SortDirection.Value,
+                Genre = searchSection.Genre.Value,
+                Language = searchSection.Language.Value,
+            };
 
             getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
 

@@ -254,11 +254,11 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            getSetsRequest = new SearchBeatmapSetsRequest(
-                currentQuery.Value,
-                ((FilterControl)Filter).Ruleset.Value,
-                Filter.DisplayStyleControl.Dropdown.Current.Value,
-                Filter.Tabs.Current.Value); //todo: sort direction (?)
+            getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value, ((FilterControl)Filter).Ruleset.Value)
+            {
+                SearchCategory = Filter.DisplayStyleControl.Dropdown.Current.Value,
+                SortCriteria = Filter.Tabs.Current.Value
+            };
 
             getSetsRequest.Success += response =>
             {
