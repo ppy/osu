@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Multi
                                             new HeaderBackgroundSprite
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                Height = 400 // Keep a static height so the header doesn't change as it's resized
+                                                Height = 400 // Keep a static height so the header doesn't change as it's resized between subscreens
                                             },
                                         }
                                     },
