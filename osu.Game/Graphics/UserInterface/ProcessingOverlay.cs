@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (State.Value == Visibility.Visible)
             {
-                // ensure we don't leave the targetin a bad state.
+                // ensure we don't leave the target in a bad state.
                 dimTarget?.FadeColour(Color4.White, transition_duration);
             }
         }
