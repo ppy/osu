@@ -35,6 +35,7 @@ namespace osu.Game.Overlays
         private SearchBeatmapSetsRequest getSetsRequest;
 
         private Container panelsPlaceholder;
+        private Drawable currentContent;
         private BeatmapListingSearchSection searchSection;
         private BeatmapListingSortTabControl sortControl;
 
@@ -124,6 +125,8 @@ namespace osu.Game.Overlays
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,
+                                                AutoSizeEasing = Easing.Out,
+                                                AutoSizeDuration = 200,
                                                 Padding = new MarginPadding { Horizontal = 20 },
                                             }
                                         }
@@ -180,7 +183,7 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            panelsPlaceholder.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
+            currentContent?.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
 
             getSetsRequest = new SearchBeatmapSetsRequest(
                 searchSection.Query.Value,
@@ -222,16 +225,15 @@ namespace osu.Game.Overlays
             LoadComponentAsync(newPanels, loaded =>
             {
                 addContentToPlaceholder(loaded);
-                loaded.FadeIn(600, Easing.OutQuint);
                 searchSection.BeatmapSet = beatmaps.First();
             });
         }
 
         private void addContentToPlaceholder(Drawable content)
         {
-            panelsPlaceholder.Clear();
-            panelsPlaceholder.FadeColour(Color4.White);
-            panelsPlaceholder.Add(content);
+            currentContent?.FadeOut(100, Easing.OutQuint).Expire();
+            panelsPlaceholder.Add(currentContent = content);
+            currentContent.FadeIn(200, Easing.OutQuint);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -248,6 +250,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 250;
+                Alpha = 0;
                 Margin = new MarginPadding { Top = 15 };
             }
 
