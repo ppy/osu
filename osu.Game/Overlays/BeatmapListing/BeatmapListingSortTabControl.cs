@@ -8,16 +8,17 @@ using osu.Framework.Graphics;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Input.Events;
+using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSortTabControl : OverlaySortTabControl<BeatmapSortCriteria>
+    public class BeatmapListingSortTabControl : OverlaySortTabControl<DirectSortCriteria>
     {
         public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>(Overlays.SortDirection.Descending);
 
         public BeatmapListingSortTabControl()
         {
-            Current.Value = BeatmapSortCriteria.Ranked;
+            Current.Value = DirectSortCriteria.Ranked;
         }
 
         protected override SortTabControl CreateControl() => new BeatmapSortTabControl
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
-            protected override TabItem<BeatmapSortCriteria> CreateTabItem(BeatmapSortCriteria value) => new BeatmapSortTabItem(value)
+            protected override TabItem<DirectSortCriteria> CreateTabItem(DirectSortCriteria value) => new BeatmapSortTabItem(value)
             {
                 SortDirection = { BindTarget = SortDirection }
             };
@@ -39,12 +40,12 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
-            public BeatmapSortTabItem(BeatmapSortCriteria value)
+            public BeatmapSortTabItem(DirectSortCriteria value)
                 : base(value)
             {
             }
 
-            protected override TabButton CreateTabButton(BeatmapSortCriteria value) => new BeatmapTabButton(value)
+            protected override TabButton CreateTabButton(DirectSortCriteria value) => new BeatmapTabButton(value)
             {
                 Active = { BindTarget = Active },
                 SortDirection = { BindTarget = SortDirection }
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             private readonly SpriteIcon icon;
 
-            public BeatmapTabButton(BeatmapSortCriteria value)
+            public BeatmapTabButton(DirectSortCriteria value)
                 : base(value)
             {
                 Add(icon = new SpriteIcon
@@ -103,16 +104,5 @@ namespace osu.Game.Overlays.BeatmapListing
                 return base.OnClick(e);
             }
         }
-    }
-
-    public enum BeatmapSortCriteria
-    {
-        Title,
-        Artist,
-        Difficulty,
-        Ranked,
-        Rating,
-        Plays,
-        Favourites,
     }
 }
