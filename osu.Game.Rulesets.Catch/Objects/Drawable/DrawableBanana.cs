@@ -16,10 +16,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private Color4? colour;
 
-        protected override void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
+        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
         {
             // override any external colour changes with banananana
-            AccentColour.Value = (colour ??= getBananaColour());
+            return colour ??= getBananaColour();
         }
 
         private Color4 getBananaColour()
