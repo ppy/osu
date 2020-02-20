@@ -146,7 +146,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Text = $@"{score.MaxCombo:N0}x",
-                    Font = OsuFont.GetFont(size: text_size)
+                    Font = OsuFont.GetFont(size: text_size),
+                    Colour = score.MaxCombo == score.Beatmap?.MaxCombo ? highAccuracyColour : Color4.White
                 }
             });
 
