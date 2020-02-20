@@ -47,7 +47,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load(OsuColour colours)
         {
             background.Colour = OsuColour.FromHex(@"28242d");
-            startButton.BackgroundColour = colours.Green;
         }
     }
 }
