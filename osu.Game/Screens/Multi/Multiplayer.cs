@@ -24,6 +24,7 @@ using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -375,7 +376,7 @@ namespace osu.Game.Screens.Multi
             }
         }
 
-        public class CreateRoomButton : TriangleButton
+        public class CreateRoomButton : PurpleTriangleButton
         {
             public CreateRoomButton()
             {
@@ -390,9 +391,6 @@ namespace osu.Game.Screens.Multi
             [BackgroundDependencyLoader]
             private void load()
             {
-                BackgroundColour = OsuColour.FromHex(@"593790");
-                Triangles.ColourLight = OsuColour.FromHex(@"7247b6");
-                Triangles.ColourDark = OsuColour.FromHex(@"593790");
                 Triangles.TriangleScale = 1.5f;
 
                 Text = "Create room";
