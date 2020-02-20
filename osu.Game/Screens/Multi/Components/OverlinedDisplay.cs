@@ -104,15 +104,13 @@ namespace osu.Game.Screens.Multi.Components
                 new Dimension(AutoSizeAxes.HasFlag(Axes.Y) ? GridSizeMode.AutoSize : GridSizeMode.Distributed),
             };
 
-            grid.AutoSizeAxes = Axes.None;
-            grid.RelativeSizeAxes = Axes.None;
-            grid.AutoSizeAxes = AutoSizeAxes;
-            grid.RelativeSizeAxes = ~AutoSizeAxes;
+            // Assigning to none is done so that setting auto and relative size modes doesn't cause exceptions to be thrown
+            grid.AutoSizeAxes = Content.AutoSizeAxes = Axes.None;
+            grid.RelativeSizeAxes = Content.RelativeSizeAxes = Axes.None;
 
-            Content.AutoSizeAxes = Axes.None;
-            Content.RelativeSizeAxes = Axes.None;
-            Content.AutoSizeAxes = grid.AutoSizeAxes;
-            Content.RelativeSizeAxes = grid.RelativeSizeAxes;
+            // Auto-size when required, otherwise eagerly relative-size
+            grid.AutoSizeAxes = Content.AutoSizeAxes = AutoSizeAxes;
+            grid.RelativeSizeAxes = Content.RelativeSizeAxes = ~AutoSizeAxes;
         }
     }
 }
