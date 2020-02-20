@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<BeatmapSearchCategory> Category => categoryFilter.Current;
 
+        public Bindable<BeatmapSearchGenre> Genre => genreFilter.Current;
+
         public BeatmapSetInfo BeatmapSet
         {
             set
@@ -43,6 +45,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchTextBox textBox;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<BeatmapSearchCategory> categoryFilter;
+        private readonly BeatmapSearchSmallFilterRow<BeatmapSearchGenre> genreFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -98,6 +101,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 {
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<BeatmapSearchCategory>(@"Categories"),
+                                    genreFilter = new BeatmapSearchSmallFilterRow<BeatmapSearchGenre>(@"Genre"),
                                 }
                             }
                         }
