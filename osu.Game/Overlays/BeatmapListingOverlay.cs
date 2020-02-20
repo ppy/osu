@@ -158,6 +158,26 @@ namespace osu.Game.Overlays
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
         }
 
+        public void ShowTag(string tag)
+        {
+            var currentQuery = searchSection.Query.Value;
+
+            if (currentQuery != tag)
+            {
+                setDefaultSearchValues();
+                searchSection.Query.Value = tag;
+            }
+
+            Show();
+        }
+
+        private void setDefaultSearchValues()
+        {
+            searchSection.Query.Value = string.Empty;
+            searchSection.Ruleset.Value = new RulesetInfo { Name = @"Any" };
+            searchSection.Category.Value = BeatmapSearchCategory.Leaderboard;
+        }
+
         private ScheduledDelegate queryChangedDebounce;
 
         private void queueUpdateSearch(bool queryTextChanged = false)
