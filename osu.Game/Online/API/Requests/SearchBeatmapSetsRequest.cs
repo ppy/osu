@@ -76,35 +76,35 @@ namespace osu.Game.Online.API.Requests
 
     public enum BeatmapSearchGenre
     {
-        Any,
-        Unspecified,
+        Any = 0,
+        Unspecified = 1,
 
         [Description("Video Game")]
-        VideoGame,
-        Anime,
-        Rock,
-        Pop,
-        Other,
-        Novelty,
+        VideoGame = 2,
+        Anime = 3,
+        Rock = 4,
+        Pop = 5,
+        Other = 6,
+        Novelty = 7,
 
         [Description("Hip Hop")]
         HipHop = 9,
-        Electronic
+        Electronic = 10
     }
 
     public enum BeatmapSearchLanguage
     {
         Any,
-        English = 2,
-        Chinese = 4,
-        French = 7,
+        Other,
+        English,
+        Japanese,
+        Chinese,
+        Instrumental,
+        Korean,
+        French,
         German,
-        Italian = 11,
-        Japanese = 3,
-        Korean = 6,
-        Spanish = 10,
-        Swedish = 9,
-        Instrumental = 5,
-        Other = 1
+        Swedish,
+        Spanish,
+        Italian
     }
 }
