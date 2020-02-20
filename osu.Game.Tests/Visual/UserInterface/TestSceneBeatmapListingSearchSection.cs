@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Online.API.Requests;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -32,6 +33,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText query;
             OsuSpriteText ruleset;
             OsuSpriteText category;
+            OsuSpriteText genre;
+            OsuSpriteText language;
 
             Add(section = new BeatmapListingSearchSection
             {
@@ -49,12 +52,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                     query = new OsuSpriteText(),
                     ruleset = new OsuSpriteText(),
                     category = new OsuSpriteText(),
+                    genre = new OsuSpriteText(),
+                    language = new OsuSpriteText(),
                 }
             });
 
-            section.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
-            section.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
-            section.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
+            section.SearchParameters.BindValueChanged(parameters =>
+            {
+                query.Text = $"Query: {parameters.NewValue.Query}";
+                ruleset.Text = $"Ruleset: {parameters.NewValue.Ruleset}";
+                category.Text = $"Category: {parameters.NewValue.Category}";
+                genre.Text = $"Genre: {parameters.NewValue.Genre}";
+                language.Text = $"Language: {parameters.NewValue.Language}";
+            }, true);
         }
 
         [Test]
@@ -63,6 +73,17 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Set beatmap", () => section.BeatmapSet = beatmap_set);
             AddStep("Set beatmap (no cover)", () => section.BeatmapSet = no_cover_beatmap_set);
             AddStep("Set null beatmap", () => section.BeatmapSet = null);
+        }
+
+        [Test]
+        public void TestParametersSet()
+        {
+            AddStep("Set big black tag", () => section.SetTag("big black"));
+            AddAssert("Check query is big black", () => section.SearchParameters.Value.Query == "big black");
+            AddStep("Set anime genre", () => section.SetGenre(BeatmapSearchGenre.Anime));
+            AddAssert("Check genre is anime", () => section.SearchParameters.Value.Genre == BeatmapSearchGenre.Anime);
+            AddStep("Set japanese language", () => section.SetLanguage(BeatmapSearchLanguage.Japanese));
+            AddAssert("Check language is japanese", () => section.SearchParameters.Value.Language == BeatmapSearchLanguage.Japanese);
         }
 
         private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo

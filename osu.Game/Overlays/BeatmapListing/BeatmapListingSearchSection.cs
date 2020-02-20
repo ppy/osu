@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
 using osuTK;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Drawables;
@@ -19,15 +18,7 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapListingSearchSection : CompositeDrawable
     {
-        public Bindable<string> Query => textBox.Current;
-
-        public Bindable<RulesetInfo> Ruleset => modeFilter.Current;
-
-        public Bindable<BeatmapSearchCategory> Category => categoryFilter.Current;
-
-        public Bindable<BeatmapSearchGenre> Genre => genreFilter.Current;
-
-        public Bindable<BeatmapSearchLanguage> Language => languageFilter.Current;
+        public Bindable<BeatmapSearchParameters> SearchParameters = new Bindable<BeatmapSearchParameters>();
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -113,13 +104,35 @@ namespace osu.Game.Overlays.BeatmapListing
                 }
             });
 
-            Category.Value = BeatmapSearchCategory.Leaderboard;
+            categoryFilter.Current.Value = BeatmapSearchCategory.Leaderboard;
+
+            textBox.Current.BindValueChanged(_ => changeSearchParameters());
+            modeFilter.Current.BindValueChanged(_ => changeSearchParameters());
+            categoryFilter.Current.BindValueChanged(_ => changeSearchParameters());
+            genreFilter.Current.BindValueChanged(_ => changeSearchParameters());
+            languageFilter.Current.BindValueChanged(_ => changeSearchParameters(), true);
         }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             background.Colour = colourProvider.Dark6;
+        }
+
+        public void SetTag(string tag) => textBox.Current.Value = tag;
+
+        public void SetGenre(BeatmapSearchGenre genre) => genreFilter.Current.Value = genre;
+
+        public void SetLanguage(BeatmapSearchLanguage language) => languageFilter.Current.Value = language;
+
+        private void changeSearchParameters()
+        {
+            SearchParameters.Value = new BeatmapSearchParameters(
+                textBox.Current.Value,
+                modeFilter.Current.Value,
+                categoryFilter.Current.Value,
+                genreFilter.Current.Value,
+                languageFilter.Current.Value);
         }
 
         private class BeatmapSearchTextBox : SearchTextBox
