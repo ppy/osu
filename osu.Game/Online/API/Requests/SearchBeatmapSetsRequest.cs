@@ -16,15 +16,17 @@ namespace osu.Game.Online.API.Requests
         private readonly BeatmapSearchCategory searchCategory;
         private readonly DirectSortCriteria sortCriteria;
         private readonly SortDirection direction;
+        private readonly BeatmapSearchGenre genre;
         private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending, BeatmapSearchGenre genre = BeatmapSearchGenre.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
             this.searchCategory = searchCategory;
             this.sortCriteria = sortCriteria;
             this.direction = direction;
+            this.genre = genre;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -36,6 +38,10 @@ namespace osu.Game.Online.API.Requests
                 req.AddParameter("m", ruleset.ID.Value.ToString());
 
             req.AddParameter("s", searchCategory.ToString().ToLowerInvariant());
+
+            if (genre != BeatmapSearchGenre.Any)
+                req.AddParameter("g", ((int)genre).ToString());
+
             req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
             return req;
@@ -61,5 +67,23 @@ namespace osu.Game.Online.API.Requests
 
         [Description("My Maps")]
         Mine,
+    }
+
+    public enum BeatmapSearchGenre
+    {
+        Any,
+        Unspecified,
+
+        [Description("Video Game")]
+        Game,
+        Anime,
+        Rock,
+        Pop,
+        Other,
+        Novelty,
+
+        [Description("Hip Hop")]
+        Hiphop = 9,
+        Electronic
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Overlays;
 using NUnit.Framework;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -28,6 +29,12 @@ namespace osu.Game.Tests.Visual.Online
         public void TestShowTag()
         {
             AddStep("Show Rem tag", () => overlay.ShowTag("Rem"));
+        }
+
+        [Test]
+        public void TestShowGenre()
+        {
+            AddStep("Show Anime genre", () => overlay.ShowGenre(BeatmapSearchGenre.Anime));
         }
 
         [Test]

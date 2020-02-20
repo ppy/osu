@@ -154,6 +154,7 @@ namespace osu.Game.Overlays
 
             searchSection.Ruleset.BindValueChanged(_ => queueUpdateSearch());
             searchSection.Category.BindValueChanged(_ => queueUpdateSearch());
+            searchSection.Genre.BindValueChanged(_ => queueUpdateSearch());
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
         }
@@ -171,11 +172,25 @@ namespace osu.Game.Overlays
             Show();
         }
 
+        public void ShowGenre(BeatmapSearchGenre genre)
+        {
+            var currentGenre = searchSection.Genre.Value;
+
+            if (currentGenre != genre)
+            {
+                setDefaultSearchValues();
+                searchSection.Genre.Value = genre;
+            }
+
+            Show();
+        }
+
         private void setDefaultSearchValues()
         {
             searchSection.Query.Value = string.Empty;
             searchSection.Ruleset.Value = new RulesetInfo { Name = @"Any" };
             searchSection.Category.Value = BeatmapSearchCategory.Leaderboard;
+            searchSection.Genre.Value = BeatmapSearchGenre.Any;
         }
 
         private ScheduledDelegate queryChangedDebounce;
@@ -208,7 +223,8 @@ namespace osu.Game.Overlays
                 searchSection.Ruleset.Value,
                 searchSection.Category.Value,
                 sortControl.Current.Value,
-                sortControl.SortDirection.Value);
+                sortControl.SortDirection.Value,
+                searchSection.Genre.Value);
 
             getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
 
