@@ -75,8 +75,6 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.Items.BindTo(beatmapSets);
-
             filter.Search.OnCommit = (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
@@ -87,7 +85,13 @@ namespace osu.Game.Overlays.Music
                     beatmap.Value.Track.Restart();
                 }
             };
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
         }
 
