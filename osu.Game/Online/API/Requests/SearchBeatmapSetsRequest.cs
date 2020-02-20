@@ -80,7 +80,7 @@ namespace osu.Game.Online.API.Requests
         Unspecified,
 
         [Description("Video Game")]
-        Game,
+        VideoGame,
         Anime,
         Rock,
         Pop,
@@ -88,7 +88,7 @@ namespace osu.Game.Online.API.Requests
         Novelty,
 
         [Description("Hip Hop")]
-        Hiphop = 9,
+        HipHop = 9,
         Electronic
     }
 
@@ -96,7 +96,7 @@ namespace osu.Game.Online.API.Requests
     {
         Any,
         English = 2,
-        Chilnese = 4,
+        Chinese = 4,
         French = 7,
         German,
         Italian = 11,
@@ -104,7 +104,7 @@ namespace osu.Game.Online.API.Requests
         Korean = 6,
         Spanish = 10,
         Swedish = 9,
-        Instrumantal = 5,
+        Instrumental = 5,
         Other = 1
     }
 }
