@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -71,10 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
                 if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
-                {
-                    Debug.Assert(userScore.Position != null);
-                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position.Value));
-                }
+                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
             });
         }
 
