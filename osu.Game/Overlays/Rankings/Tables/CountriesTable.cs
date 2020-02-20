@@ -9,6 +9,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -61,18 +62,35 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
-        private class CountryName : OsuSpriteText
+        private class CountryName : OsuHoverContainer
         {
+            protected override IEnumerable<Drawable> EffectTargets => new[] { text };
+
+            [Resolved(canBeNull: true)]
+            private RankingsOverlay rankings { get; set; }
+
+            private readonly OsuSpriteText text;
+            private readonly Country country;
+
             public CountryName(Country country)
             {
-                Font = OsuFont.GetFont(size: 12);
-                Text = country.FullName ?? string.Empty;
+                this.country = country;
+
+                AutoSizeAxes = Axes.Both;
+                Add(text = new OsuSpriteText
+                {
+                    Font = OsuFont.GetFont(size: 12),
+                    Text = country.FullName ?? string.Empty,
+                });
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                Colour = colourProvider.Light2;
+                IdleColour = colourProvider.Light2;
+                HoverColour = colourProvider.Content2;
+
+                Action = () => rankings?.ShowCountry(country);
             }
         }
     }
