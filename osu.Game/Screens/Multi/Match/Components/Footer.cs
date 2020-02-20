@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
@@ -22,7 +21,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         private readonly Drawable background;
-        private readonly OsuButton startButton;
 
         public Footer()
         {
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             InternalChildren = new[]
             {
                 background = new Box { RelativeSizeAxes = Axes.Both },
-                startButton = new ReadyButton
+                new ReadyButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
