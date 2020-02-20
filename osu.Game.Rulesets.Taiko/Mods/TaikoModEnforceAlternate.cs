@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 healthProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0 && lastBlocked != null;
+        protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0 && lastBlocked != null;
 
-        protected virtual bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
+        protected bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
         {
             if (e is KeyDownEvent ev && !healthProcessor.IsBreakTime.Value)
             {
@@ -67,9 +67,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     var rimActions = rims.Select(c => c.GetAction<TaikoAction>());
                     var centreActions = centres.Select(c => c.GetAction<TaikoAction>());
 
-                    bool bothLeft = (rims.Count == 1 && rimActions.First() == TaikoAction.LeftRim) && (centres.Count == 1 && centreActions.First() == TaikoAction.LeftCentre);
-                    bool bothRight = (rims.Count == 1 && rimActions.First() == TaikoAction.RightRim) && (centres.Count == 1 && centreActions.First() == TaikoAction.RightCentre);
-
                     if (RepeatOnColorChange.Value)
                     {
                         if (!rims.Any())
@@ -83,6 +80,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                     if (combos.Count > 1)
                     {
+                        bool bothLeft = (rims.Count == 1 && rimActions.First() == TaikoAction.LeftRim) && (centres.Count == 1 && centreActions.First() == TaikoAction.LeftCentre);
+                        bool bothRight = (rims.Count == 1 && rimActions.First() == TaikoAction.RightRim) && (centres.Count == 1 && centreActions.First() == TaikoAction.RightCentre);
+
                         var blocked = combos.Find(c => c.GetAction<TaikoAction>() == lastBlocked);
 
                         if (bothLeft || bothRight)
@@ -103,9 +103,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         }
                         else
                         {
-                            if (single == TaikoAction.LeftRim || single == TaikoAction.RightRim)
+                            if (rims.Count == 2)
                                 blockedRim = null;
-                            else
+
+                            if (centres.Count == 2)
                                 blockedCentre = null;
                         }
 
@@ -131,14 +132,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     }
 
                     if (rims.Count == 1)
-                    {
-                        blockedRim = rims.First().GetAction<TaikoAction>();
-                    }
+                        blockedRim = rimActions.First();
 
                     if (centres.Count == 1)
-                    {
-                        blockedCentre = centres.First().GetAction<TaikoAction>();
-                    }
+                        blockedCentre = centreActions.First();
                 }
             }
 

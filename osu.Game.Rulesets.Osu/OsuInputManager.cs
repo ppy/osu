@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Input.Bindings;
@@ -17,12 +16,6 @@ namespace osu.Game.Rulesets.Osu
         public bool AllowUserPresses
         {
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
-        }
-
-        public event Func<UIEvent, IEnumerable<KeyBinding>, bool> BlockConditions
-        {
-            add => ((OsuKeyBindingContainer)KeyBindingContainer).BlockConditions += value;
-            remove => ((OsuKeyBindingContainer)KeyBindingContainer).BlockConditions -= value;
         }
 
         /// <summary>
@@ -46,11 +39,9 @@ namespace osu.Game.Rulesets.Osu
             return base.Handle(e);
         }
 
-        protected class OsuKeyBindingContainer : RulesetKeyBindingContainer
+        private class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
             public bool AllowUserPresses = true;
-
-            public event Func<UIEvent, IEnumerable<KeyBinding>, bool> BlockConditions;
 
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -60,9 +51,6 @@ namespace osu.Game.Rulesets.Osu
             protected override bool Handle(UIEvent e)
             {
                 if (!AllowUserPresses) return false;
-
-                if (BlockConditions?.Invoke(e, KeyBindings) == true)
-                    return false;
 
                 return base.Handle(e);
             }

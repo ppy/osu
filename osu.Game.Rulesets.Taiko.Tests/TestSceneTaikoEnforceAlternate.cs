@@ -5,9 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Testing;
+using osu.Framework.Allocation;
 using osu.Framework.Utils;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
@@ -22,30 +23,25 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override bool AllowFail => true;
 
         private TaikoModEnforceAlternate mod;
-        private readonly LocalInputManager inputManager;
+
+        private List<DatabasedKeyBinding> bindings;
 
         public TestSceneTaikoEnforceAlternate()
             : base(new TaikoRuleset())
         {
-            base.Content.Add(inputManager = new LocalInputManager());
         }
 
-        [SetUpSteps]
-        public override void SetUpSteps()
+        [BackgroundDependencyLoader]
+        private void load(KeyBindingStore keyBindings)
         {
+            var taikoBindings = keyBindings.Query(Ruleset.Value.ID, 0);
+
+            bindings = taikoBindings.Where(b => Enum.IsDefined(typeof(Key), (Key)b.KeyCombination.Keys.First())).ToList();
         }
 
         [Test]
         public void TestFailOnRepeat()
         {
-            AddStep("turn on fail on repeat", () =>
-            {
-                mod = new TaikoModEnforceAlternate();
-                mod.CauseFail.Value = true;
-            });
-
-            base.SetUpSteps();
-
             bool judged = false;
             AddStep("setup judgements", () =>
             {
@@ -53,12 +49,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 ((ScoreAccessiblePlayer)Player).ScoreProcessor.NewJudgement += b => judged = true;
             });
 
-            Key bind = Key.F;
+            var bind = Key.F;
             AddStep("get random bind", () =>
             {
                 var actions = Enum.GetValues(typeof(TaikoAction));
                 var randomAction = (TaikoAction)actions.GetValue(RNG.Next() % actions.Length);
-                bind = (Key)inputManager.KeyBindings.ToList().Find(b => b.GetAction<TaikoAction>() == randomAction).KeyCombination.Keys.First();
+                bind = (Key)bindings.Find(b => b.GetAction<TaikoAction>() == randomAction).KeyCombination.Keys.First();
             });
 
             AddStep("double press", () =>
@@ -76,7 +72,10 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
+            mod = new TaikoModEnforceAlternate();
+            mod.CauseFail.Value = true;
             SelectedMods.Value = new Mod[] { mod };
+
             return new ScoreAccessiblePlayer();
         }
 
@@ -88,29 +87,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             }
 
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-        }
-
-        private class LocalInputManager : TaikoInputManager
-        {
-            public IEnumerable<KeyBinding> KeyBindings => ((LocalKeyBindingContainer)KeyBindingContainer).KeyBindings;
-
-            public LocalInputManager()
-                : base(new TaikoRuleset().RulesetInfo)
-            {
-            }
-
-            protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
-                => new LocalKeyBindingContainer(ruleset, variant, unique);
-
-            private class LocalKeyBindingContainer : TaikoKeyBindingContainer
-            {
-                public new IEnumerable<KeyBinding> KeyBindings => base.KeyBindings;
-
-                public LocalKeyBindingContainer(RulesetInfo info, int variant, SimultaneousBindingMode unique)
-                    : base(info, variant, unique)
-                {
-                }
-            }
         }
     }
 }

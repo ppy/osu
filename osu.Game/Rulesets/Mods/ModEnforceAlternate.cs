@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
 
-        [SettingSource("Fail on repeat tap", "Fail when you don't alternate")]
+        [SettingSource("Fail on repeat tap")]
         public Bindable<bool> CauseFail { get; } = new BindableBool
         {
             Default = false,

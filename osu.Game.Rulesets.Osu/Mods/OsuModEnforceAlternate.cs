@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 healthProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0;
+        protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0;
 
-        protected virtual bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
+        protected bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
         {
             if (!healthProcessor.IsBreakTime.Value)
             {

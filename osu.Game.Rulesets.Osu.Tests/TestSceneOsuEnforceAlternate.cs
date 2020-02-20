@@ -5,9 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Testing;
+using osu.Framework.Allocation;
 using osu.Framework.Utils;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -22,29 +23,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override bool AllowFail => true;
 
         private OsuModEnforceAlternate mod;
-        private readonly LocalInputManager inputManager;
 
-        public TestSceneOsuEnforceAlternate()
-        {
-            base.Content.Add(inputManager = new LocalInputManager());
-        }
+        private List<DatabasedKeyBinding> bindings;
 
-        [SetUpSteps]
-        public override void SetUpSteps()
+        [BackgroundDependencyLoader]
+        private void load(KeyBindingStore keyBindings)
         {
+            var osuBindings = keyBindings.Query(Ruleset.Value.ID, 0);
+
+            bindings = osuBindings.Where(b => Enum.IsDefined(typeof(Key), (Key)b.KeyCombination.Keys.First())).ToList();
         }
 
         [Test]
         public void TestFailOnRepeat()
         {
-            AddStep("turn on fail on repeat", () =>
-            {
-                mod = new OsuModEnforceAlternate();
-                mod.CauseFail.Value = true;
-            });
-
-            base.SetUpSteps();
-
             bool judged = false;
             AddStep("setup judgements", () =>
             {
@@ -52,12 +44,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 ((ScoreAccessiblePlayer)Player).ScoreProcessor.NewJudgement += b => judged = true;
             });
 
-            var bind = Key.F;
+            var bind = Key.Z;
             AddStep("get random bind", () =>
             {
                 var actions = Enum.GetValues(typeof(OsuAction));
                 var randomAction = (OsuAction)actions.GetValue(RNG.Next() % actions.Length);
-                bind = (Key)inputManager.KeyBindings.ToList().Find(b => b.GetAction<OsuAction>() == randomAction).KeyCombination.Keys.First();
+                bind = (Key)bindings.Find(b => b.GetAction<OsuAction>() == randomAction).KeyCombination.Keys.First();
             });
 
             AddStep("double click", () =>
@@ -75,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
+            mod = new OsuModEnforceAlternate();
+            mod.CauseFail.Value = true;
             SelectedMods.Value = new Mod[] { mod };
 
             return new ScoreAccessiblePlayer();
@@ -88,29 +82,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
 
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-        }
-
-        private class LocalInputManager : OsuInputManager
-        {
-            public IEnumerable<KeyBinding> KeyBindings => ((LocalKeyBindingContainer)KeyBindingContainer).KeyBindings;
-
-            public LocalInputManager()
-                : base(new OsuRuleset().RulesetInfo)
-            {
-            }
-
-            protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
-                => new LocalKeyBindingContainer(ruleset, variant, unique);
-
-            private class LocalKeyBindingContainer : OsuKeyBindingContainer
-            {
-                public new IEnumerable<KeyBinding> KeyBindings => base.KeyBindings;
-
-                public LocalKeyBindingContainer(RulesetInfo info, int variant, SimultaneousBindingMode unique)
-                    : base(info, variant, unique)
-                {
-                }
-            }
         }
     }
 }
