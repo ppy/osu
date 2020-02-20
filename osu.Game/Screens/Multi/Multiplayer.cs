@@ -4,14 +4,16 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -19,6 +21,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
@@ -62,6 +65,9 @@ namespace osu.Game.Screens.Multi
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
+        private readonly Drawable header;
+        private readonly Drawable headerBackground;
+
         public Multiplayer()
         {
             Anchor = Anchor.Centre;
@@ -69,36 +75,58 @@ namespace osu.Game.Screens.Multi
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
+            var backgroundColour = OsuColour.FromHex(@"3e3a44");
+
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Container
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"3e3a44"),
-                            },
-                            new Triangles
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColourLight = OsuColour.FromHex(@"3c3842"),
-                                ColourDark = OsuColour.FromHex(@"393540"),
-                                TriangleScale = 5,
-                            },
-                        },
+                        Colour = backgroundColour,
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
+                        Children = new[]
+                        {
+                            header = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 400,
+                                Children = new[]
+                                {
+                                    headerBackground = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Width = 1.25f,
+                                        Masking = true,
+                                        Children = new Drawable[]
+                                        {
+                                            new HeaderBackgroundSprite
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 400 // Keep a static height so the header doesn't change as it's resized between subscreens
+                                            },
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Bottom = -1 }, // 1px padding to avoid a 1px gap due to masking
+                                        Child = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
+                                        },
+                                    }
+                                }
+                            },
+                            screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
+                        }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
@@ -259,7 +287,10 @@ namespace osu.Game.Screens.Multi
             Beatmap.ValueChanged -= updateTrack;
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen) => subScreenChanged(newScreen);
+        private void screenPushed(IScreen lastScreen, IScreen newScreen)
+        {
+            subScreenChanged(newScreen);
+        }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
@@ -271,6 +302,19 @@ namespace osu.Game.Screens.Multi
 
         private void subScreenChanged(IScreen newScreen)
         {
+            switch (newScreen)
+            {
+                case LoungeSubScreen _:
+                    header.Delay(MultiplayerSubScreen.RESUME_TRANSITION_DELAY).ResizeHeightTo(400, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(0, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
+                    break;
+
+                case MatchSubScreen _:
+                    header.ResizeHeightTo(135, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
+                    break;
+            }
+
             updatePollingRate(isIdle.Value);
             createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);
 
@@ -325,6 +369,16 @@ namespace osu.Game.Screens.Multi
                 SecondWaveColour = OsuColour.FromHex(@"554075");
                 ThirdWaveColour = OsuColour.FromHex(@"44325e");
                 FourthWaveColour = OsuColour.FromHex(@"392850");
+            }
+        }
+
+        private class HeaderBackgroundSprite : MultiplayerBackgroundSprite
+        {
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
+
+            private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+            {
+                protected override double TransformDuration => 200;
             }
         }
     }
