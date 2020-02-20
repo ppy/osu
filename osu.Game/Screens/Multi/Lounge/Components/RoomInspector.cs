@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
@@ -157,7 +158,15 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Horizontal = 10 },
-                                Child = new ParticipantsList { RelativeSizeAxes = Axes.Both }
+                                Child = new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new ParticipantsList
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y
+                                    }
+                                }
                             }
                         }
                     }
