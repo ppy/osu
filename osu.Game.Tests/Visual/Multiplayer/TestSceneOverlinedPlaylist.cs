@@ -27,12 +27,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             }
 
-            Add(new Container
+            Add(new OverlinedPlaylist(false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(500),
-                Child = new OverlinedPlaylist(false)
             });
         }
     }
