@@ -38,6 +38,12 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestShowLanguage()
+        {
+            AddStep("Show Japanese language", () => overlay.ShowLanguage(BeatmapSearchLanguage.Japanese));
+        }
+
+        [Test]
         public void TestShow()
         {
             AddStep("Show", overlay.Show);
