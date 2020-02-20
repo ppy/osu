@@ -12,24 +12,31 @@ namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
+        public BeatmapSearchCategory SearchCategory { get; set; }
+
+        public DirectSortCriteria SortCriteria { get; set; }
+
+        public SortDirection SortDirection { get; set; }
+
+        public BeatmapSearchGenre Genre { get; set; }
+
+        public BeatmapSearchLanguage Language { get; set; }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
-        private readonly BeatmapSearchCategory searchCategory;
-        private readonly DirectSortCriteria sortCriteria;
-        private readonly SortDirection direction;
-        private readonly BeatmapSearchGenre genre;
-        private readonly BeatmapSearchLanguage language;
-        private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending, BeatmapSearchGenre genre = BeatmapSearchGenre.Any, BeatmapSearchLanguage language = BeatmapSearchLanguage.Any)
+        private string directionString => SortDirection == SortDirection.Descending ? @"desc" : @"asc";
+
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
-            this.searchCategory = searchCategory;
-            this.sortCriteria = sortCriteria;
-            this.direction = direction;
-            this.genre = genre;
-            this.language = language;
+
+            SearchCategory = BeatmapSearchCategory.Any;
+            SortCriteria = DirectSortCriteria.Ranked;
+            SortDirection = SortDirection.Descending;
+            Genre = BeatmapSearchGenre.Any;
+            Language = BeatmapSearchLanguage.Any;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -40,15 +47,15 @@ namespace osu.Game.Online.API.Requests
             if (ruleset.ID.HasValue)
                 req.AddParameter("m", ruleset.ID.Value.ToString());
 
-            req.AddParameter("s", searchCategory.ToString().ToLowerInvariant());
+            req.AddParameter("s", SearchCategory.ToString().ToLowerInvariant());
 
-            if (genre != BeatmapSearchGenre.Any)
-                req.AddParameter("g", ((int)genre).ToString());
+            if (Genre != BeatmapSearchGenre.Any)
+                req.AddParameter("g", ((int)Genre).ToString());
 
-            if (language != BeatmapSearchLanguage.Any)
-                req.AddParameter("l", ((int)language).ToString());
+            if (Language != BeatmapSearchLanguage.Any)
+                req.AddParameter("l", ((int)Language).ToString());
 
-            req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");
+            req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
             return req;
         }
