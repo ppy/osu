@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
 using osuTK;
 using osuTK.Graphics;
 
@@ -79,9 +81,30 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 TabContainer.Spacing = new Vector2(10, 0);
 
-                if (typeof(T).IsEnum)
+                var type = typeof(T);
+
+                if (type.IsEnum)
                 {
-                    foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                    if (Attribute.GetCustomAttribute(type, typeof(HasOrderedElementsAttribute)) != null)
+                    {
+                        var enumValues = Enum.GetValues(type).Cast<T>().ToArray();
+                        var enumNames = Enum.GetNames(type);
+
+                        int[] enumPositions = Array.ConvertAll(enumNames, n =>
+                        {
+                            var orderAttr = (OrderAttribute)type.GetField(n).GetCustomAttributes(typeof(OrderAttribute), false)[0];
+                            return orderAttr.Order;
+                        });
+
+                        Array.Sort(enumPositions, enumValues);
+
+                        foreach (var val in enumValues)
+                            AddItem(val);
+
+                        return;
+                    }
+
+                    foreach (var val in (T[])Enum.GetValues(type))
                         AddItem(val);
                 }
             }
