@@ -25,6 +25,12 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestShowTag()
+        {
+            AddStep("Show Rem tag", () => overlay.ShowTag("Rem"));
+        }
+
+        [Test]
         public void TestShow()
         {
             AddStep("Show", overlay.Show);
