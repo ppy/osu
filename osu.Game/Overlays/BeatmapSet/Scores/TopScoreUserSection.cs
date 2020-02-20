@@ -112,9 +112,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        public int ScorePosition
+        public int? ScorePosition
         {
-            set => rankText.Text = $"#{value}";
+            set => rankText.Text = value == null ? "-" : $"#{value}";
         }
 
         /// <summary>

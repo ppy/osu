@@ -2,10 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
@@ -27,12 +26,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             }
 
-            Add(new Container
+            Add(new OverlinedPlaylist(false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(500),
-                Child = new OverlinedPlaylist(false)
             });
         }
     }
