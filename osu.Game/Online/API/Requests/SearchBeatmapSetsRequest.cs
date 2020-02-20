@@ -17,9 +17,10 @@ namespace osu.Game.Online.API.Requests
         private readonly DirectSortCriteria sortCriteria;
         private readonly SortDirection direction;
         private readonly BeatmapSearchGenre genre;
+        private readonly BeatmapSearchLanguage language;
         private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending, BeatmapSearchGenre genre = BeatmapSearchGenre.Any)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending, BeatmapSearchGenre genre = BeatmapSearchGenre.Any, BeatmapSearchLanguage language = BeatmapSearchLanguage.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
@@ -27,6 +28,7 @@ namespace osu.Game.Online.API.Requests
             this.sortCriteria = sortCriteria;
             this.direction = direction;
             this.genre = genre;
+            this.language = language;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -41,6 +43,9 @@ namespace osu.Game.Online.API.Requests
 
             if (genre != BeatmapSearchGenre.Any)
                 req.AddParameter("g", ((int)genre).ToString());
+
+            if (language != BeatmapSearchLanguage.Any)
+                req.AddParameter("l", ((int)language).ToString());
 
             req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
@@ -85,5 +90,21 @@ namespace osu.Game.Online.API.Requests
         [Description("Hip Hop")]
         Hiphop = 9,
         Electronic
+    }
+
+    public enum BeatmapSearchLanguage
+    {
+        Any,
+        English = 2,
+        Chilnese = 4,
+        French = 7,
+        German,
+        Italian = 11,
+        Japanese = 3,
+        Korean = 6,
+        Spanish = 10,
+        Swedish = 9,
+        Instrumantal = 5,
+        Other = 1
     }
 }
