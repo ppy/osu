@@ -59,6 +59,33 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
             foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
+            AddStep("null personal best position", showPersonalBestWithNullPosition);
+        }
+
+        private void showPersonalBestWithNullPosition()
+        {
+            leaderboard.TopScore = new APILegacyUserTopScoreInfo
+            {
+                Position = null,
+                Score = new APILegacyScoreInfo
+                {
+                    Rank = ScoreRank.XH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
+                    User = new User
+                    {
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        Country = new Country
+                        {
+                            FullName = @"Spain",
+                            FlagName = @"ES",
+                        },
+                    },
+                }
+            };
         }
 
         private void showPersonalBest()
