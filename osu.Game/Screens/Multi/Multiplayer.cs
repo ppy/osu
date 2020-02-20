@@ -305,13 +305,13 @@ namespace osu.Game.Screens.Multi
             switch (newScreen)
             {
                 case LoungeSubScreen _:
-                    header.ResizeHeightTo(400, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-                    headerBackground.MoveToX(0, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+                    header.Delay(MultiplayerSubScreen.RESUME_TRANSITION_DELAY).ResizeHeightTo(400, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(0, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
 
                 case MatchSubScreen _:
-                    header.ResizeHeightTo(135, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-                    headerBackground.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+                    header.ResizeHeightTo(135, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
             }
 
