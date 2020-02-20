@@ -125,8 +125,6 @@ namespace osu.Game.Overlays
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,
-                                                AutoSizeEasing = Easing.Out,
-                                                AutoSizeDuration = 200,
                                                 Padding = new MarginPadding { Horizontal = 20 },
                                             }
                                         }
@@ -231,7 +229,19 @@ namespace osu.Game.Overlays
 
         private void addContentToPlaceholder(Drawable content)
         {
-            currentContent?.FadeOut(100, Easing.OutQuint).Expire();
+            Drawable lastContent = currentContent;
+
+            if (lastContent != null)
+            {
+                lastContent.FadeOut(100, Easing.OutQuint).Expire();
+
+                // Consider the case when the new content is smaller than the last content.
+                // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
+                // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
+                // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
+                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
+            }
+
             panelsPlaceholder.Add(currentContent = content);
             currentContent.FadeIn(200, Easing.OutQuint);
         }
