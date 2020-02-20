@@ -104,6 +104,8 @@ namespace osu.Game.Overlays.BeatmapListing
                     }
                 }
             });
+
+            Category.Value = BeatmapSearchCategory.Leaderboard;
         }
 
         [BackgroundDependencyLoader]
