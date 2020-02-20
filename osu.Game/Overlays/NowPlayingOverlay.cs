@@ -58,6 +58,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         public NowPlayingOverlay()
         {
             Width = 400;
@@ -65,7 +68,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Children = new Drawable[]
             {
@@ -182,14 +185,14 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-
-            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
-            playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
+            playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
             beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
 
