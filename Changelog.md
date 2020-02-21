@@ -494,3 +494,6 @@
     *   [m] [Bump DiscordRichPresence from 1.0.147 to 1.0.150 #7929]
     *   [m] [Split out pulp formations into individual classes #7911]
     *   [m] [Implement CommentEditor component #7795]
+
+*   翻译修正
+    *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs 第141行](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)

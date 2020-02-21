@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Edit.Timing
                         return new RowAttribute("效果", () => $"{(effect.KiaiMode ? "+高潮 " : "")}{(effect.OmitFirstBarLine ? "+越过第一条线 " : "")}");
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("音频采样", () => $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("音频 / 采样", () => $"{sample.SampleBank} {sample.SampleVolume}%");
                 }
 
                 return null;
