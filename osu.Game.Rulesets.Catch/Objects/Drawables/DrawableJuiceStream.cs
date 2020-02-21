@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                         ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
             }
 
-            return null;
+            throw new ArgumentException($"{nameof(hitObject)} must be of type {nameof(CatchHitObject)}.");
         }
     }
 }

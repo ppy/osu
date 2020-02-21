@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            Scale /= 2;
+            ScaleContainer.Scale /= 2;
         }
     }
 }
