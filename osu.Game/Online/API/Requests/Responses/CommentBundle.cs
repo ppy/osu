@@ -35,6 +35,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 userVotes = value;
 
                 Comments.ForEach(c => c.IsVoted = value.Contains(c.Id));
+                IncludedComments.ForEach(c => c.IsVoted = value.Contains(c.Id));
             }
         }
 
@@ -51,6 +52,15 @@ namespace osu.Game.Online.API.Requests.Responses
                 value.ForEach(u =>
                 {
                     Comments.ForEach(c =>
+                    {
+                        if (c.UserId == u.Id)
+                            c.User = u;
+
+                        if (c.EditedById == u.Id)
+                            c.EditedUser = u;
+                    });
+
+                    IncludedComments.ForEach(c =>
                     {
                         if (c.UserId == u.Id)
                             c.User = u;
