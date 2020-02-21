@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -15,36 +16,47 @@ namespace osu.Game.Graphics.UserInterface
     public class LoadingAnimation : VisibilityContainer
     {
         private readonly SpriteIcon spinner;
-        private readonly SpriteIcon spinnerShadow;
 
-        private const float spin_duration = 600;
-        private const float transition_duration = 200;
+        protected Container MainContents;
 
-        public LoadingAnimation()
+        protected const float TRANSITION_DURATION = 500;
+
+        private const float spin_duration = 900;
+
+        /// <summary>
+        /// Constuct a new loading spinner.
+        /// </summary>
+        /// <param name="withBox"></param>
+        public LoadingAnimation(bool withBox = false)
         {
-            Size = new Vector2(20);
+            Size = new Vector2(60);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Children = new Drawable[]
+            Child = MainContents = new Container
             {
-                spinnerShadow = new SpriteIcon
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 20,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Position = new Vector2(1, 1),
-                    Colour = Color4.Black,
-                    Alpha = 0.4f,
-                    Icon = FontAwesome.Solid.CircleNotch
-                },
-                spinner = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Solid.CircleNotch
+                    new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = withBox ? 0.7f : 0
+                    },
+                    spinner = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(withBox ? 0.6f : 1),
+                        RelativeSizeAxes = Axes.Both,
+                        Icon = FontAwesome.Solid.CircleNotch
+                    }
                 }
             };
         }
@@ -53,12 +65,42 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            spinner.Spin(spin_duration, RotationDirection.Clockwise);
-            spinnerShadow.Spin(spin_duration, RotationDirection.Clockwise);
+            rotate();
         }
 
-        protected override void PopIn() => this.FadeIn(transition_duration * 2, Easing.OutQuint);
+        protected override void Update()
+        {
+            base.Update();
 
-        protected override void PopOut() => this.FadeOut(transition_duration, Easing.OutQuint);
+            MainContents.CornerRadius = MainContents.DrawWidth / 4;
+        }
+
+        protected override void PopIn()
+        {
+            if (Alpha < 0.5f)
+                // reset animation if the user can't see us.
+                rotate();
+
+            MainContents.ScaleTo(1, TRANSITION_DURATION, Easing.OutQuint);
+            this.FadeIn(TRANSITION_DURATION * 2, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            MainContents.ScaleTo(0.8f, TRANSITION_DURATION / 2, Easing.In);
+            this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
+        }
+
+        private void rotate()
+        {
+            spinner.Spin(spin_duration * 4, RotationDirection.Clockwise);
+
+            MainContents.RotateTo(0).Then()
+                        .RotateTo(90, spin_duration, Easing.InOutQuart).Then()
+                        .RotateTo(180, spin_duration, Easing.InOutQuart).Then()
+                        .RotateTo(270, spin_duration, Easing.InOutQuart).Then()
+                        .RotateTo(360, spin_duration, Easing.InOutQuart).Then()
+                        .Loop();
+        }
     }
 }

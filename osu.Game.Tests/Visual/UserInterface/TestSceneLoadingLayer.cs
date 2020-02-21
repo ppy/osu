@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,10 +14,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneProcessingOverlay : OsuTestScene
+    public class TestSceneLoadingLayer : OsuTestScene
     {
         private Drawable dimContent;
-        private ProcessingOverlay overlay;
+        private LoadingLayer overlay;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(LoadingAnimation) };
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -49,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new TriangleButton { Text = "puush me", Width = 200, Action = () => { } },
                             }
                         },
-                        overlay = new ProcessingOverlay(dimContent),
+                        overlay = new LoadingLayer(dimContent),
                     }
                 },
             };
