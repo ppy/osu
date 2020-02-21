@@ -6,20 +6,27 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// An overlay that will consume all available space and block input when required.
+    /// An overlay that will show a loading overlay and completely block input to an area.
+    /// Also optionally dims target elements.
     /// Useful for disabling all elements in a form and showing we are waiting on a response, for instance.
     /// </summary>
     public class ProcessingOverlay : VisibilityContainer
     {
-        private const float transition_duration = 200;
+        private readonly Drawable dimTarget;
 
-        public ProcessingOverlay()
+        private Container loadingBox;
+
+        private const float transition_duration = 600;
+
+        public ProcessingOverlay(Drawable dimTarget = null)
         {
+            this.dimTarget = dimTarget;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -28,29 +35,54 @@ namespace osu.Game.Graphics.UserInterface
         {
             InternalChildren = new Drawable[]
             {
-                new Box
+                loadingBox = new Container
                 {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.9f,
+                    Size = new Vector2(80),
+                    Scale = new Vector2(0.8f),
+                    Masking = true,
+                    CornerRadius = 15,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.Black,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new LoadingAnimation { State = { Value = Visibility.Visible } }
+                    }
                 },
-                new LoadingAnimation { State = { Value = Visibility.Visible } }
             };
         }
 
-        protected override bool Handle(UIEvent e)
-        {
-            return true;
-        }
+        protected override bool Handle(UIEvent e) => true;
 
         protected override void PopIn()
         {
-            this.FadeIn(transition_duration * 2, Easing.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint);
+            loadingBox.ScaleTo(1, transition_duration, Easing.OutElastic);
+
+            dimTarget?.FadeColour(OsuColour.Gray(0.5f), transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             this.FadeOut(transition_duration, Easing.OutQuint);
+            loadingBox.ScaleTo(0.8f, transition_duration / 2, Easing.In);
+
+            dimTarget?.FadeColour(Color4.White, transition_duration, Easing.OutQuint);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (State.Value == Visibility.Visible)
+            {
+                // ensure we don't leave the target in a bad state.
+                dimTarget?.FadeColour(Color4.White, transition_duration, Easing.OutQuint);
+            }
         }
     }
 }
