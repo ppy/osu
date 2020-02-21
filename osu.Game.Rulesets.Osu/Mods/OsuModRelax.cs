@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
 
         /// <summary>

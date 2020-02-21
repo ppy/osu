@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModRelax : ModBlockFail
     {
-        public override string Name => "自动点击";
+        public override string Name => "休闲";
         public override string Acronym => "RX";
         public override string Description => @"你不用点击,只需移动,让你用来点击的手指放松一下";
         public override IconUsage? Icon => OsuIcon.ModRelax;
