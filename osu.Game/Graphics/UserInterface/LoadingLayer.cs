@@ -11,7 +11,7 @@ using osuTK.Graphics;
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
-    /// An overlay that will show a loading overlay and completely block input to an area.
+    /// A layer that will show a loading spinner and completely block input to an area.
     /// Also optionally dims target elements.
     /// Useful for disabling all elements in a form and showing we are waiting on a response, for instance.
     /// </summary>
@@ -19,6 +19,11 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly Drawable dimTarget;
 
+        /// <summary>
+        /// Constuct a new loading spinner.
+        /// </summary>
+        /// <param name="dimTarget">An optional target to dim when displayed.</param>
+        /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
         public LoadingLayer(Drawable dimTarget = null, bool withBox = true)
             : base(withBox)
         {
