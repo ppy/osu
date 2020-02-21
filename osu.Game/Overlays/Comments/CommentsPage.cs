@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            appendComments(null, commentBundle);
+            appendComments(commentBundle);
         }
 
         private DrawableComment getDrawableComment(Comment comment)
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Comments
         {
             var request = new GetCommentsRequest(CommentableId.Value, Type.Value, Sort.Value, page, drawableComment.Comment.Id);
 
-            request.Success += response => Schedule(() => appendComments(drawableComment, response));
+            request.Success += response => Schedule(() => appendComments(response));
 
             api.PerformAsync(request);
         }
@@ -89,16 +89,13 @@ namespace osu.Game.Overlays.Comments
         private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
 
         /// <summary>
-        /// Appends retrieved comments to the subtree rooted at a parenting <see cref="DrawableComment"/>.
+        /// Appends retrieved comments to the subtree of comments in this page.
         /// </summary>
-        /// <param name="parent">The parenting <see cref="DrawableComment"/>.</param>
         /// <param name="bundle">The bundle of comments to add.</param>
-        private void appendComments([CanBeNull] DrawableComment parent, [NotNull] CommentBundle bundle)
+        private void appendComments([NotNull] CommentBundle bundle)
         {
-            var orphaned = new List<Comment>();
-
-            foreach (var topLevel in bundle.Comments)
-                addNewComment(topLevel);
+            foreach (var child in bundle.Comments)
+                addNewComment(child);
 
             foreach (var child in bundle.IncludedComments)
             {
@@ -108,10 +105,6 @@ namespace osu.Game.Overlays.Comments
 
                 addNewComment(child);
             }
-
-            // Comments whose parents did not previously have corresponding drawables, are now guaranteed that their parents have corresponding drawables.
-            foreach (var o in orphaned)
-                addNewComment(o);
 
             void addNewComment(Comment comment)
             {
@@ -124,15 +117,9 @@ namespace osu.Game.Overlays.Comments
                 }
                 else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
                 {
-                    // The comment's parent already has a corresponding drawable, so add the parent<->child links.
+                    // The comment's parent has already been seen, so the parent<-> child links can be added.
                     comment.ParentComment = parentDrawable.Comment;
                     parentDrawable.Replies.Add(drawableComment);
-                }
-                else
-                {
-                    // The comment's parent does not have a corresponding drawable yet, so keep it as orphaned for the time being.
-                    // Note that this comment's corresponding drawable has already been created by this point, so future children will be able to be added without being orphaned themselves.
-                    orphaned.Add(comment);
                 }
             }
         }
