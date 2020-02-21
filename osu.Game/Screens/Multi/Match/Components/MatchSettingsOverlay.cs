@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             public OsuSpriteText ErrorText;
 
             private OsuSpriteText typeLabel;
-            private ProcessingOverlay processingOverlay;
+            private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
 
             [Resolved(CanBeNull = true)]
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             },
                         }
                     },
-                    processingOverlay = new ProcessingOverlay(dimContent)
+                    loadingLayer = new LoadingLayer(dimContent)
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
@@ -346,19 +346,19 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 manager?.CreateRoom(currentRoom.Value, onSuccess, onError);
 
-                processingOverlay.Show();
+                loadingLayer.Show();
             }
 
             private void hideError() => ErrorText.FadeOut(50);
 
-            private void onSuccess(Room room) => processingOverlay.Hide();
+            private void onSuccess(Room room) => loadingLayer.Hide();
 
             private void onError(string text)
             {
                 ErrorText.Text = text;
                 ErrorText.FadeIn(50);
 
-                processingOverlay.Hide();
+                loadingLayer.Hide();
             }
         }
 
