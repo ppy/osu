@@ -504,6 +504,11 @@
     *   [m] [Add CommentsContainer to ChangelogOverlay #7930]
     *   [m] [Add ability to load long comment trees in CommentsContainer #7786]
     *   [m] [Fix indices in beatmap not being transferred to children #7897]
+    *   [m] [Update with framework-side bindable list changes #7874]
+    *   [m] [Support null leaderboard position #7919]
+    *   [m] [Implement BeatmapListingSortTabControl component #7864]
+    *   [m] [Implement BeatmapListingOverlay #7912]
+    *   [m] [Update design of username and country name in RankingsOverlay #7820]
 
 *   翻译修正
     *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs 第141行](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)
