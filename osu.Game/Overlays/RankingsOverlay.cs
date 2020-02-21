@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using System.Threading;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
 
         private readonly BasicScrollContainer scrollFlow;
         private readonly Container contentContainer;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
         private readonly Box background;
         private readonly RankingsOverlayHeader header;
 
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.X,
                                         Margin = new MarginPadding { Bottom = 10 }
                                     },
-                                    loading = new DimmedLoadingLayer(),
+                                    loading = new LoadingLayer(contentContainer),
                                 }
                             }
                         }

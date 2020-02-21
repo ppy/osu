@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,17 +14,21 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneProcessingOverlay : OsuTestScene
+    public class TestSceneLoadingLayer : OsuTestScene
     {
         private Drawable dimContent;
-        private ProcessingOverlay overlay;
+        private LoadingLayer overlay;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(LoadingSpinner) };
+
+        private Container content;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             Children = new[]
             {
-                new Container
+                content = new Container
                 {
                     Size = new Vector2(300),
                     Anchor = Anchor.Centre,
@@ -49,14 +55,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new TriangleButton { Text = "puush me", Width = 200, Action = () => { } },
                             }
                         },
-                        overlay = new ProcessingOverlay(dimContent),
+                        overlay = new LoadingLayer(dimContent),
                     }
                 },
             };
         });
 
         [Test]
-        public void ShowHide()
+        public void TestShowHide()
         {
             AddAssert("not visible", () => !overlay.IsPresent);
 
@@ -70,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void ContentRestoreOnDispose()
+        public void TestContentRestoreOnDispose()
         {
             AddAssert("not visible", () => !overlay.IsPresent);
 
@@ -78,9 +84,23 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("wait for content dim", () => dimContent.Colour != Color4.White);
 
-            AddStep("hide", () => overlay.Expire());
+            AddStep("expire", () => overlay.Expire());
 
             AddUntilStep("wait for content restore", () => dimContent.Colour == Color4.White);
+        }
+
+        [Test]
+        public void TestLargeArea()
+        {
+            AddStep("show", () =>
+            {
+                content.RelativeSizeAxes = Axes.Both;
+                content.Size = new Vector2(1);
+
+                overlay.Show();
+            });
+
+            AddStep("hide", () => overlay.Hide());
         }
     }
 }

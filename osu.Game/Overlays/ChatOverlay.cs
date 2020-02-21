@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
-        private LoadingAnimation loading;
+        private LoadingSpinner loading;
 
         private FocusedTextBox textbox;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays
                                         }
                                     }
                                 },
-                                loading = new LoadingAnimation(),
+                                loading = new LoadingSpinner(),
                             }
                         },
                         tabsArea = new TabsArea
