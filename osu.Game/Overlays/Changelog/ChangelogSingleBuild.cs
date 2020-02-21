@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(CancellationToken? cancellation, IAPIProvider api)
+        private void load(CancellationToken? cancellation, IAPIProvider api, OverlayColourProvider colourProvider)
         {
             bool complete = false;
 
@@ -63,10 +64,14 @@ namespace osu.Game.Overlays.Changelog
                 Children = new Drawable[]
                 {
                     new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
-                    comments = new CommentsContainer
+                    new Box
                     {
-                        Margin = new MarginPadding { Top = 10 }
-                    }
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Colour = colourProvider.Background6,
+                        Margin = new MarginPadding { Top = 30 },
+                    },
+                    comments = new CommentsContainer()
                 };
 
                 comments.ShowComments(CommentableType.Build, build.Id);
