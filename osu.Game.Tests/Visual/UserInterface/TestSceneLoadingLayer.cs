@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private Drawable dimContent;
         private LoadingLayer overlay;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(LoadingAnimation) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(LoadingSpinner) };
 
         [SetUp]
         public void SetUp() => Schedule(() =>
