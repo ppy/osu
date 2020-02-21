@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -51,7 +50,6 @@ namespace osu.Game.Screens.Select.Details
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(4f),
                 Children = new[]
                 {
                     FirstValue = new StatisticRow(), //circle size/key amount
@@ -199,6 +197,7 @@ namespace osu.Game.Screens.Select.Details
                 this.forceDecimalPlaces = forceDecimalPlaces;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Vertical = 2.5f };
 
                 Children = new Drawable[]
                 {
@@ -206,6 +205,8 @@ namespace osu.Game.Screens.Select.Details
                     {
                         Width = name_width,
                         AutoSizeAxes = Axes.Y,
+                        // osu-web uses 1.25 line-height, which at 12px font size makes the element 14px tall - this compentates that difference
+                        Padding = new MarginPadding { Vertical = 1 },
                         Child = name = new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 17)

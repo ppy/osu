@@ -20,8 +20,9 @@ namespace osu.Game.Overlays.BeatmapSet
     public class Info : Container
     {
         private const float transition_duration = 250;
-        private const float metadata_width = 225;
+        private const float metadata_width = 175;
         private const float spacing = 20;
+        private const float base_height = 220;
 
         private readonly Box successRateBackground;
         private readonly Box background;
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet
             OsuSpriteText unrankedPlaceholder;
 
             RelativeSizeAxes = Axes.X;
-            Height = 220;
+            Height = base_height;
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
             {
@@ -135,6 +136,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 var setHasLeaderboard = b.NewValue?.OnlineInfo?.Status > 0;
                 successRate.Alpha = setHasLeaderboard ? 1 : 0;
                 unrankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
+                Height = setHasLeaderboard ? 270 : base_height;
             };
         }
 
@@ -176,8 +178,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = title,
-                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.Black),
-                        Margin = new MarginPadding { Top = 20 },
+                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                        Margin = new MarginPadding { Top = 15 },
                     },
                     textFlow = new OsuTextFlowContainer
                     {

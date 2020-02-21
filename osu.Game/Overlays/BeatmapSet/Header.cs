@@ -144,12 +144,15 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     },
                                                 }
                                             },
-                                            artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true) },
+                                            artist = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
+                                                Margin = new MarginPadding { Bottom = 20 }
+                                            },
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Margin = new MarginPadding { Top = 20 },
                                                 Child = author = new AuthorInfo(),
                                             },
                                             beatmapAvailability = new BeatmapAvailability(),

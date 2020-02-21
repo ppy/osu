@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Vertical = 10 },
+                        Padding = new MarginPadding { Vertical = 10 },
                     },
                 },
                 new DetailBox

@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 new Container
                 {
                     AutoSizeAxes = Axes.Both,
-                    CornerRadius = 3,
+                    CornerRadius = 4,
                     Masking = true,
                     Child = avatar = new UpdateableAvatar
                     {
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Colour = Color4.Black.Opacity(0.25f),
                         Type = EdgeEffectType.Shadow,
-                        Radius = 3,
+                        Radius = 4,
                         Offset = new Vector2(0f, 1f),
                     },
                 },
@@ -118,12 +118,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = $"{first} ",
-                        Font = OsuFont.GetFont(size: 13)
+                        Font = OsuFont.GetFont(size: 17)
                     },
                     new OsuSpriteText
                     {
                         Text = second,
-                        Font = secondFont.With(size: 13)
+                        Font = secondFont.With(size: 17)
                     },
                 };
             }

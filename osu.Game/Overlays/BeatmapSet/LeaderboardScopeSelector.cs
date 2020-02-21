@@ -3,7 +3,6 @@
 
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -37,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
                 : base(value)
             {
-                Text.Font = OsuFont.GetFont(size: 18);
+               // Text.Font = OsuFont.GetFont(size: 18);
             }
 
             protected override bool OnHover(HoverEvent e)

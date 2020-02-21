@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Origin = Anchor.Centre,
                         Size = new Vector2(70),
                         Masking = true,
-                        CornerRadius = 5,
+                        CornerRadius = 4,
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,

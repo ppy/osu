@@ -71,7 +71,8 @@ namespace osu.Game.Screens.Select.Details
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "评分情况",
-                            Font = OsuFont.GetFont(size: 17)//第一次翻译时修改
+                            Font = OsuFont.GetFont(size: 17),//第一次翻译时修改
+                            Margin = new MarginPadding { Bottom = 5 },
                         },
                         ratingsBar = new Bar
                         {
@@ -83,6 +84,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Bottom = 10 },
                             Children = new[]
                             {
                                 negativeRatings = new OsuSpriteText
@@ -105,7 +107,7 @@ namespace osu.Game.Screens.Select.Details
                             Origin = Anchor.TopCentre,
                             Text = "评分分布",
                             Font = OsuFont.GetFont(size: 17),//第一次翻译时修改
-                            Margin = new MarginPadding { Top = 10, Bottom = 5 },
+                            Margin = new MarginPadding { Bottom = 5 },
                         },
                     },
                 },

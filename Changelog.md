@@ -478,3 +478,4 @@
 *   整合更新
     *   [m] [Improve visual appearance of ProcessingOverlay #7922]
     *   [m] [Add tooltips with precise dates to beatmap set overlay #7779]
+    *   [m] [Adjust font sizes and spacing in BeatmapSetOverlay to match osu-web values #7863]

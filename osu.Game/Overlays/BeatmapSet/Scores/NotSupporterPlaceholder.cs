@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
+                Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = @"你需要成为一名osu!supporter来查看好友和国内/区内排名!",
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                     },
                     text = new LinkFlowContainer(t => t.Font = t.Font.With(size: 18))
                     {
