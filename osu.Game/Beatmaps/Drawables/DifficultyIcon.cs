@@ -150,12 +150,12 @@ namespace osu.Game.Beatmaps.Drawables
                 };
             }
 
-            private OsuColour colours;
+            [Resolved]
+            private OsuColour colours { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
-                this.colours = colours;
                 background.Colour = colours.Gray3;
             }
 

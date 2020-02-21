@@ -33,7 +33,7 @@ namespace osu.Game.Online.API
         public APIState State
         {
             get => state;
-            private set
+            set
             {
                 if (state == value)
                     return;

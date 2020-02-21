@@ -5,78 +5,110 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
-using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneFruitObjects : OsuTestScene
+    public class TestSceneFruitObjects : SkinnableTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(CatchHitObject),
             typeof(Fruit),
+            typeof(FruitPiece),
             typeof(Droplet),
+            typeof(Banana),
+            typeof(BananaShower),
             typeof(DrawableCatchHitObject),
             typeof(DrawableFruit),
             typeof(DrawableDroplet),
-            typeof(BananaShower),
+            typeof(DrawableBanana),
+            typeof(DrawableBananaShower),
             typeof(Pulp),
         };
 
-        public TestSceneFruitObjects()
+        protected override void LoadComplete()
         {
-            Add(new GridContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        createDrawable(0),
-                        createDrawable(1),
-                        createDrawable(2),
-                    },
-                    new Drawable[]
-                    {
-                        createDrawable(3),
-                        createDrawable(4),
-                        createDrawable(5),
-                    },
-                }
-            });
+            base.LoadComplete();
+
+            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
+                AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
+
+            AddStep("show droplet", () => SetContents(createDrawableDroplet));
+
+            AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
         }
 
-        private DrawableFruit createDrawable(int index)
+        private Drawable createDrawableTinyDroplet()
         {
-            Fruit fruit = index == 5
-                ? new Banana
-                {
-                    StartTime = 1000000000000,
-                    IndexInBeatmap = index,
-                    Scale = 1.5f,
-                }
-                : new Fruit
-                {
-                    StartTime = 1000000000000,
-                    IndexInBeatmap = index,
-                    Scale = 1.5f,
-                };
+            var droplet = new TinyDroplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
 
-            return new DrawableFruit(fruit)
+            return new DrawableTinyDroplet(droplet)
             {
                 Anchor = Anchor.Centre,
-                RelativePositionAxes = Axes.Both,
+                RelativePositionAxes = Axes.None,
                 Position = Vector2.Zero,
                 Alpha = 1,
                 LifetimeStart = double.NegativeInfinity,
                 LifetimeEnd = double.PositiveInfinity,
             };
+        }
+
+        private Drawable createDrawableDroplet()
+        {
+            var droplet = new Droplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
+
+            return new DrawableDroplet(droplet)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private Drawable createDrawable(FruitVisualRepresentation rep)
+        {
+            Fruit fruit = new TestCatchFruit(rep)
+            {
+                StartTime = 1000000000000,
+                Scale = 1.5f,
+            };
+
+            return new DrawableFruit(fruit)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private class TestCatchFruit : Fruit
+        {
+            public TestCatchFruit(FruitVisualRepresentation rep)
+            {
+                VisualRepresentation = rep;
+            }
+
+            public override FruitVisualRepresentation VisualRepresentation { get; }
         }
     }
 }

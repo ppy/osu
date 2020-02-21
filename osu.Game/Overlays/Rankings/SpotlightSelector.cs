@@ -14,11 +14,14 @@ using osuTK;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightSelector : CompositeDrawable, IHasCurrentValue<APISpotlight>
+    public class SpotlightSelector : VisibilityContainer, IHasCurrentValue<APISpotlight>
     {
+        private const int duration = 300;
+
         private readonly Box background;
         private readonly SpotlightsDropdown dropdown;
 
@@ -36,50 +39,60 @@ namespace osu.Game.Overlays.Rankings
             set => dropdown.Items = value;
         }
 
+        protected override bool StartHidden => true;
+
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
+        private readonly InfoColumn mapCountColumn;
+        private readonly InfoColumn participantsColumn;
+        private readonly Container content;
 
         public SpotlightSelector()
         {
             RelativeSizeAxes = Axes.X;
             Height = 100;
-
-            InternalChildren = new Drawable[]
+            Add(content = new Container
             {
-                background = new Box
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
-                    Children = new Drawable[]
+                    background = new Box
                     {
-                        dropdown = new SpotlightsDropdown
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            Current = Current,
-                            Depth = -float.MaxValue
-                        },
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(15, 0),
-                            Children = new Drawable[]
+                            dropdown = new SpotlightsDropdown
                             {
-                                startDateColumn = new InfoColumn(@"Start Date"),
-                                endDateColumn = new InfoColumn(@"End Date"),
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Current = Current,
+                                Depth = -float.MaxValue
+                            },
+                            new FillFlowContainer
+                            {
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(15, 0),
+                                Children = new Drawable[]
+                                {
+                                    startDateColumn = new InfoColumn(@"Start Date"),
+                                    endDateColumn = new InfoColumn(@"End Date"),
+                                    mapCountColumn = new InfoColumn(@"Map Count"),
+                                    participantsColumn = new InfoColumn(@"Participants")
+                                }
                             }
                         }
                     }
-                },
-            };
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -88,18 +101,17 @@ namespace osu.Game.Overlays.Rankings
             background.Colour = colourProvider.Dark3;
         }
 
-        protected override void LoadComplete()
+        public void ShowInfo(GetSpotlightRankingsResponse response)
         {
-            base.LoadComplete();
-
-            Current.BindValueChanged(onCurrentChanged);
+            startDateColumn.Value = dateToString(response.Spotlight.StartDate);
+            endDateColumn.Value = dateToString(response.Spotlight.EndDate);
+            mapCountColumn.Value = response.BeatmapSets.Count.ToString();
+            participantsColumn.Value = response.Spotlight.Participants?.ToString("N0");
         }
 
-        private void onCurrentChanged(ValueChangedEvent<APISpotlight> spotlight)
-        {
-            startDateColumn.Value = dateToString(spotlight.NewValue.StartDate);
-            endDateColumn.Value = dateToString(spotlight.NewValue.EndDate);
-        }
+        protected override void PopIn() => content.FadeIn(duration, Easing.OutQuint);
+
+        protected override void PopOut() => content.FadeOut(duration, Easing.OutQuint);
 
         private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");
 
