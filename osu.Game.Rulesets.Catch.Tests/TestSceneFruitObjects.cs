@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
-using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 using osuTK;
 

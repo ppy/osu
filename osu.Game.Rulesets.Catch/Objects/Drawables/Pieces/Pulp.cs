@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
+namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
 {
     public class Pulp : Circle
     {

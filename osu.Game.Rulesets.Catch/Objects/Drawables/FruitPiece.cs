@@ -7,12 +7,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     internal class FruitPiece : CompositeDrawable
     {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
                     BorderThickness = 6f * radius_adjust,
-                    Children = new Framework.Graphics.Drawable[]
+                    Children = new Drawable[]
                     {
                         new Box
                         {
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             border.Alpha = (float)Math.Clamp((hitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
-        private Framework.Graphics.Drawable createPulp(FruitVisualRepresentation representation)
+        private Drawable createPulp(FruitVisualRepresentation representation)
         {
             const float large_pulp_3 = 16f * radius_adjust;
             const float distance_from_centre_3 = 0.15f;
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        Children = new Drawable[]
                         {
                             new Pulp
                             {
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        Children = new Drawable[]
                         {
                             new Pulp
                             {
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        Children = new Drawable[]
                         {
                             new Pulp
                             {
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        Children = new Drawable[]
                         {
                             new Pulp
                             {
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        Children = new Drawable[]
                         {
                             new Pulp
                             {

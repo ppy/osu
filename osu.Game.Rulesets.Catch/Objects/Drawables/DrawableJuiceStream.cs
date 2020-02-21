@@ -7,45 +7,46 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableBananaShower : DrawableCatchHitObject<BananaShower>
+    public class DrawableJuiceStream : DrawableCatchHitObject<JuiceStream>
     {
         private readonly Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation;
-        private readonly Container bananaContainer;
+        private readonly Container dropletContainer;
 
-        public DrawableBananaShower(BananaShower s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
+        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
             : base(s)
         {
             this.createDrawableRepresentation = createDrawableRepresentation;
-            RelativeSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Both;
             Origin = Anchor.BottomLeft;
             X = 0;
 
-            AddInternal(bananaContainer = new Container { RelativeSizeAxes = Axes.Both });
+            AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
             base.AddNestedHitObject(hitObject);
-            bananaContainer.Add(hitObject);
+            dropletContainer.Add(hitObject);
         }
 
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            bananaContainer.Clear();
+            dropletContainer.Clear();
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
-                case Banana banana:
-                    return createDrawableRepresentation?.Invoke(banana)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
+                case CatchHitObject catchObject:
+                    return createDrawableRepresentation?.Invoke(catchObject)?.With(o =>
+                        ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
             }
 
-            return base.CreateNestedHitObject(hitObject);
+            throw new ArgumentException($"{nameof(hitObject)} must be of type {nameof(CatchHitObject)}.");
         }
     }
 }
