@@ -35,6 +35,8 @@ namespace osu.Game.Graphics.UserInterface
             MainContents.RelativeSizeAxes = Axes.None;
         }
 
+        public override bool HandleNonPositionalInput => false;
+
         protected override bool Handle(UIEvent e)
         {
             switch (e)
