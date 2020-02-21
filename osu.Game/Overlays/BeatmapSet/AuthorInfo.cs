@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -49,8 +50,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("作图者:", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("上传日期", online.Submitted.ToString(@"yyyy MMMM d"), OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("作图者 ", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("提交日期 ", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -58,11 +59,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field("rank日期", online.Ranked.Value.ToString(@"yyyy MMMM d"), OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("Ranked时间 ", online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
             else if (online.LastUpdated.HasValue)
             {
-                fields.Add(new Field("上次更新", online.LastUpdated.Value.ToString(@"yyyy MMMM d"), OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("上次更新 ", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
         }
 
@@ -117,13 +118,32 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = $"{first} ",
-                        Font = OsuFont.GetFont(size: 17)
+                        Font = OsuFont.GetFont(size: 13)
                     },
                     new OsuSpriteText
                     {
                         Text = second,
-                        Font = secondFont.With(size: 17)
+                        Font = secondFont.With(size: 13)
                     },
+                };
+            }
+
+            public Field(string first, DateTimeOffset second, FontUsage secondFont)
+            {
+                AutoSizeAxes = Axes.Both;
+                Direction = FillDirection.Horizontal;
+
+                Children = new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = $"{first} ",
+                        Font = OsuFont.GetFont(size: 17)
+                    },
+                    new DrawableDate(second)
+                    {
+                        Font = secondFont.With(size: 17)
+                    }
                 };
             }
         }

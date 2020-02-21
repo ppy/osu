@@ -476,4 +476,5 @@
 
 ### 2020/02/21
 *   整合更新
-    *   [m] [Improve visual appearance of ProcessingOverlay #7922r]
+    *   [m] [Improve visual appearance of ProcessingOverlay #7922]
+    *   [m] [Add tooltips with precise dates to beatmap set overlay #7779]
