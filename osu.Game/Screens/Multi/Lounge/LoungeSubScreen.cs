@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Multi.Lounge
 
         public LoungeSubScreen()
         {
+            SearchContainer searchContainer;
+
             InternalChildren = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
@@ -49,14 +51,14 @@ namespace osu.Game.Screens.Multi.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = new SearchContainer
+                                    Child = searchContainer = new SearchContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Child = new RoomsContainer { JoinRequested = joinRequested }
                                     },
                                 },
-                                processingOverlay = new ProcessingOverlay { Alpha = 0 }
+                                processingOverlay = new ProcessingOverlay(searchContainer),
                             }
                         },
                         new RoomInspector

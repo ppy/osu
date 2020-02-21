@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -211,12 +212,24 @@ namespace osu.Game.Screens.Select.Carousel
         {
             private readonly BindableBool filtered = new BindableBool();
 
+            private readonly CarouselBeatmap item;
+
             public FilterableDifficultyIcon(CarouselBeatmap item)
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
+
+                this.item = item;
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (!filtered.Value)
+                    item.State.Value = CarouselItemState.Selected;
+
+                return true;
             }
         }
 
