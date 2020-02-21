@@ -8,9 +8,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLoadingAnimation : OsuGridTestScene
+    public class TestSceneLoadingSpinner : OsuGridTestScene
     {
-        public TestSceneLoadingAnimation()
+        public TestSceneLoadingSpinner()
             : base(2, 2)
         {
             LoadingSpinner loading;
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both
                 },
-                loading = new LoadingSpinner()
+                loading = new LoadingSpinner(true)
             });
 
             loading.Show();
