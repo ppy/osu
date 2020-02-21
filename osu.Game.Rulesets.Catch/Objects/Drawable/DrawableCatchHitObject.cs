@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         public override bool CanBePlated => true;
 
-        protected Container ScaleContainer;
+        protected Container ScaleContainer { get; private set; }
 
         protected PalpableCatchHitObject(TObject hitObject)
             : base(hitObject)
