@@ -74,7 +74,9 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return new VideoSprite(textureStore.GetStream(getPathForFile(Metadata.VideoFile)));
+                    var stream = textureStore.GetStream(getPathForFile(Metadata.VideoFile));
+
+                    return stream == null ? null : new VideoSprite(stream);
                 }
                 catch (Exception e)
                 {

@@ -128,17 +128,17 @@ namespace osu.Game.Tests.Visual.Online
 
             const int messages_per_call = 10;
             AddRepeatStep("add many messages", () =>
+            {
+                for (int i = 0; i < messages_per_call; i++)
                 {
-                    for (int i = 0; i < messages_per_call; i++)
+                    testChannel.AddNewMessages(new Message(sequence++)
                     {
-                        testChannel.AddNewMessages(new Message(sequence++)
-                        {
-                            Sender = longUsernameUser,
-                            Content = "Many messages! " + Guid.NewGuid(),
-                            Timestamp = DateTimeOffset.Now
-                        });
-                    }
-                }, Channel.MAX_HISTORY / messages_per_call + 5);
+                        Sender = longUsernameUser,
+                        Content = "Many messages! " + Guid.NewGuid(),
+                        Timestamp = DateTimeOffset.Now
+                    });
+                }
+            }, Channel.MAX_HISTORY / messages_per_call + 5);
 
             AddAssert("Ensure no adjacent day separators", () =>
             {

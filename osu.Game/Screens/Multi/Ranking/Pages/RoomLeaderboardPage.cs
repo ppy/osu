@@ -23,7 +23,9 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 {
     public class RoomLeaderboardPage : ResultsPage
     {
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private TextFlowContainer rankText;
 
         [Resolved(typeof(Room), nameof(Room.Name))]
@@ -35,10 +37,8 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             MatchLeaderboard leaderboard;
 
             Children = new Drawable[]
