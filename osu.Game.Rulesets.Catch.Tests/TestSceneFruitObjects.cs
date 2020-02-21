@@ -84,11 +84,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private Drawable createDrawable(FruitVisualRepresentation rep)
         {
-            Fruit fruit = new TestCatchFruit(rep)
-            {
-                StartTime = 1000000000000,
-                Scale = 1.5f,
-            };
+            Fruit fruit = new TestCatchFruit(rep) { Scale = 1.5f };
 
             return new DrawableFruit(fruit)
             {
@@ -101,11 +97,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
         }
 
-        private class TestCatchFruit : Fruit
+        public class TestCatchFruit : Fruit
         {
             public TestCatchFruit(FruitVisualRepresentation rep)
             {
                 VisualRepresentation = rep;
+                StartTime = 1000000000000;
             }
 
             public override FruitVisualRepresentation VisualRepresentation { get; }
