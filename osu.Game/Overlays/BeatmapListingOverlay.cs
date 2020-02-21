@@ -15,6 +15,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Direct;
@@ -34,7 +35,6 @@ namespace osu.Game.Overlays
 
         private SearchBeatmapSetsRequest getSetsRequest;
 
-        private Container panelsPlaceholder;
         private Drawable currentContent;
         private BeatmapListingSearchSection searchSection;
         private BeatmapListingSortTabControl sortControl;
@@ -121,12 +121,21 @@ namespace osu.Game.Overlays
                                                     }
                                                 }
                                             },
-                                            panelsPlaceholder = new Container
+                                            new Container
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,
                                                 Padding = new MarginPadding { Horizontal = 20 },
-                                            }
+                                                Children = new Drawable[]
+                                                {
+                                                    panelTarget = new Container
+                                                    {
+                                                        AutoSizeAxes = Axes.Y,
+                                                        RelativeSizeAxes = Axes.X,
+                                                    },
+                                                    loadingLayer = new LoadingLayer(panelTarget),
+                                                }
+                                            },
                                         }
                                     }
                                 }
@@ -160,6 +169,9 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate queryChangedDebounce;
 
+        private LoadingLayer loadingLayer;
+        private Container panelTarget;
+
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
             getSetsRequest?.Cancel();
@@ -181,7 +193,7 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            currentContent?.FadeColour(Color4.DimGray, 400, Easing.OutQuint);
+            loadingLayer.Show();
 
             getSetsRequest = new SearchBeatmapSetsRequest(
                 searchSection.Query.Value,
@@ -229,6 +241,8 @@ namespace osu.Game.Overlays
 
         private void addContentToPlaceholder(Drawable content)
         {
+            loadingLayer.Hide();
+
             Drawable lastContent = currentContent;
 
             if (lastContent != null)
@@ -242,7 +256,7 @@ namespace osu.Game.Overlays
                 lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
             }
 
-            panelsPlaceholder.Add(currentContent = content);
+            panelTarget.Add(currentContent = content);
             currentContent.FadeIn(200, Easing.OutQuint);
         }
 
