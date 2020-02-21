@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             Icon = FontAwesome.Solid.Users;
             TooltipMain = "社交";
-            TooltipSub = "其实是排行榜(";
+            TooltipSub = "在这里扩展人脉";
         }
 
         [BackgroundDependencyLoader(true)]

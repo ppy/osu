@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,7 +25,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly Slider slider;
         private readonly Drawable followCircle;
-        private readonly Drawable trackingArea;
         private readonly DrawableSlider drawableSlider;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
@@ -39,13 +39,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                // This is separate from the visible followcircle to ensure consistent internal tracking area (needed to match osu-stable)
-                trackingArea = new CircularContainer
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both
-                },
                 followCircle = new FollowCircleContainer
                 {
                     Origin = Anchor.Centre,
@@ -103,9 +96,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                // Tracking area is bigger than the visible followcircle and scales instantly to match osu-stable
-                trackingArea.ScaleTo(tracking ? 2.4f : 1f);
-                followCircle.ScaleTo(tracking ? 2f : 1f, 300, Easing.OutQuint);
+                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
                 followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
@@ -159,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // in valid time range
                 Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && trackingArea.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
         }
@@ -224,9 +215,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public class DefaultSliderBall : CompositeDrawable
         {
+            private Box box;
+
             [BackgroundDependencyLoader]
             private void load(DrawableHitObject drawableObject, ISkinSource skin)
             {
+                var slider = (DrawableSlider)drawableObject;
+
                 RelativeSizeAxes = Axes.Both;
 
                 float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
@@ -241,14 +236,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     BorderThickness = 10,
                     BorderColour = Color4.White,
                     Alpha = 1,
-                    Child = new Box
+                    Child = box = new Box
                     {
+                        Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
-                        Alpha = 0.4f,
+                        AlwaysPresent = true,
+                        Alpha = 0
                     }
                 };
+
+                slider.Tracking.BindValueChanged(trackingChanged, true);
             }
+
+            private void trackingChanged(ValueChangedEvent<bool> tracking) =>
+                box.FadeTo(tracking.NewValue ? 0.6f : 0.05f, 200, Easing.OutQuint);
         }
     }
 }

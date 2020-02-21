@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarRankingsButton()
         {
             SetIcon(FontAwesome.Regular.ChartBar);
+            TooltipMain = "排名";
+            TooltipSub = "在这里查看世界排行榜";
         }
 
         [BackgroundDependencyLoader(true)]

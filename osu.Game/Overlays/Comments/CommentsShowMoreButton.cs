@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Comments
 
         private void onCurrentChanged(ValueChangedEvent<int> count)
         {
-            Text = $@"显示更多的 ({count.NewValue})".ToUpper();
+            Text = $@"显示更多评论 ({count.NewValue})".ToUpper();
         }
     }
 }

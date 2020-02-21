@@ -16,8 +16,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsHeader : CompositeDrawable
     {
-        private const int font_size = 14;
-
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
@@ -40,29 +38,11 @@ namespace osu.Game.Overlays.Comments
                     Padding = new MarginPadding { Horizontal = 50 },
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        new OverlaySortTabControl<CommentsSortCriteria>
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(10, 0),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Children = new Drawable[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: font_size),
-                                    Text = @"分类规则:"
-                                },
-                                new SortTabControl
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Current = Sort
-                                }
-                            }
+                            Current = Sort
                         },
                         new ShowDeletedButton
                         {
@@ -106,8 +86,8 @@ namespace osu.Game.Overlays.Comments
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: font_size),
-                            Text = @"显示已删除的"
+                            Font = OsuFont.GetFont(size: 17),
+                            Text = @"显示已删除的评论"
                         }
                     },
                 });
@@ -125,5 +105,12 @@ namespace osu.Game.Overlays.Comments
                 return true;
             }
         }
+    }
+
+    public enum CommentsSortCriteria
+    {
+        New,
+        Old,
+        Top
     }
 }

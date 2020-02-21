@@ -496,10 +496,14 @@
     *   [m] [Implement CommentEditor component #7795]
     *   [m] [Make RankingsOverlay available in-game #7817]
     *   [m] [Use a single implementation for all loading animations #7931]
-    *   [m] [Make RankingsOverlay available in-game #7817]
     *   [m] [更新Framework #7935]
     *   [m] [Add simple updater support for linux AppImages #7936]
     *   [m] [Use new loading layer in beatmap listing overlay #7932]
+    *   [m] [Add explosion effect when catching fruit #7934]
+    *   [m] [Add fill to default skin slider ball when tracking #7933]
+    *   [m] [Add CommentsContainer to ChangelogOverlay #7930]
+    *   [m] [Add ability to load long comment trees in CommentsContainer #7786]
+    *   [m] [Fix indices in beatmap not being transferred to children #7897]
 
 *   翻译修正
     *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs 第141行](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)

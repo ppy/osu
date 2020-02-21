@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Comments
                     },
                     countText = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                        Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true),
                     }
                 }
             };
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Comments
         {
             if (!ShowDeleted.Value && Count.Value != 0)
             {
-                countText.Text = @"deleted comment".ToQuantity(Count.Value);
+                countText.Text = @"条已删除的评论".ToQuantity(Count.Value);
                 Show();
             }
             else

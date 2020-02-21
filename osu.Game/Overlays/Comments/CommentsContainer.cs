@@ -12,16 +12,19 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private CommentableType type;
-        private long? id;
+        private readonly Bindable<CommentableType> type = new Bindable<CommentableType>();
+        private readonly BindableLong id = new BindableLong();
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+
+        protected readonly Bindable<User> User = new Bindable<User>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -109,10 +112,13 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             });
+
+            User.BindTo(api.LocalUser);
         }
 
         protected override void LoadComplete()
         {
+            User.BindValueChanged(_ => refetchComments());
             Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }
@@ -121,8 +127,8 @@ namespace osu.Game.Overlays.Comments
         /// <param name="id">The id of the resource to get comments for.</param>
         public void ShowComments(CommentableType type, long id)
         {
-            this.type = type;
-            this.id = id;
+            this.type.Value = type;
+            this.id.Value = id;
 
             if (!IsLoaded)
                 return;
@@ -141,14 +147,14 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
-            if (!id.HasValue)
+            if (id.Value <= 0)
                 return;
 
             request?.Cancel();
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id.Value, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
             request.Success += onSuccess;
-            api.Queue(request);
+            api.PerformAsync(request);
         }
 
         private void clearComments()
@@ -166,7 +172,10 @@ namespace osu.Game.Overlays.Comments
 
             LoadComponentAsync(new CommentsPage(response)
             {
-                ShowDeleted = { BindTarget = ShowDeleted }
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort },
+                Type = { BindTarget = type },
+                CommentableId = { BindTarget = id }
             }, loaded =>
             {
                 content.Add(loaded);

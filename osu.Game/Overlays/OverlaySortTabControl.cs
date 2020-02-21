@@ -42,8 +42,8 @@ namespace osu.Game.Overlays
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: 12),
-                        Text = @"Sort by"
+                        Font = OsuFont.GetFont(size: 17),
+                        Text = @"排序方法:"
                     },
                     CreateControl().With(c =>
                     {
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 12),
+                            Font = OsuFont.GetFont(size: 17),
                             Text = value.ToString()
                         }
                     }
