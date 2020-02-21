@@ -221,9 +221,9 @@ namespace osu.Game.Rulesets.Catch.UI
             /// Add a caught fruit to the catcher's stack.
             /// </summary>
             /// <param name="fruit">The fruit that was caught.</param>
-            public void PlaceOnPlate(DrawableHitObject fruit)
+            public void PlaceOnPlate(DrawableCatchHitObject fruit)
             {
-                float ourRadius = ((DrawableCatchHitObject)fruit).DisplayRadius;
+                float ourRadius = fruit.DisplayRadius;
                 float theirRadius = 0;
 
                 const float allowance = 6;

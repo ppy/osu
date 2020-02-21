@@ -61,6 +61,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"failtimes")]
         private BeatmapMetrics metrics { get; set; }
 
+        [JsonProperty(@"max_combo")]
+        private int? maxCombo { get; set; }
+
         public BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
             var set = BeatmapSet?.ToBeatmapSet(rulesets);
@@ -76,6 +79,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 Status = Status,
                 BeatmapSet = set,
                 Metrics = metrics,
+                MaxCombo = maxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,

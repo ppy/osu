@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         public override bool CanBePlated => true;
 
-        protected Container ScaleContainer;
+        protected Container ScaleContainer { get; private set; }
 
         protected PalpableCatchHitObject(TObject hitObject)
             : base(hitObject)
@@ -45,11 +45,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             ScaleContainer.Scale = new Vector2(HitObject.Scale);
         }
 
-        protected override void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
-        {
-            // ignore the incoming combo colour as we use a custom lookup
-            AccentColour.Value = comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
-        }
+        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours) =>
+            comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
     }
 
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
