@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
-        private LoadingAnimation loading;
+        private LoadingSpinner loading;
         private Sprite backgroundSprite;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingAnimation { Scale = new Vector2(1.3f) }
+                                loading = new LoadingSpinner { Scale = new Vector2(1.3f) }
                             }
                         },
                         new OsuSpriteText

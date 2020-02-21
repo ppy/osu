@@ -40,14 +40,14 @@ namespace osu.Game.Graphics.UserInterface
             set => loading.Size = value;
         }
 
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
 
         protected LoadingButton()
         {
             AddRange(new[]
             {
                 CreateContent(),
-                loading = new LoadingAnimation
+                loading = new LoadingSpinner
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

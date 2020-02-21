@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
 
             AddUntilStep("children are visible", () => onlineView.ViewTarget.IsPresent);
-            AddUntilStep("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("loading animation is not visible", () => !onlineView.LoadingSpinner.IsPresent);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
-            AddUntilStep("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("loading animation is not visible", () => !onlineView.LoadingSpinner.IsPresent);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
-            AddUntilStep("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("loading animation is visible", () => onlineView.LoadingSpinner.IsPresent);
         }
 
         [Test]
@@ -62,12 +62,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
-            AddUntilStep("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("loading animation is visible", () => onlineView.LoadingSpinner.IsPresent);
         }
 
         private class TestOnlineViewContainer : OnlineViewContainer
         {
-            public new LoadingAnimation LoadingAnimation => base.LoadingAnimation;
+            public new LoadingSpinner LoadingSpinner => base.LoadingSpinner;
 
             public CompositeDrawable ViewTarget => base.Content;
 
