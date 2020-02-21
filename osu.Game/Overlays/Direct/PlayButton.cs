@@ -85,13 +85,12 @@ namespace osu.Game.Overlays.Direct
             Playing.ValueChanged += playingStateChanged;
         }
 
-        private PreviewTrackManager previewTrackManager;
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colour)
         {
-            this.previewTrackManager = previewTrackManager;
-
             hoverColour = colour.Yellow;
         }
 

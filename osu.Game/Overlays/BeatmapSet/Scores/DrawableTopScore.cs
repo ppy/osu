@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private readonly Box background;
 
-        public DrawableTopScore(ScoreInfo score, int position = 1)
+        public DrawableTopScore(ScoreInfo score, int? position = 1)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

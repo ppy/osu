@@ -118,13 +118,26 @@ namespace osu.Game.Online.Multiplayer
             if (DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            foreach (var removedItem in Playlist.Except(other.Playlist).ToArray())
-                Playlist.Remove(removedItem);
-            Playlist.AddRange(other.Playlist.Except(Playlist).ToArray());
+            // transfer local beatmaps across to ensure we have Metadata available (CreateRoomRequest does not give us metadata as expected)
+            foreach (var item in other.Playlist)
+            {
+                var localItem = Playlist.FirstOrDefault(i => i.BeatmapID == item.BeatmapID);
 
-            foreach (var removedItem in Participants.Except(other.Participants).ToArray())
-                Participants.Remove(removedItem);
-            Participants.AddRange(other.Participants.Except(Participants).ToArray());
+                if (localItem != null)
+                    item.Beatmap.Value.Metadata = localItem.Beatmap.Value.Metadata;
+            }
+
+            if (!Playlist.SequenceEqual(other.Playlist))
+            {
+                Playlist.Clear();
+                Playlist.AddRange(other.Playlist);
+            }
+
+            if (!Participants.SequenceEqual(other.Participants))
+            {
+                Participants.Clear();
+                Participants.AddRange(other.Participants);
+            }
 
             Position = other.Position;
         }
