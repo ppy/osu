@@ -16,6 +16,7 @@ using osuTK.Graphics;
 using osu.Framework.Allocation;
 using System.Net;
 using osuTK;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.Changelog
                                 Origin = Anchor.CentreRight,
                                 Size = new Vector2(10),
                                 Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
-                                Colour = entryColour,
+                                Colour = entryColour.Darken(0.7f),
                                 Margin = new MarginPadding { Right = 5 },
                             },
                             title = new LinkFlowContainer
