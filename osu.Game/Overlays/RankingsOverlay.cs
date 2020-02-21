@@ -23,8 +23,6 @@ namespace osu.Game.Overlays
 
         protected Bindable<RankingsScope> Scope => header.Current;
 
-        private Bindable<RulesetInfo> ruleset => header.Ruleset;
-
         private readonly BasicScrollContainer scrollFlow;
         private readonly Container contentContainer;
         private readonly LoadingLayer loading;
@@ -92,9 +90,14 @@ namespace osu.Game.Overlays
             background.Colour = ColourProvider.Background5;
         }
 
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            header.Ruleset.BindTo(ruleset);
 
             Country.BindValueChanged(_ =>
             {
@@ -121,6 +124,8 @@ namespace osu.Game.Overlays
 
                 Scheduler.AddOnce(loadNewContent);
             });
+
+            Scheduler.AddOnce(loadNewContent);
         }
 
         public void ShowCountry(Country requested)
