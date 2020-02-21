@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
-            if (id.Value == 0)
+            if (id.Value <= 0)
                 return;
 
             request?.Cancel();
