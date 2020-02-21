@@ -76,28 +76,28 @@ namespace osu.Game.Overlays.Comments
             var orphaned = new List<Comment>();
 
             foreach (var topLevel in bundle.Comments)
-                add(topLevel);
+                addNewComment(topLevel);
 
             foreach (var child in bundle.IncludedComments)
-                add(child);
             {
                 // Included comments can contain the parent comment, which already exists in the hierarchy.
                 if (commentDictionary.ContainsKey(child.Id))
                     continue;
 
+                addNewComment(child);
             }
 
             // Comments whose parents did not previously have corresponding drawables, are now guaranteed that their parents have corresponding drawables.
             foreach (var o in orphaned)
-                add(o);
+                addNewComment(o);
 
-            void add(Comment comment)
+            void addNewComment(Comment comment)
             {
                 var drawableComment = getDrawableComment(comment);
 
                 if (comment.ParentId == null)
                 {
-                    // Comment that has no parent is added as a top-level comment to the flow.
+                    // Comments that have no parent are added as top-level comments to the flow.
                     flow.Add(drawableComment);
                 }
                 else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
