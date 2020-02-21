@@ -6,12 +6,13 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class ReadyButton : OsuButton
+    public class ReadyButton : TriangleButton
     {
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -32,12 +33,16 @@ namespace osu.Game.Screens.Multi.Match.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             beatmaps.ItemAdded += beatmapAdded;
             beatmaps.ItemRemoved += beatmapRemoved;
 
             SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
+
+            BackgroundColour = colours.Green;
+            Triangles.ColourDark = colours.Green;
+            Triangles.ColourLight = colours.GreenLight;
         }
 
         private void updateSelectedItem(PlaylistItem item)

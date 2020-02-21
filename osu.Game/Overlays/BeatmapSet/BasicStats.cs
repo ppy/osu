@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 TooltipText = name;
                 RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
+                Height = 24f;
 
                 Children = new Drawable[]
                 {
@@ -113,7 +113,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
                             new SpriteIcon
@@ -121,7 +122,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
                                 Icon = FontAwesome.Solid.Square,
-                                Size = new Vector2(13),
+                                Size = new Vector2(12),
                                 Rotation = 45,
                                 Colour = OsuColour.FromHex(@"441288"),
                             },
@@ -130,7 +131,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.Centre,
                                 Icon = icon,
-                                Size = new Vector2(13),
+                                Size = new Vector2(12),
                                 Colour = OsuColour.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
                             },
@@ -139,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Margin = new MarginPadding { Left = 10 },
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold),
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             },
                         },
                     },
