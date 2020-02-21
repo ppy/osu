@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public TestSceneLoadingAnimation()
             : base(2, 2)
         {
-            LoadingAnimation loading;
+            LoadingSpinner loading;
 
             Cell(0).AddRange(new Drawable[]
             {
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour = Color4.Black,
                     RelativeSizeAxes = Axes.Both
                 },
-                loading = new LoadingAnimation()
+                loading = new LoadingSpinner()
             });
 
             loading.Show();
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both
                 },
-                loading = new LoadingAnimation()
+                loading = new LoadingSpinner()
             });
 
             loading.Show();
@@ -46,14 +46,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour = Color4.Gray,
                     RelativeSizeAxes = Axes.Both
                 },
-                loading = new LoadingAnimation()
+                loading = new LoadingSpinner()
             });
 
             loading.Show();
 
             Cell(3).AddRange(new Drawable[]
             {
-                loading = new LoadingAnimation()
+                loading = new LoadingSpinner()
             });
 
             Scheduler.AddDelayed(() => loading.ToggleVisibility(), 200, true);

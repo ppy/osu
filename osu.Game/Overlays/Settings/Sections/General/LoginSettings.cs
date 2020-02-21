@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     Children = new Drawable[]
                     {
-                        new LoadingAnimation
+                        new LoadingSpinner
                         {
                             State = { Value = Visibility.Visible },
                             Anchor = Anchor.TopCentre,

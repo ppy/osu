@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A loading spinner.
     /// </summary>
-    public class LoadingAnimation : VisibilityContainer
+    public class LoadingSpinner : VisibilityContainer
     {
         private readonly SpriteIcon spinner;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Constuct a new loading spinner.
         /// </summary>
         /// <param name="withBox"></param>
-        public LoadingAnimation(bool withBox = false)
+        public LoadingSpinner(bool withBox = false)
         {
             Size = new Vector2(60);
 

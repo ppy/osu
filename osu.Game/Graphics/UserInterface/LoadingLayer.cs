@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     /// Also optionally dims target elements.
     /// Useful for disabling all elements in a form and showing we are waiting on a response, for instance.
     /// </summary>
-    public class LoadingLayer : LoadingAnimation
+    public class LoadingLayer : LoadingSpinner
     {
         private readonly Drawable dimTarget;
 
