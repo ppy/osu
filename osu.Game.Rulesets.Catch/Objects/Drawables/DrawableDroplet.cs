@@ -4,10 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableDroplet : PalpableCatchHitObject<Droplet>
     {
