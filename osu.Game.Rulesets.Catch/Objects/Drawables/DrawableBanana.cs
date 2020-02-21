@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Utils;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableBanana : DrawableFruit
     {

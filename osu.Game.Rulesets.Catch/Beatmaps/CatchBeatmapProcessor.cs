@@ -34,9 +34,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
             {
-                obj.IndexInBeatmap = index++;
+                obj.IndexInBeatmap = index;
+                foreach (var nested in obj.NestedHitObjects.OfType<CatchHitObject>())
+                    nested.IndexInBeatmap = index;
+
                 if (obj.LastInCombo && obj.NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
                     lastNested.LastInCombo = true;
+
+                index++;
             }
         }
 
@@ -216,9 +221,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 CatchHitObject currentObject = objectWithDroplets[i];
                 CatchHitObject nextObject = objectWithDroplets[i + 1];
 
-                int thisDirection = nextObject.GameplayX > currentObject.GameplayX ? 1 : -1;
+                int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
-                double distanceToNext = Math.Abs(nextObject.GameplayX - currentObject.GameplayX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
+                double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext);
 
                 if (distanceToHyper < 0)

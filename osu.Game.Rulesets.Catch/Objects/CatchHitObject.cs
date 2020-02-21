@@ -23,17 +23,10 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => x = value;
         }
 
-        internal bool XOffsetReversed { get; set; }
-        
         /// <summary>
         /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
         /// </summary>
         internal float XOffset { get; set; }
-
-        /// <summary>
-        /// The effective X position during gameplay, applying with HardRock offset.
-        /// </summary>
-        public float GameplayX => XOffsetReversed ? X - XOffset : X + XOffset;
 
         public double TimePreempt = 1000;
 

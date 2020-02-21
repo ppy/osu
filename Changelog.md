@@ -486,5 +486,5 @@
     *   [m] [Add tooltips with precise dates to beatmap set overlay #7779]
     *   [m] [Adjust font sizes and spacing in BeatmapSetOverlay to match osu-web values #7863]
     *   [m] [Allow selecting/playing a specific difficulty using the beatmapset difficulty icons #7809]
-    *   [m] [Implement osu!catch fruit skinning support #7881]
+    *   [m] [**实现ctb模式的皮肤支持 #7881**]
     *   [m] [Move DrawableHitObject accent colour update duties to ruleset #7896]

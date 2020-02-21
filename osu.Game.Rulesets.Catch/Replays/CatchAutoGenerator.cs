@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Replays
 
             void moveToNext(CatchHitObject h)
             {
-                float positionChange = Math.Abs(lastPosition - h.GameplayX);
+                float positionChange = Math.Abs(lastPosition - h.X);
                 double timeAvailable = h.StartTime - lastTime;
 
                 // So we can either make it there without a dash or not.
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 // todo: get correct catcher size, based on difficulty CS.
                 const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
 
-                if (lastPosition - catcher_width_half < h.GameplayX && lastPosition + catcher_width_half > h.GameplayX)
+                if (lastPosition - catcher_width_half < h.X && lastPosition + catcher_width_half > h.X)
                 {
                     //we are already in the correct range.
                     lastTime = h.StartTime;
@@ -63,12 +63,12 @@ namespace osu.Game.Rulesets.Catch.Replays
 
                 if (impossibleJump)
                 {
-                    addFrame(h.StartTime, h.GameplayX);
+                    addFrame(h.StartTime, h.X);
                 }
                 else if (h.HyperDash)
                 {
                     addFrame(h.StartTime - timeAvailable, lastPosition);
-                    addFrame(h.StartTime, h.GameplayX);
+                    addFrame(h.StartTime, h.X);
                 }
                 else if (dashRequired)
                 {
@@ -77,23 +77,23 @@ namespace osu.Game.Rulesets.Catch.Replays
                     double timeWeNeedToSave = timeAtNormalSpeed - timeAvailable;
                     double timeAtDashSpeed = timeWeNeedToSave / 2;
 
-                    float midPosition = (float)Interpolation.Lerp(lastPosition, h.GameplayX, (float)timeAtDashSpeed / timeAvailable);
+                    float midPosition = (float)Interpolation.Lerp(lastPosition, h.X, (float)timeAtDashSpeed / timeAvailable);
 
                     //dash movement
                     addFrame(h.StartTime - timeAvailable + 1, lastPosition, true);
                     addFrame(h.StartTime - timeAvailable + timeAtDashSpeed, midPosition);
-                    addFrame(h.StartTime, h.GameplayX);
+                    addFrame(h.StartTime, h.X);
                 }
                 else
                 {
                     double timeBefore = positionChange / movement_speed;
 
                     addFrame(h.StartTime - timeBefore, lastPosition);
-                    addFrame(h.StartTime, h.GameplayX);
+                    addFrame(h.StartTime, h.X);
                 }
 
                 lastTime = h.StartTime;
-                lastPosition = h.GameplayX;
+                lastPosition = h.X;
             }
 
             foreach (var obj in Beatmap.HitObjects)

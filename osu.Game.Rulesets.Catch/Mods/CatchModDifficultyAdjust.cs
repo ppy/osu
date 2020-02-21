@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             Value = 5,
         };
 
-        [SettingSource("下落速度", "Override a beatmap's set AR.", FIRST_SETTING_ORDER + 1)]
+        [SettingSource("下落速度", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
