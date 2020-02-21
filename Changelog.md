@@ -460,9 +460,9 @@
 
 ### 2020/02/20
 *   未整合
-    *   [m] [Fix possible test failures due to async loads #7917]
+    *   [m] [Fix possible test failures due to async loads #7.917]
         *   Tests项目目前暂不维护
-    *   [m] [Implement BeatmapListingOverlay #7912]
+    *   [m] [Implement BeatmapListingOverlay #7.912]
         *   存在前置pr
 *   整合更新
     *   [m] [Fix music playlist being enumerated asynchronously #7875]
@@ -476,9 +476,9 @@
 
 ### 2020/02/21
 *   未整合
-    *   [m] [Update osu!catch test scenes to show skinnable versions #7879]
+    *   [m] [Update osu!catch test scenes to show skinnable versions #7.879]
         *   Tests项目目前暂不维护
-    *   [m] [Show skinnable test skin names and autosized component sizes #7871]
+    *   [m] [Show skinnable test skin names and autosized component sizes #7.871]
         *   Tests项目目前暂不维护
 
 *   整合更新
@@ -488,3 +488,9 @@
     *   [m] [Allow selecting/playing a specific difficulty using the beatmapset difficulty icons #7809]
     *   [m] [**实现ctb模式的皮肤支持 #7881**]
     *   [m] [Move DrawableHitObject accent colour update duties to ruleset #7896]
+    *   [m] [Rename drawable namespace to avoid clashes with framework class #7902]
+    *   [m] [Add osu!catch droplet rotation animation #7901]
+    *   [m] [Bump ppy.osu.Game.Resources from 2020.219.0 to 2020.221.0 #7928]
+    *   [m] [Bump DiscordRichPresence from 1.0.147 to 1.0.150 #7929]
+    *   [m] [Split out pulp formations into individual classes #7911]
+    *   [m] [Implement CommentEditor component #7795]
