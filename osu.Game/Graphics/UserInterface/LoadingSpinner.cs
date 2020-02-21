@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Constuct a new loading spinner.
         /// </summary>
-        /// <param name="withBox"></param>
+        /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
         public LoadingSpinner(bool withBox = false)
         {
             Size = new Vector2(60);
