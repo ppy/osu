@@ -461,7 +461,7 @@
 ### 2020/02/20
 *   未整合
     *   [m] [Fix possible test failures due to async loads #7917]
-        *   等待下一个lazer发布后整合
+        *   Tests项目目前暂不维护
     *   [m] [Implement BeatmapListingOverlay #7912]
         *   存在前置pr
 *   整合更新
@@ -475,7 +475,16 @@
     *   [m] [Update the multiplayer room inspector design #7900]
 
 ### 2020/02/21
+*   未整合
+    *   [m] [Update osu!catch test scenes to show skinnable versions #7879]
+        *   Tests项目目前暂不维护
+    *   [m] [Show skinnable test skin names and autosized component sizes #7871]
+        *   Tests项目目前暂不维护
+
 *   整合更新
     *   [m] [Improve visual appearance of ProcessingOverlay #7922]
     *   [m] [Add tooltips with precise dates to beatmap set overlay #7779]
     *   [m] [Adjust font sizes and spacing in BeatmapSetOverlay to match osu-web values #7863]
+    *   [m] [Allow selecting/playing a specific difficulty using the beatmapset difficulty icons #7809]
+    *   [m] [Implement osu!catch fruit skinning support #7881]
+    *   [m] [Move DrawableHitObject accent colour update duties to ruleset #7896]

@@ -2,11 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -15,11 +19,34 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         public override bool CanBePlated => true;
 
+        protected Container ScaleContainer { get; private set; }
+
         protected PalpableCatchHitObject(TObject hitObject)
             : base(hitObject)
         {
-            Scale = new Vector2(HitObject.Scale);
+            Origin = Anchor.Centre;
+            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
+            Masking = false;
         }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRangeInternal(new Framework.Graphics.Drawable[]
+            {
+                ScaleContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                }
+            });
+
+            ScaleContainer.Scale = new Vector2(HitObject.Scale);
+        }
+
+        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours) =>
+            comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
     }
 
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
@@ -41,11 +68,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         public virtual bool StaysOnPlate => CanBePlated;
 
+        public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
+
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
             RelativePositionAxes = Axes.X;
-            X = hitObject.GameplayX;
+            X = hitObject.X;
         }
 
         public Func<CatchHitObject, bool> CheckPosition;

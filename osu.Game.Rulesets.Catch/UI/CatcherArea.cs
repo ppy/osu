@@ -74,11 +74,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 caughtFruit.Anchor = Anchor.TopCentre;
                 caughtFruit.Origin = Anchor.Centre;
-                caughtFruit.Scale *= 0.7f;
+                caughtFruit.Scale *= 0.5f;
                 caughtFruit.LifetimeStart = caughtFruit.HitObject.StartTime;
                 caughtFruit.LifetimeEnd = double.MaxValue;
 
-                MovableCatcher.Add(caughtFruit);
+                MovableCatcher.PlaceOnPlate(caughtFruit);
                 lastPlateableFruit = caughtFruit;
 
                 if (!fruit.StaysOnPlate)
@@ -221,9 +221,9 @@ namespace osu.Game.Rulesets.Catch.UI
             /// Add a caught fruit to the catcher's stack.
             /// </summary>
             /// <param name="fruit">The fruit that was caught.</param>
-            public void Add(DrawableHitObject fruit)
+            public void PlaceOnPlate(DrawableCatchHitObject fruit)
             {
-                float ourRadius = fruit.DrawSize.X / 2 * fruit.Scale.X;
+                float ourRadius = fruit.DisplayRadius;
                 float theirRadius = 0;
 
                 const float allowance = 6;
