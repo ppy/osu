@@ -64,6 +64,28 @@ namespace osu.Game.Overlays.Comments
             appendComments(null, commentBundle);
         }
 
+        private DrawableComment getDrawableComment(Comment comment)
+        {
+            if (commentDictionary.TryGetValue(comment.Id, out var existing))
+                return existing;
+
+            return commentDictionary[comment.Id] = new DrawableComment(comment)
+            {
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort },
+                RepliesRequested = onCommentRepliesRequested
+            };
+        }
+
+        private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
+        {
+            var request = new GetCommentsRequest(CommentableId.Value, Type.Value, Sort.Value, page, drawableComment.Comment.Id);
+
+            request.Success += response => Schedule(() => appendComments(drawableComment, response));
+
+            api.PerformAsync(request);
+        }
+
         private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
 
         /// <summary>
@@ -113,28 +135,6 @@ namespace osu.Game.Overlays.Comments
                     orphaned.Add(comment);
                 }
             }
-        }
-
-        private DrawableComment getDrawableComment(Comment comment)
-        {
-            if (commentDictionary.TryGetValue(comment.Id, out var existing))
-                return existing;
-
-            return commentDictionary[comment.Id] = new DrawableComment(comment)
-            {
-                ShowDeleted = { BindTarget = ShowDeleted },
-                Sort = { BindTarget = Sort },
-                RepliesRequested = onCommentRepliesRequested
-            };
-        }
-
-        private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
-        {
-            var request = new GetCommentsRequest(CommentableId.Value, Type.Value, Sort.Value, page, drawableComment.Comment.Id);
-
-            request.Success += response => Schedule(() => appendComments(drawableComment, response));
-
-            api.PerformAsync(request);
         }
 
         private class NoCommentsPlaceholder : CompositeDrawable
