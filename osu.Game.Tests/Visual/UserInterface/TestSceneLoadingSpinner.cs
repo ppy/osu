@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both
                 },
-                loading = new LoadingSpinner()
+                loading = new LoadingSpinner(true)
             });
 
             loading.Show();
