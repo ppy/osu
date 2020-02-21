@@ -80,6 +80,8 @@ namespace osu.Game.Overlays.Changelog
             {
             }
 
+            private OsuSpriteText date;
+
             protected override FillFlowContainer CreateHeader()
             {
                 var fill = base.CreateHeader();
@@ -89,11 +91,10 @@ namespace osu.Game.Overlays.Changelog
                     existing.Scale = new Vector2(1.25f);
                     existing.Action = null;
 
-                    existing.Add(new OsuSpriteText
+                    existing.Add(date = new OsuSpriteText
                     {
-                        Text = Build.CreatedAt.Date.ToString("dd MMM yyyy"),
+                        Text = Build.CreatedAt.Date.ToString("dd MMMM yyyy"),
                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
-                        Colour = OsuColour.FromHex(@"FD5"),
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 5 },
@@ -112,6 +113,12 @@ namespace osu.Game.Overlays.Changelog
                 });
 
                 return fill;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                date.Colour = colourProvider.Light1;
             }
         }
 
