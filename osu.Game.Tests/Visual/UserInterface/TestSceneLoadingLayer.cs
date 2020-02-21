@@ -21,12 +21,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(LoadingSpinner) };
 
+        private Container content;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             Children = new[]
             {
-                new Container
+                content = new Container
                 {
                     Size = new Vector2(300),
                     Anchor = Anchor.Centre,
@@ -60,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
-        public void ShowHide()
+        public void TestShowHide()
         {
             AddAssert("not visible", () => !overlay.IsPresent);
 
@@ -74,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void ContentRestoreOnDispose()
+        public void TestContentRestoreOnDispose()
         {
             AddAssert("not visible", () => !overlay.IsPresent);
 
@@ -82,9 +84,23 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("wait for content dim", () => dimContent.Colour != Color4.White);
 
-            AddStep("hide", () => overlay.Expire());
+            AddStep("expire", () => overlay.Expire());
 
             AddUntilStep("wait for content restore", () => dimContent.Colour == Color4.White);
+        }
+
+        [Test]
+        public void TestLargeArea()
+        {
+            AddStep("show", () =>
+            {
+                content.RelativeSizeAxes = Axes.Both;
+                content.Size = new Vector2(1);
+
+                overlay.Show();
+            });
+
+            AddStep("hide", () => overlay.Hide());
         }
     }
 }
