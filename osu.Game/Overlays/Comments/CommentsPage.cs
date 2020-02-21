@@ -12,6 +12,7 @@ using System.Linq;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -60,86 +61,74 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            createBaseTree(commentBundle.Comments);
+            appendComments(null, commentBundle);
         }
 
-        private readonly Dictionary<long, Comment> nodeDictionary = new Dictionary<long, Comment>();
+        private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
 
-        private void createBaseTree(List<Comment> comments)
+        /// <summary>
+        /// Appends retrieved comments to the subtree rooted at a parenting <see cref="DrawableComment"/>.
+        /// </summary>
+        /// <param name="parent">The parenting <see cref="DrawableComment"/>.</param>
+        /// <param name="bundle">The bundle of comments to add.</param>
+        private void appendComments([CanBeNull] DrawableComment parent, [NotNull] CommentBundle bundle)
         {
-            var topLevelNodes = new List<Comment>();
-            var orphanedNodes = new List<Comment>();
+            var orphaned = new List<Comment>();
 
-            foreach (var comment in comments)
+            foreach (var topLevel in bundle.Comments)
+                add(topLevel);
+
+            foreach (var child in bundle.IncludedComments)
+                add(child);
+
+            // Comments whose parents did not previously have corresponding drawables, are now guaranteed that their parents have corresponding drawables.
+            foreach (var o in orphaned)
+                add(o);
+
+            void add(Comment comment)
             {
-                nodeDictionary.Add(comment.Id, comment);
+                var drawableComment = getDrawableComment(comment);
 
-                if (comment.IsTopLevel)
-                    topLevelNodes.Add(comment);
-
-                var orphanedNodesCopy = new List<Comment>(orphanedNodes);
-
-                foreach (var orphan in orphanedNodesCopy)
+                if (comment.ParentId == null)
                 {
-                    if (orphan.ParentId == comment.Id)
-                    {
-                        comment.ChildComments.Add(orphan);
-                        orphanedNodes.Remove(orphan);
-                    }
+                    // Comment that has no parent is added as a top-level comment to the flow.
+                    flow.Add(drawableComment);
                 }
-
-                // No need to find parent for top-level comment
-                if (!comment.ParentId.HasValue)
-                    continue;
-
-                if (nodeDictionary.ContainsKey(comment.ParentId.Value))
-                    nodeDictionary[comment.ParentId.Value].ChildComments.Add(comment);
+                else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
+                {
+                    // The comment's parent already has a corresponding drawable.
+                    parentDrawable.Replies.Add(drawableComment);
+                }
                 else
-                    orphanedNodes.Add(comment);
+                {
+                    // The comment's parent does not have a corresponding drawable yet, so keep it as orphaned for the time being.
+                    // Note that this comment's corresponding drawable has already been created by this point, so future children will be able to be added without being orphaned themselves.
+                    orphaned.Add(comment);
+                }
             }
-
-            foreach (var comment in topLevelNodes)
-                flow.Add(createCommentWithReplies(comment));
         }
 
-        private DrawableComment createCommentWithReplies(Comment comment)
+        private DrawableComment getDrawableComment(Comment comment)
         {
-            if (comment.ParentId.HasValue)
-                comment.ParentComment = nodeDictionary[comment.ParentId.Value];
+            if (commentDictionary.TryGetValue(comment.Id, out var existing))
+                return existing;
 
-            var drawableComment = createDrawableComment(comment);
-
-            var replies = comment.ChildComments;
-
-            if (replies.Any())
-                drawableComment.Replies.AddRange(replies.Select(createCommentWithReplies));
-
-            return drawableComment;
+            return commentDictionary[comment.Id] = new DrawableComment(comment)
+            {
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort },
+                RepliesRequested = onCommentRepliesRequested
+            };
         }
 
         private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
         {
             var request = new GetCommentRepliesRequest(drawableComment.Comment.Id, Type.Value, CommentableId.Value, Sort.Value, page);
-            request.Success += response => onCommentRepliesReceived(response, drawableComment);
+
+            request.Success += response => Schedule(() => appendComments(drawableComment, response));
+
             api.PerformAsync(request);
         }
-
-        private void onCommentRepliesReceived(CommentBundle response, DrawableComment drawableComment)
-        {
-            // We may receive already loaded comments
-            var uniqueComments = response.Comments.Where(c => !drawableComment.ContainsReply(c.Id)).ToList();
-
-            uniqueComments.ForEach(c => c.ParentComment = drawableComment.Comment);
-
-            drawableComment.Replies.AddRange(uniqueComments.Select(createDrawableComment));
-        }
-
-        private DrawableComment createDrawableComment(Comment comment) => new DrawableComment(comment)
-        {
-            ShowDeleted = { BindTarget = ShowDeleted },
-            Sort = { BindTarget = Sort },
-            RepliesRequested = onCommentRepliesRequested
-        };
 
         private class NoCommentsPlaceholder : CompositeDrawable
         {
