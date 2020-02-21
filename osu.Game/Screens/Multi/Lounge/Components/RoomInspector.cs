@@ -2,18 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
@@ -24,15 +18,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
 
-        private ParticipantCountDisplay participantCount;
-        private OsuSpriteText name;
-        private BeatmapTypeInfo beatmapTypeInfo;
-        private ParticipantInfo participantInfo;
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
-        private readonly Bindable<RoomStatus> status = new Bindable<RoomStatus>(new RoomStatusNoneSelected());
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -42,177 +29,52 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"343138"),
+                    Colour = Color4.Black,
+                    Alpha = 0.25f
                 },
-                new GridContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    Padding = new MarginPadding { Horizontal = 30 },
+                    Child = new GridContainer
                     {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        Content = new[]
                         {
-                            new FillFlowContainer
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
+                                new FillFlowContainer
                                 {
-                                    new Container
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = 200,
-                                        Masking = true,
-                                        Children = new Drawable[]
+                                        new RoomInfo
                                         {
-                                            new MultiplayerBackgroundSprite { RelativeSizeAxes = Axes.Both },
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0)),
-                                            },
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding(20),
-                                                Children = new Drawable[]
-                                                {
-                                                    participantCount = new ParticipantCountDisplay
-                                                    {
-                                                        Anchor = Anchor.TopRight,
-                                                        Origin = Anchor.TopRight,
-                                                    },
-                                                    name = new OsuSpriteText
-                                                    {
-                                                        Anchor = Anchor.BottomLeft,
-                                                        Origin = Anchor.BottomLeft,
-                                                        Font = OsuFont.GetFont(size: 30),
-                                                        Current = RoomName
-                                                    },
-                                                },
-                                            },
+                                            RelativeSizeAxes = Axes.X,
+                                            Margin = new MarginPadding { Vertical = 60 },
                                         },
-                                    },
-                                    new StatusColouredContainer(transition_duration)
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = 5,
-                                        Child = new Box { RelativeSizeAxes = Axes.Both }
-                                    },
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
+                                        new OverlinedParticipants(Direction.Horizontal)
                                         {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = OsuColour.FromHex(@"28242d"),
-                                            },
-                                            new FillFlowContainer
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Direction = FillDirection.Vertical,
-                                                LayoutDuration = transition_duration,
-                                                Padding = contentPadding,
-                                                Spacing = new Vector2(0f, 5f),
-                                                Children = new Drawable[]
-                                                {
-                                                    new StatusColouredContainer(transition_duration)
-                                                    {
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Child = new StatusText
-                                                        {
-                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
-                                                        }
-                                                    },
-                                                    beatmapTypeInfo = new BeatmapTypeInfo(),
-                                                },
-                                            },
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y
                                         },
-                                    },
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Padding = contentPadding,
-                                        Children = new Drawable[]
-                                        {
-                                            participantInfo = new ParticipantInfo(),
-                                        },
-                                    },
-                                },
+                                    }
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                new OverlinedPlaylist(false) { RelativeSizeAxes = Axes.Both },
                             },
                         },
-                        new Drawable[]
+                        RowDimensions = new[]
                         {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = 10 },
-                                Child = new ParticipantsList { RelativeSizeAxes = Axes.Both }
-                            }
+                            new Dimension(GridSizeMode.AutoSize),
                         }
                     }
                 }
             };
-
-            Status.BindValueChanged(_ => updateStatus(), true);
-            RoomID.BindValueChanged(_ => updateStatus(), true);
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs(status, new CacheInfo(nameof(Room.Status), typeof(Room)));
-            return dependencies;
-        }
-
-        private void updateStatus()
-        {
-            if (RoomID.Value == null)
-            {
-                status.Value = new RoomStatusNoneSelected();
-
-                participantCount.FadeOut(transition_duration);
-                beatmapTypeInfo.FadeOut(transition_duration);
-                name.FadeOut(transition_duration);
-                participantInfo.FadeOut(transition_duration);
-            }
-            else
-            {
-                status.Value = Status.Value;
-
-                participantCount.FadeIn(transition_duration);
-                beatmapTypeInfo.FadeIn(transition_duration);
-                name.FadeIn(transition_duration);
-                participantInfo.FadeIn(transition_duration);
-            }
-        }
-
-        private class RoomStatusNoneSelected : RoomStatus
-        {
-            public override string Message => @"No Room Selected";
-            public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray8;
-        }
-
-        private class StatusText : OsuSpriteText
-        {
-            [Resolved(typeof(Room), nameof(Room.Status))]
-            private Bindable<RoomStatus> status { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                status.BindValueChanged(s => Text = s.NewValue.Message, true);
-            }
         }
     }
 }
