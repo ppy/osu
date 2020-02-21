@@ -413,8 +413,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             else
                 d12StackedNerf = d12;
 
-            // Correction #9 - Small jump nerf
-            double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((d12 - 2.2) / 0.7, 2));
+            // Correction #9 - Slow small jump nerf
+            double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((d12 - 2.2) / 0.7, 2)) *
+                                             SpecialFunctions.Logistic((275 - effectiveBpm) / 10);
 
             // Correction #10 - Hidden Mod
             double correctionHidden = 0;
