@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Rankings
 
         private SpotlightSelector selector;
         private Container content;
-        private DimmedLoadingLayer loading;
+        private LoadingLayer loading;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Rankings
                                 AutoSizeAxes = Axes.Y,
                                 Margin = new MarginPadding { Vertical = 10 }
                             },
-                            loading = new DimmedLoadingLayer()
+                            loading = new LoadingLayer(content)
                         }
                     }
                 }
