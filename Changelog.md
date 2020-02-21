@@ -494,6 +494,12 @@
     *   [m] [Bump DiscordRichPresence from 1.0.147 to 1.0.150 #7929]
     *   [m] [Split out pulp formations into individual classes #7911]
     *   [m] [Implement CommentEditor component #7795]
+    *   [m] [Make RankingsOverlay available in-game #7817]
+    *   [m] [Use a single implementation for all loading animations #7931]
+    *   [m] [Make RankingsOverlay available in-game #7817]
+    *   [m] [更新Framework #7935]
+    *   [m] [Add simple updater support for linux AppImages #7936]
+    *   [m] [Use new loading layer in beatmap listing overlay #7932]
 
 *   翻译修正
     *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs 第141行](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)

@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Direct
 
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
-        private readonly LoadingAnimation loadingAnimation;
+        private readonly LoadingSpinner LoadingSpinner;
 
         private const float transition_duration = 500;
 
@@ -53,12 +53,12 @@ namespace osu.Game.Overlays.Direct
                 if (value)
                 {
                     icon.FadeTo(0.5f, transition_duration, Easing.OutQuint);
-                    loadingAnimation.Show();
+                    LoadingSpinner.Show();
                 }
                 else
                 {
                     icon.FadeTo(1, transition_duration, Easing.OutQuint);
-                    loadingAnimation.Hide();
+                    LoadingSpinner.Hide();
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.Solid.Play,
                 },
-                loadingAnimation = new LoadingAnimation
+                LoadingSpinner = new LoadingSpinner
                 {
                     Size = new Vector2(15),
                 },

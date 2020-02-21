@@ -17,8 +17,8 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override TableColumn[] CreateUniqueHeaders() => new[]
         {
-            new TableColumn("Total Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize))
+            new TableColumn("总分", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Rank分", Anchor.Centre, new Dimension(GridSizeMode.AutoSize))
         };
 
         protected override Drawable[] CreateUniqueContent(UserStatistics item) => new Drawable[]
@@ -33,6 +33,6 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
-        protected override string HighlightedColumn() => @"Ranked Score";
+        protected override string HighlightedColumn() => @"Rank分";
     }
 }

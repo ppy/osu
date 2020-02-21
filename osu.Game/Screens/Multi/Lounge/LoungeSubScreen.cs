@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly ProcessingOverlay processingOverlay;
+        private readonly LoadingLayer  LoadingLayer ;
 
         [Resolved]
         private Bindable<Room> currentRoom { get; set; }
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Lounge
                                         Child = new RoomsContainer { JoinRequested = joinRequested }
                                     },
                                 },
-                                processingOverlay = new ProcessingOverlay(searchContainer),
+                                LoadingLayer  = new LoadingLayer (searchContainer),
                             }
                         },
                         new RoomInspector
@@ -126,12 +126,12 @@ namespace osu.Game.Screens.Multi.Lounge
 
         private void joinRequested(Room room)
         {
-            processingOverlay.Show();
+            LoadingLayer .Show();
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                processingOverlay.Hide();
-            }, _ => processingOverlay.Hide());
+                LoadingLayer .Hide();
+            }, _ => LoadingLayer .Hide());
         }
 
         /// <summary>

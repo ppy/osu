@@ -22,12 +22,12 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override TableColumn[] CreateAdditionalHeaders() => new[]
         {
-            new TableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("活跃用户", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("游玩次数", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Rank总分", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("平均分数", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("表现", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("平均表现", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Country GetCountry(CountryStatistics item) => item.Country;
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 AutoSizeAxes = Axes.Both;
                 Add(text = new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 12),
+                    Font = OsuFont.GetFont(size: 17),
                     Text = country.FullName ?? string.Empty,
                 });
             }

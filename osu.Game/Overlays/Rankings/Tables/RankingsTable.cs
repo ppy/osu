@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 {
     public abstract class RankingsTable<TModel> : TableContainer
     {
-        protected const int TEXT_SIZE = 12;
+        protected const int TEXT_SIZE = 17;
         private const float horizontal_inset = 20;
         private const float row_height = 25;
         private const int items_per_page = 50;
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 this.highlighted = highlighted;
 
                 Text = text;
-                Font = OsuFont.GetFont(size: 12);
+                Font = OsuFont.GetFont(size: 17);
                 Margin = new MarginPadding { Horizontal = 10 };
             }
 

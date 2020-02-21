@@ -16,7 +16,7 @@ namespace osu.Game.Online
     /// </summary>
     public abstract class OnlineViewContainer : Container, IOnlineComponent
     {
-        protected LoadingAnimation LoadingAnimation { get; private set; }
+        protected LoadingSpinner LoadingSpinner { get; private set; }
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -41,7 +41,7 @@ namespace osu.Game.Online
             {
                 Content,
                 placeholder = new LoginPlaceholder(placeholderMessage),
-                LoadingAnimation = new LoadingAnimation
+                LoadingSpinner = new LoadingSpinner
                 {
                     Alpha = 0,
                 }
@@ -63,19 +63,19 @@ namespace osu.Game.Online
                     PopContentOut(Content);
                     placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_duration, Easing.OutQuint);
                     placeholder.FadeInFromZero(2 * transform_duration, Easing.OutQuint);
-                    LoadingAnimation.Hide();
+                    LoadingSpinner.Hide();
                     break;
 
                 case APIState.Online:
                     PopContentIn(Content);
                     placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
-                    LoadingAnimation.Hide();
+                    LoadingSpinner.Hide();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
                     PopContentOut(Content);
-                    LoadingAnimation.Show();
+                    LoadingSpinner.Show();
                     placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
                     break;
             }

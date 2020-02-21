@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using System.ComponentModel;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Overlays.Rankings
         protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector();
 
         protected override Drawable CreateContent() => countryFilter = new CountryFilter();
+
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
 
         private class RankingsTitle : ScreenTitle
         {
@@ -48,9 +51,13 @@ namespace osu.Game.Overlays.Rankings
 
     public enum RankingsScope
     {
+        [Description("表现")]
         Performance,
+        [Description("月赛")]
         Spotlights,
+        [Description("总分")]
         Score,
+        [Description("国家和地区")]
         Country
     }
 }

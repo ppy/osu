@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override TableColumn[] CreateUniqueHeaders() => new[]
         {
-            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("表现", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Drawable[] CreateUniqueContent(UserStatistics item) => new Drawable[]

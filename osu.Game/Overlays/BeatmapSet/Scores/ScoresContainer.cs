@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
@@ -13,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box background;
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
         private readonly FillFlowContainer content;
@@ -160,16 +160,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         }
                                     }
                                 },
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    CornerRadius = 5,
-                                    Child = loading = new DimmedLoadingLayer(iconScale: 0.8f)
-                                    {
-                                        Alpha = 0,
-                                    },
-                                }
+                                loading = new LoadingLayer()
                             }
                         }
                     }
@@ -191,8 +182,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.BindValueChanged(_ => getScores());
             ruleset.BindValueChanged(_ => getScores());
 
-            modSelector.SelectedMods.ItemsAdded += _ => getScores();
-            modSelector.SelectedMods.ItemsRemoved += _ => getScores();
+            modSelector.SelectedMods.CollectionChanged += (_, __) => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);

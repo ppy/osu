@@ -26,8 +26,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Playlist.ItemsAdded += _ => updateText();
-            Playlist.ItemsRemoved += _ => updateText();
+            Playlist.CollectionChanged += (_, __) => updateText();
 
             updateText();
         }
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Multi.Components
 
             if (beatmap == null)
             {
-                textFlow.AddText("还没有选择任何谱面", s =>
+                textFlow.AddText("未选择任何谱面", s =>
                 {
                     s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;

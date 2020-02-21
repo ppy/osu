@@ -21,8 +21,8 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override TableColumn[] CreateAdditionalHeaders() => new[]
         {
-            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("准确率", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("游玩次数", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         }.Concat(CreateUniqueHeaders()).Concat(new[]
         {
             new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),

@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly FavouriteButton favouriteButton;
         private readonly FillFlowContainer fadeContent;
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
         private readonly BeatmapSetHeader beatmapSetHeader;
 
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     },
                                 }
                             },
-                            loading = new LoadingAnimation
+                            loading = new LoadingSpinner
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,

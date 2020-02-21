@@ -83,10 +83,10 @@ namespace osu.Game.Overlays.Rankings
                                 Spacing = new Vector2(15, 0),
                                 Children = new Drawable[]
                                 {
-                                    startDateColumn = new InfoColumn(@"Start Date"),
-                                    endDateColumn = new InfoColumn(@"End Date"),
-                                    mapCountColumn = new InfoColumn(@"Map Count"),
-                                    participantsColumn = new InfoColumn(@"Participants")
+                                    startDateColumn = new InfoColumn(@"开始日期"),
+                                    endDateColumn = new InfoColumn(@"结束日期"),
+                                    mapCountColumn = new InfoColumn(@"谱面数量"),
+                                    participantsColumn = new InfoColumn(@"参与人数")
                                 }
                             }
                         }
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Rankings
                     new OsuSpriteText
                     {
                         Text = name,
-                        Font = OsuFont.GetFont(size: 10),
+                        Font = OsuFont.GetFont(size: 17),
                     },
                     new Container
                     {

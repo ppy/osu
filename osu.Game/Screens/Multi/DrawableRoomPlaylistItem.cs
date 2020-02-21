@@ -84,8 +84,7 @@ namespace osu.Game.Screens.Multi
             beatmap.BindValueChanged(_ => scheduleRefresh());
             ruleset.BindValueChanged(_ => scheduleRefresh());
 
-            requiredMods.ItemsAdded += _ => scheduleRefresh();
-            requiredMods.ItemsRemoved += _ => scheduleRefresh();
+            requiredMods.CollectionChanged += (_, __) => scheduleRefresh();
 
             refresh();
         }
@@ -109,7 +108,7 @@ namespace osu.Game.Screens.Multi
 
             if (item.Beatmap?.Value?.Metadata?.Author != null)
             {
-                authorText.AddText("作图者");
+                authorText.AddText("作图者 ");
                 authorText.AddUserLink(item.Beatmap.Value?.Metadata.Author);
             }
 
