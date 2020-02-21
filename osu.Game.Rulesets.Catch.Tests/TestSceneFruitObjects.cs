@@ -38,9 +38,51 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
                 AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
+
+            AddStep("show droplet", () => SetContents(createDrawableDroplet));
+
+            AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
         }
 
-        private DrawableFruit createDrawable(FruitVisualRepresentation rep)
+        private Drawable createDrawableTinyDroplet()
+        {
+            var droplet = new TinyDroplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
+
+            return new DrawableTinyDroplet(droplet)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private Drawable createDrawableDroplet()
+        {
+            var droplet = new Droplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
+
+            return new DrawableDroplet(droplet)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private Drawable createDrawable(FruitVisualRepresentation rep)
         {
             Fruit fruit = new TestCatchFruit(rep)
             {
