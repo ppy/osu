@@ -346,20 +346,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void updateComboColour()
         {
-            if (HitObject is IHasComboInformation combo)
-            {
-                var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
-                UpdateComboColour(comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White, comboColours);
-            }
+            if (!(HitObject is IHasComboInformation)) return;
+
+            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+
+            AccentColour.Value = GetComboColour(comboColours);
         }
 
         /// <summary>
-        /// Called when a combo colour change is proposed.
+        /// Called to retrieve the combo colour. Automatically assigned to <see cref="AccentColour"/>.
+        /// Defaults to using <see cref="IHasComboInformation.ComboIndex"/> to decide on a colour.
         /// </summary>
-        /// <param name="proposedColour">The proposed combo colour, based off the combo index.</param>
+        /// <remarks>
+        /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
+        /// </remarks>
         /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
-        protected virtual void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours)
+        protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
         {
+            if (!(HitObject is IHasComboInformation combo))
+                throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
+
+            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
         }
 
         /// <summary>
