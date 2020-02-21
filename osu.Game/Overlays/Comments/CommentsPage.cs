@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Comments
 
         private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
         {
-            var request = new GetCommentRepliesRequest(drawableComment.Comment.Id, Type.Value, CommentableId.Value, Sort.Value, page);
+            var request = new GetCommentsRequest(CommentableId.Value, Type.Value, Sort.Value, page, drawableComment.Comment.Id);
 
             request.Success += response => Schedule(() => appendComments(drawableComment, response));
 
