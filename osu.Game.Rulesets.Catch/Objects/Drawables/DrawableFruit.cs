@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Utils;
 using osu.Game.Skinning;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {

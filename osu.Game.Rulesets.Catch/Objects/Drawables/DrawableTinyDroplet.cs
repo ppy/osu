@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 
-namespace osu.Game.Rulesets.Catch.Objects.Drawable
+namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableTinyDroplet : DrawableDroplet
     {
