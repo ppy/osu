@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly UpdateableRank rank;
         private readonly UpdateableAvatar avatar;
         private readonly LinkFlowContainer usernameText;
-        private readonly SpriteText date;
+        private readonly DrawableDate achievedOn;
         private readonly UpdateableFlag flag;
 
         public TopScoreUserSection()
@@ -92,11 +92,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
                             },
-                            date = new OsuSpriteText
+                            new FillFlowContainer
                             {
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 10)
+                                Children = new[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Text = "achieved ",
+                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
+                                    },
+                                    achievedOn = new DrawableDate(DateTimeOffset.MinValue)
+                                    {
+                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
+                                    },
+                                }
                             },
                             flag = new UpdateableFlag
                             {
@@ -126,7 +139,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 avatar.User = value.User;
                 flag.Country = value.User.Country;
-                date.Text = $@"achieved {HumanizerUtils.Humanize(value.Date)}";
+                achievedOn.Date = value.Date;
 
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
