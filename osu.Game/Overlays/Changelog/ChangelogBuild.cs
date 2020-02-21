@@ -51,28 +51,27 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
             foreach (var categoryEntries in Build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
             {
                 ChangelogEntries.Add(new OsuSpriteText
                 {
                     Text = categoryEntries.Key,
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
 
-                var fontLarge = OsuFont.GetFont(size: 18);
-                var fontMedium = OsuFont.GetFont(size: 14);
-                var fontSmall = OsuFont.GetFont(size: 12);
+                var fontLarge = OsuFont.GetFont(size: 16);
+                var fontMedium = OsuFont.GetFont(size: 12);
 
-                foreach (APIChangelogEntry entry in categoryEntries)
+                foreach (var entry in categoryEntries)
                 {
                     var entryColour = entry.Major ? colours.YellowLight : Color4.White;
 
                     LinkFlowContainer title;
 
-                    Container titleContainer = new Container
+                    var titleContainer = new Container
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
@@ -83,7 +82,7 @@ namespace osu.Game.Overlays.Changelog
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreRight,
-                                Size = new Vector2(fontSmall.Size),
+                                Size = new Vector2(10),
                                 Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
                                 Colour = entryColour,
                                 Margin = new MarginPadding { Right = 5 },
@@ -123,9 +122,9 @@ namespace osu.Game.Overlays.Changelog
                         });
                     }
 
-                    title.AddText(" by ", t =>
+                    title.AddText("  by ", t =>
                     {
-                        t.Font = fontMedium;
+                        t.Font = fontMedium.With(italics: true);
                         t.Colour = entryColour;
                     });
 
@@ -137,7 +136,7 @@ namespace osu.Game.Overlays.Changelog
                             Id = entry.GithubUser.UserId.Value
                         }, t =>
                         {
-                            t.Font = fontMedium;
+                            t.Font = fontMedium.With(italics: true);
                             t.Colour = entryColour;
                         });
                     }
@@ -145,7 +144,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
                         {
-                            t.Font = fontMedium;
+                            t.Font = fontMedium.With(italics: true);
                             t.Colour = entryColour;
                         });
                     }
@@ -153,7 +152,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         title.AddText(entry.GithubUser.DisplayName, t =>
                         {
-                            t.Font = fontSmall;
+                            t.Font = fontMedium.With(italics: true);
                             t.Colour = entryColour;
                         });
                     }
@@ -162,7 +161,7 @@ namespace osu.Game.Overlays.Changelog
 
                     if (!string.IsNullOrEmpty(entry.MessageHtml))
                     {
-                        TextFlowContainer message = new TextFlowContainer
+                        var message = new TextFlowContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -171,8 +170,8 @@ namespace osu.Game.Overlays.Changelog
                         // todo: use markdown parsing once API returns markdown
                         message.AddText(WebUtility.HtmlDecode(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty)), t =>
                         {
-                            t.Font = fontSmall;
-                            t.Colour = new Color4(235, 184, 254, 255);
+                            t.Font = fontMedium;
+                            t.Colour = colourProvider.Foreground1;
                         });
 
                         ChangelogEntries.Add(message);
