@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -20,12 +19,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(
-                new CatchSkinComponent(CatchSkinComponents.Droplet), _ => new Pulp
-                {
-                    Size = Size / 4,
-                    AccentColour = { Value = Color4.White }
-                });
+            ScaleContainer.Child = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.Droplet), _ => new Pulp
+            {
+                Size = Size / 4,
+                AccentColour = { BindTarget = AccentColour }
+            });
         }
     }
 }
