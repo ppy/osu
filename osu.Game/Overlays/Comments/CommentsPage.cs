@@ -80,6 +80,12 @@ namespace osu.Game.Overlays.Comments
 
             foreach (var child in bundle.IncludedComments)
                 add(child);
+            {
+                // Included comments can contain the parent comment, which already exists in the hierarchy.
+                if (commentDictionary.ContainsKey(child.Id))
+                    continue;
+
+            }
 
             // Comments whose parents did not previously have corresponding drawables, are now guaranteed that their parents have corresponding drawables.
             foreach (var o in orphaned)
