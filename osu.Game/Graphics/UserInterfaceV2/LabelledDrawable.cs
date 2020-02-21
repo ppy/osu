@@ -87,7 +87,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         },
-                        descriptionText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
+                        descriptionText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

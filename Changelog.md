@@ -473,3 +473,7 @@
     *   [m] [Add a global multiplayer background header #7909]
     *   [m] [Improve consistency of buttons in multiplayer #7921]
     *   [m] [Update the multiplayer room inspector design #7900]
+
+### 2020/02/21
+*   整合更新
+    *   [m] [Improve visual appearance of ProcessingOverlay #7922r]
