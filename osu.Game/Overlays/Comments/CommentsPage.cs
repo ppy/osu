@@ -89,13 +89,15 @@ namespace osu.Game.Overlays.Comments
         private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
 
         /// <summary>
-        /// Appends retrieved comments to the subtree of comments in this page.
+        /// Appends retrieved comments to the subtree rooted of comments in this page.
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
         private void appendComments([NotNull] CommentBundle bundle)
         {
-            foreach (var child in bundle.Comments)
-                addNewComment(child);
+            var orphaned = new List<Comment>();
+
+            foreach (var topLevel in bundle.Comments)
+                addNewComment(topLevel);
 
             foreach (var child in bundle.IncludedComments)
             {
@@ -105,6 +107,10 @@ namespace osu.Game.Overlays.Comments
 
                 addNewComment(child);
             }
+
+            // Comments whose parents were seen later than themselves can now be added.
+            foreach (var o in orphaned)
+                addNewComment(o);
 
             void addNewComment(Comment comment)
             {
@@ -120,6 +126,12 @@ namespace osu.Game.Overlays.Comments
                     // The comment's parent has already been seen, so the parent<-> child links can be added.
                     comment.ParentComment = parentDrawable.Comment;
                     parentDrawable.Replies.Add(drawableComment);
+                }
+                else
+                {
+                    // The comment's parent has not been seen yet, so keep it orphaned for the time being. This can occur if the comments arrive out of order.
+                    // Since this comment has now been seen, any further children can be added to it without being orphaned themselves.
+                    orphaned.Add(comment);
                 }
             }
         }
