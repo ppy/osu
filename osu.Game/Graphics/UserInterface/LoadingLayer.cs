@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void Update()
         {
             base.Update();
-            MainContents.Size = new Vector2(Math.Min(DrawWidth, DrawHeight) * 0.25f);
+            MainContents.Size = new Vector2(Math.Min(100, Math.Min(DrawWidth, DrawHeight) * 0.25f));
         }
 
         protected override void Dispose(bool isDisposing)
