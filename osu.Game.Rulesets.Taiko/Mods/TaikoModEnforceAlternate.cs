@@ -7,12 +7,15 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
+using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
@@ -115,7 +118,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                         if (blocked != null)
                         {
                             var key = ev.PressedKeys.ToList().Find(k => KeyCombination.FromKey(k) == blocked.KeyCombination.Keys.First());
-                            inputManager.PressKey(key, true);
+                            var input = new KeyboardKeyInput(key, true);
+                            var evt = new ButtonStateChangeEvent<Key>(inputManager.CurrentState, input, key, ButtonStateChangeKind.Pressed);
+
+                            inputManager.HandleInputStateChange(evt);
                         }
 
                         return false;

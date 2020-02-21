@@ -3,10 +3,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.StateChanges;
-using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Rulesets.UI;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -15,14 +12,6 @@ namespace osu.Game.Rulesets.Taiko
         public TaikoInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
-        }
-
-        public void PressKey(Key key, bool pressed)
-        {
-            var input = new KeyboardKeyInput(key, true);
-
-            var evt = new ButtonStateChangeEvent<Key>(CurrentState, input, key, pressed ? ButtonStateChangeKind.Pressed : ButtonStateChangeKind.Released);
-            HandleInputStateChange(evt);
         }
     }
 

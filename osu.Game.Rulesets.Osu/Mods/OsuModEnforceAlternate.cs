@@ -66,9 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     {
                         if (single == blockedButton)
                         {
-                            if (kb != null && !kb.Repeat)
-                                blockedKeystrokes++;
-                            else if (mouse != null)
+                            if ((kb != null && !kb.Repeat) || mouse != null)
                                 blockedKeystrokes++;
 
                             return true;
