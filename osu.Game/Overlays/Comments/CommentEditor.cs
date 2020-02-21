@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract string TextBoxPlaceholder { get; }
 
-        protected FillFlowContainer ButtonsContainer;
+        protected FillFlowContainer ButtonsContainer { get; private set; }
 
         protected readonly Bindable<string> Current = new Bindable<string>();
 
