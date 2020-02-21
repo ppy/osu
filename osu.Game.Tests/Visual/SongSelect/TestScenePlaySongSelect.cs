@@ -502,6 +502,72 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
         }
 
+        [Test]
+        public void TestDifficultyIconSelecting()
+        {
+            addRulesetImportStep(0);
+            createSongSelect();
+
+            DrawableCarouselBeatmapSet set = null;
+            AddStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First();
+            });
+
+            DrawableCarouselBeatmapSet.FilterableDifficultyIcon difficultyIcon = null;
+            AddStep("Find an icon", () =>
+            {
+                difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                                    .First(icon => getDifficultyIconIndex(set, icon) != getCurrentBeatmapIndex());
+            });
+            AddStep("Click on a difficulty", () =>
+            {
+                InputManager.MoveMouseTo(difficultyIcon);
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("Selected beatmap correct", () => getCurrentBeatmapIndex() == getDifficultyIconIndex(set, difficultyIcon));
+
+            double? maxBPM = null;
+            AddStep("Filter some difficulties", () => songSelect.Carousel.Filter(new FilterCriteria
+            {
+                BPM = new FilterCriteria.OptionalRange<double>
+                {
+                    Min = maxBPM = songSelect.Carousel.SelectedBeatmapSet.MaxBPM,
+                    IsLowerInclusive = true
+                }
+            }));
+
+            DrawableCarouselBeatmapSet.FilterableDifficultyIcon filteredIcon = null;
+            AddStep("Get filtered icon", () =>
+            {
+                var filteredBeatmap = songSelect.Carousel.SelectedBeatmapSet.Beatmaps.Find(b => b.BPM < maxBPM);
+                int filteredBeatmapIndex = getBeatmapIndex(filteredBeatmap.BeatmapSet, filteredBeatmap);
+                filteredIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
+            });
+
+            int? previousID = null;
+            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
+            AddStep("Click on a filtered difficulty", () =>
+            {
+                InputManager.MoveMouseTo(filteredIcon);
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
+        }
+
+        private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
+
+        private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmap);
+
+        private int getDifficultyIconIndex(DrawableCarouselBeatmapSet set, DrawableCarouselBeatmapSet.FilterableDifficultyIcon icon)
+        {
+            return set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
+        }
+
         private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
 
         private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
