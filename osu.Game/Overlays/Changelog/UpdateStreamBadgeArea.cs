@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
