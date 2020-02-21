@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.AccountCreation
         private IEnumerable<Drawable> characterCheckText;
 
         private OsuTextBox[] textboxes;
-        private ProcessingOverlay processingOverlay;
+        private LoadingLayer loadingLayer;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                     },
                 },
-                processingOverlay = new ProcessingOverlay(mainContent)
+                loadingLayer = new LoadingLayer(mainContent)
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.AccountCreation
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            processingOverlay.Hide();
+            loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)
                 focusNextTextbox();
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.AccountCreation
             emailAddressDescription.ClearErrors();
             passwordDescription.ClearErrors();
 
-            processingOverlay.Show();
+            loadingLayer.Show();
 
             Task.Run(() =>
             {
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.AccountCreation
                         }
 
                         registerShake.Shake();
-                        processingOverlay.Hide();
+                        loadingLayer.Hide();
                         return;
                     }
 
