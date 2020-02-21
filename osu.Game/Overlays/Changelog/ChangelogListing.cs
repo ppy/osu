@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Changelog
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 2,
-                            Colour = new Color4(17, 17, 17, 255),
+                            Colour = colourProvider.Background6,
                             Margin = new MarginPadding { Top = 30 },
                         });
                     }
