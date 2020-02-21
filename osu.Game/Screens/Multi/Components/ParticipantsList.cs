@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
@@ -19,21 +18,39 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class ParticipantsList : MultiplayerComposite
     {
+        public const float TILE_SIZE = 35;
+
+        public override Axes RelativeSizeAxes
+        {
+            get => base.RelativeSizeAxes;
+            set
+            {
+                base.RelativeSizeAxes = value;
+                fill.RelativeSizeAxes = value;
+            }
+        }
+
+        public new Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            set
+            {
+                base.AutoSizeAxes = value;
+                fill.AutoSizeAxes = value;
+            }
+        }
+
+        public FillDirection Direction
+        {
+            get => fill.Direction;
+            set => fill.Direction = value;
+        }
+
         private readonly FillFlowContainer fill;
 
         public ParticipantsList()
         {
-            InternalChild = new OsuScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = fill = new FillFlowContainer
-                {
-                    Spacing = new Vector2(10),
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Full,
-                }
-            };
+            InternalChild = fill = new FillFlowContainer { Spacing = new Vector2(10) };
         }
 
         [BackgroundDependencyLoader]
@@ -96,7 +113,7 @@ namespace osu.Game.Screens.Multi.Components
             public UserTile(User user)
             {
                 this.user = user;
-                Size = new Vector2(70f);
+                Size = new Vector2(TILE_SIZE);
                 CornerRadius = 5f;
                 Masking = true;
 

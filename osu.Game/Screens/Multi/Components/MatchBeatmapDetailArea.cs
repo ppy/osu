@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Multi.Components
                         {
                             new TriangleButton
                             {
-                                Text = "create new item",
+                                Text = "Add new playlist entry",
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 Action = () => CreateNewItem?.Invoke()

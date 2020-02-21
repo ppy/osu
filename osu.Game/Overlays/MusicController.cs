@@ -25,7 +25,16 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+        public IBindableList<BeatmapSetInfo> BeatmapSets
+        {
+            get
+            {
+                if (LoadState < LoadState.Ready)
+                    throw new InvalidOperationException($"{nameof(BeatmapSets)} should not be accessed before the music controller is loaded.");
+
+                return beatmapSets;
+            }
+        }
 
         /// <summary>
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
@@ -54,16 +63,18 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
+
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
         }
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
-            base.LoadComplete();
         }
 
         /// <summary>
@@ -82,11 +93,16 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool IsPlaying => current?.Track.IsRunning ?? false;
 
-        private void handleBeatmapAdded(BeatmapSetInfo set) =>
-            Schedule(() => beatmapSets.Add(set));
+        private void handleBeatmapAdded(BeatmapSetInfo set) => Schedule(() =>
+        {
+            if (!beatmapSets.Contains(set))
+                beatmapSets.Add(set);
+        });
 
-        private void handleBeatmapRemoved(BeatmapSetInfo set) =>
-            Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
+        private void handleBeatmapRemoved(BeatmapSetInfo set) => Schedule(() =>
+        {
+            beatmapSets.RemoveAll(s => s.ID == set.ID);
+        });
 
         private ScheduledDelegate seekDelegate;
 

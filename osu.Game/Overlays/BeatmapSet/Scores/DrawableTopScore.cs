@@ -17,13 +17,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private readonly Box background;
 
-        public DrawableTopScore(ScoreInfo score, int position = 1)
+        public DrawableTopScore(ScoreInfo score, int? position = 1)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             Masking = true;
-            CornerRadius = 5;
+            CornerRadius = 4;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         Vertical = 10,
                         Left = 10,
-                        Right = 25,
+                        Right = 30,
                     },
                     Children = new Drawable[]
                     {
