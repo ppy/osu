@@ -96,7 +96,8 @@ namespace osu.Game.Overlays.Comments
                 }
                 else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
                 {
-                    // The comment's parent already has a corresponding drawable.
+                    // The comment's parent already has a corresponding drawable, so add the parent<->child links.
+                    comment.ParentComment = parentDrawable.Comment;
                     parentDrawable.Replies.Add(drawableComment);
                 }
                 else
