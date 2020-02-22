@@ -22,6 +22,7 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -41,6 +42,7 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
+        private readonly BindableBool replyEditorVisible = new BindableBool();
 
         private int currentPage;
 
@@ -58,13 +60,14 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
             LinkFlowContainer message;
             GridContainer content;
             VotePill votePill;
+            ReplyEditor replyEditor;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -178,7 +181,11 @@ namespace osu.Game.Overlays.Comments
                                                             Colour = OsuColour.Gray(0.7f),
                                                             Text = HumanizerUtils.Humanize(Comment.CreatedAt)
                                                         },
-                                                        new ReplyButton(),
+                                                        new ReplyButton
+                                                        {
+                                                            Action = replyEditorVisible.Toggle,
+                                                            Alpha = api.IsLoggedIn ? 1 : 0
+                                                        },
                                                         repliesButton = new RepliesButton(Comment.RepliesCount)
                                                         {
                                                             Expanded = { BindTarget = childrenExpanded }
@@ -188,6 +195,10 @@ namespace osu.Game.Overlays.Comments
                                                             Action = () => RepliesRequested(this, ++currentPage)
                                                         }
                                                     }
+                                                },
+                                                replyEditor = new ReplyEditor
+                                                {
+                                                    IsVisible = { BindTarget = replyEditorVisible }
                                                 }
                                             }
                                         }
@@ -461,6 +472,29 @@ namespace osu.Game.Overlays.Comments
 
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
+        }
+
+        private class ReplyEditor : CancellableCommentEditor
+        {
+            public readonly BindableBool IsVisible = new BindableBool();
+
+            protected override void LoadComplete()
+            {
+                IsVisible.BindValueChanged(isVisible =>
+                {
+                    Alpha = isVisible.NewValue ? 1 : 0;
+                }, true);
+
+                OnCancel += () => IsVisible.Value = false;
+
+                base.LoadComplete();
+            }
+
+            protected override string FooterText => @"Press Enter to reply.";
+
+            protected override string CommitButtonText => @"Reply";
+
+            protected override string TextBoxPlaceholder => @"Type your response here";
         }
     }
 }
