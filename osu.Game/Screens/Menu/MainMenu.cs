@@ -18,7 +18,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Charts;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
@@ -73,7 +72,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
+        private void load(DirectOverlay direct, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -101,7 +100,6 @@ namespace osu.Game.Screens.Menu
                     {
                         buttons = new ButtonSystem
                         {
-                            OnChart = delegate { this.Push(new ChartListing()); },
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
@@ -136,6 +134,7 @@ namespace osu.Game.Screens.Menu
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
             buttons.OnDirect = () => direct?.ToggleVisibility();
+            buttons.OnChart = () => rankings?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
