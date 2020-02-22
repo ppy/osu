@@ -4,10 +4,8 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -18,7 +16,6 @@ using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Overlays.Comments;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -44,7 +41,7 @@ namespace osu.Game.Overlays
         {
             OsuScrollContainer scroll;
             Info info;
-            BeatmapSetCommentsContainer comments;
+            CommentsSection comments;
 
             Children = new Drawable[]
             {
@@ -56,7 +53,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Section>
+                    Child = new ReverseChildIDFillFlowContainer<BeatmapSetLayoutSection>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -64,7 +61,7 @@ namespace osu.Game.Overlays
                         Spacing = new Vector2(0, 20),
                         Children = new[]
                         {
-                            new Section
+                            new BeatmapSetLayoutSection
                             {
                                 Child = new ReverseChildIDFillFlowContainer<Drawable>
                                 {
@@ -78,17 +75,11 @@ namespace osu.Game.Overlays
                                     }
                                 },
                             },
-                            new Section
+                            new ScoresContainer
                             {
-                                Child = new ScoresContainer
-                                {
-                                    Beatmap = { BindTarget = Header.Picker.Beatmap }
-                                }
+                                Beatmap = { BindTarget = Header.Picker.Beatmap }
                             },
-                            new Section
-                            {
-                                Child = comments = new BeatmapSetCommentsContainer()
-                            }
+                            comments = new CommentsSection()
                         },
                     },
                 },
@@ -160,29 +151,16 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private class Section : Container
-        {
-            public Section()
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Masking = true;
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Colour = Color4.Black.Opacity(0.25f),
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 3,
-                    Offset = new Vector2(0f, 1f),
-                };
-            }
-        }
-
-        private class BeatmapSetCommentsContainer : CommentsContainer
+        private class CommentsSection : BeatmapSetLayoutSection
         {
             public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-            public BeatmapSetCommentsContainer()
+            public CommentsSection()
             {
+                CommentsContainer comments;
+
+                Add(comments = new CommentsContainer());
+
                 BeatmapSet.BindValueChanged(beatmapSet =>
                 {
                     if (beatmapSet.NewValue?.OnlineBeatmapSetID.HasValue != true)
@@ -192,7 +170,7 @@ namespace osu.Game.Overlays
                     else
                     {
                         Show();
-                        ShowComments(CommentableType.Beatmapset, beatmapSet.NewValue.OnlineBeatmapSetID.Value);
+                        comments.ShowComments(CommentableType.Beatmapset, beatmapSet.NewValue.OnlineBeatmapSetID.Value);
                     }
                 }, true);
             }
