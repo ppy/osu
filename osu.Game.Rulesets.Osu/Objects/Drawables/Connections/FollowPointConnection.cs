@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private const int spacing = 32;
         private const double preempt = 800;
 
+        public override bool RemoveWhenNotAlive => false;
+
         /// <summary>
         /// The start time of <see cref="Start"/>.
         /// </summary>
@@ -79,33 +81,39 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             drawableObject.HitObject.DefaultsApplied += scheduleRefresh;
         }
 
-        private void scheduleRefresh() => Scheduler.AddOnce(refresh);
+        private void scheduleRefresh()
+        {
+            Scheduler.AddOnce(refresh);
+        }
 
         private void refresh()
         {
             ClearInternal();
 
-            if (End == null)
-                return;
-
             OsuHitObject osuStart = Start.HitObject;
-            OsuHitObject osuEnd = End.HitObject;
+            double startTime = osuStart.GetEndTime();
 
-            if (osuEnd.NewCombo)
-                return;
+            LifetimeStart = startTime;
 
-            if (osuStart is Spinner || osuEnd is Spinner)
+            OsuHitObject osuEnd = End?.HitObject;
+
+            if (osuEnd == null || osuEnd.NewCombo || osuStart is Spinner || osuEnd is Spinner)
+            {
+                // ensure we always set a lifetime for full LifetimeManagementContainer benefits
+                LifetimeEnd = LifetimeStart;
                 return;
+            }
 
             Vector2 startPosition = osuStart.EndPosition;
             Vector2 endPosition = osuEnd.Position;
-            double startTime = osuStart.GetEndTime();
             double endTime = osuEnd.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
             int distance = (int)distanceVector.Length;
             float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
             double duration = endTime - startTime;
+
+            double finalTransformEndTime = startTime;
 
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
             {
@@ -131,10 +139,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     fp.ScaleTo(osuEnd.Scale, osuEnd.TimeFadeIn, Easing.Out);
                     fp.MoveTo(pointEndPosition, osuEnd.TimeFadeIn, Easing.Out);
                     fp.Delay(fadeOutTime - fadeInTime).FadeOut(osuEnd.TimeFadeIn);
-                }
 
-                fp.Expire(true);
+                    finalTransformEndTime = fadeOutTime + osuEnd.TimeFadeIn;
+                }
             }
+
+            LifetimeStart = startTime;
+            LifetimeEnd = finalTransformEndTime;
         }
     }
 }
