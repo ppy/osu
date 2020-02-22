@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Changelog
                                 Origin = Anchor.CentreRight,
                                 Size = new Vector2(10),
                                 Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
-                                Colour = entryColour.Darken(0.7f),
+                                Colour = entryColour.Opacity(0.5f),
                                 Margin = new MarginPadding { Right = 5 },
                             },
                             title = new LinkFlowContainer
@@ -123,10 +123,11 @@ namespace osu.Game.Overlays.Changelog
                         });
                     }
 
-                    title.AddText("  by ", t =>
+                    title.AddText("by ", t =>
                     {
                         t.Font = fontMedium.With(italics: true);
                         t.Colour = entryColour;
+                        t.Padding = new MarginPadding { Left = 10 };
                     });
 
                     if (entry.GithubUser.UserId != null)
