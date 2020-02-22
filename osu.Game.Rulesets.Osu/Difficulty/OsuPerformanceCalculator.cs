@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 46000;
 
             // nerf short maps
-            double lengthFactor = 0.5 + 0.5 * SpecialFunctions.Logistic(Attributes.Length / 60.0);
+            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0);
             accuracyValue *= lengthFactor;
 
             if (mods.Any(m => m is OsuModHidden))
