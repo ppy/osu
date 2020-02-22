@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Comments
                                                         new ReplyButton
                                                         {
                                                             Action = replyEditorVisible.Toggle,
-                                                            Alpha = api.IsLoggedIn ? 1 : 0
+                                                            Alpha = api.IsLoggedIn && !Comment.IsDeleted ? 1 : 0
                                                         },
                                                         repliesButton = new RepliesButton(Comment.RepliesCount)
                                                         {
