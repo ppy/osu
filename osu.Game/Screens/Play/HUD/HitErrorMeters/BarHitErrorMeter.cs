@@ -215,7 +215,17 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 return;
 
             if (judgementsContainer.Count >= max_concurrent_judgements)
-                judgementsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + 100)?.FadeOut(100).Expire();
+            {
+                const double quick_fade_time = 100;
+
+                var old = judgementsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + quick_fade_time);
+
+                if (old != null)
+                {
+                    old.ClearTransforms();
+                    old.FadeOut(quick_fade_time).Expire();
+                }
+            }
 
             judgementsContainer.Add(new JudgementLine
             {
