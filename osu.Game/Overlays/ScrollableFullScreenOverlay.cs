@@ -12,7 +12,7 @@ namespace osu.Game.Overlays
     {
         protected override Container<Drawable> Content => ScrollFlow;
 
-        protected BasicScrollContainer ScrollFlow { get; }
+        protected OverlayScrollContainer ScrollFlow { get; }
 
         protected Box Background { get; }
 
@@ -25,11 +25,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                ScrollFlow = new BasicScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                }
+                ScrollFlow = new OverlayScrollContainer()
             });
         }
 
