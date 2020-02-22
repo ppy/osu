@@ -202,7 +202,7 @@ namespace osu.Game.Overlays.Comments
                                                 replyEditor = new ReplyEditor
                                                 {
                                                     IsVisible = { BindTarget = replyEditorVisible },
-                                                    OnCommit = message => PostReplyRequested(this, message)
+                                                    OnCommit = text => PostReplyRequested(this, text)
                                                 }
                                             }
                                         }

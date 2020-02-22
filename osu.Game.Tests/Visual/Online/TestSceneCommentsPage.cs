@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osuTK;
+using osu.Framework.Utils;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -65,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
         private void createPage(CommentBundle commentBundle)
         {
             content.Clear();
-            content.Add(new CommentsPage(commentBundle)
+            content.Add(new TestCommentPage(commentBundle)
             {
                 ShowDeleted = { BindTarget = showDeleted }
             });
@@ -182,5 +183,34 @@ namespace osu.Game.Tests.Visual.Online
                 }
             },
         };
+
+        private class TestCommentPage : CommentsPage
+        {
+            public TestCommentPage(CommentBundle bundle)
+                : base(bundle)
+            {
+            }
+
+            protected override void OnCommentPostReplyRequested(DrawableComment drawableComment, string message)
+            {
+                var testBundle = new CommentBundle
+                {
+                    Comments = new List<Comment>
+                    {
+                        new Comment
+                        {
+                            Id = RNG.Next(),
+                            ParentId = drawableComment.Comment.Id,
+                            Message = message,
+                            LegacyName = @"You",
+                            CreatedAt = DateTimeOffset.Now,
+                        }
+                    },
+                    IncludedComments = new List<Comment>(),
+                };
+
+                AppendComments(testBundle, true);
+            }
+        }
     }
 }

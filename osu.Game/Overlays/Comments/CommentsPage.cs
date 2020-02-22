@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            appendComments(commentBundle);
+            AppendComments(commentBundle);
         }
 
         private DrawableComment getDrawableComment(Comment comment)
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Comments
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
                 RepliesRequested = onCommentRepliesRequested,
-                PostReplyRequested = onCommentPostReplyRequested
+                PostReplyRequested = OnCommentPostReplyRequested
             };
         }
 
@@ -82,16 +82,16 @@ namespace osu.Game.Overlays.Comments
         {
             var request = new GetCommentsRequest(CommentableId.Value, Type.Value, Sort.Value, page, drawableComment.Comment.Id);
 
-            request.Success += response => Schedule(() => appendComments(response));
+            request.Success += response => Schedule(() => AppendComments(response));
 
             api.PerformAsync(request);
         }
 
-        private void onCommentPostReplyRequested(DrawableComment drawableComment, string message)
+        protected virtual void OnCommentPostReplyRequested(DrawableComment drawableComment, string message)
         {
             var request = new PostCommentRequest(CommentableId.Value, Type.Value, message, drawableComment.Comment.Id);
 
-            request.Success += response => Schedule(() => appendComments(response, true));
+            request.Success += response => Schedule(() => AppendComments(response, true));
 
             api.Queue(request);
         }
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Comments
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
         /// <param name="newReply">Whether or not we should add child comments as new replies.</param>
-        private void appendComments([NotNull] CommentBundle bundle, bool newReply = false)
+        protected void AppendComments([NotNull] CommentBundle bundle, bool newReply = false)
         {
             var orphaned = new List<Comment>();
 
