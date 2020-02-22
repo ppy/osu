@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapListing
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 10),
+                            Font = OsuFont.GetFont(size: 17),
                             Text = headerName.ToUpper()
                         },
                         CreateFilter().With(f =>
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected class FilterTabItem : TabItem<T>
             {
-                protected virtual float TextSize => 13;
+                protected virtual float TextSize => 17;
 
                 [Resolved]
                 private OverlayColourProvider colourProvider { get; set; }

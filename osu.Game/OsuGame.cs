@@ -65,6 +65,8 @@ namespace osu.Game
 
         private DirectOverlay direct;
 
+        private BeatmapListingOverlay beatmapListing;
+
         private SocialOverlay social;
 
         private UserProfileOverlay userProfile;
@@ -597,6 +599,7 @@ namespace osu.Game
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);

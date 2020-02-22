@@ -512,3 +512,8 @@
 
 *   翻译修正
     *   [osu.Game/Screens/Edit/Timing/ControlPointTable.cs 第141行](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)
+
+## 2020/02/22:
+*   一些翻译优化
+*   翻出来一个新的谱面列表(BeatmapListingOverlay)
+*   将各类Tests与官方同步

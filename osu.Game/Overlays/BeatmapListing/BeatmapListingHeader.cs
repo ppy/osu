@@ -14,8 +14,8 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public BeatmapListingTitle()
             {
-                Title = @"beatmap";
-                Section = @"listing";
+                Title = @"谱面";
+                Section = @"列表";
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

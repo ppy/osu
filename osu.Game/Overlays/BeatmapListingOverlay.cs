@@ -303,7 +303,7 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = @"... nope, nothing found.",
+                            Text = @"呃...啥都没找到",
                         }
                     }
                 });

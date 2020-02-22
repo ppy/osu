@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapSearchRulesetFilterRow : BeatmapSearchFilterRow<RulesetInfo>
     {
         public BeatmapSearchRulesetFilterRow()
-            : base(@"Mode")
+            : base(@"游戏模式")
         {
         }
 
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 AddItem(new RulesetInfo
                 {
-                    Name = @"Any"
+                    Name = @"任意"
                 });
 
                 foreach (var r in rulesets.AvailableRulesets)

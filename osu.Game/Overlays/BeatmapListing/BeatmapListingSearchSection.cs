@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Children = new Drawable[]
                                 {
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
-                                    categoryFilter = new BeatmapSearchFilterRow<BeatmapSearchCategory>(@"Categories"),
+                                    categoryFilter = new BeatmapSearchFilterRow<BeatmapSearchCategory>(@"分类"),
                                 }
                             }
                         }
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             public BeatmapSearchTextBox()
             {
-                PlaceholderText = @"type in keywords...";
+                PlaceholderText = @"键入关键词...";
             }
         }
     }
