@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public Action<DrawableComment, int> RepliesRequested;
+        public Action<DrawableComment, string> PostReplyRequested;
 
         public readonly Comment Comment;
 
@@ -40,6 +41,7 @@ namespace osu.Game.Overlays.Comments
         private readonly Dictionary<long, Comment> loadedReplies = new Dictionary<long, Comment>();
 
         public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
+        public readonly BindableList<DrawableComment> NewReplies = new BindableList<DrawableComment>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly BindableBool replyEditorVisible = new BindableBool();
@@ -48,11 +50,13 @@ namespace osu.Game.Overlays.Comments
 
         private FillFlowContainer childCommentsVisibilityContainer;
         private FillFlowContainer childCommentsContainer;
+        private FillFlowContainer newRepliesContainer;
         private LoadMoreCommentsButton loadMoreCommentsButton;
         private ShowMoreButton showMoreButton;
         private RepliesButton repliesButton;
         private ChevronButton chevronButton;
         private DeletedCommentsCounter deletedCommentsCounter;
+        private ReplyEditor replyEditor;
 
         public DrawableComment(Comment comment)
         {
@@ -67,7 +71,6 @@ namespace osu.Game.Overlays.Comments
             LinkFlowContainer message;
             GridContainer content;
             VotePill votePill;
-            ReplyEditor replyEditor;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -198,7 +201,8 @@ namespace osu.Game.Overlays.Comments
                                                 },
                                                 replyEditor = new ReplyEditor
                                                 {
-                                                    IsVisible = { BindTarget = replyEditorVisible }
+                                                    IsVisible = { BindTarget = replyEditorVisible },
+                                                    OnCommit = message => PostReplyRequested(this, message)
                                                 }
                                             }
                                         }
@@ -213,6 +217,13 @@ namespace osu.Game.Overlays.Comments
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
+                                newRepliesContainer = new FillFlowContainer
+                                {
+                                    Padding = new MarginPadding { Left = 20 },
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical
+                                },
                                 childCommentsContainer = new FillFlowContainer
                                 {
                                     Padding = new MarginPadding { Left = 20 },
@@ -297,6 +308,19 @@ namespace osu.Game.Overlays.Comments
                         throw new NotSupportedException(@"You can only add replies to this list. Other actions are not supported.");
                 }
             };
+
+            NewReplies.CollectionChanged += (_, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        onNewReplyAdded(args.NewItems.Cast<DrawableComment>().Single());
+                        break;
+
+                    default:
+                        throw new NotSupportedException(@"You can only add replies to this list. Other actions are not supported.");
+                }
+            };
         }
 
         protected override void LoadComplete()
@@ -326,6 +350,28 @@ namespace osu.Game.Overlays.Comments
             }
 
             LoadComponentAsync(page, loaded => addRepliesPage(loaded, replies));
+        }
+
+        private void onNewReplyAdded(DrawableComment newReply)
+        {
+            LoadComponentAsync(newReply, loaded =>
+            {
+                loadedReplies.Add(loaded.Comment.Id, loaded.Comment);
+
+                newRepliesContainer.Add(loaded.With(drawableComment =>
+                {
+                    drawableComment.Anchor = Anchor.BottomCentre;
+                    drawableComment.Origin = Anchor.BottomCentre;
+                }));
+
+                Comment.RepliesCount++;
+                repliesButton.IncreaseValue();
+
+                replyEditor.IsLoading = false;
+                replyEditorVisible.Value = false;
+
+                updateButtonsState();
+            });
         }
 
         private void addRepliesPage(FillFlowContainer<DrawableComment> page, IEnumerable<DrawableComment> replies)
@@ -382,7 +428,7 @@ namespace osu.Game.Overlays.Comments
         private class RepliesButton : ShowChildrenButton
         {
             private readonly SpriteText text;
-            private readonly int count;
+            private int count;
 
             public RepliesButton(int count)
             {
@@ -392,6 +438,12 @@ namespace osu.Game.Overlays.Comments
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 };
+            }
+
+            public void IncreaseValue()
+            {
+                count++;
+                Expanded.TriggerChange();
             }
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)

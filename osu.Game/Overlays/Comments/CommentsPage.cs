@@ -73,7 +73,8 @@ namespace osu.Game.Overlays.Comments
             {
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
-                RepliesRequested = onCommentRepliesRequested
+                RepliesRequested = onCommentRepliesRequested,
+                PostReplyRequested = onCommentPostReplyRequested
             };
         }
 
@@ -86,18 +87,34 @@ namespace osu.Game.Overlays.Comments
             api.PerformAsync(request);
         }
 
+        private void onCommentPostReplyRequested(DrawableComment drawableComment, string message)
+        {
+            var request = new PostCommentRequest(CommentableId.Value, Type.Value, message, drawableComment.Comment.Id);
+
+            request.Success += response => Schedule(() => appendComments(response, true));
+
+            api.Queue(request);
+        }
+
         private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
 
         /// <summary>
         /// Appends retrieved comments to the subtree rooted of comments in this page.
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
-        private void appendComments([NotNull] CommentBundle bundle)
+        /// <param name="newReply">Whether or not we should add child comments as new replies.</param>
+        private void appendComments([NotNull] CommentBundle bundle, bool newReply = false)
         {
             var orphaned = new List<Comment>();
 
-            foreach (var topLevel in bundle.Comments)
-                addNewComment(topLevel);
+            foreach (var child in bundle.Comments)
+            {
+                // Comments can contain the comment, which has been already added like a new reply.
+                if (commentDictionary.ContainsKey(child.Id))
+                    continue;
+
+                addNewComment(child);
+            }
 
             foreach (var child in bundle.IncludedComments)
             {
@@ -125,7 +142,11 @@ namespace osu.Game.Overlays.Comments
                 {
                     // The comment's parent has already been seen, so the parent<-> child links can be added.
                     comment.ParentComment = parentDrawable.Comment;
-                    parentDrawable.Replies.Add(drawableComment);
+
+                    if (newReply)
+                        parentDrawable.NewReplies.Add(drawableComment);
+                    else
+                        parentDrawable.Replies.Add(drawableComment);
                 }
                 else
                 {
