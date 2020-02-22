@@ -14,12 +14,13 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModEnforceAlternate : ModEnforceAlternate, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToHealthProcessor
+    public class TaikoModEnforceAlternate : ModEnforceAlternate, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToHealthProcessor, IUpdatableByPlayfield
     {
         public override IconUsage? Icon => FontAwesome.Solid.SignLanguage;
 
@@ -32,8 +33,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private TaikoAction? lastBlocked;
         private int blockedKeystrokes;
 
+        private DrawableDrumRoll currentRoll;
+
         [SettingSource("Allow repeats on color change")]
         public Bindable<bool> RepeatOnColorChange { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
+        [SettingSource("Allow repeats after drumrolls")]
+        public Bindable<bool> RepeatAfterDrumroll { get; } = new BindableBool
         {
             Default = true,
             Value = true
@@ -54,6 +64,27 @@ namespace osu.Game.Rulesets.Taiko.Mods
         }
 
         protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0 && lastBlocked != null;
+
+        public void Update(Playfield playfield)
+        {
+            if (RepeatAfterDrumroll.Value)
+            {
+                if (currentRoll != null && currentRoll.AllJudged)
+                {
+                    if (currentRoll.HitObject.IsStrong)
+                    {
+                        blockedRim = null;
+                        blockedCentre = null;
+                    }
+                    else
+                        blockedCentre = null;
+
+                    currentRoll = null;
+                }
+
+                currentRoll = playfield.HitObjectContainer.Objects.ToList().Find(o => o is DrawableDrumRoll && !o.AllJudged) as DrawableDrumRoll;
+            }
+        }
 
         protected bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
         {
