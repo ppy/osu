@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Changelog
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} {"user".Pluralize(stream.LatestBuild.Users == 1)} online" : null,
+                                    Text = stream.LatestBuild.Users > 0 ? $"{"user".ToQuantity(stream.LatestBuild.Users, "N0")} online" : null,
                                     Font = OsuFont.GetFont(size: 10),
                                     Colour = colourProvider.Foreground1
                                 },
