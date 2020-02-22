@@ -12,7 +12,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
@@ -22,7 +21,7 @@ using osu.Game.Overlays.Changelog;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : FullscreenOverlay
+    public class ChangelogOverlay : ScrollableFullScreenOverlay
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
@@ -44,37 +43,26 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {
-            Children = new Drawable[]
+            Add(new ReverseChildIDFillFlowContainer<Drawable>
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colour.PurpleDarkAlternative,
-                },
-                new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    Header = new ChangelogHeader
+                    {
+                        ListingSelected = ShowListing,
+                    },
+                    content = new Container<ChangelogContent>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            Header = new ChangelogHeader
-                            {
-                                ListingSelected = ShowListing,
-                            },
-                            content = new Container<ChangelogContent>
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
-                        },
-                    },
-                },
-            };
+                    }
+                }
+            });
+
+            Background.Colour = colour.PurpleDarkAlternative;
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 

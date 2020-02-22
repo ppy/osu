@@ -25,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : FullscreenOverlay
+    public class BeatmapListingOverlay : ScrollableFullScreenOverlay
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -47,95 +47,82 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            Add(new ReverseChildIDFillFlowContainer<Drawable>
             {
-                new Box
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 10),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider.Background6
-                },
-                new BasicScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10),
+                        Masking = true,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Colour = Color4.Black.Opacity(0.25f),
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 3,
+                            Offset = new Vector2(0f, 1f),
+                        },
                         Children = new Drawable[]
                         {
+                            new BeatmapListingHeader(),
+                            searchSection = new BeatmapListingSearchSection(),
+                        }
+                    },
+                    new Container
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = ColourProvider.Background4,
+                            },
                             new FillFlowContainer
                             {
-                                AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
-                                Direction = FillDirection.Vertical,
-                                Masking = true,
-                                EdgeEffect = new EdgeEffectParameters
-                                {
-                                    Colour = Color4.Black.Opacity(0.25f),
-                                    Type = EdgeEffectType.Shadow,
-                                    Radius = 3,
-                                    Offset = new Vector2(0f, 1f),
-                                },
+                                AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    new BeatmapListingHeader(),
-                                    searchSection = new BeatmapListingSearchSection(),
-                                }
-                            },
-                            new Container
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = ColourProvider.Background4,
-                                    },
-                                    new FillFlowContainer
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
+                                        Height = 40,
                                         Children = new Drawable[]
                                         {
-                                            new Container
+                                            new Box
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 40,
-                                                Children = new Drawable[]
-                                                {
-                                                    new Box
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Colour = ColourProvider.Background5
-                                                    },
-                                                    sortControl = new BeatmapListingSortTabControl
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                        Margin = new MarginPadding { Left = 20 }
-                                                    }
-                                                }
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = ColourProvider.Background5
                                             },
-                                            new Container
+                                            sortControl = new BeatmapListingSortTabControl
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Margin = new MarginPadding { Left = 20 }
+                                            }
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Padding = new MarginPadding { Horizontal = 20 },
+                                        Children = new Drawable[]
+                                        {
+                                            panelTarget = new Container
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,
-                                                Padding = new MarginPadding { Horizontal = 20 },
-                                                Children = new Drawable[]
-                                                {
-                                                    panelTarget = new Container
-                                                    {
-                                                        AutoSizeAxes = Axes.Y,
-                                                        RelativeSizeAxes = Axes.X,
-                                                    },
-                                                    loadingLayer = new LoadingLayer(panelTarget),
-                                                }
                                             },
+                                            loadingLayer = new LoadingLayer(panelTarget),
                                         }
                                     }
                                 }
@@ -143,7 +130,7 @@ namespace osu.Game.Overlays
                         }
                     }
                 }
-            };
+            });
         }
 
         protected override void LoadComplete()

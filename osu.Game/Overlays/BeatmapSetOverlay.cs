@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -18,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : FullscreenOverlay
+    public class BeatmapSetOverlay : ScrollableFullScreenOverlay
     {
         public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
@@ -33,51 +32,36 @@ namespace osu.Game.Overlays
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        private readonly Box background;
-
         public BeatmapSetOverlay()
             : base(OverlayColourScheme.Blue)
         {
-            OsuScrollContainer scroll;
             Info info;
 
-            Children = new Drawable[]
+            Add(new ReverseChildIDFillFlowContainer<Drawable>
             {
-                background = new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                scroll = new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    new ReverseChildIDFillFlowContainer<Drawable>
                     {
-                        RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
-                            new ReverseChildIDFillFlowContainer<Drawable>
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
-                                {
-                                    Header = new Header(),
-                                    info = new Info()
-                                }
-                            },
-                            new ScoresContainer
-                            {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
-                            }
-                        },
+                            Header = new Header(),
+                            info = new Info()
+                        }
                     },
+                    new ScoresContainer
+                    {
+                        Beatmap = { BindTarget = Header.Picker.Beatmap }
+                    }
                 },
-            };
+            });
 
             Header.BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
@@ -86,14 +70,8 @@ namespace osu.Game.Overlays
             {
                 info.Beatmap = b.NewValue;
 
-                scroll.ScrollToStart();
+                ScrollFlow.ScrollToStart();
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            background.Colour = ColourProvider.Background6;
         }
 
         protected override void PopOutComplete()

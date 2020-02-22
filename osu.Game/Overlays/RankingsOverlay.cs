@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
@@ -17,16 +16,14 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : FullscreenOverlay
+    public class RankingsOverlay : ScrollableFullScreenOverlay
     {
         protected Bindable<Country> Country => header.Country;
 
         protected Bindable<RankingsScope> Scope => header.Current;
 
-        private readonly BasicScrollContainer scrollFlow;
         private readonly Container contentContainer;
         private readonly LoadingLayer loading;
-        private readonly Box background;
         private readonly RankingsOverlayHeader header;
 
         private APIRequest lastRequest;
@@ -38,56 +35,44 @@ namespace osu.Game.Overlays
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
         {
-            Children = new Drawable[]
+            Add(new FillFlowContainer
             {
-                background = new Box
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                scrollFlow = new BasicScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new FillFlowContainer
+                    header = new RankingsOverlayHeader
                     {
-                        AutoSizeAxes = Axes.Y,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Depth = -float.MaxValue
+                    },
+                    new Container
+                    {
                         RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
+                        AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            header = new RankingsOverlayHeader
+                            contentContainer = new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Depth = -float.MaxValue
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
-                                {
-                                    contentContainer = new Container
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10 }
-                                    },
-                                    loading = new LoadingLayer(contentContainer),
-                                }
-                            }
+                                RelativeSizeAxes = Axes.X,
+                                Margin = new MarginPadding { Bottom = 10 }
+                            },
+                            loading = new LoadingLayer(contentContainer),
                         }
                     }
                 }
-            };
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            background.Colour = ColourProvider.Background5;
+            Background.Colour = ColourProvider.Background5;
         }
 
         [Resolved]
@@ -211,7 +196,7 @@ namespace osu.Game.Overlays
 
         private void loadContent(Drawable content)
         {
-            scrollFlow.ScrollToStart();
+            ScrollFlow.ScrollToStart();
 
             if (content == null)
             {
