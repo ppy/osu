@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private class JudgementLine : CompositeDrawable
         {
-            private const int judgement_fade_duration = 10000;
+            private const int judgement_fade_duration = 5000;
 
             public JudgementLine()
             {
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Width = 0;
 
                 this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
-                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
+                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration).Expire();
             }
         }
     }
