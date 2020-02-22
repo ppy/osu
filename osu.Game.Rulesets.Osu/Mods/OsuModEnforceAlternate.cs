@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModEnforceAlternate : ModEnforceAlternate, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModRelax), typeof(OsuModAutopilot) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModRelax)).ToArray();
 
         private OsuInputManager inputManager;
         private HealthProcessor healthProcessor;
