@@ -178,6 +178,7 @@ namespace osu.Game.Overlays.Comments
                                                             Colour = OsuColour.Gray(0.7f),
                                                             Text = HumanizerUtils.Humanize(Comment.CreatedAt)
                                                         },
+                                                        new ReplyButton(),
                                                         repliesButton = new RepliesButton(Comment.RepliesCount)
                                                         {
                                                             Expanded = { BindTarget = childrenExpanded }
@@ -385,6 +386,18 @@ namespace osu.Game.Overlays.Comments
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
                 text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
+            }
+        }
+
+        private class ReplyButton : CommentActionButton
+        {
+            public ReplyButton()
+            {
+                Child = new OsuSpriteText
+                {
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                    Text = @"reply"
+                };
             }
         }
 
