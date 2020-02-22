@@ -207,10 +207,15 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private double floatingAverage;
         private Container colourBars;
 
+        private const int max_concurrent_judgements = 50;
+
         public override void OnNewJudgement(JudgementResult judgement)
         {
             if (!judgement.IsHit)
                 return;
+
+            if (judgementsContainer.Count >= max_concurrent_judgements)
+                judgementsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + 100)?.FadeOut(100).Expire();
 
             judgementsContainer.Add(new JudgementLine
             {
