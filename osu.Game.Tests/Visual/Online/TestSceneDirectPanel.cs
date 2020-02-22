@@ -15,6 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
+    [Cached(typeof(IPreviewTrackOwner))]
     public class TestSceneDirectPanel : OsuTestScene, IPreviewTrackOwner
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -23,13 +24,6 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DirectListPanel),
             typeof(IconPill)
         };
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
-            return dependencies;
-        }
 
         private BeatmapSetInfo getUndownloadableBeatmapSet() => new BeatmapSetInfo
         {
