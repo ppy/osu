@@ -4,8 +4,10 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -13,8 +15,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Overlays.Comments;
 using osu.Game.Rulesets;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -40,6 +44,7 @@ namespace osu.Game.Overlays
         {
             OsuScrollContainer scroll;
             Info info;
+            BeatmapSetCommentsContainer comments;
 
             Children = new Drawable[]
             {
@@ -51,28 +56,38 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    Child = new ReverseChildIDFillFlowContainer<Section>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 20),
-                        Children = new Drawable[]
+                        Children = new[]
                         {
-                            new ReverseChildIDFillFlowContainer<Drawable>
+                            new Section
                             {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
+                                Child = new ReverseChildIDFillFlowContainer<Drawable>
                                 {
-                                    Header = new Header(),
-                                    info = new Info()
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        Header = new Header(),
+                                        info = new Info()
+                                    }
+                                },
+                            },
+                            new Section
+                            {
+                                Child = new ScoresContainer
+                                {
+                                    Beatmap = { BindTarget = Header.Picker.Beatmap }
                                 }
                             },
-                            new ScoresContainer
+                            new Section
                             {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
+                                Child = comments = new BeatmapSetCommentsContainer()
                             }
                         },
                     },
@@ -81,6 +96,7 @@ namespace osu.Game.Overlays
 
             Header.BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
+            comments.BeatmapSet.BindTo(beatmapSet);
 
             Header.Picker.Beatmap.ValueChanged += b =>
             {
@@ -142,6 +158,44 @@ namespace osu.Game.Overlays
         {
             beatmapSet.Value = set;
             Show();
+        }
+
+        private class Section : Container
+        {
+            public Section()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Masking = true;
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Colour = Color4.Black.Opacity(0.25f),
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 3,
+                    Offset = new Vector2(0f, 1f),
+                };
+            }
+        }
+
+        private class BeatmapSetCommentsContainer : CommentsContainer
+        {
+            public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
+            public BeatmapSetCommentsContainer()
+            {
+                BeatmapSet.BindValueChanged(beatmapSet =>
+                {
+                    if (beatmapSet.NewValue?.OnlineBeatmapSetID.HasValue != true)
+                    {
+                        Hide();
+                    }
+                    else
+                    {
+                        Show();
+                        ShowComments(CommentableType.Beatmapset, beatmapSet.NewValue.OnlineBeatmapSetID.Value);
+                    }
+                }, true);
+            }
         }
     }
 }
