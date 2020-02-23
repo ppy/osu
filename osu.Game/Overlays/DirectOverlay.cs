@@ -3,8 +3,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Humanizer;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -246,80 +246,12 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate queryChangedDebounce;
         private ScheduledDelegate addPageDebounce;
+
+        [CanBeNull]
         private BeatmapSetPager beatmapSetPager;
+
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
-
-        private class BeatmapSetPager
-        {
-            public event PageFetchHandler PageFetch;
-
-            private readonly RulesetStore rulesets;
-
-            private readonly string query;
-            private readonly RulesetInfo ruleset;
-            private readonly BeatmapSearchCategory searchCategory;
-            private readonly DirectSortCriteria sortCriteria;
-            private readonly SortDirection sortDirection;
-
-            private SearchBeatmapSetsRequest getSetsRequest;
-
-            private int currentPage = 1;
-
-            public bool IsLastPageFetched { get; private set; } = false;
-            public bool IsFetching => getSetsRequest != null;
-
-            public BeatmapSetPager(RulesetStore rulesets, string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
-            {
-                this.rulesets = rulesets;
-
-                this.query = query;
-                this.ruleset = ruleset;
-                this.searchCategory = searchCategory;
-                this.sortCriteria = sortCriteria;
-                this.sortDirection = sortDirection;
-            }
-
-            public SearchBeatmapSetsRequest FetchNextPage()
-            {
-                if (getSetsRequest != null)
-                    return null;
-
-                getSetsRequest = new SearchBeatmapSetsRequest(
-                    query,
-                    ruleset,
-                    currentPage,
-                    searchCategory,
-                    sortCriteria,
-                    sortDirection);
-
-                getSetsRequest.Success += response =>
-                {
-                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
-
-                    if (sets.Count <= 0) IsLastPageFetched = true;
-
-                    PageFetch?.Invoke(currentPage, sets);
-
-                    getSetsRequest = null;
-                    currentPage++;
-                };
-
-                return getSetsRequest;
-            }
-
-            public void Reset()
-            {
-                IsLastPageFetched = false;
-
-                currentPage = 1;
-
-                getSetsRequest?.Cancel();
-                getSetsRequest = null;
-            }
-
-            public delegate void PageFetchHandler(int page, List<BeatmapSetInfo> sets);
-        }
 
         private void onPageFetch(int page, List<BeatmapSetInfo> sets)
         {
@@ -352,24 +284,13 @@ namespace osu.Game.Overlays
 
         private void queueAddPage()
         {
-            if (beatmapSetPager == null)
-                return;
-
-            if (beatmapSetPager.IsLastPageFetched)
-                return;
-
-            if (beatmapSetPager.IsFetching)
+            if (beatmapSetPager == null || !beatmapSetPager.CanFetchNextPage)
                 return;
 
             if (addPageDebounce != null)
                 return;
 
-            var getSetsRequest = beatmapSetPager.FetchNextPage();
-
-            if (getSetsRequest == null)
-                return;
-
-            API.Queue(getSetsRequest);
+            beatmapSetPager.FetchNextPage();
         }
 
         private void updateSearch()
@@ -387,6 +308,7 @@ namespace osu.Game.Overlays
 
             beatmapSetPager?.Reset();
             beatmapSetPager = new BeatmapSetPager(
+                API,
                 rulesets,
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
