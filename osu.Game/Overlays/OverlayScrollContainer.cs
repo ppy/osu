@@ -18,18 +18,36 @@ namespace osu.Game.Overlays
 {
     public class OverlayScrollContainer : BasicScrollContainer
     {
+        private readonly ScrollToTopButton button;
+
         public OverlayScrollContainer()
         {
             RelativeSizeAxes = Axes.Both;
             ScrollbarVisible = false;
 
-            AddInternal(new ScrollToTopButton
+            AddInternal(button = new ScrollToTopButton
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(20),
+                Alpha = 0,
                 Action = () => ScrollToStart()
             });
+        }
+
+        private bool buttonIsVisible;
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            var buttonShouldBeVisible = Current > 200;
+
+            if (buttonIsVisible == buttonShouldBeVisible)
+                return;
+
+            button.FadeTo(buttonShouldBeVisible ? 1 : 0, 500, Easing.OutQuint);
+            buttonIsVisible = !buttonIsVisible;
         }
 
         private class ScrollToTopButton : OsuHoverContainer
