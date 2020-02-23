@@ -24,9 +24,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly OverlayScrollContainer scroll;
+        private OverlayScrollContainer scroll;
 
-        public TestSceneOverlayScrollContainer()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
             Add(scroll = new OverlayScrollContainer
             {
@@ -42,26 +43,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 }
             });
-        }
+        });
 
         [Test]
         public void TestButtonVisibility()
         {
-            AddStep("Scroll to start", () => scroll.ScrollToStart(false));
-            AddWaitStep("Wait for animation", 3);
-            AddAssert("Button is hidden", () => scroll.Button.Alpha == 0);
-            AddStep("Scroll to end", () => scroll.ScrollToEnd(false));
-            AddWaitStep("Wait for animation", 3);
-            AddAssert("Button is visible", () => scroll.Button.Alpha == 1);
+            AddAssert("button is hidden", () => scroll.Button.Alpha == 0);
+
+            AddStep("scroll to end", () => scroll.ScrollToEnd(false));
+            AddUntilStep("button is visible", () => scroll.Button.Alpha == 1);
+
+            AddStep("scroll to start", () => scroll.ScrollToStart(false));
+            AddUntilStep("button is hidden", () => scroll.Button.Alpha == 0);
         }
 
         [Test]
         public void TestButtonAction()
         {
-            AddStep("Scroll to end", () => scroll.ScrollToEnd(false));
-            AddStep("Click button", () => scroll.Button.Click());
-            AddWaitStep("Wait for animation", 7);
-            AddAssert("Scroll position is top", () => Precision.AlmostEquals(scroll.Current, 0, 0.001f));
+            AddStep("scroll to end", () => scroll.ScrollToEnd(false));
+
+            AddStep("click button", () => scroll.Button.Click());
+
+            AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 0, 0.1f));
         }
     }
 }
