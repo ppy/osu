@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using osu.Framework.IO.Network;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
@@ -28,8 +29,23 @@ namespace osu.Game.Online.API.Requests
             this.direction = direction;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&page={page}&s={searchCategory.ToString().ToLowerInvariant()}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
+        protected override WebRequest CreateWebRequest()
+        {
+            var req = base.CreateWebRequest();
+            req.AddParameter("q", query);
+
+            if (ruleset.ID.HasValue)
+                req.AddParameter("m", ruleset.ID.Value.ToString());
+
+            req.AddParameter("page", page.ToString());
+
+            req.AddParameter("s", searchCategory.ToString().ToLowerInvariant());
+            req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");
+
+            return req;
+        }
+
+        protected override string Target => @"beatmapsets/search";
     }
 
     public enum BeatmapSearchCategory

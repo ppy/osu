@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,8 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi;
+using osu.Game.Screens.Multi.Components;
 
 namespace osu.Game.Screens.Select
 {
@@ -21,8 +22,10 @@ namespace osu.Game.Screens.Select
         public string ShortTitle => "song selection";
         public override string Title => ShortTitle.Humanize();
 
-        [Resolved(typeof(Room))]
-        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
+        public override bool AllowEditing => false;
+
+        [Resolved(typeof(Room), nameof(Room.Playlist))]
+        protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -32,51 +35,48 @@ namespace osu.Game.Screens.Select
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
         }
 
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea
+        {
+            CreateNewItem = createNewItem
+        };
+
         protected override bool OnStart()
         {
-            var item = new PlaylistItem
+            switch (Playlist.Count)
             {
-                Beatmap = Beatmap.Value.BeatmapInfo,
-                Ruleset = Ruleset.Value,
-                RulesetID = Ruleset.Value.ID ?? 0
-            };
+                case 0:
+                    createNewItem();
+                    break;
 
-            item.RequiredMods.AddRange(Mods.Value);
+                case 1:
+                    populateItemFromCurrent(Playlist.Single());
+                    break;
+            }
 
-            Selected?.Invoke(item);
-
-            if (this.IsCurrentScreen())
-                this.Exit();
+            this.Exit();
 
             return true;
         }
 
-        public override bool OnExiting(IScreen next)
+        private void createNewItem()
         {
-            if (base.OnExiting(next))
-                return true;
-
-            if (CurrentItem.Value != null)
+            PlaylistItem item = new PlaylistItem
             {
-                Ruleset.Value = CurrentItem.Value.Ruleset;
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap);
-                Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
-            }
+                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1
+            };
 
-            Beatmap.Disabled = true;
-            Ruleset.Disabled = true;
-            Mods.Disabled = true;
+            populateItemFromCurrent(item);
 
-            return false;
+            Playlist.Add(item);
         }
 
-        public override void OnEntering(IScreen last)
+        private void populateItemFromCurrent(PlaylistItem item)
         {
-            base.OnEntering(last);
+            item.Beatmap.Value = Beatmap.Value.BeatmapInfo;
+            item.Ruleset.Value = Ruleset.Value;
 
-            Beatmap.Disabled = false;
-            Ruleset.Disabled = false;
-            Mods.Disabled = false;
+            item.RequiredMods.Clear();
+            item.RequiredMods.AddRange(Mods.Value);
         }
     }
 }

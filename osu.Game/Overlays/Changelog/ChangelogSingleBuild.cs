@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Comments;
 using osuTK;
 
 namespace osu.Game.Overlays.Changelog
@@ -57,11 +58,18 @@ namespace osu.Game.Overlays.Changelog
 
             if (build != null)
             {
+                CommentsContainer comments;
+
                 Children = new Drawable[]
                 {
                     new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
-                    new Comments(build)
+                    comments = new CommentsContainer
+                    {
+                        Margin = new MarginPadding { Top = 10 }
+                    }
                 };
+
+                comments.ShowComments(CommentableType.Build, build.Id);
             }
         }
 

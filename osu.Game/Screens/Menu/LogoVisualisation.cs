@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Menu
         private void updateAmplitudes()
         {
             var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
-            var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
+            var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
 
             float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
             Color4 defaultColour = Color4.White.Opacity(0.2f);
 
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetConfig<GlobalSkinColour, Color4>(GlobalSkinColour.MenuGlow)?.Value ?? defaultColour;
+                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
             else
                 AccentColour = defaultColour;
         }

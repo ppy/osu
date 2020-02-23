@@ -24,9 +24,15 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 1.0;
 
+        public override bool RequiresConfiguration => true;
+
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
-        [SettingSource("Drain Rate", "Override a beatmap's set HP.")]
+        protected const int FIRST_SETTING_ORDER = 1;
+
+        protected const int LAST_SETTING_ORDER = 2;
+
+        [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER)]
         public BindableNumber<float> DrainRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -36,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        [SettingSource("Overall Difficulty", "Override a beatmap's set OD.")]
+        [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,

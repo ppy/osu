@@ -14,7 +14,7 @@ namespace osu.Game.Online.Placeholders
         [Resolved(CanBeNull = true)]
         private LoginOverlay login { get; set; }
 
-        public LoginPlaceholder()
+        public LoginPlaceholder(string actionMessage)
         {
             AddIcon(FontAwesome.Solid.UserLock, cp =>
             {
@@ -22,7 +22,7 @@ namespace osu.Game.Online.Placeholders
                 cp.Padding = new MarginPadding { Right = 10 };
             });
 
-            AddText(@"Please sign in to view online leaderboards!");
+            AddText(actionMessage);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -31,10 +31,10 @@ namespace osu.Game.Online.Placeholders
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             this.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)

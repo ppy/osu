@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
@@ -22,28 +21,31 @@ namespace osu.Game.Overlays
     public class BeatmapSetOverlay : FullscreenOverlay
     {
         public const float X_PADDING = 40;
-        public const float TOP_PADDING = 25;
+        public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
         protected readonly Header Header;
 
-        private RulesetStore rulesets;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
+        private readonly Box background;
+
         public BeatmapSetOverlay()
+            : base(OverlayColourScheme.Blue)
         {
             OsuScrollContainer scroll;
             Info info;
 
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
+                    RelativeSizeAxes = Axes.Both
                 },
                 scroll = new OsuScrollContainer
                 {
@@ -54,10 +56,20 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
-                            Header = new Header(),
-                            info = new Info(),
+                            new ReverseChildIDFillFlowContainer<Drawable>
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    Header = new Header(),
+                                    info = new Info()
+                                }
+                            },
                             new ScoresContainer
                             {
                                 Beatmap = { BindTarget = Header.Picker.Beatmap }
@@ -79,9 +91,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
-            this.rulesets = rulesets;
+            background.Colour = ColourProvider.Background6;
         }
 
         protected override void PopOutComplete()

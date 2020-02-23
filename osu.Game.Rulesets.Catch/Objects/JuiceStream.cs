@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 Samples = tickSamples,
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
-                                        lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
                             });
                         }
                     }
@@ -110,7 +110,11 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime
+        {
+            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
 
         public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 

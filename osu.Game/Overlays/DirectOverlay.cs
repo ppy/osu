@@ -27,7 +27,8 @@ namespace osu.Game.Overlays
     {
         private const float panel_padding = 10f;
 
-        private RulesetStore rulesets;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -84,14 +85,8 @@ namespace osu.Game.Overlays
         }
 
         public DirectOverlay()
+            : base(OverlayColourScheme.Blue)
         {
-            // osu!direct colours are not part of the standard palette
-
-            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
-            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
-
             ScrollFlow.Children = new Drawable[]
             {
                 resultCountsContainer = new FillFlowContainer
@@ -161,11 +156,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colours)
         {
-            this.rulesets = rulesets;
-            this.previewTrackManager = previewTrackManager;
-
             resultCountsContainer.Colour = colours.Yellow;
         }
 
@@ -254,8 +246,9 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate queryChangedDebounce;
         private ScheduledDelegate addPageDebounce;
-        private PreviewTrackManager previewTrackManager;
         private BeatmapSetPager beatmapSetPager;
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         private class BeatmapSetPager
         {

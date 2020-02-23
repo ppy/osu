@@ -21,17 +21,22 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
+        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+
+        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-        private BeatmapManager beatmaps;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         private FilterControl filter;
-        private PlaylistList list;
+        private Playlist list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
-            this.beatmaps = beatmaps;
 
             Children = new Drawable[]
             {
@@ -53,11 +58,11 @@ namespace osu.Game.Overlays.Music
                             Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        list = new PlaylistList
+                        list = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
-                            Selected = itemSelected,
+                            RequestSelection = itemSelected
                         },
                         filter = new FilterControl
                         {
@@ -80,6 +85,14 @@ namespace osu.Game.Overlays.Music
                     beatmap.Value.Track.Restart();
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            list.Items.BindTo(beatmapSets);
+            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
         }
 
         protected override void PopIn()
