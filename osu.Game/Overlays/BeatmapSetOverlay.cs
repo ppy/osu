@@ -163,14 +163,14 @@ namespace osu.Game.Overlays
 
                 BeatmapSet.BindValueChanged(beatmapSet =>
                 {
-                    if (beatmapSet.NewValue?.OnlineBeatmapSetID.HasValue != true)
+                    if (beatmapSet.NewValue?.OnlineBeatmapSetID is int onlineBeatmapSetID)
                     {
-                        Hide();
+                        Show();
+                        comments.ShowComments(CommentableType.Beatmapset, onlineBeatmapSetID);
                     }
                     else
                     {
-                        Show();
-                        comments.ShowComments(CommentableType.Beatmapset, beatmapSet.NewValue.OnlineBeatmapSetID.Value);
+                        Hide();
                     }
                 }, true);
             }
