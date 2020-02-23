@@ -27,9 +27,9 @@ namespace osu.Game.Tests.Gameplay
         {
             DrawableHitObject hitObject = null;
 
-            AddStep("setup", () => container.Add(new TestDrawableHitObject(new HitObject { StartTime = 500 })));
+            AddStep("setup", () => container.Add(new TestDrawableHitObject(new ConvertHitObject { StartTime = 500 })));
 
-            AddStep("add late hitobject", () => container.Add(hitObject = new TestDrawableHitObject(new HitObject { StartTime = 1000 })));
+            AddStep("add late hitobject", () => container.Add(hitObject = new TestDrawableHitObject(new ConvertHitObject { StartTime = 1000 })));
 
             AddAssert("hitobject index is 0", () => container.IndexOf(hitObject) == 0);
         }
@@ -39,9 +39,9 @@ namespace osu.Game.Tests.Gameplay
         {
             DrawableHitObject hitObject = null;
 
-            AddStep("setup", () => container.Add(new TestDrawableHitObject(new HitObject { StartTime = 500 })));
+            AddStep("setup", () => container.Add(new TestDrawableHitObject(new ConvertHitObject { StartTime = 500 })));
 
-            AddStep("add early hitobject", () => container.Add(hitObject = new TestDrawableHitObject(new HitObject())));
+            AddStep("add early hitobject", () => container.Add(hitObject = new TestDrawableHitObject(new ConvertHitObject())));
 
             AddAssert("hitobject index is 0", () => container.IndexOf(hitObject) == 1);
         }
@@ -54,8 +54,8 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("setup", () =>
             {
-                container.Add(firstObject = new TestDrawableHitObject(new HitObject()));
-                container.Add(secondObject = new TestDrawableHitObject(new HitObject { StartTime = 1000 }));
+                container.Add(firstObject = new TestDrawableHitObject(new ConvertHitObject()));
+                container.Add(secondObject = new TestDrawableHitObject(new ConvertHitObject { StartTime = 1000 }));
             });
 
             AddStep("move first object after second", () => firstObject.HitObject.StartTime = 2000);

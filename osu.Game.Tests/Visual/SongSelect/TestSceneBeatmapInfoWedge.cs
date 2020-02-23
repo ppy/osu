@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             public new BufferedWedgeInfo Info => base.Info;
         }
 
-        private class TestHitObject : HitObject, IHasPosition
+        private class TestHitObject : ConvertHitObject, IHasPosition
         {
             public float X { get; } = 0;
             public float Y { get; } = 0;

@@ -4,9 +4,12 @@
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Taiko.Objects
+namespace osu.Game.Rulesets.Objects
 {
-    public class SwellTick : TaikoHitObject
+    /// <summary>
+    /// A hit object only used for conversion, not actual gameplay.
+    /// </summary>
+    public class ConvertHitObject : HitObject
     {
         public override Judgement CreateJudgement() => new IgnoreJudgement();
 

@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(double offset = 0)
         {
-            var judgement = new JudgementResult(new HitObject(), new Judgement())
+            var judgement = new JudgementResult(new ConvertHitObject(), new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
