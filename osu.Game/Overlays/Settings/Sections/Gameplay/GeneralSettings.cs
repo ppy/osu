@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Lighten playfield during breaks",
-                    Bindable = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
+                    LabelText = "Disable background effects during breaks",
+                    Bindable = config.GetBindable<bool>(OsuSetting.DisableEffectsDuringBreaks)
                 },
                 new SettingsCheckbox
                 {

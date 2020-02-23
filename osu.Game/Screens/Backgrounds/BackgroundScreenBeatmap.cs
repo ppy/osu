@@ -135,6 +135,8 @@ namespace osu.Game.Screens.Backgrounds
 
             private Bindable<double> userBlurLevel { get; set; }
 
+            private Bindable<bool> disableEffectsDuringBreaks { get; set; }
+
             private Background background;
 
             public override void Add(Drawable drawable)
@@ -148,14 +150,15 @@ namespace osu.Game.Screens.Backgrounds
             /// <summary>
             /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
             /// </summary>
-            private Vector2 blurTarget => EnableUserDim.Value
-                ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
-                : new Vector2(BlurAmount.Value);
+            private Vector2 blurTarget => new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR);
+
+            private Vector2 defaultBlurTarget => new Vector2(BlurAmount.Value);
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
                 userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+                disableEffectsDuringBreaks = config.GetBindable<bool>(OsuSetting.DisableEffectsDuringBreaks);
             }
 
             protected override void LoadComplete()
@@ -172,7 +175,17 @@ namespace osu.Game.Screens.Backgrounds
             {
                 base.UpdateVisuals();
 
-                Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                if (EnableUserDim.Value)
+                {
+                    if (disableEffectsDuringBreaks.Value && IsBreakTime.Value)
+                        Background?.BlurTo(defaultBlurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                    else
+                        Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                }
+                else
+                {
+                    Background?.BlurTo(defaultBlurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                }
             }
         }
     }

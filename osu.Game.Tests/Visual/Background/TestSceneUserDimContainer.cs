@@ -19,12 +19,12 @@ namespace osu.Game.Tests.Visual.Background
 
         private readonly BindableBool isBreakTime = new BindableBool();
 
-        private Bindable<bool> lightenDuringBreaks = new Bindable<bool>();
+        private Bindable<bool> disableEffectsDuringBreaks = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            lightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+            disableEffectsDuringBreaks = config.GetBindable<bool>(OsuSetting.DisableEffectsDuringBreaks);
         }
 
         [SetUp]
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Background
             userDimContainer.IsBreakTime.BindTo(isBreakTime);
             isBreakTime.Value = false;
 
-            lightenDuringBreaks.Value = false;
+            disableEffectsDuringBreaks.Value = false;
         });
 
         private const float test_user_dim = 0.6f;
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Background
         public void TestBreakLightening(float userDim, float expectedBreakDim)
         {
             AddStep($"set dim level {userDim}", () => userDimContainer.UserDimLevel.Value = userDim);
-            AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
+            AddStep("set lighten during break", () => disableEffectsDuringBreaks.Value = true);
 
             AddStep("set break", () => isBreakTime.Value = true);
             AddUntilStep("has lightened", () => userDimContainer.DimEqual(expectedBreakDim));
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Background
 
             AddStep("set break", () => isBreakTime.Value = true);
             AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));
-            AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
+            AddStep("set lighten during break", () => disableEffectsDuringBreaks.Value = true);
             AddUntilStep("has lightened", () => userDimContainer.DimEqual(test_user_dim_lightened));
         }
 
@@ -78,11 +78,11 @@ namespace osu.Game.Tests.Visual.Background
         public void TestDisableSettingDuringBreak()
         {
             AddStep("set dim level 0.6", () => userDimContainer.UserDimLevel.Value = test_user_dim);
-            AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
+            AddStep("set lighten during break", () => disableEffectsDuringBreaks.Value = true);
 
             AddStep("set break", () => isBreakTime.Value = true);
             AddUntilStep("has lightened", () => userDimContainer.DimEqual(test_user_dim_lightened));
-            AddStep("clear lighten during break", () => lightenDuringBreaks.Value = false);
+            AddStep("clear lighten during break", () => disableEffectsDuringBreaks.Value = false);
             AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));
             AddStep("clear break", () => isBreakTime.Value = false);
             AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));

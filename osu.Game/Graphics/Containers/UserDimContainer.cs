@@ -51,11 +51,11 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<double> UserDimLevel { get; private set; }
 
-        protected Bindable<bool> LightenDuringBreaks { get; private set; }
+        protected Bindable<bool> DisableEffectsDuringBreaks { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
-        private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
+        private float breakLightening => DisableEffectsDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
         protected float DimLevel => Math.Max(EnableUserDim.Value && !IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
 
@@ -75,12 +75,12 @@ namespace osu.Game.Graphics.Containers
         private void load(OsuConfigManager config)
         {
             UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
-            LightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+            DisableEffectsDuringBreaks = config.GetBindable<bool>(OsuSetting.DisableEffectsDuringBreaks);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             EnableUserDim.ValueChanged += _ => UpdateVisuals();
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
-            LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
+            DisableEffectsDuringBreaks.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
