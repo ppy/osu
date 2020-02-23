@@ -16,15 +16,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayScrollContainer : BasicScrollContainer
+    public class OverlayScrollContainer : OsuScrollContainer
     {
         private readonly ScrollToTopButton button;
 
         public OverlayScrollContainer()
         {
-            RelativeSizeAxes = Axes.Both;
-            ScrollbarVisible = false;
-
             AddInternal(button = new ScrollToTopButton
             {
                 Anchor = Anchor.BottomRight,

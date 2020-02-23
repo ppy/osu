@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,7 +19,7 @@ namespace osu.Game.Graphics.Containers
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         private readonly OsuScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
-        private readonly FlowContainer<T> scrollContentContainer;
+        private FlowContainer<T> scrollContentContainer;
 
         protected override Container<T> Content => scrollContentContainer;
 
@@ -100,6 +101,9 @@ namespace osu.Game.Graphics.Containers
                 RelativeSizeAxes = Axes.X,
             };
 
+        [NotNull]
+        protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
+
         public override void Add(T drawable)
         {
             base.Add(drawable);
@@ -124,13 +128,13 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(scrollContainer = new OsuScrollContainer
+            AddInternal(scrollContainer = CreateScrollContainer().With(scroll =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                ScrollbarVisible = false,
-                Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() }
-            });
+                scroll.RelativeSizeAxes = Axes.Both;
+                scroll.Masking = true;
+                scroll.ScrollbarVisible = false;
+                scroll.Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() };
+            }));
             AddInternal(headerBackgroundContainer = new Container
             {
                 RelativeSizeAxes = Axes.X

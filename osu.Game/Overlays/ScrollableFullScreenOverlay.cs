@@ -25,7 +25,11 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                ScrollFlow = new OverlayScrollContainer()
+                ScrollFlow = new OverlayScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ScrollbarVisible = false
+                }
             });
         }
 

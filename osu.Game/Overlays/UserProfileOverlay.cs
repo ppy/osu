@@ -194,6 +194,8 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X,
                 Spacing = new Vector2(0, 20),
             };
+
+            protected override OsuScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
         }
     }
 }
