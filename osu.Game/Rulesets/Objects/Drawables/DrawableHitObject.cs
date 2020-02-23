@@ -99,12 +99,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             var judgement = HitObject.CreateJudgement();
 
-            if (judgement != null)
-            {
-                Result = CreateResult(judgement);
-                if (Result == null)
-                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-            }
+            Result = CreateResult(judgement);
+            if (Result == null)
+                throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
             loadSamples();
         }
