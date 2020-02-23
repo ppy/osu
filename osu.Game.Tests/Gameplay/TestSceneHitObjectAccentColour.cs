@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Gameplay
             }
         }
 
-        private class TestHitObjectWithCombo : HitObject, IHasComboInformation
+        private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
             public bool NewCombo { get; } = false;
             public int ComboOffset { get; } = 0;

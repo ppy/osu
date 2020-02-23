@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new ConvertHitObject(), new TaikoJudgement()) { Type = hitResult });
         }
 
         private void addStrongHitJudgement(bool kiai)
@@ -163,13 +163,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new ConvertHitObject(), new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new ConvertHitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
         {
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new ConvertHitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)

@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>
         {
             public TestDrawableControlPoint(ScrollingDirection direction, double time)
-                : base(new HitObject { StartTime = time })
+                : base(new ConvertHitObject { StartTime = time })
             {
                 Origin = Anchor.Centre;
 
@@ -255,7 +255,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestDrawableHitObject : DrawableHitObject<HitObject>
         {
             public TestDrawableHitObject(double time)
-                : base(new HitObject { StartTime = time })
+                : base(new ConvertHitObject { StartTime = time })
             {
                 Origin = Anchor.Custom;
                 OriginPosition = new Vector2(75 / 4.0f);

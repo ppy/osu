@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var beatmap = new Beatmap<HitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
 
             for (int i = 0; i < 10; i++)
-                beatmap.HitObjects.Add(new HitObject { StartTime = i * time_range });
+                beatmap.HitObjects.Add(new ConvertHitObject { StartTime = i * time_range });
 
             return beatmap;
         }
@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         #region HitObject
 
-        private class TestHitObject : HitObject, IHasEndTime
+        private class TestHitObject : ConvertHitObject, IHasEndTime
         {
             public double EndTime { get; set; }
 
