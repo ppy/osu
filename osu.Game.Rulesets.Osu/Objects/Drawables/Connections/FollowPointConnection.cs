@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
             double duration = endTime - startTime;
 
+            double? firstTransformStartTime = null;
             double finalTransformEndTime = startTime;
 
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
@@ -133,6 +134,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Scale = new Vector2(1.5f * osuEnd.Scale),
                 });
 
+                if (firstTransformStartTime == null)
+                    firstTransformStartTime = fadeInTime;
+
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
                     fp.FadeIn(osuEnd.TimeFadeIn);
@@ -144,7 +148,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 }
             }
 
-            LifetimeStart = startTime;
+            // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
+            LifetimeStart = firstTransformStartTime ?? startTime;
             LifetimeEnd = finalTransformEndTime;
         }
     }
