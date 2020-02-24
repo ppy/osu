@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
+// See the LICENCE file in the repository root for  full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osuTK.Graphics;
 
 namespace osu.Game.Online
 {
@@ -14,34 +17,43 @@ namespace osu.Game.Online
     /// A <see cref="Container"/> for displaying online content which require a local user to be logged in.
     /// Shows its children only when the local user is logged in and supports displaying a placeholder if not.
     /// </summary>
-    public abstract class OnlineViewContainer : Container, IOnlineComponent
+    public class OnlineViewContainer : VisibilityContainer, IOnlineComponent
     {
-        protected LoadingSpinner LoadingSpinner { get; private set; }
+        protected LoadingSpinner LoadingSpinner;
 
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+        private readonly Drawable viewTarget;
 
         private readonly string placeholderMessage;
 
         private Placeholder placeholder;
 
-        private const double transform_duration = 300;
+        private const double transform_duration = 500;
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected OnlineViewContainer(string placeholderMessage)
+        public OnlineViewContainer(string placeholderMessage, Drawable viewTarget)
         {
             this.placeholderMessage = placeholderMessage;
+            this.viewTarget = viewTarget;
+
+            RelativeSizeAxes = Axes.Both;
         }
+
+        public override bool HandleNonPositionalInput => false;
+
+        public override bool HandlePositionalInput => false;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
-                Content,
-                placeholder = new LoginPlaceholder(placeholderMessage),
-                LoadingSpinner = new LoadingSpinner
+                placeholder = new LoginPlaceholder(placeholderMessage)
+                {
+                    Alpha = 0,
+                },
+                LoadingSpinner = new LoadingSpinner(true)
                 {
                     Alpha = 0,
                 }
@@ -60,41 +72,35 @@ namespace osu.Game.Online
             switch (state)
             {
                 case APIState.Offline:
-                    PopContentOut(Content);
-                    placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_duration, Easing.OutQuint);
+                    placeholder.ScaleTo(0.8f).Then().ScaleTo(1, transform_duration, Easing.OutQuint);
                     placeholder.FadeInFromZero(2 * transform_duration, Easing.OutQuint);
                     LoadingSpinner.Hide();
+                    Show();
                     break;
 
                 case APIState.Online:
-                    PopContentIn(Content);
-                    placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
+                    placeholder.FadeOut(transform_duration, Easing.OutQuint);
                     LoadingSpinner.Hide();
+                    Hide();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
-                    PopContentOut(Content);
                     LoadingSpinner.Show();
-                    placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
+                    placeholder.FadeOut(transform_duration, Easing.OutQuint);
+                    Show();
                     break;
             }
         }
-
-        /// <summary>
-        /// Applies a transform to the online content to make it hidden.
-        /// </summary>
-        protected virtual void PopContentOut(Drawable content) => content.FadeOut(transform_duration / 2, Easing.OutQuint);
-
-        /// <summary>
-        /// Applies a transform to the online content to make it visible.
-        /// </summary>
-        protected virtual void PopContentIn(Drawable content) => content.FadeIn(transform_duration, Easing.OutQuint);
 
         protected override void Dispose(bool isDisposing)
         {
             API?.Unregister(this);
             base.Dispose(isDisposing);
         }
+
+        protected override void PopIn() => viewTarget?.FadeColour(OsuColour.Gray(0.5f), transform_duration, Easing.OutQuint);
+
+        protected override void PopOut() => viewTarget?.FadeColour(Color4.White, transform_duration, Easing.OutQuint);
     }
 }
