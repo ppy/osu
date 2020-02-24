@@ -14,10 +14,10 @@ using osuTK.Graphics;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A <see cref="Container"/> for displaying online content which require a local user to be logged in.
-    /// Shows its children only when the local user is logged in and supports displaying a placeholder if not.
+    /// A layer which displays on top of content which require a local user to be logged in.
+    /// Blocks input to the underlying content, dims the optional target content and displays a login placeholder when the user isn't logged in.
     /// </summary>
-    public class OnlineViewContainer : VisibilityContainer, IOnlineComponent
+    public class OnlineViewLayer : VisibilityContainer, IOnlineComponent
     {
         protected LoadingSpinner LoadingSpinner;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Online
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        public OnlineViewContainer(string placeholderMessage, Drawable viewTarget)
+        public OnlineViewLayer(string placeholderMessage, Drawable viewTarget)
         {
             this.placeholderMessage = placeholderMessage;
             this.viewTarget = viewTarget;

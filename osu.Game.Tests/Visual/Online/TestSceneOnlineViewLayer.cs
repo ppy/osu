@@ -16,22 +16,22 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneOnlineViewContainer : ManualInputManagerTestScene
+    public class TestSceneOnlineViewLayer : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new Type[]
         {
-            typeof(OnlineViewContainer)
+            typeof(OnlineViewLayer)
         };
 
         private Container con;
 
         private OsuButton button;
 
-        private TestOnlineViewContainer view;
+        private TestOnlineViewLayer view;
 
         private bool inputBlocked = false;
 
-        public TestSceneOnlineViewContainer()
+        public TestSceneOnlineViewLayer()
         {
             Child = new Container
             {
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Online
                             }
                         }
                     },
-                    view = new TestOnlineViewContainer("Please sign in to view content!", con)
+                    view = new TestOnlineViewLayer("Please sign in to view content!", con)
                 }
             };
         }
@@ -110,9 +110,9 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("loading animation is not visible", () => !view.LoadingSpinner.IsPresent);
         }
 
-        private class TestOnlineViewContainer : OnlineViewContainer
+        private class TestOnlineViewLayer : OnlineViewLayer
         {
-            public TestOnlineViewContainer(string placeholderMessage, Drawable viewTarget)
+            public TestOnlineViewLayer(string placeholderMessage, Drawable viewTarget)
                 : base(placeholderMessage, viewTarget)
             {
             }
