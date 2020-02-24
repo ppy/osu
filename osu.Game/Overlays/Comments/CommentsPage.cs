@@ -96,9 +96,9 @@ namespace osu.Game.Overlays.Comments
         {
             var orphaned = new List<Comment>();
 
-            // Exclude possible duplicated comments.
             foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments))
             {
+                // Exclude possible duplicated comments.
                 if (commentDictionary.ContainsKey(comment.Id))
                     continue;
 
