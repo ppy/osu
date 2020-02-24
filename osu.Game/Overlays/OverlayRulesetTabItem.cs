@@ -53,6 +53,7 @@ namespace osu.Game.Overlays
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Text = value.Name,
+                        Font = OsuFont.GetFont(size: 18)
                     }
                 },
                 new HoverClickSounds()
