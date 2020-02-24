@@ -60,12 +60,16 @@ namespace osu.Game.Overlays
                 : base(value)
             {
                 Size = new Vector2(11);
-                Add(icon = new SpriteIcon
+                AddRange(new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit
+                    icon = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fit
+                    },
+                    new HoverClickSounds()
                 });
             }
 
