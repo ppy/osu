@@ -96,12 +96,17 @@ namespace osu.Game.Overlays.Comments
         {
             var orphaned = new List<Comment>();
 
+            // Exclude possible duplicated comments.
             foreach (var topLevel in bundle.Comments)
+            {
+                if (commentDictionary.ContainsKey(topLevel.Id))
+                    continue;
+
                 addNewComment(topLevel);
+            }
 
             foreach (var child in bundle.IncludedComments)
             {
-                // Included comments can contain the parent comment, which already exists in the hierarchy.
                 if (commentDictionary.ContainsKey(child.Id))
                     continue;
 
