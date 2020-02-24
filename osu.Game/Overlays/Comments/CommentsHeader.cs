@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
+using System.ComponentModel;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -109,6 +111,7 @@ namespace osu.Game.Overlays.Comments
 
     public enum CommentsSortCriteria
     {
+        [Description(@"Recent")]
         New,
         Old,
         Top
