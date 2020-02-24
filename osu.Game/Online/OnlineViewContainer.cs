@@ -67,7 +67,7 @@ namespace osu.Game.Online
             API.Register(this);
         }
 
-        public virtual void APIStateChanged(IAPIProvider api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {
