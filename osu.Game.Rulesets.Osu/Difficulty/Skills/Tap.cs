@@ -15,9 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int mashLevelCount = 11;
         private const double spacedBuffFactor = 0.10f;
 
-        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 2.3, -2.2))
+        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 2.3, -2.8))
                                                                                  .PointwiseExp();
 
+        private static readonly double[] timescaleFactors = { 1.02, 1.02, 1.05, 1.15 };
 
         public static (double, double, double[], double[], List<Vector<double>>) CalculateTapAttributes
             (List<OsuHitObject> hitObjects, double clockRate)
@@ -93,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     singleStrainResult += singleStrainHistory[i] * Math.Pow(k, i);
                 }
 
-                strainResult[j] = singleStrainResult * (1 - k);
+                strainResult[j] = singleStrainResult * (1 - k) * timescaleFactors[j];
             }
 
             double diff = Mean.PowerMean(strainResult, 2);
