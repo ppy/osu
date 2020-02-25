@@ -48,13 +48,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestButtonVisibility()
         {
-            AddAssert("button is hidden", () => scroll.Button.Alpha == 0);
+            AddAssert("button is hidden", () => scroll.Button.State.Value == Visibility.Hidden);
 
             AddStep("scroll to end", () => scroll.ScrollToEnd(false));
-            AddUntilStep("button is visible", () => scroll.Button.Alpha == 1);
+            AddAssert("button is visible", () => scroll.Button.State.Value == Visibility.Visible);
 
             AddStep("scroll to start", () => scroll.ScrollToStart(false));
-            AddUntilStep("button is hidden", () => scroll.Button.Alpha == 0);
+            AddAssert("button is hidden", () => scroll.Button.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("scroll to end", () => scroll.ScrollToEnd(false));
 
-            AddStep("click button", () => scroll.Button.Click());
+            AddStep("invoke action", () => scroll.Button.Action.Invoke());
 
             AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 0, 0.1f));
         }
