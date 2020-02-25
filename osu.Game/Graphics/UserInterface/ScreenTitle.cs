@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -23,8 +22,8 @@ namespace osu.Game.Graphics.UserInterface
         private const float text_padding = 17.5f; // 15px padding + 2.5px compensation for line-height
 
         private SpriteIcon iconSprite;
-        private readonly Circle circle;
-        private readonly OsuSpriteText titleText, pageText;
+        protected readonly OsuSpriteText TitleText, PageText;
+        protected readonly Circle Separator;
 
         protected IconUsage Icon
         {
@@ -39,18 +38,18 @@ namespace osu.Game.Graphics.UserInterface
 
         protected string Title
         {
-            set => titleText.Text = value;
+            set => TitleText.Text = value;
         }
 
         protected string Section
         {
-            set => pageText.Text = value;
+            set => PageText.Text = value;
         }
 
         public Color4 AccentColour
         {
-            get => pageText.Colour;
-            set => pageText.Colour = value;
+            get => PageText.Colour;
+            set => PageText.Colour = value;
         }
 
         protected virtual Drawable CreateIcon() => iconSprite = new SpriteIcon
@@ -77,21 +76,22 @@ namespace osu.Game.Graphics.UserInterface
                             t.Origin = Anchor.Centre;
                             t.Margin = new MarginPadding { Horizontal = 5 }; // compensates for osu-web sprites having around 5px of whitespace on each side
                         }),
-                        titleText = new OsuSpriteText
+                        TitleText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Vertical = text_padding }
                         },
-                        circle = new Circle
+                        Separator = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(5),
+                            Colour = Color4.Gray,
                             Margin = new MarginPadding { Top = 3 } // compensation for osu-web using a font here making the circle appear a bit lower
                         },
-                        pageText = new OsuSpriteText
+                        PageText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -101,12 +101,6 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            circle.Colour = colourProvider.Foreground1;
         }
     }
 }
