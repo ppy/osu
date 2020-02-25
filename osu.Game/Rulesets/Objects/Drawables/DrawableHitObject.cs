@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     }
                 }
 
-                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
+                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue || HitObject.HitWindows == null)
                     Expire();
             }
             else
