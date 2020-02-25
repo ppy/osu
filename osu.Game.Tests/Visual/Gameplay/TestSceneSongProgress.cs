@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var objects = new List<HitObject>();
             for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
-                objects.Add(new ConvertHitObject { StartTime = i });
+                objects.Add(new HitObject { StartTime = i });
 
             replaceObjects(objects);
         }
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var objects = new List<HitObject>();
             for (double i = 0; i < 5000; i++)
-                objects.Add(new ConvertHitObject { StartTime = i });
+                objects.Add(new HitObject { StartTime = i });
 
             replaceObjects(objects);
         }

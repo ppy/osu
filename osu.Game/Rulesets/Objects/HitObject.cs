@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Objects
     /// HitObjects may contain more properties for which you should be checking through the IHas* types.
     /// </para>
     /// </summary>
-    public abstract class HitObject
+    public class HitObject
     {
         /// <summary>
         /// A small adjustment to the start time of control points to account for rounding/precision errors.
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
 
-        protected HitObject()
+        public HitObject()
         {
             StartTimeBindable.ValueChanged += time =>
             {
@@ -144,10 +144,9 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
-        /// Used to decide on drawable object lifetimes.
         /// </summary>
         [NotNull]
-        public abstract Judgement CreateJudgement();
+        public virtual Judgement CreateJudgement() => new Judgement();
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
@@ -157,7 +156,7 @@ namespace osu.Game.Rulesets.Objects
         /// </para>
         /// </summary>
         [NotNull]
-        protected abstract HitWindows CreateHitWindows();
+        protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 
     public static class HitObjectExtensions

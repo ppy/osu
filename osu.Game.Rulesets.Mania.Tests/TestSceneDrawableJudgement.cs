@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
             {
                 AddStep("Show " + result.GetDescription(), () => SetContents(() =>
-                    new DrawableManiaJudgement(new JudgementResult(new ConvertHitObject(), new Judgement()) { Type = result }, null)
+                    new DrawableManiaJudgement(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

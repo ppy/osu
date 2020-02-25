@@ -2,16 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Rulesets.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Utils;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
@@ -43,6 +44,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("New max negative", () => newJudgement(-hitWindows.WindowFor(HitResult.Meh)), 20);
             AddRepeatStep("New max positive", () => newJudgement(hitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
+
+            AddStep("Judgement barrage", () =>
+            {
+                int runCount = 0;
+
+                ScheduledDelegate del = null;
+
+                del = Scheduler.AddDelayed(() =>
+                {
+                    newJudgement(runCount++ / 10f);
+
+                    if (runCount == 500)
+                        // ReSharper disable once AccessToModifiedClosure
+                        del?.Cancel();
+                }, 10, true);
+            });
         }
 
         [Test]
@@ -124,7 +141,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(double offset = 0)
         {
-            var judgement = new JudgementResult(new ConvertHitObject(), new Judgement())
+            var judgement = new JudgementResult(new HitObject(), new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
