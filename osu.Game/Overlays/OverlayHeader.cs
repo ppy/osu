@@ -57,7 +57,6 @@ namespace osu.Game.Overlays
                                         Padding = new MarginPadding
                                         {
                                             Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                                            Vertical = 10,
                                         },
                                         Children = new[]
                                         {

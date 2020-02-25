@@ -1,6 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
@@ -16,6 +17,9 @@ namespace osu.Game.Overlays
             public OverlayHeaderBreadcrumbControl()
             {
                 RelativeSizeAxes = Axes.X;
+                Height = 47;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
@@ -26,13 +30,14 @@ namespace osu.Game.Overlays
 
             private class ControlTabItem : BreadcrumbTabItem
             {
-                protected override float ChevronSize => 8;
+                protected override float ChevronSize => 10;
 
                 public ControlTabItem(string value)
                     : base(value)
                 {
+                    RelativeSizeAxes = Axes.Y;
                     Text.Font = Text.Font.With(size: 14);
-                    Chevron.Y = 3;
+                    Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
                     Bar.Height = 0;
                 }
             }

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
@@ -72,7 +72,8 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.X;
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;
-                Height = 35;
+                Height = 47;
+                TabContainer.Spacing = new Vector2(20, 0);
             }
 
             protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value);
@@ -82,7 +83,6 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
             };
 
             [BackgroundDependencyLoader]
