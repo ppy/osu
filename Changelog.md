@@ -525,3 +525,6 @@
     *   [m] [Improve gameplay performance via follow point renderer optimisations #7968]
     *   [m] [Fix scale of loading animation on player loading screen #7969]
     *   [m] [Update framework #7989]
+    *   [m] [Fix hitobjects with unknown lifetimes by enforcing non-null judgement #7973]
+    *   [m] [Fix bar lines in osu!taiko and osu!mania not correctly being cleaned up #7974]
+    *   [m] [Expose save option in editor to non-desktop platforms #7977]

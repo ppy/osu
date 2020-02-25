@@ -94,15 +94,18 @@ namespace osu.Game.Screens.Edit
 
             EditorMenuBar menuBar;
 
-            var fileMenuItems = new List<MenuItem>();
+            var fileMenuItems = new List<MenuItem>
+            {
+                new EditorMenuItem("保存", MenuItemType.Standard, saveBeatmap)
+            };
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("保存", MenuItemType.Standard, saveBeatmap));
+                
                 fileMenuItems.Add(new EditorMenuItem("导出地图", MenuItemType.Standard, exportBeatmap));
-                fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
+            fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("退出", MenuItemType.Standard, this.Exit));
 
             AddInternal(new OsuContextMenuContainer
