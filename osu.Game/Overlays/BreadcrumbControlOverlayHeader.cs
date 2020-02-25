@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -16,6 +16,10 @@ namespace osu.Game.Overlays
             public OverlayHeaderBreadcrumbControl()
             {
                 RelativeSizeAxes = Axes.X;
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                AccentColour = colourProvider.Light2;
             }
 
             protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value);
