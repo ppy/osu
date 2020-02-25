@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi
@@ -71,9 +72,19 @@ namespace osu.Game.Screens.Multi
 
         private class MultiHeaderTitle : ScreenTitle
         {
+            private const int text_offset = 2;
+            private const float spacing = 6;
+
             public IMultiplayerSubScreen Screen
             {
                 set => Section = value.ShortTitle.ToLowerInvariant();
+            }
+
+            public MultiHeaderTitle()
+            {
+                TitleText.Margin = PageText.Margin = new MarginPadding { Bottom = text_offset };
+                Separator.Size = new Vector2(4);
+                Separator.Margin = new MarginPadding(0);
             }
 
             [BackgroundDependencyLoader]
