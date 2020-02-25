@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,11 +18,12 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const float ICON_WIDTH = ICON_SIZE + spacing;
 
-        public const float ICON_SIZE = 25;
-        private const float spacing = 6;
-        private const int text_offset = 2;
+        public const float ICON_SIZE = 30; // osu-web uses 40, but the images there aren't cropped edge-to-edge
+        private const float spacing = 10;
+        private const float text_padding = 17.5f; // 15px padding + 2.5px compensation for line-height
 
         private SpriteIcon iconSprite;
+        private readonly Circle circle;
         private readonly OsuSpriteText titleText, pageText;
 
         protected IconUsage Icon
@@ -72,31 +75,38 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             t.Anchor = Anchor.Centre;
                             t.Origin = Anchor.Centre;
+                            t.Margin = new MarginPadding { Horizontal = 5 }; // compensates for osu-web sprites having around 5px of whitespace on each side
                         }),
                         titleText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                            Margin = new MarginPadding { Bottom = text_offset }
+                            Margin = new MarginPadding { Vertical = text_padding }
                         },
-                        new Circle
+                        circle = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(4),
-                            Colour = Color4.Gray,
+                            Size = new Vector2(5),
+                            Margin = new MarginPadding { Top = 3 } // compensation for osu-web using a font here making the circle appear a bit lower
                         },
                         pageText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20),
-                            Margin = new MarginPadding { Bottom = text_offset }
+                            Margin = new MarginPadding { Vertical = text_padding }
                         }
                     }
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            circle.Colour = colourProvider.Foreground1;
         }
     }
 }
