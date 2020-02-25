@@ -20,6 +20,8 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
+using System.Collections.Generic;
+using osu.Framework;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
@@ -91,6 +93,16 @@ namespace osu.Game.Screens.Edit
 
             EditorMenuBar menuBar;
 
+            var fileMenuItems = new List<MenuItem>();
+
+            fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap));
+
+            if (RuntimeInfo.IsDesktop)
+                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
+            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
+
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -121,13 +133,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 new MenuItem("File")
                                 {
-                                    Items = new[]
-                                    {
-                                        new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap),
-                                        new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap),
-                                        new EditorMenuItemSpacer(),
-                                        new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit),
-                                    }
+                                    Items = fileMenuItems
                                 }
                             }
                         }
