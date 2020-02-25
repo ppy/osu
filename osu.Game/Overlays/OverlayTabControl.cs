@@ -1,6 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -32,6 +33,20 @@ namespace osu.Game.Overlays
             }
         }
 
+        private Color4 textColour;
+
+        public Color4 TextColour
+        {
+            get => textColour;
+            set
+            {
+                textColour = value;
+
+                foreach (var i in TabContainer.Children.OfType<OverlayTabItem>())
+                    i.TextColour = value;
+            }
+        }
+
         protected OverlayTabControl()
         {
             TabContainer.Masking = false;
@@ -55,19 +70,29 @@ namespace osu.Game.Overlays
             protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;
 
-            private Color4 accentColour;
-
             public Color4 AccentColour
             {
-                get => accentColour;
+                get => Bar.Colour;
                 set
                 {
-                    if (accentColour == value)
+                    if (Bar.Colour == value)
                         return;
 
-                    accentColour = value;
                     Bar.Colour = value;
+                }
+            }
 
+            private Color4 textColour;
+
+            public Color4 TextColour
+            {
+                get => textColour;
+                set
+                {
+                    if (textColour == value)
+                        return;
+
+                    textColour = value;
                     updateState();
                 }
             }
@@ -144,7 +169,7 @@ namespace osu.Game.Overlays
             protected virtual void UnhoverAction()
             {
                 Bar.Collapse();
-                Text.FadeColour(AccentColour, 120, Easing.InQuad);
+                Text.FadeColour(TextColour, 120, Easing.InQuad);
             }
         }
     }

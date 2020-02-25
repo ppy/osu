@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
@@ -84,6 +84,12 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(5, 0),
             };
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                TextColour = colourProvider.Light2;
+            }
 
             private class OverlayHeaderTabItem : OverlayTabItem
             {
