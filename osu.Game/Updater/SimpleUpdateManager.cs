@@ -37,7 +37,7 @@ namespace osu.Game.Updater
         {
             try
             {
-                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/MATRIX-feather/osu/releases/latest");
+                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
                 await releases.PerformAsync();
 
@@ -47,10 +47,10 @@ namespace osu.Game.Updater
                 {
                     Notifications.Post(new SimpleNotification
                     {
-                        Text =  "mfosu已有新版本可用!\n"
+                        Text =  "osu!lazer已有新版本可用!\n"
                                 +$"你的版本{version}\n"
                                 +$"最新版本{latest.TagName}.\n\n"
-                                + "点击这里前往github下载",
+                                +"点击这里前往github下载",
                         Icon = FontAwesome.Solid.Upload,
                         Activated = () =>
                         {
