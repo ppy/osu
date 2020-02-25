@@ -144,7 +144,6 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
-        /// Used to decide on drawable object lifetimes.
         /// </summary>
         [NotNull]
         public virtual Judgement CreateJudgement() => new Judgement();
