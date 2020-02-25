@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load(IAPIProvider api, OverlayColourProvider colourProvider)
         {
             LinkFlowContainer username;
             FillFlowContainer info;
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Comments
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                             Font = OsuFont.GetFont(size: 12),
-                                                            Colour = OsuColour.Gray(0.7f),
+                                                            Colour = colourProvider.Foreground1,
                                                             Text = HumanizerUtils.Humanize(Comment.CreatedAt)
                                                         },
                                                         new ReplyButton
@@ -265,6 +265,7 @@ namespace osu.Game.Overlays.Comments
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.GetFont(size: 12),
+                    Colour = colourProvider.Foreground1,
                     Text = $@"edited {HumanizerUtils.Humanize(Comment.EditedAt.Value)} by {Comment.EditedUser.Username}"
                 });
             }
@@ -466,9 +467,10 @@ namespace osu.Game.Overlays.Comments
 
         private class LoadMoreCommentsButton : GetCommentRepliesButton
         {
-            public LoadMoreCommentsButton()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
-                IdleColour = OsuColour.Gray(0.7f);
+                IdleColour = colourProvider.Foreground1;
                 HoverColour = Color4.White;
             }
 

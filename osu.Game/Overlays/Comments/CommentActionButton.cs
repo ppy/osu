@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -13,7 +13,12 @@ namespace osu.Game.Overlays.Comments
         public CommentActionButton()
         {
             AutoSizeAxes = Axes.Both;
-            IdleColour = OsuColour.Gray(0.7f);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            IdleColour = colourProvider.Foreground1;
             HoverColour = Color4.White;
         }
     }
