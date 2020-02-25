@@ -528,3 +528,5 @@
     *   [m] [Fix hitobjects with unknown lifetimes by enforcing non-null judgement #7973]
     *   [m] [Fix bar lines in osu!taiko and osu!mania not correctly being cleaned up #7974]
     *   [m] [Expose save option in editor to non-desktop platforms #7977]
+    *   [m] [Fix potential crash when clicking on show more button in comments #7982]
+    *   [!:因为和现有一些文件冲突，未整合全部] [Rework issue templates #7961]
