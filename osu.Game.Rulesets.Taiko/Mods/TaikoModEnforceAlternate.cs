@@ -5,10 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges;
-using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -16,7 +12,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
@@ -52,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             inputManager = (TaikoInputManager)drawableRuleset.KeyBindingInputManager;
-            inputManager.BlockConditions += BlockCondition;
+            inputManager.HandleBindings += handleBindings;
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -86,10 +81,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
         }
 
-        private bool handleMultipleKeypresses(List<KeyBinding> combos, IEnumerable<TaikoAction> rims, IEnumerable<TaikoAction> centres)
+        private bool handleMultipleKeypresses(List<TaikoAction> rims, List<TaikoAction> centres)
         {
-            bool bothLeft = (rims.Count() == 1 && rims.First() == TaikoAction.LeftRim) && (centres.Count() == 1 && centres.First() == TaikoAction.LeftCentre);
-            bool bothRight = (rims.Count() == 1 && rims.First() == TaikoAction.RightRim) && (centres.Count() == 1 && centres.First() == TaikoAction.RightCentre);
+            bool bothLeft = (rims.Count == 1 && rims.First() == TaikoAction.LeftRim) && (centres.Count == 1 && centres.First() == TaikoAction.LeftCentre);
+            bool bothRight = (rims.Count == 1 && rims.First() == TaikoAction.RightRim) && (centres.Count == 1 && centres.First() == TaikoAction.RightCentre);
 
             if (bothLeft || bothRight)
             {
@@ -99,6 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 if (rimBlocked && centreBlocked)
                 {
                     blockedKeystrokes++;
+
                     return true;
                 }
                 else
@@ -109,74 +105,55 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
             else
             {
-                if (rims.Count() == 2)
+                if (rims.Count == 2)
                     blockedRim = null;
 
-                if (centres.Count() == 2)
+                if (centres.Count == 2)
                     blockedCentre = null;
             }
 
-            var blocked = combos.Find(c => c.GetAction<TaikoAction>() == lastBlocked);
+            var blocked = rims.Concat(centres).ToList().FindAll(a => a == lastBlocked);
 
             lastBlocked = null;
 
-            if (blocked != null)
-            {
-                var key = (Key)blocked.KeyCombination.Keys.First();
-                var input = new KeyboardKeyInput(key, true);
-                var evt = new ButtonStateChangeEvent<Key>(inputManager.CurrentState, input, key, ButtonStateChangeKind.Pressed);
-
-                inputManager.HandleInputStateChange(evt);
-            }
+            if (blocked.Any())
+                inputManager.RetractLastBlocked();
 
             return false;
         }
 
-        protected bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
+        private bool handleBindings(TaikoAction? single, List<TaikoAction> pressedActions)
         {
-            if (e is KeyDownEvent ev && !healthProcessor.IsBreakTime.Value)
+            if (!healthProcessor.IsBreakTime.Value)
             {
-                var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
-                var combos = keyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
+                var rims = pressedActions.FindAll(a => a == TaikoAction.LeftRim || a == TaikoAction.RightRim);
+                var centres = pressedActions.FindAll(a => a == TaikoAction.LeftCentre || a == TaikoAction.RightCentre);
 
-                if (combos != null)
+                if (pressedActions.Count > 1)
+                    return handleMultipleKeypresses(rims, centres);
+
+                if (RepeatOnColorChange.Value)
                 {
-                    var rims = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftRim || c.GetAction<TaikoAction>() == TaikoAction.RightRim)
-                                     .Select(c => c.GetAction<TaikoAction>());
+                    if (!rims.Any())
+                        blockedRim = null;
 
-                    var centres = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftCentre || c.GetAction<TaikoAction>() == TaikoAction.RightCentre)
-                                        .Select(c => c.GetAction<TaikoAction>());
-
-                    if (combos.Count > 1)
-                        return handleMultipleKeypresses(combos, rims, centres);
-
-                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == KeyCombination.FromKey(ev.Key)))?.GetAction<TaikoAction>();
-
-                    if (single != null && (single == blockedRim || single == blockedCentre))
-                    {
-                        if (!ev.Repeat)
-                            blockedKeystrokes++;
-
-                        lastBlocked = single;
-
-                        return true;
-                    }
-
-                    if (RepeatOnColorChange.Value)
-                    {
-                        if (!rims.Any())
-                            blockedRim = null;
-
-                        if (!centres.Any())
-                            blockedCentre = null;
-                    }
-
-                    if (rims.Any())
-                        blockedRim = rims.First();
-
-                    if (centres.Any())
-                        blockedCentre = centres.First();
+                    if (!centres.Any())
+                        blockedCentre = null;
                 }
+
+                if (pressedActions.Any(a => a == blockedRim || a == blockedCentre))
+                {
+                    blockedKeystrokes++;
+                    lastBlocked = pressedActions.First(a => a == blockedRim || a == blockedCentre);
+
+                    return true;
+                }
+
+                if (rims.Any())
+                    blockedRim = rims.First();
+
+                if (centres.Any())
+                    blockedCentre = centres.First();
             }
 
             return false;

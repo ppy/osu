@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -28,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            inputManager.BlockConditions += BlockCondition;
+            inputManager.HandleBindings += handleBindings;
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -41,40 +39,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0;
 
-        protected bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
+        private bool handleBindings(OsuAction? single, List<OsuAction> pressedActions)
         {
             if (!healthProcessor.IsBreakTime.Value)
             {
-                var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
-                var combos = keyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
-
-                if (combos != null)
+                if (single != null && single == blockedButton)
                 {
-                    InputKey? key;
-                    var kb = e as KeyDownEvent;
-                    var mouse = e as MouseDownEvent;
-                    if (kb != null)
-                        key = KeyCombination.FromKey(kb.Key);
-                    else if (mouse != null)
-                        key = KeyCombination.FromMouseButton(mouse.Button);
-                    else
-                        return false;
+                    blockedKeystrokes++;
 
-                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == key))?.GetAction<OsuAction>();
-
-                    if (single != null)
-                    {
-                        if (single == blockedButton)
-                        {
-                            if ((kb != null && !kb.Repeat) || mouse != null)
-                                blockedKeystrokes++;
-
-                            return true;
-                        }
-                        else
-                            blockedButton = single;
-                    }
+                    return true;
                 }
+                else
+                    blockedButton = single;
             }
 
             return false;

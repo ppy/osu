@@ -40,11 +40,13 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Container content;
 
-        public event Func<UIEvent, IEnumerable<KeyBinding>, bool> BlockConditions
+        public event Func<T?, List<T>, bool> HandleBindings
         {
-            add => ((RulesetKeyBindingContainer)KeyBindingContainer).BlockConditions += value;
-            remove => ((RulesetKeyBindingContainer)KeyBindingContainer).BlockConditions -= value;
+            add => ((RulesetKeyBindingContainer)KeyBindingContainer).HandleBindings += value;
+            remove => ((RulesetKeyBindingContainer)KeyBindingContainer).HandleBindings -= value;
         }
+
+        public void RetractLastBlocked() => ((RulesetKeyBindingContainer)KeyBindingContainer).RetractLastBlocked();
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
@@ -161,7 +163,8 @@ namespace osu.Game.Rulesets.UI
 
         public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
         {
-            public event Func<UIEvent, IEnumerable<KeyBinding>, bool> BlockConditions;
+            public event Func<T?, List<T>, bool> HandleBindings;
+            private UIEvent lastBlocked;
 
             public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -170,12 +173,44 @@ namespace osu.Game.Rulesets.UI
 
             protected override bool Handle(UIEvent e)
             {
-                if (BlockConditions?.Invoke(e, KeyBindings) == true)
+                if (!(e is KeyDownEvent || e is MouseDownEvent || e is JoystickButtonEvent)) return base.Handle(e);
+                if (e is KeyDownEvent ev && ev.Repeat) return base.Handle(e);
+
+                var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
+                var combos = KeyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
+
+                if (combos != null)
                 {
-                    return false;
+                    var pressedActions = combos.Select(c => c.GetAction<T>()).ToList();
+
+                    InputKey? key = null;
+                    if (e is KeyDownEvent kb)
+                        key = KeyCombination.FromKey(kb.Key);
+                    else if (e is MouseDownEvent mouse)
+                        key = KeyCombination.FromMouseButton(mouse.Button);
+                    else if (e is JoystickButtonEvent joystick)
+                        key = KeyCombination.FromJoystickButton(joystick.Button);
+
+                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == key))?.GetAction<T>();
+
+                    var blocked = HandleBindings?.GetInvocationList().Cast<Func<T?, List<T>, bool>>().ToList().FindAll(f => f.Invoke(single, pressedActions)).Any();
+
+                    if (blocked == true)
+                    {
+                        lastBlocked = e;
+                        return false;
+                    }
+
+                    lastBlocked = null;
                 }
 
                 return base.Handle(e);
+            }
+
+            public void RetractLastBlocked()
+            {
+                if (lastBlocked != null)
+                    base.Handle(lastBlocked);
             }
         }
     }
