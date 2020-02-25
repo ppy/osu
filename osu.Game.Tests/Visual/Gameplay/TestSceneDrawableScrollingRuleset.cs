@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -163,7 +164,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var beatmap = new Beatmap<HitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
 
             for (int i = 0; i < 10; i++)
-                beatmap.HitObjects.Add(new ConvertHitObject { StartTime = i * time_range });
+                beatmap.HitObjects.Add(new HitObject { StartTime = i * time_range });
 
             return beatmap;
         }
