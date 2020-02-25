@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -63,15 +62,9 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (value)
-                {
                     loading.Show();
-                    backgroundSprite.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
-                }
                 else
-                {
                     loading.Hide();
-                    backgroundSprite.FadeColour(Color4.White, 400, Easing.OutQuint);
-                }
             }
         }
 
@@ -138,7 +131,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingSpinner { Scale = new Vector2(1.3f) }
+                                loading = new LoadingLayer(backgroundSprite)
                             }
                         },
                         new OsuSpriteText

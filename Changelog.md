@@ -517,3 +517,11 @@
 *   一些翻译优化
 *   翻出来一个新的谱面列表(BeatmapListingOverlay)
 *   将各类Tests与官方同步
+
+## 2020/2/25:
+*   已停止继续分发二进制版本，请自行构建。
+*   整合更新
+    *   [m] [Reduce hit error display performance overhead #7967]
+    *   [m] [Improve gameplay performance via follow point renderer optimisations #7968]
+    *   [m] [Fix scale of loading animation on player loading screen #7969]
+    *   [m] [Update framework #7989]

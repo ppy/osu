@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             public BeatmapSearchTextBox()
             {
-                PlaceholderText = @"键入关键词...";
+                PlaceholderText = @"键入关键字以搜索";
             }
         }
     }

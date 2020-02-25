@@ -207,10 +207,26 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private double floatingAverage;
         private Container colourBars;
 
+        private const int max_concurrent_judgements = 50;
+
         public override void OnNewJudgement(JudgementResult judgement)
         {
             if (!judgement.IsHit)
                 return;
+
+            if (judgementsContainer.Count > max_concurrent_judgements)
+            {
+                const double quick_fade_time = 100;
+
+                // check with a bit of lenience to avoid precision error in comparison.
+                var old = judgementsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + quick_fade_time * 1.1);
+
+                if (old != null)
+                {
+                    old.ClearTransforms();
+                    old.FadeOut(quick_fade_time).Expire();
+                }
+            }
 
             judgementsContainer.Add(new JudgementLine
             {
@@ -228,7 +244,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private class JudgementLine : CompositeDrawable
         {
-            private const int judgement_fade_duration = 10000;
+            private const int judgement_fade_duration = 5000;
 
             public JudgementLine()
             {
@@ -255,7 +271,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Width = 0;
 
                 this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
-                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
+                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration).Expire();
             }
         }
     }
