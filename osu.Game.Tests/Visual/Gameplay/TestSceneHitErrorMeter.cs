@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Rulesets.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
@@ -12,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(double offset = 0)
         {
-            var judgement = new JudgementResult(new ConvertHitObject(), new Judgement())
+            var judgement = new JudgementResult(new HitObject(), new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
