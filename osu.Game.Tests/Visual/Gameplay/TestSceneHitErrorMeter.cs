@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Rulesets.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
@@ -13,6 +12,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
