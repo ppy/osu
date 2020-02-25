@@ -260,9 +260,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double deviationOnCircles = (greatWindow + 20) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 46000;
 
-            // scale acc pp with accuracy such that, for >95% acc accuracyValue doesn't really change,
-            // for 50% acc accuracyValue is halved, and for <5% acc accuracyValue is ~0
-            accuracyValue *= Math.Pow(Math.Sin(accuracy * Math.PI / 2), 2);
+            // scale acc pp with misses
+            accuracyValue *= Math.Pow(0.96, countMiss);
 
             // nerf short maps
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0);
