@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -42,6 +45,9 @@ namespace osu.Game.Overlays.Direct
             this.sortDirection = sortDirection;
         }
 
+        /// <summary>
+        /// Fetches the next page of beatmap sets. This method is not thread-safe.
+        /// </summary>
         public void FetchNextPage()
         {
             if (getSetsRequest != null)
@@ -55,21 +61,19 @@ namespace osu.Game.Overlays.Direct
                 sortCriteria,
                 sortDirection);
 
-            lock (getSetsRequest) {
-                getSetsRequest.Success += response =>
-                {
-                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+            getSetsRequest.Success += response =>
+            {
+                var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
-                    if (sets.Count <= 0) IsLastPageFetched = true;
+                if (sets.Count <= 0) IsLastPageFetched = true;
 
-                    PageFetch?.Invoke(currentPage, sets);
+                PageFetch?.Invoke(currentPage, sets);
 
-                    getSetsRequest = null;
-                    currentPage++;
-                };
+                getSetsRequest = null;
+                currentPage++;
+            };
 
-                API.Queue(getSetsRequest);
-            }
+            API.Queue(getSetsRequest);
         }
 
         public void Reset()
