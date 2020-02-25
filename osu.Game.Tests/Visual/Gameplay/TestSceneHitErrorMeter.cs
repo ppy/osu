@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Framework.Utils;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mania.Scoring;
@@ -43,6 +44,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("New max negative", () => newJudgement(-hitWindows.WindowFor(HitResult.Meh)), 20);
             AddRepeatStep("New max positive", () => newJudgement(hitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
+
+            AddStep("Judgement barrage", () =>
+            {
+                int runCount = 0;
+
+                ScheduledDelegate del = null;
+
+                del = Scheduler.AddDelayed(() =>
+                {
+                    newJudgement(runCount++ / 10f);
+
+                    if (runCount == 500)
+                        // ReSharper disable once AccessToModifiedClosure
+                        del?.Cancel();
+                }, 10, true);
+            });
         }
 
         [Test]
