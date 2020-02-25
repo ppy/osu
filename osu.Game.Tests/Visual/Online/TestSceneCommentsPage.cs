@@ -14,6 +14,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osuTK;
 using osu.Framework.Utils;
+using JetBrains.Annotations;
+using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -30,6 +32,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private readonly BindableBool showDeleted = new BindableBool();
         private readonly Container content;
+
+        private TestCommentsPage commentsPage;
 
         public TestSceneCommentsPage()
         {
@@ -58,15 +62,29 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 }
             });
+        }
 
-            AddStep("load comments", () => createPage(getCommentBundle()));
-            AddStep("load empty comments", () => createPage(getEmptyCommentBundle()));
+        [Test]
+        public void TestAppendDuplicatedComment()
+        {
+            AddStep("Create page", () => createPage(getCommentBundle()));
+            AddAssert("Dictionary length is 10", () => commentsPage?.DictionaryLength == 10);
+            AddStep("Append existing comment", () => commentsPage?.AppendComments(getCommentSubBundle(), false));
+            AddAssert("Dictionary length is 10", () => commentsPage?.DictionaryLength == 10);
+        }
+
+        [Test]
+        public void TestEmptyBundle()
+        {
+            AddStep("Create page", () => createPage(getEmptyCommentBundle()));
+            AddAssert("Dictionary length is 0", () => commentsPage?.DictionaryLength == 0);
         }
 
         private void createPage(CommentBundle commentBundle)
         {
+            commentsPage = null;
             content.Clear();
-            content.Add(new TestCommentPage(commentBundle)
+            content.Add(commentsPage = new TestCommentsPage(commentBundle)
             {
                 ShowDeleted = { BindTarget = showDeleted }
             });
@@ -184,12 +202,32 @@ namespace osu.Game.Tests.Visual.Online
             },
         };
 
-        private class TestCommentPage : CommentsPage
+        private CommentBundle getCommentSubBundle() => new CommentBundle
         {
-            public TestCommentPage(CommentBundle bundle)
-                : base(bundle)
+            Comments = new List<Comment>
+            {
+                new Comment
+                {
+                    Id = 1,
+                    Message = "Simple test comment",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 5
+                },
+            },
+            IncludedComments = new List<Comment>(),
+        };
+
+        private class TestCommentsPage : CommentsPage
+        {
+            public TestCommentsPage(CommentBundle commentBundle)
+                : base(commentBundle)
             {
             }
+
+            public new void AppendComments([NotNull] CommentBundle bundle, bool newReply) => base.AppendComments(bundle, newReply);
+
+            public int DictionaryLength => CommentDictionary.Count;
 
             protected override void OnCommentPostReplyRequested(DrawableComment drawableComment, string message)
             {
