@@ -93,9 +93,10 @@ namespace osu.Game.Screens.Edit
 
             EditorMenuBar menuBar;
 
-            var fileMenuItems = new List<MenuItem>();
-
-            fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap));
+            var fileMenuItems = new List<MenuItem>
+            {
+                new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap)
+            };
 
             if (RuntimeInfo.IsDesktop)
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
