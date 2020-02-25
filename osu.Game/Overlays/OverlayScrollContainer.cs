@@ -21,6 +21,8 @@ namespace osu.Game.Overlays
     {
         public ScrollToTopButton Button { get; }
 
+        private bool canBeClicked = true;
+
         public OverlayScrollContainer()
         {
             AddInternal(Button = new ScrollToTopButton
@@ -28,7 +30,15 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(20),
-                Action = () => ScrollToStart()
+                Action = () =>
+                {
+                    if (!canBeClicked)
+                        return;
+
+                    canBeClicked = false;
+                    ScrollToStart();
+                    Button.State.Value = Visibility.Hidden;
+                }
             });
         }
 
@@ -36,7 +46,16 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
+            if (!canBeClicked)
+                return;
+
             Button.State.Value = Current > 200 ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            canBeClicked = true;
+            return base.OnScroll(e);
         }
 
         public class ScrollToTopButton : VisibilityContainer
