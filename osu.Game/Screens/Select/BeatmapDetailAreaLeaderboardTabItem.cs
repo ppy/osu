@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions;
 using System;
 
 namespace osu.Game.Screens.Select
@@ -8,7 +9,7 @@ namespace osu.Game.Screens.Select
     public class BeatmapDetailAreaLeaderboardTabItem<TScope> : BeatmapDetailAreaTabItem
         where TScope : Enum
     {
-        public override string Name => Scope.ToString();
+        public override string Name => Scope.GetDescription()??ToString();
 
         public override bool FilterableByMods => true;
 

@@ -7,10 +7,11 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System.ComponentModel;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
+    public class RankingsOverlayHeader : TabControlOverlayHeaderCN<RankingsScope>
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
@@ -41,8 +42,8 @@ namespace osu.Game.Overlays.Rankings
 
             protected override void LoadComplete()
             {
-                base.LoadComplete();
-                Scope.BindValueChanged(scope => Section = scope.NewValue.ToString().ToLowerInvariant(), true);
+                base.LoadComplete();//
+                Scope.BindValueChanged(scope => Section = scope.NewValue.GetDescription()??ToString().ToLowerInvariant(), true);
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/rankings");
