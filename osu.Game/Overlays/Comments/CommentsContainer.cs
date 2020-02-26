@@ -167,10 +167,10 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
             moreButton.IsLoading = true;
             content.Clear();
-            commentDictionary.Clear();
+            CommentDictionary.Clear();
         }
 
-        private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
+        protected readonly Dictionary<long, DrawableComment> CommentDictionary = new Dictionary<long, DrawableComment>();
 
         protected void OnSuccess(CommentBundle response)
         {
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            var topLevelComments = appendComments(response);
+            var topLevelComments = AppendComments(response);
 
             LoadComponentsAsync(topLevelComments, loaded =>
             {
@@ -209,7 +209,7 @@ namespace osu.Game.Overlays.Comments
         /// Appends retrieved comments to the subtree rooted of comments in this page.
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
-        private List<DrawableComment> appendComments([NotNull] CommentBundle bundle)
+        protected List<DrawableComment> AppendComments([NotNull] CommentBundle bundle)
         {
             var topLevelComments = new List<DrawableComment>();
             var orphaned = new List<Comment>();
@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Comments
             foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments))
             {
                 // Exclude possible duplicated comments.
-                if (commentDictionary.ContainsKey(comment.Id))
+                if (CommentDictionary.ContainsKey(comment.Id))
                     continue;
 
                 addNewComment(comment);
@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Comments
                     // Comments that have no parent are added as top-level comments to the flow.
                     topLevelComments.Add(drawableComment);
                 }
-                else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
+                else if (CommentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
                 {
                     // The comment's parent has already been seen, so the parent<-> child links can be added.
                     comment.ParentComment = parentDrawable.Comment;
@@ -255,10 +255,10 @@ namespace osu.Game.Overlays.Comments
 
         private DrawableComment getDrawableComment(Comment comment)
         {
-            if (commentDictionary.TryGetValue(comment.Id, out var existing))
+            if (CommentDictionary.TryGetValue(comment.Id, out var existing))
                 return existing;
 
-            return commentDictionary[comment.Id] = new DrawableComment(comment)
+            return CommentDictionary[comment.Id] = new DrawableComment(comment)
             {
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
@@ -270,7 +270,7 @@ namespace osu.Game.Overlays.Comments
         {
             var req = new GetCommentsRequest(id.Value, type.Value, Sort.Value, page, drawableComment.Comment.Id);
 
-            req.Success += response => Schedule(() => appendComments(response));
+            req.Success += response => Schedule(() => AppendComments(response));
 
             api.PerformAsync(req);
         }
