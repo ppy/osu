@@ -138,6 +138,12 @@ namespace osu.Game.Overlays
             Country.Value = requested;
         }
 
+        public void ShowSpotlights()
+        {
+            Scope.Value = RankingsScope.Spotlights;
+            Show();
+        }
+
         private void loadNewContent()
         {
             loading.Show();
