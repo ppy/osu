@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests.Responses;
+using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Users;
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; }
 
         private GetCommentsRequest request;
+        private CancellationTokenSource loadCancellation;
         private int currentPage;
 
         private FillFlowContainer content;
@@ -152,6 +154,7 @@ namespace osu.Game.Overlays.Comments
                 return;
 
             request?.Cancel();
+            loadCancellation?.Cancel();
             request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
             request.Success += response => Schedule(() => onSuccess(response));
             api.PerformAsync(request);
@@ -164,6 +167,7 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
             moreButton.IsLoading = true;
             content.Clear();
+            commentDictionary.Clear();
         }
 
         private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
@@ -173,26 +177,33 @@ namespace osu.Game.Overlays.Comments
             if (!response.Comments.Any())
             {
                 content.Add(new NoCommentsPlaceholder());
+                moreButton.Hide();
                 return;
             }
             else
             {
-                appendComments(response);
+                var topLevelComments = appendComments(response);
 
-                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-            }
+                LoadComponentsAsync(topLevelComments, loaded =>
+                {
+                    content.AddRange(loaded);
 
-            if (response.HasMore)
-            {
-                int loadedTopLevelComments = 0;
-                content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+                    deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                    commentCounter.Current.Value = response.Total;
 
-                moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                moreButton.IsLoading = false;
-            }
-            else
-            {
-                moreButton.Hide();
+                    if (response.HasMore)
+                    {
+                        int loadedTopLevelComments = 0;
+                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+
+                        moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
+                        moreButton.IsLoading = false;
+                    }
+                    else
+                    {
+                        moreButton.Hide();
+                    }
+                }, (loadCancellation = new CancellationTokenSource()).Token);
             }
         }
 
@@ -200,8 +211,9 @@ namespace osu.Game.Overlays.Comments
         /// Appends retrieved comments to the subtree rooted of comments in this page.
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
-        private void appendComments([NotNull] CommentBundle bundle)
+        private List<DrawableComment> appendComments([NotNull] CommentBundle bundle)
         {
+            var topLevelComments = new List<DrawableComment>();
             var orphaned = new List<Comment>();
 
             foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments))
@@ -217,6 +229,8 @@ namespace osu.Game.Overlays.Comments
             foreach (var o in orphaned)
                 addNewComment(o);
 
+            return topLevelComments;
+
             void addNewComment(Comment comment)
             {
                 var drawableComment = getDrawableComment(comment);
@@ -224,7 +238,7 @@ namespace osu.Game.Overlays.Comments
                 if (comment.ParentId == null)
                 {
                     // Comments that have no parent are added as top-level comments to the flow.
-                    content.Add(drawableComment);
+                    topLevelComments.Add(drawableComment);
                 }
                 else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
                 {
@@ -266,6 +280,7 @@ namespace osu.Game.Overlays.Comments
         protected override void Dispose(bool isDisposing)
         {
             request?.Cancel();
+            loadCancellation?.Cancel();
             base.Dispose(isDisposing);
         }
 
