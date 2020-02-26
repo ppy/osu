@@ -109,6 +109,7 @@ namespace osu.Game.Overlays.Comments
 
     public enum CommentsSortCriteria
     {
+        [System.ComponentModel.Description(@"Recent")]
         New,
         Old,
         Top
