@@ -3,17 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -43,14 +40,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
             RelativeSizeAxes = Axes.X;
             Height = base_height;
-            Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = Color4.Black.Opacity(0.25f),
-                Type = EdgeEffectType.Shadow,
-                Radius = 3,
-                Offset = new Vector2(0f, 1f),
-            };
 
             Children = new Drawable[]
             {

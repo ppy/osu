@@ -15,6 +15,8 @@ using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Game.Overlays.Comments;
 using JetBrains.Annotations;
+using System;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays
 {
@@ -132,7 +134,7 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12),
-                            Text = value.ToString()
+                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
                         }
                     }
                 });
