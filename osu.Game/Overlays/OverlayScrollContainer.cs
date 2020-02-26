@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
     {
         public ScrollToTopButton Button { get; }
 
-        private bool animaionIsRunning;
+        private bool animationIsRunning;
 
         public OverlayScrollContainer()
         {
@@ -32,10 +32,10 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding(20),
                 Action = () =>
                 {
-                    if (animaionIsRunning)
+                    if (animationIsRunning)
                         return;
 
-                    animaionIsRunning = true;
+                    animationIsRunning = true;
                     ScrollToStart();
                     Button.State.Value = Visibility.Hidden;
                 }
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            if (animaionIsRunning)
+            if (animationIsRunning)
                 return;
 
             Button.State.Value = Current > 200 ? Visibility.Visible : Visibility.Hidden;
@@ -54,19 +54,19 @@ namespace osu.Game.Overlays
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            animaionIsRunning = false;
+            animationIsRunning = false;
             return base.OnScroll(e);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            animaionIsRunning = false;
+            animationIsRunning = false;
             return base.OnDragStart(e);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (animaionIsRunning)
+            if (animationIsRunning)
                 return false;
 
             return base.OnMouseDown(e);
