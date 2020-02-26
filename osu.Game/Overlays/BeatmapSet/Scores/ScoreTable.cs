@@ -88,11 +88,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
 
-            columns.AddRange(new[]
-            {
-                new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)),
-                new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-            });
+            if (score.PP.HasValue)
+                columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
+
+            columns.Add(new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
 
             return columns.ToArray();
         }
@@ -150,24 +149,25 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            content.AddRange(new Drawable[]
+            if (score.PP.HasValue)
             {
-                new OsuSpriteText
+                content.Add(new OsuSpriteText
                 {
-                    Text = $@"{score.PP ?? 0:N0}",
+                    Text = $@"{score.PP:N0}",
                     Font = OsuFont.GetFont(size: text_size)
-                },
-                new FillFlowContainer
+                });
+            }
+
+            content.Add(new FillFlowContainer
+            {
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(1),
+                ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
                 {
-                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(1),
-                    ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.3f)
-                    })
-                },
+                    Scale = new Vector2(0.3f)
+                })
             });
 
             return content.ToArray();
