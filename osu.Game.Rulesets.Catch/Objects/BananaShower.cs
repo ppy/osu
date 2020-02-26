@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
@@ -10,6 +11,8 @@ namespace osu.Game.Rulesets.Catch.Objects
         public override FruitVisualRepresentation VisualRepresentation => FruitVisualRepresentation.Banana;
 
         public override bool LastInCombo => true;
+
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override void CreateNestedHitObjects()
         {
