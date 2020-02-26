@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Comments
         private FillFlowContainer content;
         private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
-        private TotalCommentsCounter commentCounter;
+        protected TotalCommentsCounter CommentCounter;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        commentCounter = new TotalCommentsCounter(),
+                        CommentCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -137,14 +137,14 @@ namespace osu.Game.Overlays.Comments
                 return;
 
             // only reset when changing ID/type. other refetch ops are generally just changing sort order.
-            commentCounter.Current.Value = 0;
+            CommentCounter.Current.Value = 0;
 
             refetchComments();
         }
 
         private void refetchComments()
         {
-            clearComments();
+            ClearComments();
             getComments();
         }
 
@@ -156,11 +156,11 @@ namespace osu.Game.Overlays.Comments
             request?.Cancel();
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
-            request.Success += response => Schedule(() => onSuccess(response));
+            request.Success += response => Schedule(() => OnSuccess(response));
             api.PerformAsync(request);
         }
 
-        private void clearComments()
+        protected void ClearComments()
         {
             currentPage = 1;
             deletedCommentsCounter.Count.Value = 0;
@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Comments
 
         private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
 
-        private void onSuccess(CommentBundle response)
+        protected void OnSuccess(CommentBundle response)
         {
             if (!response.Comments.Any())
             {
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays.Comments
                     content.AddRange(loaded);
 
                     deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-                    commentCounter.Current.Value = response.Total;
+                    CommentCounter.Current.Value = response.Total;
 
                     if (response.HasMore)
                     {
