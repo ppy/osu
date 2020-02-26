@@ -50,6 +50,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
+            if (result.Judgement is IgnoreJudgement)
+                return;
+
             void runAfterLoaded(Action action)
             {
                 if (lastPlateableFruit == null)
