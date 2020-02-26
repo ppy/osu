@@ -40,13 +40,13 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Container content;
 
-        public event Func<T?, List<T>, bool> HandleBindings
+        public event Func<List<T>, bool> OnRulesetAction
         {
-            add => ((RulesetKeyBindingContainer)KeyBindingContainer).HandleBindings += value;
-            remove => ((RulesetKeyBindingContainer)KeyBindingContainer).HandleBindings -= value;
+#pragma warning disable CA1030 // Use events where appropriate
+            add => ((RulesetKeyBindingContainer)KeyBindingContainer).OnRulesetAction += value;
+            remove => ((RulesetKeyBindingContainer)KeyBindingContainer).OnRulesetAction -= value;
+#pragma warning restore CA1030 // Use events where appropriate
         }
-
-        public void RetractLastBlocked() => ((RulesetKeyBindingContainer)KeyBindingContainer).RetractLastBlocked();
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
@@ -163,8 +163,7 @@ namespace osu.Game.Rulesets.UI
 
         public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
         {
-            public event Func<T?, List<T>, bool> HandleBindings;
-            private UIEvent lastBlocked;
+            public event Func<List<T>, bool> OnRulesetAction;
 
             public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -173,8 +172,7 @@ namespace osu.Game.Rulesets.UI
 
             protected override bool Handle(UIEvent e)
             {
-                if (!(e is KeyDownEvent || e is MouseDownEvent || e is JoystickButtonEvent)) return base.Handle(e);
-                if (e is KeyDownEvent ev && ev.Repeat) return base.Handle(e);
+                if (!(e is KeyDownEvent || e is MouseDownEvent || e is JoystickButtonEvent) || (e is KeyDownEvent ev && ev.Repeat) || OnRulesetAction == null) return base.Handle(e);
 
                 var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
                 var combos = KeyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
@@ -183,34 +181,21 @@ namespace osu.Game.Rulesets.UI
                 {
                     var pressedActions = combos.Select(c => c.GetAction<T>()).ToList();
 
-                    InputKey? key = null;
-                    if (e is KeyDownEvent kb)
-                        key = KeyCombination.FromKey(kb.Key);
-                    else if (e is MouseDownEvent mouse)
-                        key = KeyCombination.FromMouseButton(mouse.Button);
-                    else if (e is JoystickButtonEvent joystick)
-                        key = KeyCombination.FromJoystickButton(joystick.Button);
+                    bool handled = false;
 
-                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == key))?.GetAction<T>();
-
-                    var blocked = HandleBindings?.GetInvocationList().Cast<Func<T?, List<T>, bool>>().ToList().FindAll(f => f.Invoke(single, pressedActions)).Any();
-
-                    if (blocked == true)
+                    foreach (var d in OnRulesetAction.GetInvocationList())
                     {
-                        lastBlocked = e;
-                        return false;
+                        var onRulesetAction = (Func<List<T>, bool>)d;
+
+                        if (onRulesetAction.Invoke(pressedActions))
+                            handled = true;
                     }
 
-                    lastBlocked = null;
+                    if (handled)
+                        return false;
                 }
 
                 return base.Handle(e);
-            }
-
-            public void RetractLastBlocked()
-            {
-                if (lastBlocked != null)
-                    base.Handle(lastBlocked);
             }
         }
     }

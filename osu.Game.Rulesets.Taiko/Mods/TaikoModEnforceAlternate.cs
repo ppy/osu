@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -19,16 +20,15 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override IconUsage? Icon => FontAwesome.Solid.SignLanguage;
 
-        private TaikoInputManager inputManager;
         private HealthProcessor healthProcessor;
 
-        private TaikoAction? blockedRim;
-        private TaikoAction? blockedCentre;
+        private MultiAction blockedRim;
+        private MultiAction blockedCentre;
 
-        private TaikoAction? lastBlocked;
         private int blockedKeystrokes;
 
-        private DrawableDrumRoll currentRoll;
+        private DrawableTaikoHitObject nextHitObject;
+        private bool? objectInRange;
 
         [SettingSource("Allow repeats on color change")]
         public Bindable<bool> RepeatOnColorChange { get; } = new BindableBool
@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            inputManager = (TaikoInputManager)drawableRuleset.KeyBindingInputManager;
-            inputManager.HandleBindings += handleBindings;
+            var inputManager = (TaikoInputManager)drawableRuleset.KeyBindingInputManager;
+            inputManager.OnRulesetAction += handleBindings;
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -58,38 +58,36 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 healthProcessor.FailConditions += FailCondition;
         }
 
-        protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0 && lastBlocked != null;
+        protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0;
 
         public void Update(Playfield playfield)
         {
             if (RepeatAfterDrumroll.Value)
             {
-                if (currentRoll != null && currentRoll.AllJudged)
+                if (nextHitObject is DrawableDrumRoll roll)
                 {
-                    if (currentRoll.HitObject.IsStrong)
+                    if (roll.HitObject.IsStrong)
                     {
-                        blockedRim = null;
-                        blockedCentre = null;
+                        blockedRim = MultiAction.None;
+                        blockedCentre = MultiAction.None;
                     }
                     else
-                        blockedCentre = null;
-
-                    currentRoll = null;
+                        blockedCentre = MultiAction.None;
                 }
 
-                currentRoll = playfield.HitObjectContainer.Objects.ToList().Find(o => o is DrawableDrumRoll && !o.AllJudged) as DrawableDrumRoll;
+                nextHitObject = playfield.HitObjectContainer.Objects.ToList().Find(o => o is DrawableTaikoHitObject && !o.AllJudged) as DrawableTaikoHitObject;
+                objectInRange = nextHitObject?.HitObject.HitWindows.CanBeHit(playfield.Time.Current - nextHitObject.HitObject.StartTime);
             }
         }
 
-        private bool handleMultipleKeypresses(List<TaikoAction> rims, List<TaikoAction> centres)
+        private bool handleMultipleKeypresses(List<MultiAction> multiActions)
         {
-            bool bothLeft = (rims.Count == 1 && rims.First() == TaikoAction.LeftRim) && (centres.Count == 1 && centres.First() == TaikoAction.LeftCentre);
-            bool bothRight = (rims.Count == 1 && rims.First() == TaikoAction.RightRim) && (centres.Count == 1 && centres.First() == TaikoAction.RightCentre);
+            var allPressed = multiActions.Aggregate((all, next) => all | next);
 
-            if (bothLeft || bothRight)
+            if (allPressed == MultiAction.LeftBoth || allPressed == MultiAction.RightBoth)
             {
-                bool rimBlocked = rims.Any(a => a == blockedRim);
-                bool centreBlocked = centres.Any(a => a == blockedCentre);
+                bool rimBlocked = multiActions.Any(a => a == blockedRim);
+                bool centreBlocked = multiActions.Any(a => a == blockedCentre);
 
                 if (rimBlocked && centreBlocked)
                 {
@@ -99,64 +97,86 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 }
                 else
                 {
-                    blockedRim = rims.First();
-                    blockedCentre = centres.First();
+                    blockedRim = multiActions.First(a => a.HasFlag(MultiAction.Rim));
+                    blockedCentre = multiActions.First(a => a.HasFlag(MultiAction.Centre));
                 }
             }
             else
             {
-                if (rims.Count == 2)
-                    blockedRim = null;
+                if (allPressed == MultiAction.LargeRim)
+                    blockedRim = MultiAction.None;
 
-                if (centres.Count == 2)
-                    blockedCentre = null;
+                if (allPressed == MultiAction.LargeCentre)
+                    blockedCentre = MultiAction.None;
             }
-
-            var blocked = rims.Concat(centres).ToList().FindAll(a => a == lastBlocked);
-
-            lastBlocked = null;
-
-            if (blocked.Any())
-                inputManager.RetractLastBlocked();
 
             return false;
         }
 
-        private bool handleBindings(TaikoAction? single, List<TaikoAction> pressedActions)
+        private bool handleBindings(List<TaikoAction> pressedActions)
         {
-            if (!healthProcessor.IsBreakTime.Value)
+            if (healthProcessor.IsBreakTime.Value || !pressedActions.Any()) return false;
+
+            var multiActions = new List<MultiAction>();
+
+            pressedActions.ForEach(a =>
             {
-                var rims = pressedActions.FindAll(a => a == TaikoAction.LeftRim || a == TaikoAction.RightRim);
-                var centres = pressedActions.FindAll(a => a == TaikoAction.LeftCentre || a == TaikoAction.RightCentre);
+                Enum.TryParse(a.ToString(), out MultiAction action);
+                multiActions.Add(action);
+            });
 
-                if (pressedActions.Count > 1)
-                    return handleMultipleKeypresses(rims, centres);
+            var rim = multiActions.Find(a => a.HasFlag(MultiAction.Rim));
+            var centre = multiActions.Find(a => a.HasFlag(MultiAction.Centre));
 
-                if (RepeatOnColorChange.Value)
-                {
-                    if (!rims.Any())
-                        blockedRim = null;
+            if (pressedActions.Count > 1)
+                return handleMultipleKeypresses(multiActions);
 
-                    if (!centres.Any())
-                        blockedCentre = null;
-                }
+            bool exempt = nextHitObject?.HitObject.IsStrong == true && objectInRange == true;
 
-                if (pressedActions.Any(a => a == blockedRim || a == blockedCentre))
-                {
-                    blockedKeystrokes++;
-                    lastBlocked = pressedActions.First(a => a == blockedRim || a == blockedCentre);
+            if (nextHitObject is DrawableHit hit)
+                exempt &= hit.HitActions.Any(pressedActions.Contains);
 
-                    return true;
-                }
+            if (multiActions.Any(a => a == blockedRim || a == blockedCentre) && !exempt)
+            {
+                blockedKeystrokes++;
 
-                if (rims.Any())
-                    blockedRim = rims.First();
-
-                if (centres.Any())
-                    blockedCentre = centres.First();
+                return true;
             }
 
+            if (rim != MultiAction.None)
+                blockedRim = rim;
+            else if (RepeatOnColorChange.Value)
+                blockedRim = MultiAction.None;
+
+            if (centre != MultiAction.None)
+                blockedCentre = centre;
+            else if (RepeatOnColorChange.Value)
+                blockedCentre = MultiAction.None;
+
             return false;
+        }
+
+        [Flags]
+        private enum MultiAction
+        {
+            None = 0,
+
+            Left = 1,
+            Right = 2,
+
+            Rim = 4,
+            Centre = 8,
+
+            LeftRim = Left | Rim,
+            LeftCentre = Left | Centre,
+            RightCentre = Right | Centre,
+            RightRim = Right | Rim,
+
+            LeftBoth = LeftRim | LeftCentre,
+            RightBoth = RightRim | RightCentre,
+
+            LargeRim = LeftRim | RightRim,
+            LargeCentre = LeftCentre | RightCentre
         }
     }
 }

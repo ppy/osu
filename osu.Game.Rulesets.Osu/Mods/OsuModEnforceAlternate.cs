@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModRelax)).ToArray();
 
-        private OsuInputManager inputManager;
         private HealthProcessor healthProcessor;
 
         private OsuAction? blockedButton;
@@ -25,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            inputManager.HandleBindings += handleBindings;
+            var inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            inputManager.OnRulesetAction += handleBindings;
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -39,19 +38,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0;
 
-        private bool handleBindings(OsuAction? single, List<OsuAction> pressedActions)
+        private bool handleBindings(List<OsuAction> pressedActions)
         {
-            if (!healthProcessor.IsBreakTime.Value)
-            {
-                if (single != null && single == blockedButton)
-                {
-                    blockedKeystrokes++;
+            if (healthProcessor.IsBreakTime.Value || !pressedActions.Any()) return false;
 
-                    return true;
-                }
-                else
-                    blockedButton = single;
+            if (pressedActions.All(a => a == blockedButton))
+            {
+                blockedKeystrokes++;
+                return true;
             }
+
+            blockedButton = pressedActions.First(a => a != blockedButton);
 
             return false;
         }
