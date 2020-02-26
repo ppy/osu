@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -24,13 +23,13 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            DateTime currentDate = DateTime.MinValue;
+            var currentDate = DateTime.MinValue;
 
             if (entries == null) return;
 
-            foreach (APIChangelogBuild build in entries)
+            foreach (var build in entries)
             {
                 if (build.CreatedAt.Date != currentDate)
                 {
@@ -40,7 +39,7 @@ namespace osu.Game.Overlays.Changelog
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 2,
-                            Colour = new Color4(17, 17, 17, 255),
+                            Colour = colourProvider.Background6,
                             Margin = new MarginPadding { Top = 30 },
                         });
                     }
@@ -49,10 +48,9 @@ namespace osu.Game.Overlays.Changelog
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding { Top = 15 },
-                        Text = build.CreatedAt.Date.ToString("dd MMM yyyy"),
+                        Margin = new MarginPadding { Top = 20 },
+                        Text = build.CreatedAt.Date.ToString("dd MMMM yyyy"),
                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 24),
-                        Colour = OsuColour.FromHex(@"FD5"),
                     });
 
                     currentDate = build.CreatedAt.Date;
@@ -68,7 +66,7 @@ namespace osu.Game.Overlays.Changelog
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(32, 24, 35, 255),
+                            Colour = colourProvider.Background6,
                         }
                     });
                 }
