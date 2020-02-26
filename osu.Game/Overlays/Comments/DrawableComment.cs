@@ -23,6 +23,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public Action<DrawableComment, int> RepliesRequested;
-        public Action<DrawableComment, string> PostReplyRequested;
+        public Action<DrawableComment, CommentBundle> NewReplyReceived;
 
         public readonly Comment Comment;
 
@@ -56,7 +57,6 @@ namespace osu.Game.Overlays.Comments
         private RepliesButton repliesButton;
         private ChevronButton chevronButton;
         private DeletedCommentsCounter deletedCommentsCounter;
-        private ReplyEditor replyEditor;
 
         public DrawableComment(Comment comment)
         {
@@ -199,10 +199,10 @@ namespace osu.Game.Overlays.Comments
                                                         }
                                                     }
                                                 },
-                                                replyEditor = new ReplyEditor
+                                                new ReplyEditor(Comment)
                                                 {
                                                     IsVisible = { BindTarget = replyEditorVisible },
-                                                    OnCommit = text => PostReplyRequested(this, text)
+                                                    ReplyReceived = reply => NewReplyReceived?.Invoke(this, reply)
                                                 }
                                             }
                                         }
@@ -338,8 +338,6 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        public bool ContainsReply(long replyId) => loadedReplies.ContainsKey(replyId);
-
         private void onRepliesAdded(IEnumerable<DrawableComment> replies)
         {
             var page = createRepliesPage(replies);
@@ -367,9 +365,6 @@ namespace osu.Game.Overlays.Comments
 
                 Comment.RepliesCount++;
                 repliesButton.IncreaseValue();
-
-                replyEditor.IsLoading = false;
-                replyEditorVisible.Value = false;
 
                 updateButtonsState();
             });
@@ -530,7 +525,27 @@ namespace osu.Game.Overlays.Comments
 
         private class ReplyEditor : CancellableCommentEditor
         {
+            public Action<CommentBundle> ReplyReceived;
+
             public readonly BindableBool IsVisible = new BindableBool();
+
+            protected override string FooterText => @"Press Enter to reply.";
+
+            protected override string CommitButtonText => @"Reply";
+
+            protected override string TextBoxPlaceholder => @"Type your response here";
+
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            private PostCommentRequest request;
+
+            private readonly Comment comment;
+
+            public ReplyEditor(Comment comment)
+            {
+                this.comment = comment;
+            }
 
             protected override void LoadComplete()
             {
@@ -540,15 +555,31 @@ namespace osu.Game.Overlays.Comments
                 }, true);
 
                 OnCancel += () => IsVisible.Value = false;
+                OnCommit += message => post(message);
 
                 base.LoadComplete();
             }
 
-            protected override string FooterText => @"Press Enter to reply.";
+            private void post(string message)
+            {
+                request = new PostCommentRequest(comment.CommentableId, comment.CommentableType, message, comment.Id);
 
-            protected override string CommitButtonText => @"Reply";
+                request.Success += response => Schedule(() =>
+                {
+                    ReplyReceived?.Invoke(response);
 
-            protected override string TextBoxPlaceholder => @"Type your response here";
+                    IsLoading = false;
+                    IsVisible.Value = false;
+                });
+
+                api.Queue(request);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                request?.Cancel();
+                base.Dispose(isDisposing);
+            }
         }
     }
 }

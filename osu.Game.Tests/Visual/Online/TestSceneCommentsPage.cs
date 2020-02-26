@@ -13,7 +13,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osuTK;
-using osu.Framework.Utils;
 using JetBrains.Annotations;
 using NUnit.Framework;
 
@@ -228,27 +227,6 @@ namespace osu.Game.Tests.Visual.Online
             public new void AppendComments([NotNull] CommentBundle bundle, bool newReply) => base.AppendComments(bundle, newReply);
 
             public int DictionaryLength => CommentDictionary.Count;
-
-            protected override void OnCommentPostReplyRequested(DrawableComment drawableComment, string message)
-            {
-                var testBundle = new CommentBundle
-                {
-                    Comments = new List<Comment>
-                    {
-                        new Comment
-                        {
-                            Id = RNG.Next(),
-                            ParentId = drawableComment.Comment.Id,
-                            Message = message,
-                            LegacyName = @"You",
-                            CreatedAt = DateTimeOffset.Now,
-                        }
-                    },
-                    IncludedComments = new List<Comment>(),
-                };
-
-                AppendComments(testBundle, true);
-            }
         }
     }
 }

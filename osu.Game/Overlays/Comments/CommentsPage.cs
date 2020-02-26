@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Comments
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
                 RepliesRequested = onCommentRepliesRequested,
-                PostReplyRequested = OnCommentPostReplyRequested
+                NewReplyReceived = onCommentNewReplyReceived
             };
         }
 
@@ -87,13 +87,9 @@ namespace osu.Game.Overlays.Comments
             api.PerformAsync(request);
         }
 
-        protected virtual void OnCommentPostReplyRequested(DrawableComment drawableComment, string message)
+        private void onCommentNewReplyReceived(DrawableComment drawableComment, CommentBundle bundle)
         {
-            var request = new PostCommentRequest(CommentableId.Value, Type.Value, message, drawableComment.Comment.Id);
-
-            request.Success += response => Schedule(() => AppendComments(response, true));
-
-            api.Queue(request);
+            Schedule(() => AppendComments(bundle, true));
         }
 
         protected readonly Dictionary<long, DrawableComment> CommentDictionary = new Dictionary<long, DrawableComment>();
