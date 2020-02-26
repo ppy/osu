@@ -86,6 +86,7 @@ namespace osu.Game.Overlays
         {
             titleBackground.Colour = colourProvider.Dark5;
             title.AccentColour = colourProvider.Highlight1;
+            title.SeparatorColour = colourProvider.Foreground1;
         }
 
         [NotNull]

@@ -51,6 +51,12 @@ namespace osu.Game.Graphics.UserInterface
             set => PageText.Colour = value;
         }
 
+        public Color4 SeparatorColour
+        {
+            get => Separator.Colour;
+            set => Separator.Colour = value;
+        }
+
         protected virtual Drawable CreateIcon() => iconSprite = new SpriteIcon
         {
             Size = new Vector2(ICON_SIZE),
