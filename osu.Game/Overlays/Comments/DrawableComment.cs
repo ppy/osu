@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public Action<DrawableComment, int> RepliesRequested;
-        public Action<DrawableComment, CommentBundle> NewReplyReceived;
+        public Action<CommentBundle> NewReplyReceived;
 
         public readonly Comment Comment;
 
@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Comments
                                                 new ReplyEditor(Comment)
                                                 {
                                                     IsVisible = { BindTarget = replyEditorVisible },
-                                                    ReplyReceived = reply => NewReplyReceived?.Invoke(this, reply)
+                                                    ReplyReceived = NewReplyReceived
                                                 }
                                             }
                                         }

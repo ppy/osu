@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Comments
             api.PerformAsync(request);
         }
 
-        private void onCommentNewReplyReceived(DrawableComment drawableComment, CommentBundle bundle)
+        private void onCommentNewReplyReceived(CommentBundle bundle)
         {
             Schedule(() => AppendComments(bundle, true));
         }
