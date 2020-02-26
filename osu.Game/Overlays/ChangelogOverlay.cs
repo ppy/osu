@@ -12,7 +12,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
@@ -41,7 +40,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colour)
+        private void load(AudioManager audio)
         {
             Add(new ReverseChildIDFillFlowContainer<Drawable>
             {
@@ -59,10 +58,10 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                     }
-                }
+                },
             });
 
-            Background.Colour = colour.PurpleDarkAlternative;
+            Background.Colour = ColourProvider.Background4;
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 

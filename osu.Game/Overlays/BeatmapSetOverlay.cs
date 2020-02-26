@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Overlays.Comments;
 using osu.Game.Rulesets;
 using osuTK;
 
@@ -36,6 +37,7 @@ namespace osu.Game.Overlays
             : base(OverlayColourScheme.Blue)
         {
             Info info;
+            CommentsSection comments;
 
             Add(new ReverseChildIDFillFlowContainer<Drawable>
             {
@@ -45,26 +47,31 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
-                    new ReverseChildIDFillFlowContainer<Drawable>
+                    new BeatmapSetLayoutSection
                     {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        Child = new ReverseChildIDFillFlowContainer<Drawable>
                         {
-                            Header = new Header(),
-                            info = new Info()
-                        }
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                Header = new Header(),
+                                info = new Info()
+                            }
+                        },
                     },
                     new ScoresContainer
                     {
                         Beatmap = { BindTarget = Header.Picker.Beatmap }
-                    }
+                    },
+                    comments = new CommentsSection()
                 },
             });
 
             Header.BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
+            comments.BeatmapSet.BindTo(beatmapSet);
 
             Header.Picker.Beatmap.ValueChanged += b =>
             {
@@ -120,6 +127,31 @@ namespace osu.Game.Overlays
         {
             beatmapSet.Value = set;
             Show();
+        }
+
+        private class CommentsSection : BeatmapSetLayoutSection
+        {
+            public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
+            public CommentsSection()
+            {
+                CommentsContainer comments;
+
+                Add(comments = new CommentsContainer());
+
+                BeatmapSet.BindValueChanged(beatmapSet =>
+                {
+                    if (beatmapSet.NewValue?.OnlineBeatmapSetID is int onlineBeatmapSetID)
+                    {
+                        Show();
+                        comments.ShowComments(CommentableType.Beatmapset, onlineBeatmapSetID);
+                    }
+                    else
+                    {
+                        Hide();
+                    }
+                }, true);
+            }
         }
     }
 }
