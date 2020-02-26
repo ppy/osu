@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
         private GetUserRequest userReq;
         protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
-        private ProfileTabControl tabs;
+        private ProfileSectionTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays
                 }
                 : Array.Empty<ProfileSection>();
 
-            tabs = new ProfileTabControl
+            tabs = new ProfileSectionTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
@@ -151,9 +151,9 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class ProfileTabControl : OverlayTabControl<ProfileSection>
+        private class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
         {
-            public ProfileTabControl()
+            public ProfileSectionTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
                 TabContainer.Origin |= Anchor.x1;
             }
 
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value)
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value)
             {
                 // This needs to be set here manually because TabControl attempts to propagate these values to its children before these tabs are added
                 AccentColour = AccentColour,
@@ -175,9 +175,9 @@ namespace osu.Game.Overlays
                 TextColour = Color4.White;
             }
 
-            private class ProfileTabItem : OverlayTabItem
+            private class ProfileSectionTabItem : OverlayTabItem
             {
-                public ProfileTabItem(ProfileSection value)
+                public ProfileSectionTabItem(ProfileSection value)
                     : base(value)
                 {
                     Text.Text = value.Title;
