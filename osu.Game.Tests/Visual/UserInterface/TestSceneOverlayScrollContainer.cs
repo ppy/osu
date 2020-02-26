@@ -11,10 +11,11 @@ using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using NUnit.Framework;
 using osu.Framework.Utils;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayScrollContainer : OsuTestScene
+    public class TestSceneOverlayScrollContainer : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -25,6 +26,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private OverlayScrollContainer scroll;
+
+        private int invocationCount;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -43,6 +46,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 }
             });
+
+            invocationCount = 0;
+
+            scroll.Button.Action += () => invocationCount++;
         });
 
         [Test]
@@ -65,6 +72,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("invoke action", () => scroll.Button.Action.Invoke());
 
             AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 0, 0.1f));
+        }
+
+        [Test]
+        public void TestMultipleClicks()
+        {
+            AddStep("scroll to end", () => scroll.ScrollToEnd(false));
+
+            AddAssert("invocation count is 0", () => invocationCount == 0);
+
+            AddStep("hover button", () => InputManager.MoveMouseTo(scroll.Button));
+            AddRepeatStep("click button", () => InputManager.Click(MouseButton.Left), 3);
+
+            AddAssert("invocation count is 1", () => invocationCount == 1);
         }
     }
 }
