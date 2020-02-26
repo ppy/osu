@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
                 {
                     Text = new OsuSpriteText
                     {
-                        Margin = new MarginPadding { Vertical = 16.5f }, // 15px padding + 1.5px line-height difference compensation
+                        Margin = new MarginPadding { Bottom = 10 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Font = OsuFont.GetFont(),
