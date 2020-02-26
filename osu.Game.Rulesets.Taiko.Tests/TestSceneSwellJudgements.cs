@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         public void TestZeroTickTimeOffsets()
         {
             AddUntilStep("gameplay finished", () => Player.ScoreProcessor.HasCompleted);
-            AddAssert("all tick offsets are 0", () => Player.Results.Where(r => r.Judgement is TaikoSwellTickJudgement).All(r => r.TimeOffset == 0));
+            AddAssert("all tick offsets are 0", () => Player.Results.Where(r => r.HitObject is SwellTick).All(r => r.TimeOffset == 0));
         }
 
         protected override bool Autoplay => true;
