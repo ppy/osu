@@ -51,6 +51,15 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Add empty comment bundle", () => comments.ShowComments(getEmptyCommentBundle()));
         }
 
+        [Test]
+        public void TestAppendDuplicatedComment()
+        {
+            AddStep("Add comment bundle", () => comments.ShowComments(getCommentBundle()));
+            AddUntilStep("Dictionary length is 10", () => comments.DictionaryLength == 10);
+            AddStep("Append existing comment", () => comments.AppendComments(getCommentSubBundle()));
+            AddAssert("Dictionary length is 10", () => comments.DictionaryLength == 10);
+        }
+
         private CommentBundle getEmptyCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>(),
@@ -164,8 +173,28 @@ namespace osu.Game.Tests.Visual.Online
             Total = 10
         };
 
+        private CommentBundle getCommentSubBundle() => new CommentBundle
+        {
+            Comments = new List<Comment>	
+            {	
+                new Comment	
+                {	
+                    Id = 1,	
+                    Message = "Simple test comment",	
+                    LegacyName = "TestUser1",	
+                    CreatedAt = DateTimeOffset.Now,	
+                    VotesCount = 5	
+                },	
+            },	
+            IncludedComments = new List<Comment>(),	
+        };
+
         private class TestCommentsContainer : CommentsContainer
         {
+            public int DictionaryLength => CommentDictionary.Count;
+
+            public new void AppendComments(CommentBundle bundle) => base.AppendComments(bundle);
+
             public void ShowComments(CommentBundle bundle)
             {
                 CommentCounter.Current.Value = 0;
