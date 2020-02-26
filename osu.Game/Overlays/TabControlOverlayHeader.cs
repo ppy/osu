@@ -56,7 +56,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            TabControl.AccentColour = colourProvider.Highlight1;
             controlBackground.Colour = colourProvider.Dark4;
         }
 
@@ -84,12 +83,6 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.X,
                 Direction = FillDirection.Horizontal,
             };
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                TextColour = colourProvider.Light2;
-            }
 
             private class OverlayHeaderTabItem : OverlayTabItem
             {

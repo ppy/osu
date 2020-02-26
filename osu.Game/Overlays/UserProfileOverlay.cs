@@ -171,7 +171,6 @@ namespace osu.Game.Overlays
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                AccentColour = colourProvider.Highlight1;
                 TextColour = Color4.White;
             }
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -59,6 +60,13 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.CentreLeft
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            AccentColour = colourProvider.Highlight1;
+            TextColour = colourProvider.Light2;
         }
 
         protected override Dropdown<T> CreateDropdown() => null;
