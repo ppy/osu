@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using System.Threading;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 
@@ -136,6 +136,12 @@ namespace osu.Game.Overlays
             Show();
 
             Country.Value = requested;
+        }
+
+        public void ShowSpotlights()
+        {
+            Scope.Value = RankingsScope.Spotlights;
+            Show();
         }
 
         private void loadNewContent()
