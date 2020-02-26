@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
@@ -14,7 +15,8 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneDirectPanel : OsuTestScene
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class TestSceneDirectPanel : OsuTestScene, IPreviewTrackOwner
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
