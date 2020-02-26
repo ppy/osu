@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Comments
                     comment.ParentComment = parentDrawable.Comment;
 
                     if (newReply)
-                        parentDrawable.NewReplies.Add(drawableComment);
+                        parentDrawable.AddNewReply(drawableComment);
                     else
                         parentDrawable.Replies.Add(drawableComment);
                 }

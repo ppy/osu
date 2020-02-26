@@ -42,7 +42,6 @@ namespace osu.Game.Overlays.Comments
         private readonly Dictionary<long, Comment> loadedReplies = new Dictionary<long, Comment>();
 
         public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
-        public readonly BindableList<DrawableComment> NewReplies = new BindableList<DrawableComment>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly BindableBool replyEditorVisible = new BindableBool();
@@ -51,7 +50,6 @@ namespace osu.Game.Overlays.Comments
 
         private FillFlowContainer childCommentsVisibilityContainer;
         private FillFlowContainer childCommentsContainer;
-        private FillFlowContainer newRepliesContainer;
         private LoadMoreCommentsButton loadMoreCommentsButton;
         private ShowMoreButton showMoreButton;
         private RepliesButton repliesButton;
@@ -217,13 +215,6 @@ namespace osu.Game.Overlays.Comments
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                newRepliesContainer = new FillFlowContainer
-                                {
-                                    Padding = new MarginPadding { Left = 20 },
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical
-                                },
                                 childCommentsContainer = new FillFlowContainer
                                 {
                                     Padding = new MarginPadding { Left = 20 },
@@ -309,19 +300,6 @@ namespace osu.Game.Overlays.Comments
                         throw new NotSupportedException(@"You can only add replies to this list. Other actions are not supported.");
                 }
             };
-
-            NewReplies.CollectionChanged += (_, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        onNewReplyAdded(args.NewItems.Cast<DrawableComment>().Single());
-                        break;
-
-                    default:
-                        throw new NotSupportedException(@"You can only add replies to this list. Other actions are not supported.");
-                }
-            };
         }
 
         protected override void LoadComplete()
@@ -351,17 +329,13 @@ namespace osu.Game.Overlays.Comments
             LoadComponentAsync(page, loaded => addRepliesPage(loaded, replies));
         }
 
-        private void onNewReplyAdded(DrawableComment newReply)
+        public void AddNewReply(DrawableComment newReply)
         {
             LoadComponentAsync(newReply, loaded =>
             {
                 loadedReplies.Add(loaded.Comment.Id, loaded.Comment);
 
-                newRepliesContainer.Add(loaded.With(drawableComment =>
-                {
-                    drawableComment.Anchor = Anchor.BottomCentre;
-                    drawableComment.Origin = Anchor.BottomCentre;
-                }));
+                childCommentsContainer.Insert(-(childCommentsContainer.Count + 1), loaded);
 
                 Comment.RepliesCount++;
                 repliesButton.IncreaseValue();
@@ -555,7 +529,7 @@ namespace osu.Game.Overlays.Comments
                 }, true);
 
                 OnCancel += () => IsVisible.Value = false;
-                OnCommit += message => post(message);
+                OnCommit += post;
 
                 base.LoadComplete();
             }
