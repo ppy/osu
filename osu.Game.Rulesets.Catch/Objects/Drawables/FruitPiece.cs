@@ -7,9 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
@@ -64,15 +62,24 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             if (hitObject.HyperDash)
             {
-                AddInternal(new Pulp
+                AddInternal(new Circle
                 {
-                    RelativePositionAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AccentColour = { Value = Color4.Red },
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.5f,
-                    Scale = new Vector2(1.333f)
+                    BorderColour = Color4.Red,
+                    BorderThickness = 12f * RADIUS_ADJUST,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            AlwaysPresent = true,
+                            Alpha = 0.3f,
+                            Blending = BlendingParameters.Additive,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Red,
+                        }
+                    }
                 });
             }
         }
