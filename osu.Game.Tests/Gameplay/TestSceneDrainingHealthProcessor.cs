@@ -154,6 +154,7 @@ namespace osu.Game.Tests.Gameplay
         private class JudgeableHitObject : HitObject
         {
             public override Judgement CreateJudgement() => new Judgement();
+            protected override HitWindows CreateHitWindows() => new HitWindows();
         }
     }
 }
