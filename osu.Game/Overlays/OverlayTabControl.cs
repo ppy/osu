@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -73,13 +73,7 @@ namespace osu.Game.Overlays
             public Color4 AccentColour
             {
                 get => Bar.Colour;
-                set
-                {
-                    if (Bar.Colour == value)
-                        return;
-
-                    Bar.Colour = value;
-                }
+                set => Bar.Colour = value;
             }
 
             private Color4 textColour;
