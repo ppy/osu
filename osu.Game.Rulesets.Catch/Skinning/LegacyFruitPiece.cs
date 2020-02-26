@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning
@@ -49,6 +50,23 @@ namespace osu.Game.Rulesets.Catch.Skinning
                     Origin = Anchor.Centre,
                 },
             };
+
+            if (drawableCatchObject.HitObject.HyperDash)
+            {
+                var hyperDash = new Sprite
+                {
+                    Texture = skin.GetTexture(lookupName),
+                    Colour = Color4.Red,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Blending = BlendingParameters.Additive,
+                    Depth = 1,
+                    Alpha = 0.7f,
+                    Scale = new Vector2(1.2f)
+                };
+
+                AddInternal(hyperDash);
+            }
         }
 
         protected override void LoadComplete()
