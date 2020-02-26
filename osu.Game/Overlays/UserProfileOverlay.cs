@@ -14,6 +14,7 @@ using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -87,6 +88,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both
                 },
             });
+
             sectionsContainer.SelectedSection.ValueChanged += section =>
             {
                 if (lastSection != section.NewValue)
@@ -161,13 +163,16 @@ namespace osu.Game.Overlays
 
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value)
             {
-                AccentColour = AccentColour
+                // This needs to be set here manually because TabControl attempts to propagate these values to its children before these tabs are added
+                AccentColour = AccentColour,
+                TextColour = TextColour
             };
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
                 AccentColour = colourProvider.Highlight1;
+                TextColour = Color4.White;
             }
 
             private class ProfileTabItem : OverlayTabItem
