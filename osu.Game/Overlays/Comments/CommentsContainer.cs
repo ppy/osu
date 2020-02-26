@@ -180,31 +180,29 @@ namespace osu.Game.Overlays.Comments
                 moreButton.Hide();
                 return;
             }
-            else
+
+            var topLevelComments = appendComments(response);
+
+            LoadComponentsAsync(topLevelComments, loaded =>
             {
-                var topLevelComments = appendComments(response);
+                content.AddRange(loaded);
 
-                LoadComponentsAsync(topLevelComments, loaded =>
+                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                CommentCounter.Current.Value = response.Total;
+
+                if (response.HasMore)
                 {
-                    content.AddRange(loaded);
+                    int loadedTopLevelComments = 0;
+                    content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
 
-                    deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-                    CommentCounter.Current.Value = response.Total;
-
-                    if (response.HasMore)
-                    {
-                        int loadedTopLevelComments = 0;
-                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
-
-                        moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                        moreButton.IsLoading = false;
-                    }
-                    else
-                    {
-                        moreButton.Hide();
-                    }
-                }, (loadCancellation = new CancellationTokenSource()).Token);
-            }
+                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
+                    moreButton.IsLoading = false;
+                }
+                else
+                {
+                    moreButton.Hide();
+                }
+            }, (loadCancellation = new CancellationTokenSource()).Token);
         }
 
         /// <summary>
@@ -270,11 +268,11 @@ namespace osu.Game.Overlays.Comments
 
         private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
         {
-            var request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, page, drawableComment.Comment.Id);
+            var req = new GetCommentsRequest(id.Value, type.Value, Sort.Value, page, drawableComment.Comment.Id);
 
-            request.Success += response => Schedule(() => appendComments(response));
+            req.Success += response => Schedule(() => appendComments(response));
 
-            api.PerformAsync(request);
+            api.PerformAsync(req);
         }
 
         protected override void Dispose(bool isDisposing)
