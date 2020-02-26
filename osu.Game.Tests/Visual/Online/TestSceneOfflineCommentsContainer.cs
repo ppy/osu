@@ -11,6 +11,7 @@ using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
+using JetBrains.Annotations;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -45,19 +46,19 @@ namespace osu.Game.Tests.Visual.Online
         });
 
         [Test]
-        public void TestLocalCommentBundle()
-        {
-            AddStep("Add comment bundle", () => comments.ShowComments(getCommentBundle()));
-            AddStep("Add empty comment bundle", () => comments.ShowComments(getEmptyCommentBundle()));
-        }
-
-        [Test]
         public void TestAppendDuplicatedComment()
         {
             AddStep("Add comment bundle", () => comments.ShowComments(getCommentBundle()));
             AddUntilStep("Dictionary length is 10", () => comments.DictionaryLength == 10);
             AddStep("Append existing comment", () => comments.AppendComments(getCommentSubBundle()));
             AddAssert("Dictionary length is 10", () => comments.DictionaryLength == 10);
+        }
+
+        [Test]
+        public void TestLocalCommentBundle()
+        {
+            AddStep("Add comment bundle", () => comments.ShowComments(getCommentBundle()));
+            AddStep("Add empty comment bundle", () => comments.ShowComments(getEmptyCommentBundle()));
         }
 
         private CommentBundle getEmptyCommentBundle() => new CommentBundle
@@ -175,25 +176,25 @@ namespace osu.Game.Tests.Visual.Online
 
         private CommentBundle getCommentSubBundle() => new CommentBundle
         {
-            Comments = new List<Comment>	
-            {	
-                new Comment	
-                {	
-                    Id = 1,	
-                    Message = "Simple test comment",	
-                    LegacyName = "TestUser1",	
-                    CreatedAt = DateTimeOffset.Now,	
-                    VotesCount = 5	
-                },	
-            },	
-            IncludedComments = new List<Comment>(),	
+            Comments = new List<Comment>
+            {
+                new Comment
+                {
+                    Id = 1,
+                    Message = "Simple test comment",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 5
+                },
+            },
+            IncludedComments = new List<Comment>(),
         };
 
         private class TestCommentsContainer : CommentsContainer
         {
-            public int DictionaryLength => CommentDictionary.Count;
+            public new void AppendComments([NotNull] CommentBundle bundle) => base.AppendComments(bundle);
 
-            public new void AppendComments(CommentBundle bundle) => base.AppendComments(bundle);
+            public int DictionaryLength => CommentDictionary.Count;
 
             public void ShowComments(CommentBundle bundle)
             {
