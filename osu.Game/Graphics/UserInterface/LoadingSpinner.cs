@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void rotate()
         {
-            spinner.Spin(spin_duration * 4, RotationDirection.Clockwise);
+            spinner.Spin(spin_duration * 3.5f, RotationDirection.Clockwise);
 
             MainContents.RotateTo(0).Then()
                         .RotateTo(90, spin_duration, Easing.InOutQuart).Then()
