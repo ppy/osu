@@ -77,6 +77,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("click", () => InputManager.Click());
 
             AddAssert("input is blocked by overlay", () => inputBlocked == false);
+            AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddAssert("loading animation is not visible", () => !view.LoadingSpinner.IsPresent);
         }
 
@@ -87,6 +88,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("click", () => InputManager.Click());
 
             AddUntilStep("input is blocked by overlay", () => inputBlocked == false);
+            AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddUntilStep("loading animation is visible", () => view.LoadingSpinner.IsPresent);
         }
 
@@ -97,6 +99,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("click", () => InputManager.Click());
 
             AddAssert("input is blocked by overlay", () => inputBlocked == false);
+            AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddAssert("loading animation is visible", () => view.LoadingSpinner.IsPresent);
         }
 
@@ -107,6 +110,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("click", () => InputManager.Click(osuTK.Input.MouseButton.Left));
 
             AddAssert("input is not blocked by overlay", () => inputBlocked == true);
+            AddAssert("content is not dimmed", () => con.Colour == Color4.White);
             AddAssert("loading animation is not visible", () => !view.LoadingSpinner.IsPresent);
         }
 

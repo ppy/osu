@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -97,6 +96,12 @@ namespace osu.Game.Online
         {
             API?.Unregister(this);
             base.Dispose(isDisposing);
+
+            if (State.Value == Visibility.Visible)
+            {
+                // ensure we don't leave the view in a bad state.
+                viewTarget?.FadeColour(Color4.White, transform_duration, Easing.OutQuint);
+            }
         }
 
         protected override void PopIn() => viewTarget?.FadeColour(OsuColour.Gray(0.5f), transform_duration, Easing.OutQuint);
