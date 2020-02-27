@@ -7,9 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -46,73 +45,69 @@ namespace osu.Game.Screens.Multi.Components
             set => fill.Direction = value;
         }
 
-        private readonly FillFlowContainer fill;
+        private readonly FillFlowContainer<UserTile> fill;
 
         public ParticipantsList()
         {
-            InternalChild = fill = new FillFlowContainer { Spacing = new Vector2(10) };
+            InternalChild = fill = new FillFlowContainer<UserTile> { Spacing = new Vector2(10) };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomID.BindValueChanged(_ => updateParticipants(), true);
+            Participants.CollectionChanged += (_, __) => updateParticipants();
+            updateParticipants();
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetRoomScoresRequest request;
+        private ScheduledDelegate scheduledUpdate;
 
         private void updateParticipants()
         {
-            var roomId = RoomID.Value ?? 0;
-
-            request?.Cancel();
-
-            // nice little progressive fade
-            int time = 500;
-
-            foreach (var c in fill.Children)
+            scheduledUpdate?.Cancel();
+            scheduledUpdate = Schedule(() =>
             {
-                c.Delay(500 - time).FadeOut(time, Easing.Out);
-                time = Math.Max(20, time - 20);
-                c.Expire();
-            }
+                // Remove all extra tiles with a nice, progressive fade
+                int time = 500;
 
-            if (roomId == 0) return;
+                for (int i = Participants.Count; i < fill.Count; i++)
+                {
+                    var tile = fill[i];
 
-            request = new GetRoomScoresRequest(roomId);
-            request.Success += scores => Schedule(() =>
-            {
-                if (roomId != RoomID.Value)
-                    return;
+                    tile.Delay(500 - time).FadeOut(time, Easing.Out);
+                    time = Math.Max(20, time - 20);
+                    tile.Expire();
+                }
 
-                fill.Clear();
-                foreach (var s in scores)
-                    fill.Add(new UserTile(s.User));
+                // Add new tiles for all new players
+                for (int i = fill.Count; i < Participants.Count; i++)
+                {
+                    var tile = new UserTile();
+                    fill.Add(tile);
 
-                fill.FadeInFromZero(1000, Easing.OutQuint);
+                    tile.ClearTransforms();
+                    tile.LifetimeEnd = double.MaxValue;
+                    tile.FadeInFromZero(250, Easing.OutQuint);
+                }
+
+                for (int i = 0; i < Participants.Count; i++)
+                    fill[i].User = Participants[i];
             });
-
-            api.Queue(request);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            request?.Cancel();
-            base.Dispose(isDisposing);
         }
 
         private class UserTile : CompositeDrawable, IHasTooltip
         {
-            private readonly User user;
-
-            public string TooltipText => user.Username;
-
-            public UserTile(User user)
+            public User User
             {
-                this.user = user;
+                get => avatar.User;
+                set => avatar.User = value;
+            }
+
+            public string TooltipText => User?.Username ?? string.Empty;
+
+            private readonly UpdateableAvatar avatar;
+
+            public UserTile()
+            {
                 Size = new Vector2(TILE_SIZE);
                 CornerRadius = 5f;
                 Masking = true;
@@ -124,11 +119,7 @@ namespace osu.Game.Screens.Multi.Components
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.FromHex(@"27252d"),
                     },
-                    new UpdateableAvatar
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        User = user,
-                    },
+                    avatar = new UpdateableAvatar { RelativeSizeAxes = Axes.Both },
                 };
             }
         }
