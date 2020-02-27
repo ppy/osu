@@ -86,7 +86,17 @@ namespace osu.Game.Overlays.Changelog
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                Streams = new UpdateStreamBadgeArea(),
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 85,
+                        Vertical = 20
+                    },
+                    Child = Streams = new UpdateStreamBadgeArea()
+                }
             }
         };
 
