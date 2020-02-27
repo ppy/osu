@@ -6,25 +6,16 @@ using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class UpdateStreamBadgeArea : TabControl<APIUpdateStream>
     {
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        public UpdateStreamBadgeArea()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            AddInternal(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider.Background5,
-            });
         }
 
         public void Populate(List<APIUpdateStream> streams)
