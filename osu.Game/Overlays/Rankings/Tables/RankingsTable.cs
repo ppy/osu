@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -96,19 +96,23 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
+        protected virtual IEnumerable<string> GradeColumns() => new List<string>();
+
         protected virtual string HighlightedColumn() => @"Performance";
 
         private class HeaderText : OsuSpriteText
         {
             private readonly string highlighted;
 
-            public HeaderText(string text, string highlighted)
+            public HeaderText(string text, string highlighted, IEnumerable<string> gradeColumns)
             {
                 this.highlighted = highlighted;
 
                 Text = text;
                 Font = OsuFont.GetFont(size: 12);
-                Margin = new MarginPadding { Horizontal = 10 };
+
+                var isGrade = gradeColumns.Contains(text);
+                Margin = new MarginPadding { Vertical = 5, Horizontal = isGrade ? 20 : 10 };
             }
 
             [BackgroundDependencyLoader]
