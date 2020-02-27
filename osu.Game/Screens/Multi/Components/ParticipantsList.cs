@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Participants.CollectionChanged += (_, __) => updateParticipants();
+            RecentParticipants.CollectionChanged += (_, __) => updateParticipants();
             updateParticipants();
         }
 
@@ -82,8 +82,8 @@ namespace osu.Game.Screens.Multi.Components
                     Spacing = new Vector2(10)
                 };
 
-                for (int i = 0; i < Participants.Count; i++)
-                    tiles.Add(new UserTile { User = Participants[i] });
+                for (int i = 0; i < RecentParticipants.Count; i++)
+                    tiles.Add(new UserTile { User = RecentParticipants[i] });
 
                 AddInternal(tiles);
 
