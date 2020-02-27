@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Multi
                 {
                     case LoungeSubScreen _:
                         roomManager.TimeBetweenListingPolls = idle ? 120000 : 15000;
-                        roomManager.TimeBetweenSelectionPolls = idle ? 30000 : 5000;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 120000 : 15000;
                         break;
 
                     case MatchSubScreen _:
