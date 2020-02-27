@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.Rankings
         public SpotlightSelector()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            Height = 155;
             Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Rankings
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
                         Children = new Drawable[]
                         {
                             dropdown = new SpotlightsDropdown
@@ -128,6 +129,7 @@ namespace osu.Game.Overlays.Rankings
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;
+                Padding = new MarginPadding { Vertical = 15 };
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -138,12 +140,12 @@ namespace osu.Game.Overlays.Rankings
                     new Container
                     {
                         AutoSizeAxes = Axes.X,
-                        Height = 20,
+                        Height = 25,
                         Child = valueText = new OsuSpriteText
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Light),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
                         }
                     }
                 };
