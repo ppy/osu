@@ -175,7 +175,7 @@ namespace osu.Game.Overlays.Rankings
 
             private class SpotlightsDropdownHeader : OsuDropdownHeader
             {
-                public SpotlightsDropdownHeader() : base()
+                public SpotlightsDropdownHeader()
                 {
                     Height = 48;
                     Text.Font = OsuFont.GetFont(size: 15);

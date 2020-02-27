@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected override IEnumerable<string> GradeColumns() => new List<string>() { "SS", "S", "A" };
+        protected override IEnumerable<string> GradeColumns() => new List<string> { "SS", "S", "A" };
 
         protected override TableColumn[] CreateAdditionalHeaders()
         {

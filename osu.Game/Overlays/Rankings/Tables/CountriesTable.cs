@@ -66,12 +66,9 @@ namespace osu.Game.Overlays.Rankings.Tables
             [Resolved(canBeNull: true)]
             private RankingsOverlay rankings { get; set; }
 
-            private readonly Country country;
-
-            public CountryName(Country country) : base(t => t.Font = OsuFont.GetFont(size: 12))
+            public CountryName(Country country)
+                : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
-                this.country = country;
-
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
                 TextAnchor = Anchor.CentreLeft;
