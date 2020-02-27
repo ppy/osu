@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,7 +24,9 @@ namespace osu.Game.Screens.Multi.Components
             set
             {
                 base.RelativeSizeAxes = value;
-                fill.RelativeSizeAxes = value;
+
+                if (tiles != null)
+                    tiles.RelativeSizeAxes = value;
             }
         }
 
@@ -35,21 +36,24 @@ namespace osu.Game.Screens.Multi.Components
             set
             {
                 base.AutoSizeAxes = value;
-                fill.AutoSizeAxes = value;
+
+                if (tiles != null)
+                    tiles.AutoSizeAxes = value;
             }
         }
 
+        private FillDirection direction = FillDirection.Full;
+
         public FillDirection Direction
         {
-            get => fill.Direction;
-            set => fill.Direction = value;
-        }
+            get => direction;
+            set
+            {
+                direction = value;
 
-        private readonly FillFlowContainer<UserTile> fill;
-
-        public ParticipantsList()
-        {
-            InternalChild = fill = new FillFlowContainer<UserTile> { Spacing = new Vector2(10) };
+                if (tiles != null)
+                    tiles.Direction = value;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -60,37 +64,30 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         private ScheduledDelegate scheduledUpdate;
+        private FillFlowContainer<UserTile> tiles;
 
         private void updateParticipants()
         {
             scheduledUpdate?.Cancel();
             scheduledUpdate = Schedule(() =>
             {
-                // Remove all extra tiles with a nice, progressive fade
-                int time = 500;
+                tiles?.FadeOut(250, Easing.Out).Expire();
 
-                for (int i = Participants.Count; i < fill.Count; i++)
+                tiles = new FillFlowContainer<UserTile>
                 {
-                    var tile = fill[i];
-
-                    tile.Delay(500 - time).FadeOut(time, Easing.Out);
-                    time = Math.Max(20, time - 20);
-                    tile.Expire();
-                }
-
-                // Add new tiles for all new players
-                for (int i = fill.Count; i < Participants.Count; i++)
-                {
-                    var tile = new UserTile();
-                    fill.Add(tile);
-
-                    tile.ClearTransforms();
-                    tile.LifetimeEnd = double.MaxValue;
-                    tile.FadeInFromZero(250, Easing.OutQuint);
-                }
+                    Alpha = 0,
+                    Direction = Direction,
+                    AutoSizeAxes = AutoSizeAxes,
+                    RelativeSizeAxes = RelativeSizeAxes,
+                    Spacing = new Vector2(10)
+                };
 
                 for (int i = 0; i < Participants.Count; i++)
-                    fill[i].User = Participants[i];
+                    tiles.Add(new UserTile { User = Participants[i] });
+
+                AddInternal(tiles);
+
+                tiles.Delay(250).FadeIn(250, Easing.OutQuint);
             });
         }
 
