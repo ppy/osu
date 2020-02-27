@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -19,16 +19,18 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected override TableColumn[] CreateAdditionalHeaders() => new[]
+        protected override IEnumerable<string> GradeColumns() => new List<string>() { "SS", "S", "A" };
+
+        protected override TableColumn[] CreateAdditionalHeaders()
         {
+            var gradeColumns = GradeColumns().Select(grade => new TableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)));
+
+            return new[]
+            {
             new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
             new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-        }.Concat(CreateUniqueHeaders()).Concat(new[]
-        {
-            new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("S", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-        }).ToArray();
+            }.Concat(CreateUniqueHeaders()).Concat(gradeColumns).ToArray();
+        }
 
         protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
 
