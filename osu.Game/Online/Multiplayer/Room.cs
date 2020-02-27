@@ -59,7 +59,7 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<int?> MaxParticipants { get; private set; } = new Bindable<int?>();
 
         [Cached]
-        [JsonIgnore]
+        [JsonProperty("recent_participants")]
         public BindableList<User> Participants { get; private set; } = new BindableList<User>();
 
         [Cached]
