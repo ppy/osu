@@ -174,6 +174,8 @@ namespace osu.Game.Overlays.Comments
 
         protected void OnSuccess(CommentBundle response)
         {
+            CommentCounter.Current.Value = response.Total;
+
             if (!response.Comments.Any())
             {
                 content.Add(new NoCommentsPlaceholder());
@@ -181,35 +183,14 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            var topLevelComments = AppendComments(response);
-
-            LoadComponentsAsync(topLevelComments, loaded =>
-            {
-                content.AddRange(loaded);
-
-                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-                CommentCounter.Current.Value = response.Total;
-
-                if (response.HasMore)
-                {
-                    int loadedTopLevelComments = 0;
-                    content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
-
-                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                    moreButton.IsLoading = false;
-                }
-                else
-                {
-                    moreButton.Hide();
-                }
-            }, (loadCancellation = new CancellationTokenSource()).Token);
+            AppendComments(response);
         }
 
         /// <summary>
         /// Appends retrieved comments to the subtree rooted of comments in this page.
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
-        protected List<DrawableComment> AppendComments([NotNull] CommentBundle bundle)
+        protected void AppendComments([NotNull] CommentBundle bundle)
         {
             var topLevelComments = new List<DrawableComment>();
             var orphaned = new List<Comment>();
@@ -227,7 +208,28 @@ namespace osu.Game.Overlays.Comments
             foreach (var o in orphaned)
                 addNewComment(o);
 
-            return topLevelComments;
+            if (topLevelComments.Any())
+            {
+                LoadComponentsAsync(topLevelComments, loaded =>
+                {
+                    content.AddRange(loaded);
+
+                    deletedCommentsCounter.Count.Value += topLevelComments.Select(d => d.Comment).Count(c => c.IsDeleted && c.IsTopLevel);
+
+                    if (bundle.HasMore)
+                    {
+                        int loadedTopLevelComments = 0;
+                        content.Children.OfType<DrawableComment>().ForEach(p => loadedTopLevelComments++);
+
+                        moreButton.Current.Value = bundle.TopLevelCount - loadedTopLevelComments;
+                        moreButton.IsLoading = false;
+                    }
+                    else
+                    {
+                        moreButton.Hide();
+                    }
+                }, (loadCancellation = new CancellationTokenSource()).Token);
+            }
 
             void addNewComment(Comment comment)
             {
