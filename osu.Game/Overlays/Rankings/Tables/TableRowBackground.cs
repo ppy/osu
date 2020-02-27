@@ -19,13 +19,14 @@ namespace osu.Game.Overlays.Rankings.Tables
         private Color4 idleColour;
         private Color4 hoverColour;
 
-        public TableRowBackground()
+        public TableRowBackground(float height)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 25;
+            Height = height;
 
-            CornerRadius = 3;
+            CornerRadius = 4;
             Masking = true;
+            MaskingSmoothness = 0.5f;
 
             InternalChild = background = new Box
             {
