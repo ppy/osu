@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -165,8 +165,28 @@ namespace osu.Game.Overlays.Rankings
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
+                // osu-web adds a 0.6 opacity container on top of the 0.5 base one when hovering, 0.8 on a single container here matches the resulting colour
+                AccentColour = colourProvider.Background6.Opacity(0.8f);
                 menu.BackgroundColour = colourProvider.Background5;
-                AccentColour = colourProvider.Background6;
+                Padding = new MarginPadding { Vertical = 20 };
+            }
+
+            private class SpotlightsDropdownHeader : OsuDropdownHeader
+            {
+                public SpotlightsDropdownHeader() : base()
+                {
+                    Height = 48;
+                    Text.Font = OsuFont.GetFont(size: 15);
+                    Foreground.Padding = new MarginPadding { Horizontal = 10, Vertical = 15 };
+                    Margin = Icon.Margin = new MarginPadding(0);
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background6.Opacity(0.5f);
+                    BackgroundColourHover = colourProvider.Background5;
+                }
             }
         }
     }
