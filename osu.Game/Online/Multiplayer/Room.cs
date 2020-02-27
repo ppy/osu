@@ -60,7 +60,7 @@ namespace osu.Game.Online.Multiplayer
 
         [Cached]
         [JsonProperty("recent_participants")]
-        public BindableList<User> Participants { get; private set; } = new BindableList<User>();
+        public BindableList<User> RecentParticipants { get; private set; } = new BindableList<User>();
 
         [Cached]
         public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
@@ -133,10 +133,10 @@ namespace osu.Game.Online.Multiplayer
                 Playlist.AddRange(other.Playlist);
             }
 
-            if (!Participants.SequenceEqual(other.Participants))
+            if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
             {
-                Participants.Clear();
-                Participants.AddRange(other.Participants);
+                RecentParticipants.Clear();
+                RecentParticipants.AddRange(other.RecentParticipants);
             }
 
             Position = other.Position;
