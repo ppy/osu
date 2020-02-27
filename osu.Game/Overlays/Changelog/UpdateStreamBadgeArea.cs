@@ -40,21 +40,12 @@ namespace osu.Game.Overlays.Changelog
             base.OnHoverLost(e);
         }
 
-        protected override TabFillFlowContainer CreateTabFlow()
+        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
-            var flow = base.CreateTabFlow();
-
-            flow.RelativeSizeAxes = Axes.X;
-            flow.AutoSizeAxes = Axes.Y;
-            flow.AllowMultiline = true;
-            flow.Padding = new MarginPadding
-            {
-                Vertical = 20,
-                Horizontal = 85,
-            };
-
-            return flow;
-        }
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            AllowMultiline = true,
+        };
 
         protected override Dropdown<APIUpdateStream> CreateDropdown() => null;
 
