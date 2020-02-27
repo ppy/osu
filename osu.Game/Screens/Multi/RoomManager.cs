@@ -62,8 +62,8 @@ namespace osu.Game.Screens.Multi
 
             InternalChildren = new Drawable[]
             {
-                listingPollingComponent = new ListingPollingComponent { RoomsReceived = onRoomsReceived },
-                selectionPollingComponent = new SelectionPollingComponent { RoomReceived = onRoomReceived }
+                listingPollingComponent = new ListingPollingComponent { RoomsReceived = onListingReceived },
+                selectionPollingComponent = new SelectionPollingComponent { RoomReceived = onSelectedRoomReceived }
             };
         }
 
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Multi
         /// Invoked when the listing of all <see cref="Room"/>s is received from the server.
         /// </summary>
         /// <param name="listing">The listing.</param>
-        private void onRoomsReceived(List<Room> listing)
+        private void onListingReceived(List<Room> listing)
         {
             // Remove past matches
             foreach (var r in rooms.ToList())
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Multi
         /// Invoked when a <see cref="Room"/> is received from the server.
         /// </summary>
         /// <param name="toUpdate">The received <see cref="Room"/>.</param>
-        private void onRoomReceived(Room toUpdate)
+        private void onSelectedRoomReceived(Room toUpdate)
         {
             foreach (var room in rooms)
             {
