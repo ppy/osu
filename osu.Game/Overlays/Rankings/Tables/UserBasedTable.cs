@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -27,8 +27,8 @@ namespace osu.Game.Overlays.Rankings.Tables
 
             return new[]
             {
-            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
             }.Concat(CreateUniqueHeaders()).Concat(gradeColumns).ToArray();
         }
 
@@ -36,7 +36,12 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {
-            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true)) { AutoSizeAxes = Axes.Both };
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true))
+            {
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                TextAnchor = Anchor.CentreLeft
+            };
             username.AddUserLink(item.User);
             return username;
         }
