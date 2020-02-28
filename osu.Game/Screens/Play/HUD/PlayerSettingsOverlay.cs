@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),
-                    PlaybackSettings = new PlaybackSettings(),
+                    PlaybackSettings = new PlaybackSettings { Expanded = false },
                     VisualSettings = new VisualSettings { Expanded = false }
                 }
             };
