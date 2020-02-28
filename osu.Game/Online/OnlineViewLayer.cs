@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -41,7 +42,7 @@ namespace osu.Game.Online
 
         public override bool HandleNonPositionalInput => false;
 
-        public override bool HandlePositionalInput => false;
+        protected override bool Handle(UIEvent e) => true;
 
         [BackgroundDependencyLoader]
         private void load()
