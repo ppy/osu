@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Home;
+using osu.Game.Overlays.Home.Friends;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -15,6 +16,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(HomeOverlay),
             typeof(HomeOverlayHeader),
+            typeof(FriendsLayout),
         };
 
         private readonly HomeOverlay overlay;

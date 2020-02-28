@@ -2,16 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Home;
+using osu.Game.Overlays.Home.Friends;
 
 namespace osu.Game.Overlays
 {
     public class HomeOverlay : FullscreenOverlay
     {
         private readonly Box background;
+        private readonly HomeOverlayHeader header;
+        private readonly Container content;
 
         public HomeOverlay()
             : base(OverlayColourScheme.Purple)
@@ -33,11 +37,16 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new HomeOverlayHeader
+                            header = new HomeOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Depth = -float.MaxValue
+                            },
+                            content = new Container()
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
                             }
                         }
                     }
@@ -49,6 +58,35 @@ namespace osu.Game.Overlays
         private void load()
         {
             background.Colour = ColourProvider.Background5;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            header.Current.BindValueChanged(onTabChanged);
+        }
+
+        private void onTabChanged(ValueChangedEvent<HomeOverlayTabs> tab)
+        {
+            switch (tab.NewValue)
+            {
+                default:
+                    loadLayout(null);
+                    return;
+
+                case HomeOverlayTabs.Friends:
+                    loadLayout(new FriendsLayout());
+                    return;
+            }
+        }
+
+        private void loadLayout(Drawable layout)
+        {
+            content.Clear();
+
+            if (layout != null)
+                content.Add(layout);
         }
     }
 }
