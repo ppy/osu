@@ -8,7 +8,6 @@ using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Configuration
@@ -105,7 +104,8 @@ namespace osu.Game.Configuration
                         var dropdownType = typeof(SettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
 
-                        dropdown.GetType().GetProperty(nameof(IHasCurrentValue<object>.Current))?.SetValue(dropdown, obj);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Bindable))?.SetValue(dropdown, bindable);
 
                         yield return dropdown;
 
