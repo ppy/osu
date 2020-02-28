@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Multi
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected BindableList<User> Participants { get; private set; }
+        protected BindableList<User> RecentParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<int> ParticipantCount { get; private set; }
