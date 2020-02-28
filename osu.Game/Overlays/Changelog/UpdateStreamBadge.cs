@@ -100,26 +100,20 @@ namespace osu.Game.Overlays.Changelog
 
         private void updateState()
         {
-            // Expand based on the local state
-            bool shouldExpand = Active.Value || IsHovered;
-
-            bool allHighlighted = SelectedTab.Value == null && !externalDimRequested;
-
-            // Expand based on whether no build is selected and the badge area is hovered
-            shouldExpand |= allHighlighted;
-
-            if (shouldExpand)
+            if (SelectedTab.Value == null && !externalDimRequested)
             {
                 expandingBar.Expand();
                 expandingBar.FadeTo(1, transition_duration, Easing.OutQuint);
-            }
-            else
-            {
-                expandingBar.Collapse();
-                expandingBar.FadeTo(0.5f, transition_duration, Easing.OutQuint);
+                text.FadeTo(1, transition_duration, Easing.OutQuint);
+                return;
             }
 
-            text.FadeTo(IsHovered || (Active.Value && !externalDimRequested) || allHighlighted ? 1 : 0.5f, transition_duration, Easing.OutQuint);
+            var shouldExpand = Active.Value || IsHovered;
+
+            expandingBar.IsCollapsed = !shouldExpand;
+            expandingBar.FadeTo(shouldExpand ? 1 : 0.5f, transition_duration, Easing.OutQuint);
+
+            text.FadeTo(IsHovered || (Active.Value && !externalDimRequested) ? 1 : 0.5f, transition_duration, Easing.OutQuint);
         }
 
         private bool externalDimRequested;
