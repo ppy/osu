@@ -23,11 +23,6 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "记录性能",
-                    Bindable = config.GetBindable<bool>(DebugSetting.PerformanceLogging)
-                },
-                new SettingsCheckbox
-                {
                     LabelText = "绕过 front-to-back 渲染检查",
                     Bindable = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }

@@ -54,8 +54,6 @@ namespace osu.Game.Screens.Menu
         {
             base.LogoArriving(logo, resuming);
 
-            logo.Triangles = true;
-
             if (!resuming)
             {
                 PrepareMenuLoad();

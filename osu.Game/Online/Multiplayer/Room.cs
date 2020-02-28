@@ -118,15 +118,6 @@ namespace osu.Game.Online.Multiplayer
             if (DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            // transfer local beatmaps across to ensure we have Metadata available (CreateRoomRequest does not give us metadata as expected)
-            foreach (var item in other.Playlist)
-            {
-                var localItem = Playlist.FirstOrDefault(i => i.BeatmapID == item.BeatmapID);
-
-                if (localItem != null)
-                    item.Beatmap.Value.Metadata = localItem.Beatmap.Value.Metadata;
-            }
-
             if (!Playlist.SequenceEqual(other.Playlist))
             {
                 Playlist.Clear();

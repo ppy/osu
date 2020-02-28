@@ -15,6 +15,8 @@ namespace osu.Game.Beatmaps.Drawables
     public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        
+        protected override double LoadDelay => 500;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

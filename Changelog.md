@@ -546,3 +546,8 @@
     *   [m] [Fix stutter when showing game HUD after being hidden for a while #8007]
     *   [m] [Use overlay theme colours for comment vote button #8014]
     *   [m] [Fix incorrect RepliesButton presentation in comments #8030]
+    *   [m] [Hide logo background when exiting with the triangles intro #8026]
+    *   [m] [Remove workarounds for CreateRoomRequest shortcomings #8027]
+    *   [m] [Add delay for loading multiplayer beatmap covers #8028]
+    *   [m] [Add labels and fix bindable values of SettingSource dropdowns #8040]
+    *   [m] [Implement new multiplayer participants retrieval #8029]
