@@ -14,13 +14,15 @@ namespace osu.Game.Graphics.Containers
 {
     public class LinkFlowContainer : OsuTextFlowContainer
     {
+        public bool IgnoreColourProvider { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
+
         public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null)
             : base(defaultCreationParameters)
         {
         }
-
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -67,7 +69,7 @@ namespace osu.Game.Graphics.Containers
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
-            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
+            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList(), IgnoreColourProvider)
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText,

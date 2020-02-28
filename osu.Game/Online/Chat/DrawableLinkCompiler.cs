@@ -28,15 +28,18 @@ namespace osu.Game.Online.Chat
 
         protected override HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
-        public DrawableLinkCompiler(IEnumerable<Drawable> parts)
+        private readonly bool ignoreColourProvider;
+
+        public DrawableLinkCompiler(IEnumerable<Drawable> parts, bool ignoreColourProvider = false)
         {
             Parts = parts.ToList();
+            this.ignoreColourProvider = ignoreColourProvider;
         }
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider colourProvider, [NotNull] OsuColour colours)
         {
-            IdleColour = colourProvider?.Light2 ?? colours.Blue;
+            IdleColour = (ignoreColourProvider || colourProvider == null) ? colours.Blue : colourProvider.Light2;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;

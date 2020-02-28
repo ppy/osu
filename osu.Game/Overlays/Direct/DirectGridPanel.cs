@@ -126,6 +126,7 @@ namespace osu.Game.Overlays.Direct
                                             s.Font = OsuFont.GetFont(size: 14);
                                         }).With(d =>
                                         {
+                                            d.IgnoreColourProvider = true;
                                             d.AutoSizeAxes = Axes.Both;
                                             d.AddText("mapped by ", t => t.Colour = colours.Gray5);
                                             d.AddUserLink(SetInfo.Metadata.Author);
