@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Changelog
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding
                     {
-                        Horizontal = 85,
+                        Horizontal = 65,
                         Vertical = 20
                     },
                     Child = Streams = new UpdateStreamBadgeArea()
