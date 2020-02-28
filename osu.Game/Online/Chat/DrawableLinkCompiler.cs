@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Online.Chat
@@ -31,10 +32,16 @@ namespace osu.Game.Online.Chat
             Parts = parts.ToList();
         }
 
+        [Resolved(CanBeNull = true)]
+        private OverlayColourProvider colourProvider { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            IdleColour = colours.Blue;
+            IdleColour = colourProvider?.Light2 ?? colours.Blue;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
