@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override string ShortName => SHORT_NAME;
 
-        public override string PlayingVerb => "Catching fruit";
+        public override string PlayingVerb => "正在接水果";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 

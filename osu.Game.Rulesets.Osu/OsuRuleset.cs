@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => SHORT_NAME;
 
-        public override string PlayingVerb => "游戏中";
+        public override string PlayingVerb => "正在戳泡泡";
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 

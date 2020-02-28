@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override string ShortName => SHORT_NAME;
 
-        public override string PlayingVerb => "Smashing keys";
+        public override string PlayingVerb => "正在弹琴";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 

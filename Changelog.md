@@ -538,3 +538,10 @@
     *   [m] [Add CommentsContainer to BeatmapSetOverlay #7951]
     *   [m] [Adjust ChangelogOverlay appearance to match web #7940]
     *   [m] [Increase HP awarded for GOODs from 1.5% to 2.5% #7997]
+
+### 2020/2/27:
+*   整合更新
+    *   [m] [Fix hyperdash red glow not being visible #8004]
+    *   [m] [Fix catcher dropping juice streams due to it considering ignored judgements #8005]
+    *   [m] [Fix stutter when showing game HUD after being hidden for a while #8007]
+    *   [m] [Use overlay theme colours for comment vote button #8014]

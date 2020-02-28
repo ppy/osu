@@ -7,6 +7,7 @@
     <ProjectGuid>{3F082D0B-A964-43D7-BDF7-C256D76A50D0}</ProjectGuid>
     <RootNamespace>osu.iOS</RootNamespace>
     <AssemblyName>osu.iOS</AssemblyName>
+    <MtouchUseLlvm>false</MtouchUseLlvm> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
   </PropertyGroup>
   <Import Project="..\osu.iOS.props" />
   <ItemGroup>

@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string ShortName => SHORT_NAME;
 
-        public override string PlayingVerb => "Bashing drums";
+        public override string PlayingVerb => "正在打鼓";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
