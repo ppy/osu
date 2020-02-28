@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return new TooltipDisplayContent
                 {
                     Rank = $"#{ranks[dayIndex].Value:#,##0}",
-                    Time = days == 0 ? "now" : $"{days} days ago"
+                    Time = days == 0 ? "现在" : $"{days} 天前"
                 };
             }
         }
