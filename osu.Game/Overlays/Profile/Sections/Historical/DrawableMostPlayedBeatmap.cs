@@ -37,8 +37,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
+            ProfileItemContainer container;
+
             AddRangeInternal(new Drawable[]
             {
                 new UpdateableBeatmapSetCover
@@ -61,7 +63,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
                             {
-                                new ProfileItemContainer
+                                container = new ProfileItemContainer
                                 {
                                     Child = new Container
                                     {
@@ -78,11 +80,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                 Children = new Drawable[]
                                                 {
                                                     new MostPlayedBeatmapMetadataContainer(beatmap),
-                                                    new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular))
+                                                    new LinkFlowContainer(t =>
+                                                    {
+                                                        t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
+                                                        t.Colour = colourProvider.Foreground1;
+                                                    })
                                                     {
                                                         AutoSizeAxes = Axes.Both,
                                                         Direction = FillDirection.Horizontal,
-                                                        Colour = colours.GreySeafoamLighter
                                                     }.With(d =>
                                                     {
                                                         d.AddText("mapped by ");
@@ -103,6 +108,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     }
                 }
             });
+
+            container.IdleColour = colourProvider.Background4;
+            container.HoverColour = colourProvider.Background3;
         }
 
         private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
