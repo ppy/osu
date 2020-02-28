@@ -142,17 +142,9 @@ namespace osu.Game.Overlays
                     UnhoverAction();
             }
 
-            protected override void OnActivated()
-            {
-                HoverAction();
-                Text.Font = Text.Font.With(weight: FontWeight.Bold);
-            }
+            protected override void OnActivated() => HoverAction();
 
-            protected override void OnDeactivated()
-            {
-                UnhoverAction();
-                Text.Font = Text.Font.With(weight: FontWeight.Medium);
-            }
+            protected override void OnDeactivated() => UnhoverAction();
 
             private void updateState()
             {
