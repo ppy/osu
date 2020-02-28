@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -32,14 +33,8 @@ namespace osu.Game.Online.Chat
             Parts = parts.ToList();
         }
 
-        [Resolved(CanBeNull = true)]
-        private OverlayColourProvider colourProvider { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] OverlayColourProvider colourProvider, [NotNull] OsuColour colours)
         {
             IdleColour = colourProvider?.Light2 ?? colours.Blue;
         }
