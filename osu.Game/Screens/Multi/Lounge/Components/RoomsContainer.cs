@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private Bindable<FilterCriteria> filter { get; set; }
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
+        private Bindable<Room> selectedRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
-            currentRoom.Value = room;
+            selectedRoom.Value = room;
         }
 
         protected override void Dispose(bool isDisposing)
