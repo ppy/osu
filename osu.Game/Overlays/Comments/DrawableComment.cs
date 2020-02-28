@@ -384,7 +384,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
-                text.Text = $@"{(expanded.NewValue ? "[+] 展开" : "[-] 折叠")} ({count})";
+                text.Text = $@"{(expanded.NewValue ? "[-] 折叠" : "[+] 展开")} ({count})";
             }
         }
 

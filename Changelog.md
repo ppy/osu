@@ -545,3 +545,4 @@
     *   [m] [Fix catcher dropping juice streams due to it considering ignored judgements #8005]
     *   [m] [Fix stutter when showing game HUD after being hidden for a while #8007]
     *   [m] [Use overlay theme colours for comment vote button #8014]
+    *   [m] [Fix incorrect RepliesButton presentation in comments #8030]
