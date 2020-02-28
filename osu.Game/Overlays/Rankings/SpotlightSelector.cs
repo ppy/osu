@@ -164,6 +164,8 @@ namespace osu.Game.Overlays.Rankings
 
             protected override DropdownMenu CreateMenu() => menu = base.CreateMenu().With(m => m.MaxHeight = 400);
 
+            protected override DropdownHeader CreateHeader() => new SpotlightsDropdownHeader();
+
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
