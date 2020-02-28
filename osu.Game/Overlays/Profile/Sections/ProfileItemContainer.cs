@@ -16,11 +16,18 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override Container<Drawable> Content => content;
 
-        private Color4 idleColour;
-        private Color4 hoverColour;
-
         private readonly Box background;
         private readonly Container content;
+
+        private Color4 idleColour;
+
+        public Color4 IdleColour
+        {
+            get => idleColour;
+            set => idleColour = background.Colour = value;
+        }
+
+        public Color4 HoverColour { get; set; }
 
         public ProfileItemContainer()
         {
@@ -44,20 +51,20 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = idleColour = colourProvider.Background3;
-            hoverColour = colourProvider.Background2;
+            IdleColour = colourProvider.Background3;
+            HoverColour = colourProvider.Background2;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            background.FadeColour(hoverColour, hover_duration, Easing.OutQuint);
+            background.FadeColour(HoverColour, hover_duration, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            background.FadeColour(idleColour, hover_duration, Easing.OutQuint);
+            background.FadeColour(IdleColour, hover_duration, Easing.OutQuint);
         }
     }
 }
