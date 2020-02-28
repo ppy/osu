@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -90,7 +92,7 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    Text.Text = value.ToString().ToLower();
+                    Text.Text = ((value as Enum)?.GetDescription() ?? value.ToString()).ToLower();
                     Text.Font = OsuFont.GetFont(size: 14);
                     Bar.ExpandedSize = 5;
                 }
