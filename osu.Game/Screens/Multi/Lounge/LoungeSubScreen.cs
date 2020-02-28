@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly LoadingLayer  LoadingLayer ;
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
+        private Bindable<Room> selectedRoom { get; set; }
 
         public LoungeSubScreen()
         {
@@ -101,8 +101,8 @@ namespace osu.Game.Screens.Multi.Lounge
         {
             base.OnResuming(last);
 
-            if (currentRoom.Value?.RoomID.Value == null)
-                currentRoom.Value = new Room();
+            if (selectedRoom.Value?.RoomID.Value == null)
+                selectedRoom.Value = new Room();
 
             onReturning();
         }
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (!this.IsCurrentScreen())
                 return;
 
-            currentRoom.Value = room;
+            selectedRoom.Value = room;
 
             this.Push(new MatchSubScreen(room));
         }

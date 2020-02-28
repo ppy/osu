@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         public OverlinedParticipants(Direction direction)
-            : base("参与人数")
+            : base("最近参与")
         {
             OsuScrollContainer scroll;
             ParticipantsList list;

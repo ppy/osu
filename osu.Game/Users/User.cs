@@ -9,7 +9,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
-    public class User
+    public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
         public long Id = 1;
@@ -243,6 +243,13 @@ namespace osu.Game.Users
 
             [Description("触摸屏")]
             Touch,
+        }
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
         }
     }
 }

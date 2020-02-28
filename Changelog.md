@@ -551,3 +551,5 @@
     *   [m] [Add delay for loading multiplayer beatmap covers #8028]
     *   [m] [Add labels and fix bindable values of SettingSource dropdowns #8040]
     *   [m] [Implement new multiplayer participants retrieval #8029]
+    *   [m] [Remove legacy DrawableHitObject state management #8021]
+    *   [m] [Fix iOS/Android lockups by disabling LLVM #8020]
