@@ -18,18 +18,18 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneOnlineViewLayer : ManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new Type[]
+        public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OnlineViewLayer)
         };
 
-        private Container con;
+        private readonly Container con;
 
-        private OsuButton button;
+        private readonly OsuButton button;
 
-        private TestOnlineViewLayer view;
+        private readonly TestOnlineViewLayer view;
 
-        private bool inputBlocked = false;
+        private bool inputBlocked;
 
         public TestSceneOnlineViewLayer()
         {
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
             AddStep("click", () => InputManager.Click());
 
-            AddAssert("input is blocked by overlay", () => inputBlocked == false);
+            AddAssert("input is blocked by overlay", () => !inputBlocked);
             AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddAssert("loading animation is visible", () => view.LoadingSpinner.IsPresent);
         }
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
             AddStep("click", () => InputManager.Click(osuTK.Input.MouseButton.Left));
 
-            AddAssert("input is not blocked by overlay", () => inputBlocked == true);
+            AddAssert("input is not blocked by overlay", () => inputBlocked);
             AddAssert("content is not dimmed", () => con.Colour == Color4.White);
             AddAssert("loading animation is not visible", () => !view.LoadingSpinner.IsPresent);
         }
