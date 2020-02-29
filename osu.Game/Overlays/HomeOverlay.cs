@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Home;
 using osu.Game.Overlays.Home.Friends;
 
@@ -13,9 +15,12 @@ namespace osu.Game.Overlays
 {
     public class HomeOverlay : FullscreenOverlay
     {
+        private CancellationTokenSource cancellationToken;
+
         private readonly Box background;
         private readonly HomeOverlayHeader header;
         private readonly Container content;
+        private readonly LoadingLayer loading;
 
         public HomeOverlay()
             : base(OverlayColourScheme.Purple)
@@ -43,14 +48,15 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre,
                                 Depth = -float.MaxValue
                             },
-                            content = new Container()
+                            content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y
                             }
                         }
                     }
-                }
+                },
+                loading = new LoadingLayer(content),
             };
         }
 
@@ -64,11 +70,14 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            header.Current.BindValueChanged(onTabChanged);
+            header.Current.BindValueChanged(onTabChanged, true);
         }
 
         private void onTabChanged(ValueChangedEvent<HomeOverlayTabs> tab)
         {
+            loading.Show();
+            cancellationToken?.Cancel();
+
             switch (tab.NewValue)
             {
                 default:
@@ -83,10 +92,25 @@ namespace osu.Game.Overlays
 
         private void loadLayout(Drawable layout)
         {
-            content.Clear();
+            if (layout == null)
+            {
+                content.Clear();
+                loading.Hide();
+                return;
+            }
 
-            if (layout != null)
-                content.Add(layout);
+            LoadComponentAsync(layout, loaded =>
+            {
+                content.Clear();
+                content.Add(loaded);
+                loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }
