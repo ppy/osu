@@ -65,9 +65,7 @@ namespace osu.Game.Online.Multiplayer
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            // If we don't have an api beatmap, the request occurred as a result of room creation, so we can query the local beatmap instead
-            // Todo: Is this a bug? Room creation only returns the beatmap ID
-            Beatmap.Value = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
+            Beatmap.Value = apiBeatmap.ToBeatmap(rulesets);
             Ruleset.Value = rulesets.GetRuleset(RulesetID);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
@@ -93,12 +91,5 @@ namespace osu.Game.Online.Multiplayer
         public bool ShouldSerializeapiBeatmap() => false;
 
         public bool Equals(PlaylistItem other) => ID == other?.ID && BeatmapID == other.BeatmapID && RulesetID == other.RulesetID;
-
-        public override int GetHashCode()
-        {
-            // ReSharper disable NonReadonlyMemberInGetHashCode
-            return HashCode.Combine(ID, BeatmapID, RulesetID);
-            // ReSharper restore NonReadonlyMemberInGetHashCode
-        }
     }
 }

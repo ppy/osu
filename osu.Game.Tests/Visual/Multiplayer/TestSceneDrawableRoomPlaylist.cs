@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             typeof(DrawableRoomPlaylistItem)
         };
 
-        private DrawableRoomPlaylist playlist;
+        private TestPlaylist playlist;
 
         [Test]
         public void TestNonEditableNonSelectable()
@@ -179,6 +179,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
         }
 
+        [Test]
+        public void TestChangeBeatmapAndRemove()
+        {
+            createPlaylist(true, true);
+
+            AddStep("change beatmap of first item", () => playlist.Items[0].BeatmapID = 30);
+            moveToDeleteButton(0);
+            AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index), offset));
 
@@ -201,30 +211,45 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertDeleteButtonVisibility(int index, bool visible)
             => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible", () => (playlist.ChildrenOfType<IconButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
-        private void createPlaylist(bool allowEdit, bool allowSelection) => AddStep("create playlist", () =>
+        private void createPlaylist(bool allowEdit, bool allowSelection)
         {
-            Child = playlist = new DrawableRoomPlaylist(allowEdit, allowSelection)
+            AddStep("create playlist", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(500, 300)
-            };
-
-            for (int i = 0; i < 20; i++)
-            {
-                playlist.Items.Add(new PlaylistItem
+                Child = playlist = new TestPlaylist(allowEdit, allowSelection)
                 {
-                    ID = i,
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    RequiredMods =
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500, 300)
+                };
+
+                for (int i = 0; i < 20; i++)
+                {
+                    playlist.Items.Add(new PlaylistItem
                     {
-                        new OsuModHardRock(),
-                        new OsuModDoubleTime(),
-                        new OsuModAutoplay()
-                    }
-                });
+                        ID = i,
+                        Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RequiredMods =
+                        {
+                            new OsuModHardRock(),
+                            new OsuModDoubleTime(),
+                            new OsuModAutoplay()
+                        }
+                    });
+                }
+            });
+
+            AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
+        }
+
+        private class TestPlaylist : DrawableRoomPlaylist
+        {
+            public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
+
+            public TestPlaylist(bool allowEdit, bool allowSelection)
+                : base(allowEdit, allowSelection)
+            {
             }
-        });
+        }
     }
 }

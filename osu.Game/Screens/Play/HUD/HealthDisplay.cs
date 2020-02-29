@@ -13,12 +13,5 @@ namespace osu.Game.Screens.Play.HUD
             MinValue = 0,
             MaxValue = 1
         };
-
-        protected HealthDisplay()
-        {
-            Current.ValueChanged += health => SetHealth((float)health.NewValue);
-        }
-
-        protected abstract void SetHealth(float value);
     }
 }

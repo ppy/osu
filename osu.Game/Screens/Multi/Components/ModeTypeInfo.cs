@@ -48,8 +48,7 @@ namespace osu.Game.Screens.Multi.Components
 
             Type.BindValueChanged(type => gameTypeContainer.Child = new DrawableGameType(type.NewValue) { Size = new Vector2(height) }, true);
 
-            Playlist.ItemsAdded += _ => updateBeatmap();
-            Playlist.ItemsRemoved += _ => updateBeatmap();
+            Playlist.CollectionChanged += (_, __) => updateBeatmap();
 
             updateBeatmap();
         }

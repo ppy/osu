@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Multi
         private readonly bool allowEdit;
         private readonly bool allowSelection;
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || SelectedItem.Value == Model;
+        protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || !allowSelection || SelectedItem.Value == Model;
 
         public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection)
             : base(item)
@@ -84,8 +84,7 @@ namespace osu.Game.Screens.Multi
             beatmap.BindValueChanged(_ => scheduleRefresh());
             ruleset.BindValueChanged(_ => scheduleRefresh());
 
-            requiredMods.ItemsAdded += _ => scheduleRefresh();
-            requiredMods.ItemsRemoved += _ => scheduleRefresh();
+            requiredMods.CollectionChanged += (_, __) => scheduleRefresh();
 
             refresh();
         }
