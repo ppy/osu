@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private HealthProcessor healthProcessor;
 
+        private MultiAction blockedSide;
         private MultiAction blockedRim;
         private MultiAction blockedCentre;
 
@@ -30,11 +31,19 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private DrawableTaikoHitObject nextHitObject;
         private bool? objectInRange;
 
+        [SettingSource("Playstyle")]
+        public Bindable<Playstyle> KeyConfiguration { get; } = new Bindable<Playstyle>
+        {
+            Default = Playstyle.KDDK,
+            Value = Playstyle.KDDK
+        };
+
         [SettingSource("Allow repeats on color change")]
         public Bindable<bool> RepeatOnColorChange { get; } = new BindableBool
         {
             Default = true,
-            Value = true
+            Value = true,
+            Disabled = true
         };
 
         [SettingSource("Allow repeats after drumrolls")]
@@ -43,6 +52,18 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Default = true,
             Value = true
         };
+
+        [SettingSource("Allow repeats after large notes")]
+        public Bindable<bool> RepeatAfterLargeNote { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
+        public TaikoModEnforceAlternate()
+        {
+            KeyConfiguration.ValueChanged += ev => RepeatOnColorChange.Disabled = ev.NewValue == Playstyle.KDDK;
+        }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -62,22 +83,25 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void Update(Playfield playfield)
         {
-            if (RepeatAfterDrumroll.Value)
+            if (RepeatAfterDrumroll.Value && nextHitObject is DrawableDrumRoll roll && roll.AllJudged)
             {
-                if (nextHitObject is DrawableDrumRoll roll)
+                if (roll.HitObject.IsStrong)
                 {
-                    if (roll.HitObject.IsStrong)
-                    {
-                        blockedRim = MultiAction.None;
-                        blockedCentre = MultiAction.None;
-                    }
-                    else
-                        blockedCentre = MultiAction.None;
+                    blockedRim = MultiAction.None;
+                    blockedCentre = MultiAction.None;
                 }
+                else
+                    blockedCentre = MultiAction.None;
 
-                nextHitObject = playfield.HitObjectContainer.Objects.ToList().Find(o => o is DrawableTaikoHitObject && !o.AllJudged) as DrawableTaikoHitObject;
-                objectInRange = nextHitObject?.HitObject.HitWindows.CanBeHit(playfield.Time.Current - nextHitObject.HitObject.StartTime);
+                blockedSide = MultiAction.None;
             }
+
+            nextHitObject = playfield.HitObjectContainer.Objects.ToList().Find(o => o is DrawableTaikoHitObject && !o.AllJudged) as DrawableTaikoHitObject;
+
+            if (nextHitObject is DrawableDrumRoll drumRoll)
+                objectInRange = playfield.Time.Current >= drumRoll.HitObject.StartTime && playfield.Time.Current <= drumRoll.HitObject.EndTime;
+            else
+                objectInRange = nextHitObject?.HitObject.HitWindows.CanBeHit(playfield.Time.Current - nextHitObject.HitObject.StartTime);
         }
 
         private bool handleMultipleKeypresses(List<MultiAction> multiActions)
@@ -89,7 +113,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 bool rimBlocked = multiActions.Any(a => a == blockedRim);
                 bool centreBlocked = multiActions.Any(a => a == blockedCentre);
 
-                if (rimBlocked && centreBlocked)
+                bool sideBlocked = blockedSide != MultiAction.None && multiActions.All(a => a.HasFlag(blockedSide));
+
+                if ((rimBlocked && centreBlocked) || sideBlocked)
                 {
                     blockedKeystrokes++;
 
@@ -99,44 +125,57 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 {
                     blockedRim = multiActions.First(a => a.HasFlag(MultiAction.Rim));
                     blockedCentre = multiActions.First(a => a.HasFlag(MultiAction.Centre));
+
+                    blockedSide = multiActions.First() & ~MultiAction.Rim & ~MultiAction.Centre;
                 }
             }
-            else
+            else if (RepeatAfterLargeNote.Value)
             {
                 if (allPressed == MultiAction.LargeRim)
                     blockedRim = MultiAction.None;
 
                 if (allPressed == MultiAction.LargeCentre)
                     blockedCentre = MultiAction.None;
+
+                blockedSide = MultiAction.None;
             }
 
             return false;
         }
 
-        private bool handleBindings(List<TaikoAction> pressedActions)
+        private bool handleSingleKddk(bool exempt, List<MultiAction> multiActions)
         {
-            if (healthProcessor.IsBreakTime.Value || !pressedActions.Any()) return false;
+            if (exempt) return false;
 
-            var multiActions = new List<MultiAction>();
-
-            pressedActions.ForEach(a =>
+            if (blockedSide != MultiAction.None && multiActions.All(a => a.HasFlag(blockedSide)))
             {
-                Enum.TryParse(a.ToString(), out MultiAction action);
-                multiActions.Add(action);
-            });
+                blockedKeystrokes++;
 
+                return true;
+            }
+
+            var newAction = blockedSide != MultiAction.None ? multiActions.Find(a => !a.HasFlag(blockedSide)) : multiActions.First();
+
+            blockedSide = newAction & ~MultiAction.Rim & ~MultiAction.Centre;
+
+            return false;
+        }
+
+        private bool handleSingleKkdd(bool exempt, List<MultiAction> multiActions)
+        {
             var rim = multiActions.Find(a => a.HasFlag(MultiAction.Rim));
             var centre = multiActions.Find(a => a.HasFlag(MultiAction.Centre));
 
-            if (pressedActions.Count > 1)
-                return handleMultipleKeypresses(multiActions);
+            if (RepeatOnColorChange.Value)
+            {
+                if (rim == MultiAction.None)
+                    blockedRim = MultiAction.None;
 
-            bool exempt = nextHitObject?.HitObject.IsStrong == true && objectInRange == true;
+                if (centre == MultiAction.None)
+                    blockedCentre = MultiAction.None;
+            }
 
-            if (nextHitObject is DrawableHit hit)
-                exempt &= hit.HitActions.Any(pressedActions.Contains);
-
-            if (multiActions.Any(a => a == blockedRim || a == blockedCentre) && !exempt)
+            if (multiActions.All(a => a == blockedRim || a == blockedCentre) && !exempt)
             {
                 blockedKeystrokes++;
 
@@ -154,6 +193,32 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 blockedCentre = MultiAction.None;
 
             return false;
+        }
+
+        private bool handleBindings(List<TaikoAction> pressedActions)
+        {
+            if (healthProcessor.IsBreakTime.Value || !pressedActions.Any()) return false;
+
+            var multiActions = new List<MultiAction>();
+
+            pressedActions.ForEach(a =>
+            {
+                Enum.TryParse(a.ToString(), out MultiAction action);
+                multiActions.Add(action);
+            });
+
+            bool exempt = nextHitObject?.HitObject.IsStrong == true && objectInRange == true;
+
+            if (nextHitObject is DrawableHit hit)
+                exempt &= hit.HitActions.Any(pressedActions.Contains);
+
+            if (exempt && pressedActions.Count > 1)
+                return handleMultipleKeypresses(multiActions);
+
+            if (KeyConfiguration.Value == Playstyle.KDDK)
+                return handleSingleKddk(exempt, multiActions);
+            else
+                return handleSingleKkdd(exempt, multiActions);
         }
 
         [Flags]
@@ -177,6 +242,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             LargeRim = LeftRim | RightRim,
             LargeCentre = LeftCentre | RightCentre
+        }
+
+        public enum Playstyle
+        {
+            KDDK,
+            KKDD
         }
     }
 }
