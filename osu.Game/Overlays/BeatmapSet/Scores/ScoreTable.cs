@@ -29,7 +29,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly FillFlowContainer backgroundFlow;
 
         private Color4 highAccuracyColour;
-        private bool isBeatmapRanked;
 
         public ScoreTable()
         {
@@ -67,12 +66,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 for (int i = 0; i < value.Count; i++)
                     backgroundFlow.Add(new ScoreTableRowBackground(i, value[i], row_height));
 
-                isBeatmapRanked = value.First().Beatmap.Status == BeatmapSetOnlineStatus.Ranked;
-
                 Columns = createHeaders(value.First());
                 Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
             }
         }
+
+        public bool IsBeatmapRanked { get; set; }
 
         private TableColumn[] createHeaders(ScoreInfo score)
         {
@@ -92,7 +91,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
 
-            if (isBeatmapRanked)
+            if (IsBeatmapRanked)
                 columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
 
             columns.Add(new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
@@ -153,7 +152,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            if (isBeatmapRanked)
+            if (IsBeatmapRanked)
             {
                 content.Add(new OsuSpriteText
                 {
