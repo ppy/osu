@@ -24,10 +24,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void AddCheckSteps()
         {
-            AddUntilStep("score above zero", () => ((ScoreAccessiblePlayer)Player).ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
-            AddStep("rewind", () => track.Seek(-10000));
-            AddUntilStep("key counter reset", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+            ScoreAccessiblePlayer scoreAccessiblePlayer = null;
+
+            AddUntilStep("player loaded", () => (scoreAccessiblePlayer = (ScoreAccessiblePlayer)Player) != null);
+            AddUntilStep("score above zero", () => scoreAccessiblePlayer.ScoreProcessor.TotalScore.Value > 0);
+            AddUntilStep("key counter counted keys", () => scoreAccessiblePlayer.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
+            AddStep("seek to break time", () => scoreAccessiblePlayer.GameplayClockContainer.Seek(scoreAccessiblePlayer.BreakOverlay.Breaks.First().StartTime));
+            AddUntilStep("wait for seek to complete", () =>
+                scoreAccessiblePlayer.HUDOverlay.Progress.ReferenceClock.CurrentTime >= scoreAccessiblePlayer.BreakOverlay.Breaks.First().StartTime);
+            AddAssert("test keys not counting", () => !scoreAccessiblePlayer.HUDOverlay.KeyCounter.IsCounting);
+            AddStep("rewind", () => scoreAccessiblePlayer.GameplayClockContainer.Seek(-80000));
+            AddUntilStep("key counter reset", () => scoreAccessiblePlayer.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
@@ -43,6 +50,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
+            public new BreakOverlay BreakOverlay => base.BreakOverlay;
 
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
