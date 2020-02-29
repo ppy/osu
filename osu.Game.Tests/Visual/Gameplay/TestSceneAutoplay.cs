@@ -14,8 +14,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [Description("Player instantiated with an autoplay mod.")]
     public class TestSceneAutoplay : TestSceneAllRulesetPlayers
     {
-        private ClockBackedTestWorkingBeatmap.TrackVirtualManual track;
-
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
@@ -40,8 +38,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
             var working = base.CreateWorkingBeatmap(beatmap, storyboard);
-
-            track = (ClockBackedTestWorkingBeatmap.TrackVirtualManual)working.Track;
 
             return working;
         }
