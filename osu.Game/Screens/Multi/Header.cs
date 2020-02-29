@@ -73,7 +73,6 @@ namespace osu.Game.Screens.Multi
         private class MultiHeaderTitle : ScreenTitle
         {
             private const int text_offset = 2;
-            private const float spacing = 6;
 
             public IMultiplayerSubScreen Screen
             {
