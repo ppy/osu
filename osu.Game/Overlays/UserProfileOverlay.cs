@@ -79,7 +79,7 @@ namespace osu.Game.Overlays
 
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = Header = new ProfileHeader { HorizontalMargin = CONTENT_X_MARGIN },
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {

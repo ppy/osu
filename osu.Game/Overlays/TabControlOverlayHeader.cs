@@ -23,6 +23,7 @@ namespace osu.Game.Overlays
         protected OsuTabControl<T> TabControl;
 
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
+        private readonly Box controlBackground;
 
         public Bindable<T> Current
         {
@@ -30,7 +31,15 @@ namespace osu.Game.Overlays
             set => current.Current = value;
         }
 
-        private readonly Box controlBackground;
+        public override float HorizontalMargin
+        {
+            get => base.HorizontalMargin;
+            set
+            {
+                base.HorizontalMargin = value;
+                TabControl.Margin = new MarginPadding { Left = value };
+            }
+        }
 
         protected TabControlOverlayHeader()
         {
@@ -46,7 +55,7 @@ namespace osu.Game.Overlays
                     },
                     TabControl = CreateTabControl().With(control =>
                     {
-                        control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN };
+                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
                         control.Current = Current;
                     })
                 }

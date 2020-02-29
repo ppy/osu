@@ -15,8 +15,17 @@ namespace osu.Game.Overlays
     {
         private readonly Box titleBackground;
         private readonly ScreenTitle title;
+        private readonly Container content;
 
         protected readonly FillFlowContainer HeaderInfo;
+
+        public const float CONTENT_X_MARGIN = 50;
+
+        public virtual float HorizontalMargin
+        {
+            get => content.Padding.Left;
+            set => content.Padding = new MarginPadding { Horizontal = value, Vertical = 10 };
+        }
 
         protected OverlayHeader()
         {
@@ -50,14 +59,11 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Gray,
                                     },
-                                    new Container
+                                    content = new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding
-                                        {
-                                            Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                                        },
+                                        Padding = new MarginPadding { Horizontal = CONTENT_X_MARGIN },
                                         Children = new[]
                                         {
                                             title = CreateTitle().With(title =>
