@@ -947,7 +947,7 @@ namespace osu.Game
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
-                else
+                else if(Toolbar.State.Value == Visibility.Visible)
                     Toolbar.Show();
 
                 if (newOsuScreen.AllowBackButton)
