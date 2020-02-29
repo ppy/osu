@@ -553,3 +553,10 @@
     *   [m] [Implement new multiplayer participants retrieval #8029]
     *   [m] [Remove legacy DrawableHitObject state management #8021]
     *   [m] [Fix iOS/Android lockups by disabling LLVM #8020]
+
+### 2020/03/01:
+*   整合更新
+    *   [m] [Fix crash when reaching results screen on single threaded execution mode #8050]
+    *   [m] [Update Framework #8053]
+*   修复一处翻译缺失
+    *   [osu.Game/Beatmaps/DummyWorkingBeatmap.cs:28-29](osu.Game/Beatmaps/DummyWorkingBeatmap.cs)

@@ -609,9 +609,9 @@ namespace osu.Game.Screens.Play
             {
                 var score = CreateScore();
                 if (DrawableRuleset.ReplayScore == null)
-                    scoreManager.Import(score).Wait();
-
-                this.Push(CreateResults(score));
+                    scoreManager.Import(score).ContinueWith(_ => Schedule(() => this.Push(CreateResults(score))));
+                else
+                    this.Push(CreateResults(score));
             });
         }
 
