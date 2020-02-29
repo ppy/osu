@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Rankings
 
             InternalChild = content = new CircularContainer
             {
-                Height = 25,
+                Height = 30,
                 AutoSizeDuration = duration,
                 AutoSizeEasing = Easing.OutQuint,
                 Masking = true,
@@ -58,9 +58,9 @@ namespace osu.Game.Overlays.Rankings
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         AutoSizeAxes = Axes.X,
-                        Margin = new MarginPadding { Horizontal = 10 },
+                        Margin = new MarginPadding { Horizontal = 15 },
                         Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(8, 0),
+                        Spacing = new Vector2(15, 0),
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
@@ -70,14 +70,14 @@ namespace osu.Game.Overlays.Rankings
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(3, 0),
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     flag = new UpdateableFlag
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Size = new Vector2(22, 15)
+                                        Size = new Vector2(30, 20)
                                     },
                                     countryName = new OsuSpriteText
                                     {
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Rankings
                 AutoSizeAxes = Axes.Both;
                 Add(icon = new SpriteIcon
                 {
-                    Size = new Vector2(8),
+                    Size = new Vector2(10),
                     Icon = FontAwesome.Solid.Times
                 });
             }
