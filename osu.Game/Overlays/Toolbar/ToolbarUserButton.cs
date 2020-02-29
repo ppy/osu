@@ -18,8 +18,12 @@ namespace osu.Game.Overlays.Toolbar
     {
         private readonly UpdateableAvatar avatar;
 
-        public ToolbarUserButton()
+        private Toolbar toolbar;
+
+        public ToolbarUserButton(Toolbar toolbar)
         {
+            this.toolbar = toolbar;
+
             AutoSizeAxes = Axes.X;
 
             DrawableText.Font = OsuFont.GetFont(italics: true);

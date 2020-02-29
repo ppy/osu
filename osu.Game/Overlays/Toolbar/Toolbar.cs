@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
                         //{
                         //    Icon = FontAwesome.Solid.search
                         //},
-                        userButton = new ToolbarUserButton(),
+                        userButton = new ToolbarUserButton(this),
                         new ToolbarNotificationButton(),
                     }
                 }
@@ -153,5 +153,7 @@ namespace osu.Game.Overlays.Toolbar
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);
         }
+
+
     }
 }

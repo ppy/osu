@@ -334,3 +334,6 @@ inspectcode
 
 # BenchmarkDotNet
 /BenchmarkDotNet.Artifacts
+
+# Discord Plugin Integration
+.idea/.idea.osu.Desktop/.idea/discord.xml
