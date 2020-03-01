@@ -94,9 +94,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double average = AimStrain.JumpDistanceArray.Average();
-            double sumOfSquaresOfDifferences = AimStrain.JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
-            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / AimStrain.JumpDistanceArray.Length); 
+            double average = Attributes.JumpDistanceArray.Average();
+            double sumOfSquaresOfDifferences = Attributes.JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
+            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / Attributes.JumpDistanceArray.Length); 
             double finalsdpp = 0;
             if (countMiss = 0) 
                   double finalsdpp = finalsdpp+(finalsd/stdevconst);

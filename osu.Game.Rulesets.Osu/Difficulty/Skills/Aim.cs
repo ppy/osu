@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double timing_threshold = 107;
         private const double streamaimconst = 2.42;
         private const double stdevconst = 0.149820;
-        double[] JumpDistanceArray;
+        public double[] JumpDistanceArray;
         int jumpdistpointercount = 0;
 
         protected override double SkillMultiplier => 26.25;
