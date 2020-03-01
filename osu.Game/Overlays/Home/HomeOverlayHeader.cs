@@ -44,9 +44,6 @@ namespace osu.Game.Overlays.Home
         Forum,
 
         [Description(@"modding watchlist")]
-        Modding,
-
-        [Description(@"account settings")]
-        Settings
+        Modding
     }
 }
