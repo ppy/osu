@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
         public virtual float HorizontalMargin
         {
             get => content.Padding.Left;
-            set => content.Padding = new MarginPadding { Horizontal = value, Vertical = 10 };
+            set => content.Padding = new MarginPadding { Horizontal = value };
         }
 
         protected OverlayHeader()
