@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
-            AddStep(ruleset.RulesetInfo.Name, loadPlayer);
+            AddStep(ruleset.RulesetInfo.Name, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
-        private void loadPlayer()
+        protected void LoadPlayer()
         {
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
