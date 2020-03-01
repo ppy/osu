@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
         public double AimStrain;
+        public double[] JumpDistanceArray;
         public double SpeedStrain;
         public double ApproachRate;
         public double OverallDifficulty;
