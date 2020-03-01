@@ -3,12 +3,12 @@
 
 using System;
 using System.Linq;
-using static System.Math;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -35,7 +35,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         ///     double denominator = values.Count - 1;
         ///     return denominator > 0.0 ? Math.Sqrt(sum / denominator) : -1;
         ///     };
-        
         public static double StreamDeterminant(double deltadist,double deltatime)
             {
                double sectionvelocity = deltadist/deltatime;
@@ -51,10 +50,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 /// double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
                 /// double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
                 /// double finalsdpp = finalsd/stdevconst when missCount = 0;
-                };
+                };;
             }
         
-
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
