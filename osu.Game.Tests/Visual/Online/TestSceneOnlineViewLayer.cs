@@ -16,7 +16,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneOnlineViewLayer : ManualInputManagerTestScene
+    public class TestSceneOnlineViewLayer : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -25,11 +25,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private readonly Container con;
 
-        private readonly OsuButton button;
-
         private readonly TestOnlineViewLayer view;
-
-        private bool inputBlocked;
 
         public TestSceneOnlineViewLayer()
         {
@@ -48,13 +44,13 @@ namespace osu.Game.Tests.Visual.Online
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = Color4.Blue,
                             },
-                            button = new OsuButton
+                            new OsuButton
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(500, 500),
                                 Text = "Click me!",
-                                Action = () => { inputBlocked = true; }
+                                Action = () => { }
                             }
                         }
                     },
@@ -63,20 +59,11 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        [SetUp]
-        public void Setup()
-        {
-            inputBlocked = false;
-            InputManager.MoveMouseTo(button);
-        }
-
         [Test]
         public void TestOfflineStateVisibility()
         {
             AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
-            AddStep("click", () => InputManager.Click());
-
-            AddAssert("input is blocked by overlay", () => inputBlocked == false);
+            AddWaitStep("wait for animation to finish", 5);
             AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddAssert("loading animation is not visible", () => !view.LoadingSpinner.IsPresent);
         }
@@ -85,9 +72,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestConnectingStateVisibility()
         {
             AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
-            AddStep("click", () => InputManager.Click());
-
-            AddUntilStep("input is blocked by overlay", () => inputBlocked == false);
+            AddWaitStep("wait for animation to finish", 5);
             AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddUntilStep("loading animation is visible", () => view.LoadingSpinner.IsPresent);
         }
@@ -96,9 +81,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFailingStateVisibility()
         {
             AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
-            AddStep("click", () => InputManager.Click());
-
-            AddAssert("input is blocked by overlay", () => !inputBlocked);
+            AddWaitStep("wait for animation to finish", 5);
             AddAssert("content is dimmed", () => con.Colour != Color4.White);
             AddAssert("loading animation is visible", () => view.LoadingSpinner.IsPresent);
         }
@@ -107,9 +90,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestOnlineStateVisibility()
         {
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
-            AddStep("click", () => InputManager.Click(osuTK.Input.MouseButton.Left));
-
-            AddAssert("input is not blocked by overlay", () => inputBlocked);
+            AddWaitStep("wait for animation to finish", 5);
             AddAssert("content is not dimmed", () => con.Colour == Color4.White);
             AddAssert("loading animation is not visible", () => !view.LoadingSpinner.IsPresent);
         }
