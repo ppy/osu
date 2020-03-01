@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 /// double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
                 /// double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
                 /// double finalsdpp = finalsd/stdevconst when missCount = 0;
-                };;
+                }
             }
         
         protected override double StrainValueOf(DifficultyHitObject current)
