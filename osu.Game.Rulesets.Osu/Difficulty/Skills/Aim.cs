@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double streamaimconst = 2.42;
         private const double stdevconst = 0.149820;
         public double[] JumpDistanceArray;
-        int jumpdistpointercount = 0;
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
@@ -35,23 +34,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         ///     double denominator = values.Count - 1;
         ///     return denominator > 0.0 ? Math.Sqrt(sum / denominator) : -1;
         ///     };
-        public static double StreamDeterminant(double deltadist,double deltatime)
-            {
-               double sectionvelocity = deltadist/deltatime;
-               double[] JumpDistanceArray;
-               int jumpdistpointercount = 0;
-               if (sectionvelocity < streamaimconst) 
-                { 
-                    JumpDistanceArray[jumpdistpointercount] = deltadist;
-                    int jumpdistpointercount = jumpdistpointercount + 1;
                 /// Use JumpDistanceArray to calculate SD
                 /// https://stackoverflow.com/a/5336708
                 /// double average = JumpDistanceArray.Average();
                 /// double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
                 /// double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
                 /// double finalsdpp = finalsd/stdevconst when missCount = 0;
-                }
-            }
+               
         
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -62,7 +51,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double result = 0;
 
-            StreamDeterminant(osuCurrent.JumpDistance,osuCurrent.StrainTime);
+            double sectionvelocity = osuCurrent.JumpDistance/osuCurrent.StrainTime;
+            double[] JumpDistanceArray = {};
+            if (sectionvelocity < streamaimconst) 
+                { 
+                    int jumpdistpointercount = 0;
+                    JumpDistanceArray[jumpdistpointercount] = osuCurrent.JumpDistance;
+                    jumpdistpointercount = jumpdistpointercount + 1;
+                }
 
             if (Previous.Count > 0)
             {

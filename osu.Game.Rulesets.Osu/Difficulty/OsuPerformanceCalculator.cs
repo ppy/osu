@@ -98,8 +98,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sumOfSquaresOfDifferences = Attributes.JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
             double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / Attributes.JumpDistanceArray.Length); 
             double finalsdpp = 0;
-            if (countMiss = 0) 
-                  double finalsdpp = finalsdpp+(finalsd/stdevconst);
+            if (countMiss == 0) 
+                  finalsdpp = finalsdpp+(finalsd/stdevconst);
             double rawAim = Attributes.AimStrain + finalsdpp;
 
             if (mods.Any(m => m is OsuModTouchDevice))
