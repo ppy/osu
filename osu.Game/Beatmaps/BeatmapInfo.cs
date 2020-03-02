@@ -51,6 +51,9 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
+        [NotMapped]
+        public int? MaxCombo { get; set; }
+
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
         /// </summary>
@@ -98,7 +101,7 @@ namespace osu.Game.Beatmaps
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    Bookmarks = new int[0];
+                    Bookmarks = Array.Empty<int>();
                     return;
                 }
 
@@ -111,7 +114,7 @@ namespace osu.Game.Beatmaps
         }
 
         [NotMapped]
-        public int[] Bookmarks { get; set; } = new int[0];
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }

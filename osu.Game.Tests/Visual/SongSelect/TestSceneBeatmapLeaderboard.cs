@@ -3,10 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Overlays;
+using osu.Game.Online.Placeholders;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
@@ -28,8 +31,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private readonly FailableLeaderboard leaderboard;
 
+        [Cached]
+        private readonly DialogOverlay dialogOverlay;
+
         public TestSceneBeatmapLeaderboard()
         {
+            Add(dialogOverlay = new DialogOverlay
+            {
+                Depth = -1
+            });
+
             Add(leaderboard = new FailableLeaderboard
             {
                 Origin = Anchor.Centre,
@@ -48,6 +59,33 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
             foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
+            AddStep("null personal best position", showPersonalBestWithNullPosition);
+        }
+
+        private void showPersonalBestWithNullPosition()
+        {
+            leaderboard.TopScore = new APILegacyUserTopScoreInfo
+            {
+                Position = null,
+                Score = new APILegacyScoreInfo
+                {
+                    Rank = ScoreRank.XH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
+                    User = new User
+                    {
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        Country = new Country
+                        {
+                            FullName = @"Spain",
+                            FlagName = @"ES",
+                        },
+                    },
+                }
+            };
         }
 
         private void showPersonalBest()

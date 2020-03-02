@@ -135,7 +135,7 @@ csharp_preferred_modifier_order = public,private,protected,internal,new,abstract
 csharp_style_expression_bodied_accessors = true:warning
 csharp_style_expression_bodied_constructors = false:none
 csharp_style_expression_bodied_indexers = true:warning
-csharp_style_expression_bodied_methods = true:silent
+csharp_style_expression_bodied_methods = false:silent
 csharp_style_expression_bodied_operators = true:warning
 csharp_style_expression_bodied_properties = true:warning
 csharp_style_expression_bodied_local_functions = true:silent
@@ -176,8 +176,8 @@ dotnet_style_prefer_is_null_check_over_reference_equality_method = true:silent
 #Style - C# 8 features
 csharp_prefer_static_local_function = true:warning
 csharp_prefer_simple_using_statement = true:silent
-csharp_style_prefer_index_operator = false:none
-csharp_style_prefer_range_operator = false:none
+csharp_style_prefer_index_operator = true:warning
+csharp_style_prefer_range_operator = true:warning
 csharp_style_prefer_switch_expression = false:none
 
 #Supressing roslyn built-in analyzers

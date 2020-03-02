@@ -26,16 +26,26 @@ namespace osu.Game.Screens
                 Beatmap = parent.Get<LeasedBindable<WorkingBeatmap>>()?.GetBoundCopy();
 
                 if (Beatmap == null)
+                {
                     Cache(Beatmap = parent.Get<Bindable<WorkingBeatmap>>().BeginLease(false));
+                    CacheAs(Beatmap);
+                }
 
                 Ruleset = parent.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
 
                 if (Ruleset == null)
+                {
                     Cache(Ruleset = parent.Get<Bindable<RulesetInfo>>().BeginLease(true));
+                    CacheAs(Ruleset);
+                }
 
                 Mods = parent.Get<LeasedBindable<IReadOnlyList<Mod>>>()?.GetBoundCopy();
+
                 if (Mods == null)
+                {
                     Cache(Mods = parent.Get<Bindable<IReadOnlyList<Mod>>>().BeginLease(true));
+                    CacheAs(Mods);
+                }
             }
             else
             {

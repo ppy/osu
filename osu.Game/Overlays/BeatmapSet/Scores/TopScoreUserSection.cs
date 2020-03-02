@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly UpdateableRank rank;
         private readonly UpdateableAvatar avatar;
         private readonly LinkFlowContainer usernameText;
-        private readonly SpriteText date;
+        private readonly DrawableDate achievedOn;
         private readonly UpdateableFlag flag;
 
         public TopScoreUserSection()
@@ -51,13 +50,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold, italics: true)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                             },
                             rank = new UpdateableRank(ScoreRank.D)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(40),
+                                Size = new Vector2(28),
                                 FillMode = FillMode.Fit,
                             },
                         }
@@ -66,9 +65,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(80),
+                        Size = new Vector2(70),
                         Masking = true,
-                        CornerRadius = 5,
+                        CornerRadius = 4,
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,
@@ -87,23 +86,37 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(0, 3),
                         Children = new Drawable[]
                         {
-                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true))
+                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true))
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
                             },
-                            date = new OsuSpriteText
+                            new FillFlowContainer
                             {
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
+                                Children = new[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Text = "achieved ",
+                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
+                                    },
+                                    achievedOn = new DrawableDate(DateTimeOffset.MinValue)
+                                    {
+                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
+                                    },
+                                }
                             },
                             flag = new UpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Size = new Vector2(20, 13),
+                                Size = new Vector2(19, 13),
+                                Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
                                 ShowPlaceholderOnNull = false,
                             },
                         }
@@ -112,15 +125,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public int? ScorePosition
         {
-            rankText.Colour = colours.Yellow;
-        }
-
-        public int ScorePosition
-        {
-            set => rankText.Text = $"#{value}";
+            set => rankText.Text = value == null ? "-" : $"#{value}";
         }
 
         /// <summary>
@@ -132,7 +139,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 avatar.User = value.User;
                 flag.Country = value.User.Country;
-                date.Text = $@"achieved {HumanizerUtils.Humanize(value.Date)}";
+                achievedOn.Date = value.Date;
 
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);

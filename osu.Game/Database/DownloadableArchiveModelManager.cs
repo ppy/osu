@@ -21,7 +21,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class DownloadableArchiveModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>, IModelDownloader<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         public event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
 
@@ -33,7 +33,8 @@ namespace osu.Game.Database
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
-        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
+        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore,
+                                                  IIpcHost importHost = null)
             : base(storage, contextFactory, modelStore, importHost)
         {
             this.api = api;
@@ -91,8 +92,6 @@ namespace osu.Game.Database
             notification.CancelRequested += () =>
             {
                 request.Cancel();
-                currentDownloads.Remove(request);
-                notification.State = ProgressNotificationState.Cancelled;
                 return true;
             };
 
@@ -106,13 +105,14 @@ namespace osu.Game.Database
 
             void triggerFailure(Exception error)
             {
+                currentDownloads.Remove(request);
+
                 DownloadFailed?.Invoke(request);
 
-                if (error is OperationCanceledException) return;
-
                 notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
-                currentDownloads.Remove(request);
+
+                if (!(error is OperationCanceledException))
+                    Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
             }
         }
 
@@ -124,7 +124,8 @@ namespace osu.Game.Database
         /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
         /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
-        protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
+        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
+            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 

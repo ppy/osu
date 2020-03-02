@@ -5,8 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
@@ -14,13 +12,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : CompositeDrawable
+    public class ScoresContainer : BeatmapSetLayoutSection
     {
         private const int spacing = 15;
 
@@ -32,10 +31,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box background;
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
-        private readonly FillFlowContainer content;
         private readonly NotSupporterPlaceholder notSupporterPlaceholder;
 
         [Resolved]
@@ -77,23 +75,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public ScoresContainer()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            InternalChildren = new Drawable[]
+            AddRange(new Drawable[]
             {
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                content = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Width = 0.95f,
                     Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding { Vertical = spacing },
+                    Padding = new MarginPadding { Horizontal = 50 },
+                    Margin = new MarginPadding { Vertical = 20 },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -122,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Margin = new MarginPadding { Vertical = spacing },
+                            Margin = new MarginPadding { Top = spacing },
                             Children = new Drawable[]
                             {
                                 noScoresPlaceholder = new NoScoresPlaceholder
@@ -161,27 +157,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         }
                                     }
                                 },
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    CornerRadius = 10,
-                                    Child = loading = new DimmedLoadingLayer(iconScale: 0.8f)
-                                    {
-                                        Alpha = 0,
-                                    },
-                                }
+                                loading = new LoadingLayer()
                             }
                         }
                     }
-                },
-            };
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.Gray2;
+            background.Colour = colourProvider.Background5;
 
             user.BindTo(api.LocalUser);
         }
@@ -192,8 +179,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             scope.BindValueChanged(_ => getScores());
             ruleset.BindValueChanged(_ => getScores());
 
-            modSelector.SelectedMods.ItemsAdded += _ => getScores();
-            modSelector.SelectedMods.ItemsRemoved += _ => getScores();
+            modSelector.SelectedMods.CollectionChanged += (_, __) => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
             user.BindValueChanged(onUserChanged, true);
@@ -234,7 +220,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 Scores = null;
-                content.Hide();
+                Hide();
                 return;
             }
 
@@ -248,7 +234,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             notSupporterPlaceholder.Hide();
 
-            content.Show();
+            Show();
             loading.Show();
 
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);

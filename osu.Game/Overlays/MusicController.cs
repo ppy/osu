@@ -8,7 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -25,7 +25,21 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+        public IBindableList<BeatmapSetInfo> BeatmapSets
+        {
+            get
+            {
+                if (LoadState < LoadState.Ready)
+                    throw new InvalidOperationException($"{nameof(BeatmapSets)} should not be accessed before the music controller is loaded.");
+
+                return beatmapSets;
+            }
+        }
+
+        /// <summary>
+        /// Point in time after which the current track will be restarted on triggering a "previous track" action.
+        /// </summary>
+        private const double restart_cutoff_point = 5000;
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -49,16 +63,18 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
+
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
         }
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
-            base.LoadComplete();
         }
 
         /// <summary>
@@ -77,11 +93,16 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool IsPlaying => current?.Track.IsRunning ?? false;
 
-        private void handleBeatmapAdded(BeatmapSetInfo set) =>
-            Schedule(() => beatmapSets.Add(set));
+        private void handleBeatmapAdded(BeatmapSetInfo set) => Schedule(() =>
+        {
+            if (!beatmapSets.Contains(set))
+                beatmapSets.Add(set);
+        });
 
-        private void handleBeatmapRemoved(BeatmapSetInfo set) =>
-            Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
+        private void handleBeatmapRemoved(BeatmapSetInfo set) => Schedule(() =>
+        {
+            beatmapSets.RemoveAll(s => s.ID == set.ID);
+        });
 
         private ScheduledDelegate seekDelegate;
 
@@ -151,11 +172,19 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Play the previous track.
+        /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>
         /// </summary>
-        /// <returns>Whether the operation was successful.</returns>
-        public bool PrevTrack()
+        /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action</returns>
+        public PreviousTrackResult PreviousTrack()
         {
+            var currentTrackPosition = current?.Track.CurrentTime;
+
+            if (currentTrackPosition >= restart_cutoff_point)
+            {
+                SeekTo(0);
+                return PreviousTrackResult.Restart;
+            }
+
             queuedDirection = TrackChangeDirection.Prev;
 
             var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
@@ -166,10 +195,10 @@ namespace osu.Game.Overlays
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
 
-                return true;
+                return PreviousTrackResult.Previous;
             }
 
-            return false;
+            return PreviousTrackResult.None;
         }
 
         /// <summary>
@@ -183,7 +212,7 @@ namespace osu.Game.Overlays
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? BeatmapSets.FirstOrDefault();
+            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -261,8 +290,8 @@ namespace osu.Game.Overlays
 
             if (allowRateAdjustments)
             {
-                foreach (var mod in mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(track);
+                foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
+                    mod.ApplyToTrack(track);
             }
         }
 
@@ -296,8 +325,16 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicPrev:
-                    if (PrevTrack())
-                        onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
+                    switch (PreviousTrack())
+                    {
+                        case PreviousTrackResult.Restart:
+                            onScreenDisplay?.Display(new MusicControllerToast("Restart track"));
+                            break;
+
+                        case PreviousTrackResult.Previous:
+                            onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
+                            break;
+                    }
 
                     return true;
             }
@@ -305,7 +342,9 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         public class MusicControllerToast : Toast
         {
@@ -321,5 +360,12 @@ namespace osu.Game.Overlays
         None,
         Next,
         Prev
+    }
+
+    public enum PreviousTrackResult
+    {
+        None,
+        Restart,
+        Previous
     }
 }

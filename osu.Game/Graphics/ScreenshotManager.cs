@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -22,7 +22,7 @@ using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -35,18 +35,20 @@ namespace osu.Game.Graphics
         private Bindable<ScreenshotFormat> screenshotFormat;
         private Bindable<bool> captureMenuCursor;
 
-        private GameHost host;
+        [Resolved]
+        private GameHost host { get; set; }
+
         private Storage storage;
-        private NotificationOverlay notificationOverlay;
+
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; }
 
         private SampleChannel shutter;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
         {
-            this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-            this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
@@ -67,7 +69,9 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private volatile int screenShotTasks;
 
@@ -88,7 +92,7 @@ namespace osu.Game.Graphics
                 {
                     ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
                     {
-                        if (framesWaited++ < frames_to_wait)
+                        if (framesWaited++ >= frames_to_wait)
                             // ReSharper disable once AccessToDisposedClosure
                             framesWaitedEvent.Set();
                     }, 10, true);
@@ -119,7 +123,7 @@ namespace osu.Game.Graphics
                         break;
 
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
+                        throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
                 }
 
                 notificationOverlay.Post(new SimpleNotification

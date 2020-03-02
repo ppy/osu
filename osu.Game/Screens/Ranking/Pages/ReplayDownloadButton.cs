@@ -74,15 +74,15 @@ namespace osu.Game.Screens.Ranking.Pages
                 switch (replayAvailability)
                 {
                     case ReplayAvailability.Local:
-                        button.TooltipText = @"Watch replay";
+                        button.TooltipText = @"watch replay";
                         break;
 
                     case ReplayAvailability.Online:
-                        button.TooltipText = @"Download replay";
+                        button.TooltipText = @"download replay";
                         break;
 
                     default:
-                        button.TooltipText = @"Replay unavailable";
+                        button.TooltipText = @"replay unavailable";
                         break;
                 }
             }, true);

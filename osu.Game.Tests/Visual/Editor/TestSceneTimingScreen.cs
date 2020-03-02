@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -25,10 +26,18 @@ namespace osu.Game.Tests.Visual.Editor
             typeof(RowAttribute)
         };
 
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap;
+
+        public TestSceneTimingScreen()
+        {
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
             Child = new TimingScreen();
         }
     }

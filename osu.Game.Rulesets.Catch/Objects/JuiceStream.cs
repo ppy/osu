@@ -7,6 +7,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// Positional distance that results in a duration of one second, before any speed adjustments.
         /// </summary>
         private const float base_scoring_distance = 100;
+
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         public int RepeatCount { get; set; }
 
@@ -75,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 Samples = tickSamples,
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
-                                        lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
                             });
                         }
                     }
@@ -110,13 +113,33 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime
+        {
+            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
 
         public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
         public double Duration => EndTime - StartTime;
 
-        public SliderPath Path { get; set; }
+        private readonly SliderPath path = new SliderPath();
+
+        public SliderPath Path
+        {
+            get => path;
+            set
+            {
+                path.ControlPoints.Clear();
+                path.ExpectedDistance.Value = null;
+
+                if (value != null)
+                {
+                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position.Value, c.Type.Value)));
+                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
+                }
+            }
+        }
 
         public double Distance => Path.Distance;
 

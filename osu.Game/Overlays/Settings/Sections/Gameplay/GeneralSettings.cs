@@ -21,18 +21,30 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Background dim",
                     Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = "Background blur",
                     Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Lighten playfield during breaks",
+                    Bindable = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show difficulty graph on progress bar",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
                 },
                 new SettingsCheckbox
                 {

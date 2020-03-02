@@ -149,7 +149,15 @@ namespace osu.Game.Database
             lock (writeLock)
             {
                 recycleThreadContexts();
-                storage.DeleteDatabase(database_name);
+
+                try
+                {
+                    storage.DeleteDatabase(database_name);
+                }
+                catch
+                {
+                    // for now we are not sure why file handles are kept open by EF, but this is generally only used in testing
+                }
             }
         }
     }

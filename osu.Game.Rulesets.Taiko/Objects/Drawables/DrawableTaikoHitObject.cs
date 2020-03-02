@@ -77,7 +77,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
         public abstract bool OnPressed(TaikoAction action);
-        public virtual bool OnReleased(TaikoAction action) => false;
+
+        public virtual void OnReleased(TaikoAction action)
+        {
+        }
 
         public override double LifetimeStart
         {
@@ -105,19 +108,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
     }
 
-    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableTaikoHitObject
-        where TaikoHitType : TaikoHitObject
+    public abstract class DrawableTaikoHitObject<TTaikoHit> : DrawableTaikoHitObject
+        where TTaikoHit : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        public new TaikoHitType HitObject;
+        public new TTaikoHit HitObject;
 
         protected readonly Vector2 BaseSize;
         protected readonly TaikoPiece MainPiece;
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
-        protected DrawableTaikoHitObject(TaikoHitType hitObject)
+        protected DrawableTaikoHitObject(TTaikoHit hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
@@ -165,8 +168,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         // Normal and clap samples are handled by the drum
         protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
-
-        protected override string SampleNamespace => "taiko";
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 

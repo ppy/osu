@@ -12,14 +12,16 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, ScoreInfo> : Container, IOnlineComponent
+    public abstract class Leaderboard<TScope, TScoreInfo> : Container, IOnlineComponent
     {
         private const double fade_duration = 300;
 
@@ -28,7 +30,7 @@ namespace osu.Game.Online.Leaderboards
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
 
         private ScheduledDelegate showScoresDelegate;
         private CancellationTokenSource showScoresCancellationSource;
@@ -39,9 +41,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Container<Drawable> Content => content;
 
-        private IEnumerable<ScoreInfo> scores;
+        private IEnumerable<TScoreInfo> scores;
 
-        public IEnumerable<ScoreInfo> Scores
+        public IEnumerable<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -150,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
+                        replacePlaceholder(new LoginPlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
@@ -180,10 +182,14 @@ namespace osu.Game.Online.Leaderboards
                     {
                         new Drawable[]
                         {
-                            scrollContainer = new OsuScrollContainer
+                            new OsuContextMenuContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ScrollbarVisible = false,
+                                Child = scrollContainer = new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarVisible = false,
+                                }
                             }
                         },
                         new Drawable[]
@@ -196,7 +202,7 @@ namespace osu.Game.Online.Leaderboards
                         }
                     },
                 },
-                loading = new LoadingAnimation(),
+                loading = new LoadingSpinner(),
                 placeholderContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
@@ -211,14 +217,14 @@ namespace osu.Game.Online.Leaderboards
             Scores = null;
         }
 
-        private IAPIProvider api;
+        [Resolved(CanBeNull = true)]
+        private IAPIProvider api { get; set; }
 
         private ScheduledDelegate pendingUpdateScores;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.api = api;
             api?.Register(this);
         }
 
@@ -288,7 +294,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
+        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;
 
@@ -359,6 +365,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected abstract LeaderboardScore CreateDrawableScore(ScoreInfo model, int index);
+        protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
     }
 }

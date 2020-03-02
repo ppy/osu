@@ -5,13 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.IO.File;
 using osu.Game.IO;
 using osu.Game.Storyboards;
+using osu.Game.Beatmaps.Legacy;
+using osu.Framework.Utils;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -41,10 +41,6 @@ namespace osu.Game.Beatmaps.Formats
         {
             this.storyboard = storyboard;
             base.ParseStreamInto(stream, storyboard);
-
-            // OrderBy is used to guarantee that the parsing order of elements with equal start times is maintained (stably-sorted)
-            foreach (StoryboardLayer layer in storyboard.Layers)
-                layer.Elements = layer.Elements.OrderBy(h => h.StartTime).ToList();
         }
 
         protected override void ParseLine(Storyboard storyboard, Section section, string line)
@@ -69,11 +65,15 @@ namespace osu.Game.Beatmaps.Formats
         {
             var depth = 0;
 
-            while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
+            foreach (char c in line)
             {
-                ++depth;
-                line = line.Substring(1);
+                if (c == ' ' || c == '_')
+                    depth++;
+                else
+                    break;
             }
+
+            line = line.Substring(depth);
 
             decodeVariables(ref line);
 
@@ -83,16 +83,16 @@ namespace osu.Game.Beatmaps.Formats
             {
                 storyboardSprite = null;
 
-                if (!Enum.TryParse(split[0], out EventType type))
+                if (!Enum.TryParse(split[0], out LegacyEventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
                 {
-                    case EventType.Sprite:
+                    case LegacyEventType.Sprite:
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
-                        var path = cleanFilename(split[3]);
+                        var path = CleanFilename(split[3]);
                         var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                         var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
@@ -100,11 +100,11 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     }
 
-                    case EventType.Animation:
+                    case LegacyEventType.Animation:
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
-                        var path = cleanFilename(split[3]);
+                        var path = CleanFilename(split[3]);
                         var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                         var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         var frameCount = int.Parse(split[6]);
@@ -115,11 +115,11 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     }
 
-                    case EventType.Sample:
+                    case LegacyEventType.Sample:
                     {
                         var time = double.Parse(split[1], CultureInfo.InvariantCulture);
                         var layer = parseLayer(split[2]);
-                        var path = cleanFilename(split[3]);
+                        var path = CleanFilename(split[3]);
                         var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
                         storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
@@ -176,7 +176,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
+                                timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps.Formats
                                 var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
                                 var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                                timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                 break;
                             }
 
@@ -194,7 +194,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
-                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
+                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
                                 break;
                             }
 
@@ -271,7 +271,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse(typeof(StoryLayer), value).ToString();
+        private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
 
         private Anchor parseOrigin(string value)
         {
@@ -334,7 +334,5 @@ namespace osu.Game.Beatmaps.Formats
                     break;
             }
         }
-
-        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
     }
 }

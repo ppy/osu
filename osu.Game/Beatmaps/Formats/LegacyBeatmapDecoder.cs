@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using osu.Framework.IO.File;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Beatmaps.Formats
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
-        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal);
+        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
@@ -112,7 +113,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"AudioFilename":
-                    metadata.AudioFile = FileSafety.PathStandardise(pair.Value);
+                    metadata.AudioFile = pair.Value.ToStandardisedPath();
                     break;
 
                 case @"AudioLeadIn":
@@ -238,11 +239,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Source":
-                    beatmap.BeatmapInfo.Metadata.Source = pair.Value;
+                    metadata.Source = pair.Value;
                     break;
 
                 case @"Tags":
-                    beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
+                    metadata.Tags = pair.Value;
                     break;
 
                 case @"BeatmapID":
@@ -293,22 +294,20 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            if (!Enum.TryParse(split[0], out EventType type))
+            if (!Enum.TryParse(split[0], out LegacyEventType type))
                 throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
             switch (type)
             {
-                case EventType.Background:
-                    string bgFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(bgFilename);
+                case LegacyEventType.Background:
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
 
-                case EventType.Video:
-                    string videoFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.VideoFile = FileSafety.PathStandardise(videoFilename);
+                case LegacyEventType.Video:
+                    beatmap.BeatmapInfo.Metadata.VideoFile = CleanFilename(split[2]);
                     break;
 
-                case EventType.Break:
+                case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
 
                     var breakEvent = new BreakPeriod
@@ -358,9 +357,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length >= 8)
             {
-                EffectFlags effectFlags = (EffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
+                kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
@@ -448,13 +447,5 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
 
         protected virtual TimingControlPoint CreateTimingControlPoint() => new TimingControlPoint();
-
-        [Flags]
-        internal enum EffectFlags
-        {
-            None = 0,
-            Kiai = 1,
-            OmitFirstBarLine = 8
-        }
     }
 }

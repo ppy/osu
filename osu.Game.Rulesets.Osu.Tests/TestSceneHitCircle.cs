@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -57,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableHitCircle(circle, auto);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             return drawable;

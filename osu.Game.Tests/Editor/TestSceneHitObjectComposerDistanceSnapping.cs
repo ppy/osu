@@ -2,11 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 
@@ -17,10 +21,35 @@ namespace osu.Game.Tests.Editor
     {
         private TestHitObjectComposer composer;
 
+        [Cached(typeof(EditorBeatmap))]
+        [Cached(typeof(IBeatSnapProvider))]
+        private readonly EditorBeatmap editorBeatmap;
+
+        protected override Container<Drawable> Content { get; }
+
+        public TestSceneHitObjectComposerDistanceSnapping()
+        {
+            base.Content.Add(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    editorBeatmap = new EditorBeatmap(new OsuBeatmap()),
+                    Content = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                },
+            });
+        }
+
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = composer = new TestHitObjectComposer();
+            Children = new Drawable[]
+            {
+                composer = new TestHitObjectComposer()
+            };
 
             BeatDivisor.Value = 1;
 
@@ -107,17 +136,19 @@ namespace osu.Game.Tests.Editor
         [Test]
         public void TestGetSnappedDurationFromDistance()
         {
-            assertSnappedDuration(50, 0);
+            assertSnappedDuration(0, 0);
+            assertSnappedDuration(50, 1000);
             assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 1000);
+            assertSnappedDuration(150, 2000);
             assertSnappedDuration(200, 2000);
-            assertSnappedDuration(250, 2000);
+            assertSnappedDuration(250, 3000);
 
             AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
 
+            assertSnappedDuration(0, 0);
             assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 0);
-            assertSnappedDuration(150, 0);
+            assertSnappedDuration(100, 1000);
+            assertSnappedDuration(150, 1000);
             assertSnappedDuration(200, 1000);
             assertSnappedDuration(250, 1000);
 
@@ -128,8 +159,8 @@ namespace osu.Game.Tests.Editor
             });
 
             assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 0);
-            assertSnappedDuration(150, 0);
+            assertSnappedDuration(100, 500);
+            assertSnappedDuration(150, 500);
             assertSnappedDuration(200, 500);
             assertSnappedDuration(250, 500);
             assertSnappedDuration(400, 1000);
@@ -138,17 +169,17 @@ namespace osu.Game.Tests.Editor
         [Test]
         public void GetSnappedDistanceFromDistance()
         {
-            assertSnappedDistance(50, 0);
+            assertSnappedDistance(50, 100);
             assertSnappedDistance(100, 100);
-            assertSnappedDistance(150, 100);
+            assertSnappedDistance(150, 200);
             assertSnappedDistance(200, 200);
-            assertSnappedDistance(250, 200);
+            assertSnappedDistance(250, 300);
 
             AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
 
             assertSnappedDistance(50, 0);
-            assertSnappedDistance(100, 0);
-            assertSnappedDistance(150, 0);
+            assertSnappedDistance(100, 200);
+            assertSnappedDistance(150, 200);
             assertSnappedDistance(200, 200);
             assertSnappedDistance(250, 200);
 
@@ -159,8 +190,8 @@ namespace osu.Game.Tests.Editor
             });
 
             assertSnappedDistance(50, 0);
-            assertSnappedDistance(100, 0);
-            assertSnappedDistance(150, 0);
+            assertSnappedDistance(100, 200);
+            assertSnappedDistance(150, 200);
             assertSnappedDistance(200, 200);
             assertSnappedDistance(250, 200);
             assertSnappedDistance(400, 400);
@@ -183,7 +214,7 @@ namespace osu.Game.Tests.Editor
 
         private class TestHitObjectComposer : OsuHitObjectComposer
         {
-            public new EditorBeatmap<OsuHitObject> EditorBeatmap => base.EditorBeatmap;
+            public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
 
             public TestHitObjectComposer()
                 : base(new OsuRuleset())

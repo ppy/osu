@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSliderHead : DrawableHitCircle
     {
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+        private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         private readonly Slider slider;
 
@@ -27,10 +26,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             positionBindable.BindTo(HitObject.PositionBindable);
-            pathBindable.BindTo(slider.PathBindable);
+            pathVersion.BindTo(slider.Path.Version);
 
             positionBindable.BindValueChanged(_ => updatePosition());
-            pathBindable.BindValueChanged(_ => updatePosition(), true);
+            pathVersion.BindValueChanged(_ => updatePosition(), true);
         }
 
         protected override void Update()

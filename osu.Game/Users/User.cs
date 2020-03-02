@@ -9,7 +9,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
-    public class User
+    public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
         public long Id = 1;
@@ -26,9 +26,9 @@ namespace osu.Game.Users
         [JsonProperty(@"country")]
         public Country Country;
 
-        public Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public IBindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         //public Team Team;
 
@@ -126,6 +126,24 @@ namespace osu.Game.Users
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
 
+        [JsonProperty(@"favourite_beatmapset_count")]
+        public int FavouriteBeatmapsetCount;
+
+        [JsonProperty(@"graveyard_beatmapset_count")]
+        public int GraveyardBeatmapsetCount;
+
+        [JsonProperty(@"loved_beatmapset_count")]
+        public int LovedBeatmapsetCount;
+
+        [JsonProperty(@"ranked_and_approved_beatmapset_count")]
+        public int RankedAndApprovedBeatmapsetCount;
+
+        [JsonProperty(@"unranked_beatmapset_count")]
+        public int UnrankedBeatmapsetCount;
+
+        [JsonProperty(@"scores_first_count")]
+        public int ScoresFirstCount;
+
         [JsonProperty]
         private string[] playstyle
         {
@@ -185,6 +203,21 @@ namespace osu.Game.Users
             public int ID;
         }
 
+        [JsonProperty("monthly_playcounts")]
+        public UserHistoryCount[] MonthlyPlaycounts;
+
+        [JsonProperty("replays_watched_counts")]
+        public UserHistoryCount[] ReplaysWatchedCounts;
+
+        public class UserHistoryCount
+        {
+            [JsonProperty("start_date")]
+            public DateTime Date;
+
+            [JsonProperty("count")]
+            public long Count;
+        }
+
         public override string ToString() => Username;
 
         /// <summary>
@@ -210,6 +243,14 @@ namespace osu.Game.Users
 
             [Description("Touch Screen")]
             Touch,
+        }
+
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
         }
     }
 }

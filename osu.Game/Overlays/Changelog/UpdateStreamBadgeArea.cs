@@ -8,36 +8,34 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osuTK.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class UpdateStreamBadgeArea : TabControl<APIUpdateStream>
     {
-        public UpdateStreamBadgeArea()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             AddInternal(new Box
             {
-                Colour = Color4.Black,
-                Alpha = 0.12f,
                 RelativeSizeAxes = Axes.Both,
+                Colour = colourProvider.Background5,
             });
         }
 
         public void Populate(List<APIUpdateStream> streams)
         {
-            Current.Value = null;
-
-            foreach (APIUpdateStream updateStream in streams)
+            foreach (var updateStream in streams)
                 AddItem(updateStream);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            foreach (UpdateStreamBadge streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
+            foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
                 streamBadge.EnableDim();
 
             return base.OnHover(e);
@@ -45,7 +43,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            foreach (UpdateStreamBadge streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
+            foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
                 streamBadge.DisableDim();
 
             base.OnHoverLost(e);

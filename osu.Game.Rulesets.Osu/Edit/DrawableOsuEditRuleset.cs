@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private const double editor_hit_object_fade_out_extension = 500;
 
-        public DrawableOsuEditRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuEditRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                     var existing = hitObject.Transforms.LastOrDefault(t => t.TargetMember == nameof(Alpha));
                     if (existing == null)
                         return;
+
+                    hitObject.RemoveTransform(existing);
 
                     using (hitObject.BeginAbsoluteSequence(existing.StartTime))
                         hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();

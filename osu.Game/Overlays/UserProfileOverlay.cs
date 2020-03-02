@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
@@ -27,6 +27,11 @@ namespace osu.Game.Overlays
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
+
+        public UserProfileOverlay()
+            : base(OverlayColourScheme.Pink)
+        {
+        }
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -55,23 +60,20 @@ namespace osu.Game.Overlays
                     new BeatmapsSection(),
                     new KudosuSection()
                 }
-                : new ProfileSection[]
-                {
-                    //new AboutSection(),
-                };
+                : Array.Empty<ProfileSection>();
 
             tabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Height = 30
+                Height = 34
             };
 
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.1f)
+                Colour = ColourProvider.Background6
             });
 
             Add(sectionsContainer = new ProfileSectionsContainer
@@ -80,7 +82,8 @@ namespace osu.Game.Overlays
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
-                    Colour = OsuColour.Gray(34),
+                    // this is only visible as the ProfileTabControl background
+                    Colour = ColourProvider.Background5,
                     RelativeSizeAxes = Axes.Both
                 },
             });
@@ -162,12 +165,12 @@ namespace osu.Game.Overlays
             };
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                AccentColour = colours.Seafoam;
+                AccentColour = colourProvider.Highlight1;
             }
 
-            private class ProfileTabItem : OverlayTabItem<ProfileSection>
+            private class ProfileTabItem : OverlayTabItem
             {
                 public ProfileTabItem(ProfileSection value)
                     : base(value)

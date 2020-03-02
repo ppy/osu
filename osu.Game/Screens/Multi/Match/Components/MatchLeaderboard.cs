@@ -13,9 +13,9 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIRoomScoreInfo>
+    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
-        public Action<IEnumerable<APIRoomScoreInfo>> ScoresLoaded;
+        public Action<IEnumerable<APIUserScoreAggregate>> ScoresLoaded;
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         protected override bool IsOnlineScope => true;
 
-        protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
+        protected override APIRequest FetchScores(Action<IEnumerable<APIUserScoreAggregate>> scoresCallback)
         {
             if (roomId.Value == null)
                 return null;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index) => new MatchLeaderboardScore(model, index);
+        protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index) => new MatchLeaderboardScore(model, index);
     }
 
     public enum MatchLeaderboardScope

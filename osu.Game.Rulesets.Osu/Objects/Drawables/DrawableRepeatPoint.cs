@@ -6,12 +6,11 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
-        private readonly SkinnableDrawable scaleContainer;
+        private readonly Drawable scaleContainer;
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
@@ -35,19 +34,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
-            {
-                RelativeSizeAxes = Axes.Both,
-                Icon = FontAwesome.Solid.ChevronRight,
-                Size = new Vector2(0.35f)
-            }, confineMode: ConfineMode.NoScaling)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
+            InternalChild = scaleContainer = new ReverseArrowPiece();
         }
 
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<float> scaleBindable = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -64,11 +54,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
+            animDuration = Math.Min(300, repeatPoint.SpanDuration);
 
             this.Animate(
                 d => d.FadeIn(animDuration),
-                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
+                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 2, Easing.OutElasticHalf)
             );
         }
 
@@ -87,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(animDuration, Easing.OutQuint)
+                    this.FadeOut(animDuration, Easing.Out)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
                     break;
             }
@@ -98,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
-            List<Vector2> curve = drawableSlider.Body.CurrentCurve;
+            List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
 
@@ -120,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
-            float aimRotation = MathHelper.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)
                 aimRotation += aimRotation < Rotation ? 360 : -360;
 

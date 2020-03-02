@@ -10,11 +10,11 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailJudgement : AllPlayersTestScene
+    public class TestSceneFailJudgement : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Array.Empty<Mod>();
+            SelectedMods.Value = Array.Empty<Mod>();
             return new FailPlayer();
         }
 
@@ -22,12 +22,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
             AddUntilStep("wait for multiple judged objects", () => ((FailPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.Count(h => h.AllJudged) > 1);
-            AddAssert("total judgements == 1", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits == 1);
+            AddAssert("total judgements == 1", () => ((FailPlayer)Player).HealthProcessor.JudgedHits >= 1);
         }
 
         private class FailPlayer : TestPlayer
         {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
             public FailPlayer()
                 : base(false, false)
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += (_, __) => true;
+                HealthProcessor.FailConditions += (_, __) => true;
             }
         }
     }
