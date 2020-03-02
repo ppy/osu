@@ -5,6 +5,8 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,15 +25,14 @@ namespace osu.Game.Screens.Edit.Components
     {
         private IconButton playButton;
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
+
+        private readonly BindableNumber<double> tempo = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load(IAdjustableClock adjustableClock)
+        private void load()
         {
-            this.adjustableClock = adjustableClock;
-
-            PlaybackTabControl tabs;
-
             Children = new Drawable[]
             {
                 playButton = new IconButton
@@ -58,11 +59,18 @@ namespace osu.Game.Screens.Edit.Components
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Padding = new MarginPadding { Left = 45 },
-                    Child = tabs = new PlaybackTabControl(),
+                    Child = new PlaybackTabControl { Current = tempo },
                 }
             };
 
-            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
+            Track?.AddAdjustment(AdjustableProperty.Tempo, tempo);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Track?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

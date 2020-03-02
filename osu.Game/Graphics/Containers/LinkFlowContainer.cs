@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
-                AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
+                AddText(text[previousLinkEnd..link.Index]);
                 AddLink(text.Substring(link.Index, link.Length), link.Action, link.Argument ?? link.Url);
                 previousLinkEnd = link.Index + link.Length;
             }
@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "View Profile");
+            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {

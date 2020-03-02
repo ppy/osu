@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : OverlayHeader
+    public class ProfileHeader : TabControlOverlayHeader<string>
     {
         private UserCoverBackground coverContainer;
 
@@ -28,22 +27,18 @@ namespace osu.Game.Overlays.Profile
         {
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
-            TabControl.AddItem("Info");
-            TabControl.AddItem("Modding");
+            TabControl.AddItem("info");
+            TabControl.AddItem("modding");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            TabControl.AccentColour = colours.Seafoam;
         }
 
         protected override Drawable CreateBackground() =>
             new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                Height = 150,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     coverContainer = new UserCoverBackground
@@ -101,15 +96,11 @@ namespace osu.Game.Overlays.Profile
         {
             public ProfileHeaderTitle()
             {
-                Title = "Player";
-                Section = "Info";
+                Title = "player";
+                Section = "info";
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Seafoam;
-            }
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }

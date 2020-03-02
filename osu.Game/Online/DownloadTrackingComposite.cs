@@ -19,14 +19,15 @@ namespace osu.Game.Online
     {
         protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
-        private TModelManager manager;
+        [Resolved(CanBeNull = true)]
+        private TModelManager manager { get; set; }
 
         /// <summary>
         /// Holds the current download state of the <typeparamref name="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
         /// </summary>
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
-        protected readonly Bindable<double> Progress = new Bindable<double>();
+        protected readonly BindableNumber<double> Progress = new BindableNumber<double> { MinValue = 0, MaxValue = 1 };
 
         protected DownloadTrackingComposite(TModel model = null)
         {
@@ -34,10 +35,8 @@ namespace osu.Game.Online
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(TModelManager manager)
+        private void load()
         {
-            this.manager = manager;
-
             Model.BindValueChanged(modelInfo =>
             {
                 if (modelInfo.NewValue == null)

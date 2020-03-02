@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected DrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
@@ -201,7 +201,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private class LocalScrollingInfo : IScrollingInfo
         {

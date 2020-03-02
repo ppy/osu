@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -21,6 +22,7 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
         private readonly OAuth authentication;
 
         public string Endpoint => @"https://osu.ppy.sh";
@@ -152,6 +154,10 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
+
+                            // todo: save/pull from settings
+                            LocalUser.Value.Status.Value = new UserStatusOnline();
+
                             failureCount = 0;
 
                             //we're connected!
@@ -249,7 +255,7 @@ namespace osu.Game.Online.API
                 catch
                 {
                     // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    throw e;
+                    e.Rethrow();
                 }
             }
 

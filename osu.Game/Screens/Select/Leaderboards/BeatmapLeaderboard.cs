@@ -103,6 +103,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 ScoreSelected = s => ScoreSelected?.Invoke(s)
             });
+
+            scoreManager.ItemRemoved += onScoreRemoved;
         }
 
         protected override void Reset()
@@ -110,6 +112,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             base.Reset();
             TopScore = null;
         }
+
+        private void onScoreRemoved(ScoreInfo score) => Schedule(RefreshScores);
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
@@ -186,5 +190,13 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (scoreManager != null)
+                scoreManager.ItemRemoved -= onScoreRemoved;
+        }
     }
 }

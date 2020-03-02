@@ -27,12 +27,18 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Text = "Background dim:"
                 },
-                dimSliderBar = new PlayerSliderBar<double>(),
+                dimSliderBar = new PlayerSliderBar<double>
+                {
+                    DisplayAsPercentage = true
+                },
                 new OsuSpriteText
                 {
                     Text = "Background blur:"
                 },
-                blurSliderBar = new PlayerSliderBar<double>(),
+                blurSliderBar = new PlayerSliderBar<double>
+                {
+                    DisplayAsPercentage = true
+                },
                 new OsuSpriteText
                 {
                     Text = "Toggles:"

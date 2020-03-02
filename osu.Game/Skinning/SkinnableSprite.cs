@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
         [Resolved]
         private TextureStore textures { get; set; }
 
-        public SkinnableSprite(string textureName, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+        public SkinnableSprite(string textureName, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(new SpriteComponent(textureName), allowFallback, confineMode)
         {
         }

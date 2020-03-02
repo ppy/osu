@@ -76,12 +76,12 @@ namespace osu.Game.Graphics.Containers
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (closeOnMouseUp && !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                 Hide();
 
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -99,7 +99,9 @@ namespace osu.Game.Graphics.Containers
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {

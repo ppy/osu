@@ -7,8 +7,8 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.IO.Network;
 using osu.Framework.Platform;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
@@ -20,12 +20,13 @@ namespace osu.Game.Updater
     public class SimpleUpdateManager : UpdateManager
     {
         private string version;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, GameHost host)
+        private void load(OsuGameBase game)
         {
-            this.host = host;
             version = game.Version;
 
             if (game.IsDeployedBuild)
@@ -36,7 +37,7 @@ namespace osu.Game.Updater
         {
             try
             {
-                var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
                 await releases.PerformAsync();
 
@@ -75,6 +76,10 @@ namespace osu.Game.Updater
 
                 case RuntimeInfo.Platform.MacOsx:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
+                    break;
+
+                case RuntimeInfo.Platform.Linux:
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage"));
                     break;
 
                 case RuntimeInfo.Platform.Android:

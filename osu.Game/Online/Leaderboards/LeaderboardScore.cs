@@ -11,11 +11,15 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Select;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -25,7 +29,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer
+    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu
     {
         public const float HEIGHT = 60;
 
@@ -37,7 +41,7 @@ namespace osu.Game.Online.Leaderboards
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
-        private readonly int rank;
+        private readonly int? rank;
         private readonly bool allowHighlight;
 
         private Box background;
@@ -51,7 +55,10 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
+        [Resolved(CanBeNull = true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
             this.rank = rank;
@@ -83,7 +90,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },
@@ -270,7 +277,7 @@ namespace osu.Game.Online.Leaderboards
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
             new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy)
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -357,6 +364,19 @@ namespace osu.Game.Online.Leaderboards
                 Icon = icon;
                 Name = name;
                 Value = value;
+            }
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (score.ID != 0)
+                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+
+                return items.ToArray();
             }
         }
     }

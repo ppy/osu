@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -362,7 +363,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableSlider(slider);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;

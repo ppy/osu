@@ -18,7 +18,11 @@ namespace osu.Game.Screens.Edit
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
+        private const float timeline_height = 110;
+
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+
+        private Container timelineContainer;
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
@@ -30,66 +34,57 @@ namespace osu.Game.Screens.Edit
 
             Children = new Drawable[]
             {
-                new GridContainer
+                mainContent = new Container
                 {
+                    Name = "Main content",
                     RelativeSizeAxes = Axes.Both,
-                    Content = new[]
+                    Padding = new MarginPadding
                     {
-                        new Drawable[]
+                        Horizontal = horizontal_margins,
+                        Top = vertical_margins + timeline_height,
+                        Bottom = vertical_margins
+                    },
+                },
+                new Container
+                {
+                    Name = "Timeline",
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_height,
+                    Children = new Drawable[]
+                    {
+                        new Box
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black.Opacity(0.5f)
+                        },
+                        new Container
+                        {
+                            Name = "Timeline content",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
+                            Child = new GridContainer
                             {
-                                Name = "Timeline",
                                 RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                Content = new[]
                                 {
-                                    new Box
+                                    new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black.Opacity(0.5f)
-                                    },
-                                    new Container
-                                    {
-                                        Name = "Timeline content",
-                                        RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                                        Child = new GridContainer
+                                        timelineContainer = new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Content = new[]
-                                            {
-                                                new Drawable[]
-                                                {
-                                                    new Container
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Padding = new MarginPadding { Right = 5 },
-                                                        Child = CreateTimeline()
-                                                    },
-                                                    new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
-                                                },
-                                            },
-                                            ColumnDimensions = new[]
-                                            {
-                                                new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 90),
-                                            }
+                                            Padding = new MarginPadding { Right = 5 },
                                         },
-                                    }
+                                        new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                    },
+                                },
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, 90),
                                 }
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            mainContent = new Container
-                            {
-                                Name = "Main content",
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                            }
+                            },
                         }
-                    },
-                    RowDimensions = new[] { new Dimension(GridSizeMode.Absolute, 110) }
+                    }
                 },
             };
 
@@ -97,11 +92,21 @@ namespace osu.Game.Screens.Edit
             {
                 mainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
+
+                LoadComponentAsync(new TimelineArea
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        new TimelineTickDisplay(),
+                        CreateTimelineContent(),
+                    }
+                }, timelineContainer.Add);
             });
         }
 
         protected abstract Drawable CreateMainContent();
 
-        protected virtual Drawable CreateTimeline() => new TimelineArea { RelativeSizeAxes = Axes.Both };
+        protected virtual Drawable CreateTimelineContent() => new Container();
     }
 }

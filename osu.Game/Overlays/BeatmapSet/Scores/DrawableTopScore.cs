@@ -7,8 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
@@ -17,20 +15,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class DrawableTopScore : CompositeDrawable
     {
-        private const float fade_duration = 100;
-
-        private Color4 backgroundIdleColour;
-        private Color4 backgroundHoveredColour;
-
         private readonly Box background;
 
-        public DrawableTopScore(ScoreInfo score, int position = 1)
+        public DrawableTopScore(ScoreInfo score, int? position = 1)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             Masking = true;
-            CornerRadius = 10;
+            CornerRadius = 4;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
@@ -49,7 +42,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(10),
+                    Padding = new MarginPadding
+                    {
+                        Vertical = 10,
+                        Left = 10,
+                        Right = 30,
+                    },
                     Children = new Drawable[]
                     {
                         new AutoSizingGrid
@@ -84,24 +82,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            backgroundIdleColour = colours.Gray3;
-            backgroundHoveredColour = colours.Gray4;
-
-            background.Colour = backgroundIdleColour;
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            background.FadeColour(backgroundHoveredColour, fade_duration, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            background.FadeColour(backgroundIdleColour, fade_duration, Easing.OutQuint);
-            base.OnHoverLost(e);
+            background.Colour = colourProvider.Background4;
         }
 
         private class AutoSizingGrid : GridContainer

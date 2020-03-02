@@ -2,51 +2,42 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : OverlayHeader
+    public class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
-        public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
+        public readonly Bindable<APIChangelogBuild> Build = new Bindable<APIChangelogBuild>();
 
         public Action ListingSelected;
 
         public UpdateStreamBadgeArea Streams;
 
-        private const string listing_string = "Listing";
+        private const string listing_string = "listing";
 
         public ChangelogHeader()
         {
             TabControl.AddItem(listing_string);
-            TabControl.Current.ValueChanged += e =>
+            Current.ValueChanged += e =>
             {
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
             };
 
-            Current.ValueChanged += showBuild;
+            Build.ValueChanged += showBuild;
 
             Streams.Current.ValueChanged += e =>
             {
-                if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
-                    Current.Value = e.NewValue.LatestBuild;
+                if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
+                    Build.Value = e.NewValue.LatestBuild;
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            TabControl.AccentColour = colours.Violet;
         }
 
         private ChangelogHeaderTitle title;
@@ -59,21 +50,21 @@ namespace osu.Game.Overlays.Changelog
             if (e.NewValue != null)
             {
                 TabControl.AddItem(e.NewValue.ToString());
-                TabControl.Current.Value = e.NewValue.ToString();
+                Current.Value = e.NewValue.ToString();
 
-                Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == e.NewValue.UpdateStream.Name);
+                updateCurrentStream();
 
                 title.Version = e.NewValue.UpdateStream.DisplayName;
             }
             else
             {
-                TabControl.Current.Value = listing_string;
+                Current.Value = listing_string;
                 Streams.Current.Value = null;
                 title.Version = null;
             }
         }
 
-        protected override Drawable CreateBackground() => new HeaderBackground();
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
         protected override Drawable CreateContent() => new Container
         {
@@ -87,19 +78,18 @@ namespace osu.Game.Overlays.Changelog
 
         protected override ScreenTitle CreateTitle() => title = new ChangelogHeaderTitle();
 
-        public class HeaderBackground : Sprite
+        public void Populate(List<APIUpdateStream> streams)
         {
-            public HeaderBackground()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fill;
-            }
+            Streams.Populate(streams);
+            updateCurrentStream();
+        }
 
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(@"Headers/changelog");
-            }
+        private void updateCurrentStream()
+        {
+            if (Build.Value == null)
+                return;
+
+            Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
         private class ChangelogHeaderTitle : ScreenTitle
@@ -111,14 +101,8 @@ namespace osu.Game.Overlays.Changelog
 
             public ChangelogHeaderTitle()
             {
-                Title = "Changelog";
+                Title = "changelog";
                 Version = null;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

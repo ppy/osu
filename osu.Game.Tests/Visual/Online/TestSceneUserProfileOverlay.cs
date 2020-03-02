@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
-            Achievements = new User.UserAchievement[0],
+            Achievements = Array.Empty<User.UserAchievement>(),
         };
 
         public TestSceneUserProfileOverlay()

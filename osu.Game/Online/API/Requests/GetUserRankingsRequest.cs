@@ -8,13 +8,14 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetUserRankingsRequest : GetRankingsRequest<GetUsersResponse>
     {
+        public readonly UserRankingsType Type;
+
         private readonly string country;
-        private readonly UserRankingsType type;
 
         public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
             : base(ruleset, page)
         {
-            this.type = type;
+            Type = type;
             this.country = country;
         }
 
@@ -28,7 +29,7 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string TargetPostfix() => type.ToString().ToLowerInvariant();
+        protected override string TargetPostfix() => Type.ToString().ToLowerInvariant();
     }
 
     public enum UserRankingsType

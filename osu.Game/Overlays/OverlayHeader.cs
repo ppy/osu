@@ -1,69 +1,105 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        protected readonly OverlayHeaderTabControl TabControl;
+        private readonly Box titleBackground;
+        private readonly ScreenTitle title;
 
-        private const float cover_height = 150;
-        private const float cover_info_height = 75;
+        protected readonly FillFlowContainer HeaderInfo;
 
         protected OverlayHeader()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            Add(new FillFlowContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = cover_height,
-                    Masking = true,
-                    Child = CreateBackground()
-                },
-                new Container
-                {
-                    Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
-                    Y = cover_height,
-                    Height = cover_info_height,
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.BottomLeft,
-                    Depth = -float.MaxValue,
-                    Children = new Drawable[]
+                    HeaderInfo = new FillFlowContainer
                     {
-                        CreateTitle().With(t => t.X = -ScreenTitle.ICON_WIDTH),
-                        TabControl = new OverlayHeaderTabControl
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Depth = -float.MaxValue,
+                        Children = new[]
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = cover_info_height - 30,
-                            Margin = new MarginPadding { Left = -UserProfileOverlay.CONTENT_X_MARGIN },
-                            Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN }
+                            CreateBackground(),
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    titleBackground = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.Gray,
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding
+                                        {
+                                            Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
+                                            Vertical = 10,
+                                        },
+                                        Children = new[]
+                                        {
+                                            title = CreateTitle().With(title =>
+                                            {
+                                                title.Anchor = Anchor.CentreLeft;
+                                                title.Origin = Anchor.CentreLeft;
+                                            }),
+                                            CreateTitleContent().With(content =>
+                                            {
+                                                content.Anchor = Anchor.CentreRight;
+                                                content.Origin = Anchor.CentreRight;
+                                            })
+                                        }
+                                    }
+                                }
+                            },
                         }
-                    }
-                },
-                new Container
-                {
-                    Margin = new MarginPadding { Top = cover_height },
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Child = CreateContent()
+                    },
+                    CreateContent()
                 }
-            };
+            });
         }
 
-        protected abstract Drawable CreateBackground();
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            titleBackground.Colour = colourProvider.Dark5;
+            title.AccentColour = colourProvider.Highlight1;
+        }
 
-        protected abstract Drawable CreateContent();
+        [NotNull]
+        protected virtual Drawable CreateContent() => Empty();
+
+        [NotNull]
+        protected virtual Drawable CreateBackground() => Empty();
+
+        /// <summary>
+        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="ScreenTitle"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
+        /// </summary>
+        [NotNull]
+        protected virtual Drawable CreateTitleContent() => Empty();
 
         protected abstract ScreenTitle CreateTitle();
     }

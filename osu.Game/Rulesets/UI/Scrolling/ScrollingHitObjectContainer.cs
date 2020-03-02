@@ -100,13 +100,41 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
             foreach (var obj in hitObject.NestedHitObjects)
                 computeLifetimeStartRecursive(obj);
         }
 
         private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
+
+        private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
+        {
+            float originAdjustment = 0.0f;
+
+            // calculate the dimension of the part of the hitobject that should already be visible
+            // when the hitobject origin first appears inside the scrolling container
+            switch (direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    originAdjustment = hitObject.OriginPosition.Y;
+                    break;
+
+                case ScrollingDirection.Down:
+                    originAdjustment = hitObject.DrawHeight - hitObject.OriginPosition.Y;
+                    break;
+
+                case ScrollingDirection.Left:
+                    originAdjustment = hitObject.OriginPosition.X;
+                    break;
+
+                case ScrollingDirection.Right:
+                    originAdjustment = hitObject.DrawWidth - hitObject.OriginPosition.X;
+                    break;
+            }
+
+            return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
+        }
 
         // Cant use AddOnce() since the delegate is re-constructed every invocation
         private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>

@@ -7,23 +7,21 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using osu.Game.Storyboards;
-using osu.Framework.IO.File;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Statistics;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Logging;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract class WorkingBeatmap : IWorkingBeatmap, IDisposable
+    public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -42,7 +40,7 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(1000));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
@@ -51,7 +49,7 @@ namespace osu.Game.Beatmaps
             total_count.Value++;
         }
 
-        protected virtual Track GetVirtualTrack()
+        protected virtual Track GetVirtualTrack(double emptyLength = 0)
         {
             const double excess_length = 1000;
 
@@ -62,7 +60,7 @@ namespace osu.Game.Beatmaps
             switch (lastObject)
             {
                 case null:
-                    length = excess_length;
+                    length = emptyLength;
                     break;
 
                 case IHasEndTime endTime:
@@ -78,18 +76,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Saves the <see cref="Beatmaps.Beatmap"/>.
-        /// </summary>
-        /// <returns>The absolute path of the output file.</returns>
-        public string Save()
-        {
-            var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
-            using (var sw = new StreamWriter(path))
-                sw.WriteLine(Beatmap.Serialize());
-            return path;
-        }
-
-        /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> for a specified <see cref="Ruleset"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
@@ -97,14 +83,16 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods)
+        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
         {
+            mods ??= Array.Empty<Mod>();
+
             var rulesetInstance = ruleset.CreateInstance();
 
             IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
             // Check if the beatmap can be converted
-            if (!converter.CanConvert)
+            if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
 
             // Apply conversion mods
@@ -146,11 +134,29 @@ namespace osu.Game.Beatmaps
             return converted;
         }
 
-        public override string ToString() => BeatmapInfo.ToString();
+        private CancellationTokenSource loadCancellation = new CancellationTokenSource();
 
-        public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+        /// <summary>
+        /// Beings loading the contents of this <see cref="WorkingBeatmap"/> asynchronously.
+        /// </summary>
+        public void BeginAsyncLoad()
+        {
+            loadBeatmapAsync();
+        }
 
-        public Task<IBeatmap> LoadBeatmapAsync() => beatmapLoadTask ??= Task.Factory.StartNew(() =>
+        /// <summary>
+        /// Cancels the asynchronous loading of the contents of this <see cref="WorkingBeatmap"/>.
+        /// </summary>
+        public void CancelAsyncLoad()
+        {
+            loadCancellation?.Cancel();
+            loadCancellation = new CancellationTokenSource();
+
+            if (beatmapLoadTask?.IsCompleted != true)
+                beatmapLoadTask = null;
+        }
+
+        private Task<IBeatmap> loadBeatmapAsync() => beatmapLoadTask ??= Task.Factory.StartNew(() =>
         {
             // Todo: Handle cancellation during beatmap parsing
             var b = GetBeatmap() ?? new Beatmap();
@@ -162,7 +168,11 @@ namespace osu.Game.Beatmaps
             b.BeatmapInfo = BeatmapInfo;
 
             return b;
-        }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }, loadCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+        public override string ToString() => BeatmapInfo.ToString();
+
+        public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
         public IBeatmap Beatmap
         {
@@ -170,16 +180,25 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return LoadBeatmapAsync().Result;
+                    return loadBeatmapAsync().Result;
                 }
-                catch (TaskCanceledException)
+                catch (AggregateException ae)
                 {
+                    // This is the exception that is generally expected here, which occurs via natural cancellation of the asynchronous load
+                    if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
+                        return null;
+
+                    Logger.Error(ae, "Beatmap failed to load");
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Beatmap failed to load");
                     return null;
                 }
             }
         }
 
-        private readonly CancellationTokenSource beatmapCancellation = new CancellationTokenSource();
         protected abstract IBeatmap GetBeatmap();
         private Task<IBeatmap> beatmapLoadTask;
 
@@ -230,39 +249,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public virtual void RecycleTrack() => track.Recycle();
 
-        #region Disposal
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private bool isDisposed;
-
-        protected virtual void Dispose(bool isDisposing)
-        {
-            if (isDisposed)
-                return;
-
-            isDisposed = true;
-
-            // recycling logic is not here for the time being, as components which use
-            // retrieved objects from WorkingBeatmap may not hold a reference to the WorkingBeatmap itself.
-            // this should be fine as each retrieved component do have their own finalizers.
-
-            // cancelling the beatmap load is safe for now since the retrieval is a synchronous
-            // operation. if we add an async retrieval method this may need to be reconsidered.
-            beatmapCancellation?.Cancel();
-            total_count.Value--;
-        }
-
         ~WorkingBeatmap()
         {
-            Dispose(false);
+            total_count.Value--;
         }
-
-        #endregion
 
         public class RecyclableLazy<T>
         {

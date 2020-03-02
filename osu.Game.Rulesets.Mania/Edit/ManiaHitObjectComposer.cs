@@ -5,11 +5,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -42,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public int TotalColumns => ((ManiaPlayfield)drawableRuleset.Playfield).TotalColumns;
 
-        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
             drawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
 
@@ -52,26 +49,12 @@ namespace osu.Game.Rulesets.Mania.Edit
             return drawableRuleset;
         }
 
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new ManiaBlueprintContainer(drawableRuleset.Playfield.AllHitObjects);
+
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
         };
-
-        public override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
-
-        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case DrawableNote note:
-                    return new NoteSelectionBlueprint(note);
-
-                case DrawableHoldNote holdNote:
-                    return new HoldNoteSelectionBlueprint(holdNote);
-            }
-
-            return base.CreateBlueprintFor(hitObject);
-        }
     }
 }

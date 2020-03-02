@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -19,7 +18,12 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Slider : OsuHitObject, IHasCurve
     {
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime
+        {
+            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
+
         public double Duration => EndTime - StartTime;
 
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
@@ -28,17 +32,21 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
+        private readonly SliderPath path = new SliderPath();
 
         public SliderPath Path
         {
-            get => PathBindable.Value;
+            get => path;
             set
             {
-                PathBindable.Value = value;
-                endPositionCache.Invalidate();
+                path.ControlPoints.Clear();
+                path.ExpectedDistance.Value = null;
 
-                updateNestedPositions();
+                if (value != null)
+                {
+                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position.Value, c.Type.Value)));
+                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
+                }
             }
         }
 
@@ -50,8 +58,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.Position = value;
-                endPositionCache.Invalidate();
-
                 updateNestedPositions();
             }
         }
@@ -80,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 repeatCount = value;
-                endPositionCache.Invalidate();
+                updateNestedPositions();
             }
         }
 
@@ -110,8 +116,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.ItemsAdded += _ => updateNestedSamples();
-            SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
+            Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -189,6 +195,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void updateNestedPositions()
         {
+            endPositionCache.Invalidate();
+
             if (HeadCircle != null)
                 HeadCircle.Position = Position;
 

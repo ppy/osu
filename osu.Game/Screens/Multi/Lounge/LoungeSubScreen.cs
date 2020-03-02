@@ -23,13 +23,15 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly ProcessingOverlay processingOverlay;
+        private readonly LoadingLayer loadingLayer;
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
+        private Bindable<Room> selectedRoom { get; set; }
 
         public LoungeSubScreen()
         {
+            SearchContainer searchContainer;
+
             InternalChildren = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
@@ -49,14 +51,14 @@ namespace osu.Game.Screens.Multi.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = new SearchContainer
+                                    Child = searchContainer = new SearchContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Child = new RoomsContainer { JoinRequested = joinRequested }
                                     },
                                 },
-                                processingOverlay = new ProcessingOverlay { Alpha = 0 }
+                                loadingLayer = new LoadingLayer(searchContainer),
                             }
                         },
                         new RoomInspector
@@ -91,6 +93,22 @@ namespace osu.Game.Screens.Multi.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            onReturning();
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (selectedRoom.Value?.RoomID.Value == null)
+                selectedRoom.Value = new Room();
+
+            onReturning();
+        }
+
+        private void onReturning()
+        {
             Filter.Search.HoldFocus = true;
         }
 
@@ -106,22 +124,14 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.HoldFocus = false;
         }
 
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            if (currentRoom.Value?.RoomID.Value == null)
-                currentRoom.Value = new Room();
-        }
-
         private void joinRequested(Room room)
         {
-            processingOverlay.Show();
+            loadingLayer.Show();
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                processingOverlay.Hide();
-            }, _ => processingOverlay.Hide());
+                loadingLayer.Hide();
+            }, _ => loadingLayer.Hide());
         }
 
         /// <summary>
@@ -133,7 +143,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (!this.IsCurrentScreen())
                 return;
 
-            currentRoom.Value = room;
+            selectedRoom.Value = room;
 
             this.Push(new MatchSubScreen(room));
         }

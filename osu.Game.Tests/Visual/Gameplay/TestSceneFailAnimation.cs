@@ -10,17 +10,17 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailAnimation : AllPlayersTestScene
+    public class TestSceneFailAnimation : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Array.Empty<Mod>();
+            SelectedMods.Value = Array.Empty<Mod>();
             return new FailPlayer();
         }
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(AllPlayersTestScene),
+            typeof(TestSceneAllRulesetPlayers),
             typeof(TestPlayer),
             typeof(Player),
         };
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += (_, __) => true;
+                HealthProcessor.FailConditions += (_, __) => true;
             }
         }
     }
