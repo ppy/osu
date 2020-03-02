@@ -4,15 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
-using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Mods;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
@@ -26,83 +18,47 @@ namespace osu.Game.Tests.Visual
             typeof(ModSandboxTestScene)
         };
 
-        protected Mod Mod;
-        private readonly TriangleButton button;
-
-        protected ModSandboxTestScene(Ruleset ruleset, Mod mod = null)
+        protected ModSandboxTestScene(Ruleset ruleset)
             : base(ruleset)
         {
-            Mod = mod ?? new SandboxMod();
-
-            var props = Mod.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-            var hasSettings = props.Any(prop => prop.GetCustomAttribute<SettingSourceAttribute>(true) != null);
-
-            Child = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Padding = new MarginPadding(50),
-                Margin = new MarginPadding { Bottom = 20 },
-                Width = 0.4f,
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                Children = new Drawable[]
-                {
-                    new ModControlSection(Mod, Mod.CreateSettingsControls()),
-                    button = new TriangleButton
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Width = 0.5f,
-                        Text = "Start",
-                        Action = () =>
-                        {
-                            button.Text = hasSettings ? "Apply Settings" : "Restart";
-                            LoadPlayer();
-                        }
-                    }
-                }
-            };
         }
 
-        [SetUpSteps]
+        private ModTestCaseData currentTest;
+
         public override void SetUpSteps()
         {
+            foreach (var testCase in CreateTestCases())
+            {
+                AddStep("set test case", () => currentTest = testCase);
+                base.SetUpSteps();
+            }
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            LocalConfig.GetBindable<bool>(OsuSetting.KeyOverlay).Value = true;
-        }
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTest.Beatmap;
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            SelectedMods.Value = SelectedMods.Value.Append(Mod).ToArray();
+            SelectedMods.Value = SelectedMods.Value.Append(currentTest.Mod).ToArray();
+
+            if (currentTest.Autoplay)
+            {
+                // We're simulating an auto-play via a replay so that the auto-play mod does not interfere
+                var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, SelectedMods.Value);
+                var score = ruleset.GetAutoplayMod().CreateReplayScore(beatmap);
+
+                return new TestReplayPlayer(score, false, false);
+            }
 
             return base.CreatePlayer(ruleset);
         }
 
-        protected class SandboxMod : Mod
+        protected abstract ModTestCaseData[] CreateTestCases();
+
+        protected class ModTestCaseData
         {
-            public override string Name => "Sandbox Test";
-            public override string Acronym => "ST";
-            public override double ScoreMultiplier => 1.0;
-
-            [SettingSource("Test Setting")]
-            public Bindable<bool> TestSetting1 { get; } = new BindableBool
-            {
-                Default = true,
-                Value = true
-            };
-
-            [SettingSource("Test Setting 2")]
-            public Bindable<float> TestSetting2 { get; } = new BindableFloat
-            {
-                Precision = 0.1f,
-                MinValue = 0,
-                MaxValue = 20
-            };
+            public Mod Mod;
+            public bool Autoplay;
+            public IBeatmap Beatmap;
         }
     }
 }
