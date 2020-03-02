@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -11,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
     public class TestSceneTaikoModPerfect : ModPerfectTestScene
     {
         public TestSceneTaikoModPerfect()
-            : base(new TaikoRuleset(), new TaikoModPerfect())
+            : base(new TestTaikoRuleset(), new TaikoModPerfect())
         {
         }
 
@@ -26,5 +28,20 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase(false)]
         [TestCase(true)]
         public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new Swell { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+
+        private class TestTaikoRuleset : TaikoRuleset
+        {
+            public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TestTaikoHealthProcessor();
+
+            private class TestTaikoHealthProcessor : TaikoHealthProcessor
+            {
+                protected override void Reset(bool storeResults)
+                {
+                    base.Reset(storeResults);
+
+                    Health.Value = 1; // Don't care about the health condition (only the mod condition)
+                }
+            }
+        }
     }
 }
