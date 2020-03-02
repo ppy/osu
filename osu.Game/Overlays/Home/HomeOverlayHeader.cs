@@ -40,10 +40,10 @@ namespace osu.Game.Overlays.Home
         Dashboard,
         Friends,
 
-        [Description(@"forum subscriptions")]
+        [Description(@"Forum Subscriptions")]
         Forum,
 
-        [Description(@"modding watchlist")]
+        [Description(@"Modding Watchlist")]
         Modding
     }
 }
