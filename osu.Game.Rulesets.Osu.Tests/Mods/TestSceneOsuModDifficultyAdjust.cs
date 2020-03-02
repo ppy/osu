@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -20,24 +21,26 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
         }
 
-        protected override ModTestCaseData[] CreateTestCases() => new[]
+        [Test]
+        public void TestNoAdjustment() => CreateModTest(new ModTestCaseData("no adjustment", new OsuModDifficultyAdjust())
         {
-            new ModTestCaseData("no adjustment", new OsuModDifficultyAdjust())
-            {
-                Autoplay = true,
-                PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
-            },
-            new ModTestCaseData("cs = 10", new OsuModDifficultyAdjust { CircleSize = { Value = 10 } })
-            {
-                Autoplay = true,
-                PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
-            },
-            new ModTestCaseData("ar = 10", new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } })
-            {
-                Autoplay = true,
-                PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
-            },
-        };
+            Autoplay = true,
+            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+        });
+
+        [Test]
+        public void TestCircleSize10() => CreateModTest(new ModTestCaseData("cs = 10", new OsuModDifficultyAdjust { CircleSize = { Value = 10 } })
+        {
+            Autoplay = true,
+            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+        });
+
+        [Test]
+        public void TestApproachRate10() => CreateModTest(new ModTestCaseData("ar = 10", new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } })
+        {
+            Autoplay = true,
+            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+        });
 
         protected override TestPlayer CreateReplayPlayer(Score score) => new ScoreAccessibleTestPlayer(score);
 
