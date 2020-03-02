@@ -39,6 +39,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
 
+            new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
+            new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
+
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
@@ -142,5 +145,11 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle now playing overlay")]
         ToggleNowPlaying,
+
+        [Description("Previous Selection")]
+        SelectPrevious,
+
+        [Description("Next Selection")]
+        SelectNext,
     }
 }
