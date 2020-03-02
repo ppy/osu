@@ -58,10 +58,11 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
         {
-            new KeyBinding(InputKey.Up, GlobalAction.IncreaseVolume),
-            new KeyBinding(InputKey.MouseWheelUp, GlobalAction.IncreaseVolume),
-            new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
-            new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
+
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
