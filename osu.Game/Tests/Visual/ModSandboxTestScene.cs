@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -29,36 +32,78 @@ namespace osu.Game.Tests.Visual
         {
             foreach (var testCase in CreateTestCases())
             {
-                AddStep("set test case", () => currentTest = testCase);
+                AddStep(testCase.Name, () => currentTest = testCase);
                 base.SetUpSteps();
+                AddUntilStep("test passed", () => testCase.PassCondition?.Invoke() ?? true);
             }
         }
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTest.Beatmap;
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTest?.Beatmap ?? base.CreateBeatmap(ruleset);
 
-        protected override Player CreatePlayer(Ruleset ruleset)
+        protected sealed override Player CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = SelectedMods.Value.Append(currentTest.Mod).ToArray();
 
-            if (currentTest.Autoplay)
-            {
-                // We're simulating an auto-play via a replay so that the auto-play mod does not interfere
-                var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, SelectedMods.Value);
-                var score = ruleset.GetAutoplayMod().CreateReplayScore(beatmap);
+            var score = currentTest.Autoplay
+                ? ruleset.GetAutoplayMod().CreateReplayScore(Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, SelectedMods.Value))
+                : new Score { Replay = new Replay() };
 
-                return new TestReplayPlayer(score, false, false);
-            }
-
-            return base.CreatePlayer(ruleset);
+            return CreateReplayPlayer(score);
         }
 
+        /// <summary>
+        /// Creates the test cases for this test scene.
+        /// </summary>
         protected abstract ModTestCaseData[] CreateTestCases();
+
+        /// <summary>
+        /// Creates the <see cref="TestPlayer"/> for a test case.
+        /// </summary>
+        /// <param name="score">The <see cref="Score"/>.</param>
+        protected virtual TestPlayer CreateReplayPlayer(Score score) => new TestPlayer(score);
+
+        protected class TestPlayer : TestReplayPlayer
+        {
+            public TestPlayer(Score score)
+                : base(score, false, false)
+            {
+            }
+        }
 
         protected class ModTestCaseData
         {
-            public Mod Mod;
-            public bool Autoplay;
+            /// <summary>
+            /// Whether to use a replay to simulate an auto-play. True by default.
+            /// </summary>
+            public bool Autoplay = true;
+
+            /// <summary>
+            /// The beatmap for this test case.
+            /// </summary>
+            [CanBeNull]
             public IBeatmap Beatmap;
+
+            /// <summary>
+            /// The conditions that cause this test case to pass.
+            /// </summary>
+            [CanBeNull]
+            public Func<bool> PassCondition;
+
+            /// <summary>
+            /// The name of this test case, displayed in the test browser.
+            /// </summary>
+            public readonly string Name;
+
+            /// <summary>
+            /// The <see cref="Mod"/> this test case tests.
+            /// </summary>
+            public readonly Mod Mod;
+
+            public ModTestCaseData(string name, Mod mod)
+            {
+                Name = name;
+                Mod = mod;
+            }
         }
     }
 }
