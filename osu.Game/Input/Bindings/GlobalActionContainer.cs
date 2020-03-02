@@ -15,6 +15,7 @@ namespace osu.Game.Input.Bindings
         private readonly Drawable handler;
 
         public GlobalActionContainer(OsuGameBase game)
+            : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
