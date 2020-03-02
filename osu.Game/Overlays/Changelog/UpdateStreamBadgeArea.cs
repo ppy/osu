@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Changelog
         protected override bool OnHover(HoverEvent e)
         {
             foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
-                streamBadge.AllStreamsDimmed = true;
+                streamBadge.UserHoveringArea = true;
 
             return base.OnHover(e);
         }
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Changelog
         protected override void OnHoverLost(HoverLostEvent e)
         {
             foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
-                streamBadge.AllStreamsDimmed = false;
+                streamBadge.UserHoveringArea = false;
 
             base.OnHoverLost(e);
         }
