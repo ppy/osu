@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Changelog
                     Colour = stream.Colour,
                     ExpandedSize = 4,
                     CollapsedSize = 2,
-                    IsCollapsed = true
+                    Expanded = true
                 },
                 new HoverClickSounds()
             });
@@ -100,33 +100,39 @@ namespace osu.Game.Overlays.Changelog
 
         private void updateState()
         {
-            if (SelectedTab.Value == null && !allStreamsDimmed)
+            // highlighted regardless if we are hovered
+            bool textHighlighted = IsHovered;
+            bool barExpanded = IsHovered;
+
+            if (SelectedTab.Value == null)
             {
-                expandingBar.Expand();
-                expandingBar.FadeTo(1, transition_duration, Easing.OutQuint);
-                text.FadeTo(1, transition_duration, Easing.OutQuint);
-                return;
+                // at listing, all badges are highlighted when user is not hovering any badge.
+                textHighlighted |= !userHoveringArea;
+                barExpanded |= !userHoveringArea;
+            }
+            else
+            {
+                // bar is always expanded when active
+                barExpanded |= Active.Value;
+
+                // text is highlighted only when hovered or active (but not if in selection mode)
+                textHighlighted |= Active.Value && !userHoveringArea;
             }
 
-            var shouldExpand = Active.Value || IsHovered;
-
-            expandingBar.IsCollapsed = !shouldExpand;
-            expandingBar.FadeTo(shouldExpand ? 1 : 0.5f, transition_duration, Easing.OutQuint);
-
-            text.FadeTo(IsHovered || (Active.Value && !allStreamsDimmed) ? 1 : 0.5f, transition_duration, Easing.OutQuint);
+            expandingBar.Expanded = barExpanded;
+            text.FadeTo(textHighlighted ? 1 : 0.5f, transition_duration, Easing.OutQuint);
         }
 
-        private bool allStreamsDimmed;
+        private bool userHoveringArea;
 
-        public bool AllStreamsDimmed
+        public bool UserHoveringArea
         {
-            get => allStreamsDimmed;
             set
             {
-                if (value == allStreamsDimmed)
+                if (value == userHoveringArea)
                     return;
 
-                allStreamsDimmed = value;
+                userHoveringArea = value;
                 updateState();
             }
         }
