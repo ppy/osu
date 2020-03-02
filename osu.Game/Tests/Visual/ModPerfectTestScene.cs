@@ -12,11 +12,13 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class ModPerfectTestScene : ModSandboxTestScene
     {
+        private readonly Ruleset ruleset;
         private readonly ModPerfect perfectMod;
 
         protected ModPerfectTestScene(Ruleset ruleset, ModPerfect perfectMod)
             : base(ruleset)
         {
+            this.ruleset = ruleset;
             this.perfectMod = perfectMod;
         }
 
@@ -24,7 +26,7 @@ namespace osu.Game.Tests.Visual
         {
             Beatmap = new Beatmap
             {
-                BeatmapInfo = { Ruleset = Ruleset.Value },
+                BeatmapInfo = { Ruleset = ruleset.RulesetInfo },
                 HitObjects = { testCaseData.HitObject }
             },
             Autoplay = !shouldMiss,
