@@ -67,6 +67,7 @@ namespace osu.Game.Tests.Visual
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
+            Ruleset.Value = ruleset.RulesetInfo;
 
             if (!AllowFail)
             {
