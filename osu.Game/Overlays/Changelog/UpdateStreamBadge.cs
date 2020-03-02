@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Changelog
 
         private void updateState()
         {
-            if (SelectedTab.Value == null && !externalDimRequested)
+            if (SelectedTab.Value == null && !allStreamsDimmed)
             {
                 expandingBar.Expand();
                 expandingBar.FadeTo(1, transition_duration, Easing.OutQuint);
@@ -113,21 +113,22 @@ namespace osu.Game.Overlays.Changelog
             expandingBar.IsCollapsed = !shouldExpand;
             expandingBar.FadeTo(shouldExpand ? 1 : 0.5f, transition_duration, Easing.OutQuint);
 
-            text.FadeTo(IsHovered || (Active.Value && !externalDimRequested) ? 1 : 0.5f, transition_duration, Easing.OutQuint);
+            text.FadeTo(IsHovered || (Active.Value && !allStreamsDimmed) ? 1 : 0.5f, transition_duration, Easing.OutQuint);
         }
 
-        private bool externalDimRequested;
+        private bool allStreamsDimmed;
 
-        public void EnableDim()
+        public bool AllStreamsDimmed
         {
-            externalDimRequested = true;
-            updateState();
-        }
+            get => allStreamsDimmed;
+            set
+            {
+                if (value == allStreamsDimmed)
+                    return;
 
-        public void DisableDim()
-        {
-            externalDimRequested = false;
-            updateState();
+                allStreamsDimmed = value;
+                updateState();
+            }
         }
     }
 }
