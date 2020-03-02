@@ -106,9 +106,11 @@ namespace osu.Game.Overlays
                         case string stringValue:
                             baseText = stringValue;
                             break;
+
                         case Enum enumValue:
                             baseText = enumValue.GetDescription();
                             break;
+
                         default:
                             baseText = value.ToString();
                             break;
