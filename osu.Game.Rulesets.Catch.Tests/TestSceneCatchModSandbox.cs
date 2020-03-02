@@ -11,7 +11,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchModSandbox : TestSceneModSandbox
+    public class TestSceneCatchModSandbox : ModSandboxTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Append(typeof(TestSceneCatchModSandbox)).ToList();
 

@@ -11,7 +11,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneTaikoModSandbox : TestSceneModSandbox
+    public class TestSceneTaikoModSandbox : ModSandboxTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Append(typeof(TestSceneTaikoModSandbox)).ToList();
 

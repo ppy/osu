@@ -11,7 +11,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class TestSceneManiaModSandbox : TestSceneModSandbox
+    public class TestSceneManiaModSandbox : ModSandboxTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Append(typeof(TestSceneManiaModSandbox)).ToList();
 

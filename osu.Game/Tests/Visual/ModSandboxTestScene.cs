@@ -19,17 +19,17 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestSceneModSandbox : PlayerTestScene
+    public abstract class ModSandboxTestScene : PlayerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(TestSceneModSandbox)
+            typeof(ModSandboxTestScene)
         };
 
         protected Mod Mod;
         private readonly TriangleButton button;
 
-        protected TestSceneModSandbox(Ruleset ruleset, Mod mod = null)
+        protected ModSandboxTestScene(Ruleset ruleset, Mod mod = null)
             : base(ruleset)
         {
             Mod = mod ?? new SandboxMod();
