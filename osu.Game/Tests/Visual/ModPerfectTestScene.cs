@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
                 if (!failed)
                     return ScoreProcessor.HasCompleted && !HealthProcessor.HasFailed;
 
-                return ScoreProcessor.JudgedHits > 0 && HealthProcessor.HasFailed;
+                return HealthProcessor.HasFailed;
             }
         }
 
