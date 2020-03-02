@@ -92,9 +92,29 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    Text.Text = ((value as Enum)?.GetDescription() ?? value.ToString()).ToLower();
+                    Text.Text = formatItemText(value);
                     Text.Font = OsuFont.GetFont(size: 14);
                     Bar.ExpandedSize = 5;
+                }
+
+                private string formatItemText(object value)
+                {
+                    string baseText;
+
+                    switch (value)
+                    {
+                        case string stringValue:
+                            baseText = stringValue;
+                            break;
+                        case Enum enumValue:
+                            baseText = enumValue.GetDescription();
+                            break;
+                        default:
+                            baseText = value.ToString();
+                            break;
+                    }
+
+                    return baseText.ToLower();
                 }
             }
         }
