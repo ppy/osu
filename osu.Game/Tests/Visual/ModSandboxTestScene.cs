@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class ModSandboxTestScene : PlayerTestScene
     {
+        protected sealed override bool HasCustomSteps => true;
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ModSandboxTestScene)
@@ -28,14 +30,15 @@ namespace osu.Game.Tests.Visual
 
         private ModTestCaseData currentTest;
 
-        public override void SetUpSteps()
+        protected void CreateModTest(ModTestCaseData testCaseData) => CreateTest(() =>
         {
-            foreach (var testCase in CreateTestCases())
-            {
-                AddStep(testCase.Name, () => currentTest = testCase);
-                base.SetUpSteps();
-                AddUntilStep("test passed", () => testCase.PassCondition?.Invoke() ?? true);
-            }
+            AddStep("set test data", () => currentTest = testCaseData);
+        });
+
+        public override void TearDownSteps()
+        {
+            AddUntilStep("test passed", () => currentTest?.PassCondition?.Invoke() ?? true);
+            base.TearDownSteps();
         }
 
         protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTest?.Beatmap ?? base.CreateBeatmap(ruleset);
@@ -50,11 +53,6 @@ namespace osu.Game.Tests.Visual
 
             return CreateReplayPlayer(score);
         }
-
-        /// <summary>
-        /// Creates the test cases for this test scene.
-        /// </summary>
-        protected abstract ModTestCaseData[] CreateTestCases();
 
         /// <summary>
         /// Creates the <see cref="TestPlayer"/> for a test case.
