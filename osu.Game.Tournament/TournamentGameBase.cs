@@ -54,9 +54,6 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
-            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
-
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
             this.storage = storage;

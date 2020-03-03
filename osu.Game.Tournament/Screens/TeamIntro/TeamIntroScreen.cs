@@ -201,7 +201,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             new OsuSpriteText
                             {
                                 Text = team?.FullName.Value.ToUpper() ?? "???",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 40, FontWeight.Light),
+                                Font = OsuFont.Torus.With(size: 40, weight: FontWeight.Light),
                                 Colour = Color4.Black,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
@@ -209,7 +209,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             new OsuSpriteText
                             {
                                 Text = teamName.ToUpper(),
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 20, FontWeight.Regular),
+                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Regular),
                                 Colour = colour,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
