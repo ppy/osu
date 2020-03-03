@@ -9,7 +9,6 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi
