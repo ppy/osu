@@ -7,12 +7,12 @@ namespace osu.Game.Overlays.Home.Friends
     {
         public FriendsOnlineStatus Status { get; }
 
-        public int Amount { get; }
+        public int Count { get; }
 
-        public FriendsBundle(FriendsOnlineStatus status, int amount)
+        public FriendsBundle(FriendsOnlineStatus status, int count)
         {
             Status = status;
-            Amount = amount;
+            Count = count;
         }
     }
 
