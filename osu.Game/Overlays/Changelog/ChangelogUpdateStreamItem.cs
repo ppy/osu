@@ -17,11 +17,11 @@ namespace osu.Game.Overlays.Changelog
                 Width *= 2; 
         }
 
-        protected override string GetMainText() => Value.DisplayName;
+        protected override string GetMainText => Value.DisplayName;
 
-        protected override string GetAdditionalText() => Value.LatestBuild.DisplayVersion;
+        protected override string GetAdditionalText => Value.LatestBuild.DisplayVersion;
 
-        protected override string GetInfoText() => Value.LatestBuild.Users > 0 ? $"{"user".ToQuantity(Value.LatestBuild.Users, "N0")} online" : null;
+        protected override string GetInfoText => Value.LatestBuild.Users > 0 ? $"{"user".ToQuantity(Value.LatestBuild.Users, "N0")} online" : null;
 
         protected override Color4 GetBarColour(OsuColour colours) => Value.Colour;
     }
