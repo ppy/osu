@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Changelog
             : base(stream)
         {
             if (stream.IsFeatured)
-                Width *= 2; 
+                Width *= 2;
         }
 
         protected override string GetMainText => Value.DisplayName;
