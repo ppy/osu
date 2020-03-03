@@ -14,6 +14,14 @@ namespace osu.Game.Overlays.Changelog
         {
         }
 
+        protected override float GetWidth()
+        {
+            if (Value.IsFeatured)
+                return base.GetWidth() * 2;
+
+            return base.GetWidth();
+        }
+
         protected override string GetMainText() => Value.DisplayName;
 
         protected override string GetAdditionalText() => Value.LatestBuild.DisplayVersion;
