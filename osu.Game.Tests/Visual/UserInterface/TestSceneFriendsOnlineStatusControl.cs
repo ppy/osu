@@ -30,14 +30,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         private FriendsOnlineStatusControl control;
 
         [SetUp]
-        public void SetUp() => Schedule(() =>
+        public void SetUp() => Schedule(() => Child = control = new FriendsOnlineStatusControl
         {
-            Clear();
-            Add(control = new FriendsOnlineStatusControl
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
         });
 
         [Test]
