@@ -13,14 +13,8 @@ namespace osu.Game.Overlays.Changelog
         public ChangelogUpdateStreamItem(APIUpdateStream stream)
             : base(stream)
         {
-        }
-
-        protected override float GetWidth()
-        {
-            if (Value.IsFeatured)
-                return base.GetWidth() * 2;
-
-            return base.GetWidth();
+            if (stream.IsFeatured)
+                Width *= 2; 
         }
 
         protected override string GetMainText() => Value.DisplayName;
