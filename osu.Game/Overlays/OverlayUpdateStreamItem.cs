@@ -1,44 +1,54 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Allocation;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics;
 using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Changelog
+namespace osu.Game.Overlays
 {
-    public class ChangelogUpdateStreamBadge : TabItem<APIUpdateStream>
+    public abstract class OverlayUpdateStreamItem<T> : TabItem<T>
     {
-        private const float badge_width = 100;
         private const float transition_duration = 100;
+        private const float tab_width = 100;
 
-        public readonly Bindable<APIUpdateStream> SelectedTab = new Bindable<APIUpdateStream>();
+        public readonly Bindable<T> SelectedItem = new Bindable<T>();
 
-        private readonly APIUpdateStream stream;
+        private bool userHoveringArea;
+
+        public bool UserHoveringArea
+        {
+            set
+            {
+                if (value == userHoveringArea)
+                    return;
+
+                userHoveringArea = value;
+                updateState();
+            }
+        }
 
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
-        public ChangelogUpdateStreamBadge(APIUpdateStream stream)
-            : base(stream)
+        public OverlayUpdateStreamItem(T value)
+            : base(value)
         {
-            this.stream = stream;
         }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            Size = new Vector2(stream.IsFeatured ? badge_width * 2 : badge_width, 60);
+            Size = new Vector2(GetWidth(), 60);
             Padding = new MarginPadding(5);
 
             AddRange(new Drawable[]
@@ -52,17 +62,17 @@ namespace osu.Game.Overlays.Changelog
                     {
                         new OsuSpriteText
                         {
-                            Text = stream.DisplayName,
+                            Text = GetMainText(),
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black),
                         },
                         new OsuSpriteText
                         {
-                            Text = stream.LatestBuild.DisplayVersion,
+                            Text = GetAdditionalText(),
                             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                         },
                         new OsuSpriteText
                         {
-                            Text = stream.LatestBuild.Users > 0 ? $"{"user".ToQuantity(stream.LatestBuild.Users, "N0")} online" : null,
+                            Text = GetInfoText(),
                             Font = OsuFont.GetFont(size: 10),
                             Colour = colourProvider.Foreground1
                         },
@@ -71,7 +81,7 @@ namespace osu.Game.Overlays.Changelog
                 expandingBar = new ExpandingBar
                 {
                     Anchor = Anchor.TopCentre,
-                    Colour = stream.Colour,
+                    Colour = GetBarColour(),
                     ExpandedSize = 4,
                     CollapsedSize = 2,
                     Expanded = true
@@ -79,8 +89,18 @@ namespace osu.Game.Overlays.Changelog
                 new HoverClickSounds()
             });
 
-            SelectedTab.BindValueChanged(_ => updateState(), true);
+            SelectedItem.BindValueChanged(_ => updateState(), true);
         }
+
+        protected abstract string GetMainText();
+
+        protected abstract string GetAdditionalText();
+
+        protected virtual string GetInfoText() => string.Empty;
+
+        protected abstract Color4 GetBarColour();
+
+        protected virtual float GetWidth() => tab_width;
 
         protected override void OnActivated() => updateState();
 
@@ -104,7 +124,7 @@ namespace osu.Game.Overlays.Changelog
             bool textHighlighted = IsHovered;
             bool barExpanded = IsHovered;
 
-            if (SelectedTab.Value == null)
+            if (SelectedItem.Value == null)
             {
                 // at listing, all badges are highlighted when user is not hovering any badge.
                 textHighlighted |= !userHoveringArea;
@@ -121,20 +141,6 @@ namespace osu.Game.Overlays.Changelog
 
             expandingBar.Expanded = barExpanded;
             text.FadeTo(textHighlighted ? 1 : 0.5f, transition_duration, Easing.OutQuint);
-        }
-
-        private bool userHoveringArea;
-
-        public bool UserHoveringArea
-        {
-            set
-            {
-                if (value == userHoveringArea)
-                    return;
-
-                userHoveringArea = value;
-                updateState();
-            }
         }
     }
 }
