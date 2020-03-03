@@ -37,7 +37,14 @@ namespace osu.Game.Tests.Visual
 
         public override void TearDownSteps()
         {
-            AddUntilStep("test passed", () => currentTest?.PassCondition?.Invoke() ?? false);
+            AddUntilStep("test passed", () =>
+            {
+                if (currentTest == null)
+                    return true;
+
+                return currentTest.PassCondition?.Invoke() ?? false;
+            });
+
             base.TearDownSteps();
         }
 
