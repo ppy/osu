@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
     public class TestSceneManiaModPerfect : ModPerfectTestScene
     {
