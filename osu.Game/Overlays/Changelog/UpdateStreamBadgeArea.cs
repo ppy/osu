@@ -6,25 +6,16 @@ using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class UpdateStreamBadgeArea : TabControl<APIUpdateStream>
     {
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        public UpdateStreamBadgeArea()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            AddInternal(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider.Background5,
-            });
         }
 
         public void Populate(List<APIUpdateStream> streams)
@@ -36,7 +27,7 @@ namespace osu.Game.Overlays.Changelog
         protected override bool OnHover(HoverEvent e)
         {
             foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
-                streamBadge.EnableDim();
+                streamBadge.UserHoveringArea = true;
 
             return base.OnHover(e);
         }
@@ -44,26 +35,17 @@ namespace osu.Game.Overlays.Changelog
         protected override void OnHoverLost(HoverLostEvent e)
         {
             foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
-                streamBadge.DisableDim();
+                streamBadge.UserHoveringArea = false;
 
             base.OnHoverLost(e);
         }
 
-        protected override TabFillFlowContainer CreateTabFlow()
+        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
-            var flow = base.CreateTabFlow();
-
-            flow.RelativeSizeAxes = Axes.X;
-            flow.AutoSizeAxes = Axes.Y;
-            flow.AllowMultiline = true;
-            flow.Padding = new MarginPadding
-            {
-                Vertical = 20,
-                Horizontal = 85,
-            };
-
-            return flow;
-        }
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            AllowMultiline = true,
+        };
 
         protected override Dropdown<APIUpdateStream> CreateDropdown() => null;
 
