@@ -229,16 +229,9 @@ namespace osu.Game.Tests.Visual
             /// </summary>
             public class TrackVirtualManual : Track
             {
+                private readonly StopwatchClock stopwatchClock = new StopwatchClock();
+
                 private readonly IFrameBasedClock referenceClock;
-
-                private readonly ManualClock clock = new ManualClock();
-
-                private bool running;
-
-                /// <summary>
-                /// Local offset added to the reference clock to resolve correct time.
-                /// </summary>
-                private double offset;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock)
                 {
@@ -248,60 +241,32 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = Math.Clamp(seek, 0, Length);
-                    lastReferenceTime = null;
+                    var offset = Math.Clamp(seek, 0, Length);
+
+                    stopwatchClock.Seek(offset);
 
                     return offset == seek;
                 }
 
-                public override void Start()
-                {
-                    running = true;
-                }
+                public override void Start() => stopwatchClock.Start();
 
                 public override void Reset()
                 {
-                    Seek(0);
+                    stopwatchClock.Seek(0);
                     base.Reset();
                 }
 
-                public override void Stop()
-                {
-                    if (running)
-                    {
-                        running = false;
-                        // on stopping, the current value should be transferred out of the clock, as we can no longer rely on
-                        // the referenceClock (which will still be counting time).
-                        offset = clock.CurrentTime;
-                        lastReferenceTime = null;
-                    }
-                }
+                public override void Stop() => stopwatchClock.Stop();
 
-                public override bool IsRunning => running;
+                public override bool IsRunning => stopwatchClock.IsRunning;
 
-                private double? lastReferenceTime;
-
-                public override double CurrentTime => clock.CurrentTime;
+                public override double CurrentTime => stopwatchClock.CurrentTime;
 
                 protected override void UpdateState()
                 {
                     base.UpdateState();
 
-                    if (running)
-                    {
-                        double refTime = referenceClock.CurrentTime;
-
-                        if (!lastReferenceTime.HasValue)
-                        {
-                            // if the clock just started running, the current value should be transferred to the offset
-                            // (to zero the progression of time).
-                            offset -= refTime;
-                        }
-
-                        lastReferenceTime = refTime;
-                    }
-
-                    clock.CurrentTime = Math.Min((lastReferenceTime ?? 0) + offset, Length);
+                    stopwatchClock.Rate = Rate * referenceClock.Rate;
 
                     if (CurrentTime >= Length)
                     {
