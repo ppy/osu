@@ -15,7 +15,6 @@ namespace osu.Game.Overlays
     {
         private readonly Box titleBackground;
         private readonly ScreenTitle title;
-        private readonly Container content;
 
         protected readonly FillFlowContainer HeaderInfo;
 
@@ -55,7 +54,7 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Gray,
                                     },
-                                    content = new Container
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
