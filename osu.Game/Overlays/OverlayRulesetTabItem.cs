@@ -12,6 +12,7 @@ using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.Centre,
                         Text = value.Name,
                         Font = OsuFont.GetFont(size: 18),
-                        ShadowColour = new Color4(0, 0, 0, 0.75f)
+                        ShadowColour = Color4.Black.Opacity(0.75f)
                     }
                 },
                 new HoverClickSounds()
