@@ -1,9 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -165,7 +164,8 @@ namespace osu.Game.Overlays
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value)
             {
                 // This needs to be set here manually because TabControl attempts to propagate these values to its children before these tabs are added
-                AccentColour = AccentColour
+                AccentColour = AccentColour,
+                IdleColour = Color4.White
             };
 
             private class ProfileSectionTabItem : OverlayTabItem
@@ -174,12 +174,6 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.Title;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    IdleColour = Color4.White;
                 }
             }
         }
