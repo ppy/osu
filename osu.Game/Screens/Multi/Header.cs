@@ -77,12 +77,6 @@ namespace osu.Game.Screens.Multi
                 set => Section = value.ShortTitle.ToLowerInvariant();
             }
 
-            public MultiHeaderTitle()
-            {
-                Separator.Size = new Vector2(4);
-                Separator.Margin = new MarginPadding(0);
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {

@@ -21,8 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         private const float text_padding = 17.5f; // 15px padding + 2.5px compensation for line-height
 
         private SpriteIcon iconSprite;
-        private readonly OsuSpriteText titleText, pageText;
-        protected readonly Circle Separator;
+        private readonly OsuSpriteText titleText, pageText, separator;
 
         protected IconUsage Icon
         {
@@ -53,8 +52,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 SeparatorColour
         {
-            get => Separator.Colour;
-            set => Separator.Colour = value;
+            get => separator.Colour;
+            set => separator.Colour = value;
         }
 
         protected virtual Drawable CreateIcon() => iconSprite = new SpriteIcon
@@ -88,13 +87,14 @@ namespace osu.Game.Graphics.UserInterface
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Vertical = text_padding }
                         },
-                        Separator = new Circle
+                        separator = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(5),
+                            Font = OsuFont.GetFont(size: 20),
                             Colour = Color4.Gray,
-                            Margin = new MarginPadding { Top = 3 } // compensation for osu-web using a font here making the circle appear a bit lower
+                            Margin = new MarginPadding { Vertical = text_padding },
+                            Text = "\u2022"
                         },
                         pageText = new OsuSpriteText
                         {
