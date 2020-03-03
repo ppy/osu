@@ -241,6 +241,24 @@ namespace osu.Game.Tournament
                 }
             }
 
+            foreach (var t in ladder.Teams)
+            {
+                foreach (var s in t.SeedingResults)
+                {
+                    foreach (var b in s.Beatmaps)
+                    {
+                        if (b.BeatmapInfo == null && b.ID > 0)
+                        {
+                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                            req.Perform(API);
+                            b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+
+                            addedInfo = true;
+                        }
+                    }
+                }
+            }
+
             return addedInfo;
         }
 

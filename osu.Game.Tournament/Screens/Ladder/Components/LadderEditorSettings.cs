@@ -127,49 +127,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             }
         }
 
-        private class SettingsTeamDropdown : LadderSettingsDropdown<TournamentTeam>
-        {
-            public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
-            {
-                foreach (var t in teams.Prepend(new TournamentTeam()))
-                    add(t);
-
-                teams.CollectionChanged += (_, args) =>
-                {
-                    switch (args.Action)
-                    {
-                        case NotifyCollectionChangedAction.Add:
-                            args.NewItems.Cast<TournamentTeam>().ForEach(add);
-                            break;
-
-                        case NotifyCollectionChangedAction.Remove:
-                            args.OldItems.Cast<TournamentTeam>().ForEach(i => Control.RemoveDropdownItem(i));
-                            break;
-                    }
-                };
-            }
-
-            private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
-
-            private T boundReference<T>(T obj)
-                where T : IBindable
-            {
-                obj = (T)obj.GetBoundCopy();
-                refBindables.Add(obj);
-                return obj;
-            }
-
-            private void add(TournamentTeam team)
-            {
-                Control.AddDropdownItem(team);
-                boundReference(team.FullName).BindValueChanged(_ =>
-                {
-                    Control.RemoveDropdownItem(team);
-                    Control.AddDropdownItem(team);
-                });
-            }
-        }
-
         private class LadderSettingsDropdown<T> : SettingsDropdown<T>
         {
             protected override OsuDropdown<T> CreateDropdown() => new DropdownControl();
