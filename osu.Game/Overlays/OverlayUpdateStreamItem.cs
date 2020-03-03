@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             Size = new Vector2(GetWidth(), 60);
             Padding = new MarginPadding(5);
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
                 expandingBar = new ExpandingBar
                 {
                     Anchor = Anchor.TopCentre,
-                    Colour = GetBarColour(),
+                    Colour = GetBarColour(colours),
                     ExpandedSize = 4,
                     CollapsedSize = 2,
                     Expanded = true
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
 
         protected virtual string GetInfoText() => string.Empty;
 
-        protected abstract Color4 GetBarColour();
+        protected abstract Color4 GetBarColour(OsuColour colours);
 
         protected virtual float GetWidth() => tab_width;
 
