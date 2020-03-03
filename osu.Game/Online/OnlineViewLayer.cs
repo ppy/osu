@@ -19,7 +19,7 @@ namespace osu.Game.Online
     /// </summary>
     public class OnlineViewLayer : VisibilityContainer, IOnlineComponent
     {
-        protected LoadingSpinner LoadingSpinner;
+        private LoadingSpinner loadingSpinner;
 
         private readonly Drawable viewTarget;
 
@@ -31,6 +31,8 @@ namespace osu.Game.Online
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
+
+        protected virtual Placeholder CreatePlaceholder(string message) => new LoginPlaceholder(message);
 
         public OnlineViewLayer(string placeholderMessage, Drawable viewTarget)
         {
@@ -49,11 +51,8 @@ namespace osu.Game.Online
         {
             Children = new Drawable[]
             {
-                placeholder = new LoginPlaceholder(placeholderMessage)
-                {
-                    Alpha = 0,
-                },
-                LoadingSpinner = new LoadingSpinner(true)
+                placeholder = CreatePlaceholder(placeholderMessage),
+                loadingSpinner = new LoadingSpinner(true)
                 {
                     Alpha = 0,
                 }
@@ -74,19 +73,19 @@ namespace osu.Game.Online
                 case APIState.Offline:
                     placeholder.ScaleTo(0.8f).Then().ScaleTo(1, transform_duration, Easing.OutQuint);
                     placeholder.FadeInFromZero(2 * transform_duration, Easing.OutQuint);
-                    LoadingSpinner.Hide();
+                    loadingSpinner.Hide();
                     Show();
                     break;
 
                 case APIState.Online:
                     placeholder.FadeOut(transform_duration, Easing.OutQuint);
-                    LoadingSpinner.Hide();
+                    loadingSpinner.Hide();
                     Hide();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
-                    LoadingSpinner.Show();
+                    loadingSpinner.Show();
                     placeholder.FadeOut(transform_duration, Easing.OutQuint);
                     Show();
                     break;
