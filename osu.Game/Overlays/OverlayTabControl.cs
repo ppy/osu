@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -34,20 +33,6 @@ namespace osu.Game.Overlays
             }
         }
 
-        private Color4 textColour;
-
-        public Color4 TextColour
-        {
-            get => textColour;
-            set
-            {
-                textColour = value;
-
-                foreach (var i in TabContainer.Children.OfType<OverlayTabItem>())
-                    i.TextColour = value;
-            }
-        }
-
         protected OverlayTabControl()
         {
             TabContainer.Masking = false;
@@ -67,7 +52,6 @@ namespace osu.Game.Overlays
         private void load(OverlayColourProvider colourProvider)
         {
             AccentColour = colourProvider.Highlight1;
-            TextColour = colourProvider.Light2;
         }
 
         protected override Dropdown<T> CreateDropdown() => null;
@@ -85,17 +69,17 @@ namespace osu.Game.Overlays
                 set => Bar.Colour = value;
             }
 
-            private Color4 textColour;
+            private Color4 idleColour;
 
-            public Color4 TextColour
+            protected Color4 IdleColour
             {
-                get => textColour;
+                get => idleColour;
                 set
                 {
-                    if (textColour == value)
+                    if (idleColour == value)
                         return;
 
-                    textColour = value;
+                    idleColour = value;
                     updateState();
                 }
             }
@@ -124,6 +108,12 @@ namespace osu.Game.Overlays
                     },
                     new HoverClickSounds()
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                IdleColour = colourProvider.Light2;
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -165,7 +155,7 @@ namespace osu.Game.Overlays
             protected virtual void UnhoverAction()
             {
                 Bar.Collapse();
-                Text.FadeColour(TextColour, 120, Easing.InQuad);
+                Text.FadeColour(idleColour, 120, Easing.InQuad);
             }
         }
     }

@@ -164,15 +164,8 @@ namespace osu.Game.Overlays
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value)
             {
                 // This needs to be set here manually because TabControl attempts to propagate these values to its children before these tabs are added
-                AccentColour = AccentColour,
-                TextColour = TextColour
+                AccentColour = AccentColour
             };
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                TextColour = Color4.White;
-            }
 
             private class ProfileSectionTabItem : OverlayTabItem
             {
@@ -180,6 +173,12 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.Title;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    IdleColour = Color4.White;
                 }
             }
         }
