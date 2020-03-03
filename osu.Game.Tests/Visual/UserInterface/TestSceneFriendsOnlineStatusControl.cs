@@ -55,9 +55,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             }));
 
-            AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.All)?.Amount == 3);
-            AddAssert("1 online user", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Online)?.Amount == 1);
-            AddAssert("2 offline users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Offline)?.Amount == 2);
+            AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.All)?.Count == 3);
+            AddAssert("1 online user", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Online)?.Count == 1);
+            AddAssert("2 offline users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Offline)?.Count == 2);
         }
     }
 }

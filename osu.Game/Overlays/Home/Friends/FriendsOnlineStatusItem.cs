@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Home.Friends
 
         protected override string GetMainText() => Value.Status.ToString();
 
-        protected override string GetAdditionalText() => Value.Amount.ToString();
+        protected override string GetAdditionalText() => Value.Count.ToString();
 
         protected override Color4 GetBarColour(OsuColour colours)
         {
