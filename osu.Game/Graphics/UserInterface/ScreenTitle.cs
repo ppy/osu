@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         private const float text_padding = 17.5f; // 15px padding + 2.5px compensation for line-height
 
         private SpriteIcon iconSprite;
-        protected readonly OsuSpriteText TitleText, PageText;
+        private readonly OsuSpriteText titleText, pageText;
         protected readonly Circle Separator;
 
         protected IconUsage Icon
@@ -37,18 +37,18 @@ namespace osu.Game.Graphics.UserInterface
 
         protected string Title
         {
-            set => TitleText.Text = value;
+            set => titleText.Text = value;
         }
 
         protected string Section
         {
-            set => PageText.Text = value;
+            set => pageText.Text = value;
         }
 
         public Color4 AccentColour
         {
-            get => PageText.Colour;
-            set => PageText.Colour = value;
+            get => pageText.Colour;
+            set => pageText.Colour = value;
         }
 
         public Color4 SeparatorColour
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
                             t.Origin = Anchor.Centre;
                             t.Margin = new MarginPadding { Horizontal = 5 }; // compensates for osu-web sprites having around 5px of whitespace on each side
                         }),
-                        TitleText = new OsuSpriteText
+                        titleText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -96,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
                             Colour = Color4.Gray,
                             Margin = new MarginPadding { Top = 3 } // compensation for osu-web using a font here making the circle appear a bit lower
                         },
-                        PageText = new OsuSpriteText
+                        pageText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

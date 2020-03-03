@@ -72,8 +72,6 @@ namespace osu.Game.Screens.Multi
 
         private class MultiHeaderTitle : ScreenTitle
         {
-            private const int text_offset = 2;
-
             public IMultiplayerSubScreen Screen
             {
                 set => Section = value.ShortTitle.ToLowerInvariant();
@@ -81,7 +79,6 @@ namespace osu.Game.Screens.Multi
 
             public MultiHeaderTitle()
             {
-                TitleText.Margin = PageText.Margin = new MarginPadding { Bottom = text_offset };
                 Separator.Size = new Vector2(4);
                 Separator.Margin = new MarginPadding(0);
             }
