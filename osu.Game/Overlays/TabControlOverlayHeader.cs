@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
@@ -65,7 +65,6 @@ namespace osu.Game.Overlays
         {
             public OverlayHeaderTabControl()
             {
-                BarHeight = 1;
                 RelativeSizeAxes = Axes.None;
                 AutoSizeAxes = Axes.X;
                 Anchor = Anchor.BottomLeft;
