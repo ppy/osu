@@ -19,6 +19,8 @@ namespace osu.Game.Graphics
 
         public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Regular);
 
+        public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
+
         /// <summary>
         /// Retrieves a <see cref="FontUsage"/>.
         /// </summary>
@@ -45,6 +47,9 @@ namespace osu.Game.Graphics
 
                 case Typeface.Venera:
                     return "Venera";
+
+                case Typeface.Torus:
+                    return "Torus";
             }
 
             return null;
@@ -65,16 +70,7 @@ namespace osu.Game.Graphics
         /// <param name="family">The family string.</param>
         /// <param name="weight">The <see cref="FontWeight"/>.</param>
         /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="family"/>.</returns>
-        public static string GetWeightString(string family, FontWeight weight)
-        {
-            string weightString = weight.ToString();
-
-            // Only exo has an explicit "regular" weight, other fonts do not
-            if (family != GetFamilyString(Typeface.Exo) && weight == FontWeight.Regular)
-                weightString = string.Empty;
-
-            return weightString;
-        }
+        public static string GetWeightString(string family, FontWeight weight) => weight.ToString();
     }
 
     public static class OsuFontExtensions
@@ -102,6 +98,7 @@ namespace osu.Game.Graphics
     {
         Exo,
         Venera,
+        Torus
     }
 
     public enum FontWeight

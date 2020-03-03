@@ -157,6 +157,11 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Exo2.0-Black");
             AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
 
+            AddFont(Resources, @"Fonts/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Bold");
+            AddFont(Resources, @"Fonts/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus-Light");
+
             AddFont(Resources, @"Fonts/Venera");
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Medium");
