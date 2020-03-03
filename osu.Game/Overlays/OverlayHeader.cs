@@ -21,11 +21,7 @@ namespace osu.Game.Overlays
 
         public const float CONTENT_X_MARGIN = 50;
 
-        public virtual float HorizontalMargin
-        {
-            get => content.Padding.Left;
-            set => content.Padding = new MarginPadding { Horizontal = value };
-        }
+        protected virtual float HorizontalMargin => CONTENT_X_MARGIN;
 
         protected OverlayHeader()
         {
@@ -63,7 +59,7 @@ namespace osu.Game.Overlays
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding { Horizontal = CONTENT_X_MARGIN },
+                                        Padding = new MarginPadding { Horizontal = HorizontalMargin },
                                         Children = new[]
                                         {
                                             title = CreateTitle().With(title =>

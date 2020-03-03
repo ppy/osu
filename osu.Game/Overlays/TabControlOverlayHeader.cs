@@ -31,16 +31,6 @@ namespace osu.Game.Overlays
             set => current.Current = value;
         }
 
-        public override float HorizontalMargin
-        {
-            get => base.HorizontalMargin;
-            set
-            {
-                base.HorizontalMargin = value;
-                TabControl.Margin = new MarginPadding { Left = value };
-            }
-        }
-
         protected TabControlOverlayHeader()
         {
             HeaderInfo.Add(new Container
@@ -55,7 +45,7 @@ namespace osu.Game.Overlays
                     },
                     TabControl = CreateTabControl().With(control =>
                     {
-                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
+                        control.Margin = new MarginPadding { Left = HorizontalMargin };
                         control.Current = Current;
                     })
                 }

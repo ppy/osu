@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Profile
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
+        protected override float HorizontalMargin => UserProfileOverlay.CONTENT_X_MARGIN;
+
         public ProfileHeader()
         {
             User.ValueChanged += e => updateDisplay(e.NewValue);
