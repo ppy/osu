@@ -157,7 +157,10 @@ namespace osu.Game.Screens.Play
             addGameplayComponents(GameplayClockContainer, Beatmap.Value);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(e =>
+            {
+                updatePauseOnFocusLostState(e.NewValue, BreakOverlay.IsBreakTime.Value);
+            }, true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -184,7 +187,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
                 mod.ApplyToHealthProcessor(HealthProcessor);
 
-            BreakOverlay.IsBreakTime.BindValueChanged(_ => onBreakTimeChanged(), true);
+            BreakOverlay.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
         private void addUnderlayComponents(Container target)
@@ -286,16 +289,16 @@ namespace osu.Game.Screens.Play
             HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
 
-        private void onBreakTimeChanged()
+        private void onBreakTimeChanged(ValueChangedEvent<bool> changeEvent)
         {
-            updatePauseOnFocusLostState();
-            HUDOverlay.KeyCounter.IsCounting = !BreakOverlay.IsBreakTime.Value;
+            updatePauseOnFocusLostState(DrawableRuleset.HasReplayLoaded.Value, changeEvent.NewValue);
+            HUDOverlay.KeyCounter.IsCounting = !changeEvent.NewValue;
         }
 
-        private void updatePauseOnFocusLostState() =>
+        private void updatePauseOnFocusLostState(bool replayLoaded, bool isBreakTime) =>
             HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
-                                                     && !DrawableRuleset.HasReplayLoaded.Value
-                                                     && !BreakOverlay.IsBreakTime.Value;
+                                                     && !replayLoaded
+                                                     && !isBreakTime;
 
         private IBeatmap loadPlayableBeatmap()
         {
