@@ -41,10 +41,9 @@ namespace osu.Game.Overlays
             AddInternal(bar = new Box
             {
                 RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding { Top = -1 },
                 Height = 2,
                 Anchor = Anchor.BottomLeft,
-                Origin = Anchor.CentreLeft
+                Origin = Anchor.BottomLeft
             });
         }
 
@@ -102,9 +101,9 @@ namespace osu.Game.Overlays
                     Bar = new ExpandingBar
                     {
                         Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.Centre,
                         ExpandedSize = 7.5f,
                         CollapsedSize = 0,
-                        Margin = new MarginPadding { Top = -1 }
                     },
                     new HoverClickSounds()
                 };
