@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -101,8 +101,7 @@ namespace osu.Game.Overlays
                     Bar = new ExpandingBar
                     {
                         Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.Centre,
-                        ExpandedSize = 7.5f,
+                        ExpandedSize = 5f,
                         CollapsedSize = 0,
                     },
                     new HoverClickSounds()
