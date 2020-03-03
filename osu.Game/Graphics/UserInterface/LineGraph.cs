@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Caching;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Layout;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -83,17 +83,11 @@ namespace osu.Game.Graphics.UserInterface
                     PathRadius = 1
                 }
             });
+
+            AddLayout(pathCached);
         }
 
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                pathCached.Invalidate();
-
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
-
-        private readonly Cached pathCached = new Cached();
+        private readonly LayoutValue pathCached = new LayoutValue(Invalidation.DrawSize);
 
         protected override void Update()
         {
