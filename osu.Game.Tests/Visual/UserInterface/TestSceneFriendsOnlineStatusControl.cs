@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Home.Friends;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -41,12 +43,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void Populate()
         {
-            AddStep(@"Populate", () => control.Populate(new List<FriendsBundle>
+            AddStep("Populate", () => control.Populate(new List<User>
             {
-                new FriendsBundle(FriendsOnlineStatus.All, 100),
-                new FriendsBundle(FriendsOnlineStatus.Online, 50),
-                new FriendsBundle(FriendsOnlineStatus.Offline, 50),
+                new User
+                {
+                    IsOnline = true
+                },
+                new User
+                {
+                    IsOnline = false
+                },
+                new User
+                {
+                    IsOnline = false
+                }
             }));
+
+            AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.All)?.Amount == 3);
+            AddAssert("1 online user", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Online)?.Amount == 1);
+            AddAssert("2 offline users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Offline)?.Amount == 2);
         }
     }
 }

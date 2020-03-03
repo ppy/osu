@@ -40,7 +40,7 @@ namespace osu.Game.Overlays
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
-        public OverlayUpdateStreamItem(T value)
+        protected OverlayUpdateStreamItem(T value)
             : base(value)
         {
         }
