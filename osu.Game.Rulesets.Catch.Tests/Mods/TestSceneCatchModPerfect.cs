@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Visual;
 using osuTK;
 
-namespace osu.Game.Rulesets.Catch.Tests
+namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
     public class TestSceneCatchModPerfect : ModPerfectTestScene
     {

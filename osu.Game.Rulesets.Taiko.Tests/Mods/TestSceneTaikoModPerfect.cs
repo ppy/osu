@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
     public class TestSceneTaikoModPerfect : ModPerfectTestScene
     {
