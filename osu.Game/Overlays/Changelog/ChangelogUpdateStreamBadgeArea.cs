@@ -10,9 +10,9 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class UpdateStreamBadgeArea : TabControl<APIUpdateStream>
+    public class ChangelogUpdateStreamBadgeArea : TabControl<APIUpdateStream>
     {
-        public UpdateStreamBadgeArea()
+        public ChangelogUpdateStreamBadgeArea()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override bool OnHover(HoverEvent e)
         {
-            foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
+            foreach (var streamBadge in TabContainer.Children.OfType<ChangelogUpdateStreamBadge>())
                 streamBadge.UserHoveringArea = true;
 
             return base.OnHover(e);
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
+            foreach (var streamBadge in TabContainer.Children.OfType<ChangelogUpdateStreamBadge>())
                 streamBadge.UserHoveringArea = false;
 
             base.OnHoverLost(e);
@@ -50,6 +50,6 @@ namespace osu.Game.Overlays.Changelog
         protected override Dropdown<APIUpdateStream> CreateDropdown() => null;
 
         protected override TabItem<APIUpdateStream> CreateTabItem(APIUpdateStream value) =>
-            new UpdateStreamBadge(value) { SelectedTab = { BindTarget = Current } };
+            new ChangelogUpdateStreamBadge(value) { SelectedTab = { BindTarget = Current } };
     }
 }

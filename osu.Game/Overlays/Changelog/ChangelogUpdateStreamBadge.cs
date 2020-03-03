@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class UpdateStreamBadge : TabItem<APIUpdateStream>
+    public class ChangelogUpdateStreamBadge : TabItem<APIUpdateStream>
     {
         private const float badge_width = 100;
         private const float transition_duration = 100;
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Changelog
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
-        public UpdateStreamBadge(APIUpdateStream stream)
+        public ChangelogUpdateStreamBadge(APIUpdateStream stream)
             : base(stream)
         {
             this.stream = stream;
