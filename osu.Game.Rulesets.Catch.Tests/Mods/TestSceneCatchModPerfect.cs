@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestTestJuiceStream(bool shouldMiss)
+        public void TestJuiceStream(bool shouldMiss)
         {
             var stream = new JuiceStream
             {
