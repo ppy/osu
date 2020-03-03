@@ -11,16 +11,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public abstract class OverlayUpdateStreamItem<T> : TabItem<T>
     {
-        private const float transition_duration = 100;
-        private const float tab_width = 100;
-
         public readonly Bindable<T> SelectedItem = new Bindable<T>();
 
         private bool userHoveringArea;
@@ -43,14 +39,14 @@ namespace osu.Game.Overlays
         protected OverlayUpdateStreamItem(T value)
             : base(value)
         {
+            Height = 60;
+            Width = 100;
+            Padding = new MarginPadding(5);
         }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            Size = new Vector2(GetWidth(), 60);
-            Padding = new MarginPadding(5);
-
             AddRange(new Drawable[]
             {
                 text = new FillFlowContainer<SpriteText>
@@ -100,8 +96,6 @@ namespace osu.Game.Overlays
 
         protected abstract Color4 GetBarColour(OsuColour colours);
 
-        protected virtual float GetWidth() => tab_width;
-
         protected override void OnActivated() => updateState();
 
         protected override void OnDeactivated() => updateState();
@@ -140,7 +134,7 @@ namespace osu.Game.Overlays
             }
 
             expandingBar.Expanded = barExpanded;
-            text.FadeTo(textHighlighted ? 1 : 0.5f, transition_duration, Easing.OutQuint);
+            text.FadeTo(textHighlighted ? 1 : 0.5f, 100, Easing.OutQuint);
         }
     }
 }
