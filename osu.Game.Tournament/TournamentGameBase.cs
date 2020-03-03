@@ -121,10 +121,9 @@ namespace osu.Game.Tournament
                 using (var sr = new StreamReader(stream))
                     ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
             }
-            else
-            {
+
+            if (ladder == null)
                 ladder = new LadderInfo();
-            }
 
             if (ladder.Ruleset.Value == null)
                 ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
