@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Schedule
 
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                new TourneyVideo(storage.GetStream(@"videos/schedule.m4v"))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,

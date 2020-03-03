@@ -33,13 +33,13 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
             InternalChildren = new Drawable[]
             {
-                blueWinVideo = new TourneyVideo(storage.GetStream(@"BG Team - Win Blue.m4v"))
+                blueWinVideo = new TourneyVideo(storage.GetStream(@"videos/teamwin-blue.m4v"))
                 {
                     Alpha = 1,
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                redWinVideo = new TourneyVideo(storage.GetStream(@"BG Team - Win Red.m4v"))
+                redWinVideo = new TourneyVideo(storage.GetStream(@"videos/teamwin-red.m4v"))
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
