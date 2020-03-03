@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -19,11 +20,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        private readonly Cached initialStateCache = new Cached();
+        private readonly LayoutValue initialStateCache = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
 
         public ScrollingHitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
+
+            AddLayout(initialStateCache);
         }
 
         [BackgroundDependencyLoader]
@@ -53,14 +56,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
 
             return result;
-        }
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & (Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo)) > 0)
-                initialStateCache.Invalidate();
-
-            return base.Invalidate(invalidation, source, shallPropagate);
         }
 
         private float scrollLength;
