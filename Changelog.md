@@ -560,3 +560,8 @@
     *   [m] [Update Framework #8053]
 *   修复一处翻译缺失
     *   [osu.Game/Beatmaps/DummyWorkingBeatmap.cs:28-29](osu.Game/Beatmaps/DummyWorkingBeatmap.cs)
+
+### 2020/03/03:
+*   整合更新
+    *   [m] [Bump Sentry from 2.0.3 to 2.1.0 #8088]
+    *   [m] [Fix double-dimming in changelog stream badge area #8031]

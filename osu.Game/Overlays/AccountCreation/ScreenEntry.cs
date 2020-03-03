@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.AccountCreation
         private IEnumerable<Drawable> characterCheckText;
 
         private OsuTextBox[] textboxes;
-        private LoadingLayer LoadingLayer;
+        private LoadingLayer loadingLayer;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         emailTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "电子邮件地址",
+                            PlaceholderText = "邮箱地址",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                     },
                 },
-                LoadingLayer = new LoadingLayer{mainContent}
+                loadingLayer = new LoadingLayer(mainContent)
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.AccountCreation
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            LoadingLayer.Hide();
+            loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)
                 focusNextTextbox();
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.AccountCreation
             emailAddressDescription.ClearErrors();
             passwordDescription.ClearErrors();
 
-            LoadingLayer.Show();
+            loadingLayer.Show();
 
             Task.Run(() =>
             {
@@ -191,11 +191,11 @@ namespace osu.Game.Overlays.AccountCreation
                         }
                         else
                         {
-                            passwordDescription.AddErrors(new[] { "好像有什么不对劲,但我们无法确认具体原因..." });
+                            passwordDescription.AddErrors(new[] { "Something happened... but we're not sure what." });
                         }
 
                         registerShake.Shake();
-                        LoadingLayer.Hide();
+                        loadingLayer.Hide();
                         return;
                     }
 

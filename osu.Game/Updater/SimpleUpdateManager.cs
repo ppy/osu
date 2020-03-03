@@ -37,7 +37,7 @@ namespace osu.Game.Updater
         {
             try
             {
-                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/MATRIX-feather/osu/releases/latest");
+                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
                 await releases.PerformAsync();
 
