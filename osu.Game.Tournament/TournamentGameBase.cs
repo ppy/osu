@@ -201,9 +201,11 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    if (p.Username == null || p.Statistics == null)
+                    if (string.IsNullOrEmpty(p.Username) || p.Statistics == null)
+                    {
                         PopulateUser(p);
-                    addedInfo = true;
+                        addedInfo = true;
+                    }
                 }
             }
 
