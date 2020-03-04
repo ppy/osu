@@ -64,15 +64,16 @@ namespace osu.Game.Beatmaps.Formats
         private void handleEvents(string line)
         {
             var depth = 0;
-            var lineSpan = line.AsSpan();
 
-            while (lineSpan.StartsWith(" ", StringComparison.Ordinal) || lineSpan.StartsWith("_", StringComparison.Ordinal))
+            foreach (char c in line)
             {
-                lineSpan = lineSpan.Slice(1);
-                ++depth;
+                if (c == ' ' || c == '_')
+                    depth++;
+                else
+                    break;
             }
 
-            line = lineSpan.ToString();
+            line = line.Substring(depth);
 
             decodeVariables(ref line);
 

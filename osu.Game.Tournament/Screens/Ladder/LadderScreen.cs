@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
@@ -41,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new TourneyVideo(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                    new TourneyVideo(storage.GetStream(@"videos/ladder.m4v"))
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
@@ -68,22 +69,24 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var match in LadderInfo.Matches)
                 addMatch(match);
 
-            LadderInfo.Rounds.ItemsAdded += _ => layout.Invalidate();
-            LadderInfo.Rounds.ItemsRemoved += _ => layout.Invalidate();
-
-            LadderInfo.Matches.ItemsAdded += matches =>
+            LadderInfo.Rounds.CollectionChanged += (_, __) => layout.Invalidate();
+            LadderInfo.Matches.CollectionChanged += (_, args) =>
             {
-                foreach (var p in matches)
-                    addMatch(p);
-                layout.Invalidate();
-            };
-
-            LadderInfo.Matches.ItemsRemoved += matches =>
-            {
-                foreach (var p in matches)
+                switch (args.Action)
                 {
-                    foreach (var d in MatchesContainer.Where(d => d.Match == p))
-                        d.Expire();
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var p in args.NewItems.Cast<TournamentMatch>())
+                            addMatch(p);
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var p in args.OldItems.Cast<TournamentMatch>())
+                        {
+                            foreach (var d in MatchesContainer.Where(d => d.Match == p))
+                                d.Expire();
+                        }
+
+                        break;
                 }
 
                 layout.Invalidate();

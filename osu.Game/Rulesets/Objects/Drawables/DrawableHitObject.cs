@@ -99,12 +99,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             var judgement = HitObject.CreateJudgement();
 
-            if (judgement != null)
-            {
-                Result = CreateResult(judgement);
-                if (Result == null)
-                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-            }
+            Result = CreateResult(judgement);
+            if (Result == null)
+                throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
             loadSamples();
         }
@@ -116,17 +113,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
-            startTimeBindable.BindValueChanged(_ => updateState(ArmedState.Idle, true));
+            startTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
 
             if (HitObject is IHasComboInformation combo)
             {
                 comboIndexBindable = combo.ComboIndexBindable.GetBoundCopy();
-                comboIndexBindable.BindValueChanged(_ => updateAccentColour(), true);
+                comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
-            samplesBindable.ItemsAdded += _ => loadSamples();
-            samplesBindable.ItemsRemoved += _ => loadSamples();
+            samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
             onDefaultsApplied();
@@ -225,18 +221,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
-#pragma warning disable 618 // (legacy state management) - can be removed 20200227
-
-        /// <summary>
-        /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
-        /// </summary>
-        /// <remarks>
-        /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
-        /// is offered as a compatibility layer until all rulesets have been migrated across.
-        /// </remarks>
-        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
-        protected virtual bool UseTransformStateManagement => true;
-
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
 
         private void updateState(ArmedState newState, bool force = false)
@@ -244,35 +228,28 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (State.Value == newState && !force)
                 return;
 
-            if (UseTransformStateManagement)
+            LifetimeEnd = double.MaxValue;
+
+            double transformTime = HitObject.StartTime - InitialLifetimeOffset;
+
+            base.ApplyTransformsAt(double.MinValue, true);
+            base.ClearTransformsAfter(double.MinValue, true);
+
+            using (BeginAbsoluteSequence(transformTime, true))
             {
-                LifetimeEnd = double.MaxValue;
+                UpdateInitialTransforms();
 
-                double transformTime = HitObject.StartTime - InitialLifetimeOffset;
+                var judgementOffset = Result?.TimeOffset ?? 0;
 
-                base.ApplyTransformsAt(transformTime, true);
-                base.ClearTransformsAfter(transformTime, true);
-
-                using (BeginAbsoluteSequence(transformTime, true))
+                using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                 {
-                    UpdateInitialTransforms();
-
-                    var judgementOffset = Result?.TimeOffset ?? 0;
-
-                    using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
-                    {
-                        UpdateStateTransforms(newState);
-                        state.Value = newState;
-                    }
+                    UpdateStateTransforms(newState);
+                    state.Value = newState;
                 }
-
-                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
-                    Expire();
             }
-            else
-                state.Value = newState;
 
-            UpdateState(newState);
+            if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue || HitObject.HitWindows == null)
+                Expire();
 
             // apply any custom state overrides
             ApplyCustomUpdateState?.Invoke(this, newState);
@@ -307,29 +284,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
-            // When we are using automatic state management, parent calls to this should be blocked for safety.
-            if (!UseTransformStateManagement)
-                base.ClearTransformsAfter(time, propagateChildren, targetMember);
+            // Parent calls to this should be blocked for safety, as we are manually handling this in updateState.
         }
 
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
-            // When we are using automatic state management, parent calls to this should be blocked for safety.
-            if (!UseTransformStateManagement)
-                base.ApplyTransformsAt(time, propagateChildren);
+            // Parent calls to this should be blocked for safety, as we are manually handling this in updateState.
         }
-
-        /// <summary>
-        /// Legacy method to handle state changes.
-        /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
-        /// </summary>
-        /// <param name="state">The new armed state.</param>
-        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
-        protected virtual void UpdateState(ArmedState state)
-        {
-        }
-
-#pragma warning restore 618
 
         #endregion
 
@@ -337,7 +298,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            updateAccentColour();
+            updateComboColour();
 
             ApplySkin(skin, allowFallback);
 
@@ -345,13 +306,29 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 updateState(State.Value, true);
         }
 
-        private void updateAccentColour()
+        private void updateComboColour()
         {
-            if (HitObject is IHasComboInformation combo)
-            {
-                var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
-                AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
-            }
+            if (!(HitObject is IHasComboInformation)) return;
+
+            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+
+            AccentColour.Value = GetComboColour(comboColours);
+        }
+
+        /// <summary>
+        /// Called to retrieve the combo colour. Automatically assigned to <see cref="AccentColour"/>.
+        /// Defaults to using <see cref="IHasComboInformation.ComboIndex"/> to decide on a colour.
+        /// </summary>
+        /// <remarks>
+        /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
+        /// </remarks>
+        /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
+        protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
+        {
+            if (!(HitObject is IHasComboInformation combo))
+                throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
+
+            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
         }
 
         /// <summary>

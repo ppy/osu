@@ -48,7 +48,8 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
@@ -465,12 +466,6 @@ namespace osu.Game.Online.Chat
             req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel} up to '{message}' as read");
 
             api.Queue(req);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
-        {
-            this.api = api;
         }
     }
 
