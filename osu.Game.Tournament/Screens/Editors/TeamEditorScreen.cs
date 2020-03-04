@@ -154,7 +154,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Text = "Edit seeding results",
                                 Action = () =>
                                 {
-                                    sceneManager.SetScreen(new SeedingEditorScreen(team));
+                                    sceneManager?.SetScreen(new SeedingEditorScreen(team));
                                 }
                             },
                         }
