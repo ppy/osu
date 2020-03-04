@@ -22,9 +22,6 @@ namespace osu.Game.Overlays.Home.Friends
         {
             switch (Value.Status)
             {
-                default:
-                    throw new ArgumentException($@"{Value.Status} status does not provide a colour in {nameof(GetBarColour)}.");
-
                 case FriendsOnlineStatus.All:
                     return Color4.White;
 
@@ -33,6 +30,9 @@ namespace osu.Game.Overlays.Home.Friends
 
                 case FriendsOnlineStatus.Offline:
                     return Color4.Black;
+
+                default:
+                    throw new ArgumentException($@"{Value.Status} status does not provide a colour in {nameof(GetBarColour)}.");
             }
         }
     }
