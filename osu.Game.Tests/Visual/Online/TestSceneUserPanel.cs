@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Online
         });
 
         [Test]
-        public void UserStatusesTests()
+        public void TestUserStatus()
         {
             AddStep("online", () => peppy.Status.Value = new UserStatusOnline());
             AddStep("do not disturb", () => peppy.Status.Value = new UserStatusDoNotDisturb());
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void UserActivitiesTests()
+        public void TestUserActivity()
         {
             AddStep("idle", () => activity.Value = null);
             AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
