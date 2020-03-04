@@ -180,22 +180,23 @@ namespace osu.Game.Users
         {
             if (status != null)
             {
+                // Set status message based on activity (if we have one) and status is not offline
                 if (activity != null && !(status is UserStatusOffline))
                 {
                     statusMessage.Text = activity.Status;
                     statusIcon.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
+                    return;
                 }
-                else
-                {
-                    lastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
-                    statusMessage.Text = status.Message;
-                    statusIcon.FadeColour(status.GetAppropriateColour(colours), 500, Easing.OutQuint);
-                }
+
+                // Otherwise use only status
+                lastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
+                statusMessage.Text = status.Message;
+                statusIcon.FadeColour(status.GetAppropriateColour(colours), 500, Easing.OutQuint);
 
                 return;
             }
 
-            // Set local status according to web if it's null
+            // Fallback to web status if local one is null
             if (User.IsOnline)
             {
                 Status.Value = new UserStatusOnline();
