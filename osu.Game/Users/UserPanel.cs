@@ -57,8 +57,6 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load()
         {
-            Action = () => profileOverlay?.ShowUser(User);
-
             Masking = true;
             BorderColour = colours.GreyVioletLighter;
 
