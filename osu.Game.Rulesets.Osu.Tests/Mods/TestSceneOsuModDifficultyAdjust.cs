@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
         });
 
-        protected override TestPlayer CreateReplayPlayer(Score score) => new ScoreAccessibleTestPlayer(score);
+        protected override TestPlayer CreateReplayPlayer(Score score, bool allowFail) => new ScoreAccessibleTestPlayer(score, allowFail);
 
         private class ScoreAccessibleTestPlayer : TestPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
-            public ScoreAccessibleTestPlayer(Score score)
-                : base(score)
+            public ScoreAccessibleTestPlayer(Score score, bool allowFail)
+                : base(score, allowFail)
             {
             }
         }
