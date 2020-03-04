@@ -58,9 +58,9 @@ namespace osu.Game.Tests.Visual.Online
         public void UserStatusesTests()
         {
             AddStep("online", () => peppy.Status.Value = new UserStatusOnline());
-            AddStep(@"do not disturb", () => peppy.Status.Value = new UserStatusDoNotDisturb());
-            AddStep(@"offline", () => peppy.Status.Value = new UserStatusOffline());
-            AddStep(@"null status", () => peppy.Status.Value = null);
+            AddStep("do not disturb", () => peppy.Status.Value = new UserStatusDoNotDisturb());
+            AddStep("offline", () => peppy.Status.Value = new UserStatusOffline());
+            AddStep("null status", () => peppy.Status.Value = null);
         }
 
         [Test]
