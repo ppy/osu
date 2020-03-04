@@ -58,17 +58,17 @@ namespace osu.Game.Overlays
                     {
                         new OsuSpriteText
                         {
-                            Text = GetMainText,
+                            Text = MainText,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black),
                         },
                         new OsuSpriteText
                         {
-                            Text = GetAdditionalText,
+                            Text = AdditionalText,
                             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                         },
                         new OsuSpriteText
                         {
-                            Text = GetInfoText,
+                            Text = InfoText,
                             Font = OsuFont.GetFont(size: 10),
                             Colour = colourProvider.Foreground1
                         },
@@ -88,11 +88,11 @@ namespace osu.Game.Overlays
             SelectedItem.BindValueChanged(_ => updateState(), true);
         }
 
-        protected abstract string GetMainText { get; }
+        protected abstract string MainText { get; }
 
-        protected abstract string GetAdditionalText { get; }
+        protected abstract string AdditionalText { get; }
 
-        protected virtual string GetInfoText => string.Empty;
+        protected virtual string InfoText => string.Empty;
 
         protected abstract Color4 GetBarColour(OsuColour colours);
 
