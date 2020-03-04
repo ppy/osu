@@ -26,7 +26,7 @@ namespace osu.Game.Users
         private void load()
         {
             Background.Width = 0.5f;
-            Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.6f));
+            Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.3f));
         }
 
         protected override Drawable CreateLayout()

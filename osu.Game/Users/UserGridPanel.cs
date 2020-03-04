@@ -23,7 +23,7 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.FadeTo(0.6f);
+            Background.FadeTo(0.4f);
         }
 
         protected override Drawable CreateLayout()
