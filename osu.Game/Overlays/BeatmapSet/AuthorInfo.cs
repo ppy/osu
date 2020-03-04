@@ -66,12 +66,15 @@ namespace osu.Game.Overlays.BeatmapSet
                     case BeatmapSetOnlineStatus.Ranked:
                         verb = "ranked";
                         break;
+
                     case BeatmapSetOnlineStatus.Approved:
                         verb = "approved";
                         break;
+
                     case BeatmapSetOnlineStatus.Qualified:
                         verb = "qualified";
                         break;
+
                     case BeatmapSetOnlineStatus.Loved:
                         verb = "loved";
                         break;
