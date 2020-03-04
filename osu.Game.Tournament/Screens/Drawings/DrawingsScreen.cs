@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
@@ -29,7 +28,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
         private ScrollingTeamContainer teamsContainer;
         private GroupContainer groupsContainer;
-        private OsuSpriteText fullTeamNameText;
+        private TournamentSpriteText fullTeamNameText;
 
         private readonly List<TournamentTeam> allTeams = new List<TournamentTeam>();
 
@@ -109,18 +108,18 @@ namespace osu.Game.Tournament.Screens.Drawings
                             RelativeSizeAxes = Axes.X,
                         },
                         // Scrolling team name
-                        fullTeamNameText = new OsuSpriteText
+                        fullTeamNameText = new TournamentSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
 
                             Position = new Vector2(0, 45f),
 
-                            Colour = OsuColour.Gray(0.33f),
+                            Colour = OsuColour.Gray(0.95f),
 
                             Alpha = 0,
 
-                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Light, size: 42),
                         }
                     }
                 },
