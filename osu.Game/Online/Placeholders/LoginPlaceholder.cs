@@ -4,43 +4,39 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Online.Placeholders
 {
     public sealed class LoginPlaceholder : Placeholder
     {
-        [Resolved(CanBeNull = true)]
-        private LoginOverlay login { get; set; }
-
         public LoginPlaceholder(string actionMessage)
         {
-            AddIcon(FontAwesome.Solid.UserLock, cp =>
+            AddArbitraryDrawable(new LoginButton(actionMessage));
+        }
+
+        private class LoginButton : OsuAnimatedButton
+        {
+            [Resolved(CanBeNull = true)]
+            private LoginOverlay login { get; set; }
+
+            public LoginButton(string actionMessage)
             {
-                cp.Font = cp.Font.With(size: TEXT_SIZE);
-                cp.Padding = new MarginPadding { Right = 10 };
-            });
+                AutoSizeAxes = Axes.Both;
 
-            AddText(actionMessage);
-        }
+                Child = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
+                        .With(t => t.AutoSizeAxes = Axes.Both)
+                        .With(t => t.AddIcon(FontAwesome.Solid.UserLock, icon =>
+                        {
+                            icon.Padding = new MarginPadding { Right = 10 };
+                        }))
+                        .With(t => t.AddText(actionMessage))
+                        .With(t => t.Margin = new MarginPadding(5));
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            this.ScaleTo(0.8f, 4000, Easing.OutQuint);
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            this.ScaleTo(1, 1000, Easing.OutElastic);
-            base.OnMouseUp(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            login?.Show();
-            return base.OnClick(e);
+                Action = () => login?.Show();
+            }
         }
     }
 }
