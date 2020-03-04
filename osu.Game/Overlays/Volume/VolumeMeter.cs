@@ -11,16 +11,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -259,6 +261,29 @@ namespace osu.Game.Overlays.Volume
         protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!IsHovered)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.SelectPrevious:
+                    adjust(1, false);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    adjust(-1, false);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }
