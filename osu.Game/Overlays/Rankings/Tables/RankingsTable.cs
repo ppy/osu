@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 Spacing = new Vector2(0, row_spacing),
             });
 
-            rankings.ForEach(_ => backgroundFlow.Add(new TableRowBackground(row_height)));
+            rankings.ForEach(_ => backgroundFlow.Add(new TableRowBackground { Height = row_height }));
 
             Columns = mainHeaders.Concat(CreateAdditionalHeaders()).ToArray();
             Content = rankings.Select((s, i) => createContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
