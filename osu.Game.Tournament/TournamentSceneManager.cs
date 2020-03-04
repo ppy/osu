@@ -80,6 +80,7 @@ namespace osu.Game.Tournament
                                 new ShowcaseScreen(),
                                 new MapPoolScreen(),
                                 new TeamIntroScreen(),
+                                new SeedingScreen(),
                                 new DrawingsScreen(),
                                 new GameplayScreen(),
                                 new TeamWinScreen()
@@ -121,6 +122,7 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(LadderScreen)) { Text = "Bracket", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(TeamIntroScreen)) { Text = "队伍介绍", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(SeedingScreen)) { Text = "随机分配", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(MapPoolScreen)) { Text = "谱面列表", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(GameplayScreen)) { Text = "游戏内界面", RequestSelection = SetScreen },
@@ -145,9 +147,20 @@ namespace osu.Game.Tournament
 
         private Drawable currentScreen;
         private ScheduledDelegate scheduledHide;
+        private Drawable temporaryScreen;
+
+        public void SetScreen(Drawable screen)
+        {
+            currentScreen?.Hide();
+            currentScreen = null;
+
+            screens.Add(temporaryScreen = screen);
+        }
 
         public void SetScreen(Type screenType)
-        {
+        {           
+            temporaryScreen?.Expire();
+
             var target = screens.FirstOrDefault(s => s.GetType() == screenType);
 
             if (target == null || currentScreen == target) return;

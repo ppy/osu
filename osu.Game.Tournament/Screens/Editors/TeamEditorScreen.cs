@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Editors
             ControlPanel.Add(new TourneyButton
             {
                 RelativeSizeAxes = Axes.X,
-                Text = "添加所有国家",
+                Text = "添加所有的国家和地区",
                 Action = addAllCountries
             });
         }
@@ -56,6 +56,9 @@ namespace osu.Game.Tournament.Screens.Editors
             public TournamentTeam Model { get; }
 
             private readonly Container drawableContainer;
+
+            [Resolved(canBeNull: true)]
+            private TournamentSceneManager sceneManager { get; set; }
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
@@ -109,9 +112,21 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "旗子(?)",
+                                LabelText = "标志旗",
                                 Width = 0.2f,
                                 Bindable = Model.FlagName
+                            },
+                            new SettingsTextBox
+                            {
+                                LabelText = "种子",
+                                Width = 0.2f,
+                                Bindable = Model.Seed
+                            },
+                            new SettingsSlider<int>
+                            {
+                                LabelText = "去年的位置(Last Year Placement)",
+                                Width = 0.33f,
+                                Bindable = Model.LastYearPlacing
                             },
                             new SettingsButton
                             {
@@ -131,7 +146,17 @@ namespace osu.Game.Tournament.Screens.Editors
                                     ladderInfo.Teams.Remove(Model);
                                 },
                             },
-                            playerEditor
+                            playerEditor,
+                            new SettingsButton
+                            {
+                                Width = 0.2f,
+                                Margin = new MarginPadding(10),
+                                Text = "编辑随机结果",
+                                Action = () =>
+                                {
+                                    sceneManager?.SetScreen(new SeedingEditorScreen(team));
+                                }
+                            },
                         }
                     },
                 };
