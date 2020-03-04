@@ -571,3 +571,4 @@
     *   [m] [Reduce social overlay/direct overlay paddings #8103]
     *   [m] [Add SelectPrevious and SelectNext bindings / Change volume bindings to be truly global #8090]
     *   [m] [Split out LadderEditorSetings into multiple files #8122]
+    *   [m] [Fix nullref when deleting teams in the ladder screen #8123]
