@@ -395,7 +395,7 @@ namespace osu.Game.Screens.Select
                 // we still want to temporarily show the new beatmap, bypassing filters.
                 // This will be undone the next time the user changes the filter.
                 var criteria = FilterControl.CreateCriteria();
-                criteria.SelectedBeatmap = e.NewValue.BeatmapInfo;
+                criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
                 Carousel.Filter(criteria);
             }
         }
