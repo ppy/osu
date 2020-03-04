@@ -18,9 +18,9 @@ using JetBrains.Annotations;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Graphics.UserInterfaceV2.Users
 {
@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
 
         protected DelayedLoadUnloadWrapper Background;
 
-        public UserCard(User user)
+        protected UserCard(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -42,6 +42,12 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
 
         [Resolved(canBeNull: true)]
         private UserProfileOverlay profileOverlay { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private ChannelManager channelManager { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private ChatOverlay chatOverlay { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -54,7 +60,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
             Masking = true;
             BorderColour = colours.GreyVioletLighter;
 
-            AddRange(new Drawable[]
+            AddRange(new[]
             {
                 new Box
                 {
@@ -152,6 +158,11 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
+            new OsuMenuItem("Send message", MenuItemType.Standard, () =>
+            {
+                channelManager?.OpenPrivateChannel(User);
+                chatOverlay?.Show();
+            })
         };
     }
 }
