@@ -66,6 +66,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestUserActivity()
         {
+            AddStep("set online status", () => peppy.Status.Value = new UserStatusOnline());
+
             AddStep("idle", () => activity.Value = null);
             AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
             AddStep("solo", () => activity.Value = new UserActivity.SoloGame(null, null));
