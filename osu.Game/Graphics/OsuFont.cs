@@ -109,27 +109,27 @@ namespace osu.Game.Graphics
         Light = 300,
 
         /// <summary>
-        /// equivalent to weight 400
+        /// Equivalent to weight 400.
         /// </summary>
         Regular = 400,
 
         /// <summary>
-        /// equivalent to weight 500
+        /// Equivalent to weight 500.
         /// </summary>
         Medium = 500,
 
         /// <summary>
-        /// equivalent to weight 600
+        /// Equivalent to weight 600.
         /// </summary>
         SemiBold = 600,
 
         /// <summary>
-        /// equivalent to weight 700
+        /// Equivalent to weight 700.
         /// </summary>
         Bold = 700,
 
         /// <summary>
-        /// equivalent to weight 900
+        /// Equivalent to weight 900.
         /// </summary>
         Black = 900
     }
