@@ -56,6 +56,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public void DisplayScores(IReadOnlyList<ScoreInfo> scores, bool showPerformanceColumn)
         {
+            ClearScores();
+
             if (!scores.Any())
                 return;
 
