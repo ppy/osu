@@ -565,3 +565,9 @@
 *   整合更新
     *   [m] [Bump Sentry from 2.0.3 to 2.1.0 #8088]
     *   [m] [Fix double-dimming in changelog stream badge area #8031]
+
+### 2020/03/04:
+*   整合更新
+    *   [m] [Reduce social overlay/direct overlay paddings #8103]
+    *   [m] [Add SelectPrevious and SelectNext bindings / Change volume bindings to be truly global #8090]
+    *   [m] [Split out LadderEditorSetings into multiple files #8122]

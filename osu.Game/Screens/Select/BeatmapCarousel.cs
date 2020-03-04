@@ -16,15 +16,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapCarousel : CompositeDrawable
+    public class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.Select
 
         public override bool HandleNonPositionalInput => AllowSelection;
         public override bool HandlePositionalInput => AllowSelection;
-        
+
         public override bool PropagatePositionalInputSubTree => AllowSelection;
         public override bool PropagateNonPositionalInputSubTree => AllowSelection;
 
@@ -68,6 +70,7 @@ namespace osu.Game.Screens.Select
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
+        // todo: only used for testing, maybe remove.
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get => beatmapSets.Select(g => g.BeatmapSet);
@@ -133,14 +136,22 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config, BeatmapManager beatmaps)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
             RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
+
+            beatmaps.ItemAdded += beatmapAdded;
+            beatmaps.ItemRemoved += beatmapRemoved;
+            beatmaps.BeatmapHidden += beatmapHidden;
+            beatmaps.BeatmapRestored += beatmapRestored;
 
             loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
         }
@@ -425,42 +436,39 @@ namespace osu.Game.Screens.Select
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
         protected override bool OnKeyDown(KeyDownEvent e)
-        {   
-            // allow for controlling volume when alt is held.
-            // this is required as the VolumeControlReceptor uses OnPressed, which is
-            // executed after all OnKeyDown events.
-            if (e.AltPressed)
-                return base.OnKeyDown(e);
-
-            int direction = 0;
-            bool skipDifficulties = false;
-
+        {
             switch (e.Key)
             {
-                case Key.Up:
-                    direction = -1;
-                    break;
-
-                case Key.Down:
-                    direction = 1;
-                    break;
-
                 case Key.Left:
-                    direction = -1;
-                    skipDifficulties = true;
-                    break;
+                    SelectNext(-1, true);
+                    return true;
 
                 case Key.Right:
-                    direction = 1;
-                    skipDifficulties = true;
-                    break;
+                    SelectNext(1, true);
+                    return true;
             }
 
-            if (direction == 0)
-                return base.OnKeyDown(e);
+            return false;
+        }
 
-            SelectNext(direction, skipDifficulties);
-            return true;
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.SelectNext:
+                    SelectNext(1, false);
+                    return true;
+
+                case GlobalAction.SelectPrevious:
+                    SelectNext(-1, false);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected override void Update()
@@ -546,10 +554,26 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= beatmapAdded;
+                beatmaps.ItemRemoved -= beatmapRemoved;
+                beatmaps.BeatmapHidden -= beatmapHidden;
+                beatmaps.BeatmapRestored -= beatmapRestored;
+            }
+
             // aggressively dispose "off-screen" items to reduce GC pressure.
             foreach (var i in Items)
                 i.Dispose();
         }
+
+        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
+
+        private void beatmapAdded(BeatmapSetInfo item) => UpdateBeatmapSet(item);
+
+        private void beatmapRestored(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+
+        private void beatmapHidden(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {

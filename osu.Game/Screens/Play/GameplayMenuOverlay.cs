@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Input;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Bindings;
@@ -204,35 +203,24 @@ namespace osu.Game.Screens.Play
                 InternalButtons[selectionIndex].Selected.Value = true;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat)
-            {
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        if (selectionIndex == -1 || selectionIndex == 0)
-                            setSelected(InternalButtons.Count - 1);
-                        else
-                            setSelected(selectionIndex - 1);
-                        return true;
-
-                    case Key.Down:
-                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                            setSelected(0);
-                        else
-                            setSelected(selectionIndex + 1);
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
+                case GlobalAction.SelectPrevious:
+                    if (selectionIndex == -1 || selectionIndex == 0)
+                        setSelected(InternalButtons.Count - 1);
+                    else
+                        setSelected(selectionIndex - 1);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
+                        setSelected(0);
+                    else
+                        setSelected(selectionIndex + 1);
+                    return true;
+
                 case GlobalAction.Back:
                     BackAction.Invoke();
                     return true;
@@ -266,15 +254,15 @@ namespace osu.Game.Screens.Play
             {
                 new OsuSpriteText
                 {
-                    Text = "你这次已经重试了",
+                    Text = "你这次已经尝试了",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    Font = OsuFont.GetFont(size: 20),
+                    Font = OsuFont.GetFont(size: 18),
                 },
                 new OsuSpriteText
                 {
-                    Text = " ".ToQuantity(retries, ShowQuantityAs.Numeric),
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
+                    Text = " ".ToQuantity(retries),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                 },
@@ -283,7 +271,7 @@ namespace osu.Game.Screens.Play
                     Text = "次",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    Font = OsuFont.GetFont(size: 20),
+                    Font = OsuFont.GetFont(size: 18),
                 }
             };
         }
