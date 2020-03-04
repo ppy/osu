@@ -26,14 +26,20 @@ namespace osu.Game.Online.Placeholders
             {
                 AutoSizeAxes = Axes.Both;
 
-                Child = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
-                        .With(t => t.AutoSizeAxes = Axes.Both)
-                        .With(t => t.AddIcon(FontAwesome.Solid.UserLock, icon =>
-                        {
-                            icon.Padding = new MarginPadding { Right = 10 };
-                        }))
-                        .With(t => t.AddText(actionMessage))
-                        .With(t => t.Margin = new MarginPadding(5));
+                var textFlowContainer = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding(5)
+                };
+
+                Child = textFlowContainer;
+
+                textFlowContainer.AddIcon(FontAwesome.Solid.UserLock, icon =>
+                {
+                    icon.Padding = new MarginPadding { Right = 10 };
+                });
+
+                textFlowContainer.AddText(actionMessage);
 
                 Action = () => login?.Show();
             }
