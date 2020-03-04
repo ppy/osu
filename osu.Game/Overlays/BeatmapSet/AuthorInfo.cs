@@ -59,7 +59,25 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field("ranked", online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                string verb = "ranked";
+
+                switch (online.Status)
+                {
+                    case BeatmapSetOnlineStatus.Ranked:
+                        verb = "ranked";
+                        break;
+                    case BeatmapSetOnlineStatus.Approved:
+                        verb = "approved";
+                        break;
+                    case BeatmapSetOnlineStatus.Qualified:
+                        verb = "qualified";
+                        break;
+                    case BeatmapSetOnlineStatus.Loved:
+                        verb = "loved";
+                        break;
+                }
+
+                fields.Add(new Field(verb, online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
             else if (online.LastUpdated.HasValue)
             {
