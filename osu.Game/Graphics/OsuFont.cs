@@ -17,7 +17,7 @@ namespace osu.Game.Graphics
         /// </summary>
         public static FontUsage Default => GetFont();
 
-        public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Regular);
+        public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Bold);
 
         public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
 
@@ -103,11 +103,34 @@ namespace osu.Game.Graphics
 
     public enum FontWeight
     {
-        Light,
-        Regular,
-        Medium,
-        SemiBold,
-        Bold,
-        Black
+        /// <summary>
+        /// equivalent to weight 300
+        /// </summary>
+        Light = 300,
+
+        /// <summary>
+        /// equivalent to weight 400
+        /// </summary>
+        Regular = 400,
+
+        /// <summary>
+        /// equivalent to weight 500
+        /// </summary>
+        Medium = 500,
+
+        /// <summary>
+        /// equivalent to weight 600
+        /// </summary>
+        SemiBold = 600,
+
+        /// <summary>
+        /// equivalent to weight 700
+        /// </summary>
+        Bold = 700,
+
+        /// <summary>
+        /// equivalent to weight 900
+        /// </summary>
+        Black = 900
     }
 }
