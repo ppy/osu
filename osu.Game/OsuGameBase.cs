@@ -162,9 +162,9 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus-Light");
 
-            AddFont(Resources, @"Fonts/Venera");
             AddFont(Resources, @"Fonts/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera-Medium");
+            AddFont(Resources, @"Fonts/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera-Black");
 
             runMigrations();
 
