@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 if (value?.Scores.Any() != true)
                 {
-                    scoreTable.Scores = null;
+                    scoreTable.ClearScores();
                     scoreTable.Hide();
                     return;
                 }
@@ -61,8 +61,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
                 var topScore = scoreInfos.First();
 
-                scoreTable.Scores = scoreInfos;
-                scoreTable.IsBeatmapRanked = topScore.Beatmap.Status == BeatmapSetOnlineStatus.Ranked;
+                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status == BeatmapSetOnlineStatus.Ranked);
                 scoreTable.Show();
 
                 var userScore = value.UserScore;
