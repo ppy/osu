@@ -5,8 +5,8 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogUpdateStreamControl : OverlayUpdateStreamControl<APIUpdateStream>
+    public class ChangelogUpdateStreamControl : OverlayStreamControl<APIUpdateStream>
     {
-        protected override OverlayUpdateStreamItem<APIUpdateStream> CreateStreamItem(APIUpdateStream value) => new ChangelogUpdateStreamItem(value);
+        protected override OverlayStreamItem<APIUpdateStream> CreateStreamItem(APIUpdateStream value) => new ChangelogUpdateStreamItem(value);
     }
 }

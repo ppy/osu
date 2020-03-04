@@ -7,7 +7,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Home.Friends
 {
-    public class FriendsOnlineStatusItem : OverlayUpdateStreamItem<FriendsBundle>
+    public class FriendsOnlineStatusItem : OverlayStreamItem<FriendsBundle>
     {
         public FriendsOnlineStatusItem(FriendsBundle value)
             : base(value)

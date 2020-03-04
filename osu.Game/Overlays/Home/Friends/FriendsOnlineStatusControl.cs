@@ -7,9 +7,9 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Home.Friends
 {
-    public class FriendsOnlineStatusControl : OverlayUpdateStreamControl<FriendsBundle>
+    public class FriendsOnlineStatusControl : OverlayStreamControl<FriendsBundle>
     {
-        protected override OverlayUpdateStreamItem<FriendsBundle> CreateStreamItem(FriendsBundle value) => new FriendsOnlineStatusItem(value);
+        protected override OverlayStreamItem<FriendsBundle> CreateStreamItem(FriendsBundle value) => new FriendsOnlineStatusItem(value);
 
         public void Populate(List<User> users)
         {
