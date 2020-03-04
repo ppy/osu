@@ -428,11 +428,17 @@ namespace osu.Game
             }
         }
 
-        private void currentTrackCompleted() => Schedule(() =>
+        private void currentTrackCompleted()
         {
-            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                musicController.NextTrack();
-        });
+            if (Beatmap.Value is DummyWorkingBeatmap)
+                return;
+
+            Schedule(() =>
+            {
+                if (Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                    musicController.NextTrack();
+            });
+        }
 
         #endregion
 
