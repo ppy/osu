@@ -126,7 +126,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = "胜出者",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 15, FontWeight.Regular),
+                                Font = OsuFont.Torus.With(size: 15, weight: FontWeight.Regular),
                             },
                             new OsuSpriteText
                             {
@@ -134,7 +134,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = match.Round.Value?.Name.Value ?? "未知回合",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 50, FontWeight.Light),
+                                Font = OsuFont.Torus.With(size: 50, weight: FontWeight.Light),
                                 Spacing = new Vector2(10, 0),
                             },
                             new OsuSpriteText
@@ -143,7 +143,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = match.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 20, FontWeight.Light),
+                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Light),
                             },
                         }
                     }
@@ -203,7 +203,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                             new OsuSpriteText
                             {
                                 Text = team?.FullName.Value.ToUpper() ?? "???",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 40, FontWeight.Light),
+                                Font = OsuFont.Torus.With(size: 40, weight: FontWeight.Light),
                                 Colour = Color4.Black,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,

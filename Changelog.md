@@ -572,3 +572,5 @@
     *   [m] [Add SelectPrevious and SelectNext bindings / Change volume bindings to be truly global #8090]
     *   [m] [Split out LadderEditorSetings into multiple files #8122]
     *   [m] [Fix nullref when deleting teams in the ladder screen #8123]
+    *   [m] [因为和现有issue模板冲突，未整合] [Comment out log locations in bug report template #8121]
+    *   [m] [Add torus font #8104]

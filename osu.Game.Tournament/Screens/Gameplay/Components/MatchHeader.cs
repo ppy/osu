@@ -175,7 +175,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                             X = (flip ? -1 : 1) * 90,
                             Y = -10,
                             Colour = colour,
-                            Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 20),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 20),
                             Origin = anchor,
                             Anchor = anchor,
                         },
@@ -211,7 +211,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         Origin = Anchor.Centre,
                         Colour = Color4.White,
                         Text = match.NewValue.Round.Value?.Name.Value ?? "未知回合",
-                        Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 18),
+                        Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 18),
                     },
                 };
             }
