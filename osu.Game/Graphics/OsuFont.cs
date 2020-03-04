@@ -104,7 +104,7 @@ namespace osu.Game.Graphics
     public enum FontWeight
     {
         /// <summary>
-        /// equivalent to weight 300
+        /// Equivalent to weight 300.
         /// </summary>
         Light = 300,
 
