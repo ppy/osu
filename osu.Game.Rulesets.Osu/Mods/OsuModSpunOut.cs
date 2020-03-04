@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (drawable is DrawableSpinner spinner)
             {
                 if (spinner.Disc.Valid)
-                    spinner.Disc.Rotate(180 / MathF.PI * (float)spinner.Clock.ElapsedFrameTime * 0.03f);
+                    spinner.Disc.Rotate(MathUtils.RadiansToDegrees((float)spinner.Clock.ElapsedFrameTime * 0.03f));
                 if (!spinner.SpmCounter.IsPresent)
                     spinner.SpmCounter.FadeIn(spinner.HitObject.TimeFadeIn);
             }
