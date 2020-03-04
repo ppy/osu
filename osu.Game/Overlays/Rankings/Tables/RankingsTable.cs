@@ -70,7 +70,14 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected abstract Drawable[] CreateAdditionalContent(TModel item);
 
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty, HighlightedColumn(), GradeColumns());
+        protected override Drawable CreateHeader(int index, TableColumn column)
+        {
+            var title = column?.Header ?? string.Empty;
+            var isHighlighted = HighlightedColumn() == title;
+            var isGrade = GradeColumns().Contains(title);
+
+            return new HeaderText(title, isHighlighted) { Margin = new MarginPadding { Vertical = 5, Horizontal = isGrade ? 20 : 10 } };
+        }
 
         protected abstract Country GetCountry(TModel item);
 
@@ -105,23 +112,20 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private class HeaderText : OsuSpriteText
         {
-            private readonly string highlighted;
+            private readonly bool isHighlighted;
 
-            public HeaderText(string text, string highlighted, IEnumerable<string> gradeColumns)
+            public HeaderText(string text, bool isHighlighted)
             {
-                this.highlighted = highlighted;
+                this.isHighlighted = isHighlighted;
 
                 Text = text;
                 Font = OsuFont.GetFont(size: 12);
-
-                var isGrade = gradeColumns.Contains(text);
-                Margin = new MarginPadding { Vertical = 5, Horizontal = isGrade ? 20 : 10 };
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                if (Text != highlighted)
+                if (isHighlighted)
                     Colour = colourProvider.Foreground1;
             }
         }
