@@ -13,13 +13,16 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
-        private readonly UserPanel peppy;
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
-        public TestSceneUserPanel()
+        private UserPanel peppy;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
             UserPanel flyte;
 
-            Add(new FillFlowContainer
+            Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -44,11 +47,12 @@ namespace osu.Game.Tests.Visual.Online
                         SupportLevel = 3,
                     }) { Width = 300 },
                 },
-            });
+            };
 
             flyte.Status.Value = new UserStatusOnline();
             peppy.Status.Value = null;
-        }
+            peppy.Activity.BindTo(activity);
+        });
 
         [Test]
         public void UserStatusesTests()
@@ -62,10 +66,6 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void UserActivitiesTests()
         {
-            Bindable<UserActivity> activity = new Bindable<UserActivity>();
-
-            peppy.Activity.BindTo(activity);
-
             AddStep("idle", () => { activity.Value = null; });
             AddStep("spectating", () => { activity.Value = new UserActivity.Spectating(); });
             AddStep("solo", () => { activity.Value = new UserActivity.SoloGame(null, null); });
