@@ -68,7 +68,7 @@ namespace osu.Game.Users
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider?.Background4 ?? colours.Gray1
+                    Colour = colourProvider?.Background5 ?? colours.Gray1
                 },
                 Background = new DelayedLoadUnloadWrapper(() => new UserCoverBackground
                 {
@@ -147,12 +147,12 @@ namespace osu.Game.Users
                 Direction = FillDirection.Vertical
             };
 
-            var alignment = rightAlignedChildren ? Anchor.x2 : Anchor.x0;
+            var alignment = rightAlignedChildren ? Anchor.CentreRight : Anchor.CentreLeft;
 
             statusContainer.Add(lastVisitMessage = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 15)).With(text =>
             {
-                text.Anchor = Anchor.y1 | alignment;
-                text.Origin = Anchor.y1 | alignment;
+                text.Anchor = alignment;
+                text.Origin = alignment;
                 text.AutoSizeAxes = Axes.Both;
                 text.Alpha = 0;
 
@@ -165,8 +165,8 @@ namespace osu.Game.Users
 
             statusContainer.Add(statusMessage = new OsuSpriteText
             {
-                Anchor = Anchor.y1 | alignment,
-                Origin = Anchor.y1 | alignment,
+                Anchor = alignment,
+                Origin = alignment,
                 Font = OsuFont.GetFont(size: 17)
             });
 
