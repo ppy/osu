@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListOverlay : FullscreenOverlay
     {
-        public const float WIDTH_PADDING = 10;
+        public const float WIDTH_PADDING = 80;
 
         protected SearchableListOverlay(OverlayColourScheme colourScheme)
             : base(colourScheme)
