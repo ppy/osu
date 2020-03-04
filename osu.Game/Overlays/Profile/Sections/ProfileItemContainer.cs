@@ -21,13 +21,29 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private Color4 idleColour;
 
-        public Color4 IdleColour
+        protected Color4 IdleColour
         {
             get => idleColour;
-            set => idleColour = background.Colour = value;
+            set
+            {
+                idleColour = value;
+                if (!IsHovered)
+                    background.Colour = value;
+            }
         }
 
-        public Color4 HoverColour { get; set; }
+        private Color4 hoverColour;
+
+        protected Color4 HoverColour
+        {
+            get => hoverColour;
+            set
+            {
+                hoverColour = value;
+                if (IsHovered)
+                    background.Colour = value;
+            }
+        }
 
         public ProfileItemContainer()
         {

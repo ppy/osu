@@ -37,10 +37,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
-            ProfileItemContainer container;
-
             AddRangeInternal(new Drawable[]
             {
                 new UpdateableBeatmapSetCover
@@ -63,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
                             {
-                                container = new ProfileItemContainer
+                                new MostPlayedBeatmapContainer
                                 {
                                     Child = new Container
                                     {
@@ -108,9 +106,16 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     }
                 }
             });
+        }
 
-            container.IdleColour = colourProvider.Background4;
-            container.HoverColour = colourProvider.Background3;
+        private class MostPlayedBeatmapContainer : ProfileItemContainer
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                IdleColour = colourProvider.Background4;
+                HoverColour = colourProvider.Background3;
+            }
         }
 
         private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
