@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Users;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Colour;
@@ -11,11 +10,11 @@ using osu.Framework.Graphics.Containers;
 using osuTK;
 using osu.Game.Overlays.Profile.Header.Components;
 
-namespace osu.Game.Graphics.UserInterfaceV2.Users
+namespace osu.Game.Users
 {
-    public class UserListCard : UserCard
+    public class UserListPanel : UserPanel
     {
-        public UserListCard(User user)
+        public UserListPanel(User user)
             : base(user)
         {
             RelativeSizeAxes = Axes.X;
@@ -27,7 +26,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
         private void load()
         {
             Background.Width = 0.5f;
-            Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(User.IsOnline ? 0.6f : 0.7f));
+            Background.Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(1), Color4.White.Opacity(0.6f));
         }
 
         protected override Drawable CreateLayout()

@@ -5,26 +5,25 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Profile.Header.Components;
-using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Graphics.UserInterfaceV2.Users
+namespace osu.Game.Users
 {
-    public class UserGridCard : UserCard
+    public class UserGridPanel : UserPanel
     {
         private const int margin = 10;
 
-        public UserGridCard(User user)
+        public UserGridPanel(User user)
             : base(user)
         {
-            Size = new Vector2(290, 120);
+            Height = 120;
             CornerRadius = 10;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.FadeTo(User.IsOnline ? 0.6f : 0.7f);
+            Background.FadeTo(0.6f);
         }
 
         protected override Drawable CreateLayout()
