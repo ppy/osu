@@ -68,6 +68,8 @@ namespace osu.Game.Tests.Visual
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
+            SelectedMods.Value = Array.Empty<Mod>();
+
             if (!AllowFail)
             {
                 var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);

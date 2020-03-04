@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -56,22 +55,26 @@ namespace osu.Game.Tests.Visual
 
             var score = currentTest.Autoplay
                 ? ruleset.GetAutoplayMod().CreateReplayScore(Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, SelectedMods.Value))
-                : new Score { Replay = new Replay() };
+                : null;
 
-            return CreateReplayPlayer(score);
+            return CreateReplayPlayer(score, AllowFail);
         }
 
         /// <summary>
         /// Creates the <see cref="TestPlayer"/> for a test case.
         /// </summary>
         /// <param name="score">The <see cref="Score"/>.</param>
-        protected virtual TestPlayer CreateReplayPlayer(Score score) => new TestPlayer(score);
+        /// <param name="allowFail">Whether the player can fail.</param>
+        protected virtual TestPlayer CreateReplayPlayer(Score score, bool allowFail) => new TestPlayer(score, allowFail);
 
         protected class TestPlayer : TestReplayPlayer
         {
-            public TestPlayer(Score score)
+            protected override bool AllowFail { get; }
+
+            public TestPlayer(Score score, bool allowFail)
                 : base(score, false, false)
             {
+                AllowFail = allowFail;
             }
         }
 
