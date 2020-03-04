@@ -83,7 +83,6 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar
         {
             User = User,
-            Masking = true,
             OpenOnClick = { Value = false }
         };
 
