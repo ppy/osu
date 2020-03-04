@@ -94,7 +94,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.None,
                         Width = 150,
-                        Text = "Delete SeeingResult",
+                        Text = "Delete result",
                         Action = () =>
                         {
                             Expire();
