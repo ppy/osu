@@ -45,6 +45,7 @@ namespace osu.Game.Users
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, margin),
                         new Dimension()
                     },
                     Content = new[]
@@ -54,31 +55,56 @@ namespace osu.Game.Users
                             CreateAvatar().With(avatar =>
                             {
                                 avatar.Size = new Vector2(60);
-                                avatar.Margin = new MarginPadding { Bottom = margin };
                                 avatar.Masking = true;
                                 avatar.CornerRadius = 6;
                             }),
-                            new FillFlowContainer
+                            new Container
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, 7),
-                                Margin = new MarginPadding { Left = margin },
-                                Children = new Drawable[]
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Left = margin },
+                                Child = new GridContainer
                                 {
-                                    details = new FillFlowContainer
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[]
                                     {
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(6),
-                                        Children = new Drawable[]
-                                        {
-                                            CreateFlag(),
-                                        }
+                                        new Dimension()
                                     },
-                                    CreateUsername(),
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension()
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            details = new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(6),
+                                                Children = new Drawable[]
+                                                {
+                                                    CreateFlag(),
+                                                }
+                                            }
+                                        },
+                                        new Drawable[]
+                                        {
+                                            CreateUsername().With(username =>
+                                            {
+                                                username.Anchor = Anchor.CentreLeft;
+                                                username.Origin = Anchor.CentreLeft;
+                                            })
+                                        }
+                                    }
                                 }
                             }
+                        },
+                        new[]
+                        {
+                            Empty(),
+                            Empty()
                         },
                         new Drawable[]
                         {
