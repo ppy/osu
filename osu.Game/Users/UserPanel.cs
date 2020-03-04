@@ -129,7 +129,7 @@ namespace osu.Game.Users
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
         {
-            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true),
+            Font = OsuFont.GetFont(size: 19, weight: FontWeight.Bold, italics: true),
             Text = User.Username,
         };
 
@@ -149,7 +149,7 @@ namespace osu.Game.Users
 
             var alignment = rightAlignedChildren ? Anchor.CentreRight : Anchor.CentreLeft;
 
-            statusContainer.Add(lastVisitMessage = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 15)).With(text =>
+            statusContainer.Add(lastVisitMessage = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold)).With(text =>
             {
                 text.Anchor = alignment;
                 text.Origin = alignment;
@@ -159,7 +159,10 @@ namespace osu.Game.Users
                 if (User.LastVisit.HasValue)
                 {
                     text.AddText(@"Last seen ");
-                    text.AddText(new DrawableDate(User.LastVisit.Value, italic: false));
+                    text.AddText(new DrawableDate(User.LastVisit.Value, italic: false)
+                    {
+                        Shadow = false
+                    });
                 }
             }));
 
@@ -167,7 +170,7 @@ namespace osu.Game.Users
             {
                 Anchor = alignment,
                 Origin = alignment,
-                Font = OsuFont.GetFont(size: 17)
+                Font = OsuFont.GetFont(size: 17, weight: FontWeight.SemiBold)
             });
 
             return statusContainer;
