@@ -51,6 +51,9 @@ namespace osu.Game.Users
         [Resolved(canBeNull: true)]
         private UserProfileOverlay profileOverlay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private OverlayColourProvider colourProvider { get; set; }
+
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -58,14 +61,14 @@ namespace osu.Game.Users
         private void load()
         {
             Masking = true;
-            BorderColour = colours.GreyVioletLighter;
+            BorderColour = colourProvider?.Light1 ?? colours.GreyVioletLighter;
 
             AddRange(new[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Gray1
+                    Colour = colourProvider?.Background4 ?? colours.Gray1
                 },
                 Background = new DelayedLoadUnloadWrapper(() => new UserCoverBackground
                 {
