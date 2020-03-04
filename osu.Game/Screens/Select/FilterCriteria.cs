@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
 
+        public BeatmapInfo SelectedBeatmap;
+
         public OptionalRange<double> StarDifficulty;
         public OptionalRange<float> ApproachRate;
         public OptionalRange<float> DrainRate;

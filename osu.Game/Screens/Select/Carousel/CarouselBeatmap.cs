@@ -25,6 +25,13 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
+            if (Beatmap.Equals(criteria.SelectedBeatmap))
+            {
+                // bypass filtering for selected beatmap
+                Filtered.Value = false;
+                return;
+            }
+
             bool match =
                 criteria.Ruleset == null ||
                 Beatmap.RulesetID == criteria.Ruleset.ID ||
