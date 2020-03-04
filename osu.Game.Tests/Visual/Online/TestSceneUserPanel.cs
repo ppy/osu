@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 
@@ -16,6 +18,9 @@ namespace osu.Game.Tests.Visual.Online
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
         private UserPanel peppy;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -70,10 +75,15 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("idle", () => activity.Value = null);
             AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
-            AddStep("solo", () => activity.Value = new UserActivity.SoloGame(null, null));
+            AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
+            AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
+            AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
+            AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
             AddStep("editing", () => activity.Value = new UserActivity.Editing(null));
             AddStep("modding", () => activity.Value = new UserActivity.Modding());
         }
+
+        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.SoloGame(null, rulesetStore.GetRuleset(rulesetId));
     }
 }
