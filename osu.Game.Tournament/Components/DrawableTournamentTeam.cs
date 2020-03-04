@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Components
@@ -19,7 +18,7 @@ namespace osu.Game.Tournament.Components
         public readonly TournamentTeam Team;
 
         protected readonly Sprite Flag;
-        protected readonly OsuSpriteText AcronymText;
+        protected readonly TournamentSpriteText AcronymText;
 
         [UsedImplicitly]
         private Bindable<string> acronym;
@@ -37,9 +36,9 @@ namespace osu.Game.Tournament.Components
                 FillMode = FillMode.Fit
             };
 
-            AcronymText = new OsuSpriteText
+            AcronymText = new TournamentSpriteText
             {
-                Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                Font = OsuFont.Torus.With(weight: FontWeight.Regular),
             };
         }
 
