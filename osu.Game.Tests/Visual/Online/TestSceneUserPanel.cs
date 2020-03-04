@@ -57,21 +57,21 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void UserStatusesTests()
         {
-            AddStep("online", () => { peppy.Status.Value = new UserStatusOnline(); });
-            AddStep(@"do not disturb", () => { peppy.Status.Value = new UserStatusDoNotDisturb(); });
-            AddStep(@"offline", () => { peppy.Status.Value = new UserStatusOffline(); });
-            AddStep(@"null status", () => { peppy.Status.Value = null; });
+            AddStep("online", () => peppy.Status.Value = new UserStatusOnline());
+            AddStep(@"do not disturb", () => peppy.Status.Value = new UserStatusDoNotDisturb());
+            AddStep(@"offline", () => peppy.Status.Value = new UserStatusOffline());
+            AddStep(@"null status", () => peppy.Status.Value = null);
         }
 
         [Test]
         public void UserActivitiesTests()
         {
-            AddStep("idle", () => { activity.Value = null; });
-            AddStep("spectating", () => { activity.Value = new UserActivity.Spectating(); });
-            AddStep("solo", () => { activity.Value = new UserActivity.SoloGame(null, null); });
-            AddStep("choosing", () => { activity.Value = new UserActivity.ChoosingBeatmap(); });
-            AddStep("editing", () => { activity.Value = new UserActivity.Editing(null); });
-            AddStep("modding", () => { activity.Value = new UserActivity.Modding(); });
+            AddStep("idle", () => activity.Value = null);
+            AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
+            AddStep("solo", () => activity.Value = new UserActivity.SoloGame(null, null));
+            AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
+            AddStep("editing", () => activity.Value = new UserActivity.Editing(null));
+            AddStep("modding", () => activity.Value = new UserActivity.Modding());
         }
     }
 }
