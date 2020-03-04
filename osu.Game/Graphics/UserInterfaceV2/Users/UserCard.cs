@@ -13,17 +13,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Input.Events;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterfaceV2.Users
 {
     public abstract class UserCard : OsuHoverContainer, IHasContextMenu
     {
-        [Resolved(canBeNull:true)]
-        private UserProfileOverlay profileOverlay { get; set; }
+        public User User { get; }
 
         protected override IEnumerable<Drawable> EffectTargets => null;
 
-        public User User { get; }
+        protected DelayedLoadUnloadWrapper Background;
 
         public UserCard(User user)
         {
@@ -33,23 +33,36 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
             User = user;
         }
 
+        [Resolved(canBeNull: true)]
+        private UserProfileOverlay profileOverlay { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
             Action = () => profileOverlay?.ShowUser(User);
 
             Masking = true;
             BorderColour = colours.GreyVioletLighter;
 
-            Add(new DelayedLoadUnloadWrapper(() => new UserCoverBackground
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                User = User,
-            }, 300, 5000)
-            {
-                RelativeSizeAxes = Axes.Both,
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5
+                },
+                Background = new DelayedLoadUnloadWrapper(() => new UserCoverBackground
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    User = User,
+                }, 300, 5000)
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    RelativeSizeAxes = Axes.Both,
+                }
             });
         }
 
