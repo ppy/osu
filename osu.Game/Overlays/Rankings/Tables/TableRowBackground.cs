@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -19,10 +19,9 @@ namespace osu.Game.Overlays.Rankings.Tables
         private Color4 idleColour;
         private Color4 hoverColour;
 
-        public TableRowBackground(float height)
+        public TableRowBackground()
         {
             RelativeSizeAxes = Axes.X;
-            Height = height;
 
             CornerRadius = 4;
             Masking = true;
