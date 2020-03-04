@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2.Users;
+using osu.Game.Overlays;
 using osu.Game.Users;
 using osuTK;
 
@@ -19,6 +21,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(UserGridCard),
             typeof(UserListCard)
         };
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         public TestSceneUserCard()
         {
