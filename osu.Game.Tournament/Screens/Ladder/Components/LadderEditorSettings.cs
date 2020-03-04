@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tournament.Components;
@@ -124,24 +123,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Control.RemoveDropdownItem(round);
                     Control.AddDropdownItem(round);
                 });
-            }
-        }
-
-        private class LadderSettingsDropdown<T> : SettingsDropdown<T>
-        {
-            protected override OsuDropdown<T> CreateDropdown() => new DropdownControl();
-
-            private new class DropdownControl : SettingsDropdown<T>.DropdownControl
-            {
-                protected override DropdownMenu CreateMenu() => new Menu();
-
-                private new class Menu : OsuDropdownMenu
-                {
-                    public Menu()
-                    {
-                        MaxHeight = 200;
-                    }
-                }
             }
         }
     }
