@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const float bottom_columns_min_width = 45;
 
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
-        private readonly FontUsage largeFont = OsuFont.GetFont(size: 22);
+        private readonly FontUsage largeFont = OsuFont.GetFont(size: 22, weight: FontWeight.Light);
 
         private readonly TextColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
@@ -47,7 +47,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(10, 8),
                 Children = new Drawable[]
                 {
                     new FillFlowContainer
@@ -117,27 +116,47 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public InfoColumn(string title, Drawable content, float? minWidth = null)
             {
                 AutoSizeAxes = Axes.Both;
+                Margin = new MarginPadding { Vertical = 5 };
 
-                InternalChild = new FillFlowContainer
+                InternalChild = new GridContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 1),
-                    Children = new[]
+                    ColumnDimensions = new[]
                     {
-                        text = new OsuSpriteText
+                        new Dimension(GridSizeMode.AutoSize, minSize: minWidth ?? 0)
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 2),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
-                            Text = title.ToUpper()
+                            text = new OsuSpriteText
+                            {
+                                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
+                                Text = title.ToUpper(),
+                                // 2px padding bottom + 1px vertical to compensate for the additional spacing because of 1.25 line-height in osu-web
+                                Padding = new MarginPadding { Top = 1, Bottom = 3 }
+                            }
                         },
-                        separator = new Box
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = minWidth == null ? Axes.X : Axes.None,
-                            Width = minWidth ?? 1f,
-                            Height = 2,
-                            Margin = new MarginPadding { Top = 2 }
+                            separator = new Box
+                            {
+                                Anchor = Anchor.TopLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 2,
+                            },
                         },
-                        content
+                        new[]
+                        {
+                            // osu-web has 4px margin here but also uses 0.9 line-height, reducing margin to 2px seems like a good alternative to that
+                            content.With(c => c.Margin = new MarginPadding { Top = 2 })
+                        }
                     }
                 };
             }
@@ -178,9 +197,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public ModsInfoColumn()
                 : this(new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(1),
+                    Height = 18f
                 })
             {
             }

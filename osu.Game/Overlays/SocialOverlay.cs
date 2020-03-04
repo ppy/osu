@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
 {
     public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
     {
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
         private FillFlowContainer<SocialPanel> panels;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"60284b");
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
         public SocialOverlay()
             : base(OverlayColourScheme.Pink)
         {
-            Add(loading = new LoadingAnimation());
+            Add(loading = new LoadingSpinner());
 
             Filter.Search.Current.ValueChanged += text =>
             {

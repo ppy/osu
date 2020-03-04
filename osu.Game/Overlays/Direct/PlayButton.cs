@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Direct
 
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
-        private readonly LoadingAnimation loadingAnimation;
+        private readonly LoadingSpinner loadingSpinner;
 
         private const float transition_duration = 500;
 
@@ -53,12 +53,12 @@ namespace osu.Game.Overlays.Direct
                 if (value)
                 {
                     icon.FadeTo(0.5f, transition_duration, Easing.OutQuint);
-                    loadingAnimation.Show();
+                    loadingSpinner.Show();
                 }
                 else
                 {
                     icon.FadeTo(1, transition_duration, Easing.OutQuint);
-                    loadingAnimation.Hide();
+                    loadingSpinner.Hide();
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.Solid.Play,
                 },
-                loadingAnimation = new LoadingAnimation
+                loadingSpinner = new LoadingSpinner
                 {
                     Size = new Vector2(15),
                 },
@@ -85,13 +85,12 @@ namespace osu.Game.Overlays.Direct
             Playing.ValueChanged += playingStateChanged;
         }
 
-        private PreviewTrackManager previewTrackManager;
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colour)
         {
-            this.previewTrackManager = previewTrackManager;
-
             hoverColour = colour.Yellow;
         }
 

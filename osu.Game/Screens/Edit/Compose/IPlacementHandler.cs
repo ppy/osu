@@ -17,7 +17,8 @@ namespace osu.Game.Screens.Edit.Compose
         /// Notifies that a placement has finished.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> that has been placed.</param>
-        void EndPlacement(HitObject hitObject);
+        /// <param name="commit">Whether the object should be committed.</param>
+        void EndPlacement(HitObject hitObject, bool commit);
 
         /// <summary>
         /// Deletes a <see cref="HitObject"/>.

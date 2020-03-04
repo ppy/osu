@@ -22,15 +22,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly int index;
         private readonly ScoreInfo score;
 
-        public ScoreTableRowBackground(int index, ScoreInfo score)
+        public ScoreTableRowBackground(int index, ScoreInfo score, float height)
         {
             this.index = index;
             this.score = score;
 
             RelativeSizeAxes = Axes.X;
-            Height = 25;
+            Height = height;
 
-            CornerRadius = 3;
+            CornerRadius = 5;
             Masking = true;
 
             InternalChildren = new Drawable[]

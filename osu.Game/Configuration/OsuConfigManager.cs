@@ -20,7 +20,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
-            Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
+            Set(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
@@ -78,7 +78,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MenuParallax, true);
 
             // Gameplay
-            Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
+            Set(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             Set(OsuSetting.LightenDuringBreaks, true);
 

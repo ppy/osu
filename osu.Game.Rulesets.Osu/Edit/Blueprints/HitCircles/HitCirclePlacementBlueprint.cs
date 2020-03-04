@@ -30,12 +30,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 
         protected override bool OnClick(ClickEvent e)
         {
-            EndPlacement();
+            EndPlacement(true);
             return true;
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
+            BeginPlacement();
             HitObject.Position = ToLocalSpace(screenSpacePosition);
         }
     }

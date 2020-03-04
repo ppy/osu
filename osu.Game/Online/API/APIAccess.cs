@@ -22,6 +22,7 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
         private readonly OAuth authentication;
 
         public string Endpoint => @"https://osu.ppy.sh";
