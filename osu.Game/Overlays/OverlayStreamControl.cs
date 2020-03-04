@@ -10,9 +10,9 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayUpdateStreamControl<T> : TabControl<T>
+    public abstract class OverlayStreamControl<T> : TabControl<T>
     {
-        protected OverlayUpdateStreamControl()
+        protected OverlayStreamControl()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
         });
 
         [NotNull]
-        protected abstract OverlayUpdateStreamItem<T> CreateStreamItem(T value);
+        protected abstract OverlayStreamItem<T> CreateStreamItem(T value);
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnHover(HoverEvent e)
         {
-            foreach (var streamBadge in TabContainer.Children.OfType<OverlayUpdateStreamItem<T>>())
+            foreach (var streamBadge in TabContainer.Children.OfType<OverlayStreamItem<T>>())
                 streamBadge.UserHoveringArea = true;
 
             return base.OnHover(e);
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            foreach (var streamBadge in TabContainer.Children.OfType<OverlayUpdateStreamItem<T>>())
+            foreach (var streamBadge in TabContainer.Children.OfType<OverlayStreamItem<T>>())
                 streamBadge.UserHoveringArea = false;
 
             base.OnHoverLost(e);

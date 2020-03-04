@@ -19,8 +19,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(FriendsOnlineStatusControl),
             typeof(FriendsOnlineStatusItem),
-            typeof(OverlayUpdateStreamControl<>),
-            typeof(OverlayUpdateStreamItem<>),
+            typeof(OverlayStreamControl<>),
+            typeof(OverlayStreamItem<>),
             typeof(FriendsBundle)
         };
 

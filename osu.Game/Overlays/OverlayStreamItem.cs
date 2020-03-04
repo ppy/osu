@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayUpdateStreamItem<T> : TabItem<T>
+    public abstract class OverlayStreamItem<T> : TabItem<T>
     {
         public readonly Bindable<T> SelectedItem = new Bindable<T>();
 
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
-        protected OverlayUpdateStreamItem(T value)
+        protected OverlayStreamItem(T value)
             : base(value)
         {
             Height = 60;
