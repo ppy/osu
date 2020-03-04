@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.SearchableList
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            Position = new Vector2(-35f, 5f),
+                            Position = new Vector2(0f, 5f),
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(10f, 0f),
