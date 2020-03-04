@@ -1,0 +1,55 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Tournament.Models;
+
+namespace osu.Game.Tournament.Screens.Ladder.Components
+{
+    public class SettingsTeamDropdown : LadderSettingsDropdown<TournamentTeam>
+    {
+        public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
+        {
+            foreach (var t in teams.Prepend(new TournamentTeam()))
+                add(t);
+
+            teams.CollectionChanged += (_, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        args.NewItems.Cast<TournamentTeam>().ForEach(add);
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        args.OldItems.Cast<TournamentTeam>().ForEach(i => Control.RemoveDropdownItem(i));
+                        break;
+                }
+            };
+        }
+
+        private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
+
+        private T boundReference<T>(T obj)
+            where T : IBindable
+        {
+            obj = (T)obj.GetBoundCopy();
+            refBindables.Add(obj);
+            return obj;
+        }
+
+        private void add(TournamentTeam team)
+        {
+            Control.AddDropdownItem(team);
+            boundReference(team.FullName).BindValueChanged(_ =>
+            {
+                Control.RemoveDropdownItem(team);
+                Control.AddDropdownItem(team);
+            });
+        }
+    }
+}
