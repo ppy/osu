@@ -80,7 +80,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var p in args.NewItems.Cast<TournamentMatch>())
+                        foreach (var p in args.OldItems.Cast<TournamentMatch>())
                         {
                             foreach (var d in MatchesContainer.Where(d => d.Match == p))
                                 d.Expire();
