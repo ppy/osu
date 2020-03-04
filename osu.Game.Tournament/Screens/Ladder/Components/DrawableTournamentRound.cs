@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -22,8 +21,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public DrawableTournamentRound(TournamentRound round, bool losers = false)
         {
-            OsuSpriteText textName;
-            OsuSpriteText textDescription;
+            TournamentSpriteText textName;
+            TournamentSpriteText textDescription;
 
             AutoSizeAxes = Axes.Both;
             InternalChild = new FillFlowContainer
@@ -32,15 +31,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    textDescription = new OsuSpriteText
+                    textDescription = new TournamentSpriteText
                     {
                         Colour = Color4.Black,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre
                     },
-                    textName = new OsuSpriteText
+                    textName = new TournamentSpriteText
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                        Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         Colour = Color4.Black,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre
@@ -49,7 +48,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             };
 
             name = round.Name.GetBoundCopy();
-            name.BindValueChanged(n => textName.Text = ((losers ? "失败者" : "") + round.Name).ToUpper(), true);
+            name.BindValueChanged(n => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpper(), true);
 
             description = round.Description.GetBoundCopy();
             description.BindValueChanged(n => textDescription.Text = round.Description.Value?.ToUpper(), true);

@@ -5,9 +5,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 new TournamentLogo(),
                 new RoundDisplay
                 {
-                    Y = 10,
+                    Y = 5,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                 },
@@ -50,9 +50,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private class TeamScoreDisplay : CompositeDrawable
         {
             private readonly TeamColour teamColour;
-
-            private readonly Color4 red = new Color4(129, 68, 65, 255);
-            private readonly Color4 blue = new Color4(41, 91, 97, 255);
 
             private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
             private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
@@ -106,7 +103,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             private void teamChanged(TournamentTeam team)
             {
-                var colour = teamColour == TeamColour.Red ? red : blue;
+                var colour = teamColour == TeamColour.Red ? TournamentGame.COLOUR_RED : TournamentGame.COLOUR_BLUE;
                 var flip = teamColour != TeamColour.Red;
 
                 InternalChildren = new Drawable[]
@@ -169,7 +166,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Children = new Drawable[]
                     {
                         Flag,
-                        new OsuSpriteText
+                        new TournamentSpriteText
                         {
                             Text = team?.FullName.Value.ToUpper() ?? "???",
                             X = (flip ? -1 : 1) * 90,
@@ -188,10 +185,31 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         {
             private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
+            private readonly TournamentSpriteText text;
+
             public RoundDisplay()
             {
                 Width = 200;
                 Height = 20;
+
+                Masking = true;
+                CornerRadius = 10;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = OsuColour.Gray(0.18f),
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    text = new TournamentSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = Color4.White,
+                        Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 16),
+                    },
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -201,20 +219,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 currentMatch.BindTo(ladder.CurrentMatch);
             }
 
-            private void matchChanged(ValueChangedEvent<TournamentMatch> match)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = Color4.White,
-                        Text = match.NewValue.Round.Value?.Name.Value ?? "未知回合",
-                        Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 18),
-                    },
-                };
-            }
+            private void matchChanged(ValueChangedEvent<TournamentMatch> match) =>
+                text.Text = match.NewValue.Round.Value?.Name.Value ?? "未知回合";
         }
     }
 }

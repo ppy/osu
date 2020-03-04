@@ -574,4 +574,5 @@
     *   [m] [Fix nullref when deleting teams in the ladder screen #8123]
     *   [m] [因为和现有issue模板冲突，未整合] [Comment out log locations in bug report template #8121]
     *   [m] [Add torus font #8104]
-    *   [m] [**Add tournament seeding screen #8105**]
+    *   [m] [**Add tournament seeding screen #8105**][**添加了比赛端的队伍随机分配界面**]
+    *   [m] [**Update tournament client to 2019 design language #8106**][**将比赛端更新至2019的设计语言**]

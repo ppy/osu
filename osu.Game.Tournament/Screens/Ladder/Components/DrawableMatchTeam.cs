@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -26,7 +25,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         private readonly TournamentMatch match;
         private readonly bool losers;
-        private OsuSpriteText scoreText;
+        private TournamentSpriteText scoreText;
         private Box background;
 
         private readonly Bindable<int?> score = new Bindable<int?>();
@@ -69,7 +68,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             AcronymText.Anchor = AcronymText.Origin = Anchor.CentreLeft;
             AcronymText.Padding = new MarginPadding { Left = 50 };
-            AcronymText.Font = OsuFont.GetFont(size: 24);
+            AcronymText.Font = OsuFont.Torus.With(size: 24);
 
             if (match != null)
             {
@@ -119,11 +118,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                                     Alpha = 0.8f,
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                scoreText = new OsuSpriteText
+                                scoreText = new TournamentSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 20),
+                                    Font = OsuFont.Torus.With(size: 20),
                                 }
                             }
                         }
@@ -184,7 +183,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             background.FadeColour(winner ? colourWinner : colourNormal, winner ? 500 : 0, Easing.OutQuint);
 
-            scoreText.Font = AcronymText.Font = OsuFont.GetFont(weight: winner ? FontWeight.Bold : FontWeight.Regular);
+            scoreText.Font = AcronymText.Font = OsuFont.Torus.With(weight: winner ? FontWeight.Bold : FontWeight.Regular);
         }
 
         public MenuItem[] ContextMenuItems
@@ -196,10 +195,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Set as current", MenuItemType.Standard, setCurrent),
+                    new OsuMenuItem("设为当前", MenuItemType.Standard, setCurrent),
                     new OsuMenuItem("Join with", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, false)),
                     new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, true)),
-                    new OsuMenuItem("Remove", MenuItemType.Destructive, () => ladderEditor.Remove(match)),
+                    new OsuMenuItem("移除", MenuItemType.Destructive, () => ladderEditor.Remove(match)),
                 };
             }
         }

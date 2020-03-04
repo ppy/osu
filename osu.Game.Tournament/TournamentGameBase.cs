@@ -18,7 +18,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -101,10 +100,10 @@ namespace osu.Game.Tournament
                             Colour = Color4.Red,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new OsuSpriteText
+                        new TournamentSpriteText
                         {
                             Text = "窗口太窄了，拉宽一些",
-                            Font = OsuFont.Default.With(weight: "bold"),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                             Colour = Color4.White,
                             Padding = new MarginPadding(20)
                         }

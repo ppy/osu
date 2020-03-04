@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
@@ -147,7 +146,7 @@ namespace osu.Game.Tournament.Screens
 
             public Action Action;
 
-            private OsuSpriteText valueText;
+            private TournamentSpriteText valueText;
 
             protected override Drawable CreateComponent() => new Container
             {
@@ -155,7 +154,7 @@ namespace osu.Game.Tournament.Screens
                 RelativeSizeAxes = Axes.X,
                 Children = new Drawable[]
                 {
-                    valueText = new OsuSpriteText
+                    valueText = new TournamentSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
