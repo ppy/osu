@@ -14,6 +14,13 @@ using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Input.Events;
 using osu.Framework.Graphics.Shapes;
+using JetBrains.Annotations;
+using osu.Game.Users.Drawables;
+using osuTK;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Profile.Header.Components;
+using osu.Framework.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2.Users
 {
@@ -36,8 +43,11 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
         [Resolved(canBeNull: true)]
         private UserProfileOverlay profileOverlay { get; set; }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
             Action = () => profileOverlay?.ShowUser(User);
 
@@ -62,8 +72,70 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
+                CreateLayout()
             });
+        }
+
+        [NotNull]
+        protected abstract Drawable CreateLayout();
+
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar
+        {
+            User = User,
+            Masking = true,
+            OpenOnClick = { Value = false }
+        };
+
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
+        {
+            Size = new Vector2(39, 26)
+        };
+
+        protected OsuSpriteText CreateUsername() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true),
+            Text = User.Username,
+        };
+
+        protected SpriteIcon CreateStatusIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Regular.Circle,
+            Size = new Vector2(25),
+            Colour = User.IsOnline ? colours.GreenLight : Color4.Black
+        };
+
+        protected FillFlowContainer CreateStatusMessage(bool rightAlignedChildren)
+        {
+            var status = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical
+            };
+
+            var alignment = rightAlignedChildren ? Anchor.x2 : Anchor.x0;
+
+            if (!User.IsOnline && User.LastVisit.HasValue)
+            {
+                status.Add(new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 15)).With(text =>
+                {
+                    text.Anchor = Anchor.y1 | alignment;
+                    text.Origin = Anchor.y1 | alignment;
+                    text.AutoSizeAxes = Axes.Both;
+                    text.AddText(@"Last seen ");
+                    text.AddText(new DrawableDate(User.LastVisit.Value, italic: false));
+                }));
+            }
+
+            status.Add(new OsuSpriteText
+            {
+                Anchor = Anchor.y1 | alignment,
+                Origin = Anchor.y1 | alignment,
+                Font = OsuFont.GetFont(size: 17),
+                Text = User.IsOnline ? @"Online" : @"Offline"
+            });
+
+            return status;
         }
 
         protected override bool OnHover(HoverEvent e)

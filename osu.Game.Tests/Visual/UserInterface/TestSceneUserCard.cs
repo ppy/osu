@@ -55,6 +55,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                         IsSupporter = true,
                         SupportLevel = 3,
+                        IsOnline = false,
+                        LastVisit = DateTimeOffset.Now
                     })
                     {
                         Anchor = Anchor.Centre,
