@@ -52,25 +52,27 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             highAccuracyColour = colours.GreenLight;
         }
 
-        public IReadOnlyList<ScoreInfo> Scores
+        private bool showPerformancePoints;
+
+        public void DisplayScores(IReadOnlyList<ScoreInfo> scores, bool showPerformanceColumn)
         {
-            set
-            {
-                Content = null;
-                backgroundFlow.Clear();
+            if (!scores.Any())
+                return;
 
-                if (value?.Any() != true)
-                    return;
+            showPerformancePoints = showPerformanceColumn;
 
-                for (int i = 0; i < value.Count; i++)
-                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i], row_height));
+            for (int i = 0; i < scores.Count; i++)
+                backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
 
-                Columns = createHeaders(value.First());
-                Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
-            }
+            Columns = createHeaders(scores.FirstOrDefault());
+            Content = scores.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
         }
 
-        public bool IsBeatmapRanked { get; set; }
+        public void ClearScores()
+        {
+            Content = null;
+            backgroundFlow.Clear();
+        }
 
         private TableColumn[] createHeaders(ScoreInfo score)
         {
@@ -90,7 +92,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
 
-            if (IsBeatmapRanked)
+            if (showPerformancePoints)
                 columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
 
             columns.Add(new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
@@ -151,7 +153,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            if (IsBeatmapRanked)
+            if (showPerformancePoints)
             {
                 content.Add(new OsuSpriteText
                 {
