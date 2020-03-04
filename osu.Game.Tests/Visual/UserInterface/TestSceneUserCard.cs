@@ -36,16 +36,33 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    new UserGridCard(new User
+                    new FillFlowContainer
                     {
-                        Username = @"flyte",
-                        Id = 3103765,
-                        Country = new Country { FlagName = @"JP" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-                    })
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(10),
+                        Children = new Drawable[]
+                        {
+                            new UserGridCard(new User
+                            {
+                                Username = @"flyte",
+                                Id = 3103765,
+                                Country = new Country { FlagName = @"JP" },
+                                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                                IsOnline = true,
+                                IsSupporter = true,
+                                SupportLevel = 3,
+                            }),
+                            new UserGridCard(new User
+                            {
+                                Username = @"Evast",
+                                Id = 8195163,
+                                Country = new Country { FlagName = @"BY" },
+                                CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
+                                IsOnline = false,
+                                LastVisit = DateTimeOffset.Now
+                            })
+                        }
                     },
                     new UserListCard(new User
                     {
@@ -57,11 +74,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                         SupportLevel = 3,
                         IsOnline = false,
                         LastVisit = DateTimeOffset.Now
-                    })
+                    }),
+                    new UserListCard(new User
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                        Username = @"chocomint",
+                        Id = 124493,
+                        Country = new Country { FlagName = @"KR" },
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c5.jpg",
+                        IsOnline = true,
+                    }),
                 }
             });
         }

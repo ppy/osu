@@ -53,7 +53,6 @@ namespace osu.Game.Graphics.UserInterfaceV2.Users
                                 avatar.Anchor = Anchor.CentreLeft;
                                 avatar.Origin = Anchor.CentreLeft;
                                 avatar.Size = new Vector2(40);
-                                avatar.Masking = false;
                             }),
                             CreateFlag().With(flag =>
                             {
