@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2.Users;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -15,20 +17,45 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(UserCard),
             typeof(UserGridCard),
+            typeof(UserListCard)
         };
 
         public TestSceneUserCard()
         {
-            Add(new UserGridCard(new User
-            {
-                Username = @"flyte",
-                Id = 3103765,
-                Country = new Country { FlagName = @"JP" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-            })
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Spacing = new Vector2(0, 10),
+                Children = new Drawable[]
+                {
+                    new UserGridCard(new User
+                    {
+                        Username = @"flyte",
+                        Id = 3103765,
+                        Country = new Country { FlagName = @"JP" },
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                    })
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new UserListCard(new User
+                    {
+                        Username = @"peppy",
+                        Id = 2,
+                        Country = new Country { FlagName = @"AU" },
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        IsSupporter = true,
+                        SupportLevel = 3,
+                    })
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                }
             });
         }
     }
