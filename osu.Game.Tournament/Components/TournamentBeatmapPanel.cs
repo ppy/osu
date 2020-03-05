@@ -15,7 +15,6 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
@@ -77,14 +76,14 @@ namespace osu.Game.Tournament.Components
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new TournamentSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = new LocalisedString((
                                 $"{Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist} - {Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title}",
                                 $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
                         {
@@ -95,28 +94,28 @@ namespace osu.Game.Tournament.Components
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = "mapper",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
                                 },
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = Beatmap.Metadata.AuthorString,
                                     Padding = new MarginPadding { Right = 20 },
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Bold, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = "difficulty",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
                                 },
-                                new OsuSpriteText
+                                new TournamentSpriteText
                                 {
                                     Text = Beatmap.Version,
-                                    Font = OsuFont.GetFont(italics: true, weight: FontWeight.Bold, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
                                 },
                             }
                         }
