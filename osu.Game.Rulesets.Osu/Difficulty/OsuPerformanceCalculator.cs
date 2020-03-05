@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double greatWindow;
 
+        private double effectiveMissCount;
+
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
@@ -78,6 +80,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 0.95;
 
+            // guess the number of misses + slider breaks from combo
+            double comboBasedMissCount;
+            if (countSliders == 0)
+            {
+                if (scoreMaxCombo < beatmapMaxCombo)
+                    comboBasedMissCount = (double)beatmapMaxCombo / scoreMaxCombo;
+                else
+                    comboBasedMissCount = 0;
+            }
+            else
+            {
+                double fullComboThreshold = beatmapMaxCombo - 0.1 * countSliders;
+                if (scoreMaxCombo < fullComboThreshold)
+                    comboBasedMissCount = fullComboThreshold / scoreMaxCombo;
+                else
+                    comboBasedMissCount = Math.Pow((beatmapMaxCombo - scoreMaxCombo) / (0.1 * countSliders), 3);
+            }
+            effectiveMissCount = Math.Max(countMiss, comboBasedMissCount);
+
             double aimValue = computeAimValue();
             double tapValue = computeTapValue();
             double accuracyValue = computeAccuracyValue();
@@ -102,9 +123,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Beatmap.HitObjects.Count <= 1)
                 return 0;
 
-            // Guess the number of misaims from combo
-            int effectiveMissCount = Math.Max(countMiss, (int)(Math.Floor((beatmapMaxCombo - 0.1 * countSliders) / scoreMaxCombo)));
-
 
             // Get player's throughput according to combo
             int comboTPCount = Attributes.ComboTPs.Length;
@@ -123,7 +141,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 missTP = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
                                  .Interpolate(effectiveMissCount);
-                missTP = Math.Max(missTP, 0);
+
+                // give it a small penalty so that higher combo almost always gives higher pp
+                missTP = Math.Max(missTP, 0) * 0.997;
             }
 
             // Combine combo based throughput and miss count based throughput
