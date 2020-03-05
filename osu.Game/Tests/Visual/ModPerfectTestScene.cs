@@ -1,29 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class ModPerfectTestScene : ModSandboxTestScene
+    public abstract class ModPerfectTestScene : ModTestScene
     {
         private readonly Ruleset ruleset;
-        private readonly ModPerfect perfectMod;
+        private readonly ModPerfect mod;
 
-        protected ModPerfectTestScene(Ruleset ruleset, ModPerfect perfectMod)
+        protected ModPerfectTestScene(Ruleset ruleset, ModPerfect mod)
             : base(ruleset)
         {
             this.ruleset = ruleset;
-            this.perfectMod = perfectMod;
+            this.mod = mod;
         }
 
-        protected void CreateHitObjectTest(HitObjectTestCase testCaseData, bool shouldMiss) => CreateModTest(new ModTestCaseData(testCaseData.HitObject.GetType().ReadableName(), perfectMod)
+        protected void CreateHitObjectTest(HitObjectTestCase testCaseData, bool shouldMiss) => CreateModTest(new ModTestData
         {
+            Mod = mod,
             Beatmap = new Beatmap
             {
                 BeatmapInfo = { Ruleset = ruleset.RulesetInfo },
@@ -33,15 +32,10 @@ namespace osu.Game.Tests.Visual
             PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testCaseData.FailOnMiss)
         });
 
-        protected sealed override TestPlayer CreateReplayPlayer(Score score) => new PerfectModTestPlayer(score);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PerfectModTestPlayer();
 
         private class PerfectModTestPlayer : TestPlayer
         {
-            public PerfectModTestPlayer(Score score)
-                : base(score)
-            {
-            }
-
             protected override bool AllowFail => true;
 
             public bool CheckFailed(bool failed)
