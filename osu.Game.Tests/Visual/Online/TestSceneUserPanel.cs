@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 
@@ -22,20 +24,27 @@ namespace osu.Game.Tests.Visual.Online
             typeof(UserGridPanel),
         };
 
-        private readonly UserPanel peppy;
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
-        public TestSceneUserPanel()
+        private UserGridPanel peppy;
+        private UserListPanel evast;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            UserPanel flyte;
+            UserGridPanel flyte;
 
-            Add(new FillFlowContainer
+            Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
                 Spacing = new Vector2(10f),
-                Children = new[]
+                Children = new Drawable[]
                 {
                     flyte = new UserGridPanel(new User
                     {
@@ -53,7 +62,7 @@ namespace osu.Game.Tests.Visual.Online
                         IsSupporter = true,
                         SupportLevel = 3,
                     }) { Width = 300 },
-                    new UserListPanel(new User
+                    evast = new UserListPanel(new User
                     {
                         Username = @"Evast",
                         Id = 8195163,
@@ -63,34 +72,42 @@ namespace osu.Game.Tests.Visual.Online
                         LastVisit = DateTimeOffset.Now
                     })
                 },
-            });
+            };
 
             flyte.Status.Value = new UserStatusOnline();
+
             peppy.Status.Value = null;
-        }
-
-        [Test]
-        public void UserStatusesTests()
-        {
-            AddStep("online", () => { peppy.Status.Value = new UserStatusOnline(); });
-            AddStep(@"do not disturb", () => { peppy.Status.Value = new UserStatusDoNotDisturb(); });
-            AddStep(@"offline", () => { peppy.Status.Value = new UserStatusOffline(); });
-            AddStep(@"null status", () => { peppy.Status.Value = null; });
-        }
-
-        [Test]
-        public void UserActivitiesTests()
-        {
-            Bindable<UserActivity> activity = new Bindable<UserActivity>();
-
             peppy.Activity.BindTo(activity);
 
-            AddStep("idle", () => { activity.Value = null; });
-            AddStep("spectating", () => { activity.Value = new UserActivity.Spectating(); });
-            AddStep("solo", () => { activity.Value = new UserActivity.SoloGame(null, null); });
-            AddStep("choosing", () => { activity.Value = new UserActivity.ChoosingBeatmap(); });
-            AddStep("editing", () => { activity.Value = new UserActivity.Editing(null); });
-            AddStep("modding", () => { activity.Value = new UserActivity.Modding(); });
+            evast.Status.Value = null;
+            evast.Activity.BindTo(activity);
+        });
+
+        [Test]
+        public void TestUserStatus()
+        {
+            AddStep("online", () => peppy.Status.Value = evast.Status.Value = new UserStatusOnline());
+            AddStep("do not disturb", () => peppy.Status.Value = evast.Status.Value = new UserStatusDoNotDisturb());
+            AddStep("offline", () => peppy.Status.Value = evast.Status.Value = new UserStatusOffline());
+            AddStep("null status", () => peppy.Status.Value = evast.Status.Value = null);
         }
+
+        [Test]
+        public void TestUserActivity()
+        {
+            AddStep("set online status", () => peppy.Status.Value = evast.Status.Value = new UserStatusOnline());
+
+            AddStep("idle", () => activity.Value = null);
+            AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
+            AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
+            AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
+            AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
+            AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
+            AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
+            AddStep("editing", () => activity.Value = new UserActivity.Editing(null));
+            AddStep("modding", () => activity.Value = new UserActivity.Modding());
+        }
+
+        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.SoloGame(null, rulesetStore.GetRuleset(rulesetId));
     }
 }
