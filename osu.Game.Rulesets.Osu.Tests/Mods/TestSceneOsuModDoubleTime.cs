@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModDoubleTime : ModSandboxTestScene
+    public class TestSceneOsuModDoubleTime : ModTestScene
     {
         public TestSceneOsuModDoubleTime()
             : base(new OsuRuleset())
@@ -21,21 +20,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [TestCase(1.5)]
         [TestCase(2)]
         [TestCase(5)]
-        public void TestDefaultRate(double rate) => CreateModTest(new ModTestCaseData("1.5x", new OsuModDoubleTime { SpeedChange = { Value = rate } })
+        public void TestSpeedChangeCustomisation(double rate)
         {
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
-        });
+            var mod = new OsuModDoubleTime { SpeedChange = { Value = rate } };
 
-        protected override TestPlayer CreateReplayPlayer(Score score) => new ScoreAccessibleTestPlayer(score);
-
-        private class ScoreAccessibleTestPlayer : TestPlayer
-        {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-
-            public ScoreAccessibleTestPlayer(Score score)
-                : base(score)
+            CreateModTest(new ModTestData
             {
-            }
+                Mod = mod,
+                PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2 &&
+                                      Precision.AlmostEquals(Player.GameplayClockContainer.GameplayClock.Rate, mod.SpeedChange.Value)
+            });
         }
     }
 }
