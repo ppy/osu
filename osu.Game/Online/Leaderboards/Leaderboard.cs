@@ -30,7 +30,7 @@ namespace osu.Game.Online.Leaderboards
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
 
         private ScheduledDelegate showScoresDelegate;
         private CancellationTokenSource showScoresCancellationSource;
@@ -202,7 +202,7 @@ namespace osu.Game.Online.Leaderboards
                         }
                     },
                 },
-                loading = new LoadingAnimation(),
+                loading = new LoadingSpinner(),
                 placeholderContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both

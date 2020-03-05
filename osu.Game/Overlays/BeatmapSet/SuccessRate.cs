@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Success Rate",
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 12)
                         },
                         successRate = new Bar
                         {
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
-                                Font = OsuFont.GetFont(size: 13),
+                                Font = OsuFont.GetFont(size: 12),
                             },
                         },
                         new OsuSpriteText
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Points of Failure",
-                            Font = OsuFont.GetFont(size: 13),
+                            Font = OsuFont.GetFont(size: 12),
                             Margin = new MarginPadding { Vertical = 20 },
                         },
                     },

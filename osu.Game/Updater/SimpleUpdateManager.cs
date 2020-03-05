@@ -78,6 +78,10 @@ namespace osu.Game.Updater
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
                     break;
 
+                case RuntimeInfo.Platform.Linux:
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage"));
+                    break;
+
                 case RuntimeInfo.Platform.Android:
                     // on our testing device this causes the download to magically disappear.
                     //bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".apk"));
