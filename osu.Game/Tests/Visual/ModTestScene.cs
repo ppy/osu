@@ -98,18 +98,12 @@ namespace osu.Game.Tests.Visual
             public Func<bool> PassCondition;
 
             /// <summary>
-            /// The name of this test case, displayed in the test browser.
-            /// </summary>
-            public readonly string Name;
-
-            /// <summary>
             /// The <see cref="Mod"/> this test case tests.
             /// </summary>
             public readonly Mod Mod;
 
-            public ModTestCaseData(string name, Mod mod)
+            public ModTestCaseData(Mod mod)
             {
-                Name = name;
                 Mod = mod;
             }
         }
