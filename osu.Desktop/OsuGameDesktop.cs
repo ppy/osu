@@ -47,19 +47,24 @@ namespace osu.Desktop
             return null;
         }
 
+        protected override UpdateManager CreateUpdateManager()
+        {
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    return new SquirrelUpdateManager();
+
+                default:
+                    return new SimpleUpdateManager();
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             if (!noVersionOverlay)
-            {
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
-
-                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                    Add(new SquirrelUpdateManager());
-                else
-                    Add(new SimpleUpdateManager());
-            }
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
         }
