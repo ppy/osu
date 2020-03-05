@@ -531,7 +531,6 @@ namespace osu.Game
 
             AddRange(new Drawable[]
             {
-                CreateUpdateManager(),
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -632,6 +631,7 @@ namespace osu.Game
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
+            Add(CreateUpdateManager()); // dependency on notification overlay
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
