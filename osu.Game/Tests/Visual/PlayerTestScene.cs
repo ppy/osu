@@ -9,7 +9,6 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Tests.Visual
 
         private readonly Ruleset ruleset;
 
-        protected Player Player;
+        protected TestPlayer Player;
 
         protected PlayerTestScene(Ruleset ruleset)
         {
@@ -88,6 +87,6 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
+        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }
