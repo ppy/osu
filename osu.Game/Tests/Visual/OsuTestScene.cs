@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
-        public void RecycleLocalStorage()
+        public virtual void RecycleLocalStorage()
         {
             if (localStorage?.IsValueCreated == true)
             {
@@ -191,9 +191,9 @@ namespace osu.Game.Tests.Visual
                     track = audio?.Tracks.GetVirtual(length);
             }
 
-            protected override void Dispose(bool isDisposing)
+            ~ClockBackedTestWorkingBeatmap()
             {
-                base.Dispose(isDisposing);
+                // Remove the track store from the audio manager
                 store?.Dispose();
             }
 

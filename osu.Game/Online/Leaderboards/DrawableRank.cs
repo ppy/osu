@@ -58,7 +58,7 @@ namespace osu.Game.Online.Leaderboards
                             Spacing = new Vector2(-3, 0),
                             Padding = new MarginPadding { Top = 5 },
                             Colour = getRankNameColour(),
-                            Font = OsuFont.GetFont(Typeface.Venera, 25),
+                            Font = OsuFont.Numeric.With(size: 25),
                             Text = getRankName(),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),

@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -142,15 +143,17 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
-        public override void InvalidateFromChild(Invalidation invalidation, Drawable source = null)
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            base.InvalidateFromChild(invalidation, source);
+            var result = base.OnInvalidate(invalidation, source);
 
-            if ((invalidation & Invalidation.DrawSize) != 0)
+            if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
-                if (source == ExpandableHeader) //We need to recalculate the positions if the ExpandableHeader changed its size
-                    lastKnownScroll = -1;
+                lastKnownScroll = -1;
+                result = true;
             }
+
+            return result;
         }
 
         private float lastKnownScroll;

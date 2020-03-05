@@ -41,7 +41,7 @@ namespace osu.Game.Online.Leaderboards
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
-        private readonly int rank;
+        private readonly int? rank;
         private readonly bool allowHighlight;
 
         private Box background;
@@ -55,10 +55,10 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
-        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
             this.rank = rank;
@@ -90,7 +90,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },

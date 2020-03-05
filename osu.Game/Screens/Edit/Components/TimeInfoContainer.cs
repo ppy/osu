@@ -14,7 +14,8 @@ namespace osu.Game.Screens.Edit.Components
     {
         private readonly OsuSpriteText trackTimer;
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
 
         public TimeInfoContainer()
         {
@@ -28,12 +29,6 @@ namespace osu.Game.Screens.Edit.Components
                     Y = 0.5f,
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IAdjustableClock adjustableClock)
-        {
-            this.adjustableClock = adjustableClock;
         }
 
         protected override void Update()

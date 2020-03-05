@@ -7,6 +7,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// Positional distance that results in a duration of one second, before any speed adjustments.
         /// </summary>
         private const float base_scoring_distance = 100;
+
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         public int RepeatCount { get; set; }
 
@@ -75,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 Samples = tickSamples,
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
-                                        lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
                             });
                         }
                     }

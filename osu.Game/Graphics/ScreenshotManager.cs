@@ -35,18 +35,20 @@ namespace osu.Game.Graphics
         private Bindable<ScreenshotFormat> screenshotFormat;
         private Bindable<bool> captureMenuCursor;
 
-        private GameHost host;
+        [Resolved]
+        private GameHost host { get; set; }
+
         private Storage storage;
-        private NotificationOverlay notificationOverlay;
+
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; }
 
         private SampleChannel shutter;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
         {
-            this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-            this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);

@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Rankings
 
         private SpotlightSelector selector;
         private Container content;
-        private DimmedLoadingLayer loading;
+        private LoadingLayer loading;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Rankings
                                 AutoSizeAxes = Axes.Y,
                                 Margin = new MarginPadding { Vertical = 10 }
                             },
-                            loading = new DimmedLoadingLayer()
+                            loading = new LoadingLayer(content)
                         }
                     }
                 }
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Rankings
         private void getSpotlights()
         {
             spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => selector.Spotlights = response.Spotlights;
+            spotlightsRequest.Success += response => Schedule(() => selector.Spotlights = response.Spotlights);
             api.Queue(spotlightsRequest);
         }
 
@@ -151,11 +151,11 @@ namespace osu.Game.Overlays.Rankings
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
-
             spotlightsRequest?.Cancel();
             getRankingsRequest?.Cancel();
             cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
@@ -46,17 +46,21 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item => updateBeatmap(item.NewValue), true);
-
             Type.BindValueChanged(type => gameTypeContainer.Child = new DrawableGameType(type.NewValue) { Size = new Vector2(height) }, true);
+
+            Playlist.CollectionChanged += (_, __) => updateBeatmap();
+
+            updateBeatmap();
         }
 
-        private void updateBeatmap(PlaylistItem item)
+        private void updateBeatmap()
         {
+            var item = Playlist.FirstOrDefault();
+
             if (item?.Beatmap != null)
             {
                 drawableRuleset.FadeIn(transition_duration);
-                drawableRuleset.Child = new DifficultyIcon(item.Beatmap, item.Ruleset) { Size = new Vector2(height) };
+                drawableRuleset.Child = new DifficultyIcon(item.Beatmap.Value, item.Ruleset.Value) { Size = new Vector2(height) };
             }
             else
                 drawableRuleset.FadeOut(transition_duration);
