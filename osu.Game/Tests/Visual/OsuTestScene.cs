@@ -229,9 +229,9 @@ namespace osu.Game.Tests.Visual
             /// </summary>
             public class TrackVirtualManual : Track
             {
-                private readonly StopwatchClock stopwatchClock = new StopwatchClock();
-
                 private readonly IFrameBasedClock referenceClock;
+
+                private bool running;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock)
                 {
@@ -241,32 +241,55 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    var offset = Math.Clamp(seek, 0, Length);
+                    accumulated = Math.Min(seek, Length);
+                    lastReferenceTime = null;
 
-                    stopwatchClock.Seek(offset);
-
-                    return offset == seek;
+                    return accumulated == seek;
                 }
 
-                public override void Start() => stopwatchClock.Start();
+                public override void Start()
+                {
+                    running = true;
+                }
 
                 public override void Reset()
                 {
-                    stopwatchClock.Seek(0);
+                    Seek(0);
                     base.Reset();
                 }
 
-                public override void Stop() => stopwatchClock.Stop();
+                public override void Stop()
+                {
+                    if (running)
+                    {
+                        running = false;
+                        lastReferenceTime = null;
+                    }
+                }
 
-                public override bool IsRunning => stopwatchClock.IsRunning;
+                public override bool IsRunning => running;
 
-                public override double CurrentTime => stopwatchClock.CurrentTime;
+                private double? lastReferenceTime;
+
+                private double accumulated;
+
+                public override double CurrentTime => Math.Min(accumulated, Length);
 
                 protected override void UpdateState()
                 {
                     base.UpdateState();
 
-                    stopwatchClock.Rate = Rate * referenceClock.Rate;
+                    if (running)
+                    {
+                        double refTime = referenceClock.CurrentTime;
+
+                        if (lastReferenceTime.HasValue)
+                            accumulated += (refTime - lastReferenceTime.Value) * Rate;
+
+                        lastReferenceTime = refTime;
+                    }
+
+                    Console.WriteLine($"t={CurrentTime}");
 
                     if (CurrentTime >= Length)
                     {
