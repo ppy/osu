@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
-        public void RecycleLocalStorage()
+        public virtual void RecycleLocalStorage()
         {
             if (localStorage?.IsValueCreated == true)
             {

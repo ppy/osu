@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Changelog
 
         private readonly APIUpdateStream stream;
 
-        private Container fadeContainer;
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
@@ -44,46 +43,38 @@ namespace osu.Game.Overlays.Changelog
 
             AddRange(new Drawable[]
             {
-                fadeContainer = new Container
+                text = new FillFlowContainer<SpriteText>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Margin = new MarginPadding { Top = 6 },
+                    Children = new[]
                     {
-                        text = new FillFlowContainer<SpriteText>
+                        new OsuSpriteText
                         {
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Margin = new MarginPadding { Top = 6 },
-                            Children = new[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Text = stream.DisplayName,
-                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black),
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = stream.LatestBuild.DisplayVersion,
-                                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = stream.LatestBuild.Users > 0 ? $"{"user".ToQuantity(stream.LatestBuild.Users, "N0")} online" : null,
-                                    Font = OsuFont.GetFont(size: 10),
-                                    Colour = colourProvider.Foreground1
-                                },
-                            }
+                            Text = stream.DisplayName,
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black),
                         },
-                        expandingBar = new ExpandingBar
+                        new OsuSpriteText
                         {
-                            Anchor = Anchor.TopCentre,
-                            Colour = stream.Colour,
-                            ExpandedSize = 4,
-                            CollapsedSize = 2,
-                            IsCollapsed = true
+                            Text = stream.LatestBuild.DisplayVersion,
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = stream.LatestBuild.Users > 0 ? $"{"user".ToQuantity(stream.LatestBuild.Users, "N0")} online" : null,
+                            Font = OsuFont.GetFont(size: 10),
+                            Colour = colourProvider.Foreground1
                         },
                     }
+                },
+                expandingBar = new ExpandingBar
+                {
+                    Anchor = Anchor.TopCentre,
+                    Colour = stream.Colour,
+                    ExpandedSize = 4,
+                    CollapsedSize = 2,
+                    Expanded = true
                 },
                 new HoverClickSounds()
             });
@@ -109,38 +100,41 @@ namespace osu.Game.Overlays.Changelog
 
         private void updateState()
         {
-            // Expand based on the local state
-            bool shouldExpand = Active.Value || IsHovered;
+            // highlighted regardless if we are hovered
+            bool textHighlighted = IsHovered;
+            bool barExpanded = IsHovered;
 
-            // Expand based on whether no build is selected and the badge area is hovered
-            shouldExpand |= SelectedTab.Value == null && !externalDimRequested;
-
-            if (shouldExpand)
+            if (SelectedTab.Value == null)
             {
-                expandingBar.Expand();
-                fadeContainer.FadeTo(1, transition_duration);
+                // at listing, all badges are highlighted when user is not hovering any badge.
+                textHighlighted |= !userHoveringArea;
+                barExpanded |= !userHoveringArea;
             }
             else
             {
-                expandingBar.Collapse();
-                fadeContainer.FadeTo(0.5f, transition_duration);
+                // bar is always expanded when active
+                barExpanded |= Active.Value;
+
+                // text is highlighted only when hovered or active (but not if in selection mode)
+                textHighlighted |= Active.Value && !userHoveringArea;
             }
 
-            text.FadeTo(externalDimRequested && !IsHovered ? 0.5f : 1, transition_duration);
+            expandingBar.Expanded = barExpanded;
+            text.FadeTo(textHighlighted ? 1 : 0.5f, transition_duration, Easing.OutQuint);
         }
 
-        private bool externalDimRequested;
+        private bool userHoveringArea;
 
-        public void EnableDim()
+        public bool UserHoveringArea
         {
-            externalDimRequested = true;
-            updateState();
-        }
+            set
+            {
+                if (value == userHoveringArea)
+                    return;
 
-        public void DisableDim()
-        {
-            externalDimRequested = false;
-            updateState();
+                userHoveringArea = value;
+                updateState();
+            }
         }
     }
 }

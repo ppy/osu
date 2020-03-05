@@ -4,11 +4,9 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -22,10 +20,10 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         protected override bool AllowFail => true;
 
-        protected override Player CreatePlayer(Ruleset ruleset)
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = SelectedMods.Value.Concat(new[] { new TaikoModSuddenDeath() }).ToArray();
-            return new ScoreAccessiblePlayer();
+            return base.CreatePlayer(ruleset);
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) =>
@@ -49,20 +47,10 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Setup judgements", () =>
             {
                 judged = false;
-                ((ScoreAccessiblePlayer)Player).ScoreProcessor.NewJudgement += b => judged = true;
+                Player.ScoreProcessor.NewJudgement += b => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
             AddAssert("not failed", () => !Player.HasFailed);
-        }
-
-        private class ScoreAccessiblePlayer : TestPlayer
-        {
-            public ScoreAccessiblePlayer()
-                : base(false, false)
-            {
-            }
-
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
         }
     }
 }
