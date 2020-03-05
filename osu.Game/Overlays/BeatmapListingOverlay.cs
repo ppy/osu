@@ -153,41 +153,20 @@ namespace osu.Game.Overlays
             var sortCriteria = sortControl.Current;
             var sortDirection = sortControl.SortDirection;
 
-            searchSection.SearchParameters.BindValueChanged(parameters =>
+            searchSection.Query.BindValueChanged(query =>
             {
-                if (parameters.OldValue.Query != parameters.NewValue.Query)
-                {
-                    sortCriteria.Value = string.IsNullOrEmpty(parameters.NewValue.Query) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
-                    sortDirection.Value = SortDirection.Descending;
-
-                    queueUpdateSearch(true);
-                }
-                else
-                {
-                    queueUpdateSearch();
-                }
+                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
+                sortDirection.Value = SortDirection.Descending;
+                queueUpdateSearch(true);
             });
+
+            searchSection.Ruleset.BindValueChanged(_ => queueUpdateSearch());
+            searchSection.Category.BindValueChanged(_ => queueUpdateSearch());
+            searchSection.Genre.BindValueChanged(_ => queueUpdateSearch());
+            searchSection.Language.BindValueChanged(_ => queueUpdateSearch());
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
-        }
-
-        public void ShowTag(string tag)
-        {
-            searchSection.SetTag(tag);
-            Show();
-        }
-
-        public void ShowGenre(BeatmapSearchGenre genre)
-        {
-            searchSection.SetGenre(genre);
-            Show();
-        }
-
-        public void ShowLanguage(BeatmapSearchLanguage language)
-        {
-            searchSection.SetLanguage(language);
-            Show();
         }
 
         private ScheduledDelegate queryChangedDebounce;
@@ -218,13 +197,13 @@ namespace osu.Game.Overlays
 
             loadingLayer.Show();
 
-            getSetsRequest = new SearchBeatmapSetsRequest(searchSection.SearchParameters.Value.Query, searchSection.SearchParameters.Value.Ruleset)
+            getSetsRequest = new SearchBeatmapSetsRequest(searchSection.Query.Value, searchSection.Ruleset.Value)
             {
-                SearchCategory = searchSection.SearchParameters.Value.Category,
+                SearchCategory = searchSection.Category.Value,
                 SortCriteria = sortControl.Current.Value,
                 SortDirection = sortControl.SortDirection.Value,
-                Genre = searchSection.SearchParameters.Value.Genre,
-                Language = searchSection.SearchParameters.Value.Language
+                Genre = searchSection.Genre.Value,
+                Language = searchSection.Language.Value
             };
 
             getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
