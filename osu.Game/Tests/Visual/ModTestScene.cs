@@ -13,16 +13,16 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class ModSandboxTestScene : PlayerTestScene
+    public abstract class ModTestScene : PlayerTestScene
     {
         protected sealed override bool HasCustomSteps => true;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ModSandboxTestScene)
+            typeof(ModTestScene)
         };
 
-        protected ModSandboxTestScene(Ruleset ruleset)
+        protected ModTestScene(Ruleset ruleset)
             : base(ruleset)
         {
         }

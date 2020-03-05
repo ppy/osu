@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModDifficultyAdjust : ModSandboxTestScene
+    public class TestSceneOsuModDifficultyAdjust : ModTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Append(typeof(OsuModDifficultyAdjust)).ToList();
 
