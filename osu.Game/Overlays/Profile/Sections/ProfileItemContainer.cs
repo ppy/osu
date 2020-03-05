@@ -27,8 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections
             set
             {
                 idleColour = value;
-                if (!IsHovered)
-                    background.Colour = value;
+                fadeBackgroundColour();
             }
         }
 
@@ -40,8 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections
             set
             {
                 hoverColour = value;
-                if (IsHovered)
-                    background.Colour = value;
+                fadeBackgroundColour();
             }
         }
 
@@ -73,14 +71,19 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected override bool OnHover(HoverEvent e)
         {
-            background.FadeColour(HoverColour, hover_duration, Easing.OutQuint);
+            fadeBackgroundColour(hover_duration);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            background.FadeColour(IdleColour, hover_duration, Easing.OutQuint);
+            fadeBackgroundColour(hover_duration);
+        }
+
+        private void fadeBackgroundColour(double fadeDuration = 0)
+        {
+            background.FadeColour(IsHovered ? HoverColour : IdleColour, fadeDuration, Easing.OutQuint);
         }
     }
 }
