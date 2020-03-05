@@ -17,21 +17,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         }
 
         [Test]
-        public void TestNoAdjustment() => CreateModTest(new ModTestCaseData(new OsuModDifficultyAdjust())
+        public void TestNoAdjustment() => CreateModTest(new ModTestData(new OsuModDifficultyAdjust())
         {
             Autoplay = true,
             PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
         });
 
         [Test]
-        public void TestCircleSize10() => CreateModTest(new ModTestCaseData(new OsuModDifficultyAdjust { CircleSize = { Value = 10 } })
+        public void TestCircleSize10() => CreateModTest(new ModTestData(new OsuModDifficultyAdjust { CircleSize = { Value = 10 } })
         {
             Autoplay = true,
             PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
         });
 
         [Test]
-        public void TestApproachRate10() => CreateModTest(new ModTestCaseData(new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } })
+        public void TestApproachRate10() => CreateModTest(new ModTestData(new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } })
         {
             Autoplay = true,
             PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
