@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
 
         protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
 
-        protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             var mods = new List<Mod>(SelectedMods.Value);
 
