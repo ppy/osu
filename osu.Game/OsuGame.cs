@@ -414,8 +414,8 @@ namespace osu.Game
                 if (Beatmap.Value != b)
                     return;
 
-                if (Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                    musicController.NextTrack();
+                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                    MusicController.NextTrack();
             }
         }
 
@@ -588,7 +588,7 @@ namespace osu.Game
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
-            loadComponentSingleFile(musicController = new MusicController(), Add, true);
+            loadComponentSingleFile(MusicController = new MusicController(), Add, true);
 
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
@@ -896,7 +896,7 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
-        private MusicController musicController;
+        protected MusicController MusicController { get; private set; }
 
         protected override bool OnExiting()
         {
@@ -954,7 +954,7 @@ namespace osu.Game
             {
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
 
-                musicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
+                MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
