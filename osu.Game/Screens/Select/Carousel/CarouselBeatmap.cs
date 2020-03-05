@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            if (Beatmap.BeatmapSet.Equals(criteria.SelectedBeatmapSet))
+            if (Beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
                 // bypass filtering for selected beatmap
                 Filtered.Value = false;
