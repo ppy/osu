@@ -214,7 +214,7 @@ namespace osu.Game
 
             // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
             // and potentially causing a reload of it after just unloading.
-            // Note that the reason for this being added *has* been resolved, so it may be feasible to remover this if required.
+            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
             Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
