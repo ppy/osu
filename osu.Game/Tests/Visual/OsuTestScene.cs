@@ -289,8 +289,6 @@ namespace osu.Game.Tests.Visual
                         lastReferenceTime = refTime;
                     }
 
-                    Console.WriteLine($"t={CurrentTime}");
-
                     if (CurrentTime >= Length)
                     {
                         Stop();
