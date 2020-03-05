@@ -1,15 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -26,7 +24,9 @@ namespace osu.Game.Screens.Multi.Components
             set
             {
                 base.RelativeSizeAxes = value;
-                fill.RelativeSizeAxes = value;
+
+                if (tiles != null)
+                    tiles.RelativeSizeAxes = value;
             }
         }
 
@@ -36,83 +36,75 @@ namespace osu.Game.Screens.Multi.Components
             set
             {
                 base.AutoSizeAxes = value;
-                fill.AutoSizeAxes = value;
+
+                if (tiles != null)
+                    tiles.AutoSizeAxes = value;
             }
         }
 
+        private FillDirection direction = FillDirection.Full;
+
         public FillDirection Direction
         {
-            get => fill.Direction;
-            set => fill.Direction = value;
-        }
+            get => direction;
+            set
+            {
+                direction = value;
 
-        private readonly FillFlowContainer fill;
-
-        public ParticipantsList()
-        {
-            InternalChild = fill = new FillFlowContainer { Spacing = new Vector2(10) };
+                if (tiles != null)
+                    tiles.Direction = value;
+            }
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomID.BindValueChanged(_ => updateParticipants(), true);
+            RecentParticipants.CollectionChanged += (_, __) => updateParticipants();
+            updateParticipants();
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetRoomScoresRequest request;
+        private ScheduledDelegate scheduledUpdate;
+        private FillFlowContainer<UserTile> tiles;
 
         private void updateParticipants()
         {
-            var roomId = RoomID.Value ?? 0;
-
-            request?.Cancel();
-
-            // nice little progressive fade
-            int time = 500;
-
-            foreach (var c in fill.Children)
+            scheduledUpdate?.Cancel();
+            scheduledUpdate = Schedule(() =>
             {
-                c.Delay(500 - time).FadeOut(time, Easing.Out);
-                time = Math.Max(20, time - 20);
-                c.Expire();
-            }
+                tiles?.FadeOut(250, Easing.Out).Expire();
 
-            if (roomId == 0) return;
+                tiles = new FillFlowContainer<UserTile>
+                {
+                    Alpha = 0,
+                    Direction = Direction,
+                    AutoSizeAxes = AutoSizeAxes,
+                    RelativeSizeAxes = RelativeSizeAxes,
+                    Spacing = new Vector2(10)
+                };
 
-            request = new GetRoomScoresRequest(roomId);
-            request.Success += scores => Schedule(() =>
-            {
-                if (roomId != RoomID.Value)
-                    return;
+                for (int i = 0; i < RecentParticipants.Count; i++)
+                    tiles.Add(new UserTile { User = RecentParticipants[i] });
 
-                fill.Clear();
-                foreach (var s in scores)
-                    fill.Add(new UserTile(s.User));
+                AddInternal(tiles);
 
-                fill.FadeInFromZero(1000, Easing.OutQuint);
+                tiles.Delay(250).FadeIn(250, Easing.OutQuint);
             });
-
-            api.Queue(request);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            request?.Cancel();
-            base.Dispose(isDisposing);
         }
 
         private class UserTile : CompositeDrawable, IHasTooltip
         {
-            private readonly User user;
-
-            public string TooltipText => user.Username;
-
-            public UserTile(User user)
+            public User User
             {
-                this.user = user;
+                get => avatar.User;
+                set => avatar.User = value;
+            }
+
+            public string TooltipText => User?.Username ?? string.Empty;
+
+            private readonly UpdateableAvatar avatar;
+
+            public UserTile()
+            {
                 Size = new Vector2(TILE_SIZE);
                 CornerRadius = 5f;
                 Masking = true;
@@ -124,11 +116,7 @@ namespace osu.Game.Screens.Multi.Components
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.FromHex(@"27252d"),
                     },
-                    new UpdateableAvatar
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        User = user,
-                    },
+                    avatar = new UpdateableAvatar { RelativeSizeAxes = Axes.Both },
                 };
             }
         }
