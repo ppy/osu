@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
-        private TestPlayer player;
+        private LoadBlockingTestPlayer player;
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Background
         public void PlayerLoaderSettingsHoverTest()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer { BlockLoad = true })));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true })));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -268,7 +268,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             setupUserSettings();
 
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer(allowPause))));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer(allowPause))));
 
             AddUntilStep("Wait for Player Loader to load", () => playerLoader.IsLoaded);
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
@@ -347,7 +347,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
         }
 
-        private class TestPlayer : Visual.TestPlayer
+        private class LoadBlockingTestPlayer : TestPlayer
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-            public TestPlayer(bool allowPause = true)
+            public LoadBlockingTestPlayer(bool allowPause = true)
                 : base(allowPause)
             {
             }
