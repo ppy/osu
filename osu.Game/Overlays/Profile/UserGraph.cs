@@ -141,13 +141,13 @@ namespace osu.Game.Overlays.Profile
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Y,
-                            Width = 1.5f,
+                            Width = 2,
                         },
                         movingBall = new CircularContainer
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(18),
+                            Size = new Vector2(20),
                             Masking = true,
                             BorderThickness = 4,
                             RelativePositionAxes = Axes.Y,
