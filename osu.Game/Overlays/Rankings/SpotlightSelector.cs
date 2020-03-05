@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Rankings
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Horizontal = OverlayHeader.CONTENT_X_MARGIN },
+                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
                         Children = new Drawable[]
                         {
                             dropdown = new SpotlightsDropdown
