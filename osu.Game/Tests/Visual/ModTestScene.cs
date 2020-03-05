@@ -100,12 +100,7 @@ namespace osu.Game.Tests.Visual
             /// <summary>
             /// The <see cref="Mod"/> this test case tests.
             /// </summary>
-            public readonly Mod Mod;
-
-            public ModTestData(Mod mod)
-            {
-                Mod = mod;
-            }
+            public Mod Mod;
         }
     }
 }
