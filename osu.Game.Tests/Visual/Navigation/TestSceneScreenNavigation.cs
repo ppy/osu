@@ -114,6 +114,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Options overlay was closed", () => Game.Settings.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestWaitForNextTrackInMenu()
+        {
+            bool trackCompleted = false;
+
+            AddUntilStep("Wait for music controller", () => Game.MusicController.IsLoaded);
+            AddStep("Seek close to end", () =>
+            {
+                Game.MusicController.SeekTo(Game.Beatmap.Value.Track.Length - 1000);
+                Game.Beatmap.Value.Track.Completed += () => trackCompleted = true;
+            });
+
+            AddUntilStep("Track was completed", () => trackCompleted);
+            AddUntilStep("Track was restarted", () => Game.Beatmap.Value.Track.IsRunning);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => pressAndRelease(Key.Escape));
 
