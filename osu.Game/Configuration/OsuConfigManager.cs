@@ -140,6 +140,8 @@ namespace osu.Game.Configuration
 
             var pieces = rawVersion.Split('.');
 
+            // on a fresh install or when coming from a non-release build, execution will end here.
+            // we don't want to run migrations in such cases.
             if (!int.TryParse(pieces[0], out int year)) return;
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
