@@ -97,7 +97,7 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
-        public string Version
+        public virtual string Version
         {
             get
             {
@@ -211,6 +211,10 @@ namespace osu.Game
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+
+            // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
+            // and potentially causing a reload of it after just unloading.
+            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
             Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)

@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 
@@ -13,13 +15,19 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
-        private readonly UserPanel peppy;
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
-        public TestSceneUserPanel()
+        private UserPanel peppy;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
             UserPanel flyte;
 
-            Add(new FillFlowContainer
+            Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -44,34 +52,38 @@ namespace osu.Game.Tests.Visual.Online
                         SupportLevel = 3,
                     }) { Width = 300 },
                 },
-            });
+            };
 
             flyte.Status.Value = new UserStatusOnline();
             peppy.Status.Value = null;
-        }
-
-        [Test]
-        public void UserStatusesTests()
-        {
-            AddStep("online", () => { peppy.Status.Value = new UserStatusOnline(); });
-            AddStep(@"do not disturb", () => { peppy.Status.Value = new UserStatusDoNotDisturb(); });
-            AddStep(@"offline", () => { peppy.Status.Value = new UserStatusOffline(); });
-            AddStep(@"null status", () => { peppy.Status.Value = null; });
-        }
-
-        [Test]
-        public void UserActivitiesTests()
-        {
-            Bindable<UserActivity> activity = new Bindable<UserActivity>();
-
             peppy.Activity.BindTo(activity);
+        });
 
-            AddStep("idle", () => { activity.Value = null; });
-            AddStep("spectating", () => { activity.Value = new UserActivity.Spectating(); });
-            AddStep("solo", () => { activity.Value = new UserActivity.SoloGame(null, null); });
-            AddStep("choosing", () => { activity.Value = new UserActivity.ChoosingBeatmap(); });
-            AddStep("editing", () => { activity.Value = new UserActivity.Editing(null); });
-            AddStep("modding", () => { activity.Value = new UserActivity.Modding(); });
+        [Test]
+        public void TestUserStatus()
+        {
+            AddStep("online", () => peppy.Status.Value = new UserStatusOnline());
+            AddStep("do not disturb", () => peppy.Status.Value = new UserStatusDoNotDisturb());
+            AddStep("offline", () => peppy.Status.Value = new UserStatusOffline());
+            AddStep("null status", () => peppy.Status.Value = null);
         }
+
+        [Test]
+        public void TestUserActivity()
+        {
+            AddStep("set online status", () => peppy.Status.Value = new UserStatusOnline());
+
+            AddStep("idle", () => activity.Value = null);
+            AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
+            AddStep("solo (osu!)", () => activity.Value = soloGameStatusForRuleset(0));
+            AddStep("solo (osu!taiko)", () => activity.Value = soloGameStatusForRuleset(1));
+            AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
+            AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
+            AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
+            AddStep("editing", () => activity.Value = new UserActivity.Editing(null));
+            AddStep("modding", () => activity.Value = new UserActivity.Modding());
+        }
+
+        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.SoloGame(null, rulesetStore.GetRuleset(rulesetId));
     }
 }
