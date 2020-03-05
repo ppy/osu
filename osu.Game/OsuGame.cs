@@ -43,6 +43,7 @@ using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 
@@ -390,6 +391,8 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
+        protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -528,6 +531,7 @@ namespace osu.Game
 
             AddRange(new Drawable[]
             {
+                CreateUpdateManager(),
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
