@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -70,8 +71,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             return new TooltipDisplayContent
             {
-                Rank = $"#{rank:#,##0}",
-                Time = days == 0 ? "now" : $"{days} days ago"
+                Rank = $"#{rank:N0}",
+                Time = days == 0 ? "now" : $"{"day".ToQuantity(days)} ago"
             };
         }
 
