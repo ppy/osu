@@ -4,24 +4,27 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -45,7 +48,7 @@ namespace osu.Game.Screens.Multi
         private readonly IBindable<bool> isIdle = new BindableBool();
 
         [Cached]
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
@@ -62,6 +65,9 @@ namespace osu.Game.Screens.Multi
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
+        private readonly Drawable header;
+        private readonly Drawable headerBackground;
+
         public Multiplayer()
         {
             Anchor = Anchor.Centre;
@@ -69,54 +75,65 @@ namespace osu.Game.Screens.Multi
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
+            var backgroundColour = OsuColour.FromHex(@"3e3a44");
+
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Container
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"3e3a44"),
-                            },
-                            new Triangles
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColourLight = OsuColour.FromHex(@"3c3842"),
-                                ColourDark = OsuColour.FromHex(@"393540"),
-                                TriangleScale = 5,
-                            },
-                        },
+                        Colour = backgroundColour,
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
+                        Children = new[]
+                        {
+                            header = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 400,
+                                Children = new[]
+                                {
+                                    headerBackground = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Width = 1.25f,
+                                        Masking = true,
+                                        Children = new Drawable[]
+                                        {
+                                            new HeaderBackgroundSprite
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 400 // Keep a static height so the header doesn't change as it's resized between subscreens
+                                            },
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Bottom = -1 }, // 1px padding to avoid a 1px gap due to masking
+                                        Child = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
+                                        },
+                                    }
+                                }
+                            },
+                            screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
+                        }
                     },
                     new Header(screenStack),
-                    createButton = new HeaderButton
+                    createButton = new CreateRoomButton
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.None,
-                        Size = new Vector2(150, Header.HEIGHT - 20),
-                        Margin = new MarginPadding
-                        {
-                            Top = 10,
-                            Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
-                        },
-                        Text = "Create room",
-                        Action = () => loungeSubScreen.Open(new Room
-                        {
-                            Name = { Value = $"{api.LocalUser}'s awesome room" }
-                        }),
+                        Action = createRoom
                     },
                     roomManager = new RoomManager()
                 }
@@ -146,14 +163,39 @@ namespace osu.Game.Screens.Multi
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.BindTo(currentRoom);
+            dependencies.Model.BindTo(selectedRoom);
             return dependencies;
         }
 
         private void updatePollingRate(bool idle)
         {
-            roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
-            Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
+            if (!this.IsCurrentScreen())
+            {
+                roomManager.TimeBetweenListingPolls = 0;
+                roomManager.TimeBetweenSelectionPolls = 0;
+            }
+            else
+            {
+                switch (screenStack.CurrentScreen)
+                {
+                    case LoungeSubScreen _:
+                        roomManager.TimeBetweenListingPolls = idle ? 120000 : 15000;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 120000 : 15000;
+                        break;
+
+                    case MatchSubScreen _:
+                        roomManager.TimeBetweenListingPolls = 0;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 30000 : 5000;
+                        break;
+
+                    default:
+                        roomManager.TimeBetweenListingPolls = 0;
+                        roomManager.TimeBetweenSelectionPolls = 0;
+                        break;
+                }
+            }
+
+            Logger.Log($"Polling adjusted (listing: {roomManager.TimeBetweenListingPolls}, selection: {roomManager.TimeBetweenSelectionPolls})");
         }
 
         /// <summary>
@@ -205,6 +247,8 @@ namespace osu.Game.Screens.Multi
             base.OnResuming(last);
 
             beginHandlingTrack();
+
+            updatePollingRate(isIdle.Value);
         }
 
         public override void OnSuspending(IScreen next)
@@ -214,7 +258,7 @@ namespace osu.Game.Screens.Multi
 
             endHandlingTrack();
 
-            roomManager.TimeBetweenPolls = 0;
+            updatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)
@@ -248,6 +292,11 @@ namespace osu.Game.Screens.Multi
             logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
         }
 
+        private void createRoom()
+        {
+            loungeSubScreen.Open(new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } });
+        }
+
         private void beginHandlingTrack()
         {
             Beatmap.BindValueChanged(updateTrack, true);
@@ -259,7 +308,10 @@ namespace osu.Game.Screens.Multi
             Beatmap.ValueChanged -= updateTrack;
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen) => subScreenChanged(newScreen);
+        private void screenPushed(IScreen lastScreen, IScreen newScreen)
+        {
+            subScreenChanged(newScreen);
+        }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
@@ -271,6 +323,19 @@ namespace osu.Game.Screens.Multi
 
         private void subScreenChanged(IScreen newScreen)
         {
+            switch (newScreen)
+            {
+                case LoungeSubScreen _:
+                    header.Delay(MultiplayerSubScreen.RESUME_TRANSITION_DELAY).ResizeHeightTo(400, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(0, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
+                    break;
+
+                case MatchSubScreen _:
+                    header.ResizeHeightTo(135, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
+                    break;
+            }
+
             updatePollingRate(isIdle.Value);
             createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);
 
@@ -325,6 +390,37 @@ namespace osu.Game.Screens.Multi
                 SecondWaveColour = OsuColour.FromHex(@"554075");
                 ThirdWaveColour = OsuColour.FromHex(@"44325e");
                 FourthWaveColour = OsuColour.FromHex(@"392850");
+            }
+        }
+
+        private class HeaderBackgroundSprite : MultiplayerBackgroundSprite
+        {
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
+
+            private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+            {
+                protected override double TransformDuration => 200;
+            }
+        }
+
+        public class CreateRoomButton : PurpleTriangleButton
+        {
+            public CreateRoomButton()
+            {
+                Size = new Vector2(150, Header.HEIGHT - 20);
+                Margin = new MarginPadding
+                {
+                    Top = 10,
+                    Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Triangles.TriangleScale = 1.5f;
+
+                Text = "Create room";
             }
         }
     }

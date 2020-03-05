@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using System.Threading;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 
@@ -19,14 +19,15 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
-        protected readonly Bindable<Country> Country = new Bindable<Country>();
-        protected readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        protected Bindable<Country> Country => header.Country;
+
+        protected Bindable<RankingsScope> Scope => header.Current;
 
         private readonly BasicScrollContainer scrollFlow;
         private readonly Container contentContainer;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
         private readonly Box background;
+        private readonly RankingsOverlayHeader header;
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
@@ -54,14 +55,11 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new RankingsOverlayHeader
+                            header = new RankingsOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Depth = -float.MaxValue,
-                                Country = { BindTarget = Country },
-                                Current = { BindTarget = Scope },
-                                Ruleset = { BindTarget = ruleset }
+                                Depth = -float.MaxValue
                             },
                             new Container
                             {
@@ -77,7 +75,7 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.X,
                                         Margin = new MarginPadding { Bottom = 10 }
                                     },
-                                    loading = new DimmedLoadingLayer(),
+                                    loading = new LoadingLayer(contentContainer),
                                 }
                             }
                         }
@@ -92,8 +90,15 @@ namespace osu.Game.Overlays
             background.Colour = ColourProvider.Background5;
         }
 
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
+
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            header.Ruleset.BindTo(ruleset);
+
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
@@ -101,7 +106,7 @@ namespace osu.Game.Overlays
                     Scope.Value = RankingsScope.Performance;
 
                 Scheduler.AddOnce(loadNewContent);
-            }, true);
+            });
 
             Scope.BindValueChanged(_ =>
             {
@@ -110,7 +115,7 @@ namespace osu.Game.Overlays
                     Country.Value = null;
 
                 Scheduler.AddOnce(loadNewContent);
-            }, true);
+            });
 
             ruleset.BindValueChanged(_ =>
             {
@@ -118,9 +123,9 @@ namespace osu.Game.Overlays
                     return;
 
                 Scheduler.AddOnce(loadNewContent);
-            }, true);
+            });
 
-            base.LoadComplete();
+            Scheduler.AddOnce(loadNewContent);
         }
 
         public void ShowCountry(Country requested)
@@ -131,6 +136,12 @@ namespace osu.Game.Overlays
             Show();
 
             Country.Value = requested;
+        }
+
+        public void ShowSpotlights()
+        {
+            Scope.Value = RankingsScope.Spotlights;
+            Show();
         }
 
         private void loadNewContent()
@@ -158,8 +169,8 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            request.Success += () => loadContent(createTableFromResponse(request));
-            request.Failure += _ => loadContent(null);
+            request.Success += () => Schedule(() => loadContent(createTableFromResponse(request)));
+            request.Failure += _ => Schedule(() => loadContent(null));
 
             api.Queue(request);
         }
@@ -220,6 +231,14 @@ namespace osu.Game.Overlays
                 loading.Hide();
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            lastRequest?.Cancel();
+            cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
         }
     }
 }

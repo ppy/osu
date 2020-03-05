@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             if (MenuVoice.Value && !MenuMusic.Value)
                 welcome = audio.Samples.Get(@"welcome");
@@ -53,8 +53,6 @@ namespace osu.Game.Screens.Menu
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
-
-            logo.Triangles = true;
 
             if (!resuming)
             {
@@ -102,13 +100,12 @@ namespace osu.Game.Screens.Menu
                 this.background = background;
             }
 
-            private OsuGameBase game;
+            [Resolved]
+            private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuGameBase game)
+            private void load(TextureStore textures)
             {
-                this.game = game;
-
                 InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
