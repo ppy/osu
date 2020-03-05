@@ -3,13 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Scoring;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
@@ -27,52 +24,48 @@ namespace osu.Game.Tests.Visual
         {
         }
 
-        private ModTestData currentTest;
+        private ModTestData currentTestData;
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>
         {
-            AddStep("set test data", () => currentTest = testData);
+            AddStep("set test data", () => currentTestData = testData);
         });
 
         public override void TearDownSteps()
         {
             AddUntilStep("test passed", () =>
             {
-                if (currentTest == null)
+                if (currentTestData == null)
                     return true;
 
-                return currentTest.PassCondition?.Invoke() ?? false;
+                return currentTestData.PassCondition?.Invoke() ?? false;
             });
 
             base.TearDownSteps();
         }
 
-        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTest?.Beatmap ?? base.CreateBeatmap(ruleset);
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
 
-        protected sealed override Player CreatePlayer(Ruleset ruleset)
+        protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
         {
-            SelectedMods.Value = SelectedMods.Value.Append(currentTest.Mod).ToArray();
+            var mods = new List<Mod>(SelectedMods.Value);
 
-            var score = currentTest.Autoplay
-                ? ruleset.GetAutoplayMod().CreateReplayScore(Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, SelectedMods.Value))
-                : null;
+            if (currentTestData.Mod != null)
+                mods.Add(currentTestData.Mod);
+            if (currentTestData.Autoplay)
+                mods.Add(ruleset.GetAutoplayMod());
 
-            return CreateReplayPlayer(score, AllowFail);
+            SelectedMods.Value = mods;
+
+            return new ModTestPlayer(AllowFail);
         }
 
-        /// <summary>
-        /// Creates the <see cref="TestPlayer"/> for a test case.
-        /// </summary>
-        /// <param name="score">The <see cref="Score"/>.</param>
-        /// <param name="allowFail">Whether the player can fail.</param>
-        protected virtual TestPlayer CreateReplayPlayer(Score score, bool allowFail) => new TestPlayer(score, allowFail);
-
-        protected class TestPlayer : TestReplayPlayer
+        protected class ModTestPlayer : TestPlayer
         {
             protected override bool AllowFail { get; }
 
-            public TestPlayer(Score score, bool allowFail)
-                : base(score, false, false)
+            public ModTestPlayer(bool allowFail)
+                : base(false, false)
             {
                 AllowFail = allowFail;
             }

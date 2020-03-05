@@ -3,8 +3,6 @@
 
 using NUnit.Framework;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
@@ -17,11 +15,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         }
 
         [Test]
-        public void TestNoAdjustment() => CreateModTest(new ModTestData()
+        public void TestNoAdjustment() => CreateModTest(new ModTestData
         {
             Mod = new OsuModDifficultyAdjust(),
             Autoplay = true,
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+            PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2
         });
 
         [Test]
@@ -29,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 10 } },
             Autoplay = true,
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+            PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2
         });
 
         [Test]
@@ -37,19 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } },
             Autoplay = true,
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+            PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2
         });
-
-        protected override TestPlayer CreateReplayPlayer(Score score, bool allowFail) => new ScoreAccessibleTestPlayer(score, allowFail);
-
-        private class ScoreAccessibleTestPlayer : TestPlayer
-        {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-
-            public ScoreAccessibleTestPlayer(Score score, bool allowFail)
-                : base(score, allowFail)
-            {
-            }
-        }
     }
 }
