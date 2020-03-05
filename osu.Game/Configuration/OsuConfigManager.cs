@@ -142,7 +142,6 @@ namespace osu.Game.Configuration
 
             if (!int.TryParse(pieces[0], out int year)) return;
             if (!int.TryParse(pieces[1], out int monthDay)) return;
-            if (!int.TryParse(pieces[2], out int minor)) return;
 
             int combined = (year * 10000) + monthDay;
 
