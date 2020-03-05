@@ -27,11 +27,11 @@ namespace osu.Game.Tests.Visual
         {
         }
 
-        private ModTestCaseData currentTest;
+        private ModTestData currentTest;
 
-        protected void CreateModTest(ModTestCaseData testCaseData) => CreateTest(() =>
+        protected void CreateModTest(ModTestData testData) => CreateTest(() =>
         {
-            AddStep("set test data", () => currentTest = testCaseData);
+            AddStep("set test data", () => currentTest = testData);
         });
 
         public override void TearDownSteps()
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        protected class ModTestCaseData
+        protected class ModTestData
         {
             /// <summary>
             /// Whether to use a replay to simulate an auto-play. True by default.
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual
             /// </summary>
             public readonly Mod Mod;
 
-            public ModTestCaseData(Mod mod)
+            public ModTestData(Mod mod)
             {
                 Mod = mod;
             }
