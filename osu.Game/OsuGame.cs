@@ -410,7 +410,7 @@ namespace osu.Game
 
             void trackCompleted(WorkingBeatmap b)
             {
-                // the source of track completion is the audio thread, so the beatmap may have changed before a firing.
+                // the source of track completion is the audio thread, so the beatmap may have changed before firing.
                 if (Beatmap.Value != b)
                     return;
 
