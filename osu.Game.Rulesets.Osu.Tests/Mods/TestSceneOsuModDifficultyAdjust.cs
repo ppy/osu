@@ -1,57 +1,86 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModDifficultyAdjust : ModSandboxTestScene
+    public class TestSceneOsuModDifficultyAdjust : ModTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Append(typeof(OsuModDifficultyAdjust)).ToList();
-
         public TestSceneOsuModDifficultyAdjust()
             : base(new OsuRuleset())
         {
         }
 
         [Test]
-        public void TestNoAdjustment() => CreateModTest(new ModTestCaseData("no adjustment", new OsuModDifficultyAdjust())
+        public void TestNoAdjustment() => CreateModTest(new ModTestData
         {
+            Mod = new OsuModDifficultyAdjust(),
             Autoplay = true,
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+            PassCondition = checkSomeHit
         });
 
         [Test]
-        public void TestCircleSize10() => CreateModTest(new ModTestCaseData("cs = 10", new OsuModDifficultyAdjust { CircleSize = { Value = 10 } })
+        public void TestCircleSize1() => CreateModTest(new ModTestData
         {
+            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 1 } },
             Autoplay = true,
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+            PassCondition = () => checkSomeHit() && checkObjectsScale(0.78f)
         });
 
         [Test]
-        public void TestApproachRate10() => CreateModTest(new ModTestCaseData("ar = 10", new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } })
+        public void TestCircleSize10() => CreateModTest(new ModTestData
         {
+            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 10 } },
             Autoplay = true,
-            PassCondition = () => ((ScoreAccessibleTestPlayer)Player).ScoreProcessor.JudgedHits >= 2
+            PassCondition = () => checkSomeHit() && checkObjectsScale(0.15f)
         });
 
-        protected override TestPlayer CreateReplayPlayer(Score score) => new ScoreAccessibleTestPlayer(score);
-
-        private class ScoreAccessibleTestPlayer : TestPlayer
+        [Test]
+        public void TestApproachRate1() => CreateModTest(new ModTestData
         {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } },
+            Autoplay = true,
+            PassCondition = () => checkSomeHit() && checkObjectsPreempt(1680)
+        });
 
-            public ScoreAccessibleTestPlayer(Score score)
-                : base(score)
-            {
-            }
+        [Test]
+        public void TestApproachRate10() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } },
+            Autoplay = true,
+            PassCondition = () => checkSomeHit() && checkObjectsPreempt(450)
+        });
+
+        private bool checkObjectsPreempt(double target)
+        {
+            var objects = Player.ChildrenOfType<DrawableHitCircle>();
+            if (!objects.Any())
+                return false;
+
+            return objects.All(o => o.HitObject.TimePreempt == target);
+        }
+
+        private bool checkObjectsScale(float target)
+        {
+            var objects = Player.ChildrenOfType<DrawableHitCircle>();
+            if (!objects.Any())
+                return false;
+
+            return objects.All(o => Precision.AlmostEquals(o.ChildrenOfType<ShakeContainer>().First().Children.OfType<Container>().Single().Scale.X, target));
+        }
+
+        private bool checkSomeHit()
+        {
+            return Player.ScoreProcessor.JudgedHits >= 2;
         }
     }
 }

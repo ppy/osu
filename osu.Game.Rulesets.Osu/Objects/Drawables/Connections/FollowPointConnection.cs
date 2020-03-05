@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 return;
             }
 
-            Vector2 startPosition = osuStart.EndPosition;
-            Vector2 endPosition = osuEnd.Position;
+            Vector2 startPosition = osuStart.StackedEndPosition;
+            Vector2 endPosition = osuEnd.StackedPosition;
             double endTime = osuEnd.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
