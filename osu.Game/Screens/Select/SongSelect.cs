@@ -397,6 +397,8 @@ namespace osu.Game.Screens.Select
                 var criteria = FilterControl.CreateCriteria();
                 criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
                 Carousel.Filter(criteria);
+
+                Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
             }
         }
 
