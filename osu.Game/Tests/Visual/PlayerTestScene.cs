@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -13,6 +14,11 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class PlayerTestScene : RateAdjustedBeatmapTestScene
     {
+        /// <summary>
+        /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
+        /// </summary>
+        protected virtual bool HasCustomSteps { get; } = false;
+
         private readonly Ruleset ruleset;
 
         protected TestPlayer Player;
@@ -36,7 +42,18 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
-            AddStep(ruleset.RulesetInfo.Name, loadPlayer);
+            if (!HasCustomSteps)
+                CreateTest(null);
+        }
+
+        protected void CreateTest(Action action)
+        {
+            if (action != null && !HasCustomSteps)
+                throw new InvalidOperationException($"Cannot add custom test steps without {nameof(HasCustomSteps)} being set.");
+
+            action?.Invoke();
+
+            AddStep(ruleset.RulesetInfo.Name, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -44,11 +61,13 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
-        private void loadPlayer()
+        protected void LoadPlayer()
         {
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
+
+            SelectedMods.Value = Array.Empty<Mod>();
 
             if (!AllowFail)
             {
