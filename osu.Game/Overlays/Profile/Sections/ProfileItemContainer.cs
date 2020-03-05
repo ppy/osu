@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override bool OnHover(HoverEvent e)
         {
             fadeBackgroundColour(hover_duration);
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
