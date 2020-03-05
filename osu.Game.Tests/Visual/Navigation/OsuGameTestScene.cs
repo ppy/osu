@@ -108,6 +108,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
+            // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
             public override string Version => "test game";
 
             protected override Loader CreateLoader() => new TestLoader();
