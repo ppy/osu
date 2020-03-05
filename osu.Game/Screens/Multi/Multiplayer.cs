@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Multi
         private readonly IBindable<bool> isIdle = new BindableBool();
 
         [Cached]
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
@@ -163,14 +163,39 @@ namespace osu.Game.Screens.Multi
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.BindTo(currentRoom);
+            dependencies.Model.BindTo(selectedRoom);
             return dependencies;
         }
 
         private void updatePollingRate(bool idle)
         {
-            roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
-            Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
+            if (!this.IsCurrentScreen())
+            {
+                roomManager.TimeBetweenListingPolls = 0;
+                roomManager.TimeBetweenSelectionPolls = 0;
+            }
+            else
+            {
+                switch (screenStack.CurrentScreen)
+                {
+                    case LoungeSubScreen _:
+                        roomManager.TimeBetweenListingPolls = idle ? 120000 : 15000;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 120000 : 15000;
+                        break;
+
+                    case MatchSubScreen _:
+                        roomManager.TimeBetweenListingPolls = 0;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 30000 : 5000;
+                        break;
+
+                    default:
+                        roomManager.TimeBetweenListingPolls = 0;
+                        roomManager.TimeBetweenSelectionPolls = 0;
+                        break;
+                }
+            }
+
+            Logger.Log($"Polling adjusted (listing: {roomManager.TimeBetweenListingPolls}, selection: {roomManager.TimeBetweenSelectionPolls})");
         }
 
         /// <summary>
@@ -222,6 +247,8 @@ namespace osu.Game.Screens.Multi
             base.OnResuming(last);
 
             beginHandlingTrack();
+
+            updatePollingRate(isIdle.Value);
         }
 
         public override void OnSuspending(IScreen next)
@@ -231,7 +258,7 @@ namespace osu.Game.Screens.Multi
 
             endHandlingTrack();
 
-            roomManager.TimeBetweenPolls = 0;
+            updatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)

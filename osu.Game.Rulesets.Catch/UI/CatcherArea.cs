@@ -4,14 +4,16 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -48,6 +50,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
+            if (result.Judgement is IgnoreJudgement)
+                return;
+
             void runAfterLoaded(Action action)
             {
                 if (lastPlateableFruit == null)
@@ -74,11 +79,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 caughtFruit.Anchor = Anchor.TopCentre;
                 caughtFruit.Origin = Anchor.Centre;
-                caughtFruit.Scale *= 0.7f;
+                caughtFruit.Scale *= 0.5f;
                 caughtFruit.LifetimeStart = caughtFruit.HitObject.StartTime;
                 caughtFruit.LifetimeEnd = double.MaxValue;
 
-                MovableCatcher.Add(caughtFruit);
+                MovableCatcher.PlaceOnPlate(caughtFruit);
                 lastPlateableFruit = caughtFruit;
 
                 if (!fruit.StaysOnPlate)
@@ -87,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (fruit.HitObject.LastInCombo)
             {
-                if (((CatchJudgement)result.Judgement).ShouldExplodeFor(result))
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();
@@ -221,9 +226,9 @@ namespace osu.Game.Rulesets.Catch.UI
             /// Add a caught fruit to the catcher's stack.
             /// </summary>
             /// <param name="fruit">The fruit that was caught.</param>
-            public void Add(DrawableHitObject fruit)
+            public void PlaceOnPlate(DrawableCatchHitObject fruit)
             {
-                float ourRadius = fruit.DrawSize.X / 2 * fruit.Scale.X;
+                float ourRadius = fruit.DisplayRadius;
                 float theirRadius = 0;
 
                 const float allowance = 6;
@@ -240,6 +245,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 fruit.X = Math.Clamp(fruit.X, -CATCHER_SIZE / 2, CATCHER_SIZE / 2);
 
                 caughtFruit.Add(fruit);
+
+                Add(new HitExplosion(fruit)
+                {
+                    X = fruit.X,
+                    Scale = new Vector2(fruit.HitObject.Scale)
+                });
             }
 
             /// <summary>
@@ -463,6 +474,114 @@ namespace osu.Game.Rulesets.Catch.UI
                     fruit.Expire();
                 }
             }
+        }
+    }
+
+    public class HitExplosion : CompositeDrawable
+    {
+        private readonly CircularContainer largeFaint;
+
+        public HitExplosion(DrawableCatchHitObject fruit)
+        {
+            Size = new Vector2(20);
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.BottomCentre;
+
+            Color4 objectColour = fruit.AccentColour.Value;
+
+            // scale roughly in-line with visual appearance of notes
+
+            const float angle_variangle = 15; // should be less than 45
+
+            const float roundness = 100;
+
+            const float initial_height = 10;
+
+            var colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1);
+
+            InternalChildren = new Drawable[]
+            {
+                largeFaint = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    // we want our size to be very small so the glow dominates it.
+                    Size = new Vector2(0.8f),
+                    Blending = BlendingParameters.Additive,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = Interpolation.ValueAt(0.1f, objectColour, Color4.White, 0, 1).Opacity(0.3f),
+                        Roundness = 160,
+                        Radius = 200,
+                    },
+                },
+                new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = Interpolation.ValueAt(0.6f, objectColour, Color4.White, 0, 1),
+                        Roundness = 20,
+                        Radius = 50,
+                    },
+                },
+                new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Size = new Vector2(0.01f, initial_height),
+                    Blending = BlendingParameters.Additive,
+                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = colour,
+                        Roundness = roundness,
+                        Radius = 40,
+                    },
+                },
+                new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Size = new Vector2(0.01f, initial_height),
+                    Blending = BlendingParameters.Additive,
+                    Rotation = RNG.NextSingle(-angle_variangle, angle_variangle),
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = colour,
+                        Roundness = roundness,
+                        Radius = 40,
+                    },
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            const double duration = 400;
+
+            largeFaint
+                .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
+                .FadeOut(duration * 2);
+
+            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
+            Expire(true);
         }
     }
 }

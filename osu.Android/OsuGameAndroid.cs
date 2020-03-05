@@ -30,11 +30,6 @@ namespace osu.Android
             }
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Add(new SimpleUpdateManager());
-        }
+        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
     }
 }

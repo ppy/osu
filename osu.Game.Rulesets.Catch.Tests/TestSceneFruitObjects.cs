@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
-using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             typeof(CatchHitObject),
             typeof(Fruit),
+            typeof(FruitPiece),
             typeof(Droplet),
             typeof(Banana),
             typeof(BananaShower),
@@ -37,14 +38,59 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
                 AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
+
+            AddStep("show droplet", () => SetContents(createDrawableDroplet));
+
+            AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
+
+            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
+                AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawable(rep, true)));
         }
 
-        private DrawableFruit createDrawable(FruitVisualRepresentation rep)
+        private Drawable createDrawableTinyDroplet()
+        {
+            var droplet = new TinyDroplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
+
+            return new DrawableTinyDroplet(droplet)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private Drawable createDrawableDroplet()
+        {
+            var droplet = new Droplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
+
+            return new DrawableDroplet(droplet)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private Drawable createDrawable(FruitVisualRepresentation rep, bool hyperdash = false)
         {
             Fruit fruit = new TestCatchFruit(rep)
             {
-                StartTime = 1000000000000,
                 Scale = 1.5f,
+                HyperDashTarget = hyperdash ? new Banana() : null
             };
 
             return new DrawableFruit(fruit)
@@ -58,11 +104,12 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
         }
 
-        private class TestCatchFruit : Fruit
+        public class TestCatchFruit : Fruit
         {
             public TestCatchFruit(FruitVisualRepresentation rep)
             {
                 VisualRepresentation = rep;
+                StartTime = 1000000000000;
             }
 
             public override FruitVisualRepresentation VisualRepresentation { get; }
