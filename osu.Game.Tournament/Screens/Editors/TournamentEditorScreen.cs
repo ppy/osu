@@ -48,8 +48,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         Spacing = new Vector2(20)
                     },
                 },
