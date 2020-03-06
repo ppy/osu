@@ -23,11 +23,13 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = CreateWorkingBeatmap(ruleset.RulesetInfo);}
+            Beatmap.Value = CreateWorkingBeatmap(ruleset.RulesetInfo);
+        }
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
             AddStep("Load editor", () => LoadScreen(new Editor()));
         }
     }

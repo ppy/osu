@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Text = "输入优先级"
+                                    Text = "Input Priority"
                                 },
                                 new FillFlowContainer
                                 {
@@ -80,13 +80,13 @@ namespace osu.Game.Tests.Visual
                                     {
                                         buttonLocal = new TriangleButton
                                         {
-                                            Text = "本地",
+                                            Text = "local",
                                             Size = new Vector2(50, 30),
                                             Action = returnUserInput
                                         },
                                         buttonTest = new TriangleButton
                                         {
-                                            Text = "测试",
+                                            Text = "test",
                                             Size = new Vector2(50, 30),
                                             Action = returnTestInput
                                         },

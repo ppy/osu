@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Beatmaps
                 }
             };
         }
-        
+
         protected virtual Beatmap CreateBeatmap() => createTestBeatmap();
 
         private static Beatmap createTestBeatmap()
