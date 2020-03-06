@@ -3,10 +3,8 @@
 
 using System.ComponentModel;
 using System.Linq;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
