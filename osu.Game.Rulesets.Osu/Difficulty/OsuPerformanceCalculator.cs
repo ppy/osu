@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             tapValue *= accFactor;
 
             // Penalize misses and 50s exponentially
-            tapValue *= Math.Pow(0.93, countMiss);
+            tapValue *= Math.Pow(0.93, effectiveMissCount);
             tapValue *= Math.Pow(0.98, countMeh);
 
             // Buff very high AR
@@ -281,7 +281,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 46000;
 
             // scale acc pp with misses
-            accuracyValue *= Math.Pow(0.96, countMiss);
+            accuracyValue *= Math.Pow(0.96, effectiveMissCount);
 
             // nerf short maps
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0);
