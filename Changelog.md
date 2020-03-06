@@ -576,3 +576,11 @@
     *   [m] [Add torus font #8104]
     *   [m] [**Add tournament seeding screen #8105**][**添加了比赛端的队伍随机分配界面**]
     *   [m] [**Update tournament client to 2019 design language #8106**][**将比赛端更新至2019的设计语言**]
+
+### 2020/03/06:
+*   整合更新
+    *   [m] [Fix beatmap status always using "ranked" for Ranked field #8128]
+    *   [m] [Fix follow points using unstacked hitobject positions #8118]
+    *   [m] [Fix user panel tests #8138]
+    *   [m] [Fix searchable list padding #8131]
+    *   [m] [Centralise creation of UpdateManagers #8141]
