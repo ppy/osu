@@ -584,3 +584,8 @@
     *   [m] [Fix user panel tests #8138]
     *   [m] [Fix searchable list padding #8131]
     *   [m] [Centralise creation of UpdateManagers #8141]
+    *   [m] [稍后整合] [Centralise TestPlayer implementations as much as possible #8140]
+    *   [m] [Fix song select max displayable star difficulty getting stuck at wrong maximum #8142]
+    *   [m] [稍后整合] [Add base test scene allowing different player initialisation per test method #8066]
+    *   [m] [Remove LD_LIBRARY_PATH from vscode launch.json #8135]
+    *   [m] [Fix DummyWorkingBeatmap's track completion attempting to change game-wide beatmap #8129]

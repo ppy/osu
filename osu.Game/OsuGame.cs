@@ -399,18 +399,27 @@ namespace osu.Game
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            var nextBeatmap = beatmap.NewValue;
-            if (nextBeatmap?.Track != null)
-                nextBeatmap.Track.Completed += currentTrackCompleted;
-
-            var oldBeatmap = beatmap.OldValue;
-            if (oldBeatmap?.Track != null)
-                oldBeatmap.Track.Completed -= currentTrackCompleted;
+            beatmap.OldValue?.CancelAsyncLoad();
 
             updateModDefaults();
 
-            oldBeatmap?.CancelAsyncLoad();
-            nextBeatmap?.BeginAsyncLoad();
+            var newBeatmap = beatmap.NewValue;
+
+            if (newBeatmap != null)
+            {
+                newBeatmap.Track.Completed += () => Scheduler.AddOnce(() => trackCompleted(newBeatmap));
+                newBeatmap.BeginAsyncLoad();
+            }
+
+            void trackCompleted(WorkingBeatmap b)
+            {
+                // the source of track completion is the audio thread, so the beatmap may have changed before firing.
+                if (Beatmap.Value != b)
+                    return;
+
+                if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
+                    MusicController.NextTrack();
+            }
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -430,12 +439,6 @@ namespace osu.Game
                     mod.ReadFromDifficulty(adjustedDifficulty);
             }
         }
-
-        private void currentTrackCompleted() => Schedule(() =>
-        {
-            if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
-                musicController.NextTrack();
-        });
 
         #endregion
 
@@ -588,7 +591,7 @@ namespace osu.Game
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
-            loadComponentSingleFile(musicController = new MusicController(), Add, true);
+            loadComponentSingleFile(MusicController = new MusicController(), Add, true);
 
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
@@ -897,7 +900,7 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
-        private MusicController musicController;
+        protected MusicController MusicController { get; private set; }
 
         protected override bool OnExiting()
         {
@@ -955,7 +958,7 @@ namespace osu.Game
             {
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
 
-                musicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
+                MusicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
