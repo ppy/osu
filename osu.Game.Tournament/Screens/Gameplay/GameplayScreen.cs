@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             AddRangeInternal(new Drawable[]
             {
-                new TourneyVideo(storage.GetStream("videos/gameplay.m4v"))
+                new TourneyVideo("gameplay")
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
