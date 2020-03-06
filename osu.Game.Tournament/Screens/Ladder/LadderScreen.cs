@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new TourneyVideo(storage.GetStream(@"videos/ladder.m4v"))
+                    new TourneyVideo("ladder")
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
