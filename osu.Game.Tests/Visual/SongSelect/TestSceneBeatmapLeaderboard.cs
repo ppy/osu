@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             typeof(Placeholder),
             typeof(MessagePlaceholder),
-            typeof(RetrievalFailurePlaceholder),
+            typeof(ClickablePlaceholder),
             typeof(UserTopScoreContainer),
             typeof(Leaderboard<BeatmapLeaderboardScope, ScoreInfo>),
         };
