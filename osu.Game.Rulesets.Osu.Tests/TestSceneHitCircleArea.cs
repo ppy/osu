@@ -71,23 +71,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("hit registered", () => hitAreaReceptor.HitAction == OsuAction.LeftButton);
         }
 
-        [Test]
-        public void TestCircleHitTopLeftEdge()
+        [TestCase(0.95f, OsuAction.LeftButton)]
+        [TestCase(1.05f, null)]
+        public void TestHitsCloseToEdge(float relativeDistanceFromCentre, OsuAction? expectedAction)
         {
             AddStep("move mouse to top left circle edge", () =>
             {
                 var drawQuad = hitAreaReceptor.ScreenSpaceDrawQuad;
                 // sqrt(2) / 2 = sin(45deg) = cos(45deg)
                 // draw width halved to get radius
-                // 0.95f taken for leniency
-                float correction = 0.95f * (float)Math.Sqrt(2) / 2 * (drawQuad.Width / 2);
+                float correction = relativeDistanceFromCentre * (float)Math.Sqrt(2) / 2 * (drawQuad.Width / 2);
                 var mousePosition = new Vector2(drawQuad.Centre.X - correction, drawQuad.Centre.Y - correction);
 
                 InputManager.MoveMouseTo(mousePosition);
             });
             scheduleHit();
 
-            AddAssert("hit registered", () => hitAreaReceptor.HitAction == OsuAction.LeftButton);
+            AddAssert($"hit {(expectedAction == null ? "not " : string.Empty)}registered", () => hitAreaReceptor.HitAction == expectedAction);
         }
 
         [Test]
