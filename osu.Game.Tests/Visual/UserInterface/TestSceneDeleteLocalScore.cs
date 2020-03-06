@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(Placeholder),
             typeof(MessagePlaceholder),
-            typeof(RetrievalFailurePlaceholder),
+            typeof(ClickablePlaceholder),
             typeof(UserTopScoreContainer),
             typeof(Leaderboard<BeatmapLeaderboardScope, ScoreInfo>),
             typeof(LeaderboardScore),
