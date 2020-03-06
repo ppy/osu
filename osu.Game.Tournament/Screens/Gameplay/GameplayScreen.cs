@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
@@ -19,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen
+    public class GameplayScreen : BeatmapInfoScreen, IProvideVideo
     {
         private readonly BindableBool warmup = new BindableBool();
 
@@ -39,12 +40,17 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private TournamentMatchChatDisplay chat { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
         {
             this.ipc = ipc;
 
             AddRangeInternal(new Drawable[]
             {
+                new TourneyVideo("gameplay")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new MatchHeader(),
                 new Container
                 {
