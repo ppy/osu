@@ -157,10 +157,7 @@ namespace osu.Game.Screens.Play
             addGameplayComponents(GameplayClockContainer, Beatmap.Value);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(e =>
-            {
-                updatePauseOnFocusLostState(e.NewValue, BreakOverlay.IsBreakTime.Value);
-            }, true);
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -232,7 +229,11 @@ namespace osu.Game.Screens.Play
                         IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                     },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
-                    KeyCounter = { AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded }, IsCounting = false },
+                    KeyCounter =
+                    {
+                        AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
+                        IsCounting = false
+                    },
                     RequestSeek = GameplayClockContainer.Seek,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -289,16 +290,16 @@ namespace osu.Game.Screens.Play
             HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
 
-        private void onBreakTimeChanged(ValueChangedEvent<bool> changeEvent)
+        private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
-            updatePauseOnFocusLostState(DrawableRuleset.HasReplayLoaded.Value, changeEvent.NewValue);
-            HUDOverlay.KeyCounter.IsCounting = !changeEvent.NewValue;
+            updatePauseOnFocusLostState();
+            HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
         }
 
-        private void updatePauseOnFocusLostState(bool replayLoaded, bool isBreakTime) =>
+        private void updatePauseOnFocusLostState() =>
             HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
-                                                     && !replayLoaded
-                                                     && !isBreakTime;
+                                                     && !DrawableRuleset.HasReplayLoaded.Value
+                                                     && !BreakOverlay.IsBreakTime.Value;
 
         private IBeatmap loadPlayableBeatmap()
         {
