@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -28,18 +29,18 @@ namespace osu.Game.Online.Chat
 
         protected override HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
-        private readonly bool ignoreColourProvider;
-
-        public DrawableLinkCompiler(IEnumerable<Drawable> parts, bool ignoreColourProvider = false)
+        public DrawableLinkCompiler(List<Drawable> parts, string tooltipText, Action action)
         {
-            Parts = parts.ToList();
-            this.ignoreColourProvider = ignoreColourProvider;
+            RelativeSizeAxes = Axes.Both;
+            Parts = parts;
+            TooltipText = tooltipText;
+            Action = action;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OverlayColourProvider colourProvider, [NotNull] OsuColour colours)
+        private void load(OsuColour colours)
         {
-            IdleColour = (ignoreColourProvider || colourProvider == null) ? colours.Blue : colourProvider.Light2;
+            IdleColour = colours.Blue;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;

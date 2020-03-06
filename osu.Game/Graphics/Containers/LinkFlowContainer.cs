@@ -14,8 +14,6 @@ namespace osu.Game.Graphics.Containers
 {
     public class LinkFlowContainer : OsuTextFlowContainer
     {
-        public bool IgnoreColourProvider { get; set; }
-
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
@@ -67,20 +65,15 @@ namespace osu.Game.Graphics.Containers
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
             => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
 
+        protected virtual DrawableLinkCompiler CreateLinkCompiler(List<Drawable> parts, string tooltipText, Action action)
+            => new DrawableLinkCompiler(parts, tooltipText, action);
+
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
-            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList(), IgnoreColourProvider)
-            {
-                RelativeSizeAxes = Axes.Both,
-                TooltipText = tooltipText,
-                Action = () =>
-                {
-                    if (action != null)
-                        action();
-                    else
-                        game?.HandleLink(link);
-                },
-            });
+            if (action == null)
+                action = () => game?.HandleLink(link);
+
+            AddInternal(CreateLinkCompiler(drawables.OfType<SpriteText>().ToList<Drawable>(), tooltipText, action));
         }
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
