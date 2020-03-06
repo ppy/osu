@@ -589,3 +589,13 @@
     *   [m] [稍后整合] [Add base test scene allowing different player initialisation per test method #8066]
     *   [m] [Remove LD_LIBRARY_PATH from vscode launch.json #8135]
     *   [m] [Fix DummyWorkingBeatmap's track completion attempting to change game-wide beatmap #8129]
+
+*   界面修改:
+    *   主界面按钮系统
+        *   变更描述
+            *   修正了"一个神秘的按钮"不正常工作的问题
+            *   将原先的"表格"变成"排名"
+        *   文件变更
+            *   [osu.Game/Screens/Menu/ButtonSystem.cs](osu.Game/Screens/Menu/ButtonSystem.cs)
+            *   [osu.Game/Screens/Menu/MainMenu.cs](osu.Game/Screens/Menu/MainMenu.cs)
+            *   [osu.Game/OsuGame.cs](osu.Game/OsuGame.cs)

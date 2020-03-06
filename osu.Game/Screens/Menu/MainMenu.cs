@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Menu
             buttons.OnSettings = () => settings?.ToggleVisibility();
             buttons.OnDirect = () => direct?.ToggleVisibility();
             buttons.OnChart = () => rankings?.ShowSpotlights();
+            buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
