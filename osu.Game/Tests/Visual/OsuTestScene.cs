@@ -241,7 +241,7 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    accumulated = Math.Min(seek, Length);
+                    accumulated = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
                     return accumulated == seek;
