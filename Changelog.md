@@ -589,6 +589,8 @@
     *   [m] [稍后整合] [Add base test scene allowing different player initialisation per test method #8066]
     *   [m] [Remove LD_LIBRARY_PATH from vscode launch.json #8135]
     *   [m] [Fix DummyWorkingBeatmap's track completion attempting to change game-wide beatmap #8129]
+    *   [m] [Make KeyCounter not count key presses during breaks #8059]
+    *   [m] [Update Framework #8152]
 
 *   界面修改:
     *   主界面按钮系统

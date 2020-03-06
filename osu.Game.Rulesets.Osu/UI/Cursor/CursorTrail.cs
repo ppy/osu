@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
@@ -14,6 +13,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osuTK;
 using osuTK.Graphics;
@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 // -1 signals that the part is unusable, and should not be drawn
                 parts[i].InvalidationID = -1;
             }
+
+            AddLayout(partSizeCache);
         }
 
         [BackgroundDependencyLoader]
@@ -72,19 +74,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        private readonly Cached<Vector2> partSizeCache = new Cached<Vector2>();
+        private readonly LayoutValue<Vector2> partSizeCache = new LayoutValue<Vector2>(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
 
         private Vector2 partSize => partSizeCache.IsValid
             ? partSizeCache.Value
             : (partSizeCache.Value = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight) * DrawInfo.Matrix.ExtractScale().Xy);
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & (Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
-                partSizeCache.Invalidate();
-
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
 
         /// <summary>
         /// The amount of time to fade the cursor trail pieces.
@@ -97,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.Update();
 
-            Invalidate(Invalidation.DrawNode, shallPropagate: false);
+            Invalidate(Invalidation.DrawNode);
 
             const int fade_clock_reset_threshold = 1000000;
 
