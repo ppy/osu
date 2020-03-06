@@ -32,12 +32,5 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
         }
-
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-        {
-            var working = base.CreateWorkingBeatmap(beatmap, storyboard);
-
-            return working;
-        }
     }
 }
