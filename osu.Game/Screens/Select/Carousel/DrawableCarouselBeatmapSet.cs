@@ -132,12 +132,12 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("展开", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.OnlineBeatmapSetID != null)
-                    items.Add(new OsuMenuItem("细节...", MenuItemType.Standard, () => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value)));
+                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value)));
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
-                    items.Add(new OsuMenuItem("恢复所有隐藏难度", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
+                    items.Add(new OsuMenuItem("恢复所有隐藏的难度", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
 
-                items.Add(new OsuMenuItem("删除整租图", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
+                items.Add(new OsuMenuItem("删除整组图", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
 
                 return items.ToArray();
             }
@@ -159,11 +159,11 @@ namespace osu.Game.Screens.Select.Carousel
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
                     },
-                    // Todo: This should be a fill flow, but has invalidation issues (see https://github.com/ppy/osu-framework/issues/223)
-                    new Container
+                    new FillFlowContainer
                     {
                         Depth = -1,
                         RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
                         Alpha = 0.5f,
@@ -173,7 +173,6 @@ namespace osu.Game.Screens.Select.Carousel
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = Color4.Black,
                                 Width = 0.4f,
                             },
@@ -181,26 +180,20 @@ namespace osu.Game.Screens.Select.Carousel
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
-                                X = 0.4f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
-                                X = 0.45f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                                 Width = 0.05f,
-                                X = 0.65f,
                             },
                         }
                     },
@@ -220,7 +213,7 @@ namespace osu.Game.Screens.Select.Carousel
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
-                
+
                 this.item = item;
             }
 

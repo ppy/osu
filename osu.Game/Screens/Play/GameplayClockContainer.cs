@@ -122,7 +122,11 @@ namespace osu.Game.Screens.Play
         }
 
         public void Restart()
-        {
+        {            
+            // The Reset() call below causes speed adjustments to be reset in an async context, leading to deadlocks.
+            // The deadlock can be prevented by resetting the track synchronously before entering the async context.
+            track.ResetSpeedAdjustments();
+
             Task.Run(() =>
             {
                 track.Reset();

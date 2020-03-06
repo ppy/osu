@@ -591,6 +591,9 @@
     *   [m] [Fix DummyWorkingBeatmap's track completion attempting to change game-wide beatmap #8129]
     *   [m] [Make KeyCounter not count key presses during breaks #8059]
     *   [m] [Update Framework #8152]
+    *   [m] [Prevent unnecessary auto-size computations in mania #8091]
+    *   [m] [Fix potential deadlock during gameplay tests #8101]
+    *   [m] [Apply osu!-side invalidation changes #8006]
 
 *   界面修改:
     *   主界面按钮系统
