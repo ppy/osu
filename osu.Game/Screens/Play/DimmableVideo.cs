@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Timing;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -14,11 +15,13 @@ namespace osu.Game.Screens.Play
     public class DimmableVideo : UserDimContainer
     {
         private readonly VideoSprite video;
+        private readonly int offset;
         private DrawableVideo drawableVideo;
 
-        public DimmableVideo(VideoSprite video)
+        public DimmableVideo(VideoSprite video, int offset)
         {
             this.video = video;
+            this.offset = offset;
         }
 
         [BackgroundDependencyLoader]
@@ -46,7 +49,7 @@ namespace osu.Game.Screens.Play
             if (!ShowVideo.Value && !IgnoreUserSettings.Value)
                 return;
 
-            drawableVideo = new DrawableVideo(video);
+            drawableVideo = new DrawableVideo(video, offset);
 
             if (async)
                 LoadComponentAsync(drawableVideo, Add);
@@ -56,8 +59,15 @@ namespace osu.Game.Screens.Play
 
         private class DrawableVideo : Container
         {
-            public DrawableVideo(VideoSprite video)
+            private readonly Drawable cover;
+            private readonly int offset;
+            private readonly ManualClock videoClock;
+            private bool videoStarted;
+
+            public DrawableVideo(VideoSprite video, int offset)
             {
+                this.offset = offset;
+
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
 
@@ -66,14 +76,17 @@ namespace osu.Game.Screens.Play
                 video.Anchor = Anchor.Centre;
                 video.Origin = Anchor.Centre;
 
-                AddRangeInternal(new Drawable[]
+                videoClock = new ManualClock();
+                video.Clock = new FramedClock(videoClock);
+
+                AddRangeInternal(new[]
                 {
-                    new Box
+                    video,
+                    cover = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    video,
                 });
             }
 
@@ -82,6 +95,23 @@ namespace osu.Game.Screens.Play
             {
                 if (clock != null)
                     Clock = clock;
+            }
+
+            protected override void Update()
+            {
+                if (videoClock != null && Clock.CurrentTime > offset)
+                {
+                    if (!videoStarted)
+                    {
+                        cover.FadeOut(500);
+                        videoStarted = true;
+                    }
+
+                    // handle seeking before the video starts (break skipping, replay seek)
+                    videoClock.CurrentTime = Clock.CurrentTime - offset;
+                }
+
+                base.Update();
             }
         }
     }
