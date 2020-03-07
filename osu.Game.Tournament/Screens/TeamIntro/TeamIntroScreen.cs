@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class TeamIntroScreen : TournamentScreen, IProvideVideo
+    public class TeamIntroScreen : TournamentScreen
     {
         private Container mainContainer;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo(storage.GetStream(@"videos/teamintro.m4v"))
+                new TourneyVideo("teamintro")
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,

@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class SeedingScreen : TournamentScreen, IProvideVideo
+    public class SeedingScreen : TournamentScreen
     {
         private Container mainContainer;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo(storage.GetStream(@"videos/seeding.m4v"))
+                new TourneyVideo("seeding")
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
