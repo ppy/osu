@@ -30,9 +30,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private OsuButton warmupButton;
         private MatchIPCInfo ipc;
 
-        private readonly Color4 red = new Color4(186, 0, 18, 255);
-        private readonly Color4 blue = new Color4(17, 136, 170, 255);
-
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
@@ -66,35 +63,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             // chroma key area for stable gameplay
                             Name = "chroma",
                             RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Height = 512,
                             Colour = new Color4(0, 255, 0, 255),
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Y = -4,
-                            Children = new Drawable[]
-                            {
-                                new Circle
-                                {
-                                    Name = "top bar red",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = red,
-                                },
-                                new Circle
-                                {
-                                    Name = "top bar blue",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = blue,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                },
-                            }
                         },
                     }
                 },
