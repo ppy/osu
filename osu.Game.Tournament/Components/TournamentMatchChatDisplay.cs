@@ -10,7 +10,6 @@ using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
@@ -23,11 +22,11 @@ namespace osu.Game.Tournament.Components
         public TournamentMatchChatDisplay()
         {
             RelativeSizeAxes = Axes.X;
-            Y = 100;
-            Size = new Vector2(0.45f, 112);
-            Margin = new MarginPadding(10);
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            Size = new Vector2(0.5f, 142);
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+
+            CornerRadius = 0;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -75,19 +74,15 @@ namespace osu.Game.Tournament.Components
             {
             }
 
-            [BackgroundDependencyLoader]
             private void load(LadderInfo info)
             {
-                //if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                //    ColourBox.Colour = red;
-                //else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                //    ColourBox.Colour = blue;
-                //else if (Message.Sender.Colour != null)
-                //    SenderText.Colour = ColourBox.Colour = OsuColour.FromHex(Message.Sender.Colour);
+                // if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == Message.Sender.Id))
+                //     SenderText.Colour = TournamentGame.COLOUR_RED;
+                // else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
+                //     SenderText.Colour = TournamentGame.COLOUR_BLUE;
+                // else if (Message.Sender.Colour != null)
+                //     SenderText.Colour = ColourBox.Colour = OsuColour.FromHex(Message.Sender.Colour);
             }
-
-            private readonly Color4 red = new Color4(186, 0, 18, 255);
-            private readonly Color4 blue = new Color4(17, 136, 170, 255);
         }
     }
 }
