@@ -15,7 +15,6 @@ using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.TeamWin;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
@@ -72,10 +71,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 },
                 scoreDisplay = new MatchScoreDisplay
                 {
-                    Y = -60,
-                    Scale = new Vector2(0.8f),
+                    Y = -147,
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.TopCentre,
                 },
                 new ControlPanel
                 {
