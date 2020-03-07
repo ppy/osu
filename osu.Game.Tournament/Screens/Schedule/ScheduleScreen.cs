@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Schedule
 {
-    public class ScheduleScreen : TournamentScreen, IProvideVideo
+    public class ScheduleScreen : TournamentScreen
     {
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Container mainContainer;
@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Schedule
 
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo(storage.GetStream(@"videos/schedule.m4v"))
+                new TourneyVideo("schedule")
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,

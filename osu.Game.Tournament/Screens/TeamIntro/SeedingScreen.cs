@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo(storage.GetStream(@"videos/seeding.m4v"))
+                new TourneyVideo("seeding")
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
