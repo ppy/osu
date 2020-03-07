@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Play
 
         private void addUnderlayComponents(Container target)
         {
-            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video) { RelativeSizeAxes = Axes.Both });
+            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video, Beatmap.Value.Metadata.VideoOffset) { RelativeSizeAxes = Axes.Both });
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
