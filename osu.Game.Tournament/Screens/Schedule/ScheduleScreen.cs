@@ -209,6 +209,8 @@ namespace osu.Game.Tournament.Screens.Schedule
 
                 Scale = new Vector2(0.8f);
 
+                CurrentMatchSelectionBox.Scale = new Vector2(1.02f, 1.15f);
+
                 bool conditional = match is ConditionalTournamentMatch;
 
                 if (conditional)

@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0,
-                    Colour = Color4.OrangeRed,
+                    Colour = Color4.White,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 Flow = new FillFlowContainer<DrawableMatchTeam>
