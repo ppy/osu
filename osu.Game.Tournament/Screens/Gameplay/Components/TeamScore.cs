@@ -2,10 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Tournament.Models;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
@@ -14,18 +20,16 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
         private readonly StarCounter counter;
 
-        public TeamScore(Bindable<int?> score, bool flip, int count)
+        public TeamScore(Bindable<int?> score, TeamColour colour, int count)
         {
-            var anchor = flip ? Anchor.CentreRight : Anchor.CentreLeft;
+            bool flip = colour == TeamColour.Blue;
+            var anchor = flip ? Anchor.TopRight : Anchor.TopLeft;
 
-            Anchor = anchor;
-            Origin = anchor;
+            AutoSizeAxes = Axes.Both;
 
-            InternalChild = counter = new StarCounter(count)
+            InternalChild = counter = new TeamScoreStarCounter(count)
             {
                 Anchor = anchor,
-                X = (flip ? -1 : 1) * 90,
-                Y = 5,
                 Scale = flip ? new Vector2(-1, 1) : Vector2.One,
             };
 
@@ -33,6 +37,67 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             currentTeamScore.BindTo(score);
         }
 
-        private void scoreChanged(ValueChangedEvent<int?> score) => counter.CountStars = score.NewValue ?? 0;
+        private void scoreChanged(ValueChangedEvent<int?> score) => counter.Current = score.NewValue ?? 0;
+
+        public class TeamScoreStarCounter : StarCounter
+        {
+            public TeamScoreStarCounter(int count)
+                : base(count)
+            {
+            }
+
+            public override Star CreateStar() => new LightSquare();
+
+            public class LightSquare : Star
+            {
+                private Box box;
+
+                public LightSquare()
+                {
+                    Size = new Vector2(22.5f);
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            BorderColour = OsuColour.Gray(0.5f),
+                            BorderThickness = 3,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = Color4.Transparent,
+                                    RelativeSizeAxes = Axes.Both,
+                                    AlwaysPresent = true,
+                                },
+                            }
+                        },
+                        box = new Box
+                        {
+                            Colour = OsuColour.FromHex("#FFE8AD"),
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    };
+
+                    Masking = true;
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = OsuColour.FromHex("#FFE8AD").Opacity(0.1f),
+                        Hollow = true,
+                        Radius = 20,
+                        Roundness = 10,
+                    };
+                }
+
+                public override void DisplayAt(float scale)
+                {
+                    box.FadeTo(scale, 500, Easing.OutQuint);
+                    FadeEdgeEffectTo(0.2f * scale, 500, Easing.OutQuint);
+                }
+            }
+        }
     }
 }

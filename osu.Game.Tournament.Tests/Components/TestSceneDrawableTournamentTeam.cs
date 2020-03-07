@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
@@ -113,7 +114,7 @@ namespace osu.Game.Tournament.Tests.Components
             Cell(i).AddRange(new Drawable[]
             {
                 new TournamentSpriteText { Text = "TeamDisplay" },
-                new TeamDisplay(team, TournamentGame.COLOUR_RED, false)
+                new TeamDisplay(team, TeamColour.Red, new Bindable<int?>(2), 6)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

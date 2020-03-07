@@ -6,8 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
-using osu.Game.Tournament.Screens.Showcase;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
@@ -21,13 +22,28 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             Height = 95;
             Children = new Drawable[]
             {
-                new TournamentLogo(),
-                new RoundDisplay
+                new FillFlowContainer
                 {
-                    Y = 5,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new DrawableTournamentTitleText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(1.2f)
+                        },
+                        new RoundDisplay
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(0.4f)
+                        },
+                    }
                 },
+
                 new TeamScoreDisplay(TeamColour.Red)
                 {
                     Anchor = Anchor.TopLeft,
@@ -55,7 +71,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             this.teamColour = teamColour;
 
             RelativeSizeAxes = Axes.Y;
-            Width = 300;
+            AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -98,16 +114,9 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private void teamChanged(TournamentTeam team)
         {
-            var colour = teamColour == TeamColour.Red ? TournamentGame.COLOUR_RED : TournamentGame.COLOUR_BLUE;
-            var flip = teamColour == TeamColour.Red;
-
             InternalChildren = new Drawable[]
             {
-                new TeamDisplay(team, colour, flip),
-                new TeamScore(currentTeamScore, flip, currentMatch.Value.PointsToWin)
-                {
-                    Colour = colour
-                }
+                new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value.PointsToWin),
             };
         }
     }
