@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, -160),
-                CountStars = 5,
+                Current = 5,
             };
             Add(stars);
 
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 Position = new Vector2(20, -190),
-                Text = stars.CountStars.ToString("0.00"),
+                Text = stars.Current.ToString("0.00"),
             };
             Add(starsLabel);
 
@@ -69,8 +69,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 comboCounter.Current.Value = 0;
                 numerator = denominator = 0;
                 accuracyCounter.SetFraction(0, 0);
-                stars.CountStars = 0;
-                starsLabel.Text = stars.CountStars.ToString("0.00");
+                stars.Current = 0;
+                starsLabel.Text = stars.Current.ToString("0.00");
             });
 
             AddStep(@"Hit! :D", delegate
@@ -91,8 +91,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep(@"Alter stars", delegate
             {
-                stars.CountStars = RNG.NextSingle() * (stars.StarCount + 1);
-                starsLabel.Text = stars.CountStars.ToString("0.00");
+                stars.Current = RNG.NextSingle() * (stars.StarCount + 1);
+                starsLabel.Text = stars.Current.ToString("0.00");
             });
 
             AddStep(@"Stop counters", delegate
