@@ -47,9 +47,10 @@ namespace osu.Game.Tournament.Screens.MapPool
                 {
                     Y = 100,
                     Spacing = new Vector2(10, 10),
-                    Padding = new MarginPadding(25),
+                    Padding = new MarginPadding(5) { Horizontal = 100 },
                     Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 },
                 new ControlPanel
                 {
@@ -90,6 +91,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                             Text = "Reset",
                             Action = reset
                         },
+                        new ControlPanel.Spacer(),
                     }
                 }
             };
@@ -206,10 +208,14 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             mapFlows.Clear();
 
+            int totalRows = 0;
+
             if (match.NewValue.Round.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
                 string currentMod = null;
+
+                int flowCount = 0;
 
                 foreach (var b in match.NewValue.Round.Value.Beatmaps)
                 {
@@ -224,6 +230,15 @@ namespace osu.Game.Tournament.Screens.MapPool
                         });
 
                         currentMod = b.Mods;
+
+                        totalRows++;
+                        flowCount = 0;
+                    }
+
+                    if (++flowCount > 2)
+                    {
+                        totalRows++;
+                        flowCount = 0;
                     }
 
                     currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
@@ -233,6 +248,10 @@ namespace osu.Game.Tournament.Screens.MapPool
                     });
                 }
             }
+
+            if (totalRows > 8)
+                // remove horizontal padding to increase flow width to 3 panels
+                mapFlows.Padding = new MarginPadding(5);
         }
     }
 }
