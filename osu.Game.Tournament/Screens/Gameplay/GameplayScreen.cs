@@ -162,7 +162,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
                 void expand()
                 {
-                    chat?.Expand();
+                    chat?.Contract();
 
                     using (BeginDelayedSequence(300, true))
                     {
@@ -176,7 +176,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     SongBar.Expanded = false;
                     scoreDisplay.FadeOut(100);
                     using (chat?.BeginDelayedSequence(500))
-                        chat?.Contract();
+                        chat?.Expand();
                 }
 
                 switch (state.NewValue)
@@ -203,7 +203,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         break;
 
                     default:
-                        chat.Expand();
+                        chat.Contract();
                         expand();
                         break;
                 }

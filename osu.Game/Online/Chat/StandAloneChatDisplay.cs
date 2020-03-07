@@ -92,13 +92,13 @@ namespace osu.Game.Online.Chat
             textbox.Text = string.Empty;
         }
 
-        public void Contract()
+        public void Expand()
         {
             this.FadeIn(300);
             this.MoveToY(0, 500, Easing.OutQuint);
         }
 
-        public void Expand()
+        public void Contract()
         {
             this.FadeOut(200);
             this.MoveToY(100, 500, Easing.In);
