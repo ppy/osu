@@ -61,7 +61,7 @@ namespace osu.Game.Tournament
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        video = new TourneyVideo("main",true)
+                        video = new TourneyVideo("main", true)
                         {
                             Loop = true,
                             RelativeSizeAxes = Axes.Both,
@@ -131,7 +131,7 @@ namespace osu.Game.Tournament
                                 new Separator(),
                                 new ScreenButton(typeof(DrawingsScreen)) { Text = "抽签和分组", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(ShowcaseScreen)) { Text = "展示", RequestSelection = SetScreen },
-                            }
+                                 }
                         },
                     },
                 },
@@ -147,6 +147,7 @@ namespace osu.Game.Tournament
 
         private Drawable currentScreen;
         private ScheduledDelegate scheduledHide;
+
         private Drawable temporaryScreen;
 
         public void SetScreen(Drawable screen)
@@ -158,7 +159,7 @@ namespace osu.Game.Tournament
         }
 
         public void SetScreen(Type screenType)
-        {           
+        {
             temporaryScreen?.Expire();
 
             var target = screens.FirstOrDefault(s => s.GetType() == screenType);

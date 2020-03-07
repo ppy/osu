@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class TeamIntroScreen : TournamentScreen
+    public class TeamIntroScreen : TournamentScreen, IProvideVideo
     {
         private Container mainContainer;
 

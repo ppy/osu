@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "最佳(?)",//不知道要如何翻译
+                                LabelText = "最佳(Best of)",
                                 Width = 0.33f,
                                 Bindable = Model.BestOf
                             },

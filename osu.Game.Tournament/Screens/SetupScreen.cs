@@ -65,7 +65,7 @@ namespace osu.Game.Tournament.Screens
                     },
                     Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "未找到",
                     Failing = fileBasedIpc?.Storage == null,
-                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果找不到源，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其注册为默认的osu！安装目录。"//谷歌翻译
+                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果找不到源，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其注册为默认的osu！安装目录。"
                 },
                 new ActionableInfo
                 {
@@ -93,7 +93,7 @@ namespace osu.Game.Tournament.Screens
                 new LabelledDropdown<RulesetInfo>
                 {
                     Label = "游戏模式",
-                    Description = "决定显示哪些统计数据以及为玩家检索哪些排名",//谷歌翻译
+                    Description = "决定显示哪些统计数据以及为玩家检索哪些排名",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },

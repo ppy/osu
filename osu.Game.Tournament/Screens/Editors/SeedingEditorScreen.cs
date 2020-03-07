@@ -180,7 +180,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 {
                                     new SettingsNumberBox
                                     {
-                                        LabelText = "谱面ID",
+                                        LabelText = "谱面 ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Bindable = beatmapId,

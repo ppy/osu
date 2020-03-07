@@ -291,7 +291,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override void OnDrag(DragEvent e)
         {
-           base.OnDrag(e);
+            base.OnDrag(e);
 
             Selected = true;
             this.MoveToOffset(e.Delta);

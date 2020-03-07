@@ -125,7 +125,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                         {
                             new TournamentSpriteText
                             {
-                                Text = "胜出方",
+                                Text = "胜出方：",
                                 Font = OsuFont.Torus.With(size: 28, weight: FontWeight.SemiBold),
                                 Colour = Color4.Black,
                             },

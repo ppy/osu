@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class SeedingScreen : TournamentScreen
+    public class SeedingScreen : TournamentScreen, IProvideVideo
     {
         private Container mainContainer;
 
@@ -241,9 +241,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         Children = new Drawable[]
                         {
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
-                            new RowDisplay("平均Rank:", $"#{team.AverageRank:#,0}"),
-                            new RowDisplay("种子:", team.Seed.Value),
-                            new RowDisplay("去年的位置:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
+                            new RowDisplay("Average Rank:", $"#{team.AverageRank:#,0}"),
+                            new RowDisplay("Seed:", team.Seed.Value),
+                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },
