@@ -116,7 +116,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                .SelectMany(m => m.ConditionalMatches.Where(cp => m.Acronyms.TrueForAll(a => cp.Acronyms.Contains(a))));
 
             upcoming = upcoming.Concat(conditionals);
-            upcoming = upcoming.OrderBy(p => p.Date.Value).Take(12);
+            upcoming = upcoming.OrderBy(p => p.Date.Value).Take(8);
 
             mainContainer.Child = new FillFlowContainer
             {
