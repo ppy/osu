@@ -23,7 +23,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly bool editor;
         protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
-        private readonly Drawable currentMatchSelectionBox;
+        protected readonly Drawable CurrentMatchSelectionBox;
         private Bindable<TournamentMatch> globalSelection;
 
         [Resolved(CanBeNull = true)]
@@ -55,11 +55,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Colour = Color4.YellowGreen,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                currentMatchSelectionBox = new Container
+                CurrentMatchSelectionBox = new Container
                 {
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(1.05f),
+                    Scale = new Vector2(1.05f, 1.1f),
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -128,9 +126,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private void updateCurrentMatch()
         {
             if (Match.Current.Value)
-                currentMatchSelectionBox.Show();
+                CurrentMatchSelectionBox.Show();
             else
-                currentMatchSelectionBox.Hide();
+                CurrentMatchSelectionBox.Hide();
         }
 
         private bool selected;

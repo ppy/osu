@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Height = 0.65f,
+                        Height = 0.74f,
                         Child = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -162,7 +162,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         {
                             new FillFlowContainer
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(30),
                                 Children = new Drawable[]
@@ -207,6 +207,8 @@ namespace osu.Game.Tournament.Screens.Schedule
             {
                 Flow.Direction = FillDirection.Horizontal;
 
+                Scale = new Vector2(0.8f);
+
                 bool conditional = match is ConditionalTournamentMatch;
 
                 if (conditional)
@@ -218,15 +220,16 @@ namespace osu.Game.Tournament.Screens.Schedule
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopLeft,
-                        Colour = Color4.Black,
+                        Colour = OsuColour.Gray(0.7f),
                         Alpha = conditional ? 0.6f : 1,
+                        Font = OsuFont.Torus,
                         Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
                     });
                     AddInternal(new TournamentSpriteText
                     {
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomLeft,
-                        Colour = Color4.Black,
+                        Colour = OsuColour.Gray(0.7f),
                         Alpha = conditional ? 0.6f : 1,
                         Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Text = match.Date.Value.ToUniversalTime().ToString("HH:mm UTC") + (conditional ? " (conditional)" : "")
@@ -243,19 +246,26 @@ namespace osu.Game.Tournament.Screens.Schedule
 
             public ScheduleContainer(string title)
             {
-                Padding = new MarginPadding { Left = 30, Top = 10 };
+                Padding = new MarginPadding { Left = 60, Top = 10 };
                 InternalChildren = new Drawable[]
                 {
-                    new TournamentSpriteTextWithBackground(title.ToUpperInvariant())
+                    new FillFlowContainer
                     {
-                        X = 30,
-                        Scale = new Vector2(0.5f)
-                    },
-                    content = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.Both,
-                        Margin = new MarginPadding(10)
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            new TournamentSpriteTextWithBackground(title.ToUpperInvariant())
+                            {
+                                Scale = new Vector2(0.5f)
+                            },
+                            content = new FillFlowContainer
+                            {
+                                Direction = FillDirection.Vertical,
+                                RelativeSizeAxes = Axes.Both,
+                                Margin = new MarginPadding(10)
+                            },
+                        }
                     },
                 };
             }
