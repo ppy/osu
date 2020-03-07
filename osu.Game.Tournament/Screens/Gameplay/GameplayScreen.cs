@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new MatchHeader(),
+                header = new MatchHeader(),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -108,13 +108,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            warmup.BindValueChanged(w => warmupButton.Alpha = !w.NewValue ? 0.5f : 1, true);
+            warmup.BindValueChanged(w =>
+            {
+                warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
+                header.ShowScores = !w.NewValue;
+            }, true);
         }
 
         private ScheduledDelegate scheduledOperation;
         private MatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
+        private MatchHeader header;
 
         private void stateChanged(ValueChangedEvent<TourneyState> state)
         {

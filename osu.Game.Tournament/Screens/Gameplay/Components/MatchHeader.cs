@@ -15,6 +15,18 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
     public class MatchHeader : Container
     {
+        private TeamScoreDisplay teamDisplay1;
+        private TeamScoreDisplay teamDisplay2;
+
+        public bool ShowScores
+        {
+            set
+            {
+                teamDisplay1.ShowScore = value;
+                teamDisplay2.ShowScore = value;
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -43,13 +55,12 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         },
                     }
                 },
-
-                new TeamScoreDisplay(TeamColour.Red)
+                teamDisplay1 = new TeamScoreDisplay(TeamColour.Red)
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                new TeamScoreDisplay(TeamColour.Blue)
+                teamDisplay2 = new TeamScoreDisplay(TeamColour.Blue)
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -65,6 +76,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
         private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
+
+        private TeamDisplay teamDisplay;
+
+        public bool ShowScore { set => teamDisplay.ShowScore = value; }
 
         public TeamScoreDisplay(TeamColour teamColour)
         {
@@ -116,7 +131,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         {
             InternalChildren = new Drawable[]
             {
-                new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value.PointsToWin),
+                teamDisplay = new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value.PointsToWin),
             };
         }
     }
