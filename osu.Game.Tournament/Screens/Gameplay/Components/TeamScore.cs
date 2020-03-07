@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             public class LightSquare : Star
             {
-                private Box box;
+                private readonly Box box;
 
                 public LightSquare()
                 {

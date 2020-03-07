@@ -21,6 +21,7 @@ namespace osu.Game.Tournament.Tests.Screens
             typeof(TeamScoreDisplay),
             typeof(TeamDisplay),
             typeof(MatchHeader),
+            typeof(MatchScoreDisplay),
         };
 
         [BackgroundDependencyLoader]
