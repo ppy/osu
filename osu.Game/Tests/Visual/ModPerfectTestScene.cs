@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual
             PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testCaseData.FailOnMiss)
         });
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PerfectModTestPlayer();
+        protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new PerfectModTestPlayer();
 
         private class PerfectModTestPlayer : TestPlayer
         {
