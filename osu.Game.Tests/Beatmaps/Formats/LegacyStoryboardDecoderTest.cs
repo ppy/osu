@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 Assert.IsTrue(storyboard.HasDrawable);
-                Assert.AreEqual(4, storyboard.Layers.Count());
+                Assert.AreEqual(5, storyboard.Layers.Count());
 
                 StoryboardLayer background = storyboard.Layers.FirstOrDefault(l => l.Depth == 3);
                 Assert.IsNotNull(background);

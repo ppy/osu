@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Screens.Play;
 using osu.Game.Storyboards.Drawables;
 using osuTK.Graphics;
 
@@ -24,9 +25,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private MusicController musicController = new MusicController();
 
+        [Cached]
+        private GameplayClock gameplayClock;
+
         public TestSceneStoryboard()
         {
             Clock = new FramedClock();
+            gameplayClock = new GameplayClock(Clock);
 
             AddRange(new Drawable[]
             {
