@@ -65,6 +65,10 @@ namespace osu.Game.Tournament.Components
             }
         }
 
+        public void Expand() => this.FadeIn(300);
+
+        public void Contract() => this.FadeOut(200);
+
         protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
 
         protected class MatchMessage : StandAloneMessage
