@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -185,12 +184,24 @@ namespace osu.Game.Tournament.Screens.Schedule
                                         Text = match.NewValue.Team1.Value?.FullName + " vs " + match.NewValue.Team2.Value?.FullName,
                                         Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold)
                                     },
-                                    new TournamentSpriteText
+                                    new FillFlowContainer
                                     {
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Text = $"Starting {match.NewValue.Date.Value.Humanize()}",
-                                        Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
+                                        Children = new Drawable[]
+                                        {
+                                            new TournamentSpriteText
+                                            {
+                                                Text = "Starting ",
+                                                Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
+                                            },
+                                            new DrawableDate(match.NewValue.Date.Value)
+                                            {
+                                                Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
+                                            }
+                                        }
                                     },
                                 }
                             },
