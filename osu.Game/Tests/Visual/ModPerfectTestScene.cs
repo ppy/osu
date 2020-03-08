@@ -36,6 +36,11 @@ namespace osu.Game.Tests.Visual
 
         private class PerfectModTestPlayer : TestPlayer
         {
+            public PerfectModTestPlayer()
+                : base(showResults: false)
+            {
+            }
+
             protected override bool AllowFail => true;
 
             public bool CheckFailed(bool failed)
