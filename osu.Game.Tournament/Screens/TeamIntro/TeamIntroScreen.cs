@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 return;
             }
 
-            const float y_flag_offset = 288;
+            const float y_flag_offset = 292;
 
             const float y_offset = 460;
 
@@ -60,11 +60,11 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 },
                 new DrawableTeamFlag(match.NewValue.Team1.Value)
                 {
-                    Position = new Vector2(160, y_flag_offset),
+                    Position = new Vector2(165, y_flag_offset),
                 },
                 new DrawableTeamWithPlayers(match.NewValue.Team1.Value, TeamColour.Red)
                 {
-                    Position = new Vector2(160, y_offset),
+                    Position = new Vector2(165, y_offset),
                 },
                 new DrawableTeamFlag(match.NewValue.Team2.Value)
                 {
