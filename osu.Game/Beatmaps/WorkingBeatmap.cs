@@ -1,23 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Audio.Track;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
-using osu.Game.Storyboards;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Framework.Statistics;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
-using osu.Framework.Graphics.Video;
-using osu.Framework.Logging;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -207,10 +206,6 @@ namespace osu.Game.Beatmaps
         protected virtual bool BackgroundStillValid(Texture b) => b == null || b.Available;
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
-
-        public VideoSprite Video => GetVideo();
-
-        protected abstract VideoSprite GetVideo();
 
         public bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value;

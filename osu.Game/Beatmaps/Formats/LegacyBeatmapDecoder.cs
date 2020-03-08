@@ -303,11 +303,6 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
 
-                case LegacyEventType.Video:
-                    beatmap.BeatmapInfo.Metadata.VideoOffset = Parsing.ParseInt(split[1]);
-                    beatmap.BeatmapInfo.Metadata.VideoFile = CleanFilename(split[2]);
-                    break;
-
                 case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
 

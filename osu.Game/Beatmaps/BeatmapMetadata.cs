@@ -52,7 +52,6 @@ namespace osu.Game.Beatmaps
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
-        public int VideoOffset { get; set; }
         public string VideoFile { get; set; }
 
         public override string ToString() => $"{Artist} - {Title} ({Author})";
@@ -84,7 +83,6 @@ namespace osu.Game.Beatmaps
                    && PreviewTime == other.PreviewTime
                    && AudioFile == other.AudioFile
                    && BackgroundFile == other.BackgroundFile
-                   && VideoOffset == other.VideoOffset
                    && VideoFile == other.VideoFile;
         }
     }
