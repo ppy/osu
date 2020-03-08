@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Screens;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Tournament.Tests.Screens
     public class TestSceneGameplayScreen : TournamentTestScene
     {
         [Cached]
-        private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
+        private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay { Width = 0.5f };
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -22,6 +23,8 @@ namespace osu.Game.Tournament.Tests.Screens
             typeof(TeamDisplay),
             typeof(MatchHeader),
             typeof(MatchScoreDisplay),
+            typeof(BeatmapInfoScreen),
+            typeof(SongBar),
         };
 
         [BackgroundDependencyLoader]
