@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
 
         private UserGridPanel peppy;
         private UserListPanel evast;
@@ -76,20 +77,20 @@ namespace osu.Game.Tests.Visual.Online
 
             flyte.Status.Value = new UserStatusOnline();
 
-            peppy.Status.Value = null;
+            peppy.Status.BindTo(status);
             peppy.Activity.BindTo(activity);
 
-            evast.Status.Value = null;
+            evast.Status.BindTo(status);
             evast.Activity.BindTo(activity);
         });
 
         [Test]
         public void TestUserStatus()
         {
-            AddStep("online", () => peppy.Status.Value = evast.Status.Value = new UserStatusOnline());
-            AddStep("do not disturb", () => peppy.Status.Value = evast.Status.Value = new UserStatusDoNotDisturb());
-            AddStep("offline", () => peppy.Status.Value = evast.Status.Value = new UserStatusOffline());
-            AddStep("null status", () => peppy.Status.Value = evast.Status.Value = null);
+            AddStep("online", () => status.Value = new UserStatusOnline());
+            AddStep("do not disturb", () => status.Value = new UserStatusDoNotDisturb());
+            AddStep("offline", () => status.Value = new UserStatusOffline());
+            AddStep("null status", () => status.Value = null);
         }
 
         [Test]
