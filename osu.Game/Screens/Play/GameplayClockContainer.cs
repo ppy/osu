@@ -117,8 +117,15 @@ namespace osu.Game.Screens.Play
                 startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
 
             // some beatmaps have no AudioLeadIn but the video starts before the first object
-            if (beatmap.Video != null && beatmap.Metadata.VideoOffset != 0)
-                startTime = Math.Min(startTime, beatmap.Metadata.VideoOffset);
+            var videoLayer = beatmap.Storyboard.GetLayer("Video");
+
+            if (videoLayer.Elements.Any())
+            {
+                var videoOffset = videoLayer.Elements.First().StartTime;
+
+                if (videoOffset != 0)
+                    startTime = Math.Min(startTime, videoOffset);
+            }
 
             Seek(startTime);
 
