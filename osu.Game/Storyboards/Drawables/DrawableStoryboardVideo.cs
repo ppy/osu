@@ -32,11 +32,13 @@ namespace osu.Game.Storyboards.Drawables
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(GameplayClock clock, IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            if (clock != null)
-                this.clock = clock;
+            if (clock == null)
+                return;
+
+            this.clock = clock;
 
             var path = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
@@ -64,7 +66,7 @@ namespace osu.Game.Storyboards.Drawables
 
         protected override void Update()
         {
-            if (clock.CurrentTime > Video.StartTime)
+            if (clock != null && clock.CurrentTime > Video.StartTime)
             {
                 if (!videoStarted)
                 {

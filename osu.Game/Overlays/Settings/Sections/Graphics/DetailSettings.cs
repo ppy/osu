@@ -23,11 +23,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Video",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVideoBackground)
-                },
-                new SettingsCheckbox
-                {
                     LabelText = "Hit Lighting",
                     Bindable = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
