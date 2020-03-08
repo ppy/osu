@@ -92,10 +92,8 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         var offset = Parsing.ParseInt(split[1]);
                         var filename = CleanFilename(split[2]);
-                        var xOffset = split.Length > 3 ? Parsing.ParseInt(split[3]) : 0;
-                        var yOffset = split.Length > 4 ? Parsing.ParseInt(split[4]) : 0;
 
-                        storyboard.GetLayer(LegacyStoryLayer.Video).Add(new StoryboardVideo(filename, offset, xOffset, yOffset));
+                        storyboard.GetLayer(LegacyStoryLayer.Video).Add(new StoryboardVideo(filename, offset));
                         break;
                     }
 
