@@ -37,11 +37,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly Func<bool> isWinner;
         private LadderEditorScreen ladderEditor;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private LadderInfo ladderInfo { get; set; }
 
         private void setCurrent()
         {
+            if (ladderInfo == null) return;
+
             //todo: tournamentgamebase?
             if (ladderInfo.CurrentMatch.Value != null)
                 ladderInfo.CurrentMatch.Value.Current.Value = false;
