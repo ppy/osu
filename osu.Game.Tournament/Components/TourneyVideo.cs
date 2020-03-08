@@ -60,6 +60,8 @@ namespace osu.Game.Tournament.Components
             }
         }
 
+        public void Reset() => manualClock.CurrentTime = 0;
+
         protected override void Update()
         {
             base.Update();
