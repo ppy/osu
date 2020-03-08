@@ -62,7 +62,9 @@ namespace osu.Game.Tournament.Screens.TeamWin
             update();
         }
 
-        private void update()
+        private bool firstDisplay = true;
+
+        private void update() => Schedule(() =>
         {
             var match = currentMatch.Value;
 
@@ -74,6 +76,15 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
             redWinVideo.Alpha = match.WinnerColour == TeamColour.Red ? 1 : 0;
             blueWinVideo.Alpha = match.WinnerColour == TeamColour.Blue ? 1 : 0;
+
+            if (firstDisplay)
+            {
+                if (match.WinnerColour == TeamColour.Red)
+                    redWinVideo.Reset();
+                else
+                    blueWinVideo.Reset();
+                firstDisplay = false;
+            }
 
             mainContainer.Children = new Drawable[]
             {
@@ -108,6 +119,8 @@ namespace osu.Game.Tournament.Screens.TeamWin
                     }
                 },
             };
-        }
+            mainContainer.FadeOut();
+            mainContainer.Delay(2000).FadeIn(1600, Easing.OutQuint);
+        });
     }
 }
