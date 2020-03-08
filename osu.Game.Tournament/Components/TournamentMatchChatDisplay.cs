@@ -9,7 +9,6 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Tournament.Components
         public TournamentMatchChatDisplay()
         {
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(0.5f, 142);
+            Height = 144;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 

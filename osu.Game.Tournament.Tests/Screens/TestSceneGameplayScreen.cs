@@ -35,3 +35,4 @@ namespace osu.Game.Tournament.Tests.Screens
         }
     }
 }
+

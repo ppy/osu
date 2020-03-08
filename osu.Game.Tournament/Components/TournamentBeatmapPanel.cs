@@ -70,8 +70,8 @@ namespace osu.Game.Tournament.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding(vertical_padding),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
@@ -137,8 +137,8 @@ namespace osu.Game.Tournament.Components
                     Texture = textures.Get($"mods/{mods}"),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(20),
-                    Scale = new Vector2(0.5f)
+                    Margin = new MarginPadding(10),
+                    Scale = new Vector2(0.8f)
                 });
             }
         }
