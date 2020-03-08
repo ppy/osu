@@ -52,9 +52,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Y = 5,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Y = 110,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
                         new Box
