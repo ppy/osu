@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Video;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -57,7 +58,8 @@ namespace osu.Game.Storyboards.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AlwaysPresent = true,
-                Alpha = 0
+                Alpha = 0,
+                Position = new Vector2(Video.XOffset, Video.YOffset)
             });
 
             videoClock = new ManualClock();

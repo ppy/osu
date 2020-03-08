@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,8 @@ namespace osu.Game.Storyboards
             layers.Add("Foreground", new StoryboardLayer("Foreground", 0));
         }
 
+        public StoryboardLayer GetLayer(LegacyStoryLayer layer) => GetLayer(layer.ToString());
+
         public StoryboardLayer GetLayer(string name)
         {
             if (!layers.TryGetValue(name, out var layer))
@@ -47,14 +50,14 @@ namespace osu.Game.Storyboards
                 if (backgroundPath == null)
                     return false;
 
-                return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
+                return GetLayer(LegacyStoryLayer.Background).Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }
         }
 
         public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null)
         {
             var drawable = new DrawableStoryboard(this);
-            drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard || GetLayer("Video").Elements.Any() ? 16 / 9f : 4 / 3f);
+            drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard || GetLayer(LegacyStoryLayer.Video).Elements.Any() ? 16 / 9f : 4 / 3f);
             return drawable;
         }
     }

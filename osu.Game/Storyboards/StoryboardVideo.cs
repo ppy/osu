@@ -14,10 +14,16 @@ namespace osu.Game.Storyboards
 
         public double StartTime { get; }
 
-        public StoryboardVideo(string path, int offset)
+        public int XOffset { get; }
+
+        public int YOffset { get; }
+
+        public StoryboardVideo(string path, int offset, int xOffset, int yOffset)
         {
             Path = path;
             StartTime = offset;
+            XOffset = xOffset;
+            YOffset = yOffset;
         }
 
         public Drawable CreateDrawable() => new DrawableStoryboardVideo(this);
