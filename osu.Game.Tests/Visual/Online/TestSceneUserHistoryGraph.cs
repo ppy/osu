@@ -25,14 +25,15 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneUserHistoryGraph()
         {
-            TestGraph graph;
+            UserHistoryGraph graph;
 
-            Add(graph = new TestGraph
+            Add(graph = new UserHistoryGraph
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                TooltipCounterName = "Test"
             });
 
             var values = new[]
@@ -59,16 +60,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Set more values", () => graph.Values = moreValues);
             AddStep("Set null values", () => graph.Values = null);
             AddStep("Set empty values", () => graph.Values = Array.Empty<UserHistoryCount>());
-        }
-
-        private class TestGraph : UserHistoryGraph
-        {
-            protected override UserGraphTooltip GetTooltip() => new TestTooltip();
-
-            private class TestTooltip : HistoryGraphTooltip
-            {
-                protected override string TooltipCounterName => "Test Counter";
-            }
         }
     }
 }
