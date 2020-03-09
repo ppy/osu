@@ -11,3 +11,10 @@
     *   [m] [Simplify tournament video construction #8151]
     *   [m] [Fix test scene virtual track not respecting rate adjustments #8100]
     *   [m] [Fix osu! hitbox accepting input outside of circle #8163]
+
+### 2020/03/09
+*   整合更新
+    *   [m] [Adjust most played beatmaps section to better match osu-web #8047]
+    *   [m] [Fix video looping not propagating when set too early in initialisation #8178]
+    *   [m] [Increase flexibility of StarCounter component #8175]
+    *   [m] [Fix hit error ticks getting out of the hit error meter #8182]
