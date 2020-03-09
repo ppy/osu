@@ -92,17 +92,20 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder)
         {
-            currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
+            currentMatch.BindValueChanged(matchChanged, true);
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             currentTeamScore.UnbindBindings();
-            currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
-
             currentTeam.UnbindBindings();
-            currentTeam.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1 : match.NewValue.Team2);
+
+            if (match.NewValue != null)
+            {
+                currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
+                currentTeam.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1 : match.NewValue.Team2);
+            }
 
             // team may change to same team, which means score is not in a good state.
             // thus we handle this manually.
@@ -131,7 +134,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         {
             InternalChildren = new Drawable[]
             {
-                teamDisplay = new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value.PointsToWin),
+                teamDisplay = new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
             };
         }
     }
