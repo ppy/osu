@@ -33,6 +33,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             currentTeamScore.BindTo(score);
         }
 
-        private void scoreChanged(ValueChangedEvent<int?> score) => counter.CountStars = score.NewValue ?? 0;
+        private void scoreChanged(ValueChangedEvent<int?> score) => counter.Current = score.NewValue ?? 0;
     }
 }
