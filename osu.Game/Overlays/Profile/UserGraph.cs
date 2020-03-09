@@ -197,12 +197,7 @@ namespace osu.Game.Overlays.Profile
             protected readonly OsuSpriteText Counter, BottomText;
             private readonly Box background;
 
-            /// <summary>
-            /// Text which will be shown near the <see cref="Counter"/>.
-            /// </summary>
-            protected abstract string TooltipCounterName { get; }
-
-            protected UserGraphTooltip()
+            protected UserGraphTooltip(string tooltipCounterName)
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -225,12 +220,13 @@ namespace osu.Game.Overlays.Profile
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(3, 0),
                                 Children = new Drawable[]
                                 {
                                     new OsuSpriteText
                                     {
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                        Text = $"{TooltipCounterName} "
+                                        Text = tooltipCounterName
                                     },
                                     Counter = new OsuSpriteText
                                     {
