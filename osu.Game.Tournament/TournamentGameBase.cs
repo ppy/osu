@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -74,16 +75,40 @@ namespace osu.Game.Tournament
 
             AddRange(new[]
             {
-                new TourneyButton
+                new Container
                 {
-                    Text = "保存更改",
-                    Width = 140,
-                    Height = 50,
+                    CornerRadius = 10,
                     Depth = float.MinValue,
+                    Position = new Vector2(5),
+                    Masking = true,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Padding = new MarginPadding(10),
-                    Action = SaveChanges,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = OsuColour.Gray(0.2f),
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new TourneyButton
+                        {
+                            Text = "保存更改",
+                            Width = 140,
+                            Height = 50,
+                            Padding = new MarginPadding
+                            {
+                                Top = 10,
+                                Left = 10,
+                            },
+                            Margin = new MarginPadding
+                            {
+                                Right = 10,
+                                Bottom = 10,
+                            },
+                            Action = SaveChanges,
+                        },
+                    }
                 },
                 heightWarning = new Container
                 {

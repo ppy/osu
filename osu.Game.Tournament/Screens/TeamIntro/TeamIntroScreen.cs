@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
-using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK;
@@ -49,141 +48,33 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 return;
             }
 
+            const float y_flag_offset = 292;
+
+            const float y_offset = 460;
+
             mainContainer.Children = new Drawable[]
             {
-                new TeamWithPlayers(match.NewValue.Team1.Value, true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Height = 0.6f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreRight
-                },
-                new TeamWithPlayers(match.NewValue.Team2.Value)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Height = 0.6f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreLeft
-                },
                 new RoundDisplay(match.NewValue)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.25f,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Y = 180,
-                }
+                    Position = new Vector2(100, 100)
+                },
+                new DrawableTeamFlag(match.NewValue.Team1.Value)
+                {
+                    Position = new Vector2(165, y_flag_offset),
+                },
+                new DrawableTeamWithPlayers(match.NewValue.Team1.Value, TeamColour.Red)
+                {
+                    Position = new Vector2(165, y_offset),
+                },
+                new DrawableTeamFlag(match.NewValue.Team2.Value)
+                {
+                    Position = new Vector2(740, y_flag_offset),
+                },
+                new DrawableTeamWithPlayers(match.NewValue.Team2.Value, TeamColour.Blue)
+                {
+                    Position = new Vector2(740, y_offset),
+                },
             };
-        }
-
-        private class RoundDisplay : CompositeDrawable
-        {
-            public RoundDisplay(TournamentMatch match)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10),
-                        Children = new Drawable[]
-                        {
-                            new TournamentSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Colour = OsuColour.Gray(0.33f),
-                                Text = match.Round.Value?.Name.Value ?? "未知回合",
-                                Font = OsuFont.Torus.With(size: 26, weight: FontWeight.Light)
-                            },
-                        }
-                    }
-                };
-            }
-        }
-
-        private class TeamWithPlayers : CompositeDrawable
-        {
-            public TeamWithPlayers(TournamentTeam team, bool left = false)
-            {
-                FillFlowContainer players;
-                var colour = left ? TournamentGame.COLOUR_RED : TournamentGame.COLOUR_BLUE;
-                InternalChildren = new Drawable[]
-                {
-                    new TeamDisplay(team)
-                    {
-                        Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = Anchor.TopCentre,
-                        RelativePositionAxes = Axes.Both,
-                        X = (left ? -1 : 1) * 0.3145f,
-                        Y = -0.077f,
-                    },
-                    players = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Vertical,
-                        AutoSizeAxes = Axes.Both,
-                        Spacing = new Vector2(0, 5),
-                        Padding = new MarginPadding(20),
-                        Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                        RelativePositionAxes = Axes.Both,
-                        X = (left ? -1 : 1) * 0.58f,
-                    },
-                };
-
-                if (team != null)
-                {
-                    foreach (var p in team.Players)
-                    {
-                        players.Add(new TournamentSpriteText
-                        {
-                            Text = p.Username,
-                            Font = OsuFont.Torus.With(size: 24),
-                            Colour = colour,
-                            Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                            Origin = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                        });
-                    }
-                }
-            }
-
-            private class TeamDisplay : DrawableTournamentTeam
-            {
-                public TeamDisplay(TournamentTeam team)
-                    : base(team)
-                {
-                    AutoSizeAxes = Axes.Both;
-
-                    Flag.Anchor = Flag.Origin = Anchor.TopCentre;
-                    Flag.RelativeSizeAxes = Axes.None;
-                    Flag.Size = new Vector2(300, 200);
-                    Flag.Scale = new Vector2(0.32f);
-
-                    InternalChild = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(160),
-                        Children = new Drawable[]
-                        {
-                            Flag,
-                            new TournamentSpriteText
-                            {
-                                Text = team?.FullName.Value ?? "???",
-                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.Regular),
-                                Colour = OsuColour.Gray(0.2f),
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
-                            },
-                        }
-                    };
-                }
-            }
         }
     }
 }

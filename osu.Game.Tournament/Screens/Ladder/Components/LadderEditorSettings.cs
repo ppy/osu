@@ -43,7 +43,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "队伍 2" },
                 roundDropdown = new SettingsRoundDropdown(ladderInfo.Rounds) { LabelText = "回合" },
                 losersCheckbox = new PlayerCheckbox { LabelText = "Losers Bracket" },
-                dateTimeBox = new DateTextBox { LabelText = "　比赛时间" },
+                dateTimeBox = new DateTextBox { LabelText = "比赛时间" },
             };
 
             editorInfo.Selected.ValueChanged += selection =>

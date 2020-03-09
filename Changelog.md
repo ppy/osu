@@ -19,3 +19,9 @@
     *   [m] [Increase flexibility of StarCounter component #8175]
     *   [m] [Fix hit error ticks getting out of the hit error meter #8182]
     *   [m] [Fix textbox characters not animating when typing/backspacing #8186]
+    *   同步Tournament相关代码,涉及pr:
+        *   [m] [Apply tournament client usability changes #8170]
+        *   [m] [Add new tournament design base elements #8171]
+        *   [m] [Implement 2020 map pool design #8173]
+        *   [m] [Implement 2020 ladder design #8174]
+        *   [m] [Implement 2020 win screen design #8179]

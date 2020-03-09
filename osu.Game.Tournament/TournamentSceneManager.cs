@@ -127,11 +127,11 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(MapPoolScreen)) { Text = "谱面列表", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(GameplayScreen)) { Text = "游戏内界面", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(TeamWinScreen)) { Text = "胜出", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(TeamWinScreen)) { Text = "胜出界面", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(DrawingsScreen)) { Text = "抽签和分组", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(ShowcaseScreen)) { Text = "展示", RequestSelection = SetScreen },
-                                 }
+                            }
                         },
                     },
                 },

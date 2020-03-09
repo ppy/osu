@@ -51,7 +51,7 @@ namespace osu.Game.Tournament.Components
                 };
             }
         }
-        
+
         private bool loop;
 
         public bool Loop
@@ -62,6 +62,12 @@ namespace osu.Game.Tournament.Components
                 if (video != null)
                     video.Loop = value;
             }
+        }
+
+        public void Reset()
+        {
+            if (manualClock != null)
+                manualClock.CurrentTime = 0;
         }
 
         protected override void Update()
