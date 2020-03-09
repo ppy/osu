@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Profile
 
         private void redrawGraph()
         {
-            if (!data?.Any() ?? true)
+            if (!(data?.Length > 1))
             {
                 HideGraph();
                 return;
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Profile
         {
             get
             {
-                if (!data?.Any() ?? true)
+                if (!(data?.Length > 1))
                     return null;
 
                 var (key, value) = data[dataIndex];
