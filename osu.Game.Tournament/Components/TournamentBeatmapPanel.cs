@@ -50,8 +50,6 @@ namespace osu.Game.Tournament.Components
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            CornerRadius = HEIGHT / 2;
-            CornerExponent = 2;
             Masking = true;
 
             AddRangeInternal(new Drawable[]
@@ -72,14 +70,12 @@ namespace osu.Game.Tournament.Components
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Padding = new MarginPadding(vertical_padding),
+                    Padding = new MarginPadding(15),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new TournamentSpriteText
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
                             Text = new LocalisedString((
                                 $"{Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist} - {Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title}",
                                 $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
@@ -88,9 +84,6 @@ namespace osu.Game.Tournament.Components
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Padding = new MarginPadding(vertical_padding),
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
