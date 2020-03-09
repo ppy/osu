@@ -64,7 +64,11 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        public void Reset() => manualClock.CurrentTime = 0;
+        public void Reset()
+        {
+            if (manualClock != null)
+                manualClock.CurrentTime = 0;
+        }
 
         protected override void Update()
         {
