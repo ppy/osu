@@ -42,13 +42,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             int[] userRanks = statistics?.RankHistory?.Data;
 
-            if (userRanks == null)
-            {
-                Data = null;
-                return;
-            }
-
-            Data = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
+            Data = userRanks?.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
         }
 
         protected override float GetDataPointHeight(int rank) => -MathF.Log(rank);
