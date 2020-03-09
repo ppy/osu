@@ -63,7 +63,11 @@ namespace osu.Game.Graphics.UserInterface
             base.OnFocusLost(e);
         }
 
-        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
+        protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+        {
+            AutoSizeAxes = Axes.Both,
+            Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
+        };
 
         protected override Caret CreateCaret() => new OsuCaret
         {

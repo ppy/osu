@@ -18,3 +18,4 @@
     *   [m] [Fix video looping not propagating when set too early in initialisation #8178]
     *   [m] [Increase flexibility of StarCounter component #8175]
     *   [m] [Fix hit error ticks getting out of the hit error meter #8182]
+    *   [m] [Fix textbox characters not animating when typing/backspacing #8186]
