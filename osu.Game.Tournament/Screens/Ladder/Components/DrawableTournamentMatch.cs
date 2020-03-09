@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
@@ -45,9 +46,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 selectionBox = new Container
                 {
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(1.05f),
+                    Scale = new Vector2(1.1f),
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -57,14 +56,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 },
                 currentMatchSelectionBox = new Container
                 {
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(1.05f),
+                    Scale = new Vector2(1.1f),
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0,
-                    Colour = Color4.OrangeRed,
+                    Colour = OsuColour.FromHex("#D24747"),
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 Flow = new FillFlowContainer<DrawableMatchTeam>

@@ -32,8 +32,8 @@ namespace osu.Game.Tournament.Screens.Ladder
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Storage storage)
         {
-            normalPathColour = colours.BlueDarker.Darken(2);
-            losersPathColour = colours.YellowDarker.Darken(2);
+            normalPathColour = OsuColour.FromHex("#66D1FF");
+            losersPathColour = OsuColour.FromHex("#FFC700");
 
             RelativeSizeAxes = Axes.Both;
 
@@ -46,6 +46,12 @@ namespace osu.Game.Tournament.Screens.Ladder
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
+                    },
+                    new DrawableTournamentTitleText
+                    {
+                        Y = 100,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                     },
                     ScrollContent = new LadderDragContainer
                     {
