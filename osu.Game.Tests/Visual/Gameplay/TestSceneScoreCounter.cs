@@ -3,9 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Utils;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -45,32 +42,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
             Add(accuracyCounter);
 
-            StarCounter stars = new StarCounter
-            {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, -160),
-                CountStars = 5,
-            };
-            Add(stars);
-
-            SpriteText starsLabel = new OsuSpriteText
-            {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                Position = new Vector2(20, -190),
-                Text = stars.CountStars.ToString("0.00"),
-            };
-            Add(starsLabel);
-
             AddStep(@"Reset all", delegate
             {
                 score.Current.Value = 0;
                 comboCounter.Current.Value = 0;
                 numerator = denominator = 0;
                 accuracyCounter.SetFraction(0, 0);
-                stars.CountStars = 0;
-                starsLabel.Text = stars.CountStars.ToString("0.00");
             });
 
             AddStep(@"Hit! :D", delegate
@@ -87,20 +64,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 comboCounter.Current.Value = 0;
                 denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
-            });
-
-            AddStep(@"Alter stars", delegate
-            {
-                stars.CountStars = RNG.NextSingle() * (stars.StarCount + 1);
-                starsLabel.Text = stars.CountStars.ToString("0.00");
-            });
-
-            AddStep(@"Stop counters", delegate
-            {
-                score.StopRolling();
-                comboCounter.StopRolling();
-                accuracyCounter.StopRolling();
-                stars.StopAnimation();
             });
         }
     }
