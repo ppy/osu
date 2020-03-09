@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -307,17 +306,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        private class TestPlayer : Visual.TestPlayer
-        {
-            public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
-
-            public TestPlayer(bool allowPause = true, bool showResults = true)
-                : base(allowPause, showResults)
-            {
-            }
-        }
-
-        protected class SlowLoadPlayer : Visual.TestPlayer
+        protected class SlowLoadPlayer : TestPlayer
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 

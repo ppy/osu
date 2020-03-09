@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private const int spacing = 32;
         private const double preempt = 800;
 
+        public override bool RemoveWhenNotAlive => false;
+
         /// <summary>
         /// The start time of <see cref="Start"/>.
         /// </summary>
@@ -79,33 +81,40 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             drawableObject.HitObject.DefaultsApplied += scheduleRefresh;
         }
 
-        private void scheduleRefresh() => Scheduler.AddOnce(refresh);
+        private void scheduleRefresh()
+        {
+            Scheduler.AddOnce(refresh);
+        }
 
         private void refresh()
         {
             ClearInternal();
 
-            if (End == null)
-                return;
-
             OsuHitObject osuStart = Start.HitObject;
-            OsuHitObject osuEnd = End.HitObject;
-
-            if (osuEnd.NewCombo)
-                return;
-
-            if (osuStart is Spinner || osuEnd is Spinner)
-                return;
-
-            Vector2 startPosition = osuStart.EndPosition;
-            Vector2 endPosition = osuEnd.Position;
             double startTime = osuStart.GetEndTime();
+
+            LifetimeStart = startTime;
+
+            OsuHitObject osuEnd = End?.HitObject;
+
+            if (osuEnd == null || osuEnd.NewCombo || osuStart is Spinner || osuEnd is Spinner)
+            {
+                // ensure we always set a lifetime for full LifetimeManagementContainer benefits
+                LifetimeEnd = LifetimeStart;
+                return;
+            }
+
+            Vector2 startPosition = osuStart.StackedEndPosition;
+            Vector2 endPosition = osuEnd.StackedPosition;
             double endTime = osuEnd.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
             int distance = (int)distanceVector.Length;
             float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
             double duration = endTime - startTime;
+
+            double? firstTransformStartTime = null;
+            double finalTransformEndTime = startTime;
 
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
             {
@@ -125,16 +134,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Scale = new Vector2(1.5f * osuEnd.Scale),
                 });
 
+                if (firstTransformStartTime == null)
+                    firstTransformStartTime = fadeInTime;
+
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
                     fp.FadeIn(osuEnd.TimeFadeIn);
                     fp.ScaleTo(osuEnd.Scale, osuEnd.TimeFadeIn, Easing.Out);
                     fp.MoveTo(pointEndPosition, osuEnd.TimeFadeIn, Easing.Out);
                     fp.Delay(fadeOutTime - fadeInTime).FadeOut(osuEnd.TimeFadeIn);
-                }
 
-                fp.Expire(true);
+                    finalTransformEndTime = fadeOutTime + osuEnd.TimeFadeIn;
+                }
             }
+
+            // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
+            LifetimeStart = firstTransformStartTime ?? startTime;
+            LifetimeEnd = finalTransformEndTime;
         }
     }
 }

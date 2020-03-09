@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new TourneyVideo(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                    new TourneyVideo("ladder")
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
@@ -80,7 +80,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var p in args.NewItems.Cast<TournamentMatch>())
+                        foreach (var p in args.OldItems.Cast<TournamentMatch>())
                         {
                             foreach (var d in MatchesContainer.Where(d => d.Match == p))
                                 d.Expire();

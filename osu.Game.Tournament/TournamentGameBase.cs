@@ -18,7 +18,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -53,9 +52,6 @@ namespace osu.Game.Tournament
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
-
-            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
-            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
 
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
@@ -104,10 +100,10 @@ namespace osu.Game.Tournament
                             Colour = Color4.Red,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new OsuSpriteText
+                        new TournamentSpriteText
                         {
                             Text = "Please make the window wider",
-                            Font = OsuFont.Default.With(weight: "bold"),
+                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                             Colour = Color4.White,
                             Padding = new MarginPadding(20)
                         }
@@ -124,10 +120,9 @@ namespace osu.Game.Tournament
                 using (var sr = new StreamReader(stream))
                     ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
             }
-            else
-            {
+
+            if (ladder == null)
                 ladder = new LadderInfo();
-            }
 
             if (ladder.Ruleset.Value == null)
                 ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
@@ -205,9 +200,11 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    if (p.Username == null || p.Statistics == null)
+                    if (string.IsNullOrEmpty(p.Username) || p.Statistics == null)
+                    {
                         PopulateUser(p);
-                    addedInfo = true;
+                        addedInfo = true;
+                    }
                 }
             }
 
@@ -240,6 +237,24 @@ namespace osu.Game.Tournament
                     if (b.BeatmapInfo == null)
                         // if online population couldn't be performed, ensure we don't leave a null value behind
                         r.Beatmaps.Remove(b);
+                }
+            }
+
+            foreach (var t in ladder.Teams)
+            {
+                foreach (var s in t.SeedingResults)
+                {
+                    foreach (var b in s.Beatmaps)
+                    {
+                        if (b.BeatmapInfo == null && b.ID > 0)
+                        {
+                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                            req.Perform(API);
+                            b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+
+                            addedInfo = true;
+                        }
+                    }
                 }
             }
 

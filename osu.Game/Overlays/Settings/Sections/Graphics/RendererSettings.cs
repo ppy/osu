@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -23,6 +24,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "Frame limiter",
                     Bindable = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
+                },
+                new SettingsEnumDropdown<ExecutionMode>
+                {
+                    LabelText = "Threading mode",
+                    Bindable = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
                 },
                 new SettingsCheckbox
                 {

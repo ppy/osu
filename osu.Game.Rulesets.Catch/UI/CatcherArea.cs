@@ -50,6 +50,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
+            if (result.Judgement is IgnoreJudgement)
+                return;
+
             void runAfterLoaded(Action action)
             {
                 if (lastPlateableFruit == null)
@@ -89,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (fruit.HitObject.LastInCombo)
             {
-                if (((CatchJudgement)result.Judgement).ShouldExplodeFor(result))
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();

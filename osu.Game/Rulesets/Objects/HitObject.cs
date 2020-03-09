@@ -144,9 +144,9 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
-        /// May be null.
         /// </summary>
-        public virtual Judgement CreateJudgement() => null;
+        [NotNull]
+        public virtual Judgement CreateJudgement() => new Judgement();
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.

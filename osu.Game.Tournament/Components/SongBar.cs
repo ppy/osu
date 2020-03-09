@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -262,7 +261,7 @@ namespace osu.Game.Tournament.Components
                 static void cp(SpriteText s, Color4 colour)
                 {
                     s.Colour = colour;
-                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
+                    s.Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 15);
                 }
 
                 for (var i = 0; i < tuples.Length; i++)
@@ -278,9 +277,9 @@ namespace osu.Game.Tournament.Components
                         });
                     }
 
-                    AddText(new OsuSpriteText { Text = heading }, s => cp(s, OsuColour.Gray(0.33f)));
+                    AddText(new TournamentSpriteText { Text = heading }, s => cp(s, OsuColour.Gray(0.33f)));
                     AddText(" ", s => cp(s, OsuColour.Gray(0.33f)));
-                    AddText(new OsuSpriteText { Text = content }, s => cp(s, OsuColour.Gray(0.5f)));
+                    AddText(new TournamentSpriteText { Text = content }, s => cp(s, OsuColour.Gray(0.5f)));
                 }
             }
         }

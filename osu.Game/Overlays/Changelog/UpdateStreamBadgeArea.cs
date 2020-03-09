@@ -6,9 +6,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -18,52 +16,36 @@ namespace osu.Game.Overlays.Changelog
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            AddInternal(new Box
-            {
-                Colour = Color4.Black,
-                Alpha = 0.12f,
-                RelativeSizeAxes = Axes.Both,
-            });
         }
 
         public void Populate(List<APIUpdateStream> streams)
         {
-            foreach (APIUpdateStream updateStream in streams)
+            foreach (var updateStream in streams)
                 AddItem(updateStream);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            foreach (UpdateStreamBadge streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
-                streamBadge.EnableDim();
+            foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
+                streamBadge.UserHoveringArea = true;
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            foreach (UpdateStreamBadge streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
-                streamBadge.DisableDim();
+            foreach (var streamBadge in TabContainer.Children.OfType<UpdateStreamBadge>())
+                streamBadge.UserHoveringArea = false;
 
             base.OnHoverLost(e);
         }
 
-        protected override TabFillFlowContainer CreateTabFlow()
+        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
-            var flow = base.CreateTabFlow();
-
-            flow.RelativeSizeAxes = Axes.X;
-            flow.AutoSizeAxes = Axes.Y;
-            flow.AllowMultiline = true;
-            flow.Padding = new MarginPadding
-            {
-                Vertical = 20,
-                Horizontal = 85,
-            };
-
-            return flow;
-        }
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            AllowMultiline = true,
+        };
 
         protected override Dropdown<APIUpdateStream> CreateDropdown() => null;
 

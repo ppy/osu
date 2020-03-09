@@ -21,6 +21,7 @@ namespace osu.Game.Tournament.Tests.Screens
             match.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
             match.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
             match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
+            match.Completed.Value = true;
             ladder.CurrentMatch.Value = match;
 
             Add(new TeamWinScreen
