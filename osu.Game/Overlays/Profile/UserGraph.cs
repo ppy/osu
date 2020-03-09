@@ -46,13 +46,15 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (data.Length <= 1)
-                return base.OnHover(e);
+            if (data.Length > 1)
+            {
+                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.ShowBar();
 
-            graph.UpdateBallPosition(e.MousePosition.X);
-            graph.ShowBar();
+                return true;
+            }
 
-            return true;
+            return base.OnHover(e);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
