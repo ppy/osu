@@ -17,6 +17,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile
 {
+    /// <summary>
+    /// Graph which is used in <see cref="UserProfileOverlay"/> to present changes in user statistics over time.
+    /// </summary>
+    /// <typeparam name="TKey">Type of data to be used for X-axis of the graph.</typeparam>
+    /// <typeparam name="TValue">Type of data to be used for Y-axis of the graph.</typeparam>
     public abstract class UserGraph<TKey, TValue> : Container, IHasCustomTooltip
     {
         protected const float FADE_DURATION = 150;
@@ -192,6 +197,9 @@ namespace osu.Game.Overlays.Profile
             protected readonly OsuSpriteText Counter, BottomText;
             private readonly Box background;
 
+            /// <summary>
+            /// Text which will be shown near the <see cref="Counter"/>.
+            /// </summary>
             protected abstract string TooltipCounterName { get; }
 
             protected UserGraphTooltip()
