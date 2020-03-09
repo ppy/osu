@@ -27,8 +27,6 @@ namespace osu.Game.Overlays.Profile
 
         protected UserGraph()
         {
-            data = Array.Empty<KeyValuePair<TKey, TValue>>();
-
             Add(graph = new UserLineGraph
             {
                 RelativeSizeAxes = Axes.Both,
@@ -46,7 +44,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (data.Length > 1)
+            if (data?.Length > 1)
             {
                 graph.UpdateBallPosition(e.MousePosition.X);
                 graph.ShowBar();
@@ -59,7 +57,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (data.Length > 1)
+            if (data?.Length > 1)
                 graph.UpdateBallPosition(e.MousePosition.X);
 
             return base.OnMouseMove(e);
@@ -67,7 +65,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (data.Length > 1)
+            if (data?.Length > 1)
                 graph.HideBar();
 
             base.OnHoverLost(e);
@@ -85,7 +83,7 @@ namespace osu.Game.Overlays.Profile
 
         private void redrawGraph()
         {
-            if (data.Length == 0)
+            if (!data?.Any() ?? true)
             {
                 HideGraph();
                 return;
@@ -108,7 +106,7 @@ namespace osu.Game.Overlays.Profile
         {
             get
             {
-                if (data.Length == 0)
+                if (!data?.Any() ?? true)
                     return null;
 
                 var (key, value) = data[dataIndex];
