@@ -76,6 +76,9 @@ namespace osu.Game.Overlays.Profile
             base.OnHoverLost(e);
         }
 
+        /// <summary>
+        /// Set of values which will be used to create a graph.
+        /// </summary>
         protected KeyValuePair<TKey, TValue>[] Data
         {
             set
@@ -99,7 +102,13 @@ namespace osu.Game.Overlays.Profile
             ShowGraph();
         }
 
+        /// <summary>
+        /// Function used to convert <see cref="Data"/> point to it's Y-axis position on the graph.
+        /// </summary>
+        /// <param name="value">Value to convert.</param>
+        /// <returns></returns>
         protected abstract float GetDataPointHeight(TValue value);
+
         protected virtual void ShowGraph() => graph.FadeIn(FADE_DURATION, Easing.Out);
         protected virtual void HideGraph() => graph.FadeOut(FADE_DURATION, Easing.Out);
 
