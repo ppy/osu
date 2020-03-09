@@ -12,16 +12,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         public UserHistoryCount[] Values
         {
-            set
-            {
-                if (value == null)
-                {
-                    Data = null;
-                    return;
-                }
-
-                Data = value.Select(v => new KeyValuePair<DateTime, long>(v.Date, v.Count)).ToArray();
-            }
+            set => Data = value?.Select(v => new KeyValuePair<DateTime, long>(v.Date, v.Count)).ToArray();
         }
 
         protected override float GetDataPointHeight(long playCount) => playCount;
