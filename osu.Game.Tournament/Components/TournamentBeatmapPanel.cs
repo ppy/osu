@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Components
         private readonly string mods;
 
         private const float horizontal_padding = 10;
-        private const float vertical_padding = 5;
+        private const float vertical_padding = 10;
 
         public const float HEIGHT = 50;
 
@@ -163,16 +163,7 @@ namespace osu.Game.Tournament.Components
 
                 BorderThickness = 6;
 
-                switch (found.Team)
-                {
-                    case TeamColour.Red:
-                        BorderColour = Color4.Red;
-                        break;
-
-                    case TeamColour.Blue:
-                        BorderColour = Color4.Blue;
-                        break;
-                }
+                BorderColour = TournamentGame.GetTeamColour(found.Team);
 
                 switch (found.Type)
                 {
