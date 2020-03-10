@@ -6,13 +6,19 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarMfButton : ToolbarButton
+    public class ToolbarMfButton : ToolbarOverlayToggleButton
     {
         public ToolbarMfButton()
         {
             Icon = FontAwesome.Solid.Gift;
             TooltipMain = "Mf-osu";
-            TooltipSub = "这是一个ppy/osu的分支,翻译由MATRIX-feather提供,祝游玩愉快(｡･ω･)ﾉﾞ";
+            TooltipSub = "这是一个官方lazer的分支,祝游玩愉快(｡･ω･)ﾉﾞ";
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(CustomMenuOverlay custommenu)
+        {
+            StateContainer = custommenu;
         }
     }
 }

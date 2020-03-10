@@ -16,15 +16,12 @@ namespace osu.Game.Overlays
 {
     public class CustomMenuOverlay : FullscreenOverlay
     {
+        protected CustomMenuHeader Header;
 
         public CustomMenuOverlay()
             : base(OverlayColourScheme.Orange)
         {
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Children = new Drawable[]
             {
                 new Box
@@ -36,36 +33,32 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    Child = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10),
                         Children = new Drawable[]
                         {
-                            new FillFlowContainer
+                            new CustomMenuHeader(),
+                            new Container
                             {
-                                AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
-                                Direction = FillDirection.Vertical,
-                                Masking = true,
-                                EdgeEffect = new EdgeEffectParameters
-                                {
-                                    Colour = Color4.Black.Opacity(0.25f),
-                                    Type = EdgeEffectType.Shadow,
-                                    Radius = 3,
-                                    Offset = new Vector2(0f, 1f),
-                                },
+                                AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    new CustomMenuHeader(),
+                                    new CustomMenuTexts(),
                                 }
                             }
                         }
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
         }
     }
 }

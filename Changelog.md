@@ -35,3 +35,5 @@
     *   [m] [Add idle animation and fallback catcher support #8196]
     *   [m] [Fix hyperdash not initiating correctly when juice streams are present #8192]
     *   [m] [Fix osu! shaking instead of missing for early hits #8197]
+*   **添加了"关于Mf-osu"界面**
+*   **实现了实时显示系统时间的功能**
