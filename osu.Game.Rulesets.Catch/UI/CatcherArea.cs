@@ -155,11 +155,21 @@ namespace osu.Game.Rulesets.Catch.UI
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
                     },
-                    createCatcherSprite().With(c =>
-                    {
-                        c.Anchor = Anchor.TopCentre;
-                    })
                 };
+
+                updateCatcher();
+            }
+
+            private Drawable catcherSprite;
+
+            private void updateCatcher()
+            {
+                catcherSprite?.Expire();
+
+                Add(catcherSprite = createCatcherSprite().With(c =>
+                {
+                    c.Anchor = Anchor.TopCentre;
+                }));
             }
 
             private int currentDirection;
@@ -222,7 +232,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
             }
 
-            private Drawable createCatcherSprite() => new CatcherSprite();
+            private Drawable createCatcherSprite() => new CatcherSprite(currentState);
 
             /// <summary>
             /// Add a caught fruit to the catcher's stack.
@@ -290,8 +300,24 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
                 }
 
+                if (validCatch)
+                    updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
+                else
+                    updateState(CatcherAnimationState.Fail);
+
                 return validCatch;
             }
+
+            private void updateState(CatcherAnimationState state)
+            {
+                if (currentState == state)
+                    return;
+
+                currentState = state;
+                updateCatcher();
+            }
+
+            private CatcherAnimationState currentState;
 
             private double hyperDashModifier = 1;
             private int hyperDashDirection;
