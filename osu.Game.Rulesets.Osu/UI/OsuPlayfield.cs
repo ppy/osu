@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -64,7 +65,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
             base.Add(h);
 
-            followPoints.AddFollowPoints((DrawableOsuHitObject)h);
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+            osuHitObject.CheckHittable = checkHittable;
+
+            followPoints.AddFollowPoints(osuHitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
@@ -72,9 +76,29 @@ namespace osu.Game.Rulesets.Osu.UI
             bool result = base.Remove(h);
 
             if (result)
-                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
+            {
+                DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+                osuHitObject.CheckHittable = null;
+
+                followPoints.RemoveFollowPoints(osuHitObject);
+            }
 
             return result;
+        }
+
+        private bool checkHittable(DrawableOsuHitObject osuHitObject)
+        {
+            var lastObject = HitObjectContainer.AliveObjects.GetPrevious(osuHitObject);
+
+            // Ensure the last object is not alive anymore, in which case always allow the hit.
+            if (lastObject == null)
+                return true;
+
+            // Ensure that either the last object has received a judgement or the hit time occurs after the last object's start time.
+            if (lastObject.Judged || Time.Current > lastObject.HitObject.StartTime)
+                return true;
+
+            return false;
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
