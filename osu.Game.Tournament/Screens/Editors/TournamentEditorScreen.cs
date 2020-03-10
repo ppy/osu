@@ -40,7 +40,6 @@ namespace osu.Game.Tournament.Screens.Editors
                 new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.9f,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Child = flow = new FillFlowContainer<TDrawable>
@@ -48,8 +47,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         Spacing = new Vector2(20)
                     },
                 },

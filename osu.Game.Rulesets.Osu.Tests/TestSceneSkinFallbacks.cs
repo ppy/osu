@@ -18,7 +18,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNextHitObject(string skin) =>
             AddUntilStep($"check skin from {skin}", () =>
             {
-                var firstObject = ((TestPlayer)Player).DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
+                var firstObject = Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
 
                 if (firstObject == null)
                     return false;
@@ -75,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audio { get; set; }
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, audio, testBeatmapSkin);
 

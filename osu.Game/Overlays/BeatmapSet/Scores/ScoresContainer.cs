@@ -19,7 +19,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoresContainer : CompositeDrawable
+    public class ScoresContainer : BeatmapSetLayoutSection
     {
         private const int spacing = 15;
 
@@ -34,7 +34,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly LoadingLayer loading;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
-        private readonly FillFlowContainer content;
         private readonly NotSupporterPlaceholder notSupporterPlaceholder;
 
         [Resolved]
@@ -76,15 +75,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public ScoresContainer()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            InternalChildren = new Drawable[]
+            AddRange(new Drawable[]
             {
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                content = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -164,8 +161,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             }
                         }
                     }
-                },
-            };
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -223,7 +220,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 Scores = null;
-                content.Hide();
+                Hide();
                 return;
             }
 
@@ -237,7 +234,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             notSupporterPlaceholder.Hide();
 
-            content.Show();
+            Show();
             loading.Show();
 
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
