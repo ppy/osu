@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
@@ -15,6 +16,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         // Must be set to update IsHovered as it's used in relax mdo to detect osu hit objects.
         public override bool HandlePositionalInput => true;
+
+        /// <summary>
+        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit.
+        /// If not-null, this <see cref="DrawableOsuHitObject"/> will not receive a judgement until this function returns <c>true</c>.
+        /// </summary>
+        public Func<DrawableOsuHitObject, bool> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
