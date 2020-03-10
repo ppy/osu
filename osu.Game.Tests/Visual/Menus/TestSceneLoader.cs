@@ -14,14 +14,14 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneLoaderAnimation : ScreenTestScene
+    public class TestSceneLoader : ScreenTestScene
     {
         private TestLoader loader;
 
         [Cached]
         private OsuLogo logo;
 
-        public TestSceneLoaderAnimation()
+        public TestSceneLoader()
         {
             Child = logo = new OsuLogo
             {
