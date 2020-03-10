@@ -34,3 +34,4 @@
     *   [m] [Update framework #8193]
     *   [m] [Add idle animation and fallback catcher support #8196]
     *   [m] [Fix hyperdash not initiating correctly when juice streams are present #8192]
+    *   [m] [Fix osu! shaking instead of missing for early hits #8197]
