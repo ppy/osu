@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
-        public double Velocity;
-        public double TickDistance;
+        public double Velocity { get; private set; }
+        public double TickDistance { get; private set; }
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
