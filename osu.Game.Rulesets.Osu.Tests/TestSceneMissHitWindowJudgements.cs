@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Tests.Visual;
@@ -16,24 +17,54 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneEarlyMissJudgement : ModTestScene
+    public class TestSceneMissHitWindowJudgements : ModTestScene
     {
-        public TestSceneEarlyMissJudgement()
+        public TestSceneMissHitWindowJudgements()
             : base(new OsuRuleset())
         {
         }
 
         [Test]
-        public void TestHitCircleEarly() => CreateModTest(new ModTestData
+        public void TestMissViaEarlyHit()
         {
-            Autoplay = false,
-            Mod = new TestAutoMod(),
-            Beatmap = new Beatmap
+            var beatmap = new Beatmap
             {
                 HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
-            },
-            PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset < 0 && Player.Results[0].Type == HitResult.Miss
-        });
+            };
+
+            var hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
+            CreateModTest(new ModTestData
+            {
+                Autoplay = false,
+                Mod = new TestAutoMod(),
+                Beatmap = new Beatmap
+                {
+                    HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
+                },
+                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset < -hitWindows.WindowFor(HitResult.Meh) && Player.Results[0].Type == HitResult.Miss
+            });
+        }
+
+        [Test]
+        public void TestMissViaNotHitting()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
+            };
+
+            var hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
+            CreateModTest(new ModTestData
+            {
+                Autoplay = false,
+                Beatmap = beatmap,
+                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && Player.Results[0].Type == HitResult.Miss
+            });
+        }
 
         private class TestAutoMod : OsuModAutoplay
         {
