@@ -61,15 +61,15 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            appendComments(commentBundle);
+            AppendComments(commentBundle);
         }
 
         private DrawableComment getDrawableComment(Comment comment)
         {
-            if (commentDictionary.TryGetValue(comment.Id, out var existing))
+            if (CommentDictionary.TryGetValue(comment.Id, out var existing))
                 return existing;
 
-            return commentDictionary[comment.Id] = new DrawableComment(comment)
+            return CommentDictionary[comment.Id] = new DrawableComment(comment)
             {
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
@@ -81,31 +81,28 @@ namespace osu.Game.Overlays.Comments
         {
             var request = new GetCommentsRequest(CommentableId.Value, Type.Value, Sort.Value, page, drawableComment.Comment.Id);
 
-            request.Success += response => Schedule(() => appendComments(response));
+            request.Success += response => Schedule(() => AppendComments(response));
 
             api.PerformAsync(request);
         }
 
-        private readonly Dictionary<long, DrawableComment> commentDictionary = new Dictionary<long, DrawableComment>();
+        protected readonly Dictionary<long, DrawableComment> CommentDictionary = new Dictionary<long, DrawableComment>();
 
         /// <summary>
         /// Appends retrieved comments to the subtree rooted of comments in this page.
         /// </summary>
         /// <param name="bundle">The bundle of comments to add.</param>
-        private void appendComments([NotNull] CommentBundle bundle)
+        protected void AppendComments([NotNull] CommentBundle bundle)
         {
             var orphaned = new List<Comment>();
 
-            foreach (var topLevel in bundle.Comments)
-                addNewComment(topLevel);
-
-            foreach (var child in bundle.IncludedComments)
+            foreach (var comment in bundle.Comments.Concat(bundle.IncludedComments))
             {
-                // Included comments can contain the parent comment, which already exists in the hierarchy.
-                if (commentDictionary.ContainsKey(child.Id))
+                // Exclude possible duplicated comments.
+                if (CommentDictionary.ContainsKey(comment.Id))
                     continue;
 
-                addNewComment(child);
+                addNewComment(comment);
             }
 
             // Comments whose parents were seen later than themselves can now be added.
@@ -121,7 +118,7 @@ namespace osu.Game.Overlays.Comments
                     // Comments that have no parent are added as top-level comments to the flow.
                     flow.Add(drawableComment);
                 }
-                else if (commentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
+                else if (CommentDictionary.TryGetValue(comment.ParentId.Value, out var parentDrawable))
                 {
                     // The comment's parent has already been seen, so the parent<-> child links can be added.
                     comment.ParentComment = parentDrawable.Comment;

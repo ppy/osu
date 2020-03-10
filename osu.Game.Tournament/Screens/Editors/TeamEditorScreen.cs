@@ -57,6 +57,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
             private readonly Container drawableContainer;
 
+            [Resolved(canBeNull: true)]
+            private TournamentSceneManager sceneManager { get; set; }
+
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
@@ -113,6 +116,18 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.2f,
                                 Bindable = Model.FlagName
                             },
+                            new SettingsTextBox
+                            {
+                                LabelText = "Seed",
+                                Width = 0.2f,
+                                Bindable = Model.Seed
+                            },
+                            new SettingsSlider<int>
+                            {
+                                LabelText = "Last Year Placement",
+                                Width = 0.33f,
+                                Bindable = Model.LastYearPlacing
+                            },
                             new SettingsButton
                             {
                                 Width = 0.11f,
@@ -131,7 +146,17 @@ namespace osu.Game.Tournament.Screens.Editors
                                     ladderInfo.Teams.Remove(Model);
                                 },
                             },
-                            playerEditor
+                            playerEditor,
+                            new SettingsButton
+                            {
+                                Width = 0.2f,
+                                Margin = new MarginPadding(10),
+                                Text = "Edit seeding results",
+                                Action = () =>
+                                {
+                                    sceneManager?.SetScreen(new SeedingEditorScreen(team));
+                                }
+                            },
                         }
                     },
                 };
@@ -145,19 +170,6 @@ namespace osu.Game.Tournament.Screens.Editors
             private void updateDrawable(ValueChangedEvent<string> flag)
             {
                 drawableContainer.Child = new DrawableTeamFlag(Model);
-            }
-
-            private class DrawableTeamFlag : DrawableTournamentTeam
-            {
-                public DrawableTeamFlag(TournamentTeam team)
-                    : base(team)
-                {
-                    InternalChild = Flag;
-                    RelativeSizeAxes = Axes.Both;
-
-                    Flag.Anchor = Anchor.Centre;
-                    Flag.Origin = Anchor.Centre;
-                }
             }
 
             public class PlayerEditor : CompositeDrawable
@@ -177,8 +189,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
                     };
                 }

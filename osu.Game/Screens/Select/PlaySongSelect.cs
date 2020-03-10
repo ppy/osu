@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Screens.Play;
@@ -47,6 +48,20 @@ namespace osu.Game.Screens.Select
                 ModSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    // this is a special hard-coded case; we can't rely on OnPressed (of SongSelect) as GlobalActionContainer is
+                    // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
+                    FinaliseSelection();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override bool OnStart()

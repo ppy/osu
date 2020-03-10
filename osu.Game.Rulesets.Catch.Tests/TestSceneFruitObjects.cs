@@ -42,6 +42,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("show droplet", () => SetContents(createDrawableDroplet));
 
             AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
+
+            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
+                AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawable(rep, true)));
         }
 
         private Drawable createDrawableTinyDroplet()
@@ -82,9 +85,13 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
         }
 
-        private Drawable createDrawable(FruitVisualRepresentation rep)
+        private Drawable createDrawable(FruitVisualRepresentation rep, bool hyperdash = false)
         {
-            Fruit fruit = new TestCatchFruit(rep) { Scale = 1.5f };
+            Fruit fruit = new TestCatchFruit(rep)
+            {
+                Scale = 1.5f,
+                HyperDashTarget = hyperdash ? new Banana() : null
+            };
 
             return new DrawableFruit(fruit)
             {

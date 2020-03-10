@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(CancellationToken? cancellation, IAPIProvider api)
+        private void load(CancellationToken? cancellation, IAPIProvider api, OverlayColourProvider colourProvider)
         {
             bool complete = false;
 
@@ -63,10 +64,14 @@ namespace osu.Game.Overlays.Changelog
                 Children = new Drawable[]
                 {
                     new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
-                    comments = new CommentsContainer
+                    new Box
                     {
-                        Margin = new MarginPadding { Top = 10 }
-                    }
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Colour = colourProvider.Background6,
+                        Margin = new MarginPadding { Top = 30 },
+                    },
+                    comments = new CommentsContainer()
                 };
 
                 comments.ShowComments(CommentableType.Build, build.Id);
@@ -80,6 +85,8 @@ namespace osu.Game.Overlays.Changelog
             {
             }
 
+            private OsuSpriteText date;
+
             protected override FillFlowContainer CreateHeader()
             {
                 var fill = base.CreateHeader();
@@ -89,11 +96,10 @@ namespace osu.Game.Overlays.Changelog
                     existing.Scale = new Vector2(1.25f);
                     existing.Action = null;
 
-                    existing.Add(new OsuSpriteText
+                    existing.Add(date = new OsuSpriteText
                     {
-                        Text = Build.CreatedAt.Date.ToString("dd MMM yyyy"),
+                        Text = Build.CreatedAt.Date.ToString("dd MMMM yyyy"),
                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
-                        Colour = OsuColour.FromHex(@"FD5"),
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 5 },
@@ -112,6 +118,12 @@ namespace osu.Game.Overlays.Changelog
                 });
 
                 return fill;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                date.Colour = colourProvider.Light1;
             }
         }
 

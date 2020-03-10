@@ -29,6 +29,12 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
+        [Test]
+        public void TestBananaShower()
+        {
+            AddUntilStep("player is done", () => !Player.ValidForResume);
+        }
+
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
@@ -40,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 5000, NewCombo = true });
+            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 3000, NewCombo = true });
 
             return beatmap;
         }

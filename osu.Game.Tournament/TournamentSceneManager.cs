@@ -61,7 +61,7 @@ namespace osu.Game.Tournament
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        video = new TourneyVideo(storage.GetStream("BG Logoless - OWC.m4v"))
+                        video = new TourneyVideo("main", true)
                         {
                             Loop = true,
                             RelativeSizeAxes = Axes.Both,
@@ -80,6 +80,7 @@ namespace osu.Game.Tournament
                                 new ShowcaseScreen(),
                                 new MapPoolScreen(),
                                 new TeamIntroScreen(),
+                                new SeedingScreen(),
                                 new DrawingsScreen(),
                                 new GameplayScreen(),
                                 new TeamWinScreen()
@@ -121,6 +122,7 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(LadderScreen)) { Text = "Bracket", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(TeamIntroScreen)) { Text = "TeamIntro", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(SeedingScreen)) { Text = "Seeding", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(MapPoolScreen)) { Text = "MapPool", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(GameplayScreen)) { Text = "Gameplay", RequestSelection = SetScreen },
@@ -146,8 +148,20 @@ namespace osu.Game.Tournament
         private Drawable currentScreen;
         private ScheduledDelegate scheduledHide;
 
+        private Drawable temporaryScreen;
+
+        public void SetScreen(Drawable screen)
+        {
+            currentScreen?.Hide();
+            currentScreen = null;
+
+            screens.Add(temporaryScreen = screen);
+        }
+
         public void SetScreen(Type screenType)
         {
+            temporaryScreen?.Expire();
+
             var target = screens.FirstOrDefault(s => s.GetType() == screenType);
 
             if (target == null || currentScreen == target) return;
@@ -180,9 +194,14 @@ namespace osu.Game.Tournament
 
             switch (currentScreen)
             {
-                case GameplayScreen _:
                 case MapPoolScreen _:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
+                    chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
+                    break;
+
+                case GameplayScreen _:
+                    chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
+                    chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
                     break;
 
                 default:
