@@ -38,7 +38,8 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
-                    Clock = new FramedClock(manualClock = new ManualClock())
+                    Clock = new FramedClock(manualClock = new ManualClock()),
+                    Loop = loop,
                 };
             }
             else if (drawFallbackGradient)
@@ -51,13 +52,22 @@ namespace osu.Game.Tournament.Components
             }
         }
 
+        private bool loop;
+
         public bool Loop
         {
             set
             {
+                loop = value;
                 if (video != null)
                     video.Loop = value;
             }
+        }
+
+        public void Reset()
+        {
+            if (manualClock != null)
+                manualClock.CurrentTime = 0;
         }
 
         protected override void Update()

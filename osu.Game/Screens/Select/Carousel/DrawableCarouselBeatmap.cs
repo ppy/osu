@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    CountStars = (float)beatmap.StarDifficulty,
+                                    Current = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
                             }
