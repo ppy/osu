@@ -20,16 +20,16 @@ namespace osu.Game.Tests.Visual
             this.mod = mod;
         }
 
-        protected void CreateHitObjectTest(HitObjectTestCase testCaseData, bool shouldMiss) => CreateModTest(new ModTestData
+        protected void CreateHitObjectTest(HitObjectTestData testData, bool shouldMiss) => CreateModTest(new ModTestData
         {
             Mod = mod,
             Beatmap = new Beatmap
             {
                 BeatmapInfo = { Ruleset = ruleset.RulesetInfo },
-                HitObjects = { testCaseData.HitObject }
+                HitObjects = { testData.HitObject }
             },
             Autoplay = !shouldMiss,
-            PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testCaseData.FailOnMiss)
+            PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testData.FailOnMiss)
         });
 
         protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new PerfectModTestPlayer();
@@ -52,12 +52,12 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        protected class HitObjectTestCase
+        protected class HitObjectTestData
         {
             public readonly HitObject HitObject;
             public readonly bool FailOnMiss;
 
-            public HitObjectTestCase(HitObject hitObject, bool failOnMiss = true)
+            public HitObjectTestData(HitObject hitObject, bool failOnMiss = true)
             {
                 HitObject = hitObject;
                 FailOnMiss = failOnMiss;

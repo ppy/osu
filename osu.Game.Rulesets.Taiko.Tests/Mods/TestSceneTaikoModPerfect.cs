@@ -19,15 +19,15 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestHit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new CentreHit { StartTime = 1000 }), shouldMiss);
+        public void TestHit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new CentreHit { StartTime = 1000 }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestDrumRoll(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new DrumRoll { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+        public void TestDrumRoll(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new DrumRoll { StartTime = 1000, EndTime = 3000 }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new Swell { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+        public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Swell { StartTime = 1000, EndTime = 3000 }), shouldMiss);
 
         private class TestTaikoRuleset : TaikoRuleset
         {

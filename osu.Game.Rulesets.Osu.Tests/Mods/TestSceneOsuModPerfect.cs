@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestHitCircle(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new HitCircle { StartTime = 1000 }), shouldMiss);
+        public void TestHitCircle(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HitCircle { StartTime = 1000 }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
             };
 
-            CreateHitObjectTest(new HitObjectTestCase(slider), shouldMiss);
+            CreateHitObjectTest(new HitObjectTestData(slider), shouldMiss);
         }
 
         [TestCase(false)]
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 Position = new Vector2(256, 192)
             };
 
-            CreateHitObjectTest(new HitObjectTestCase(spinner), shouldMiss);
+            CreateHitObjectTest(new HitObjectTestData(spinner), shouldMiss);
         }
     }
 }
