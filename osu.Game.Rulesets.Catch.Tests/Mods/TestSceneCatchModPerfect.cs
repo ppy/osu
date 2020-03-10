@@ -20,11 +20,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestBananaShower(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new BananaShower { StartTime = 1000, EndTime = 3000 }, false), shouldMiss);
+        public void TestBananaShower(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new BananaShower { StartTime = 1000, EndTime = 3000 }, false), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestFruit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new Fruit { StartTime = 1000 }), shouldMiss);
+        public void TestFruit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Fruit { StartTime = 1000 }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
@@ -40,15 +40,15 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 })
             };
 
-            CreateHitObjectTest(new HitObjectTestCase(stream), shouldMiss);
+            CreateHitObjectTest(new HitObjectTestData(stream), shouldMiss);
         }
 
         // We only care about testing misses, hits are tested via JuiceStream
         [TestCase(true)]
-        public void TestDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new Droplet { StartTime = 1000 }), shouldMiss);
+        public void TestDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Droplet { StartTime = 1000 }), shouldMiss);
 
         // We only care about testing misses, hits are tested via JuiceStream
         [TestCase(true)]
-        public void TestTinyDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestCase(new TinyDroplet { StartTime = 1000 }), shouldMiss);
+        public void TestTinyDroplet(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new TinyDroplet { StartTime = 1000 }), shouldMiss);
     }
 }
