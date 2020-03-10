@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -25,7 +26,9 @@ namespace osu.Game.Tournament.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum TeamColour
     {
+        [Description("红")]
         Red,
+        [Description("蓝")]
         Blue
     }
 

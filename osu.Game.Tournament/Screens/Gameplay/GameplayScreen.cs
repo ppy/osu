@@ -15,7 +15,6 @@ using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.TeamWin;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
@@ -29,9 +28,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private OsuButton warmupButton;
         private MatchIPCInfo ipc;
-
-        private readonly Color4 red = new Color4(186, 0, 18, 255);
-        private readonly Color4 blue = new Color4(17, 136, 170, 255);
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -51,14 +47,14 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new MatchHeader(),
+                header = new MatchHeader(),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Y = 5,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Y = 110,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
                         new Box
@@ -66,44 +62,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             // chroma key area for stable gameplay
                             Name = "chroma",
                             RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Height = 512,
                             Colour = new Color4(0, 255, 0, 255),
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Y = -4,
-                            Children = new Drawable[]
-                            {
-                                new Circle
-                                {
-                                    Name = "top bar red",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = red,
-                                },
-                                new Circle
-                                {
-                                    Name = "top bar blue",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = blue,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                },
-                            }
                         },
                     }
                 },
                 scoreDisplay = new MatchScoreDisplay
                 {
-                    Y = -60,
-                    Scale = new Vector2(0.8f),
+                    Y = -147,
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.TopCentre,
                 },
                 new ControlPanel
                 {
@@ -136,13 +106,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            warmup.BindValueChanged(w => warmupButton.Alpha = !w.NewValue ? 0.5f : 1, true);
+            warmup.BindValueChanged(w =>
+            {
+                warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
+                header.ShowScores = !w.NewValue;
+            }, true);
         }
 
         private ScheduledDelegate scheduledOperation;
         private MatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
+        private MatchHeader header;
 
         private void stateChanged(ValueChangedEvent<TourneyState> state)
         {
