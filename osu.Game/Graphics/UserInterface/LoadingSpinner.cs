@@ -27,7 +27,8 @@ namespace osu.Game.Graphics.UserInterface
         /// Constuct a new loading spinner.
         /// </summary>
         /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
-        public LoadingSpinner(bool withBox = false)
+        /// <param name="inverted">Whether colours should be inverted (black spinner instead of white).</param>
+        public LoadingSpinner(bool withBox = false, bool inverted = false)
         {
             Size = new Vector2(60);
 
@@ -45,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     new Box
                     {
-                        Colour = Color4.Black,
+                        Colour = inverted ? Color4.White : Color4.Black,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = withBox ? 0.7f : 0
                     },
@@ -53,6 +54,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Colour = inverted ? Color4.Black : Color4.White,
                         Scale = new Vector2(withBox ? 0.6f : 1),
                         RelativeSizeAxes = Axes.Both,
                         Icon = FontAwesome.Solid.CircleNotch
