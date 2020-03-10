@@ -155,7 +155,10 @@ namespace osu.Game.Rulesets.Catch.UI
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
                     },
-                    createCatcherSprite(),
+                    createCatcherSprite().With(c =>
+                    {
+                        c.Anchor = Anchor.TopCentre;
+                    })
                 };
             }
 
@@ -205,12 +208,11 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
-                additive.OriginPosition += new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
-                additive.Position = Position;
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
-                additive.RelativePositionAxes = RelativePositionAxes;
                 additive.Blending = BlendingParameters.Additive;
+                additive.RelativePositionAxes = RelativePositionAxes;
+                additive.Position = Position;
 
                 AdditiveTarget.Add(additive);
 
