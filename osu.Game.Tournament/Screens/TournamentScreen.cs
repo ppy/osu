@@ -18,6 +18,9 @@ namespace osu.Game.Tournament.Screens
         protected TournamentScreen()
         {
             RelativeSizeAxes = Axes.Both;
+
+            FillMode = FillMode.Fit;
+            FillAspectRatio = 16 / 9f;
         }
 
         public override void Hide() => this.FadeOut(FADE_DELAY);
