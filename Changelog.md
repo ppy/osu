@@ -30,3 +30,7 @@
 *   添加了一些东西,详见文件变更列表
 *   整合更新
     *   [m] [Implement 2020 gameplay design #8176]
+    *   [m] [Implement 2020 schedule design #8177]
+    *   [m] [Update framework #8193]
+    *   [m] [Add idle animation and fallback catcher support #8196]
+    *   [m] [Fix hyperdash not initiating correctly when juice streams are present #8192]

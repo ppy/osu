@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private DrawableCatchHitObject lastPlateableFruit;
 
         public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
-        {     
+        {
             if (result.Judgement is IgnoreJudgement)
                 return;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (fruit.HitObject.LastInCombo)
             {
-                if (((CatchJudgement)result.Judgement).ShouldExplodeFor(result))
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();
@@ -155,7 +155,10 @@ namespace osu.Game.Rulesets.Catch.UI
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
                     },
-                    createCatcherSprite(),
+                    createCatcherSprite().With(c =>
+                    {
+                        c.Anchor = Anchor.TopCentre;
+                    })
                 };
             }
 
@@ -205,12 +208,11 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
-                additive.OriginPosition += new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
-                additive.Position = Position;
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
-                additive.RelativePositionAxes = RelativePositionAxes;
                 additive.Blending = BlendingParameters.Additive;
+                additive.RelativePositionAxes = RelativePositionAxes;
+                additive.Position = Position;
 
                 AdditiveTarget.Add(additive);
 
@@ -269,6 +271,11 @@ namespace osu.Game.Rulesets.Catch.UI
                 var validCatch =
                     catchObjectPosition >= catcherPosition - halfCatchWidth &&
                     catchObjectPosition <= catcherPosition + halfCatchWidth;
+
+                // only update hyperdash state if we are catching a fruit.
+                // exceptions are Droplets and JuiceStreams.
+                if (!(fruit is Fruit)) return validCatch;
+
 
                 if (validCatch && fruit.HyperDash)
                 {

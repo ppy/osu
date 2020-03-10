@@ -44,6 +44,10 @@ namespace osu.Game.Rulesets.Catch.Skinning
                         return new LegacyFruitPiece("fruit-drop") { Scale = new Vector2(0.8f) };
 
                     break;
+                
+                case CatchSkinComponents.CatcherIdle:
+                    return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
+                           this.GetAnimation("fruit-ryuuta", true, true, true);
             }
 
             return null;

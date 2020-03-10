@@ -3,31 +3,35 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatcherSprite : CompositeDrawable
+    public class CatcherSprite : SkinnableDrawable
     {
+        protected override bool ApplySizeRestrictionsToDefault => true;
+
         public CatcherSprite()
+            : base(new CatchSkinComponent(CatchSkinComponents.CatcherIdle), _ =>
+                new DefaultCatcherSprite(), confineMode: ConfineMode.ScaleDownToFit)
         {
+            RelativeSizeAxes = Axes.None;
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
 
             // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
-            OriginPosition = new Vector2(-0.02f, 0.06f) * CatcherArea.CATCHER_SIZE;
+            OriginPosition = new Vector2(0.5f, 0.06f) * CatcherArea.CATCHER_SIZE;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private class DefaultCatcherSprite : Sprite
         {
-            InternalChild = new SkinnableSprite("Gameplay/catch/fruit-catcher-idle", confineMode: ConfineMode.ScaleDownToFit)
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            };
+                Texture = textures.Get("Gameplay/catch/fruit-catcher-idle");
+            }
         }
     }
 }
