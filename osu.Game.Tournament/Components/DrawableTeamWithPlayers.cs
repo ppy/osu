@@ -46,12 +46,7 @@ namespace osu.Game.Tournament.Components
                                 {
                                     Direction = FillDirection.Vertical,
                                     AutoSizeAxes = Axes.Both,
-                                    ChildrenEnumerable = team?.Players.Select(p => new TournamentSpriteText
-                                    {
-                                        Text = p.Username,
-                                        Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
-                                        Colour = Color4.White,
-                                    }).Skip(5) ?? Enumerable.Empty<Drawable>()
+                                    ChildrenEnumerable = team?.Players.Select(createPlayerText).Skip(5) ?? Enumerable.Empty<Drawable>()
                                 },
                             }
                         },

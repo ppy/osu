@@ -92,18 +92,6 @@ namespace osu.Game.Online.Chat
             textbox.Text = string.Empty;
         }
 
-        public void Expand()
-        {
-            this.FadeIn(300);
-            this.MoveToY(0, 500, Easing.OutQuint);
-        }
-
-        public void Contract()
-        {
-            this.FadeOut(200);
-            this.MoveToY(100, 500, Easing.In);
-        }
-
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
 
         private void channelChanged(ValueChangedEvent<Channel> e)
