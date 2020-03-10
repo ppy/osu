@@ -53,17 +53,17 @@ namespace osu.Game.Online
             manager.ItemRemoved += itemRemoved;
         }
 
-        private void downloadBegan(ArchiveDownloadRequest<TModel> request)
+        private void downloadBegan(ArchiveDownloadRequest<TModel> request) => Schedule(() =>
         {
             if (request.Model.Equals(Model.Value))
                 attachDownload(request);
-        }
+        });
 
-        private void downloadFailed(ArchiveDownloadRequest<TModel> request)
+        private void downloadFailed(ArchiveDownloadRequest<TModel> request) => Schedule(() =>
         {
             if (request.Model.Equals(Model.Value))
                 attachDownload(null);
-        }
+        });
 
         private ArchiveDownloadRequest<TModel> attachedRequest;
 
