@@ -25,3 +25,6 @@
         *   [m] [Implement 2020 map pool design #8173]
         *   [m] [Implement 2020 ladder design #8174]
         *   [m] [Implement 2020 win screen design #8179]
+
+### 2020/03/10
+*   添加了一些东西,详见文件变更列表
