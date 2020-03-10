@@ -22,11 +22,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         private RulesetInfo catchRuleset;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CatcherArea),
-        };
-
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
