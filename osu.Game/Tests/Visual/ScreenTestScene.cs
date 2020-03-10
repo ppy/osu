@@ -38,12 +38,11 @@ namespace osu.Game.Tests.Visual
 
         private void addExitAllScreensStep()
         {
-            AddUntilStep("exit all screens", () =>
+            AddStep("exit all screens", () =>
             {
-                if (Stack.CurrentScreen == null) return true;
+                if (Stack.CurrentScreen == null) return;
 
                 Stack.Exit();
-                return false;
             });
         }
     }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osuTK.Graphics;
 
@@ -20,6 +21,22 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             // override any external colour changes with banananana
             return colour ??= getBananaColour();
+        }
+
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            const float end_scale = 0.6f;
+            const float random_scale_range = 1.6f;
+
+            ScaleContainer.ScaleTo(HitObject.Scale * (end_scale + random_scale_range * RNG.NextSingle()))
+                          .Then().ScaleTo(HitObject.Scale * end_scale, HitObject.TimePreempt);
+
+            const float random_angle_range = 180;
+
+            ScaleContainer.RotateTo(random_angle_range * (RNG.NextSingle() * 2 - 1))
+                          .Then().RotateTo(random_angle_range * (RNG.NextSingle() * 2 - 1), HitObject.TimePreempt);
         }
 
         private Color4 getBananaColour()
