@@ -9,13 +9,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Users;
-using osu.Framework;
 
 namespace osu.Game.Screens.Menu
 {
@@ -26,8 +26,6 @@ namespace osu.Game.Screens.Menu
         private LinkFlowContainer textFlow;
         private LinkFlowContainer supportFlow;
 
-        private LinkFlowContainer mfFlow;
-
         private Drawable heart;
 
         private const float icon_y = -85;
@@ -36,6 +34,7 @@ namespace osu.Game.Screens.Menu
         private readonly OsuScreen nextScreen;
 
         private readonly Bindable<User> currentUser = new Bindable<User>();
+        private FillFlowContainer fill;
 
         public Disclaimer(OsuScreen nextScreen = null)
         {
@@ -52,16 +51,16 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Icon = FontAwesome.Solid.Poo,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
-                new FillFlowContainer
+                fill = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Y = icon_y + icon_size,
+                    Y = icon_y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Children = new Drawable[]
@@ -74,6 +73,8 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Spacing = new Vector2(0, 2),
+                            LayoutDuration = 2000,
+                            LayoutEasing = Easing.OutQuint
                         },
                         supportFlow = new LinkFlowContainer
                         {
@@ -85,35 +86,23 @@ namespace osu.Game.Screens.Menu
                             Alpha = 0,
                             Spacing = new Vector2(0, 2),
                         },
-                        mfFlow = new LinkFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            TextAnchor = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Spacing = new Vector2(0, 2),
-                        },
                     }
                 }
             };
 
-            textFlow.AddText("注意!这是一个", t => t.Font = t.Font.With(Typeface.Exo, 35, FontWeight.Light));
-            textFlow.AddText("分支版本", t => t.Font = t.Font.With(Typeface.Exo, 35, FontWeight.SemiBold));
+            textFlow.NewParagraph();
+            textFlow.NewParagraph();
+            textFlow.AddText("注意, 这是一个", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
+            textFlow.AddText("分支版本", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
 
             textFlow.AddParagraph("一些功能可能不会像预期或最新版的那样工作", t => t.Font = t.Font.With(size: 25));
             textFlow.NewParagraph();
 
-            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold);
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
-            textFlow.AddParagraph("如果遇到了功能问题,请下载官方最新版后检查是否仍然存在",format);
-            textFlow.AddParagraph("若问题依然存在,欢迎前往",format);
-            textFlow.AddLink("官方github页面", "https://github.com/ppy/osu/issues", creationParameters: format);
-            textFlow.AddText("来提交问题报告", format);
+            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Exo, 20, FontWeight.SemiBold));
+            textFlow.NewParagraph();
 
-            textFlow.AddParagraph("反馈翻译问题,请前往", format);
-            textFlow.AddLink("mfosu的github页面", "https://github.com/MATRIX-feather/osu/issues", creationParameters: format);
-            textFlow.AddText("来提交问题报告", format);
             textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
@@ -125,7 +114,7 @@ namespace osu.Game.Screens.Menu
 
                 if (e.NewValue.IsSupporter)
                 {
-                    supportFlow.AddText("感谢支持osu!", format);
+                    supportFlow.AddText("永远感谢您支持osu!", format);
                 }
                 else
                 {
@@ -136,7 +125,7 @@ namespace osu.Game.Screens.Menu
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
-                    t.Padding = new MarginPadding { Left = 5 };
+                    t.Padding = new MarginPadding { Left = 5, Top = 3 };
                     t.Font = t.Font.With(size: 12);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
@@ -148,15 +137,6 @@ namespace osu.Game.Screens.Menu
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
             }, true);
-
-            supportFlow.NewParagraph();
-            mfFlow.AddParagraph("基础版本 : ");
-            mfFlow.AddText(Game.Version);
-        }
-
-        private void animateHeart()
-        {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
 
         protected override void LoadComplete()
@@ -170,22 +150,34 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
 
-            icon.Delay(1000).FadeColour(iconColour, 200, Easing.OutQuint);
-            icon.Delay(1000)
-                .MoveToY(icon_y * 1.1f, 160, Easing.OutCirc)
-                .RotateTo(-10, 160, Easing.OutCirc)
-                .Then()
-                .MoveToY(icon_y, 160, Easing.InCirc)
-                .RotateTo(0, 160, Easing.InCirc);
+            icon.RotateTo(10);
+            icon.FadeOut();
+            icon.ScaleTo(0.5f);
+
+            icon.Delay(500).FadeIn(500).ScaleTo(1, 500, Easing.OutQuint);
+
+            using (BeginDelayedSequence(3000, true))
+            {
+                icon.FadeColour(iconColour, 200, Easing.OutQuint);
+                icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
+                    .RotateTo(-360, 520, Easing.OutQuint)
+                    .Then()
+                    .MoveToY(icon_y, 160, Easing.InQuart)
+                    .FadeColour(Color4.White, 160);
+
+                fill.Delay(520 + 160).MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+            }
 
             supportFlow.FadeOut().Delay(2000).FadeIn(500);
-            mfFlow.FadeOut().Delay(4000).FadeIn(500);
+            double delay = 500;
+            foreach (var c in textFlow.Children)
+                c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
 
             animateHeart();
 
             this
                 .FadeInFromZero(500)
-                .Then(5000)
+                .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
                 .Finally(d =>
@@ -193,6 +185,36 @@ namespace osu.Game.Screens.Menu
                     if (nextScreen != null)
                         this.Push(nextScreen);
                 });
+        }
+
+        private string getRandomTip()
+        {
+            string[] tips =
+            {
+                "您可以在游戏中的任何位置按Ctrl+T来切换顶栏!",
+                "您可以在游戏中的任何位置按Ctrl+O来访问设置!",
+                "所有设置都是动态的，并实时生效。试试在游戏时时更改皮肤!",
+                "每一次更新都会携带全新的功能。确保您的游戏为最新版本!",
+                "如果您发现UI太大或太小，那么试试更改设置中的界面缩放!",
+                "试着调整“屏幕缩放”模式，即使在全屏模式下也可以更改游戏或UI区域！",
+                "目前，osu!direct对所有使用lazer上的用户可用。您可以使用Ctrl+D在任何地方访问它！",
+                "看到回放界面下面的时间条没？拖动他试试！",
+                "多线程模式允许您即使在低帧数的情况下也能拥有准确的判定！",
+                "在mod选择面板中向下滚动可以找到一堆有趣的新mod！",
+                "大部分web内容(玩家资料,在线排名等)在游戏内已有原生支持！点点看顶栏上的图标！",
+                "右键一个谱面可以选择查看在线信息，隐藏该谱面甚至删除单个难度！",
+                "所有删除操作在退出游戏前都是临时的！您可以在“维护”设置中选择恢复被意外删除的内容！",
+                "看看多人游戏中的“时移”玩法，他具备房间排行榜和游玩列表的功能！",
+                "您可以在游戏中按Ctrl+F11来切换高级fps显示功能！",
+                "深入了解性能计数器，并使用Ctrl+F2启用详细的性能记录！",//本句机翻(*懒*)
+            };
+
+            return tips[RNG.Next(0, tips.Length)];
+        }
+
+        private void animateHeart()
+        {
+            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

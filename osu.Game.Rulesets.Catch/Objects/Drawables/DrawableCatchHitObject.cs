@@ -91,10 +91,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
 
-        protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
-
-        protected override void UpdateInitialTransforms() => this.FadeInFromZero(200);
-
         protected override void UpdateStateTransforms(ArmedState state)
         {
             var endTime = HitObject.GetEndTime();
