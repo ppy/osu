@@ -33,10 +33,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             ScaleContainer.ScaleTo(HitObject.Scale * (end_scale + random_scale_range * RNG.NextSingle()))
                           .Then().ScaleTo(HitObject.Scale * end_scale, HitObject.TimePreempt);
 
-            const float random_angle_range = 180;
+            ScaleContainer.RotateTo(getRandomAngle())
+                          .Then()
+                          .RotateTo(getRandomAngle(), HitObject.TimePreempt);
 
-            ScaleContainer.RotateTo(random_angle_range * (RNG.NextSingle() * 2 - 1))
-                          .Then().RotateTo(random_angle_range * (RNG.NextSingle() * 2 - 1), HitObject.TimePreempt);
+            float getRandomAngle() => 180 * (RNG.NextSingle() * 2 - 1);
         }
 
         private Color4 getBananaColour()
