@@ -36,7 +36,30 @@ namespace osu.Game.Rulesets.Osu.Mods
                     adjustFadeIn(h);
             }
 
-            base.ApplyToDrawableHitObjects(drawables);
+            int skipCount = 0;
+
+            if (IncreaseFirstObjectVisibility.Value)
+            {
+                ++skipCount;
+
+                int spinnerCount = checkForSpinners(drawables);
+
+                if (spinnerCount > 0)
+                {
+                    IEnumerable<DrawableHitObject> startingSpinners = drawables.Take(spinnerCount);
+
+                    foreach (var d in startingSpinners)
+                        d.ApplyCustomUpdateState += ApplyHiddenState;
+
+                    skipCount += spinnerCount;
+                }
+
+                DrawableHitObject firstHitObject = drawables.First();
+                firstHitObject.ApplyCustomUpdateState += ApplySpecialHiddenState;
+            }
+
+            foreach (var d in drawables.Skip(skipCount))
+                d.ApplyCustomUpdateState += ApplyHiddenState;
         }
 
         protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
