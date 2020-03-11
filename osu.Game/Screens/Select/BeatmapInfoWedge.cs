@@ -384,7 +384,7 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"441288"),
+                                    Colour = Color4Extensions.FromHex(@"441288"),
                                     Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
@@ -394,7 +394,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Scale = new Vector2(0.8f),
-                                    Colour = OsuColour.FromHex(@"f7dd55"),
+                                    Colour = Color4Extensions.FromHex(@"f7dd55"),
                                     Icon = statistic.Icon,
                                 },
                             }

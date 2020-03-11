@@ -3,15 +3,15 @@
 
 using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using System.ComponentModel;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays.Social
 {
     public class FilterControl : SearchableListFilterControl<SocialSortCriteria, SortDirection>
     {
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"47253a");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"47253a");
         protected override SocialSortCriteria DefaultTab => SocialSortCriteria.Rank;
         protected override SortDirection DefaultCategory => SortDirection.Ascending;
 

@@ -43,3 +43,4 @@
     *   [m] [Fix crashes on some storyboards #8195]
     *   [m] [Fix perfect mod incorrectly failing in some scenarios #8084]
     *   [m] [Hide pp display on leaderboards if map is qualified or loved #7971]
+    *   [m] [Use framework extension method for FromHex #8208]
