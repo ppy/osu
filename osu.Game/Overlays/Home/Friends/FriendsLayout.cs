@@ -193,13 +193,10 @@ namespace osu.Game.Overlays.Home.Friends
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
-                Children = sortedUsers.Select(u => createUserPanel(u)).ToList()
+                Children = sortedUsers.Select(createUserPanel).ToList()
             };
 
-            LoadComponentAsync(table, loaded =>
-            {
-                addContentToPlaceholder(loaded);
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+            LoadComponentAsync(table, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private void addContentToPlaceholder(Drawable content)
@@ -244,7 +241,7 @@ namespace osu.Game.Overlays.Home.Friends
                     return unsorted.OrderBy(u => u.LastVisit).Reverse().ToList();
 
                 case UserSortCriteria.Rank:
-                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(users.Where(u => !u.CurrentModeRank.HasValue)).ToList();
+                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(unsorted.Where(u => !u.CurrentModeRank.HasValue)).ToList();
 
                 case UserSortCriteria.Username:
                     return unsorted.OrderBy(u => u.Username).ToList();
