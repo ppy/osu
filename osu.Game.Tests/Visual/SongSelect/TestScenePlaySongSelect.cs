@@ -466,6 +466,43 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestExternalBeatmapChangeWhileFilteredThenRefilter()
+        {
+            createSongSelect();
+            addManyTestMaps();
+
+            changeRuleset(0);
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+
+            AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+
+            AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
+
+            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+
+            BeatmapInfo target = null;
+
+            AddStep("select beatmap externally", () =>
+            {
+                target = manager.GetAllUsableBeatmapSets().Where(b => b.Beatmaps.Any(bi => bi.RulesetID == 1))
+                                .ElementAt(5).Beatmaps.First();
+
+                Beatmap.Value = manager.GetWorkingBeatmap(target);
+            });
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+
+            AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nononoo");
+
+            AddUntilStep("game lost selection", () => Beatmap.Value is DummyWorkingBeatmap);
+            AddAssert("carousel lost selection", () => songSelect.Carousel.SelectedBeatmap == null);
+        }
+
+        [Test]
         public void TestAutoplayViaCtrlEnter()
         {
             addRulesetImportStep(0);
