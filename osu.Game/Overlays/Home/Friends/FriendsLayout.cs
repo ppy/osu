@@ -20,6 +20,18 @@ namespace osu.Game.Overlays.Home.Friends
 {
     public class FriendsLayout : CompositeDrawable
     {
+        private List<User> users;
+
+        public List<User> Users
+        {
+            get => users;
+            set
+            {
+                users = value;
+                onlineStatusControl.Populate(value);
+            }
+        }
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -153,7 +165,6 @@ namespace osu.Game.Overlays.Home.Friends
 
             request?.Cancel();
             cancellationToken?.Cancel();
-            onlineStatusControl.Clear();
 
             if (!api.IsLoggedIn)
             {
@@ -162,7 +173,7 @@ namespace osu.Game.Overlays.Home.Friends
             }
 
             request = new GetFriendsRequest();
-            request.Success += users => Schedule(() => onlineStatusControl.Populate(users));
+            request.Success += response => Schedule(() => Users = response);
             api.Queue(request);
         }
 
@@ -224,19 +235,19 @@ namespace osu.Game.Overlays.Home.Friends
             }
         }
 
-        private List<User> sortUsers(List<User> users)
+        private List<User> sortUsers(List<User> unsorted)
         {
             switch (userListToolbar.SortCriteria.Value)
             {
                 default:
                 case UserSortCriteria.LastVisit:
-                    return users.OrderBy(u => u.LastVisit).Reverse().ToList();
+                    return unsorted.OrderBy(u => u.LastVisit).Reverse().ToList();
 
                 case UserSortCriteria.Rank:
-                    return users.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(users.Where(u => !u.CurrentModeRank.HasValue)).ToList();
+                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(users.Where(u => !u.CurrentModeRank.HasValue)).ToList();
 
                 case UserSortCriteria.Username:
-                    return users.OrderBy(u => u.Username).ToList();
+                    return unsorted.OrderBy(u => u.Username).ToList();
             }
         }
 

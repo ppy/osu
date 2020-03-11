@@ -13,6 +13,8 @@ namespace osu.Game.Overlays.Home.Friends
 
         public void Populate(List<User> users)
         {
+            Clear();
+
             AddItem(new FriendsBundle(FriendsOnlineStatus.All, users));
             AddItem(new FriendsBundle(FriendsOnlineStatus.Online, users.Where(u => u.IsOnline).ToList()));
             AddItem(new FriendsBundle(FriendsOnlineStatus.Offline, users.Where(u => !u.IsOnline).ToList()));
