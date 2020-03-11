@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Catch
         FruitOrange,
         FruitPear,
         Droplet,
-        CatcherIdle
+        CatcherIdle,
+        CatcherFail,
+        CatcherKiai
     }
 }
