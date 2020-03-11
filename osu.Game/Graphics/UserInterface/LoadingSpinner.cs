@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected Container MainContents;
 
-        protected const float TRANSITION_DURATION = 500;
+        public const float TRANSITION_DURATION = 500;
 
         private const float spin_duration = 900;
 
