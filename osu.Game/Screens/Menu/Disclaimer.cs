@@ -200,7 +200,7 @@ namespace osu.Game.Screens.Menu
                 "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
                 "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
                 "Get more details, hide or delete a beatmap by right-clicking on its panel at song select!",
-                "All delete operations are temoprary until quit. Restore accidentally deleted content from the maintenance settings!",
+                "All delete operations are temporary until exiting. Restore accidentally deleted content from the maintenance settings!",
                 "Check out the \"timeshift\" multiplayer system, which has local permanent leaderboards and playlist support!",
                 "Toggle advanced frame / thread statistics with Ctrl-F11!",
                 "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!",
