@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             ApplyPositionOffsets(Beatmap);
 
-            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
-
             int index = 0;
 
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
@@ -90,6 +88,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         break;
                 }
             }
+
+            initialiseHyperDash(beatmap);
         }
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
@@ -191,14 +191,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
         }
 
-        private void initialiseHyperDash(List<CatchHitObject> objects)
+        private static void initialiseHyperDash(IBeatmap beatmap)
         {
             List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
 
-            foreach (var currentObject in objects)
+            foreach (var currentObject in beatmap.HitObjects)
             {
-                if (currentObject is Fruit)
-                    objectWithDroplets.Add(currentObject);
+                if (currentObject is Fruit fruitObject)
+                    objectWithDroplets.Add(fruitObject);
 
                 if (currentObject is JuiceStream)
                 {
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-            double halfCatcherWidth = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
+            double halfCatcherWidth = CatcherArea.GetCatcherSize(beatmap.BeatmapInfo.BaseDifficulty) / 2;
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
@@ -220,6 +220,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 CatchHitObject currentObject = objectWithDroplets[i];
                 CatchHitObject nextObject = objectWithDroplets[i + 1];
+
+                // Reset variables in-case values have changed (e.g. after applying HR)
+                currentObject.HyperDashTarget = null;
+                currentObject.DistanceToHyperDash = 0;
 
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
