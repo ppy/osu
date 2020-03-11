@@ -6,20 +6,27 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
-using osu.Game.Tournament.Screens.Showcase;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
     public class MatchHeader : Container
     {
+        private TeamScoreDisplay teamDisplay1;
+        private TeamScoreDisplay teamDisplay2;
+
+        public bool ShowScores
+        {
+            set
+            {
+                teamDisplay1.ShowScore = value;
+                teamDisplay2.ShowScore = value;
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -27,194 +34,108 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             Height = 95;
             Children = new Drawable[]
             {
-                new TournamentLogo(),
-                new RoundDisplay
+                new FillFlowContainer
                 {
-                    Y = 10,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new DrawableTournamentTitleText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(1.2f)
+                        },
+                        new RoundDisplay
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(0.4f)
+                        },
+                    }
                 },
-                new TeamScoreDisplay(TeamColour.Red)
+                teamDisplay1 = new TeamScoreDisplay(TeamColour.Red)
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                new TeamScoreDisplay(TeamColour.Blue)
+                teamDisplay2 = new TeamScoreDisplay(TeamColour.Blue)
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                 },
             };
         }
+    }
 
-        private class TeamScoreDisplay : CompositeDrawable
+    public class TeamScoreDisplay : CompositeDrawable
+    {
+        private readonly TeamColour teamColour;
+
+        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
+        private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
+        private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
+
+        private TeamDisplay teamDisplay;
+
+        public bool ShowScore { set => teamDisplay.ShowScore = value; }
+
+        public TeamScoreDisplay(TeamColour teamColour)
         {
-            private readonly TeamColour teamColour;
+            this.teamColour = teamColour;
 
-            private readonly Color4 red = new Color4(129, 68, 65, 255);
-            private readonly Color4 blue = new Color4(41, 91, 97, 255);
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+        }
 
-            private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-            private readonly Bindable<TournamentTeam> currentTeam = new Bindable<TournamentTeam>();
-            private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
+        [BackgroundDependencyLoader]
+        private void load(LadderInfo ladder)
+        {
+            currentMatch.BindTo(ladder.CurrentMatch);
+            currentMatch.BindValueChanged(matchChanged, true);
+        }
 
-            public TeamScoreDisplay(TeamColour teamColour)
+        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
+        {
+            currentTeamScore.UnbindBindings();
+            currentTeam.UnbindBindings();
+
+            if (match.NewValue != null)
             {
-                this.teamColour = teamColour;
-
-                RelativeSizeAxes = Axes.Y;
-                Width = 300;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LadderInfo ladder)
-            {
-                currentMatch.BindValueChanged(matchChanged);
-                currentMatch.BindTo(ladder.CurrentMatch);
-            }
-
-            private void matchChanged(ValueChangedEvent<TournamentMatch> match)
-            {
-                currentTeamScore.UnbindBindings();
                 currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
-
-                currentTeam.UnbindBindings();
                 currentTeam.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1 : match.NewValue.Team2);
-
-                // team may change to same team, which means score is not in a good state.
-                // thus we handle this manually.
-                teamChanged(currentTeam.Value);
             }
 
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                switch (e.Button)
-                {
-                    case MouseButton.Left:
-                        if (currentTeamScore.Value < currentMatch.Value.PointsToWin)
-                            currentTeamScore.Value++;
-                        return true;
-
-                    case MouseButton.Right:
-                        if (currentTeamScore.Value > 0)
-                            currentTeamScore.Value--;
-                        return true;
-                }
-
-                return base.OnMouseDown(e);
-            }
-
-            private void teamChanged(TournamentTeam team)
-            {
-                var colour = teamColour == TeamColour.Red ? red : blue;
-                var flip = teamColour != TeamColour.Red;
-
-                InternalChildren = new Drawable[]
-                {
-                    new TeamDisplay(team, colour, flip),
-                    new TeamScore(currentTeamScore, flip, currentMatch.Value.PointsToWin)
-                    {
-                        Colour = colour
-                    }
-                };
-            }
+            // team may change to same team, which means score is not in a good state.
+            // thus we handle this manually.
+            teamChanged(currentTeam.Value);
         }
 
-        private class TeamScore : CompositeDrawable
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
-            private readonly StarCounter counter;
-
-            public TeamScore(Bindable<int?> score, bool flip, int count)
+            switch (e.Button)
             {
-                var anchor = flip ? Anchor.CentreRight : Anchor.CentreLeft;
+                case MouseButton.Left:
+                    if (currentTeamScore.Value < currentMatch.Value.PointsToWin)
+                        currentTeamScore.Value++;
+                    return true;
 
-                Anchor = anchor;
-                Origin = anchor;
-
-                InternalChild = counter = new StarCounter(count)
-                {
-                    Anchor = anchor,
-                    X = (flip ? -1 : 1) * 90,
-                    Y = 5,
-                    Scale = flip ? new Vector2(-1, 1) : Vector2.One,
-                };
-
-                currentTeamScore.BindValueChanged(scoreChanged);
-                currentTeamScore.BindTo(score);
+                case MouseButton.Right:
+                    if (currentTeamScore.Value > 0)
+                        currentTeamScore.Value--;
+                    return true;
             }
 
-            private void scoreChanged(ValueChangedEvent<int?> score) => counter.CountStars = score.NewValue ?? 0;
+            return base.OnMouseDown(e);
         }
 
-        private class TeamDisplay : DrawableTournamentTeam
+        private void teamChanged(TournamentTeam team)
         {
-            public TeamDisplay(TournamentTeam team, Color4 colour, bool flip)
-                : base(team)
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both;
-
-                var anchor = flip ? Anchor.CentreRight : Anchor.CentreLeft;
-
-                Anchor = Origin = anchor;
-
-                Flag.Anchor = Flag.Origin = anchor;
-                Flag.RelativeSizeAxes = Axes.None;
-                Flag.Size = new Vector2(60, 40);
-                Flag.Margin = new MarginPadding(20);
-
-                InternalChild = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        Flag,
-                        new OsuSpriteText
-                        {
-                            Text = team?.FullName.Value.ToUpper() ?? "???",
-                            X = (flip ? -1 : 1) * 90,
-                            Y = -10,
-                            Colour = colour,
-                            Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 20),
-                            Origin = anchor,
-                            Anchor = anchor,
-                        },
-                    }
-                };
-            }
-        }
-
-        private class RoundDisplay : CompositeDrawable
-        {
-            private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-
-            public RoundDisplay()
-            {
-                Width = 200;
-                Height = 20;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LadderInfo ladder)
-            {
-                currentMatch.BindValueChanged(matchChanged);
-                currentMatch.BindTo(ladder.CurrentMatch);
-            }
-
-            private void matchChanged(ValueChangedEvent<TournamentMatch> match)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = Color4.White,
-                        Text = match.NewValue.Round.Value?.Name.Value ?? "Unknown Round",
-                        Font = TournamentFont.GetFont(typeface: TournamentTypeface.Aquatico, weight: FontWeight.Regular, size: 18),
-                    },
-                };
-            }
+                teamDisplay = new TeamDisplay(team, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
+            };
         }
     }
 }

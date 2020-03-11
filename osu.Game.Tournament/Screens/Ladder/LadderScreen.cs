@@ -32,8 +32,8 @@ namespace osu.Game.Tournament.Screens.Ladder
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Storage storage)
         {
-            normalPathColour = colours.BlueDarker.Darken(2);
-            losersPathColour = colours.YellowDarker.Darken(2);
+            normalPathColour = Color4Extensions.FromHex("#66D1FF");
+            losersPathColour = Color4Extensions.FromHex("#FFC700");
 
             RelativeSizeAxes = Axes.Both;
 
@@ -42,10 +42,16 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new TourneyVideo(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                    new TourneyVideo("ladder")
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
+                    },
+                    new DrawableTournamentTitleText
+                    {
+                        Y = 100,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                     },
                     ScrollContent = new LadderDragContainer
                     {
@@ -80,7 +86,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var p in args.NewItems.Cast<TournamentMatch>())
+                        foreach (var p in args.OldItems.Cast<TournamentMatch>())
                         {
                             foreach (var d in MatchesContainer.Where(d => d.Match == p))
                                 d.Expire();

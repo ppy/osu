@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -43,6 +42,11 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             InternalChildren = new Drawable[]
             {
+                new TourneyVideo("gameplay")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new MatchHeader(),
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
@@ -56,7 +60,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                 {
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new TournamentSpriteText
                         {
                             Text = "Current Mode"
                         },

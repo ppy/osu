@@ -16,15 +16,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapCarousel : CompositeDrawable
+    public class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
@@ -187,7 +189,7 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false, false);
+            applyActiveCriteria(false);
 
             //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
@@ -237,7 +239,7 @@ namespace osu.Game.Screens.Select
                     {
                         Debug.Assert(bypassFilters);
 
-                        applyActiveCriteria(false, true);
+                        applyActiveCriteria(false);
                     }
 
                     return true;
@@ -394,7 +396,7 @@ namespace osu.Game.Screens.Select
         {
             if (PendingFilter?.Completed == false)
             {
-                applyActiveCriteria(false, false);
+                applyActiveCriteria(false);
                 Update();
             }
         }
@@ -404,10 +406,10 @@ namespace osu.Game.Screens.Select
             if (newCriteria != null)
                 activeCriteria = newCriteria;
 
-            applyActiveCriteria(debounce, true);
+            applyActiveCriteria(debounce);
         }
 
-        private void applyActiveCriteria(bool debounce, bool scroll)
+        private void applyActiveCriteria(bool debounce)
         {
             if (root.Children.Any() != true) return;
 
@@ -417,7 +419,7 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-                if (scroll) scrollPositionCache.Invalidate();
+                scrollPositionCache.Invalidate();
             }
 
             PendingFilter?.Cancel();
@@ -435,41 +437,38 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            // allow for controlling volume when alt is held.
-            // this is required as the VolumeControlReceptor uses OnPressed, which is
-            // executed after all OnKeyDown events.
-            if (e.AltPressed)
-                return base.OnKeyDown(e);
-
-            int direction = 0;
-            bool skipDifficulties = false;
-
             switch (e.Key)
             {
-                case Key.Up:
-                    direction = -1;
-                    break;
-
-                case Key.Down:
-                    direction = 1;
-                    break;
-
                 case Key.Left:
-                    direction = -1;
-                    skipDifficulties = true;
-                    break;
+                    SelectNext(-1, true);
+                    return true;
 
                 case Key.Right:
-                    direction = 1;
-                    skipDifficulties = true;
-                    break;
+                    SelectNext(1, true);
+                    return true;
             }
 
-            if (direction == 0)
-                return base.OnKeyDown(e);
+            return false;
+        }
 
-            SelectNext(direction, skipDifficulties);
-            return true;
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.SelectNext:
+                    SelectNext(1, false);
+                    return true;
+
+                case GlobalAction.SelectPrevious:
+                    SelectNext(-1, false);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected override void Update()
