@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"28242d"),
+                                Colour = Color4Extensions.FromHex(@"28242d"),
                             },
                             new GridContainer
                             {
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = OsuColour.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                                    Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
                                                 },
                                                 new FillFlowContainer
                                                 {
