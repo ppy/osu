@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Home.Friends
             }
 
             request = new GetFriendsRequest();
-            request.Success += onlineStatusControl.Populate;
+            request.Success += users => Schedule(() => onlineStatusControl.Populate(users));
             api.Queue(request);
         }
 
@@ -205,6 +205,14 @@ namespace osu.Game.Overlays.Home.Friends
                 case OverlayPanelDisplayStyle.List:
                     return new SocialListPanel(user);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            request?.Cancel();
+            cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
         }
     }
 }
