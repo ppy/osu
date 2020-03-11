@@ -63,10 +63,10 @@ namespace osu.Game.Overlays.Mods
 
         public ModSelectOverlay()
         {
-            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
-            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
+            Waves.FourthWaveColour = Color4Extensions.FromHex(@"003a4e");
 
             RelativeSizeAxes = Axes.Both;
 
