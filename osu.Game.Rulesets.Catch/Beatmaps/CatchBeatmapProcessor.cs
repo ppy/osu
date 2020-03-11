@@ -100,9 +100,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
         {
-            if (!(hitObject is Fruit))
-                return;
-
             float offsetPosition = hitObject.X;
             double startTime = hitObject.StartTime;
 
