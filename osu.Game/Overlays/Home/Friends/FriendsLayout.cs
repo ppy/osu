@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Home.Friends
         private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
 
+        private Drawable currentContent;
+
         private readonly Box background;
         private readonly Box controlBackground;
         private readonly FriendsOnlineStatusControl onlineStatusControl;
@@ -185,11 +187,24 @@ namespace osu.Game.Overlays.Home.Friends
 
             LoadComponentAsync(table, loaded =>
             {
-                itemsPlaceholder.Clear();
-                itemsPlaceholder.Add(loaded);
-
-                loading.Hide();
+                addContentToPlaceholder(loaded);
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private void addContentToPlaceholder(Drawable content)
+        {
+            loading.Hide();
+
+            var lastContent = currentContent;
+
+            if (lastContent != null)
+            {
+                lastContent.FadeOut(100, Easing.OutQuint).Expire();
+                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
+            }
+
+            itemsPlaceholder.Add(currentContent = content);
+            currentContent.FadeIn(200, Easing.OutQuint);
         }
 
         private SocialPanel createUserPanel(User user)
