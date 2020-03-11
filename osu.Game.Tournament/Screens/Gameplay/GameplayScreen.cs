@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
@@ -14,12 +15,11 @@ using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.TeamWin;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen
+    public class GameplayScreen : BeatmapInfoScreen, IProvideVideo
     {
         private readonly BindableBool warmup = new BindableBool();
 
@@ -29,9 +29,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private OsuButton warmupButton;
         private MatchIPCInfo ipc;
 
-        private readonly Color4 red = new Color4(186, 0, 18, 255);
-        private readonly Color4 blue = new Color4(17, 136, 170, 255);
-
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
@@ -39,20 +36,25 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private TournamentMatchChatDisplay chat { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
         {
             this.ipc = ipc;
 
             AddRangeInternal(new Drawable[]
             {
-                new MatchHeader(),
+                new TourneyVideo("gameplay")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                header = new MatchHeader(),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Y = 5,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Y = 110,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
                         new Box
@@ -60,44 +62,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             // chroma key area for stable gameplay
                             Name = "chroma",
                             RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Height = 512,
                             Colour = new Color4(0, 255, 0, 255),
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Y = -4,
-                            Children = new Drawable[]
-                            {
-                                new Circle
-                                {
-                                    Name = "top bar red",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = red,
-                                },
-                                new Circle
-                                {
-                                    Name = "top bar blue",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = blue,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                },
-                            }
                         },
                     }
                 },
                 scoreDisplay = new MatchScoreDisplay
                 {
-                    Y = -60,
-                    Scale = new Vector2(0.8f),
+                    Y = -147,
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.TopCentre,
                 },
                 new ControlPanel
                 {
@@ -130,13 +106,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            warmup.BindValueChanged(w => warmupButton.Alpha = !w.NewValue ? 0.5f : 1, true);
+            warmup.BindValueChanged(w =>
+            {
+                warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
+                header.ShowScores = !w.NewValue;
+            }, true);
         }
 
         private ScheduledDelegate scheduledOperation;
         private MatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
+        private MatchHeader header;
 
         private void stateChanged(ValueChangedEvent<TourneyState> state)
         {
@@ -156,7 +137,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
                 void expand()
                 {
-                    chat?.Expand();
+                    chat?.Contract();
 
                     using (BeginDelayedSequence(300, true))
                     {
@@ -170,7 +151,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     SongBar.Expanded = false;
                     scoreDisplay.FadeOut(100);
                     using (chat?.BeginDelayedSequence(500))
-                        chat?.Contract();
+                        chat?.Expand();
                 }
 
                 switch (state.NewValue)
@@ -197,7 +178,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         break;
 
                     default:
-                        chat.Expand();
+                        chat.Contract();
                         expand();
                         break;
                 }
