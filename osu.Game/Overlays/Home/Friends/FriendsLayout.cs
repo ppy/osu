@@ -217,6 +217,9 @@ namespace osu.Game.Overlays.Home.Friends
                 case UserSortCriteria.LastVisit:
                     return users.OrderBy(u => u.LastVisit).Reverse().ToList();
 
+                case UserSortCriteria.Rank:
+                    return users.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(users.Where(u => !u.CurrentModeRank.HasValue)).ToList();
+
                 case UserSortCriteria.Username:
                     return users.OrderBy(u => u.Username).ToList();
             }
