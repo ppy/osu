@@ -9,6 +9,11 @@ namespace osu.Game.Rulesets.Objects
 {
     public static class SliderEventGenerator
     {
+        /// <summary>
+        /// Sane limit for maximum ticks per slider span to reduce memory usage in rare extreme scenarios.
+        /// </summary>
+        private const int max_ticks_per_span = 1000;
+
         public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
                                                                   double? legacyLastTickOffset)
         {
@@ -112,9 +117,14 @@ namespace osu.Game.Rulesets.Objects
         private static IEnumerable<SliderEventDescriptor> generateTicks(int spanIndex, double spanStartTime, double spanDuration, bool reversed, double length, double tickDistance,
                                                                         double minDistanceFromEnd)
         {
+            int tickCount = 0;
+
             for (var d = tickDistance; d <= length; d += tickDistance)
             {
                 if (d >= length - minDistanceFromEnd)
+                    break;
+
+                if (tickCount++ >= max_ticks_per_span)
                     break;
 
                 // Always generate ticks from the start of the path rather than the span to ensure that ticks in repeat spans are positioned identically to those in non-repeat spans
