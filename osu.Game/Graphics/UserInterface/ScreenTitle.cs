@@ -36,12 +36,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected string Title
         {
-            set => titleText.Text = value;
+            set => titleText.Text = value.ToLower();
         }
 
         protected string Section
         {
-            set => pageText.Text = value;
+            set => pageText.Text = value.ToLower();
         }
 
         public Color4 AccentColour

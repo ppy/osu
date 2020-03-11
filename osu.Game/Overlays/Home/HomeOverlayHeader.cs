@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Home
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Current.BindValueChanged(current => Section = current.NewValue.GetDescription().ToLower(), true);
+                Current.BindValueChanged(current => Section = current.NewValue.GetDescription(), true);
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/rankings");

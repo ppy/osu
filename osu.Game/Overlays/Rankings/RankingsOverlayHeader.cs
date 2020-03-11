@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Rankings
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Scope.BindValueChanged(scope => Section = scope.NewValue.ToString().ToLowerInvariant(), true);
+                Scope.BindValueChanged(scope => Section = scope.NewValue.ToString(), true);
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/rankings");
