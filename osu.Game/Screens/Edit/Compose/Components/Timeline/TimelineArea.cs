@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex("111")
+                    Colour = Color4Extensions.FromHex("111")
                 },
                 new GridContainer
                 {
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = OsuColour.FromHex("222")
+                                        Colour = Color4Extensions.FromHex("222")
                                     },
                                     new FillFlowContainer
                                     {
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = OsuColour.FromHex("333")
+                                        Colour = Color4Extensions.FromHex("333")
                                     },
                                     new Container<TimelineButton>
                                     {
