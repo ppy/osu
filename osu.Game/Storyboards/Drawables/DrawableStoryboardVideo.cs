@@ -46,23 +46,17 @@ namespace osu.Game.Storyboards.Drawables
                 FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Alpha = 0
+                Alpha = 0,
+                Clock = new FramedOffsetClock(Clock) { Offset = -Video.StartTime }
             });
         }
 
         protected override void LoadComplete()
         {
-            using (videoSprite.BeginAbsoluteSequence(Video.StartTime))
-            {
-                videoSprite.Clock = new FramedOffsetClock(Clock)
-                {
-                    Offset = -Video.StartTime
-                };
-
-                videoSprite.FadeIn(500);
-            }
-
             base.LoadComplete();
+
+            using (videoSprite.BeginAbsoluteSequence(0))
+                videoSprite.FadeIn(500);
         }
     }
 }
