@@ -392,7 +392,12 @@ namespace osu.Game.Screens.Select
                 }
 
                 // Even if a ruleset mismatch was not the cause (ie. a text filter is applied),
-                // we still want to forcefully show the new beatmap, bypassing filters.
+                // we still want to temporarily show the new beatmap, bypassing filters.
+                // This will be undone the next time the user changes the filter.
+                var criteria = FilterControl.CreateCriteria();
+                criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
+                Carousel.Filter(criteria);
+
                 Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
             }
         }

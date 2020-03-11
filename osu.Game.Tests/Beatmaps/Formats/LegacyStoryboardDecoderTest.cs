@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(123456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+                Assert.AreEqual(3456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
             }
         }
     }

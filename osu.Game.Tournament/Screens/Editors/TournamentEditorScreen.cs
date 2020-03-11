@@ -40,7 +40,6 @@ namespace osu.Game.Tournament.Screens.Editors
                 new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.9f,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Child = flow = new FillFlowContainer<TDrawable>
