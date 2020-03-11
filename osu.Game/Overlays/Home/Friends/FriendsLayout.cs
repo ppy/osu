@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Home.Friends
 {
     public class FriendsLayout : CompositeDrawable
     {
-        private List<APIFriend> users;
+        private List<APIFriend> users = new List<APIFriend>();
 
         public List<APIFriend> Users
         {
@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.Home.Friends
                     return unsorted.OrderBy(u => u.LastVisit).Reverse().ToList();
 
                 case UserSortCriteria.Rank:
-                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(unsorted.Where(u => !u.CurrentModeRank.HasValue)).ToList();
+                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(unsorted.Where(u => u.CurrentModeRank == null)).ToList();
 
                 case UserSortCriteria.Username:
                     return unsorted.OrderBy(u => u.Username).ToList();
