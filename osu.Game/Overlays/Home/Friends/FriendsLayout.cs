@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Home.Friends
         private readonly Box background;
         private readonly Box controlBackground;
         private readonly FriendsOnlineStatusControl onlineStatusControl;
+        private readonly UserListToolbar userListToolbar;
         private readonly Container itemsPlaceholder;
         private readonly LoadingLayer loading;
 
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Home.Friends
                                             Horizontal = 40,
                                             Vertical = 20
                                         },
-                                        Child = new UserListToolbar
+                                        Child = userListToolbar = new UserListToolbar
                                         {
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
@@ -136,6 +137,7 @@ namespace osu.Game.Overlays.Home.Friends
             base.LoadComplete();
 
             onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
+            userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(_ => refetch(), true);
@@ -147,6 +149,7 @@ namespace osu.Game.Overlays.Home.Friends
                 loading.Show();
 
             request?.Cancel();
+            cancellationToken?.Cancel();
             onlineStatusControl.Clear();
 
             if (!api.IsLoggedIn)
@@ -156,13 +159,8 @@ namespace osu.Game.Overlays.Home.Friends
             }
 
             request = new GetFriendsRequest();
-            request.Success += onSuccess;
+            request.Success += onlineStatusControl.Populate;
             api.Queue(request);
-        }
-
-        private void onSuccess(List<User> users)
-        {
-            onlineStatusControl.Populate(users);
         }
 
         private void recreatePanels()
@@ -180,11 +178,7 @@ namespace osu.Game.Overlays.Home.Friends
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
-                Children = statefulUsers.Select(u => new SocialGridPanel(u).With(panel =>
-                {
-                    panel.Anchor = Anchor.TopCentre;
-                    panel.Origin = Anchor.TopCentre;
-                })).ToList()
+                Children = statefulUsers.Select(u => createUserPanel(u)).ToList()
             };
 
             LoadComponentAsync(table, loaded =>
@@ -194,6 +188,23 @@ namespace osu.Game.Overlays.Home.Friends
 
                 loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private SocialPanel createUserPanel(User user)
+        {
+            switch (userListToolbar.DisplayStyle.Value)
+            {
+                default:
+                case OverlayPanelDisplayStyle.Card:
+                    return new SocialGridPanel(user).With(panel =>
+                    {
+                        panel.Anchor = Anchor.TopCentre;
+                        panel.Origin = Anchor.TopCentre;
+                    });
+
+                case OverlayPanelDisplayStyle.List:
+                    return new SocialListPanel(user);
+            }
         }
     }
 }
