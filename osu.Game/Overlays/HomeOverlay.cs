@@ -75,12 +75,17 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(_ => onTabChanged());
             header.Current.BindValueChanged(_ => onTabChanged());
 
-            localUser.BindTo(api.LocalUser);
-            localUser.BindValueChanged(_ => onTabChanged(), true);
+            base.LoadComplete();
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            header.Current.TriggerChange();
         }
 
         private void onTabChanged()
