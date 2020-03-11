@@ -345,7 +345,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (validCatch)
                     updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
                 else
-                    updateState(CatcherAnimationState.Fail);
+                {
+                    if (!(fruit is Banana))
+                        updateState(CatcherAnimationState.Fail);
+                }
 
                 return validCatch;
             }
