@@ -91,10 +91,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             public TestJuiceStream(float x)
             {
                 X = x;
+
                 Path = new SliderPath(new[]
                 {
-                    new PathControlPoint(new Vector2(x, 0)),
-                    new PathControlPoint(new Vector2(x + 30, 0)),
+                    new PathControlPoint(Vector2.Zero),
+                    new PathControlPoint(new Vector2(30, 0)),
                 });
             }
         }
