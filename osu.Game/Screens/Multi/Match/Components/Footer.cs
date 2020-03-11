@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = OsuColour.FromHex(@"28242d");
+            background.Colour = Color4Extensions.FromHex(@"28242d");
         }
     }
 }
