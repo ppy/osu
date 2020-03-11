@@ -13,6 +13,7 @@ namespace osu.Game.Overlays.Home.Friends
         private readonly Box background;
         private readonly Box controlBackground;
         private readonly FriendsOnlineStatusControl onlineStatusControl;
+        private readonly Container itemsPlaceholder;
 
         public FriendsLayout()
         {
@@ -58,19 +59,34 @@ namespace osu.Game.Overlays.Home.Friends
                             {
                                 RelativeSizeAxes = Axes.Both
                             },
-                            new Container
+                            new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding
+                                Direction = FillDirection.Vertical,
+                                Margin = new MarginPadding { Bottom = 20 },
+                                Children = new Drawable[]
                                 {
-                                    Horizontal = 40,
-                                    Vertical = 20
-                                },
-                                Child = new UserListToolbar
-                                {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding
+                                        {
+                                            Horizontal = 40,
+                                            Vertical = 20
+                                        },
+                                        Child = new UserListToolbar
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                        }
+                                    },
+                                    itemsPlaceholder = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y
+                                    }
                                 }
                             }
                         }
