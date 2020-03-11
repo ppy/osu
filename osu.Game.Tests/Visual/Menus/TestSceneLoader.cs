@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Menus
                 LoadScreen(loader);
             });
 
-            AddAssert("spinner did not display", () => loader.LoadingSpinner.Alpha == 0);
+            AddAssert("spinner did not display", () => loader.LoadingSpinner?.Alpha == 0);
 
             AddUntilStep("loaded", () => loader.ScreenLoaded);
             AddUntilStep("not current", () => !loader.IsCurrentScreen());
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim();
 
-            public LoadingSpinner LoadingSpinner => this.ChildrenOfType<LoadingSpinner>().Single();
+            public LoadingSpinner LoadingSpinner => this.ChildrenOfType<LoadingSpinner>().FirstOrDefault();
             private TestScreen screen;
 
             public bool ScreenLoaded => screen.IsCurrentScreen();
