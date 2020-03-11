@@ -52,7 +52,6 @@ namespace osu.Game.Tournament.Screens.MapPool
                 {
                     Y = 100,
                     Spacing = new Vector2(10, 10),
-                    Padding = new MarginPadding(5) { Horizontal = 100 },
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -212,6 +211,7 @@ namespace osu.Game.Tournament.Screens.MapPool
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             mapFlows.Clear();
+            mapFlows.Padding = new MarginPadding(5) { Horizontal = 100 };
 
             int totalRows = 0;
 
@@ -243,7 +243,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                     if (++flowCount > 2)
                     {
                         totalRows++;
-                        flowCount = 0;
+                        flowCount = 1;
                     }
 
                     currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
