@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Menu
             textFlow.AddParagraph("一些功能可能不会像预期或最新版的那样工作", t => t.Font = t.Font.With(size: 25));
             textFlow.NewParagraph();
 
-            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold);
 
             textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Exo, 20, FontWeight.SemiBold));
             textFlow.NewParagraph();
