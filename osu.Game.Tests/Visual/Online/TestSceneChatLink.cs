@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -102,7 +103,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
 
-                Color4 textColour = isAction && hasBackground ? OsuColour.FromHex(newLine.Message.Sender.Colour) : Color4.White;
+                Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
                 var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
                 var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
