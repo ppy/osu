@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Beatmaps.Formats
 {
