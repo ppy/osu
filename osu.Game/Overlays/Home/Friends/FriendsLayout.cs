@@ -138,6 +138,7 @@ namespace osu.Game.Overlays.Home.Friends
 
             onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
+            userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
 
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(_ => refetch(), true);
@@ -170,15 +171,16 @@ namespace osu.Game.Overlays.Home.Friends
 
             cancellationToken?.Cancel();
 
-            // Use users of selected status
             var statefulUsers = onlineStatusControl.Current.Value?.Users ?? new List<User>();
+
+            var sortedUsers = sortUsers(statefulUsers);
 
             var table = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
-                Children = statefulUsers.Select(u => createUserPanel(u)).ToList()
+                Children = sortedUsers.Select(u => createUserPanel(u)).ToList()
             };
 
             LoadComponentAsync(table, loaded =>
@@ -204,6 +206,19 @@ namespace osu.Game.Overlays.Home.Friends
 
                 case OverlayPanelDisplayStyle.List:
                     return new SocialListPanel(user);
+            }
+        }
+
+        private List<User> sortUsers(List<User> users)
+        {
+            switch (userListToolbar.SortCriteria.Value)
+            {
+                default:
+                case UserSortCriteria.LastVisit:
+                    return users.OrderBy(u => u.LastVisit).Reverse().ToList();
+
+                case UserSortCriteria.Username:
+                    return users.OrderBy(u => u.Username).ToList();
             }
         }
 
