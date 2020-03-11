@@ -111,6 +111,31 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        protected override void ApplySpecialHiddenState(DrawableHitObject drawable, ArmedState state)
+        {
+            if (!(drawable is DrawableOsuHitObject d))
+                return;
+
+            var h = d.HitObject;
+            getFadeTimes(h);
+
+            switch (drawable)
+            {
+                case DrawableHitCircle circle:
+                    //keep the approach circle visible, only fade out circlepiece
+                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
+                        circle.CirclePiece.FadeOut(fadeOutDuration);
+
+                    break;
+
+                case DrawableSlider slider:
+                    using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
+                        slider.Body.FadeOut(longFadeDuration, Easing.Out);
+
+                    break;
+            }
+        }
+
         private int checkForSpinners(IEnumerable<DrawableHitObject> drawables)
         {
             int startingSpinnersCount = 0;
