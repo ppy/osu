@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(FriendsLayout),
         };
 
+        protected override bool UseOnlineAPI => true;
+
         private readonly HomeOverlay overlay;
 
         public TestSceneHomeOverlay()
