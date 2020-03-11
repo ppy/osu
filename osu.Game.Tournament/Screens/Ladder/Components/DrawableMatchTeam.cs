@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -85,8 +86,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             this.ladderEditor = ladderEditor;
 
             colourWinner = losers
-                ? OsuColour.FromHex("#8E7F48")
-                : OsuColour.FromHex("#1462AA");
+                ? Color4Extensions.FromHex("#8E7F48")
+                : Color4Extensions.FromHex("#1462AA");
 
             InternalChildren = new Drawable[]
             {
@@ -180,8 +181,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             bool winner = completed.Value && isWinner?.Invoke() == true;
 
-            background.FadeColour(winner ? Color4.White : OsuColour.FromHex("#444"), winner ? 500 : 0, Easing.OutQuint);
-            backgroundRight.FadeColour(winner ? colourWinner : OsuColour.FromHex("#333"), winner ? 500 : 0, Easing.OutQuint);
+            background.FadeColour(winner ? Color4.White : Color4Extensions.FromHex("#444"), winner ? 500 : 0, Easing.OutQuint);
+            backgroundRight.FadeColour(winner ? colourWinner : Color4Extensions.FromHex("#333"), winner ? 500 : 0, Easing.OutQuint);
 
             AcronymText.Colour = winner ? Color4.Black : Color4.White;
 

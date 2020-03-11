@@ -32,8 +32,8 @@ namespace osu.Game.Tournament.Screens.Ladder
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Storage storage)
         {
-            normalPathColour = OsuColour.FromHex("#66D1FF");
-            losersPathColour = OsuColour.FromHex("#FFC700");
+            normalPathColour = Color4Extensions.FromHex("#66D1FF");
+            losersPathColour = Color4Extensions.FromHex("#FFC700");
 
             RelativeSizeAxes = Axes.Both;
 

@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Chat
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Radius = 1,
-                            Colour = OsuColour.FromHex(message.Sender.Colour),
+                            Colour = Color4Extensions.FromHex(message.Sender.Colour),
                             Type = EdgeEffectType.Shadow,
                         },
                         Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 },
@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Chat
                                 t.Font = OsuFont.GetFont(italics: true);
 
                                 if (senderHasBackground)
-                                    t.Colour = OsuColour.FromHex(message.Sender.Colour);
+                                    t.Colour = Color4Extensions.FromHex(message.Sender.Colour);
                             }
 
                             t.Font = t.Font.With(size: TextSize);
@@ -249,41 +249,41 @@ namespace osu.Game.Overlays.Chat
 
         private static readonly Color4[] username_colours =
         {
-            OsuColour.FromHex("588c7e"),
-            OsuColour.FromHex("b2a367"),
-            OsuColour.FromHex("c98f65"),
-            OsuColour.FromHex("bc5151"),
-            OsuColour.FromHex("5c8bd6"),
-            OsuColour.FromHex("7f6ab7"),
-            OsuColour.FromHex("a368ad"),
-            OsuColour.FromHex("aa6880"),
+            Color4Extensions.FromHex("588c7e"),
+            Color4Extensions.FromHex("b2a367"),
+            Color4Extensions.FromHex("c98f65"),
+            Color4Extensions.FromHex("bc5151"),
+            Color4Extensions.FromHex("5c8bd6"),
+            Color4Extensions.FromHex("7f6ab7"),
+            Color4Extensions.FromHex("a368ad"),
+            Color4Extensions.FromHex("aa6880"),
 
-            OsuColour.FromHex("6fad9b"),
-            OsuColour.FromHex("f2e394"),
-            OsuColour.FromHex("f2ae72"),
-            OsuColour.FromHex("f98f8a"),
-            OsuColour.FromHex("7daef4"),
-            OsuColour.FromHex("a691f2"),
-            OsuColour.FromHex("c894d3"),
-            OsuColour.FromHex("d895b0"),
+            Color4Extensions.FromHex("6fad9b"),
+            Color4Extensions.FromHex("f2e394"),
+            Color4Extensions.FromHex("f2ae72"),
+            Color4Extensions.FromHex("f98f8a"),
+            Color4Extensions.FromHex("7daef4"),
+            Color4Extensions.FromHex("a691f2"),
+            Color4Extensions.FromHex("c894d3"),
+            Color4Extensions.FromHex("d895b0"),
 
-            OsuColour.FromHex("53c4a1"),
-            OsuColour.FromHex("eace5c"),
-            OsuColour.FromHex("ea8c47"),
-            OsuColour.FromHex("fc4f4f"),
-            OsuColour.FromHex("3d94ea"),
-            OsuColour.FromHex("7760ea"),
-            OsuColour.FromHex("af52c6"),
-            OsuColour.FromHex("e25696"),
+            Color4Extensions.FromHex("53c4a1"),
+            Color4Extensions.FromHex("eace5c"),
+            Color4Extensions.FromHex("ea8c47"),
+            Color4Extensions.FromHex("fc4f4f"),
+            Color4Extensions.FromHex("3d94ea"),
+            Color4Extensions.FromHex("7760ea"),
+            Color4Extensions.FromHex("af52c6"),
+            Color4Extensions.FromHex("e25696"),
 
-            OsuColour.FromHex("677c66"),
-            OsuColour.FromHex("9b8732"),
-            OsuColour.FromHex("8c5129"),
-            OsuColour.FromHex("8c3030"),
-            OsuColour.FromHex("1f5d91"),
-            OsuColour.FromHex("4335a5"),
-            OsuColour.FromHex("812a96"),
-            OsuColour.FromHex("992861"),
+            Color4Extensions.FromHex("677c66"),
+            Color4Extensions.FromHex("9b8732"),
+            Color4Extensions.FromHex("8c5129"),
+            Color4Extensions.FromHex("8c3030"),
+            Color4Extensions.FromHex("1f5d91"),
+            Color4Extensions.FromHex("4335a5"),
+            Color4Extensions.FromHex("812a96"),
+            Color4Extensions.FromHex("992861"),
         };
     }
 }
