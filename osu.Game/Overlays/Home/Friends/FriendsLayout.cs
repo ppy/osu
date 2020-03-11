@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Home.Friends
     public class FriendsLayout : CompositeDrawable
     {
         private readonly Box background;
+        private readonly Box controlBackground;
+        private readonly FriendsOnlineStatusControl onlineStatusControl;
 
         public FriendsLayout()
         {
@@ -22,6 +24,29 @@ namespace osu.Game.Overlays.Home.Friends
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            controlBackground = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding
+                                {
+                                    Vertical = 20,
+                                    Horizontal = 45
+                                },
+                                Child = onlineStatusControl = new FriendsOnlineStatusControl(),
+                            }
+                        }
+                    },
                     new Container
                     {
                         Name = "User List",
@@ -58,6 +83,7 @@ namespace osu.Game.Overlays.Home.Friends
         private void load(OverlayColourProvider colourProvider)
         {
             background.Colour = colourProvider.Background4;
+            controlBackground.Colour = colourProvider.Background5;
         }
     }
 }
