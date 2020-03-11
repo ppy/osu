@@ -14,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 
@@ -116,14 +115,6 @@ namespace osu.Game.Screens.Play
             // this is not available as an option in the live editor but can still be applied via .osu editing.
             if (beatmap.BeatmapInfo.AudioLeadIn > 0)
                 startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
-
-            // some beatmaps have no AudioLeadIn but the video starts before the first object
-            var videoLayer = beatmap.Storyboard.GetLayer(LegacyStoryLayer.Video);
-
-            var videoOffset = videoLayer.Elements.SingleOrDefault()?.StartTime;
-
-            if (videoOffset != null)
-                startTime = Math.Min(startTime, videoOffset.GetValueOrDefault());
 
             Seek(startTime);
 

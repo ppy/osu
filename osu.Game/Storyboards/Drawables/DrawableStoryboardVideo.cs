@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -18,10 +17,6 @@ namespace osu.Game.Storyboards.Drawables
     {
         public readonly StoryboardVideo Video;
         private VideoSprite videoSprite;
-        private ManualClock videoClock;
-        private GameplayClock clock;
-
-        private bool videoStarted;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -33,13 +28,8 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock, IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            if (clock == null)
-                return;
-
-            this.clock = clock;
-
             var path = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             if (path == null)
@@ -56,29 +46,23 @@ namespace osu.Game.Storyboards.Drawables
                 FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AlwaysPresent = true,
                 Alpha = 0
             });
-
-            videoClock = new ManualClock();
-            videoSprite.Clock = new FramedClock(videoClock);
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            if (clock != null && clock.CurrentTime > Video.StartTime)
+            using (videoSprite.BeginAbsoluteSequence(Video.StartTime))
             {
-                if (!videoStarted)
+                videoSprite.Clock = new FramedOffsetClock(Clock)
                 {
-                    videoSprite.FadeIn(500);
-                    videoStarted = true;
-                }
+                    Offset = -Video.StartTime
+                };
 
-                // handle seeking before the video starts (break skipping, replay seek)
-                videoClock.CurrentTime = clock.CurrentTime - Video.StartTime;
+                videoSprite.FadeIn(500);
             }
 
-            base.Update();
+            base.LoadComplete();
         }
     }
 }
