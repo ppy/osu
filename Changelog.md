@@ -37,3 +37,9 @@
     *   [m] [Fix osu! shaking instead of missing for early hits #8197]
 *   **添加了"关于Mf-osu"界面**
 *   **实现了实时显示系统时间的功能**
+
+### 2020/03/11:
+*   整合更新
+    *   [m] [Fix crashes on some storyboards #8195]
+    *   [m] [Fix perfect mod incorrectly failing in some scenarios #8084]
+    *   [m] [Hide pp display on leaderboards if map is qualified or loved #7971]
