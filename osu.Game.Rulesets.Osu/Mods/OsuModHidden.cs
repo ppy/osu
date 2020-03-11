@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
+        private double fadeOutStartTime, fadeOutDuration, longFadeDuration;
+
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             static void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
@@ -43,12 +45,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             var h = d.HitObject;
-
-            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
-            var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
-
-            // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = h.GetEndTime() - fadeOutStartTime;
+            getFadeTimes(h);
 
             switch (drawable)
             {
@@ -89,6 +86,30 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     break;
             }
+        }
+
+        private int checkForSpinners(IEnumerable<DrawableHitObject> drawables)
+        {
+            int startingSpinnersCount = 0;
+
+            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            {
+                if (d is DrawableSpinner)
+                    ++startingSpinnersCount;
+                else
+                    return startingSpinnersCount;
+            }
+
+            return startingSpinnersCount;
+        }
+
+        private void getFadeTimes(OsuHitObject h)
+        {
+            fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
+            fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
+
+            // new duration from completed fade in to end (before fading out)
+            longFadeDuration = h.GetEndTime() - fadeOutStartTime;
         }
     }
 }
