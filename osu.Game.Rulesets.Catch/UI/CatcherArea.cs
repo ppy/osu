@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
@@ -148,28 +149,62 @@ namespace osu.Game.Rulesets.Catch.UI
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new[]
+                Children = new Drawable[]
                 {
                     caughtFruit = new Container<DrawableHitObject>
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
                     },
+                    catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Alpha = 0,
+                    },
+                    catcherKiai = new CatcherSprite(CatcherAnimationState.Kiai)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Alpha = 0,
+                    },
+                    catcherFail = new CatcherSprite(CatcherAnimationState.Fail)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Alpha = 0,
+                    }
                 };
 
                 updateCatcher();
             }
 
-            private Drawable catcherSprite;
+            private CatcherSprite catcherIdle;
+            private CatcherSprite catcherKiai;
+            private CatcherSprite catcherFail;
 
             private void updateCatcher()
             {
-                catcherSprite?.Expire();
+                catcherIdle.Hide();
+                catcherKiai.Hide();
+                catcherFail.Hide();
 
-                Add(catcherSprite = createCatcherSprite().With(c =>
+                CatcherSprite current;
+
+                switch (currentState)
                 {
-                    c.Anchor = Anchor.TopCentre;
-                }));
+                    default:
+                        current = catcherIdle;
+                        break;
+
+                    case CatcherAnimationState.Fail:
+                        current = catcherFail;
+                        break;
+
+                    case CatcherAnimationState.Kiai:
+                        current = catcherKiai;
+                        break;
+                }
+
+                current.Show();
+                (current.Drawable as IAnimation)?.GotoFrame(0);
             }
 
             private int currentDirection;
