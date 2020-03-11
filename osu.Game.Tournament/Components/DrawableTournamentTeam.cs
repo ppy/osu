@@ -23,14 +23,11 @@ namespace osu.Game.Tournament.Components
         [UsedImplicitly]
         private Bindable<string> acronym;
 
-        [UsedImplicitly]
-        private Bindable<string> flag;
-
         protected DrawableTournamentTeam(TournamentTeam team)
         {
             Team = team;
 
-            Flag = new Sprite
+            Flag = new DrawableTeamFlag(team)
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit
@@ -48,7 +45,6 @@ namespace osu.Game.Tournament.Components
             if (Team == null) return;
 
             (acronym = Team.Acronym.GetBoundCopy()).BindValueChanged(acronym => AcronymText.Text = Team?.Acronym.Value?.ToUpperInvariant() ?? string.Empty, true);
-            (flag = Team.FlagName.GetBoundCopy()).BindValueChanged(acronym => Flag.Texture = textures.Get($@"Flags/{Team.FlagName}"), true);
         }
     }
 }

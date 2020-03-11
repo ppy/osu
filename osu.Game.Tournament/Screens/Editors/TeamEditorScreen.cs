@@ -172,19 +172,6 @@ namespace osu.Game.Tournament.Screens.Editors
                 drawableContainer.Child = new DrawableTeamFlag(Model);
             }
 
-            private class DrawableTeamFlag : DrawableTournamentTeam
-            {
-                public DrawableTeamFlag(TournamentTeam team)
-                    : base(team)
-                {
-                    InternalChild = Flag;
-                    RelativeSizeAxes = Axes.Both;
-
-                    Flag.Anchor = Anchor.Centre;
-                    Flag.Origin = Anchor.Centre;
-                }
-            }
-
             public class PlayerEditor : CompositeDrawable
             {
                 private readonly TournamentTeam team;
