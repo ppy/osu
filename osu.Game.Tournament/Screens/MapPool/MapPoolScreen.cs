@@ -42,6 +42,11 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             InternalChildren = new Drawable[]
             {
+                new TourneyVideo("gameplay")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new MatchHeader(),
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
