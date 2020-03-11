@@ -69,9 +69,6 @@ namespace osu.Game.Users
         [JsonProperty(@"support_level")]
         public int SupportLevel;
 
-        [JsonProperty(@"current_mode_rank")]
-        public int? CurrentModeRank;
-
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 

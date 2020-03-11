@@ -10,6 +10,7 @@ using osu.Game.Users;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using NUnit.Framework;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -43,9 +44,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Populate", () => layout.Users = getUsers());
         }
 
-        private List<User> getUsers() => new List<User>
+        private List<APIFriend> getUsers() => new List<APIFriend>
         {
-            new User
+            new APIFriend
             {
                 Username = @"flyte",
                 Id = 3103765,
@@ -54,7 +55,7 @@ namespace osu.Game.Tests.Visual.Online
                 Country = new Country { FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             },
-            new User
+            new APIFriend
             {
                 Username = @"peppy",
                 Id = 2,
@@ -65,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsSupporter = true,
                 SupportLevel = 3,
             },
-            new User
+            new APIFriend
             {
                 Username = @"Evast",
                 Id = 8195163,

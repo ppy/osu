@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osuTK;
@@ -20,9 +21,9 @@ namespace osu.Game.Overlays.Home.Friends
 {
     public class FriendsLayout : CompositeDrawable
     {
-        private List<User> users;
+        private List<APIFriend> users;
 
-        public List<User> Users
+        public List<APIFriend> Users
         {
             get => users;
             set
@@ -184,7 +185,7 @@ namespace osu.Game.Overlays.Home.Friends
 
             cancellationToken?.Cancel();
 
-            var statefulUsers = onlineStatusControl.Current.Value?.Users ?? new List<User>();
+            var statefulUsers = onlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
 
             var sortedUsers = sortUsers(statefulUsers);
 
@@ -232,7 +233,7 @@ namespace osu.Game.Overlays.Home.Friends
             }
         }
 
-        private List<User> sortUsers(List<User> unsorted)
+        private List<APIFriend> sortUsers(List<APIFriend> unsorted)
         {
             switch (userListToolbar.SortCriteria.Value)
             {
