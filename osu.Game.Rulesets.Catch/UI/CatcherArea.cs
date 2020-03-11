@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 CatcherSprite current;
 
-                switch (currentState)
+                switch (CurrentState)
                 {
                     default:
                         current = catcherIdle;
@@ -274,7 +274,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 return additive;
             }
 
-            private Drawable createCatcherSprite() => new CatcherSprite(currentState);
+            private Drawable createCatcherSprite() => new CatcherSprite(CurrentState);
 
             /// <summary>
             /// Add a caught fruit to the catcher's stack.
@@ -355,14 +355,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private void updateState(CatcherAnimationState state)
             {
-                if (currentState == state)
+                if (CurrentState == state)
                     return;
 
-                currentState = state;
+                CurrentState = state;
                 updateCatcher();
             }
 
-            private CatcherAnimationState currentState;
+            public CatcherAnimationState CurrentState;
 
             private double hyperDashModifier = 1;
             private int hyperDashDirection;
