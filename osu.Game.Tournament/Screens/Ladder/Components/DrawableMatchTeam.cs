@@ -199,8 +199,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 return new MenuItem[]
                 {
                     new OsuMenuItem("设为当前", MenuItemType.Standard, setCurrent),
-                    new OsuMenuItem("Join with", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, false)),
-                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, true)),
+                    new OsuMenuItem("设置晋级回合", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, false)),
+                    new OsuMenuItem("设置晋级回合 (输者)", MenuItemType.Standard, () => ladderEditor.BeginJoin(match, true)),
                     new OsuMenuItem("移除", MenuItemType.Destructive, () => ladderEditor.Remove(match)),
                 };
             }

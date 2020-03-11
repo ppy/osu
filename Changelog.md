@@ -56,3 +56,15 @@
     *   [m] [Add catcher kiai/fail animation states #8198]
     *   [m] [Add random rotation and scale factors to osu!catch bananas #8199]
     *   [m] [Implement 2020 intro screen design #8180]
+
+### 2020/03/12:
+*   一些有关比赛端的小更新:
+    *   [将`Bracket`翻译为`晋级榜图`,取消了原随机分队(seeding)的翻译](osu.Game.Tournament/TournamentSceneManager.cs)
+        *   目前还不知道seeding到底是用来干啥的，就暂时取消掉了
+    *   补全界面中的翻译
+        *   [osu.Game.Tournament/Screens/Ladder/Components/DrawableMatchTeam.cs](osu.Game.Tournament/Screens/Ladder/Components/DrawableMatchTeam.cs)
+        *   [osu.Game.Tournament/Screens/Ladder/Components/DrawableTournamentRound.cs](osu.Game.Tournament/Screens/Ladder/Components/DrawableTournamentRound.cs)
+        *   [osu.Game.Tournament/Screens/Ladder/Components/LadderEditorSettings.cs](osu.Game.Tournament/Screens/Ladder/Components/LadderEditorSettings.cs)
+    *   优化界面中的翻译
+        *   [osu.Game.Tournament/Screens/Schedule/ScheduleScreen.cs](osu.Game.Tournament/Screens/Schedule/ScheduleScreen.cs)
+        *   [osu.Game.Tournament/Screens/TeamIntro/SeedingScreen.cs](osu.Game.Tournament/Screens/TeamIntro/SeedingScreen.cs)

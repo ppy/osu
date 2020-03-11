@@ -194,13 +194,18 @@ namespace osu.Game.Tournament.Screens.Schedule
                                         {
                                             new TournamentSpriteText
                                             {
-                                                Text = "开始于 ",
+                                                Text = "将在",
                                                 Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
                                             },
                                             new DrawableDate(match.NewValue.Date.Value)
                                             {
                                                 Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
-                                            }
+                                            },
+                                            new TournamentSpriteText
+                                            {
+                                                Text = "开始",
+                                                Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
+                                            },
                                         }
                                     },
                                 }
