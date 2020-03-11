@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("content is not dimmed", () => con.Colour == Color4.White);
             AddAssert("loading animation is not visible", () => !view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
             AddStep("click overlay", () => InputManager.Click(osuTK.Input.MouseButton.Left));
-            AddAssert("input is blocked", () => buttonClicked);
+            AddAssert("input is not blocked", () => buttonClicked);
         }
     }
 }
