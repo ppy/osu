@@ -76,7 +76,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                         },
                         box = new Box
                         {
-                            Colour = OsuColour.FromHex("#FFE8AD"),
+                            Colour = Color4Extensions.FromHex("#FFE8AD"),
                             RelativeSizeAxes = Axes.Both,
                         },
                     };
@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = OsuColour.FromHex("#FFE8AD").Opacity(0.1f),
+                        Colour = Color4Extensions.FromHex("#FFE8AD").Opacity(0.1f),
                         Hollow = true,
                         Radius = 20,
                         Roundness = 10,

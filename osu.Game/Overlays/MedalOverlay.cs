@@ -126,14 +126,14 @@ namespace osu.Game.Overlays
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"05262f"),
+                                Colour = Color4Extensions.FromHex(@"05262f"),
                             },
                             new Triangles
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 TriangleScale = 2,
-                                ColourDark = OsuColour.FromHex(@"04222b"),
-                                ColourLight = OsuColour.FromHex(@"052933"),
+                                ColourDark = Color4Extensions.FromHex(@"04222b"),
+                                ColourLight = Color4Extensions.FromHex(@"052933"),
                             },
                             innerSpin = new Sprite
                             {
