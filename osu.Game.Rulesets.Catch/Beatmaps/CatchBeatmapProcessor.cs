@@ -112,7 +112,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
 
             float positionDiff = offsetPosition - lastPosition.Value;
-            double timeDiff = startTime - lastStartTime;
+
+            // Todo: BUG!! Stable calculated time deltas as ints, which affects randomisation. This should be changed to a double.
+            int timeDiff = (int)(startTime - lastStartTime);
 
             if (timeDiff > 1000)
             {
@@ -128,7 +130,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 return;
             }
 
-            if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3d)
+            // ReSharper disable once PossibleLossOfFraction
+            if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3)
                 applyOffset(ref offsetPosition, positionDiff);
 
             hitObject.XOffset = offsetPosition - hitObject.X;
