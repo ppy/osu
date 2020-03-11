@@ -13,7 +13,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardVideo : Container
+    public class DrawableStoryboardVideo : CompositeDrawable
     {
         public readonly StoryboardVideo Video;
         private VideoSprite videoSprite;
@@ -40,7 +40,7 @@ namespace osu.Game.Storyboards.Drawables
             if (stream == null)
                 return;
 
-            AddInternal(videoSprite = new VideoSprite(stream)
+            InternalChild = videoSprite = new VideoSprite(stream, false)
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fill,
@@ -48,7 +48,7 @@ namespace osu.Game.Storyboards.Drawables
                 Origin = Anchor.Centre,
                 Alpha = 0,
                 Clock = new FramedOffsetClock(Clock) { Offset = -Video.StartTime }
-            });
+            };
         }
 
         protected override void LoadComplete()
