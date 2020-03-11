@@ -9,6 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -180,31 +182,29 @@ namespace osu.Game.Rulesets.Catch.UI
             private CatcherSprite catcherKiai;
             private CatcherSprite catcherFail;
 
+            private CatcherSprite currentCatcher;
+
             private void updateCatcher()
             {
-                catcherIdle.Hide();
-                catcherKiai.Hide();
-                catcherFail.Hide();
-
-                CatcherSprite current;
+                currentCatcher?.Hide();
 
                 switch (currentState)
                 {
                     default:
-                        current = catcherIdle;
+                        currentCatcher = catcherIdle;
                         break;
 
                     case CatcherAnimationState.Fail:
-                        current = catcherFail;
+                        currentCatcher = catcherFail;
                         break;
 
                     case CatcherAnimationState.Kiai:
-                        current = catcherKiai;
+                        currentCatcher = catcherKiai;
                         break;
                 }
 
-                current.Show();
-                (current.Drawable as IAnimation)?.GotoFrame(0);
+                currentCatcher.Show();
+                (currentCatcher.Drawable as IAnimation)?.GotoFrame(0);
             }
 
             private int currentDirection;
@@ -227,14 +227,14 @@ namespace osu.Game.Rulesets.Catch.UI
             private bool trail;
 
             /// <summary>
-            /// Activate or deactive the trail. Will be automatically deactivated when conditions to keep the trail displayed are no longer met.
+            /// Activate or deactivate the trail. Will be automatically deactivated when conditions to keep the trail displayed are no longer met.
             /// </summary>
             protected bool Trail
             {
                 get => trail;
                 set
                 {
-                    if (value == trail) return;
+                    if (value == trail || AdditiveTarget == null) return;
 
                     trail = value;
 
@@ -245,21 +245,25 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private void beginTrail()
             {
-                Trail &= dashing || HyperDashing;
-                Trail &= AdditiveTarget != null;
+                if (!dashing && !HyperDashing)
+                {
+                    Trail = false;
+                    return;
+                }
 
-                if (!Trail) return;
+                Texture tex = (currentCatcher.Drawable as TextureAnimation)?.CurrentFrame ?? ((Sprite)currentCatcher.Drawable).Texture;
 
-                var additive = createCatcherSprite();
+                var additive = new CatcherTrailSprite(tex)
+                {
+                    Anchor = Anchor,
+                    Scale = Scale,
+                    Colour = HyperDashing ? Color4.Red : Color4.White,
+                    Blending = BlendingParameters.Additive,
+                    RelativePositionAxes = RelativePositionAxes,
+                    Position = Position
+                };
 
-                additive.Anchor = Anchor;
-                additive.Scale = Scale;
-                additive.Colour = HyperDashing ? Color4.Red : Color4.White;
-                additive.Blending = BlendingParameters.Additive;
-                additive.RelativePositionAxes = RelativePositionAxes;
-                additive.Position = Position;
-
-                AdditiveTarget.Add(additive);
+                AdditiveTarget?.Add(additive);
 
                 additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
                 additive.Expire(true);
