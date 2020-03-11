@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
             typeof(OnScreenDisplay),
             typeof(NotificationOverlay),
             typeof(DirectOverlay),
-            typeof(SocialOverlay),
+            typeof(HomeOverlay),
             typeof(ChannelManager),
             typeof(ChatOverlay),
             typeof(SettingsOverlay),
