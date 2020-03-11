@@ -67,7 +67,7 @@ namespace osu.Game
 
         private DirectOverlay direct;
 
-        private SocialOverlay social;
+        private HomeOverlay social;
 
         private UserProfileOverlay userProfile;
 
@@ -604,7 +604,7 @@ namespace osu.Game
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(social = new HomeOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);

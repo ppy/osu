@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
-using System.ComponentModel;
 using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays.Home
@@ -37,13 +36,6 @@ namespace osu.Game.Overlays.Home
 
     public enum HomeOverlayTabs
     {
-        Dashboard,
-        Friends,
-
-        [Description(@"Forum Subscriptions")]
-        Forum,
-
-        [Description(@"Modding Watchlist")]
-        Modding
+        Friends
     }
 }

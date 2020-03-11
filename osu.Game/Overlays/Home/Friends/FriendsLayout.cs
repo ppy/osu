@@ -168,10 +168,7 @@ namespace osu.Game.Overlays.Home.Friends
             cancellationToken?.Cancel();
 
             if (!api.IsLoggedIn)
-            {
-                itemsPlaceholder.Clear();
                 return;
-            }
 
             request = new GetFriendsRequest();
             request.Success += response => Schedule(() => Users = response);
