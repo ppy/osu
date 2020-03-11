@@ -161,7 +161,8 @@ namespace osu.Game.Overlays.Home.Friends
 
         private void refetch()
         {
-            if (itemsPlaceholder.Any())
+            // If user is offline - will be used HomeOverlay loading
+            if (itemsPlaceholder.Any() && api.IsLoggedIn)
                 loading.Show();
 
             request?.Cancel();

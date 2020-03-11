@@ -8,13 +8,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Home;
 using osu.Game.Overlays.Home.Friends;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
     public class HomeOverlay : FullscreenOverlay
     {
+        private readonly Bindable<User> localUser = new Bindable<User>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private CancellationTokenSource cancellationToken;
 
         private readonly Box background;
@@ -70,15 +77,22 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            header.Current.BindValueChanged(onTabChanged, true);
+            header.Current.BindValueChanged(_ => onTabChanged());
+
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(_ => onTabChanged(), true);
         }
 
-        private void onTabChanged(ValueChangedEvent<HomeOverlayTabs> tab)
+        private void onTabChanged()
         {
             loading.Show();
             cancellationToken?.Cancel();
 
-            switch (tab.NewValue)
+            // We may want to use OnlineViewContainer after https://github.com/ppy/osu/pull/8044 merge
+            if (!api.IsLoggedIn)
+                return;
+
+            switch (header.Current.Value)
             {
                 default:
                     loadLayout(null);
