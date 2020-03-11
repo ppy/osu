@@ -58,5 +58,9 @@ namespace osu.Game.Rulesets.Mods
         protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
         {
         }
+
+        protected virtual void ApplySpecialHiddenState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
     }
 }
