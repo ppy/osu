@@ -9,7 +9,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -18,6 +17,7 @@ using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
@@ -27,9 +27,9 @@ namespace osu.Game.Overlays
         private readonly LoadingSpinner loading;
         private FillFlowContainer<SocialPanel> panels;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"60284b");
-        protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"672b51");
-        protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"60284b");
+        protected override Color4 TrianglesColourLight => Color4Extensions.FromHex(@"672b51");
+        protected override Color4 TrianglesColourDark => Color4Extensions.FromHex(@"5c2648");
 
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
