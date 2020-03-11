@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Social;
@@ -31,6 +32,7 @@ namespace osu.Game.Overlays.Home.Friends
         private readonly Box controlBackground;
         private readonly FriendsOnlineStatusControl onlineStatusControl;
         private readonly Container itemsPlaceholder;
+        private readonly LoadingLayer loading;
 
         public FriendsLayout()
         {
@@ -99,11 +101,20 @@ namespace osu.Game.Overlays.Home.Friends
                                             Origin = Anchor.CentreRight,
                                         }
                                     },
-                                    itemsPlaceholder = new Container
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding { Horizontal = 50 }
+                                        Children = new Drawable[]
+                                        {
+                                            itemsPlaceholder = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Padding = new MarginPadding { Horizontal = 50 }
+                                            },
+                                            loading = new LoadingLayer(itemsPlaceholder)
+                                        }
                                     }
                                 }
                             }
@@ -124,13 +135,26 @@ namespace osu.Game.Overlays.Home.Friends
         {
             base.LoadComplete();
 
+            onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
+
             localUser.BindTo(api.LocalUser);
             localUser.BindValueChanged(_ => refetch(), true);
         }
 
         private void refetch()
         {
+            if (itemsPlaceholder.Any())
+                loading.Show();
+
             request?.Cancel();
+            onlineStatusControl.Clear();
+
+            if (!api.IsLoggedIn)
+            {
+                itemsPlaceholder.Clear();
+                return;
+            }
+
             request = new GetFriendsRequest();
             request.Success += onSuccess;
             api.Queue(request);
@@ -138,22 +162,25 @@ namespace osu.Game.Overlays.Home.Friends
 
         private void onSuccess(List<User> users)
         {
-            onlineStatusControl.Clear();
             onlineStatusControl.Populate(users);
-
-            recreatePanels(users);
         }
 
-        private void recreatePanels(List<User> users)
+        private void recreatePanels()
         {
+            if (itemsPlaceholder.Any())
+                loading.Show();
+
             cancellationToken?.Cancel();
+
+            // Use users of selected status
+            var statefulUsers = onlineStatusControl.Current.Value?.Users ?? new List<User>();
 
             var table = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
-                Children = users.Select(u => new SocialGridPanel(u).With(panel =>
+                Children = statefulUsers.Select(u => new SocialGridPanel(u).With(panel =>
                 {
                     panel.Anchor = Anchor.TopCentre;
                     panel.Origin = Anchor.TopCentre;
@@ -164,6 +191,8 @@ namespace osu.Game.Overlays.Home.Friends
             {
                 itemsPlaceholder.Clear();
                 itemsPlaceholder.Add(loaded);
+
+                loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
     }

@@ -1,18 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using osu.Game.Users;
+
 namespace osu.Game.Overlays.Home.Friends
 {
     public class FriendsBundle
     {
         public FriendsOnlineStatus Status { get; }
 
-        public int Count { get; }
+        public int Count => Users.Count;
 
-        public FriendsBundle(FriendsOnlineStatus status, int count)
+        public List<User> Users { get; }
+
+        public FriendsBundle(FriendsOnlineStatus status, List<User> users)
         {
             Status = status;
-            Count = count;
+            Users = users;
         }
     }
 
