@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
-        public double Velocity;
-        public double TickDistance;
+        public double Velocity { get; private set; }
+        public double TickDistance { get; private set; }
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.CreateNestedHitObjects();
 
-            var tickSamples = Samples.Select(s => new HitSampleInfo
+            var dropletSamples = Samples.Select(s => new HitSampleInfo
             {
                 Bank = s.Bank,
                 Name = @"slidertick",
@@ -75,7 +75,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             AddNested(new TinyDroplet
                             {
-                                Samples = tickSamples,
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
                                     lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
@@ -93,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     case SliderEventType.Tick:
                         AddNested(new Droplet
                         {
-                            Samples = tickSamples,
+                            Samples = dropletSamples,
                             StartTime = e.Time,
                             X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
                         });

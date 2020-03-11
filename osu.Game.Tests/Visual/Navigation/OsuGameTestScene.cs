@@ -62,20 +62,25 @@ namespace osu.Game.Tests.Visual.Navigation
                 var frameworkConfig = host.Dependencies.Get<FrameworkConfigManager>();
                 frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).Disabled = false;
 
-                Game = new TestOsuGame(LocalStorage, API);
-                Game.SetHost(host);
-
-                // todo: this can be removed once we can run audio tracks without a device present
-                // see https://github.com/ppy/osu/issues/1302
-                Game.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
-
-                Add(Game);
+                CreateGame();
             });
 
             AddUntilStep("Wait for load", () => Game.IsLoaded);
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
 
             ConfirmAtMainMenu();
+        }
+
+        protected void CreateGame()
+        {
+            Game = new TestOsuGame(LocalStorage, API);
+            Game.SetHost(host);
+
+            // todo: this can be removed once we can run audio tracks without a device present
+            // see https://github.com/ppy/osu/issues/1302
+            Game.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
+
+            Add(Game);
         }
 
         protected void PushAndConfirm(Func<Screen> newScreen)
@@ -97,11 +102,16 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new SettingsPanel Settings => base.Settings;
 
+            public new MusicController MusicController => base.MusicController;
+
             public new OsuConfigManager LocalConfig => base.LocalConfig;
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
+            public override string Version => "test game";
 
             protected override Loader CreateLoader() => new TestLoader();
 

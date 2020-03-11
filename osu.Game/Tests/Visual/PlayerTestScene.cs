@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -8,15 +9,19 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class PlayerTestScene : RateAdjustedBeatmapTestScene
     {
+        /// <summary>
+        /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
+        /// </summary>
+        protected virtual bool HasCustomSteps { get; } = false;
+
         private readonly Ruleset ruleset;
 
-        protected Player Player;
+        protected TestPlayer Player;
 
         protected PlayerTestScene(Ruleset ruleset)
         {
@@ -37,7 +42,18 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
-            AddStep(ruleset.RulesetInfo.Name, loadPlayer);
+            if (!HasCustomSteps)
+                CreateTest(null);
+        }
+
+        protected void CreateTest(Action action)
+        {
+            if (action != null && !HasCustomSteps)
+                throw new InvalidOperationException($"Cannot add custom test steps without {nameof(HasCustomSteps)} being set.");
+
+            action?.Invoke();
+
+            AddStep(ruleset.RulesetInfo.Name, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -45,11 +61,14 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
-        private void loadPlayer()
+        protected void LoadPlayer()
         {
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
+            Ruleset.Value = ruleset.RulesetInfo;
+
+            SelectedMods.Value = Array.Empty<Mod>();
 
             if (!AllowFail)
             {
@@ -69,6 +88,6 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
+        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }

@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
-        public void RecycleLocalStorage()
+        public virtual void RecycleLocalStorage()
         {
             if (localStorage?.IsValueCreated == true)
             {
@@ -231,14 +231,7 @@ namespace osu.Game.Tests.Visual
             {
                 private readonly IFrameBasedClock referenceClock;
 
-                private readonly ManualClock clock = new ManualClock();
-
                 private bool running;
-
-                /// <summary>
-                /// Local offset added to the reference clock to resolve correct time.
-                /// </summary>
-                private double offset;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock)
                 {
@@ -248,10 +241,10 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = Math.Clamp(seek, 0, Length);
+                    accumulated = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
-                    return offset == seek;
+                    return accumulated == seek;
                 }
 
                 public override void Start()
@@ -270,9 +263,6 @@ namespace osu.Game.Tests.Visual
                     if (running)
                     {
                         running = false;
-                        // on stopping, the current value should be transferred out of the clock, as we can no longer rely on
-                        // the referenceClock (which will still be counting time).
-                        offset = clock.CurrentTime;
                         lastReferenceTime = null;
                     }
                 }
@@ -281,7 +271,9 @@ namespace osu.Game.Tests.Visual
 
                 private double? lastReferenceTime;
 
-                public override double CurrentTime => clock.CurrentTime;
+                private double accumulated;
+
+                public override double CurrentTime => Math.Min(accumulated, Length);
 
                 protected override void UpdateState()
                 {
@@ -291,17 +283,11 @@ namespace osu.Game.Tests.Visual
                     {
                         double refTime = referenceClock.CurrentTime;
 
-                        if (!lastReferenceTime.HasValue)
-                        {
-                            // if the clock just started running, the current value should be transferred to the offset
-                            // (to zero the progression of time).
-                            offset -= refTime;
-                        }
+                        if (lastReferenceTime.HasValue)
+                            accumulated += (refTime - lastReferenceTime.Value) * Rate;
 
                         lastReferenceTime = refTime;
                     }
-
-                    clock.CurrentTime = Math.Min((lastReferenceTime ?? 0) + offset, Length);
 
                     if (CurrentTime >= Length)
                     {
