@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Components
 
             if (stream != null)
             {
-                InternalChild = video = new VideoSprite(stream)
+                InternalChild = video = new VideoSprite(stream, false)
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
