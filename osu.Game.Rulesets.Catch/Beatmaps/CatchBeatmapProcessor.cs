@@ -74,6 +74,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         break;
 
                     case JuiceStream juiceStream:
+                        // Todo: BUG!! Stable used the last control point as the final position of the path, but it should use the computed path instead.
+                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X / CatchPlayfield.BASE_WIDTH;
+
+                        // Todo: BUG!! Stable attempted to use the end time of the stream, but referenced it too early in execution and used the start time instead.
+                        lastStartTime = juiceStream.StartTime;
+
                         foreach (var nested in juiceStream.NestedHitObjects)
                         {
                             var catchObject = (CatchHitObject)nested;
@@ -94,13 +100,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
         {
-            if (hitObject is JuiceStream stream)
-            {
-                lastPosition = stream.EndX;
-                lastStartTime = stream.EndTime;
-                return;
-            }
-
             if (!(hitObject is Fruit))
                 return;
 
