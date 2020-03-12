@@ -221,9 +221,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!filtered.Value)
-                    Item.State.Value = CarouselItemState.Selected;
-
+                Item.State.Value = CarouselItemState.Selected;
                 return true;
             }
         }
