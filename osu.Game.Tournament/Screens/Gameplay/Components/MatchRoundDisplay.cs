@@ -8,7 +8,7 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
-    public class RoundDisplay : TournamentSpriteTextWithBackground
+    public class MatchRoundDisplay : TournamentSpriteTextWithBackground
     {
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 

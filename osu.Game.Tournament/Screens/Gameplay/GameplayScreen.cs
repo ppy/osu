@@ -47,7 +47,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 },
-                header = new MatchHeader(),
+                header = new MatchHeader
+                {
+                    ShowLogo = false
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
