@@ -755,6 +755,15 @@ namespace osu.Game.Screens.Select
                 this.carousel = carousel;
             }
 
+            public override void Filter(FilterCriteria criteria) // override CarouselGroupEagerSelect's Filter function to bypass how CGES attempts selection after filter
+            {
+                base.Filter(criteria);
+                // CarouselGroupEagerSelect would check if it's selected here before attempting selection. CarouselRoot should do it anyway because it's always "selected"
+                // We still want to check if anything is already selected before we try selecting anything else tho
+                if (Children.All(i => i.State.Value != CarouselItemState.Selected))
+                    PerformSelection();
+            }
+
             protected override void PerformSelection()
             {
                 if (LastSelected == null)
