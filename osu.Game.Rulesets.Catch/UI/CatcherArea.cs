@@ -344,11 +344,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (validCatch)
                     updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
-                else
-                {
-                    if (!(fruit is Banana))
-                        updateState(CatcherAnimationState.Fail);
-                }
+                else if (!(fruit is Banana))
+                    updateState(CatcherAnimationState.Fail);
 
                 return validCatch;
             }
@@ -362,7 +359,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 updateCatcher();
             }
 
-            public CatcherAnimationState CurrentState;
+            public CatcherAnimationState CurrentState { get; private set; }
 
             private double hyperDashModifier = 1;
             private int hyperDashDirection;
