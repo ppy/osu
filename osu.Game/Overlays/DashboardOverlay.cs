@@ -9,13 +9,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Overlays.Home;
-using osu.Game.Overlays.Home.Friends;
+using osu.Game.Overlays.Dashboard;
+using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
-    public class HomeOverlay : FullscreenOverlay
+    public class DashboardOverlay : FullscreenOverlay
     {
         private readonly Bindable<User> localUser = new Bindable<User>();
 
@@ -25,11 +25,11 @@ namespace osu.Game.Overlays
         private CancellationTokenSource cancellationToken;
 
         private readonly Box background;
-        private readonly HomeOverlayHeader header;
+        private readonly DashboardOverlayHeader header;
         private readonly Container content;
         private readonly LoadingLayer loading;
 
-        public HomeOverlay()
+        public DashboardOverlay()
             : base(OverlayColourScheme.Purple)
         {
             Children = new Drawable[]
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new HomeOverlayHeader
+                            header = new DashboardOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,

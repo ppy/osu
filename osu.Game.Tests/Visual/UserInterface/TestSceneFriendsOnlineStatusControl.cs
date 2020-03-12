@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Home.Friends;
+using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

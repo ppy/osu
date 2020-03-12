@@ -17,7 +17,7 @@ using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Overlays.Home.Friends
+namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class FriendsLayout : CompositeDrawable
     {

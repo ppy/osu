@@ -14,9 +14,9 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(HomeOverlay social)
+        private void load(DashboardOverlay dashboard)
         {
-            StateContainer = social;
+            StateContainer = dashboard;
         }
     }
 }

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Home.Friends;
+using osu.Game.Overlays.Dashboard.Friends;
 using osu.Framework.Graphics;
 using osu.Game.Users;
 using osu.Game.Overlays;

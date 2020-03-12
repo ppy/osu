@@ -21,6 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         private const int text_offset = 2;
 
         private SpriteIcon iconSprite;
+        private readonly Circle separator;
         private readonly OsuSpriteText titleText, pageText;
 
         protected IconUsage Icon
@@ -41,7 +42,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected string Section
         {
-            set => pageText.Text = value.ToLower();
+            set
+            {
+                pageText.Text = value.ToLower();
+                separator.Alpha = string.IsNullOrEmpty(value) ? 0 : 1;
+            }
         }
 
         public Color4 AccentColour
@@ -80,12 +85,13 @@ namespace osu.Game.Graphics.UserInterface
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Bottom = text_offset }
                         },
-                        new Circle
+                        separator = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(4),
                             Colour = Color4.Gray,
+                            Alpha = 0,
                         },
                         pageText = new OsuSpriteText
                         {

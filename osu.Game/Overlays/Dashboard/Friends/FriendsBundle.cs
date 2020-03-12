@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
 
-namespace osu.Game.Overlays.Home.Friends
+namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class FriendsBundle
     {
