@@ -66,7 +66,7 @@ namespace osu.Desktop
             if (!noVersionOverlay)
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
-            LoadComponentAsync(new DiscordRichPresence(), Add);
+            LoadComponentAsync(new DiscordRichPresence(LocalConfig), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
