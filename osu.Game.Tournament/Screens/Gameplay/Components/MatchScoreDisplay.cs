@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osuTK;
 
 namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
@@ -131,13 +132,15 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 Margin = new MarginPadding { Top = bar_height, Horizontal = 10 };
 
                 Winning = false;
+
+                DisplayedCountSpriteText.Spacing = new Vector2(-6);
             }
 
             public bool Winning
             {
                 set => DisplayedCountSpriteText.Font = value
-                    ? OsuFont.Torus.With(weight: FontWeight.Bold, size: 50)
-                    : OsuFont.Torus.With(weight: FontWeight.Regular, size: 40);
+                    ? OsuFont.Torus.With(weight: FontWeight.Bold, size: 50, fixedWidth: true)
+                    : OsuFont.Torus.With(weight: FontWeight.Regular, size: 40, fixedWidth: true);
             }
         }
     }

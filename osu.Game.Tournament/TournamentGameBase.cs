@@ -37,6 +37,8 @@ namespace osu.Game.Tournament
 
         private Storage storage;
 
+        private TournamentStorage tournamentStorage;
+
         private DependencyContainer dependencies;
 
         private Bindable<Size> windowSize;
@@ -54,7 +56,9 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
+            dependencies.CacheAs(tournamentStorage = new TournamentStorage(storage));
+
+            Textures.AddStore(new TextureLoaderStore(tournamentStorage));
 
             this.storage = storage;
 
@@ -127,7 +131,7 @@ namespace osu.Game.Tournament
                         },
                         new TournamentSpriteText
                         {
-                            Text = "窗口太窄了，拉宽一些",
+                            Text = "窗口太窄了, 拉宽一些",
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                             Colour = Color4.White,
                             Padding = new MarginPadding(20)
