@@ -419,6 +419,26 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestSelectionEnteringFromEmptyRuleset()
+        {
+            var sets = new List<BeatmapSetInfo>();
+            var rulesetBeatmapSet = createTestBeatmapSet(1);
+            rulesetBeatmapSet.Beatmaps.ForEach(b =>
+            {
+                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
+                b.RulesetID = b.Ruleset.ID ?? 1;
+            });
+            sets.Add(rulesetBeatmapSet);
+            loadBeatmaps(sets);
+            AddStep("Toggle empty ruleset", () =>
+            {
+                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false);
+                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1) }, false);
+            });
+            AddAssert("Something is selected", () => carousel.SelectedBeatmap != null);
+        }
+
+        [Test]
         public void TestCarouselRootIsRandom()
         {
             List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
@@ -599,7 +619,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 // This function is used to check if carousel root is able to make random selection, not if it's able to select a previously selected beatmap
                 // Thus we forget all previously selected beatmap sets here, otherwise carousel root would select from these.
-                carousel.ForgetPreviouslySelectedSets(); 
+                carousel.ForgetPreviouslySelectedSets();
                 carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
                 carousel.Filter(new FilterCriteria(), false);
                 eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);

@@ -770,7 +770,6 @@ namespace osu.Game.Screens.Select
                     carousel.SelectNextRandom();
                 else
                     visiblePreviousSets.First().State.Value = CarouselItemState.Selected;
-
             }
         }
 
