@@ -41,13 +41,13 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
-                        new DrawableTournamentTitleText
+                        new DrawableTournamentHeaderText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Scale = new Vector2(1.2f)
                         },
-                        new RoundDisplay
+                        new MatchRoundDisplay
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
