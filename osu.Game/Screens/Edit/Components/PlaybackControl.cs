@@ -87,6 +87,9 @@ namespace osu.Game.Screens.Edit.Components
 
         private void togglePause()
         {
+            if ((adjustableClock as EditorClock)?.PlaybackFinished == true)
+                adjustableClock.Seek(0);
+
             if (adjustableClock.IsRunning)
                 adjustableClock.Stop();
             else
