@@ -259,11 +259,18 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
+                private readonly Stream videoStream;
+
                 public LazerLogo(Stream videoStream)
                 {
+                    this.videoStream = videoStream;
                     Size = new Vector2(960);
+                }
 
-                    InternalChild = new VideoSprite(videoStream)
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    InternalChild = new VideoSprite(videoStream, false)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Clock = new FramedOffsetClock(Clock) { Offset = -logo_1 }

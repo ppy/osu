@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
@@ -148,18 +149,62 @@ namespace osu.Game.Rulesets.Catch.UI
             [BackgroundDependencyLoader]
             private void load()
             {
-                Children = new[]
+                Children = new Drawable[]
                 {
                     caughtFruit = new Container<DrawableHitObject>
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
                     },
-                    createCatcherSprite().With(c =>
+                    catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
                     {
-                        c.Anchor = Anchor.TopCentre;
-                    })
+                        Anchor = Anchor.TopCentre,
+                        Alpha = 0,
+                    },
+                    catcherKiai = new CatcherSprite(CatcherAnimationState.Kiai)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Alpha = 0,
+                    },
+                    catcherFail = new CatcherSprite(CatcherAnimationState.Fail)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Alpha = 0,
+                    }
                 };
+
+                updateCatcher();
+            }
+
+            private CatcherSprite catcherIdle;
+            private CatcherSprite catcherKiai;
+            private CatcherSprite catcherFail;
+
+            private void updateCatcher()
+            {
+                catcherIdle.Hide();
+                catcherKiai.Hide();
+                catcherFail.Hide();
+
+                CatcherSprite current;
+
+                switch (CurrentState)
+                {
+                    default:
+                        current = catcherIdle;
+                        break;
+
+                    case CatcherAnimationState.Fail:
+                        current = catcherFail;
+                        break;
+
+                    case CatcherAnimationState.Kiai:
+                        current = catcherKiai;
+                        break;
+                }
+
+                current.Show();
+                (current.Drawable as IAnimation)?.GotoFrame(0);
             }
 
             private int currentDirection;
@@ -229,7 +274,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 return additive;
             }
 
-            private Drawable createCatcherSprite() => new CatcherSprite();
+            private Drawable createCatcherSprite() => new CatcherSprite(CurrentState);
 
             /// <summary>
             /// Add a caught fruit to the catcher's stack.
@@ -297,8 +342,24 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
                 }
 
+                if (validCatch)
+                    updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
+                else if (!(fruit is Banana))
+                    updateState(CatcherAnimationState.Fail);
+
                 return validCatch;
             }
+
+            private void updateState(CatcherAnimationState state)
+            {
+                if (CurrentState == state)
+                    return;
+
+                CurrentState = state;
+                updateCatcher();
+            }
+
+            public CatcherAnimationState CurrentState { get; private set; }
 
             private double hyperDashModifier = 1;
             private int hyperDashDirection;
