@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Select.Carousel
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
 
-                this.Item = item;
+                Item = item;
             }
 
             protected override bool OnClick(ClickEvent e)
