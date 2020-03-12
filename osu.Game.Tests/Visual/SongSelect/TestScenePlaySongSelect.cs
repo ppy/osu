@@ -453,8 +453,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select beatmap externally", () =>
             {
-                target = manager.GetAllUsableBeatmapSets().Where(b => b.Beatmaps.Any(bi => bi.RulesetID == targetRuleset))
-                                .ElementAt(5).Beatmaps.First();
+                target = manager.GetAllUsableBeatmapSets()
+                                .Where(b => b.Beatmaps.Any(bi => bi.RulesetID == targetRuleset))
+                                .ElementAt(5).Beatmaps.First(bi => bi.RulesetID == targetRuleset);
 
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
