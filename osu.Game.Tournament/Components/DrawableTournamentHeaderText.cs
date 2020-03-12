@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Components
         {
             InternalChild = new TextSprite();
 
-            Height = 25;
+            Height = 22;
             RelativeSizeAxes = Axes.X;
         }
 

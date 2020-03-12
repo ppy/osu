@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Components
         {
             InternalChild = new LogoSprite();
 
-            Height = 50;
+            Height = 82;
             RelativeSizeAxes = Axes.X;
         }
 
