@@ -517,7 +517,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
 
             bool changed = false;
-            AddStep($"Load {beatmapSets.Count} Beatmaps", () =>
+            AddStep($"Load {(beatmapSets.Count > 0 ? beatmapSets.Count.ToString() : "some")} beatmaps", () =>
             {
                 carousel.Filter(new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
@@ -725,6 +725,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 PreviouslySelectedSets = new LinkedList<CarouselBeatmapSet>();
             }
+            protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }
     }
 }
