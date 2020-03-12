@@ -725,6 +725,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 PreviouslySelectedSets = new LinkedList<CarouselBeatmapSet>();
             }
+
             protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }
     }
