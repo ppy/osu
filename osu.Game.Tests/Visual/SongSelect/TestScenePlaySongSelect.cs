@@ -654,6 +654,48 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
         }
 
+        [Test]
+        public void TestGroupedDifficultyIconSelecting()
+        {
+            changeRuleset(0);
+
+            createSongSelect();
+
+            AddStep("import huge difficulty count map", () =>
+            {
+                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+                manager.Import(createTestBeatmapSet(0, usableRulesets, 50)).Wait();
+            });
+
+            DrawableCarouselBeatmapSet set = null;
+            AddUntilStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().FirstOrDefault();
+                return set != null;
+            });
+
+            DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon groupIcon = null;
+            AddStep("Find group icon for different ruleset", () =>
+            {
+                groupIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon>()
+                               .First(icon => icon.Items.First().Beatmap.Ruleset.ID == 3);
+            });
+
+            AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
+
+            AddStep("Click on group", () =>
+            {
+                InputManager.MoveMouseTo(groupIcon);
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
+
+            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo == groupIcon.Items.First().Beatmap);
+        }
+
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
 
         private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmap);
@@ -695,16 +737,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int setId, RulesetInfo[] rulesets)
+        private BeatmapSetInfo createTestBeatmapSet(int setId, RulesetInfo[] rulesets, int countPerRuleset = 6)
         {
             int j = 0;
             RulesetInfo getRuleset() => rulesets[j++ % rulesets.Length];
 
             var beatmaps = new List<BeatmapInfo>();
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < countPerRuleset; i++)
             {
-                int beatmapId = setId * 10 + i;
+                int beatmapId = setId * 100 + i;
 
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
