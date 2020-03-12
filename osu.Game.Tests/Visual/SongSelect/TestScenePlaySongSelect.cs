@@ -661,11 +661,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
+            BeatmapSetInfo imported = null;
+
             AddStep("import huge difficulty count map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                manager.Import(createTestBeatmapSet(usableRulesets, 50)).Wait();
+                imported = manager.Import(createTestBeatmapSet(usableRulesets, 50)).Result;
             });
+
+            AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported.Beatmaps.First()));
 
             DrawableCarouselBeatmapSet set = null;
             AddUntilStep("Find the DrawableCarouselBeatmapSet", () =>
