@@ -283,7 +283,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("import multi-ruleset map", () =>
                 {
                     var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                    manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
+                    manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
                 });
             }
             else
@@ -624,7 +624,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import multi-ruleset map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
+                manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
             });
 
             DrawableCarouselBeatmapSet set = null;
@@ -638,7 +638,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Find an icon for different ruleset", () =>
             {
                 difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
-                                    .First(icon => icon.Item.Beatmap.ID == 3);
+                                    .First(icon => icon.Item.Beatmap.Ruleset.ID == 3);
             });
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
@@ -664,7 +664,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import huge difficulty count map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                manager.Import(createTestBeatmapSet(0, usableRulesets, 50)).Wait();
+                manager.Import(createTestBeatmapSet(usableRulesets, 50)).Wait();
             });
 
             DrawableCarouselBeatmapSet set = null;
@@ -707,7 +707,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
 
-        private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
+        private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
 
         private static int importId;
 
@@ -733,20 +733,22 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
 
                 for (int i = 0; i < 100; i += 10)
-                    manager.Import(createTestBeatmapSet(i, usableRulesets)).Wait();
+                    manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
             });
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int setId, RulesetInfo[] rulesets, int countPerRuleset = 6)
+        private BeatmapSetInfo createTestBeatmapSet(RulesetInfo[] rulesets, int countPerRuleset = 6)
         {
             int j = 0;
             RulesetInfo getRuleset() => rulesets[j++ % rulesets.Length];
+
+            int setId = getImportId();
 
             var beatmaps = new List<BeatmapInfo>();
 
             for (int i = 0; i < countPerRuleset; i++)
             {
-                int beatmapId = setId * 100 + i;
+                int beatmapId = setId * 1000 + i;
 
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
