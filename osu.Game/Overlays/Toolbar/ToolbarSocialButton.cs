@@ -11,14 +11,14 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarSocialButton()
         {
             Icon = FontAwesome.Solid.Users;
-            TooltipMain = "社交";
-            TooltipSub = "在这里扩展人脉";
+            TooltipMain = "仪表板";
+            TooltipSub = "在这里查看好友列表";
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SocialOverlay chat)
+        private void load(DashboardOverlay dashboard)
         {
-            StateContainer = chat;
+            StateContainer = dashboard;
         }
     }
 }

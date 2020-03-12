@@ -13,6 +13,8 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
+        public const int CONTENT_X_MARGIN = 50;
+
         private readonly Box titleBackground;
         private readonly ScreenTitle title;
 
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays
                                         AutoSizeAxes = Axes.Y,
                                         Padding = new MarginPadding
                                         {
-                                            Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
+                                            Horizontal = CONTENT_X_MARGIN,
                                             Vertical = 10,
                                         },
                                         Children = new[]

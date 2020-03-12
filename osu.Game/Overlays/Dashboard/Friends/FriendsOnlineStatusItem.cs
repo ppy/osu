@@ -2,19 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Home.Friends
+namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsOnlineStatusItem : OverlayStreamItem<FriendsBundle>
+    public class FriendsOnlineStatusItem : OverlayStreamItemCN<FriendsBundle>
     {
         public FriendsOnlineStatusItem(FriendsBundle value)
             : base(value)
         {
         }
 
-        protected override string MainText => Value.Status.ToString();
+        protected override string MainText => Value.Status.GetDescription().ToString();
 
         protected override string AdditionalText => Value.Count.ToString();
 

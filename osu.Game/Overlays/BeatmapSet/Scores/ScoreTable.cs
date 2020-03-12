@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold);
+                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold);
             }
 
             [BackgroundDependencyLoader]

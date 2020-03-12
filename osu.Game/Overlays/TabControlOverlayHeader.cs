@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -46,7 +48,7 @@ namespace osu.Game.Overlays
                     },
                     TabControl = CreateTabControl().With(control =>
                     {
-                        control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN };
+                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
                         control.Current = Current;
                     })
                 }
@@ -90,9 +92,31 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    Text.Text = value.ToString().ToLower();
+                    Text.Text = formatItemText(value);
                     Text.Font = OsuFont.GetFont(size: 20);
                     Bar.ExpandedSize = 5;
+                }
+
+                private string formatItemText(object value)
+                {
+                    string baseText;
+
+                    switch (value)
+                    {
+                        case string stringValue:
+                            baseText = stringValue;
+                            break;
+
+                        case Enum enumValue:
+                            baseText = enumValue.GetDescription();
+                            break;
+
+                        default:
+                            baseText = value.ToString();
+                            break;
+                    }
+
+                    return baseText.ToLower();
                 }
             }
         }

@@ -81,3 +81,6 @@
     *   [m] [Add ability to set stable path for tourney client via environment variable #8226]
     *   [m] [Fix catcher showing miss sprite upon missing bananas #8230]
     *   [m] [Fallback on invalid AnimationFramerate for legacy skins #8245]
+
+    *   [o] [Update loader animation #821_2]
+    *   [o] [Replace SocialOverlay with DashboardOverlay #805_1]
