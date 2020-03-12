@@ -591,16 +591,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }));
 
+            BeatmapInfo filteredBeatmap = null;
             DrawableCarouselBeatmapSet.FilterableDifficultyIcon filteredIcon = null;
+
             AddStep("Get filtered icon", () =>
             {
-                var filteredBeatmap = songSelect.Carousel.SelectedBeatmapSet.Beatmaps.Find(b => b.BPM < maxBPM);
+                filteredBeatmap = songSelect.Carousel.SelectedBeatmapSet.Beatmaps.Find(b => b.BPM < maxBPM);
                 int filteredBeatmapIndex = getBeatmapIndex(filteredBeatmap.BeatmapSet, filteredBeatmap);
                 filteredIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
             });
 
-            int? previousID = null;
-            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
             AddStep("Click on a filtered difficulty", () =>
             {
                 InputManager.MoveMouseTo(filteredIcon);
@@ -608,7 +608,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.ReleaseButton(MouseButton.Left);
             });
-            AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
+
+            AddAssert("Selected beatmap correct", () => songSelect.Carousel.SelectedBeatmap == filteredBeatmap);
         }
 
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
