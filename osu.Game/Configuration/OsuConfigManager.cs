@@ -10,6 +10,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
+using System;
 
 namespace osu.Game.Configuration
 {
@@ -17,9 +18,17 @@ namespace osu.Game.Configuration
     {
         protected override void InitialiseDefaults()
         {
+
+            // Discord RPC
+            Set(OsuSetting.HideDiscordRPC, false).ValueChanged += enabled =>
+            {
+                if (enabled.NewValue) Set(OsuSetting.HideDiscordRPC, true);
+            };
+
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
+
 
             Set(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
 
@@ -214,6 +223,7 @@ namespace osu.Game.Configuration
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,
+        HideDiscordRPC,
         Scaling,
         ScalingPositionX,
         ScalingPositionY,

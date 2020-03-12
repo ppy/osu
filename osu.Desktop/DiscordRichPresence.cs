@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -19,15 +20,23 @@ namespace osu.Desktop
 {
     internal class DiscordRichPresence : Component
     {
-        private const string client_id = "367827983903490050";
+        public DiscordRichPresence(OsuConfigManager config)
+        {
+            this.config = config;
+        }
 
+        private const string client_id = "367827983903490050";
         private DiscordRpcClient client;
+
+        private bool isHidden;
+        private string usernameInfo;
+        private string rankInfo;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         private Bindable<User> user;
-
+        private OsuConfigManager config;
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
 
@@ -72,9 +81,14 @@ namespace osu.Desktop
             Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
             updateStatus();
         }
-
         private void updateStatus()
         {
+            // Check to see if the user would like to hide their stats on RPC.
+            isHidden = checkRPC();
+
+            usernameInfo = isHidden == true ? "osu!" : user.Value.Username;
+            rankInfo = isHidden == true ? string.Empty : (user.Value.Statistics?.Ranks.Global > 0 ? $" (rank #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
+
             if (!client.IsInitialized)
                 return;
 
@@ -96,7 +110,8 @@ namespace osu.Desktop
             }
 
             // update user information
-            presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.Ranks.Global > 0 ? $" (rank #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
+
+            presence.Assets.LargeImageText = $"{usernameInfo} {rankInfo}";
 
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
@@ -106,6 +121,11 @@ namespace osu.Desktop
         }
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
+
+        private bool checkRPC()
+        {
+            return config.GetBindable<bool>(OsuSetting.HideDiscordRPC).Value;
+        }
 
         private string truncate(string str)
         {
@@ -146,4 +166,5 @@ namespace osu.Desktop
             base.Dispose(isDisposing);
         }
     }
+
 }

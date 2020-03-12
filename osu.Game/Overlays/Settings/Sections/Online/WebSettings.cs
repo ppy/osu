@@ -21,6 +21,13 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     LabelText = "Warn about opening external links",
                     Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
+
+                new SettingsCheckbox
+                {
+                    LabelText = "Hide Discord Rich Presence information",
+                    Bindable = config.GetBindable<bool>(OsuSetting.HideDiscordRPC)
+                },
+
             };
         }
     }
