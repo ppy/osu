@@ -125,13 +125,21 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mods))
             {
-                AddInternal(new Sprite
+                AddInternal(new Container
                 {
-                    Texture = textures.Get($"mods/{mods}"),
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 60,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(10),
-                    Scale = new Vector2(0.8f)
+                    Child = new Sprite
+                    {
+                        FillMode = FillMode.Fit,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Texture = textures.Get($"mods/{mods}"),
+                    }
                 });
             }
         }
