@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly BindableBeatDivisor beatDivisor;
 
-        public bool PlaybackFinished { get; private set; }
+        private bool playbackFinished;
 
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
         {
@@ -43,17 +43,19 @@ namespace osu.Game.Screens.Edit
         {
             base.ProcessFrame();
 
-            if (CurrentTime >= TrackLength)
+            var playbackAlreadyStopped = playbackFinished;
+            playbackFinished = CurrentTime >= TrackLength;
+
+            if (playbackFinished && IsRunning)
             {
-                if (!PlaybackFinished)
+                if (!playbackAlreadyStopped)
                 {
-                    PlaybackFinished = true;
                     Stop();
                     Seek(TrackLength);
                 }
+                else
+                    Seek(0);
             }
-            else
-                PlaybackFinished = false;
         }
 
         /// <summary>
