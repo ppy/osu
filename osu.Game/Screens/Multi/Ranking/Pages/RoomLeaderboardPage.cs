@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
             rankText.AddText($"#{index + 1} ", s =>
             {
-                s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold);
+                s.Font = s.Font.With(Typeface.Torus, weight: FontWeight.Bold);
                 s.Colour = colours.YellowDark;
             });
 
