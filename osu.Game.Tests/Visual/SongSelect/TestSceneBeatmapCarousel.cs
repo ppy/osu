@@ -388,7 +388,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 var testIrrelevant = createTestBeatmapSet(set_count + 99);
 
-                testIrrelevant.Beatmaps.ForEach((bi) =>
+                testIrrelevant.Beatmaps.ForEach(bi =>
                 {
                     bi.Ruleset = rulesets.AvailableRulesets.ElementAt(0);
                     bi.RulesetID = 0;
@@ -412,7 +412,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => !testMixed.Beatmaps.Any(bi => currentSelection == bi));
+            AddAssert("unfiltered beatmap not selected", () => testMixed.Beatmaps.All(bi => currentSelection != bi));
 
             AddStep("remove mixed set", () =>
             {
@@ -427,7 +427,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
-            AddAssert("unfiltered beatmap not selected", () => !testSingle.Beatmaps.Any(bi => currentSelection == bi));
+            AddAssert("unfiltered beatmap not selected", () => testSingle.Beatmaps.All(bi => currentSelection != bi));
             AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
         }
 
@@ -730,7 +730,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapCarousel : BeatmapCarousel
         {
-            public TestBeatmapCarousel() : base()
+            public TestBeatmapCarousel()
             {
                 StartAllowingSelectionOnFiltered();
             }

@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselRoot root;
-        public bool AttemptSelectionOnFilter { get; private set; } = false;
+        public bool AttemptSelectionOnFilter { get; private set; }
 
         public BeatmapCarousel()
         {
