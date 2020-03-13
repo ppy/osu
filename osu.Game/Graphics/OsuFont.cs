@@ -30,7 +30,7 @@ namespace osu.Game.Graphics
         /// <param name="italics">Whether the font is italic.</param>
         /// <param name="fixedWidth">Whether all characters should be spaced the same distance apart.</param>
         /// <returns>The <see cref="FontUsage"/>.</returns>
-        public static FontUsage GetFont(Typeface typeface = Typeface.Exo, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
+        public static FontUsage GetFont(Typeface typeface = Typeface.Torus, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
             => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), italics, fixedWidth);
 
         /// <summary>
@@ -42,9 +42,6 @@ namespace osu.Game.Graphics
         {
             switch (typeface)
             {
-                case Typeface.Exo:
-                    return "Exo2.0";
-
                 case Typeface.Venera:
                     return "Venera";
 
@@ -96,7 +93,6 @@ namespace osu.Game.Graphics
 
     public enum Typeface
     {
-        Exo,
         Venera,
         Torus
     }
