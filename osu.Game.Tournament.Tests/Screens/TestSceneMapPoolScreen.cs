@@ -42,13 +42,33 @@ namespace osu.Game.Tournament.Tests.Screens
         }
 
         [Test]
+        public void TestJustEnoughMaps()
+        {
+            AddStep("load just enough maps", () =>
+            {
+                Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
+
+                for (int i = 0; i < 18; i++)
+                    addBeatmap();
+            });
+
+            AddStep("reset match", () =>
+            {
+                Ladder.CurrentMatch.Value = new TournamentMatch();
+                Ladder.CurrentMatch.Value = Ladder.Matches.First();
+            });
+
+            AddAssert("ensure layout width is 2", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y > 0);
+        }
+
+        [Test]
         public void TestManyMaps()
         {
             AddStep("load many maps", () =>
             {
                 Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
 
-                for (int i = 0; i < 17; i++)
+                for (int i = 0; i < 19; i++)
                     addBeatmap();
             });
 
@@ -62,14 +82,34 @@ namespace osu.Game.Tournament.Tests.Screens
         }
 
         [Test]
+        public void TestJustEnoughMods()
+        {
+            AddStep("load many maps", () =>
+            {
+                Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
+
+                for (int i = 0; i < 11; i++)
+                    addBeatmap(i > 4 ? $"M{i}" : "NM");
+            });
+
+            AddStep("reset match", () =>
+            {
+                Ladder.CurrentMatch.Value = new TournamentMatch();
+                Ladder.CurrentMatch.Value = Ladder.Matches.First();
+            });
+
+            AddAssert("ensure layout width is 2", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y > 0);
+        }
+
+        [Test]
         public void TestManyMods()
         {
             AddStep("load many maps", () =>
             {
                 Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Clear();
 
-                for (int i = 0; i < 13; i++)
-                    addBeatmap(i < 4 ? $"M{i}" : "NM");
+                for (int i = 0; i < 12; i++)
+                    addBeatmap(i > 4 ? $"M{i}" : "NM");
             });
 
             AddStep("reset match", () =>
