@@ -2,15 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
+using System.Globalization;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -29,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countGood;
         private int countMeh;
         private int countMiss;
+
+        private const double streamaimconst = 2.42;
+        private const double stdevconst = 0.149820;
 
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
@@ -85,10 +95,86 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return totalValue;
         }
-
+public double[] Main()
+    {
+        try
+        {   // Open the text file using a stream reader.
+            string tempstor = Path.GetTempPath();
+            string jdapath = tempstor + "jda.txt";
+            using (StreamReader sr = new StreamReader(jdapath))
+            {
+            // Read the stream to a string, and write the string to the console.
+                double[] errorval = {1,2,3};
+                double[] JumpDistanceArray = new double[32767];
+                string a = sr.ReadToEnd();
+                string[] JumpDistanceArray2 = a.Split(new char[] { ',' });
+                for (int i = 0; i < JumpDistanceArray2.Length; i++)
+                {
+                    double intermres = Convert.ToDouble(JumpDistanceArray2[i]);
+                    for (int m = 0; m < JumpDistanceArray2.Length; m++)
+                    {
+                        JumpDistanceArray[m] = intermres;
+                    }
+                }
+                return JumpDistanceArray;
+            }
+        }
+        catch (IOException e)
+        {
+            double[] errorval = {1,2,4};
+            Console.WriteLine("The file could not be read:");
+            Console.WriteLine(e.Message);
+            return errorval;
+        }
+    }
+public double Main2()
+    {
+        try
+        {   // Open the text file using a stream reader.
+            string tempstor = Path.GetTempPath();
+            string jda2path = tempstor + "jda2.txt";
+            using (StreamReader sr = new StreamReader(jda2path))
+            {
+            // Read the stream to a string, and write the string to the console.
+                double sumstrain = 0;
+                string a = sr.ReadToEnd();
+                string[] StrainTimeArray2 = a.Split(new char[] { ',' });
+                for (int i = 0; i < StrainTimeArray2.Length; i++)
+                {
+                    double intermres2 = Convert.ToDouble(StrainTimeArray2[i]);
+                    sumstrain = sumstrain + intermres2;
+                }
+                return sumstrain;
+            }
+        }
+        catch (IOException e)
+        {
+            double errorval = 2;
+            Console.WriteLine("The file could not be read:");
+            Console.WriteLine(e.Message);
+            return errorval;
+        }
+    }
         private double computeAimValue()
         {
-            double rawAim = Attributes.AimStrain;
+            double[] JumpDistanceArray = Main();
+            double finalsumstrain = Main2(); 
+            // var Aim = new Aim();
+            double average = JumpDistanceArray.Average();
+            double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
+            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
+            double bpm = (60000 * countHitCircles) / finalsumstrain;
+            double finalsd2 = (bpm/375) * finalsd;
+            double finalsdpp = 0;
+            if (countMiss == 0)
+            {
+                  finalsdpp = finalsdpp+(finalsd2/stdevconst);
+                  if (finalsdpp >= 1)
+                  {
+                  finalsdpp = (-1)*(Log (finalsdpp, 0.000001));
+                  }
+            }
+            double rawAim = Attributes.AimStrain + finalsdpp;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);

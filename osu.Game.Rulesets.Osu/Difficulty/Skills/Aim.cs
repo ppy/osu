@@ -2,10 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
+using System.Linq;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -14,11 +18,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : Skill
     {
+        public double[] GetJumpDistanceArray() => (double[])JumpDistanceArray;
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
+        private const double streamaimconst = 2.42;
+        private const double stdevconst = 0.149820;
+        // public static double[] JumpDistanceArray;
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
+
+        public static object JumpDistanceArray { get; internal set; }
+
+        // Standard Deviation Calculation Code courtesy of Roman http://csharphelper.com/blog/2015/12/make-an-extension-method-that-calculates-standard-deviation-in-c/
+        // public static double GetStandardDeviation(List values)
+        //     {
+        //     double avg = values.Average();
+        //     double sum = values.Sum(v => (v - avg) * (v-avg));
+        //     double denominator = values.Count - 1;
+        //     return denominator > 0.0 ? Math.Sqrt(sum / denominator) : -1;
+        //     };
+        // Use JumpDistanceArray to calculate SD
+        // https://stackoverflow.com/a/5336708
+        // double average = JumpDistanceArray.Average();
+        // double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
+        // double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
+        // double finalsdpp = finalsd/stdevconst when missCount = 0;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -28,7 +53,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             double result = 0;
-
+            if (osuCurrent.JumpDistance < 150)
+            {
+            double sectionvelocity = osuCurrent.JumpDistance/osuCurrent.StrainTime;
+            string tempstor = Path.GetTempPath();
+            if (sectionvelocity < streamaimconst) 
+                { 
+                    string comma = "" ;
+                    string JumpDistanceArrayn = osuCurrent.JumpDistance.ToString() + comma;
+                    string StrainTimeArrayn = osuCurrent.StrainTime.ToString() + comma;
+                    string jdapath = tempstor + "jda.txt";
+                    string jda2path = tempstor + "jda2.txt";
+                    System.IO.File.WriteAllText(jdapath, JumpDistanceArrayn);
+                    System.IO.File.WriteAllText(jda2path, StrainTimeArrayn);
+                }
+            }
             if (Previous.Count > 0)
             {
                 var osuPrevious = (OsuDifficultyHitObject)Previous[0];
@@ -47,13 +86,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
             double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
-
+            
             return Math.Max(
                 result + (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(osuCurrent.StrainTime, timing_threshold),
                 (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / osuCurrent.StrainTime
             );
         }
-
+        
         private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
     }
 }
