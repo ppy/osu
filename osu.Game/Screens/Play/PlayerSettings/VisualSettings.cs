@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Text = "Toggles:"
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
+                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboard / Video" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
                 beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
             };

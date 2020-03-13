@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Formats
                         var offset = Parsing.ParseInt(split[1]);
                         var filename = CleanFilename(split[2]);
 
-                        storyboard.GetLayer(LegacyStoryLayer.Video).Add(new StoryboardVideo(filename, offset));
+                        storyboard.GetLayer("Video").Add(new StoryboardVideo(filename, offset));
                         break;
                     }
 
