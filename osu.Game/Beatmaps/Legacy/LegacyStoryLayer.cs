@@ -3,7 +3,7 @@
 
 namespace osu.Game.Beatmaps.Legacy
 {
-    public enum LegacyStoryLayer
+    internal enum LegacyStoryLayer
     {
         Background = 0,
         Fail = 1,
