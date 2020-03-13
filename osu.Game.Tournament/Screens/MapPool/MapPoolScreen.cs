@@ -211,7 +211,6 @@ namespace osu.Game.Tournament.Screens.MapPool
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
             mapFlows.Clear();
-            mapFlows.Padding = new MarginPadding(5) { Horizontal = 100 };
 
             int totalRows = 0;
 
@@ -254,9 +253,11 @@ namespace osu.Game.Tournament.Screens.MapPool
                 }
             }
 
-            if (totalRows > 9)
+            mapFlows.Padding = new MarginPadding(5)
+            {
                 // remove horizontal padding to increase flow width to 3 panels
-                mapFlows.Padding = new MarginPadding(5);
+                Horizontal = totalRows > 9 ? 0 : 100
+            };
         }
     }
 }
