@@ -638,7 +638,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Find an icon for different ruleset", () =>
             {
                 difficultyIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
-                                    .First(icon => icon.Item.Beatmap.ID == 3);
+                                    .First(icon => icon.Item.Beatmap.Ruleset.ID == 3);
             });
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
