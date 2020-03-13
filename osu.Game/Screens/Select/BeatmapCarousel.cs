@@ -119,6 +119,7 @@ namespace osu.Game.Screens.Select
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselRoot root;
+        public bool AttemptSelectionOnFilter { get; private set; } = false;
 
         public BeatmapCarousel()
         {
@@ -748,6 +749,11 @@ namespace osu.Game.Screens.Select
             p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
+        public void StartAllowingSelectionOnFiltered()
+        {
+            AttemptSelectionOnFilter = true;
+        }
+
         private class CarouselRoot : CarouselGroupEagerSelect
         {
             private readonly BeatmapCarousel carousel;
@@ -762,7 +768,7 @@ namespace osu.Game.Screens.Select
                 base.Filter(criteria);
                 // CarouselGroupEagerSelect would check if it's selected here before attempting selection. CarouselRoot should do it anyway because it's always "selected"
                 // We still want to check if anything is already selected before we try selecting anything else tho
-                if (Children.All(i => i.State.Value != CarouselItemState.Selected))
+                if (Children.All(i => i.State.Value != CarouselItemState.Selected) && carousel.AttemptSelectionOnFilter)
                     PerformSelection();
             }
 

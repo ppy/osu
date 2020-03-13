@@ -496,6 +496,8 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
 
             ModSelect.SelectedMods.BindTo(selectedMods);
+
+            Carousel.StartAllowingSelectionOnFiltered();
         }
 
         private const double logo_transition = 250;

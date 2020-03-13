@@ -717,6 +717,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapCarousel : BeatmapCarousel
         {
+            public TestBeatmapCarousel() : base()
+            {
+                StartAllowingSelectionOnFiltered();
+            }
+
             public new List<DrawableCarouselItem> Items => base.Items;
 
             public bool PendingFilterTask => PendingFilter != null;
