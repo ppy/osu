@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.6f),
                 },
-                textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
+                textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 18))
                 {
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,
@@ -69,14 +69,14 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             textContainer.Clear();
             textContainer.AddParagraph(downloadDisabled
-                ? "This beatmap is currently not available for download."
-                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Color4.Orange);
+                ? "该谱面目前无法被下载"
+                : "应创建者或第三方权利所有者的要求，已删除了该谱面的部分内容。", t => t.Colour = Color4.Orange);
 
             if (hasExternalLink)
             {
                 textContainer.NewParagraph();
                 textContainer.NewParagraph();
-                textContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
+                textContainer.AddLink("点击这里来查看更多信息。", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 16));
             }
         }
     }

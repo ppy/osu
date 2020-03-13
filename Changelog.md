@@ -84,3 +84,7 @@
 
     *   [o] [Update loader animation #821_2]
     *   [o] [Replace SocialOverlay with DashboardOverlay #805_1]
+
+*   补全翻译
+    *   [补全了"该谱面暂时无法被下载"的翻译](osu.Game/Overlays/BeatmapSet/BeatmapAvailability.cs)
+*   各种各样的修改
