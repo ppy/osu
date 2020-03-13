@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             float halfCatchWidth;
 
-            using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
             {
                 halfCatchWidth = catcher.CatchWidth * 0.5f;
                 halfCatchWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
