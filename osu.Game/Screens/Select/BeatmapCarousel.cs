@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
-        private readonly OsuScrollContainer scroll;
+        private readonly CarouselScrollContainer scroll;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -424,7 +424,7 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
-                if (alwaysResetScrollPosition || isAtScrollTarget)
+                if (alwaysResetScrollPosition || !scroll.UserScrolling)
                     ScrollToSelected();
             }
 
@@ -695,11 +695,6 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
         }
 
-        /// <summary>
-        /// Denotes whether the current scroll position is roughly at the scroll target (the current selection).
-        /// </summary>
-        private bool isAtScrollTarget => scrollTarget != null && Precision.AlmostEquals(scrollTarget.Value, scroll.Current, 150);
-
         private bool firstScroll = true;
 
         private void updateScrollPosition()
@@ -778,6 +773,23 @@ namespace osu.Game.Screens.Select
         private class CarouselScrollContainer : OsuScrollContainer
         {
             private bool rightMouseScrollBlocked;
+
+            /// <summary>
+            /// Whether the last scroll event was user triggered, directly on the scroll container.
+            /// </summary>
+            public bool UserScrolling { get; private set; }
+
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = null)
+            {
+                UserScrolling = true;
+                base.OnUserScroll(value, animated, distanceDecay);
+            }
+
+            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+            {
+                UserScrolling = false;
+                base.ScrollTo(value, animated, distanceDecay);
+            }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
