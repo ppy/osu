@@ -139,10 +139,10 @@ namespace osu.Game
 
             AddFont(Resources, @"Fonts/osuFont");
 
-            AddFont(Resources, @"Fonts/Torus-SemiBold");
-            AddFont(Resources, @"Fonts/Torus-Bold");
             AddFont(Resources, @"Fonts/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Bold");
 
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
