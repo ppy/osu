@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -196,14 +196,34 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestTabControl : ChannelTabControl
         {
-            protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value);
+            protected override TabItem<Channel> CreateTabItem(Channel value)
+            {
+                switch (value.Type)
+                {
+                    case ChannelType.PM:
+                        return new TestPrivateChannelTabItem(value);
+
+                    default:
+                        return new TestChannelTabItem(value);
+                }
+            }
 
             public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
         }
 
-        private class TestChannelTabItem : PrivateChannelTabItem
+        private class TestChannelTabItem : ChannelTabItem
         {
             public TestChannelTabItem(Channel channel)
+                : base(channel)
+            {
+            }
+
+            public new ClickableContainer CloseButton => base.CloseButton;
+        }
+
+        private class TestPrivateChannelTabItem : PrivateChannelTabItem
+        {
+            public TestPrivateChannelTabItem(Channel channel)
                 : base(channel)
             {
             }
