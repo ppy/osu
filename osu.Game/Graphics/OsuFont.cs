@@ -59,7 +59,13 @@ namespace osu.Game.Graphics
         /// <param name="weight">The <see cref="FontWeight"/>.</param>
         /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="typeface"/>.</returns>
         public static string GetWeightString(Typeface typeface, FontWeight weight)
-            => GetWeightString(GetFamilyString(typeface), weight);
+        {
+            if (typeface == Typeface.Torus && weight == FontWeight.Medium)
+                // torus doesn't have a medium; fallback to regular.
+                weight = FontWeight.Regular;
+
+            return GetWeightString(GetFamilyString(typeface), weight);
+        }
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.
