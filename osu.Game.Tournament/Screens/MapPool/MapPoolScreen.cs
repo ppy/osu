@@ -254,7 +254,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                 }
             }
 
-            if (totalRows > 8)
+            if (totalRows > 9)
                 // remove horizontal padding to increase flow width to 3 panels
                 mapFlows.Padding = new MarginPadding(5);
         }
