@@ -191,7 +191,9 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false);
+            // only reset scroll position if already near the scroll target.
+            // without this, during a large beatmap import it is impossible to navigate the carousel.
+            applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
             //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
@@ -411,7 +413,7 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(debounce);
         }
 
-        private void applyActiveCriteria(bool debounce)
+        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
             if (root.Children.Any() != true) return;
 
@@ -421,7 +423,9 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-                scrollPositionCache.Invalidate();
+
+                if (alwaysResetScrollPosition || isAtScrollTarget)
+                    ScrollToSelected();
             }
 
             PendingFilter?.Cancel();
@@ -435,6 +439,9 @@ namespace osu.Game.Screens.Select
 
         private float? scrollTarget;
 
+        /// <summary>
+        /// Scroll to the current <see cref="SelectedBeatmap"/>.
+        /// </summary>
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -601,7 +608,7 @@ namespace osu.Game.Screens.Select
                         SelectionChanged?.Invoke(c.Beatmap);
 
                         itemsCache.Invalidate();
-                        scrollPositionCache.Invalidate();
+                        ScrollToSelected();
                     }
                 };
             }
@@ -687,6 +694,11 @@ namespace osu.Game.Screens.Select
 
             itemsCache.Validate();
         }
+
+        /// <summary>
+        /// Denotes whether the current scroll position is roughly at the scroll target (the current selection).
+        /// </summary>
+        private bool isAtScrollTarget => scrollTarget != null && Precision.AlmostEquals(scrollTarget.Value, scroll.Current, 150);
 
         private bool firstScroll = true;
 
