@@ -14,22 +14,8 @@ namespace osu.Game.Overlays.Volume
         public Func<GlobalAction, bool> ActionRequested;
         public Func<GlobalAction, float, bool, bool> ScrollActionRequested;
 
-        public bool OnPressed(GlobalAction action)
-        {
-            // if nothing else handles selection actions in the game, it's safe to let volume be adjusted.
-            switch (action)
-            {
-                case GlobalAction.SelectPrevious:
-                    action = GlobalAction.IncreaseVolume;
-                    break;
-
-                case GlobalAction.SelectNext:
-                    action = GlobalAction.DecreaseVolume;
-                    break;
-            }
-
-            return ActionRequested?.Invoke(action) ?? false;
-        }
+        public bool OnPressed(GlobalAction action) =>
+            ActionRequested?.Invoke(action) ?? false;
 
         public bool OnScroll(GlobalAction action, float amount, bool isPrecise) =>
             ScrollActionRequested?.Invoke(action, amount, isPrecise) ?? false;

@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"212121"),
+                                Colour = Color4Extensions.FromHex(@"212121"),
                             },
                             new StatusColouredContainer(transition_duration)
                             {

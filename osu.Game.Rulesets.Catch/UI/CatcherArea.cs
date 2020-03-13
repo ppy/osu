@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 currentCatcher?.Hide();
 
-                switch (currentState)
+                switch (CurrentState)
                 {
                     default:
                         currentCatcher = catcherIdle;
@@ -263,15 +263,13 @@ namespace osu.Game.Rulesets.Catch.UI
                     Position = Position
                 };
 
-                AdditiveTarget?.Add(additive);
-
                 additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
                 additive.Expire(true);
+                
+                AdditiveTarget?.Add(additive);
 
                 Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
             }
-
-            private Drawable createCatcherSprite() => new CatcherSprite(currentState);
 
             /// <summary>
             /// Add a caught fruit to the catcher's stack.
@@ -341,7 +339,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (validCatch)
                     updateState(fruit.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
-                else
+                else if (!(fruit is Banana))
                     updateState(CatcherAnimationState.Fail);
 
                 return validCatch;
@@ -349,14 +347,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private void updateState(CatcherAnimationState state)
             {
-                if (currentState == state)
+                if (CurrentState == state)
                     return;
 
-                currentState = state;
+                CurrentState = state;
                 updateCatcher();
             }
 
-            private CatcherAnimationState currentState;
+            public CatcherAnimationState CurrentState { get; private set; }
 
             private double hyperDashModifier = 1;
             private int hyperDashDirection;
@@ -376,14 +374,14 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 const float hyper_dash_transition_length = 180;
 
-                bool previouslyHyperDashing = HyperDashing;
+                bool wasHyperDashing = HyperDashing;
 
                 if (modifier <= 1 || X == targetPosition)
                 {
                     hyperDashModifier = 1;
                     hyperDashDirection = 0;
 
-                    if (previouslyHyperDashing)
+                    if (wasHyperDashing)
                     {
                         this.FadeColour(Color4.White, hyper_dash_transition_length, Easing.OutQuint);
                         this.FadeTo(1, hyper_dash_transition_length, Easing.OutQuint);
@@ -396,11 +394,18 @@ namespace osu.Game.Rulesets.Catch.UI
                     hyperDashDirection = Math.Sign(targetPosition - X);
                     hyperDashTargetPosition = targetPosition;
 
-                    if (!previouslyHyperDashing)
+                    if (!wasHyperDashing)
                     {
                         this.FadeColour(Color4.OrangeRed, hyper_dash_transition_length, Easing.OutQuint);
                         this.FadeTo(0.2f, hyper_dash_transition_length, Easing.OutQuint);
                         Trail = true;
+
+                        var hyperDashEndGlow = createAdditiveSprite(true);
+
+                        hyperDashEndGlow.MoveToOffset(new Vector2(0, -20), 1200, Easing.In);
+                        hyperDashEndGlow.ScaleTo(hyperDashEndGlow.Scale * 0.9f).ScaleTo(hyperDashEndGlow.Scale * 1.2f, 1200, Easing.In);
+                        hyperDashEndGlow.FadeOut(1200);
+                        hyperDashEndGlow.Expire(true);
                     }
                 }
             }
