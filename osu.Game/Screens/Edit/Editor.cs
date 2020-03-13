@@ -23,6 +23,7 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -86,7 +87,18 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            try
+            {
+                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Could not load beatmap sucessfully!");
+                //couldn't load, hard abort!
+                this.Exit();
+                return;
+            }
+
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
 
             dependencies.CacheAs(editorBeatmap);
