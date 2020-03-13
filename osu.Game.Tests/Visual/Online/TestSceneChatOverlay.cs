@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -107,12 +107,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
 
             AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Close channel 2", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddStep("Close channel 2", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
 
             AddAssert("Selector remained closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
 
-            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddStep("Close channel 1", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
 
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Last visible selected", () => currentChannel == visibleChannels.Last());
 
             // Closing the last channel with dropdown no longer present
-            AddStep("Close last when selector next", () => 
+            AddStep("Close last when selector next", () =>
             {
                 expectedChannel = previousChannel;
                 chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Online
 
             // Standard channel closing
             AddStep("Switch to previous channel", () => chatOverlay.ChannelTabControl.SwitchTab(-1));
-            AddStep("Close current channel", () => 
+            AddStep("Close current channel", () =>
             {
                 expectedChannel = nextChannel;
                 chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
