@@ -609,7 +609,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
-            AddAssert("Selected beatmap correct", () => songSelect.Carousel.SelectedBeatmap == filteredBeatmap);
+            // todo: this logic is changed in follow up PR.
+            AddAssert("Selected beatmap not changed", () => songSelect.Carousel.SelectedBeatmap != filteredBeatmap);
         }
 
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
