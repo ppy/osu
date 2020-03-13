@@ -153,8 +153,10 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapHidden += beatmapHidden;
             beatmaps.BeatmapRestored += beatmapRestored;
 
-            loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
+            loadBeatmapSets(GetLoadableBeatmaps());
         }
+
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -189,7 +191,7 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false, false);
+            applyActiveCriteria(false);
 
             //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
@@ -239,7 +241,7 @@ namespace osu.Game.Screens.Select
                     {
                         Debug.Assert(bypassFilters);
 
-                        applyActiveCriteria(false, true);
+                        applyActiveCriteria(false);
                     }
 
                     return true;
@@ -396,7 +398,7 @@ namespace osu.Game.Screens.Select
         {
             if (PendingFilter?.Completed == false)
             {
-                applyActiveCriteria(false, false);
+                applyActiveCriteria(false);
                 Update();
             }
         }
@@ -406,10 +408,10 @@ namespace osu.Game.Screens.Select
             if (newCriteria != null)
                 activeCriteria = newCriteria;
 
-            applyActiveCriteria(debounce, true);
+            applyActiveCriteria(debounce);
         }
 
-        private void applyActiveCriteria(bool debounce, bool scroll)
+        private void applyActiveCriteria(bool debounce)
         {
             if (root.Children.Any() != true) return;
 
@@ -419,7 +421,7 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-                if (scroll) scrollPositionCache.Invalidate();
+                scrollPositionCache.Invalidate();
             }
 
             PendingFilter?.Cancel();

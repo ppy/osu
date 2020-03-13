@@ -61,7 +61,7 @@ namespace osu.Game.Tournament
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        video = new TourneyVideo(storage.GetStream("videos/main.m4v"))
+                        video = new TourneyVideo("main", true)
                         {
                             Loop = true,
                             RelativeSizeAxes = Axes.Both,
@@ -194,9 +194,14 @@ namespace osu.Game.Tournament
 
             switch (currentScreen)
             {
-                case GameplayScreen _:
                 case MapPoolScreen _:
                     chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
+                    chatContainer.ResizeWidthTo(1, 500, Easing.OutQuint);
+                    break;
+
+                case GameplayScreen _:
+                    chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
+                    chatContainer.ResizeWidthTo(0.5f, 500, Easing.OutQuint);
                     break;
 
                 default:
