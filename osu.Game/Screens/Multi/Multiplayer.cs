@@ -13,7 +13,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -75,7 +74,7 @@ namespace osu.Game.Screens.Multi
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
-            var backgroundColour = OsuColour.FromHex(@"3e3a44");
+            var backgroundColour = Color4Extensions.FromHex(@"3e3a44");
 
             InternalChild = waves = new MultiplayerWaveContainer
             {
@@ -386,10 +385,10 @@ namespace osu.Game.Screens.Multi
 
             public MultiplayerWaveContainer()
             {
-                FirstWaveColour = OsuColour.FromHex(@"654d8c");
-                SecondWaveColour = OsuColour.FromHex(@"554075");
-                ThirdWaveColour = OsuColour.FromHex(@"44325e");
-                FourthWaveColour = OsuColour.FromHex(@"392850");
+                FirstWaveColour = Color4Extensions.FromHex(@"654d8c");
+                SecondWaveColour = Color4Extensions.FromHex(@"554075");
+                ThirdWaveColour = Color4Extensions.FromHex(@"44325e");
+                FourthWaveColour = Color4Extensions.FromHex(@"392850");
             }
         }
 
