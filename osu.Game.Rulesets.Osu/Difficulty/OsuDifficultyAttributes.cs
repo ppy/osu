@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -12,5 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double ApproachRate;
         public double OverallDifficulty;
         public int MaxCombo;
+
+        public double[] JumpDistances = Array.Empty<double>();
+        public double[] StrainTimes = Array.Empty<double>();
     }
 }

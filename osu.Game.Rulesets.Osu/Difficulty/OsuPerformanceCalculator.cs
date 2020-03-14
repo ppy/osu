@@ -95,69 +95,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return totalValue;
         }
-public double[] Main()
-    {
-        try
-        {   // Open the text file using a stream reader.
-            string tempstor = Path.GetTempPath();
-            string jdapath = tempstor + "jda.txt";
-            using (StreamReader sr = new StreamReader(jdapath))
-            {
-            // Read the stream to a string, and write the string to the console.
-                double[] errorval = {1,2,3};
-            //  double[] JumpDistanceArray = new double[32767];
-                string a = sr.ReadToEnd();
-                a = a.TrimEnd(',');
-                string[] JumpDistanceArray2 = a.Split(",");                
-            //    Console.WriteLine(a);
-            //    Console.ReadKey();
-            //    Console.WriteLine(JumpDistanceArray2[0]);
-            //    Console.ReadKey();
-                double[] JumpDistanceArray = new double[JumpDistanceArray2.Length];
-                for(int i=0; i<JumpDistanceArray2.Length; i++)
-                {
-                    JumpDistanceArray[i] = double.Parse(JumpDistanceArray2[i],CultureInfo.InvariantCulture);
-                }
-                return JumpDistanceArray;
-            }
-        }
-        catch (IOException e)
+
+        public double[] Main()
         {
-            double[] errorval = {1,2,4};
-            Console.WriteLine("The file could not be read:");
-            Console.WriteLine(e.Message);
-            return errorval;
+            return Attributes.JumpDistances;
         }
-    }
-public double Main2()
-    {
-        try
-        {   // Open the text file using a stream reader.
-            string tempstor = Path.GetTempPath();
-            string jda2path = tempstor + "jda2.txt";
-            using (StreamReader sr = new StreamReader(jda2path))
-            {
-            // Read the stream to a string, and write the string to the console.
-                double sumstrain = 0;
-                string a = sr.ReadToEnd();
-                a = a.TrimEnd(',');
-                string[] StrainTimeArray2 = a.Split(',');
-                for (int i = 0; i < StrainTimeArray2.Length; i++)
-                {
-                    double intermres2 = double.Parse(StrainTimeArray2[i],CultureInfo.InvariantCulture);
-                    sumstrain = sumstrain + intermres2;
-                }
-                return sumstrain;
-            }
-        }
-        catch (IOException e)
+
+        public double Main2()
         {
-            double errorval = 2;
-            Console.WriteLine("The file could not be read:");
-            Console.WriteLine(e.Message);
-            return errorval;
+            return Attributes.StrainTimes.Sum();
         }
-    }
+
         private double computeAimValue()
         {
             double[] JumpDistanceArray = Main();
@@ -165,18 +113,21 @@ public double Main2()
             // var Aim = new Aim();
             double average = JumpDistanceArray.Average();
             double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
-            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
+            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
             double bpm = (60000 * countHitCircles) / finalsumstrain;
-            double finalsd2 = (bpm/375) * finalsd;
+            double finalsd2 = (bpm / 375) * finalsd;
             double finalsdpp = 0;
+
             if (countMiss == 0)
             {
-                  finalsdpp = finalsdpp+(finalsd2/stdevconst);
-                  if (finalsdpp >= 1)
-                  {
-                  finalsdpp = (-1)*(Log (finalsdpp, 0.000001));
-                  }
+                finalsdpp = finalsdpp + (finalsd2 / stdevconst);
+
+                if (finalsdpp >= 1)
+                {
+                    finalsdpp = (-1) * (Log(finalsdpp, 0.000001));
+                }
             }
+
             double rawAim = Attributes.AimStrain + finalsdpp;
             // Always clear temp file after end sd workflow.
             string tempstora = Path.GetTempPath();

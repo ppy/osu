@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return new OsuDifficultyAttributes
             {
+                JumpDistances = ((Aim)skills[0]).JumpDistances.ToArray(),
+                StrainTimes = ((Aim)skills[0]).StrainTimes.ToArray(),
                 StarRating = starRating,
                 Mods = mods,
                 AimStrain = aimRating,
