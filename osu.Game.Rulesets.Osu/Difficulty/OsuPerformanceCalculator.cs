@@ -129,12 +129,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             double rawAim = Attributes.AimStrain + finalsdpp;
-            // Always clear temp file after end sd workflow.
-            string tempstora = Path.GetTempPath();
-            string jdapath2 = tempstora + "jda.txt";
-            string jda2path2 = tempstora + "jda2.txt";
-            System.IO.File.WriteAllText(jdapath2, "");
-            System.IO.File.WriteAllText(jda2path2, "");
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
