@@ -348,8 +348,8 @@ namespace osu.Game.Rulesets.Catch.UI
             UpdatePosition((float)(X + direction * Clock.ElapsedFrameTime * speed));
 
             // Correct overshooting.
-            if (hyperDashDirection > 0 && hyperDashTargetPosition < X ||
-                hyperDashDirection < 0 && hyperDashTargetPosition > X)
+            if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
+                (hyperDashDirection < 0 && hyperDashTargetPosition > X))
             {
                 X = hyperDashTargetPosition;
                 SetHyperDashState();
