@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
@@ -78,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
             AddAssert($"msg #{index} has the right action", hasExpectedActions);
-            AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
+            //AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
             AddAssert($"msg #{index} shows {linkAmount} link(s)", isShowingLinks);
 
             bool hasExpectedActions()
@@ -97,7 +96,7 @@ namespace osu.Game.Tests.Visual.Online
                 return true;
             }
 
-            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
+            //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
             bool isShowingLinks()
             {
