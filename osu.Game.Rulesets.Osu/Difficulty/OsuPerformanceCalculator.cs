@@ -105,16 +105,18 @@ public double[] Main()
             {
             // Read the stream to a string, and write the string to the console.
                 double[] errorval = {1,2,3};
-                double[] JumpDistanceArray = new double[32767];
+            //  double[] JumpDistanceArray = new double[32767];
                 string a = sr.ReadToEnd();
-                string[] JumpDistanceArray2 = a.Split(new char[] { ',' });
-                for (int i = 0; i < JumpDistanceArray2.Length; i++)
+                a = a.TrimEnd(',');
+                string[] JumpDistanceArray2 = a.Split(",");                
+            //    Console.WriteLine(a);
+            //    Console.ReadKey();
+            //    Console.WriteLine(JumpDistanceArray2[0]);
+            //    Console.ReadKey();
+                double[] JumpDistanceArray = new double[JumpDistanceArray2.Length];
+                for(int i=0; i<JumpDistanceArray2.Length; i++)
                 {
-                    double intermres = Convert.ToDouble(JumpDistanceArray2[i]);
-                    for (int m = 0; m < JumpDistanceArray2.Length; m++)
-                    {
-                        JumpDistanceArray[m] = intermres;
-                    }
+                    JumpDistanceArray[i] = double.Parse(JumpDistanceArray2[i],CultureInfo.InvariantCulture);
                 }
                 return JumpDistanceArray;
             }
@@ -138,10 +140,11 @@ public double Main2()
             // Read the stream to a string, and write the string to the console.
                 double sumstrain = 0;
                 string a = sr.ReadToEnd();
-                string[] StrainTimeArray2 = a.Split(new char[] { ',' });
+                a = a.TrimEnd(',');
+                string[] StrainTimeArray2 = a.Split(',');
                 for (int i = 0; i < StrainTimeArray2.Length; i++)
                 {
-                    double intermres2 = Convert.ToDouble(StrainTimeArray2[i]);
+                    double intermres2 = double.Parse(StrainTimeArray2[i],CultureInfo.InvariantCulture);
                     sumstrain = sumstrain + intermres2;
                 }
                 return sumstrain;
@@ -158,7 +161,7 @@ public double Main2()
         private double computeAimValue()
         {
             double[] JumpDistanceArray = Main();
-            double finalsumstrain = Main2(); 
+            double finalsumstrain = Main2();
             // var Aim = new Aim();
             double average = JumpDistanceArray.Average();
             double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
@@ -175,6 +178,12 @@ public double Main2()
                   }
             }
             double rawAim = Attributes.AimStrain + finalsdpp;
+            // Always clear temp file after end sd workflow.
+            string tempstora = Path.GetTempPath();
+            string jdapath2 = tempstora + "jda.txt";
+            string jda2path2 = tempstora + "jda2.txt";
+            System.IO.File.WriteAllText(jdapath2, "");
+            System.IO.File.WriteAllText(jda2path2, "");
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
