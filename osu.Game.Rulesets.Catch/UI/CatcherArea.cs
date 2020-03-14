@@ -251,22 +251,10 @@ namespace osu.Game.Rulesets.Catch.UI
                     return;
                 }
 
-                Texture tex = (currentCatcher.Drawable as TextureAnimation)?.CurrentFrame ?? ((Sprite)currentCatcher.Drawable).Texture;
-
-                var additive = new CatcherTrailSprite(tex)
-                {
-                    Anchor = Anchor,
-                    Scale = Scale,
-                    Colour = HyperDashing ? Color4.Red : Color4.White,
-                    Blending = BlendingParameters.Additive,
-                    RelativePositionAxes = RelativePositionAxes,
-                    Position = Position
-                };
+                var additive = createAdditiveSprite();
 
                 additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
                 additive.Expire(true);
-                
-                AdditiveTarget?.Add(additive);
 
                 Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
             }
@@ -400,10 +388,10 @@ namespace osu.Game.Rulesets.Catch.UI
                         this.FadeTo(0.2f, hyper_dash_transition_length, Easing.OutQuint);
                         Trail = true;
 
-                        var hyperDashEndGlow = createAdditiveSprite(true);
+                        var hyperDashEndGlow = createAdditiveSprite();
 
-                        hyperDashEndGlow.MoveToOffset(new Vector2(0, -20), 1200, Easing.In);
-                        hyperDashEndGlow.ScaleTo(hyperDashEndGlow.Scale * 0.9f).ScaleTo(hyperDashEndGlow.Scale * 1.2f, 1200, Easing.In);
+                        hyperDashEndGlow.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
+                        hyperDashEndGlow.ScaleTo(hyperDashEndGlow.Scale * 0.95f).ScaleTo(hyperDashEndGlow.Scale * 1.2f, 1200, Easing.In);
                         hyperDashEndGlow.FadeOut(1200);
                         hyperDashEndGlow.Expire(true);
                     }
@@ -520,6 +508,25 @@ namespace osu.Game.Rulesets.Catch.UI
                     f.MoveToX(f.X + originalX * 6, 1000);
                     f.FadeOut(750);
                 });
+            }
+
+            private CatcherTrailSprite createAdditiveSprite()
+            {
+                Texture tex = (currentCatcher.Drawable as TextureAnimation)?.CurrentFrame ?? ((Sprite)currentCatcher.Drawable).Texture;
+
+                var sprite = new CatcherTrailSprite(tex)
+                {
+                    Anchor = Anchor,
+                    Scale = Scale,
+                    Colour = HyperDashing ? Color4.Red : Color4.White,
+                    Blending = BlendingParameters.Additive,
+                    RelativePositionAxes = RelativePositionAxes,
+                    Position = Position
+                };
+
+                AdditiveTarget?.Add(sprite);
+
+                return sprite;
             }
 
             private void removeFromPlateWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
