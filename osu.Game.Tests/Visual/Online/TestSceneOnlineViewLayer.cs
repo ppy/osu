@@ -53,18 +53,13 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        [SetUp]
-        public void Setup()
-        {
-            InputManager.MoveMouseTo(box);
-        }
-
         [Test]
         public void TestOfflineStateVisibility()
         {
             AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
             AddUntilStep("content is dimmed", () => con.Colour != Color4.White);
-            AddAssert("loading animation is not visible", () => !view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddUntilStep("loading animation is not visible", () => !view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddStep("move mouse", () => InputManager.MoveMouseTo(box));
             AddAssert("input is blocked", () => !box.IsHovered);
         }
 
@@ -74,6 +69,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
             AddUntilStep("content is dimmed", () => con.Colour != Color4.White);
             AddUntilStep("loading animation is visible", () => view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddStep("move mouse", () => InputManager.MoveMouseTo(box));
             AddAssert("input is blocked", () => !box.IsHovered);
         }
 
@@ -81,8 +77,9 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFailingStateVisibility()
         {
             AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
-            AddAssert("content is dimmed", () => con.Colour != Color4.White);
-            AddAssert("loading animation is visible", () => view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddUntilStep("content is dimmed", () => con.Colour != Color4.White);
+            AddUntilStep("loading animation is visible", () => view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddStep("move mouse", () => InputManager.MoveMouseTo(box));
             AddAssert("input is blocked", () => !box.IsHovered);
         }
 
@@ -91,7 +88,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
             AddUntilStep("content is not dimmed", () => con.Colour == Color4.White);
-            AddAssert("loading animation is not visible", () => !view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddUntilStep("loading animation is not visible", () => !view.ChildrenOfType<LoadingSpinner>().First().IsPresent);
+            AddStep("move mouse", () => InputManager.MoveMouseTo(box));
             AddAssert("input is not blocked", () => box.IsHovered);
         }
 
