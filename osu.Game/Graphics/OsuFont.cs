@@ -31,7 +31,14 @@ namespace osu.Game.Graphics
         /// <param name="fixedWidth">Whether all characters should be spaced the same distance apart.</param>
         /// <returns>The <see cref="FontUsage"/>.</returns>
         public static FontUsage GetFont(Typeface typeface = Typeface.Torus, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
-            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), italics, fixedWidth);
+            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), getItalics(italics), fixedWidth);
+
+        private static bool getItalics(in bool italicsRequested)
+        {
+            // right now none of our fonts support italics.
+            // should add exceptions to this rule if they come up.
+            return false;
+        }
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="Typeface"/>.
