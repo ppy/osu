@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
-        private CatcherArea.Catcher getCatcher() => Player.ChildrenOfType<CatcherArea>().First().MovableCatcher;
+        private Catcher getCatcher() => Player.ChildrenOfType<CatcherArea>().First().MovableCatcher;
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
