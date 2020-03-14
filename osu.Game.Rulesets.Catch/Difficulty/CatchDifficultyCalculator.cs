@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override int SectionLength => 750;
 
+        private float halfCatcherWidth;
+
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -48,14 +50,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            float halfCatchWidth;
-
-            using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
-            {
-                halfCatchWidth = catcher.CatchWidth * 0.5f;
-                halfCatchWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
-            }
-
             CatchHitObject lastObject = null;
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
@@ -69,16 +63,25 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatchWidth);
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth);
 
                 lastObject = hitObject;
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
-            new Movement(),
-        };
+            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+            {
+                halfCatcherWidth = catcher.CatchWidth * 0.5f;
+                halfCatcherWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
+            }
+
+            return new Skill[]
+            {
+                new Movement(halfCatcherWidth),
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
