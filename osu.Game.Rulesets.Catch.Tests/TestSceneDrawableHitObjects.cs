@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(CatcherArea.Catcher),
+            typeof(Catcher),
             typeof(DrawableCatchRuleset),
             typeof(DrawableFruit),
             typeof(DrawableJuiceStream),
