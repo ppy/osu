@@ -33,6 +33,12 @@ namespace osu.Game.Tournament
         private Container screens;
         private TourneyVideo video;
 
+        public const float CONTROL_AREA_WIDTH = 160;
+
+        public const float STREAM_AREA_WIDTH = 1366;
+
+        public const double REQUIRED_WIDTH = TournamentSceneManager.CONTROL_AREA_WIDTH * 2 + TournamentSceneManager.STREAM_AREA_WIDTH;
+
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
@@ -51,13 +57,13 @@ namespace osu.Game.Tournament
             {
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    X = 200,
+                    RelativeSizeAxes = Axes.Y,
+                    X = CONTROL_AREA_WIDTH,
                     FillMode = FillMode.Fit,
                     FillAspectRatio = 16 / 9f,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    Size = new Vector2(0.8f, 1),
+                    Width = STREAM_AREA_WIDTH,
                     //Masking = true,
                     Children = new Drawable[]
                     {
@@ -96,7 +102,7 @@ namespace osu.Game.Tournament
                 new Container
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = 200,
+                    Width = CONTROL_AREA_WIDTH,
                     Children = new Drawable[]
                     {
                         new Box
@@ -108,8 +114,8 @@ namespace osu.Game.Tournament
                         {
                             RelativeSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(2),
-                            Padding = new MarginPadding(2),
+                            Spacing = new Vector2(5),
+                            Padding = new MarginPadding(5),
                             Children = new Drawable[]
                             {
                                 new ScreenButton(typeof(SetupScreen)) { Text = "Setup", RequestSelection = SetScreen },
