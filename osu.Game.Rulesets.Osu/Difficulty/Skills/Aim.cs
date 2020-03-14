@@ -60,7 +60,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sectionvelocity < streamaimconst) 
                 { 
                     string comma = "," ;
+                //    double idenvalue = osuCurrent.JumpDistance;
+                //    if (idenvalue > 0 & idenvalue < 1)
+                //    {
+                //         string JumpDistanceArrayn2 = comma + "0" + osuCurrent.JumpDistance.ToString() + comma;
+                //         string StrainTimeArrayn2 = osuCurrent.StrainTime.ToString() + comma;
+                //         string jdapath2 = tempstor + "jda.txt";
+                //         string jda2path2 = tempstor + "jda2.txt";
+                //         // Append Fixes file-overwrite issue
+                //         System.IO.File.AppendAllText(jdapath2, JumpDistanceArrayn2);
+                //         System.IO.File.AppendAllText(jda2path2, StrainTimeArrayn2);
+                //    }
                     string JumpDistanceArrayn = osuCurrent.JumpDistance.ToString() + comma;
+                //    Console.WriteLine(JumpDistanceArrayn);
+                //    Console.ReadKey();
                     string StrainTimeArrayn = osuCurrent.StrainTime.ToString() + comma;
                     string jdapath = tempstor + "jda.txt";
                     string jda2path = tempstor + "jda2.txt";
