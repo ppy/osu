@@ -24,16 +24,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public Func<OsuAction?> GetInitialHitAction;
 
-        private Color4 accentColour;
-
         public Color4 AccentColour
         {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                ball.Colour = value;
-            }
+            get => ball.Colour;
+            set => ball.Colour = value;
         }
 
         private readonly Slider slider;
