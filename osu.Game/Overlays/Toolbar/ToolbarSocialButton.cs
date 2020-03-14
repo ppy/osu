@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarSocialButton()
         {
             Icon = FontAwesome.Solid.Users;
-            TooltipMain = "仪表板";
-            TooltipSub = "在这里查看好友列表";
+            TooltipMain = "看板";
+            TooltipSub = "在这里查看各种各样的东西";
         }
 
         [BackgroundDependencyLoader(true)]

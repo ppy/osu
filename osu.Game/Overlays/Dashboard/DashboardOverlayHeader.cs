@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             public DashboardTitle()
             {
-                Title = "仪表板";
+                Title = "看板";
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

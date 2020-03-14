@@ -16,7 +16,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -91,7 +90,7 @@ namespace osu.Game.Tournament.Components
                                 {
                                     Text = "作图者",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 15)
                                 },
                                 new TournamentSpriteText
                                 {
@@ -103,7 +102,7 @@ namespace osu.Game.Tournament.Components
                                 {
                                     Text = "难度",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 15)
                                 },
                                 new TournamentSpriteText
                                 {
@@ -125,13 +124,21 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mods))
             {
-                AddInternal(new Sprite
+                AddInternal(new Container
                 {
-                    Texture = textures.Get($"mods/{mods}"),
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 60,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(10),
-                    Scale = new Vector2(0.8f)
+                    Child = new Sprite
+                    {
+                        FillMode = FillMode.Fit,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Texture = textures.Get($"mods/{mods}"),
+                    }
                 });
             }
         }

@@ -4,7 +4,7 @@
 *   任何以 `[O]` 开头的均为仍在开放中的pr, 需要不定义检查是否有更新
 # 变更日志
 ### 2020/03/07
-*   整合更新
+*   合并上游pr
     *   [m] [Ensure tournament screens respect aspect ratio in tests #8148]
     *   [m] [Add a short load delay for avatars to avoid unnecessary fetching #8149]
     *   [m] [Remove layout durations from tournament editor screens for better performance #8150]
@@ -13,7 +13,7 @@
     *   [m] [Fix osu! hitbox accepting input outside of circle #8163]
 
 ### 2020/03/09
-*   整合更新
+*   合并上游pr
     *   [m] [Adjust most played beatmaps section to better match osu-web #8047]
     *   [m] [Fix video looping not propagating when set too early in initialisation #8178]
     *   [m] [Increase flexibility of StarCounter component #8175]
@@ -28,7 +28,7 @@
 
 ### 2020/03/10
 *   添加了一些东西,详见文件变更列表
-*   整合更新
+*   合并上游pr
     *   [m] [Implement 2020 gameplay design #8176]
     *   [m] [Implement 2020 schedule design #8177]
     *   [m] [Update framework #8193]
@@ -39,7 +39,7 @@
 *   **实现了实时显示系统时间的功能**
 
 ### 2020/03/11:
-*   整合更新
+*   合并上游pr
     *   [m] [Fix crashes on some storyboards #8195]
     *   [m] [Fix perfect mod incorrectly failing in some scenarios #8084]
     *   [m] [Hide pp display on leaderboards if map is qualified or loved #7971]
@@ -69,7 +69,7 @@
         *   [osu.Game.Tournament/Screens/Schedule/ScheduleScreen.cs](osu.Game.Tournament/Screens/Schedule/ScheduleScreen.cs)
         *   [osu.Game.Tournament/Screens/TeamIntro/SeedingScreen.cs](osu.Game.Tournament/Screens/TeamIntro/SeedingScreen.cs)
 
-*   整合更新
+*   合并上游pr
     *   [m] [Implement 2020 seeding screen design #8215]
     *   [m] [Use fixed width text for tournament score displays #8229]
     *   [m] [Disable adjusting volume via "select next" and "select previous" as fallbacks #8235]
@@ -88,3 +88,16 @@
 *   补全翻译
     *   [补全了"该谱面暂时无法被下载"的翻译](osu.Game/Overlays/BeatmapSet/BeatmapAvailability.cs)
 *   各种各样的修改
+
+### 2020/03/13:
+*   更新上游pr 
+    *   [o] [Replace SocialOverlay with DashboardOverlay #805_1]
+        *   更新翻译“仪表板”为“看板”(match osu-web)
+
+*   合并上游pr
+    *   [m] [Remove unlimited timing points in difficulty calculation #8219]
+    *   [m] [Fix mod sprite bleeding border colour #8261]
+    *   [m] [Expose half catcher width to movement skill #8256]
+    *   [m] [Add more sane limit for maximum slider length #8217]
+
+*   同步805_1的Tests

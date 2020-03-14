@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -29,14 +28,15 @@ namespace osu.Game.Overlays.Dashboard.Friends
             set
             {
                 users = value;
+
+                usersLoaded = true;
+
                 onlineStatusControl.Populate(value);
             }
         }
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        private readonly Bindable<User> localUser = new Bindable<User>();
 
         private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
@@ -147,6 +147,8 @@ namespace osu.Game.Overlays.Dashboard.Friends
             controlBackground.Colour = colourProvider.Background5;
         }
 
+        private bool usersLoaded;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -154,19 +156,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
-
-            localUser.BindTo(api.LocalUser);
-            localUser.BindValueChanged(_ => refetch(), true);
-        }
-
-        private void refetch()
-        {
-            // If user is offline - will be used HomeOverlay loading
-            if (itemsPlaceholder.Any() && api.IsLoggedIn)
-                loading.Show();
-
-            request?.Cancel();
-            cancellationToken?.Cancel();
 
             if (!api.IsLoggedIn)
                 return;
@@ -178,14 +167,18 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private void recreatePanels()
         {
-            if (itemsPlaceholder.Any())
-                loading.Show();
+            // Don't allow any changes until we have users loaded
+            if (!usersLoaded)
+                return;
 
             cancellationToken?.Cancel();
 
-            var statefulUsers = onlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
+            if (itemsPlaceholder.Any())
+                loading.Show();
 
-            var sortedUsers = sortUsers(statefulUsers);
+            var groupedUsers = onlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
+
+            var sortedUsers = sortUsers(groupedUsers);
 
             var table = new FillFlowContainer
             {
