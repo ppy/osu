@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty;
@@ -18,17 +19,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : Skill
     {
-        public double[] GetJumpDistanceArray() => (double[])JumpDistanceArray;
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
         private const double streamaimconst = 2.42;
+
         private const double stdevconst = 0.149820;
         // public static double[] JumpDistanceArray;
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
-        public static object JumpDistanceArray { get; internal set; }
+        public readonly List<double> JumpDistances = new List<double>();
+        public readonly List<double> StrainTimes = new List<double>();
 
         // Standard Deviation Calculation Code courtesy of Roman http://csharphelper.com/blog/2015/12/make-an-extension-method-that-calculates-standard-deviation-in-c/
         // public static double GetStandardDeviation(List values)
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // https://stackoverflow.com/a/5336708
         // double average = JumpDistanceArray.Average();
         // double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
-        // double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length); 
+        // double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
         // double finalsdpp = finalsd/stdevconst when missCount = 0;
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -53,35 +55,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             double result = 0;
+
             if (osuCurrent.JumpDistance < 150)
             {
-            double sectionvelocity = osuCurrent.JumpDistance/osuCurrent.StrainTime;
-            string tempstor = Path.GetTempPath();
-            if (sectionvelocity < streamaimconst) 
-                { 
-                    string comma = "," ;
-                //    double idenvalue = osuCurrent.JumpDistance;
-                //    if (idenvalue > 0 & idenvalue < 1)
-                //    {
-                //         string JumpDistanceArrayn2 = comma + "0" + osuCurrent.JumpDistance.ToString() + comma;
-                //         string StrainTimeArrayn2 = osuCurrent.StrainTime.ToString() + comma;
-                //         string jdapath2 = tempstor + "jda.txt";
-                //         string jda2path2 = tempstor + "jda2.txt";
-                //         // Append Fixes file-overwrite issue
-                //         System.IO.File.AppendAllText(jdapath2, JumpDistanceArrayn2);
-                //         System.IO.File.AppendAllText(jda2path2, StrainTimeArrayn2);
-                //    }
-                    string JumpDistanceArrayn = osuCurrent.JumpDistance.ToString() + comma;
-                //    Console.WriteLine(JumpDistanceArrayn);
-                //    Console.ReadKey();
-                    string StrainTimeArrayn = osuCurrent.StrainTime.ToString() + comma;
-                    string jdapath = tempstor + "jda.txt";
-                    string jda2path = tempstor + "jda2.txt";
-                    // Append Fixes file-overwrite issue
-                    System.IO.File.AppendAllText(jdapath, JumpDistanceArrayn);
-                    System.IO.File.AppendAllText(jda2path, StrainTimeArrayn);
+                double sectionvelocity = osuCurrent.JumpDistance / osuCurrent.StrainTime;
+
+                if (sectionvelocity < streamaimconst)
+                {
+                    JumpDistances.Add(osuCurrent.JumpDistance);
+                    StrainTimes.Add(osuCurrent.StrainTime);
                 }
             }
+
             if (Previous.Count > 0)
             {
                 var osuPrevious = (OsuDifficultyHitObject)Previous[0];
@@ -100,13 +85,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double jumpDistanceExp = applyDiminishingExp(osuCurrent.JumpDistance);
             double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
-            
+
             return Math.Max(
                 result + (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(osuCurrent.StrainTime, timing_threshold),
                 (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / osuCurrent.StrainTime
             );
         }
-        
+
         private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
     }
 }
