@@ -16,17 +16,24 @@ using osu.Game.Rulesets.Osu.Skinning;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
+    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
     {
         public Func<OsuAction?> GetInitialHitAction;
 
-        public new Color4 Colour
+        private Color4 accentColour;
+
+        public Color4 AccentColour
         {
-            get => ball.Colour;
-            set => ball.Colour = value;
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+                ball.Colour = value;
+            }
         }
 
         private readonly Slider slider;
