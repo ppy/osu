@@ -741,7 +741,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             public void ForgetPreviouslySelectedSets()
             {
-                PreviouslySelectedSets = new LinkedList<CarouselBeatmapSet>();
+                LastNotNullSelectedBeatmap = null;
             }
 
             protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();

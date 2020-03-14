@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmapSet selectedBeatmapSet;
 
-        protected LinkedList<CarouselBeatmapSet> PreviouslySelectedSets = new LinkedList<CarouselBeatmapSet>();
+        protected CarouselBeatmap LastNotNullSelectedBeatmap;
 
         /// <summary>
         /// Raised when the <see cref="SelectedBeatmap"/> is changed.
@@ -599,10 +599,7 @@ namespace osu.Game.Screens.Select
                         selectedBeatmapSet = set;
                         SelectionChanged?.Invoke(c.Beatmap);
 
-                        PreviouslySelectedSets.Remove(set); // Remove the set if it already exists. This acts as a reset to set's position in previously selected sets.
-                        PreviouslySelectedSets.AddFirst(set);
-                        if (PreviouslySelectedSets.Count > 50)
-                            PreviouslySelectedSets.RemoveLast();
+                        LastNotNullSelectedBeatmap = c;
 
                         itemsCache.Invalidate();
                         scrollPositionCache.Invalidate();
@@ -782,11 +779,10 @@ namespace osu.Game.Screens.Select
 
             private void selectFromPreviousOrRandom()
             {
-                var visiblePreviousSets = carousel.PreviouslySelectedSets.Where(s => !s.Filtered.Value).ToList();
-                if (!visiblePreviousSets.Any())
+                if (carousel.LastNotNullSelectedBeatmap == null || carousel.LastNotNullSelectedBeatmap.Filtered.Value)
                     carousel.SelectNextRandom();
                 else
-                    visiblePreviousSets.First().State.Value = CarouselItemState.Selected;
+                    carousel.LastNotNullSelectedBeatmap.State.Value = CarouselItemState.Selected;
             }
         }
 
