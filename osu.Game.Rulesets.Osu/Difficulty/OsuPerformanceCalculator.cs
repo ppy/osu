@@ -107,10 +107,11 @@ public double[] Main()
                 double[] errorval = {1,2,3};
                 double[] JumpDistanceArray = new double[32767];
                 string a = sr.ReadToEnd();
+                a = a.TrimEnd(',');
                 string[] JumpDistanceArray2 = a.Split(new char[] { ',' });
                 for (int i = 0; i < JumpDistanceArray2.Length; i++)
                 {
-                    double intermres = Convert.ToDouble(JumpDistanceArray2[i]);
+                    double intermres = Convert.ToDouble(JumpDistanceArray2[i],CultureInfo.InvariantCulture);
                     for (int m = 0; m < JumpDistanceArray2.Length; m++)
                     {
                         JumpDistanceArray[m] = intermres;
@@ -138,10 +139,11 @@ public double Main2()
             // Read the stream to a string, and write the string to the console.
                 double sumstrain = 0;
                 string a = sr.ReadToEnd();
+                a = a.TrimEnd(',');
                 string[] StrainTimeArray2 = a.Split(new char[] { ',' });
                 for (int i = 0; i < StrainTimeArray2.Length; i++)
                 {
-                    double intermres2 = Convert.ToDouble(StrainTimeArray2[i]);
+                    double intermres2 = Convert.ToDouble(StrainTimeArray2[i],CultureInfo.InvariantCulture);
                     sumstrain = sumstrain + intermres2;
                 }
                 return sumstrain;
@@ -158,7 +160,7 @@ public double Main2()
         private double computeAimValue()
         {
             double[] JumpDistanceArray = Main();
-            double finalsumstrain = Main2(); 
+            double finalsumstrain = Main2();
             // var Aim = new Aim();
             double average = JumpDistanceArray.Average();
             double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
