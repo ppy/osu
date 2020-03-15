@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 RelativeSizeAxes = Axes.Y;
                 TextAnchor = Anchor.CentreLeft;
 
-                if (country.FullName != null)
+                if (!string.IsNullOrEmpty(country.FullName))
                     AddLink(country.FullName, () => rankings?.ShowCountry(country));
             }
         }

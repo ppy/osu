@@ -76,7 +76,10 @@ namespace osu.Game.Overlays.Rankings.Tables
             var isHighlighted = HighlightedColumn() == title;
             var isGrade = GradeColumns().Contains(title);
 
-            return new HeaderText(title, isHighlighted) { Margin = new MarginPadding { Vertical = 5, Horizontal = isGrade ? 20 : 10 } };
+            return new HeaderText(title, isHighlighted)
+            { 
+                Margin = new MarginPadding { Vertical = 5, Horizontal = isGrade ? 20 : 10 } 
+            };
         }
 
         protected abstract Country GetCountry(TModel item);
