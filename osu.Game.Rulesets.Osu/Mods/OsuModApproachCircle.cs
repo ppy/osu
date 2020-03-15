@@ -20,14 +20,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "AC";
         public override string Description => "Never trust the approach circles...";
         public override double ScoreMultiplier => 1;
-
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
         [SettingSource("Easing", "Change the easing type of the approach circles.", 0)]
         public Bindable<Easing> BindableEasing { get; } = new Bindable<Easing>();
 
         [SettingSource("Scale the size", "Change the factor of the approach circle scale.", 1)]
-
         public BindableFloat Scale { get; } = new BindableFloat
         {
             Precision = 0.1f,
