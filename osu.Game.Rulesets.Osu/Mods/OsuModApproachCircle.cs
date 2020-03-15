@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     if (!(drawableHitObj is DrawableHitCircle hitCircle)) return;
 
-                    var obj = drawableOsuHitObj.HitObject;
+                    var obj = hitCircle.HitObject;
 
                     hitCircle.BeginAbsoluteSequence(obj.StartTime - obj.TimePreempt, true);
                     hitCircle.ApproachCircle.ScaleTo(Scale.Value);
