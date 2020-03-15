@@ -1,3 +1,4 @@
+仍在翻译中，请以最终文案为准。
 <p align="center">
   <img width="500px" src="assets/lazer.png">
 </p>
@@ -9,56 +10,58 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu)
 [![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
 
-Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename *osu!lazer*. Pew pew.
+节奏一*触*即发。 osu!的未来和开放时代的开始！Commonly known by the codename *osu!lazer*. Pew pew.
 
-## Status
+## 状态
 
-This project is under heavy development, but is in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
+该项目目前仍处于开发阶段, 但已经足够稳定。欢迎各大osu玩家们前来尝试，并和*osu!*stable客户端一起安装。它将继续发展下去，直到可以通过一次更新取代现有stable客户端的安装。
 
-We are accepting bug reports (please report with as much detail as possible and follow the existing issue templates). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features. A few resources are available as starting points to getting involved and understanding the project:
+如果你在体验时遇到了bug，欢迎前来提交 (请尽可能详细地汇报细节，并跟随现有的issue汇报模板)。功能性请求也同样受到欢迎，但请注意：我们目前主要会将注意力放在完成游戏已有功能上，因此请求的新功能可能不会很快地得到实现。下列资料可以帮助您作为参与和理解该项目的起点：
 
-- Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
-- You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
-- Read peppy's [latest blog post](https://blog.ppy.sh/a-definitive-lazer-faq/) exploring where lazer is currently and the roadmap going forward.
+- 详细更新日志可以通过[osu!官方网站](https://osu.ppy.sh/home/changelog/lazer)查看。
+- 您可以详细了解我们[管理该项目](https://github.com/ppy/osu/wiki/Project-management)的方法。
+- 阅读peppy的[最新博客](https://blog.ppy.sh/a-definitive-lazer-faq/) 来获知当前lazer的开发状态以及将来前进的方向
 
-## Running osu!
+## 运行osu！
 
-If you are looking to install or test osu! without setting up a development environment, you can consume our [binary releases](https://github.com/ppy/osu/releases). Handy links below will download the latest version for your operating system of choice:
+如果您正在寻找一个可以不用搭建开发环境即可安装/测试osu!，您可以下载我们的[二进制发行版](https://github.com/ppy/osu/releases)。
+下面的链接可以帮助您在您的操作系统上获取osu!的最新版本：
 
-**Latest build:**
+**最新构建：**
 
-| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS(iOS 10+)](https://osu.ppy.sh/home/testflight) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
-| ------------- | ------------- | ------------- | ------------- | ------------- |
+| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://osu.ppy.sh/home/testflight) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage)
+| ------------- | ------------- | ------------- | ------------- |
 
-- When running on Windows 7 or 8.1, **[additional prerequisites](https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?tabs=netcore31&pivots=os-windows)** may be required to correctly run .NET Core applications if your operating system is not up-to-date with the latest service packs.
+- 如果您在 Windows 7 或 8.1　上运行, 您也许需要下载 **[额外依赖](https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?tabs=netcore31&pivots=os-windows)** 来运行 .NET Core 应用程序。
 
-If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
+如果您的平台没有被列在上面，那么您仍可以尝试通过下面给出的操作手动构建。
 
-## Developing or debugging
+## 开发或调试
 
-Please make sure you have the following prerequisites:
+请确保您准备好了下列依赖:
 
-- A desktop platform with the [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download) or higher installed.
-- When developing with mobile, [Xamarin](https://docs.microsoft.com/en-us/xamarin/) is required, which is shipped together with Visual Studio or [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/).
-- When working with the codebase, we recommend using an IDE with intelligent code completion and syntax highlighting, such as [Visual Studio 2019+](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
-- When running on Linux, please have a system-wide FFmpeg installation available to support video decoding.
+- 装有[.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)或更高版本的桌面平台。
+- 若要开发移动平台的osu！，您需要安装[Xamarin](https://docs.microsoft.com/en-us/xamarin/)，Xamarin通常会作为 Visual Studio 或 [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/)的一个安装选项来附带。
+- 当编写代码时，我们推荐您使用带有自动补全和语法高亮的IDE来进行，如：[Visual Studio 2019+](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/) 或 [Visual Studio Code](https://code.visualstudio.com/).
+- 当在Linux上运行时，osu！需要一个系统范围的FFmpeg安装，否则视频播放将无法使用。
+* 译者注：您可以尝试将原本AppImage中的`AppRun`脚本替换为[这个pr](https://github.com/ppy/osu-deploy/pull/44/files)中提供的`AppRun`，如果在替换后视频播放正常，则代表您的发行版没有正确创建相关软链。
 
-### Downloading the source code
+### 下载源码（需要git）
 
-Clone the repository:
+克隆项目解决方案:
 
 ```shell
 git clone https://github.com/ppy/osu
 cd osu
 ```
 
-To update the source code to the latest commit, run the following command inside the `osu` directory:
+若要将源码更新至最后一次提交(commit)，在`osu`目录下执行以下指令：
 
 ```shell
 git pull
 ```
 
-### Building
+### 构建
 
 Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this is provided [below](#contributing).
 
