@@ -5,11 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using osu.Game;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using static osu.Game.Beatmaps.BeatmapInfo;
 using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -62,8 +65,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (sectionvelocity < streamaimconst)
                 {
+                    // Attempts to ban mapID 2058788 but failed, JUSTadICE too strong.
+                    var mc = new BeatmapInfo();
+                    if (mc.OnlineBeatmapID != 2058788 && Previous.Count > 0 && osuCurrent.Angle != null && osuCurrent.Angle.Value >= Math.PI && osuCurrent.StrainTime < 80 )
+                    {
                     JumpDistances.Add(osuCurrent.JumpDistance);
                     StrainTimes.Add(osuCurrent.StrainTime);
+                    }
                 }
             }
 

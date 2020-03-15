@@ -110,25 +110,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double[] JumpDistanceArray = Main();
             double finalsumstrain = Main2();
+            double finalsdpp = 0;
+            if (finalsumstrain != 0)
+            {
             // var Aim = new Aim();
             double average = JumpDistanceArray.Average();
             double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
             double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
             double bpm = (60000 * countHitCircles) / finalsumstrain;
             double finalsd2 = (bpm / 375) * finalsd;
-            double finalsdpp = 0;
-
             if (countMiss == 0)
             {
                 finalsdpp = finalsdpp + (finalsd2 / stdevconst);
 
                 if (finalsdpp >= 1)
                 {
-                    finalsdpp = (-1) * (Log(finalsdpp, 0.000001));
+                    finalsdpp = (-1) * (Log(finalsdpp, 0.9));
                 }
             }
+            }
 
-            double rawAim = Attributes.AimStrain + finalsdpp;
+            double rawAim = Attributes.AimStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
@@ -178,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
-            return aimValue;
+            return aimValue + finalsdpp;
         }
 
         private double computeSpeedValue()
