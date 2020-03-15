@@ -398,27 +398,6 @@ namespace osu.Game.Rulesets.Catch.UI
             Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
         }
 
-        private Drawable createAdditiveSprite(bool hyperDash)
-        {
-            var additive = createCatcherSprite();
-
-            additive.Anchor = Anchor;
-            additive.Scale = Scale;
-            additive.Colour = hyperDash ? Color4.Red : Color4.White;
-            additive.Blending = BlendingParameters.Additive;
-            additive.RelativePositionAxes = RelativePositionAxes;
-            additive.Position = Position;
-
-            AdditiveTarget.Add(additive);
-
-            return additive;
-        }
-
-        private Drawable createCatcherSprite()
-        {
-            return new CatcherSprite(CurrentState);
-        }
-
         private void updateState(CatcherAnimationState state)
         {
             if (CurrentState == state)
