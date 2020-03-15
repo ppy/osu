@@ -77,11 +77,11 @@ namespace osu.Game.Overlays.Rankings
                             },
                             new FillFlowContainer
                             {
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomRight,
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(15, 0),
+                                Spacing = new Vector2(20, 0),
                                 Children = new Drawable[]
                                 {
                                     startDateColumn = new InfoColumn(@"Start Date"),
