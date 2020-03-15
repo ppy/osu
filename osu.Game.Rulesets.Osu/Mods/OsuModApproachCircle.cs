@@ -26,14 +26,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Easing", "Change the easing type of the approach circles.", 0)]
         public Bindable<Easing> BindableEasing { get; } = new Bindable<Easing>();
 
-        [SettingSource("Scale", "Change the factor of the approach circle scale.", 1)]
+        [SettingSource("Scale the size", "Change the factor of the approach circle scale.", 1)]
+
         public BindableFloat Scale { get; } = new BindableFloat
         {
             Precision = 0.1f,
             MinValue = 2,
             MaxValue = 10,
             Default = 4,
-            Value = 4,
+            Value = 4
         };
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
