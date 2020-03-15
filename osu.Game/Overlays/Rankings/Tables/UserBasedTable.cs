@@ -19,17 +19,20 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected override IEnumerable<string> GradeColumns() => new List<string> { "SS", "S", "A" };
+        protected virtual IEnumerable<string> GradeColumns => new List<string> { "SS", "S", "A" };
 
-        protected override TableColumn[] CreateAdditionalHeaders()
-        {
-            var gradeColumns = GradeColumns().Select(grade => new TableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)));
-
-            return new[]
+        protected override TableColumn[] CreateAdditionalHeaders() => new[]
             {
                 new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            }.Concat(CreateUniqueHeaders()).Concat(gradeColumns).ToArray();
+            }.Concat(CreateUniqueHeaders())
+             .Concat(GradeColumns.Select(grade => new TableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
+             .ToArray();
+
+        protected override Drawable CreateHeader(int index, TableColumn column)
+        {
+            var title = column?.Header ?? string.Empty;
+            return new UserTableHeaderText(title, HighlightedColumn == title, GradeColumns.Contains(title));
         }
 
         protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
@@ -60,5 +63,19 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected abstract TableColumn[] CreateUniqueHeaders();
 
         protected abstract Drawable[] CreateUniqueContent(UserStatistics item);
+
+        private class UserTableHeaderText : HeaderText
+        {
+            public UserTableHeaderText(string text, bool isHighlighted, bool isGrade)
+                : base(text, isHighlighted)
+            {
+                Margin = new MarginPadding
+                {
+                    // Grade columns have extra horizontal padding for readibility
+                    Horizontal = isGrade ? 20 : 10,
+                    Vertical = 5
+                };
+            }
+        }
     }
 }
