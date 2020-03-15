@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                if (isHighlighted)
+                if (!isHighlighted)
                     Colour = colourProvider.Foreground1;
             }
         }
