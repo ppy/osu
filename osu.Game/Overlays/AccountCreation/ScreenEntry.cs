@@ -129,14 +129,14 @@ namespace osu.Game.Overlays.AccountCreation
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
-            usernameDescription.AddText("这将会公开显示在你的个人界面上,请勿填写不良信息",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
-            usernameDescription.AddText("也不要填写你自己的个人信息!",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
+            usernameDescription.AddText("这将会公开显示在你的个人界面上,请勿填写不良信息", cp => cp.Font = cp.Font.With(size: 16));
+            usernameDescription.AddText("也不要填写你自己的个人信息!", cp => cp.Font = cp.Font.With(size: 16));
 
-            emailAddressDescription.AddText("这将会用作发送通知和密码重置.",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
-            emailAddressDescription.AddText("确保这些信息正确!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold,size: 16));
+            emailAddressDescription.AddText("这将会用作发送通知和密码重置.", cp => cp.Font = cp.Font.With(size: 16));
+            emailAddressDescription.AddText("确保这些信息正确!", cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold, size: 16));
 
-            passwordDescription.AddText("至少长",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
-            characterCheckText = passwordDescription.AddText("8个字符",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
+            passwordDescription.AddText("至少长", cp => cp.Font = cp.Font.With(size: 16));
+            characterCheckText = passwordDescription.AddText("8个字符", cp => cp.Font = cp.Font.With(size: 16));
 
             passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }

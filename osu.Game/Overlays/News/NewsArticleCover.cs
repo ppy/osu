@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.News
                         Left = 25,
                         Bottom = 50,
                     },
-                    Font = OsuFont.GetFont(Typeface.Exo, 24, FontWeight.Bold),
+                    Font = OsuFont.GetFont(Typeface.Torus, 24, FontWeight.Bold),
                     Text = info.Title,
                 },
                 new OsuSpriteText
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.News
                         Left = 25,
                         Bottom = 30,
                     },
-                    Font = OsuFont.GetFont(Typeface.Exo, 16, FontWeight.Bold),
+                    Font = OsuFont.GetFont(Typeface.Torus, 16, FontWeight.Bold),
                     Text = "by " + info.Author
                 }
             };
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.News
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(Typeface.Exo, 12, FontWeight.Black, false, false),
+                        Font = OsuFont.GetFont(Typeface.Torus, 12, FontWeight.Black, false, false),
                         Text = date.ToString("d MMM yyy").ToUpper(),
                         Margin = new MarginPadding
                         {

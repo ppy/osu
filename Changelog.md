@@ -112,3 +112,4 @@
     *   [m] [Split out CatcherArea nested classes and reorder methods #8257]
     *   [m] [Fix osu! slider ball tint colour being applied to follow circle #8267]
     *   [m] [Add resolution selector in tournament setup screen #8262]
+    *   [m] [Switch game to use new font (Torus) #8259]

@@ -92,15 +92,15 @@ namespace osu.Game.Screens.Menu
 
             textFlow.NewParagraph();
             textFlow.NewParagraph();
-            textFlow.AddText("注意, 这是一个", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
-            textFlow.AddText("分支版本", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
+            textFlow.AddText("注意, 这是一个", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Light));
+            textFlow.AddText("分支版本", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.SemiBold));
 
             textFlow.AddParagraph("一些功能可能不会像预期或最新版的那样工作", t => t.Font = t.Font.With(size: 25));
             textFlow.NewParagraph();
 
             static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold);
 
-            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Exo, 20, FontWeight.SemiBold));
+            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
             textFlow.NewParagraph();
 
             textFlow.NewParagraph();
