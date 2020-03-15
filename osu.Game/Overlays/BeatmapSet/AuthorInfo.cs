@@ -13,6 +13,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -59,7 +60,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field(online.Status.ToString().ToLowerInvariant(), online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(
+                    new Field(
+                              $"{online.Status.GetDescription().ToString() ?? ToString().ToLowerInvariant()}于",
+                              online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)
+                             )
+                          );
             }
             else if (online.LastUpdated.HasValue)
             {

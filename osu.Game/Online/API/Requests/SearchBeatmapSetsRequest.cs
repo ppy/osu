@@ -51,7 +51,7 @@ namespace osu.Game.Online.API.Requests
 
         [Description("拥有排行榜的谱面")]
         Leaderboard,
-        [Description("计入排行的谱面")]
+        [Description("计入排名的谱面")]
         Ranked,
         [Description("质量合格的谱面")]
         Qualified,

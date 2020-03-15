@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Comments
             Child = text = new OsuSpriteText
             {
                 AlwaysPresent = true,
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                 Text = GetText()
             }
         };

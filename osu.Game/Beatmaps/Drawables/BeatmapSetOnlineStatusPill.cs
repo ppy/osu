@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
             };
-
+            
             Status = BeatmapSetOnlineStatus.None;
         }
     }

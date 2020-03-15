@@ -101,3 +101,11 @@
     *   [m] [Add more sane limit for maximum slider length #8217]
 
 *   同步805_1的Tests
+
+*   [优化了评论容器"显示更多"文字的字体大小](osu.Game/Overlays/Comments/GetCommentRepliesButton.cs)
+
+### 2020/03/14:
+*   各种修改
+
+### 2020/03/15:
+*   合并上游pr

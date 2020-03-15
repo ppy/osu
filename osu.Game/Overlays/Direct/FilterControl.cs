@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Direct
         Artist,
         [Description("难度较高的")]
         Difficulty,
-        [Description("计入排行的")]
+        [Description("计入排名的")]
         Ranked,
         [Description("评分较高的")]
         Rating,
