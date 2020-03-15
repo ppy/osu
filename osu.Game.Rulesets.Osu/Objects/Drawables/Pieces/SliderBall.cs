@@ -16,16 +16,24 @@ using osu.Game.Rulesets.Osu.Skinning;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
+    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
     {
         public Func<OsuAction?> GetInitialHitAction;
+
+        public Color4 AccentColour
+        {
+            get => ball.Colour;
+            set => ball.Colour = value;
+        }
 
         private readonly Slider slider;
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
+        private readonly CircularContainer ball;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
@@ -47,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Alpha = 0,
                     Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
                 },
-                new CircularContainer
+                ball = new CircularContainer
                 {
                     Masking = true,
                     RelativeSizeAxes = Axes.Both,

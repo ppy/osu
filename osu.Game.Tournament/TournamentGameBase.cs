@@ -65,7 +65,7 @@ namespace osu.Game.Tournament
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
             {
-                var minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
+                var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
 
                 heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
             }), true);
