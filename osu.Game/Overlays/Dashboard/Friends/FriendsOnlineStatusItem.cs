@@ -5,7 +5,7 @@ using System;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Home.Friends
+namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class FriendsOnlineStatusItem : OverlayStreamItem<FriendsBundle>
     {

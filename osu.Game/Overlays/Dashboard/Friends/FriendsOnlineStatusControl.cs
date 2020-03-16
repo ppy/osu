@@ -3,22 +3,21 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
-namespace osu.Game.Overlays.Home.Friends
+namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class FriendsOnlineStatusControl : OverlayStreamControl<FriendsBundle>
     {
         protected override OverlayStreamItem<FriendsBundle> CreateStreamItem(FriendsBundle value) => new FriendsOnlineStatusItem(value);
 
-        public void Populate(List<User> users)
+        public void Populate(List<APIFriend> users)
         {
-            var userCount = users.Count;
-            var onlineUsersCount = users.Count(user => user.IsOnline);
+            Clear();
 
-            AddItem(new FriendsBundle(FriendsOnlineStatus.All, userCount));
-            AddItem(new FriendsBundle(FriendsOnlineStatus.Online, onlineUsersCount));
-            AddItem(new FriendsBundle(FriendsOnlineStatus.Offline, userCount - onlineUsersCount));
+            AddItem(new FriendsBundle(FriendsOnlineStatus.All, users));
+            AddItem(new FriendsBundle(FriendsOnlineStatus.Online, users.Where(u => u.IsOnline).ToList()));
+            AddItem(new FriendsBundle(FriendsOnlineStatus.Offline, users.Where(u => !u.IsOnline).ToList()));
 
             Current.Value = Items.FirstOrDefault();
         }
