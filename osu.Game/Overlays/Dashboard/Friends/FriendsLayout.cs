@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     return unsorted.OrderByDescending(u => u.LastVisit).ToList();
 
                 case UserSortCriteria.Rank:
-                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(unsorted.Where(u => u.CurrentModeRank == null)).ToList();
+                    return unsorted.OrderByDescending(u => u.CurrentModeRank.HasValue).ThenBy(u => u.CurrentModeRank ?? 0).ToList();
 
                 case UserSortCriteria.Username:
                     return unsorted.OrderBy(u => u.Username).ToList();
