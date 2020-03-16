@@ -100,7 +100,9 @@ namespace osu.Game.Beatmaps
                 // Apply conversion mods
                 foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
                 {
-                    cancellationSource.Token.ThrowIfCancellationRequested();
+                    if (cancellationSource.IsCancellationRequested)
+                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
+
                     mod.ApplyToBeatmapConverter(converter);
                 }
 
@@ -115,7 +117,9 @@ namespace osu.Game.Beatmaps
 
                     foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     {
-                        cancellationSource.Token.ThrowIfCancellationRequested();
+                        if (cancellationSource.IsCancellationRequested)
+                            throw new BeatmapLoadTimeoutException(BeatmapInfo);
+
                         mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
                     }
                 }
@@ -127,7 +131,9 @@ namespace osu.Game.Beatmaps
                 // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
                 foreach (var obj in converted.HitObjects)
                 {
-                    cancellationSource.Token.ThrowIfCancellationRequested();
+                    if (cancellationSource.IsCancellationRequested)
+                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
+
                     obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
                 }
 
@@ -135,7 +141,9 @@ namespace osu.Game.Beatmaps
                 {
                     foreach (var obj in converted.HitObjects)
                     {
-                        cancellationSource.Token.ThrowIfCancellationRequested();
+                        if (cancellationSource.IsCancellationRequested)
+                            throw new BeatmapLoadTimeoutException(BeatmapInfo);
+
                         mod.ApplyToHitObject(obj);
                     }
                 }
@@ -314,6 +322,14 @@ namespace osu.Game.Beatmaps
             private bool stillValid => lazy.IsValueCreated && (stillValidFunction?.Invoke(lazy.Value) ?? true);
 
             private void recreate() => lazy = new Lazy<T>(valueFactory, LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        private class BeatmapLoadTimeoutException : TimeoutException
+        {
+            public BeatmapLoadTimeoutException(BeatmapInfo beatmapInfo)
+                : base($"Timed out while loading beatmap ({beatmapInfo}).")
+            {
+            }
         }
     }
 }
