@@ -30,8 +30,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
                 users = value;
 
-                usersLoaded = true;
-
                 OnlineStatusControl.Populate(value);
             }
         }
@@ -148,8 +146,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             controlBackground.Colour = colourProvider.Background5;
         }
 
-        private bool usersLoaded;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -168,8 +164,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private void recreatePanels()
         {
-            // Don't allow any changes until we have users loaded
-            if (!usersLoaded)
+            if (!users.Any())
                 return;
 
             cancellationToken?.Cancel();
