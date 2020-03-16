@@ -283,7 +283,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("import multi-ruleset map", () =>
                 {
                     var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                    manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
+                    manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
                 });
             }
             else
@@ -624,7 +624,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import multi-ruleset map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
+                manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
             });
 
             DrawableCarouselBeatmapSet set = null;
@@ -661,6 +661,52 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.ID == 3);
         }
 
+        [Test]
+        public void TestGroupedDifficultyIconSelecting()
+        {
+            changeRuleset(0);
+
+            createSongSelect();
+
+            BeatmapSetInfo imported = null;
+
+            AddStep("import huge difficulty count map", () =>
+            {
+                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+                imported = manager.Import(createTestBeatmapSet(usableRulesets, 50)).Result;
+            });
+
+            AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported.Beatmaps.First()));
+
+            DrawableCarouselBeatmapSet set = null;
+            AddUntilStep("Find the DrawableCarouselBeatmapSet", () =>
+            {
+                set = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().FirstOrDefault();
+                return set != null;
+            });
+
+            DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon groupIcon = null;
+            AddStep("Find group icon for different ruleset", () =>
+            {
+                groupIcon = set.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableGroupedDifficultyIcon>()
+                               .First(icon => icon.Items.First().Beatmap.Ruleset.ID == 3);
+            });
+
+            AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
+
+            AddStep("Click on group", () =>
+            {
+                InputManager.MoveMouseTo(groupIcon);
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
+
+            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo == groupIcon.Items.First().Beatmap);
+        }
+
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
 
         private int getCurrentBeatmapIndex() => getBeatmapIndex(songSelect.Carousel.SelectedBeatmapSet, songSelect.Carousel.SelectedBeatmap);
@@ -672,7 +718,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
 
-        private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
+        private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
 
         private static int importId;
 
@@ -698,20 +744,22 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
 
                 for (int i = 0; i < 100; i += 10)
-                    manager.Import(createTestBeatmapSet(i, usableRulesets)).Wait();
+                    manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
             });
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int setId, RulesetInfo[] rulesets)
+        private BeatmapSetInfo createTestBeatmapSet(RulesetInfo[] rulesets, int countPerRuleset = 6)
         {
             int j = 0;
             RulesetInfo getRuleset() => rulesets[j++ % rulesets.Length];
 
+            int setId = getImportId();
+
             var beatmaps = new List<BeatmapInfo>();
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < countPerRuleset; i++)
             {
-                int beatmapId = setId * 10 + i;
+                int beatmapId = setId * 1000 + i;
 
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
