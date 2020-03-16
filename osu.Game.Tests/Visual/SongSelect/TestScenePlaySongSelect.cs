@@ -436,6 +436,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             changeRuleset(0);
 
+            // used for filter check below
+            AddStep("allow convert display", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
 
             AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
@@ -446,15 +449,27 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             BeatmapInfo target = null;
 
+            int targetRuleset = differentRuleset ? 1 : 0;
+
             AddStep("select beatmap externally", () =>
             {
-                target = manager.GetAllUsableBeatmapSets().Where(b => b.Beatmaps.Any(bi => bi.RulesetID == (differentRuleset ? 1 : 0)))
-                                .ElementAt(5).Beatmaps.First();
+                target = manager.GetAllUsableBeatmapSets()
+                                .Where(b => b.Beatmaps.Any(bi => bi.RulesetID == targetRuleset))
+                                .ElementAt(5).Beatmaps.First(bi => bi.RulesetID == targetRuleset);
 
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
 
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+
+            AddAssert("selected only shows expected ruleset (plus converts)", () =>
+            {
+                var selectedPanel = songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet>().First(s => s.Item.State.Value == CarouselItemState.Selected);
+
+                // special case for converts checked here.
+                return selectedPanel.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().All(i =>
+                    i.IsFiltered || i.Item.Beatmap.Ruleset.ID == targetRuleset || i.Item.Beatmap.Ruleset.ID == 0);
+            });
 
             AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
