@@ -90,14 +90,14 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            textFlow.AddText("This project is an ongoing ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
-            textFlow.AddText("work in progress", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
+            textFlow.AddText("This project is an ongoing ", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Light));
+            textFlow.AddText("work in progress", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.SemiBold));
 
             textFlow.NewParagraph();
 
             static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
-            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Exo, 20, FontWeight.SemiBold));
+            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
             textFlow.NewParagraph();
 
             textFlow.NewParagraph();
