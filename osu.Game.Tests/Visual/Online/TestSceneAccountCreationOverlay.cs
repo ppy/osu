@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
             API.Logout();
 
             localUser = API.LocalUser.GetBoundCopy();
-            localUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
+            localUser.BindValueChanged(user => { userPanelArea.Child = new UserGridPanel(user.NewValue) { Width = 200 }; }, true);
 
             AddStep("logout", API.Logout);
         }

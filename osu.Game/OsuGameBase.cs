@@ -138,29 +138,16 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
-            AddFont(Resources, @"Fonts/Exo2.0-Medium");
-            AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
+
+            AddFont(Resources, @"Fonts/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Bold");
 
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
-
-            AddFont(Resources, @"Fonts/Exo2.0-Regular");
-            AddFont(Resources, @"Fonts/Exo2.0-RegularItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-SemiBold");
-            AddFont(Resources, @"Fonts/Exo2.0-SemiBoldItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Bold");
-            AddFont(Resources, @"Fonts/Exo2.0-BoldItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Light");
-            AddFont(Resources, @"Fonts/Exo2.0-LightItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Black");
-            AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
-
-            AddFont(Resources, @"Fonts/Torus-SemiBold");
-            AddFont(Resources, @"Fonts/Torus-Bold");
-            AddFont(Resources, @"Fonts/Torus-Regular");
-            AddFont(Resources, @"Fonts/Torus-Light");
 
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
