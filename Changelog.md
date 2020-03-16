@@ -113,3 +113,11 @@
     *   [m] [Fix osu! slider ball tint colour being applied to follow circle #8267]
     *   [m] [Add resolution selector in tournament setup screen #8262]
     *   [m] [Switch game to use new font (Torus) #8259]
+
+### 2020/03/16:
+*   合并上游pr
+    *   [m] [Switch to the next chat tab upon closing an active one #8270]
+    *   [m] [Apply ruleset filter in all cases (even when bypassing filter for selection purposes) #8242]
+    *   [m] [Improve beatmap carousel / song select fallback logic pathing #8246]
+    *   [m] [Fix osu!catch trail animating (and displaying incorrect frame) #8213]
+    *   [m] [Add the ability to click filtered difficulty icons #8247]
