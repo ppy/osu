@@ -11,6 +11,7 @@ using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
+using System.Linq;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -23,10 +24,12 @@ namespace osu.Game.Tests.Visual.Online
             typeof(UserListToolbar)
         };
 
+        protected override bool UseOnlineAPI => true;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private FriendsLayout layout;
+        private TestFriendsLayout layout;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -34,9 +37,15 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = layout = new FriendsLayout()
+                Child = layout = new TestFriendsLayout()
             };
         });
+
+        [Test]
+        public void TestOnline()
+        {
+            AddUntilStep("Users loaded", () => layout?.StatusControl.Items.Any() ?? false);
+        }
 
         [Test]
         public void TestPopulate()
@@ -76,5 +85,10 @@ namespace osu.Game.Tests.Visual.Online
                 LastVisit = DateTimeOffset.Now
             }
         };
+
+        private class TestFriendsLayout : FriendsLayout
+        {
+            public FriendsOnlineStatusControl StatusControl => OnlineStatusControl;
+        }
     }
 }
