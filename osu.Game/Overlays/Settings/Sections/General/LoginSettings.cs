@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value)
+                                panel = new UserGridPanel(api.LocalUser.Value)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Action = RequestHide
