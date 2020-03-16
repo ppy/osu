@@ -130,6 +130,8 @@
             -[依赖]-> #8132
             -[依赖]-> #8288
 
-*   优化了"关于Mf-osu"的界面排版。
 *   修复了o!c输入翻译缺失的问题。
 *   将StandAloneChatDisplay的Placeholder和ChatOverlay同步为"在这里输入你要发送的消息"
+*   优化了[比赛端图池界面](osu.Game.Tournament/Screens/MapPool/MapPoolScreen.cs)中谱面panel的高度
+*   将[比赛端队伍编辑器界面](osu.Game.Tournament/Screens/Editors/TeamEditorScreen.cs)中的"编辑随机结果"改为"编辑选手介绍信息"
+*   优化了"关于Mf-osu"的界面排版。

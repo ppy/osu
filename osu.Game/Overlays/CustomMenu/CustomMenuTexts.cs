@@ -79,8 +79,21 @@ namespace osu.Game.Overlays.CustomMenu
                             Id = 13851970
                         });
             textFlow.NewParagraph();
-            textFlow.AddLink("以及所有为官方lazer作出过贡献的人<3","https://github.com/ppy/osu/graphs/contributors");
-            textFlow.AddText(" ");
+
+            textFlow.NewParagraph();
+            textFlow.AddParagraph("Bug反馈", Titlefont);
+            textFlow.NewParagraph();
+
+            textFlow.AddText("如果你觉得某条翻译文本与功能相差过大或有待改进, 请前往");
+            textFlow.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
+            textFlow.AddText("提交新的issue来讨论。");
+            textFlow.AddParagraph("如果你在游玩时发现了一个游戏功能bug, 请先");
+            textFlow.AddLink("下载最新官方版本","https://github.com/ppy/osu/releases/latest");
+            textFlow.AddText(", 如果该问题仍然存在, 则请前往");
+            textFlow.AddLink("osu!lazer的issue页面","https://github.com/ppy/osu/issues");
+            textFlow.AddText("提交新的issue, 反之则前往");
+            textFlow.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
+            textFlow.AddText("来提交新的issue。");
 
             textFlow.NewParagraph();
             textFlow.AddParagraph("注意事项", Titlefont );
