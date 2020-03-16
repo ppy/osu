@@ -205,9 +205,6 @@ namespace osu.Game.Screens.Select
 
         /// <summary>
         /// Selects a given beatmap on the carousel.
-        ///
-        /// If bypassFilters is false, we will try to select another unfiltered beatmap in the same set. If the
-        /// entire set is filtered, no selection is made.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
@@ -229,25 +226,21 @@ namespace osu.Game.Screens.Select
                     continue;
 
                 if (!bypassFilters && item.Filtered.Value)
-                    // The beatmap exists in this set but is filtered, so look for the first unfiltered map in the set
-                    item = set.Beatmaps.FirstOrDefault(b => !b.Filtered.Value);
+                    return false;
 
-                if (item != null)
+                select(item);
+
+                // if we got here and the set is filtered, it means we were bypassing filters.
+                // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
+                // (since it is forcefully being included in the carousel).
+                if (set.Filtered.Value)
                 {
-                    select(item);
+                    Debug.Assert(bypassFilters);
 
-                    // if we got here and the set is filtered, it means we were bypassing filters.
-                    // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
-                    // (since it is forcefully being included in the carousel).
-                    if (set.Filtered.Value)
-                    {
-                        Debug.Assert(bypassFilters);
-
-                        applyActiveCriteria(false);
-                    }
-
-                    return true;
+                    applyActiveCriteria(false);
                 }
+
+                return true;
             }
 
             return false;
