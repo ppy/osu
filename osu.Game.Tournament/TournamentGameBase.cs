@@ -37,6 +37,8 @@ namespace osu.Game.Tournament
 
         private Storage storage;
 
+        private TournamentStorage tournamentStorage;
+
         private DependencyContainer dependencies;
 
         private Bindable<Size> windowSize;
@@ -54,14 +56,16 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
+            dependencies.CacheAs(tournamentStorage = new TournamentStorage(storage));
+
+            Textures.AddStore(new TextureLoaderStore(tournamentStorage));
 
             this.storage = storage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
             {
-                var minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
+                var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
 
                 heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
             }), true);

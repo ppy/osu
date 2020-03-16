@@ -153,8 +153,10 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapHidden += beatmapHidden;
             beatmaps.BeatmapRestored += beatmapRestored;
 
-            loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
+            loadBeatmapSets(GetLoadableBeatmaps());
         }
+
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
