@@ -26,11 +26,13 @@ namespace osu.Game.Overlays.Dashboard.Friends
             get => users;
             set
             {
+                request?.Cancel();
+
                 users = value;
 
                 usersLoaded = true;
 
-                onlineStatusControl.Populate(value);
+                OnlineStatusControl.Populate(value);
             }
         }
 
@@ -42,9 +44,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private Drawable currentContent;
 
+        protected readonly FriendsOnlineStatusControl OnlineStatusControl;
         private readonly Box background;
         private readonly Box controlBackground;
-        private readonly FriendsOnlineStatusControl onlineStatusControl;
         private readonly UserListToolbar userListToolbar;
         private readonly Container itemsPlaceholder;
         private readonly LoadingLayer loading;
@@ -78,7 +80,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                     Top = 20,
                                     Horizontal = 45
                                 },
-                                Child = onlineStatusControl = new FriendsOnlineStatusControl(),
+                                Child = OnlineStatusControl = new FriendsOnlineStatusControl(),
                             }
                         }
                     },
@@ -152,7 +154,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             base.LoadComplete();
 
-            onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
+            OnlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
 
@@ -175,7 +177,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             if (itemsPlaceholder.Any())
                 loading.Show();
 
-            var groupedUsers = onlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
+            var groupedUsers = OnlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
 
             var sortedUsers = sortUsers(groupedUsers);
 
