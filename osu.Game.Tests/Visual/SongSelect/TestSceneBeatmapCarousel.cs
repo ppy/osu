@@ -630,9 +630,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("Toggle non-matching filter", () =>
             {
-                // This function is used to check if carousel root is able to make random selection, not if it's able to select a previously selected beatmap
-                // Thus we forget all previously selected beatmap sets here, otherwise carousel root would select from these.
-                carousel.ForgetPreviouslySelectedSets();
+                // This function is used to check if carousel root is able to make random selection, not if it's able to select the previously selected beatmap
+                // Thus we forget the previously selected beatmap here, otherwise carousel root would select that.
+                carousel.ForgetPreviouslySelectedBeatmap();
                 carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
                 carousel.Filter(new FilterCriteria(), false);
                 eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
@@ -739,7 +739,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             public bool PendingFilterTask => PendingFilter != null;
 
-            public void ForgetPreviouslySelectedSets()
+            public void ForgetPreviouslySelectedBeatmap()
             {
                 LastNotNullSelectedBeatmap = null;
             }
