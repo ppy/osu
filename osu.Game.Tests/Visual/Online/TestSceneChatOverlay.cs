@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Online
                 // Using temporary channels because they don't hide their names when not active
                 channelManager.JoinChannel(new Channel
                 {
-                    Name = $"Channel no. {joinedChannels.Count() + 1}",
+                    Name = $"Channel no. {joinedChannels.Count() + 11}",
                     Type = ChannelType.Temporary
                 });
 
