@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
-using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 
@@ -28,17 +27,18 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(TournamentStorage storage)
         {
-            var stream = storage.GetStream($@"videos/{filename}.m4v");
+            var stream = storage.GetStream($@"videos/{filename}");
 
             if (stream != null)
             {
-                InternalChild = video = new VideoSprite(stream)
+                InternalChild = video = new VideoSprite(stream, false)
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
-                    Clock = new FramedClock(manualClock = new ManualClock())
+                    Clock = new FramedClock(manualClock = new ManualClock()),
+                    Loop = loop,
                 };
             }
             else if (drawFallbackGradient)
@@ -51,13 +51,22 @@ namespace osu.Game.Tournament.Components
             }
         }
 
+        private bool loop;
+
         public bool Loop
         {
             set
             {
+                loop = value;
                 if (video != null)
                     video.Loop = value;
             }
+        }
+
+        public void Reset()
+        {
+            if (manualClock != null)
+                manualClock.CurrentTime = 0;
         }
 
         protected override void Update()
