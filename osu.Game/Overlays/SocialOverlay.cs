@@ -120,7 +120,7 @@ namespace osu.Game.Overlays
             {
                 case SocialTab.Friends:
                     var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
-                    friendRequest.Success += users => Users = users.Select(u => (User)u).ToArray();
+                    friendRequest.Success += users => Users = users.Cast<User>().ToArray();
                     API.Queue(getUsersRequest = friendRequest);
                     break;
 
