@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
 using System.Linq;
+using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -29,6 +30,9 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private TestFriendsLayout layout;
 
         [SetUp]
@@ -44,7 +48,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOnline()
         {
-            AddUntilStep("Users loaded", () => layout?.StatusControl.Items.Any() ?? false);
+            // Skip online test if user is not logged-in
+            AddUntilStep("Users loaded", () => !api.IsLoggedIn || (layout?.StatusControl.Items.Any() ?? false));
         }
 
         [Test]
