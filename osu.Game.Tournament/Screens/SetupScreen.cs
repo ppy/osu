@@ -3,7 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -22,6 +25,7 @@ namespace osu.Game.Tournament.Screens
         private FillFlowContainer fillFlow;
 
         private LoginOverlay loginOverlay;
+        private ActionableInfo resolution;
 
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
@@ -32,9 +36,13 @@ namespace osu.Game.Tournament.Screens
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        private Bindable<Size> windowSize;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
+            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
+
             InternalChild = fillFlow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -47,6 +55,9 @@ namespace osu.Game.Tournament.Screens
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
             reload();
         }
+
+        [Resolved]
+        private Framework.Game game { get; set; }
 
         private void reload()
         {
@@ -97,7 +108,23 @@ namespace osu.Game.Tournament.Screens
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },
+                resolution = new ActionableInfo
+                {
+                    Label = "Stream area resolution",
+                    ButtonText = "Set to 1080p",
+                    Action = () =>
+                    {
+                        windowSize.Value = new Size((int)(1920 / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), 1080);
+                    }
+                }
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            resolution.Value = $"{ScreenSpaceDrawQuad.Width:N0}x{ScreenSpaceDrawQuad.Height:N0}";
         }
 
         public class LabelledDropdown<T> : LabelledComponent<OsuDropdown<T>, T>
