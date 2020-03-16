@@ -48,30 +48,30 @@ namespace osu.Game.Tests.Visual.Online
         {
             new APIFriend
             {
-                Username = @"flyte",
+                Username = "flyte",
                 Id = 3103765,
                 IsOnline = true,
                 CurrentModeRank = 1111,
-                Country = new Country { FlagName = @"JP" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                Country = new Country { FlagName = "JP" },
+                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             },
             new APIFriend
             {
-                Username = @"peppy",
+                Username = "peppy",
                 Id = 2,
                 IsOnline = false,
                 CurrentModeRank = 2222,
-                Country = new Country { FlagName = @"AU" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                Country = new Country { FlagName = "AU" },
+                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 IsSupporter = true,
                 SupportLevel = 3,
             },
             new APIFriend
             {
-                Username = @"Evast",
+                Username = "Evast",
                 Id = 8195163,
-                Country = new Country { FlagName = @"BY" },
-                CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
+                Country = new Country { FlagName = "BY" },
+                CoverUrl = "https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                 IsOnline = false,
                 LastVisit = DateTimeOffset.Now
             }
