@@ -232,7 +232,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             {
                 default:
                 case UserSortCriteria.LastVisit:
-                    return unsorted.OrderBy(u => u.LastVisit).Reverse().ToList();
+                    return unsorted.OrderByDescending(u => u.LastVisit).ToList();
 
                 case UserSortCriteria.Rank:
                     return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(unsorted.Where(u => u.CurrentModeRank == null)).ToList();
