@@ -399,7 +399,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap == null);
 
             AddStep("remove mixed set", () =>
             {
