@@ -643,6 +643,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
 
+            int previousSetID = 0;
+
+            AddStep("record set ID", () => previousSetID = Beatmap.Value.BeatmapSetInfo.ID);
+
             AddStep("Click on a difficulty", () =>
             {
                 InputManager.MoveMouseTo(difficultyIcon);
@@ -652,6 +656,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
+
+            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmap.BeatmapSet.ID == previousSetID);
+            AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.ID == 3);
         }
 
         [Test]
