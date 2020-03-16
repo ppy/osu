@@ -7,9 +7,9 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Home.Friends;
-using osu.Game.Users;
+using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -39,17 +39,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void Populate()
         {
-            AddStep("Populate", () => control.Populate(new List<User>
+            AddStep("Populate", () => control.Populate(new List<APIFriend>
             {
-                new User
+                new APIFriend
                 {
                     IsOnline = true
                 },
-                new User
+                new APIFriend
                 {
                     IsOnline = false
                 },
-                new User
+                new APIFriend
                 {
                     IsOnline = false
                 }
