@@ -47,20 +47,15 @@ namespace osu.Game.Tests.Visual.Online
         private Channel previousChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) - 1);
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
-        private Channel channelPM => channels.Last();
 
         public TestSceneChatOverlay()
         {
             channels = Enumerable.Range(1, 10)
-                                 .Select(index => new Channel
+                                 .Select(index => new Channel(new User())
                                  {
                                      Name = $"Channel no. {index}",
                                      Topic = index == 3 ? null : $"We talk about the number {index} here",
-                                     Type = ChannelType.Temporary
-                                 })
-                                 .Append(new Channel(new User())
-                                 {
-                                     Name = "PM channel"
+                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary
                                  })
                                  .ToList();
         }
@@ -150,9 +145,9 @@ namespace osu.Game.Tests.Visual.Online
 
                 // Using temporary channels because they don't hide their names when not active
                 channelManager.JoinChannel(new Channel
-                { 
+                {
                     Name = $"Channel no. {joinedChannels.Count() + 1}",
-                    Type = ChannelType.Temporary 
+                    Type = ChannelType.Temporary
                 });
 
                 return false;
@@ -203,7 +198,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 if (!joinedChannels.Any())
                     return true;
-                
+
                 chatOverlay.ChannelTabControl.RemoveChannel(joinedChannels.Last());
                 return false;
             });
@@ -213,16 +208,16 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelCloseButton()
         {
-            AddStep("Join channels", () =>
+            AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
-                channelManager.JoinChannel(channelPM);
+                channelManager.JoinChannel(channel2);
             });
 
             // PM channel close button only appears when active
-            AddStep("Select PM channel", () => clickDrawable(chatOverlay.TabMap[channelPM]));
-            AddStep("Click PM close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channelPM]).CloseButton.Child));
-            AddAssert("PM channel closed", () => !channelManager.JoinedChannels.Contains(channelPM));
+            AddStep("Select PM channel", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Click PM close button", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddAssert("PM channel closed", () => !channelManager.JoinedChannels.Contains(channel2));
 
             // Non-PM chat channel close button only appears when hovered
             AddStep("Hover normal channel tab", () => InputManager.MoveMouseTo(chatOverlay.TabMap[channel1]));
