@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Components
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new DrawableTournamentTitleText(),
+                        new DrawableTournamentHeaderText(),
                         new TournamentSpriteText
                         {
                             Text = match.Round.Value?.Name.Value ?? "Unknown Round",
