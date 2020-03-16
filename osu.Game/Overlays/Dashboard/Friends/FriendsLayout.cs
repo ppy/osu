@@ -12,7 +12,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osuTK;
 
@@ -85,7 +84,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     },
                     new Container
                     {
-                        Name = "用户列表",
+                        Name = "User List",
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
@@ -180,15 +179,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             var sortedUsers = sortUsers(groupedUsers);
 
-            var table = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(10),
-                Children = sortedUsers.Select(createUserPanel).ToList()
-            };
-
-            LoadComponentAsync(table, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+            LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private void addContentToPlaceholder(Drawable content)
@@ -207,20 +198,34 @@ namespace osu.Game.Overlays.Dashboard.Friends
             currentContent.FadeIn(200, Easing.OutQuint);
         }
 
-        private SocialPanel createUserPanel(User user)
+        private FillFlowContainer createTable(List<APIFriend> users)
         {
-            switch (userListToolbar.DisplayStyle.Value)
+            var style = userListToolbar.DisplayStyle.Value;
+
+            return new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
+                Children = users.Select(u => createUserPanel(u, style)).ToList()
+            };
+        }
+
+        private UserPanel createUserPanel(User user, OverlayPanelDisplayStyle style)
+        {
+            switch (style)
             {
                 default:
                 case OverlayPanelDisplayStyle.Card:
-                    return new SocialGridPanel(user).With(panel =>
+                    return new UserGridPanel(user).With(panel =>
                     {
                         panel.Anchor = Anchor.TopCentre;
                         panel.Origin = Anchor.TopCentre;
+                        panel.Width = 290;
                     });
 
                 case OverlayPanelDisplayStyle.List:
-                    return new SocialListPanel(user);
+                    return new UserListPanel(user);
             }
         }
 

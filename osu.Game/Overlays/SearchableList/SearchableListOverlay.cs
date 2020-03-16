@@ -10,9 +10,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Online;
-using osu.Framework.Bindables;
-using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -32,13 +29,10 @@ namespace osu.Game.Overlays.SearchableList
         where TCategory : struct, Enum
     {
         private readonly Container scrollContainer;
-        private readonly Bindable<bool> disabled = new Bindable<bool>();
 
         protected readonly SearchableListHeader<THeader> Header;
         protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
         protected readonly FillFlowContainer ScrollFlow;
-
-        protected override Container<Drawable> Content => scrollContainer;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract Color4 TrianglesColourLight { get; }
@@ -46,12 +40,10 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract SearchableListHeader<THeader> CreateHeader();
         protected abstract SearchableListFilterControl<TTab, TCategory> CreateFilterControl();
 
-        protected abstract string LoginPlaceholder { get; }
-
         protected SearchableListOverlay(OverlayColourScheme colourScheme)
             : base(colourScheme)
         {
-            base.Content.Children = new Drawable[]
+            Children = new Drawable[]
             {
                 new Box
                 {
@@ -73,7 +65,7 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
-                scrollContainer = new PanelContainer(LoginPlaceholder)
+                scrollContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new OsuContextMenuContainer
@@ -106,26 +98,6 @@ namespace osu.Game.Overlays.SearchableList
                     },
                 },
             };
-
-            Header.Disabled.BindTo(disabled);
-            Filter.Disabled.BindTo(disabled);
-        }
-
-        public override void APIStateChanged(IAPIProvider api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Offline:
-                case APIState.Failing:
-                case APIState.Connecting:
-                    disabled.Value = true;
-                    break;
-
-                case APIState.Online:
-                    disabled.Value = false;
-                    break;
-            }
-            base.APIStateChanged(api, state);   
         }
 
         protected override void Update()
@@ -152,14 +124,6 @@ namespace osu.Game.Overlays.SearchableList
             base.PopOut();
 
             Filter.Search.HoldFocus = false;
-        }
-
-        private class PanelContainer : OnlineViewContainer
-        {
-            public PanelContainer(string placeholderMessage)
-                : base(placeholderMessage)
-            {
-            }
         }
     }
 }

@@ -41,8 +41,6 @@ namespace osu.Game.Overlays
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
-
-        protected override string LoginPlaceholder => @"查看在线谱面列表";
         private IEnumerable<BeatmapSetInfo> beatmapSets;
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets

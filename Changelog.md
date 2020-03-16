@@ -123,6 +123,12 @@
     *   [m] [Add the ability to click filtered difficulty icons #8247]
     *   [m] [Add the ability to click grouped beatmap difficulty icons #8248]
     *   [m] [Fix carousel scrolling being inoperable during beatmap import #8255]
+    *   [m] [Update user panel design #8132]
+
+*   更新上游pr
+    *   [o] [Replace SocialOverlay with DashboardOverlay #805_1] 
+            -[依赖]-> #8132
+            -[依赖]-> #8288
 
 *   优化了"关于Mf-osu"的界面排版。
 *   修复了o!c输入翻译缺失的问题。
