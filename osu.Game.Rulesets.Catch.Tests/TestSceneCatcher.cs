@@ -17,12 +17,13 @@ namespace osu.Game.Rulesets.Catch.Tests
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(CatcherArea),
+            typeof(CatcherSprite)
         };
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() => new CatcherArea.Catcher
+            SetContents(() => new Catcher
             {
                 RelativePositionAxes = Axes.None,
                 Anchor = Anchor.Centre,

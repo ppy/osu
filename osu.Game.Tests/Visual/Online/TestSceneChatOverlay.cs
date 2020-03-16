@@ -38,8 +38,13 @@ namespace osu.Game.Tests.Visual.Online
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
+        private IEnumerable<Channel> visibleChannels => chatOverlay.ChannelTabControl.VisibleItems.Where(channel => channel.Name != "+");
+        private IEnumerable<Channel> joinedChannels => chatOverlay.ChannelTabControl.Items.Where(channel => channel.Name != "+");
         private readonly List<Channel> channels;
 
+        private Channel currentChannel => channelManager.CurrentChannel.Value;
+        private Channel nextChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) + 1);
+        private Channel previousChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) - 1);
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
 
@@ -91,7 +96,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Switch to channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
-            AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
             AddAssert("Channel selector was closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
         }
 
@@ -102,12 +107,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
 
             AddStep("Switch to channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Close channel 2", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddStep("Close channel 2", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
 
             AddAssert("Selector remained closed", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
-            AddAssert("Current channel is channel 1", () => channelManager.CurrentChannel.Value == channel1);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
 
-            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddStep("Close channel 1", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
 
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
@@ -140,8 +145,65 @@ namespace osu.Game.Tests.Visual.Online
                 var targetNumberKey = oneBasedIndex % 10;
                 var targetChannel = channels[zeroBasedIndex];
                 AddStep($"press Alt+{targetNumberKey}", () => pressChannelHotkey(targetNumberKey));
-                AddAssert($"channel #{oneBasedIndex} is selected", () => channelManager.CurrentChannel.Value == targetChannel);
+                AddAssert($"channel #{oneBasedIndex} is selected", () => currentChannel == targetChannel);
             }
+        }
+
+        private Channel expectedChannel;
+
+        [Test]
+        public void TestCloseChannelWhileActive()
+        {
+            AddUntilStep("Join until dropdown has channels", () =>
+            {
+                if (visibleChannels.Count() < joinedChannels.Count())
+                    return true;
+
+                // Using temporary channels because they don't hide their names when not active
+                Channel toAdd = new Channel { Name = $"test channel {joinedChannels.Count()}", Type = ChannelType.Temporary };
+                channelManager.JoinChannel(toAdd);
+
+                return false;
+            });
+
+            AddStep("Switch to last tab", () => clickDrawable(chatOverlay.TabMap[visibleChannels.Last()]));
+            AddAssert("Last visible selected", () => currentChannel == visibleChannels.Last());
+
+            // Closing the last channel before dropdown
+            AddStep("Close current channel", () =>
+            {
+                expectedChannel = nextChannel;
+                chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
+            });
+            AddAssert("Next channel selected", () => currentChannel == expectedChannel);
+
+            // Depending on the window size, one more channel might need to be closed for the selectorTab to appear
+            AddUntilStep("Close channels until selector visible", () =>
+            {
+                if (chatOverlay.ChannelTabControl.VisibleItems.Last().Name == "+")
+                    return true;
+
+                chatOverlay.ChannelTabControl.RemoveChannel(visibleChannels.Last());
+                return false;
+            });
+            AddAssert("Last visible selected", () => currentChannel == visibleChannels.Last());
+
+            // Closing the last channel with dropdown no longer present
+            AddStep("Close last when selector next", () =>
+            {
+                expectedChannel = previousChannel;
+                chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
+            });
+            AddAssert("Channel changed to previous", () => currentChannel == expectedChannel);
+
+            // Standard channel closing
+            AddStep("Switch to previous channel", () => chatOverlay.ChannelTabControl.SwitchTab(-1));
+            AddStep("Close current channel", () =>
+            {
+                expectedChannel = nextChannel;
+                chatOverlay.ChannelTabControl.RemoveChannel(currentChannel);
+            });
+            AddAssert("Channel changed to next", () => currentChannel == expectedChannel);
         }
 
         private void pressChannelHotkey(int number)
@@ -187,6 +249,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             public Visibility SelectionOverlayState => ChannelSelectionOverlay.State.Value;
 
+            public new ChannelTabControl ChannelTabControl => base.ChannelTabControl;
+
             public new ChannelSelectionOverlay ChannelSelectionOverlay => base.ChannelSelectionOverlay;
 
             protected override ChannelTabControl CreateChannelTabControl() => new TestTabControl();
@@ -196,14 +260,34 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestTabControl : ChannelTabControl
         {
-            protected override TabItem<Channel> CreateTabItem(Channel value) => new TestChannelTabItem(value);
+            protected override TabItem<Channel> CreateTabItem(Channel value)
+            {
+                switch (value.Type)
+                {
+                    case ChannelType.PM:
+                        return new TestPrivateChannelTabItem(value);
+
+                    default:
+                        return new TestChannelTabItem(value);
+                }
+            }
 
             public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
         }
 
-        private class TestChannelTabItem : PrivateChannelTabItem
+        private class TestChannelTabItem : ChannelTabItem
         {
             public TestChannelTabItem(Channel channel)
+                : base(channel)
+            {
+            }
+
+            public new ClickableContainer CloseButton => base.CloseButton;
+        }
+
+        private class TestPrivateChannelTabItem : PrivateChannelTabItem
+        {
+            public TestPrivateChannelTabItem(Channel channel)
                 : base(channel)
             {
             }
