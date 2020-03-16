@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
         [SettingSource("Easing", "Change the easing type of the approach circles.", 0)]
-        public Bindable<Easing> BindableEasing { get; } = new Bindable<Easing>();
+        public Bindable<ReadableEasing> BindableEasing { get; } = new Bindable<ReadableEasing>();
 
         [SettingSource("Scale the size", "Change the factor of the approach circle scale.", 1)]
         public BindableFloat Scale { get; } = new BindableFloat
@@ -49,11 +49,25 @@ namespace osu.Game.Rulesets.Osu.Mods
                     hitCircle.ApproachCircle.ScaleTo(Scale.Value);
 
                     hitCircle.ApproachCircle.FadeIn(Math.Min(obj.TimeFadeIn, obj.TimePreempt));
-                    hitCircle.ApproachCircle.ScaleTo(1f, obj.TimePreempt, BindableEasing.Value);
+
+                    hitCircle.ApproachCircle.ScaleTo(1f, obj.TimePreempt, (Easing)BindableEasing.Value);
 
                     hitCircle.ApproachCircle.Expire(true);
                 };
             });
+        }
+
+        internal enum ReadableEasing
+        {
+            Accelerate = 2,
+            Accelerate2 = 6,
+            Accelerate3 = 12,
+            AccelerateInAfterDeceleraingeOut = 29,
+            CasualBounces = 32,
+            CasualBouncesWhileAccelerating = 24,
+            Decelerate = 1,
+            DecelerateAfterAccelerating = 8,
+            Default = 0,
         }
     }
 }
