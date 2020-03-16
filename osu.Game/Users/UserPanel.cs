@@ -32,9 +32,9 @@ namespace osu.Game.Users
 
         public new Action Action;
 
-        protected Action ViewProfile;
+        protected Action ViewProfile { get; private set; }
 
-        protected DelayedLoadUnloadWrapper Background;
+        protected DelayedLoadUnloadWrapper Background { get; private set; }
 
         private SpriteIcon statusIcon;
         private OsuSpriteText statusMessage;
