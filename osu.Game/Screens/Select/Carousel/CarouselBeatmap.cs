@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (Beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
-                // bypass filtering for selected beatmap
+                // only check ruleset equality or convertability for selected beatmap
                 Filtered.Value = !match;
                 return;
             }

@@ -47,7 +47,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
                     },
-                    new DrawableTournamentTitleText
+                    new DrawableTournamentHeaderText
                     {
                         Y = 100,
                         Anchor = Anchor.TopCentre,
