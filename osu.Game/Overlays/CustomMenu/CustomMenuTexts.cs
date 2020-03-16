@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.CustomMenu
     {
         private LinkFlowContainer textFlow;
 
-        private OverlinedInfoContainer timeBar;
+        //private OverlinedInfoContainer timeBar;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -36,19 +36,6 @@ namespace osu.Game.Overlays.CustomMenu
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Font = OsuFont.GetFont(size: 24),
-                            Text = "时间",
-                        },
-                        timeBar = new OverlinedInfoContainer
-                        {
-                            Title = "当前时间",
-                            LineColour = colourProvider.Highlight1,
-                        },
-                        new OsuSpriteText{ Text = " ", },
                         textFlow = new LinkFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -71,7 +58,7 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.AddText("的分支版本。");
 
             textFlow.NewParagraph();
-            textFlow.AddParagraph("为该分支贡献过自己一份力量的人(按首字母排序)", Titlefont );
+            textFlow.AddParagraph("参与过完善该分支的人(按首字母排序)", Titlefont );
             textFlow.NewParagraph();
 
             textFlow.AddUserLink(new User
@@ -93,6 +80,7 @@ namespace osu.Game.Overlays.CustomMenu
                         });
             textFlow.NewParagraph();
             textFlow.AddLink("以及所有为官方lazer作出过贡献的人<3","https://github.com/ppy/osu/graphs/contributors");
+            textFlow.AddText(" ");
 
             textFlow.NewParagraph();
             textFlow.AddParagraph("注意事项", Titlefont );
@@ -111,18 +99,9 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.AddText("以商讨相关问题");
 
         }
-
-        private DateTime GetTimeInfo()
-        {
-            var dt = DateTime.Now;
-            return dt;
-        }
         protected override void Update()
         {
             base.Update();
-
-            timeBar.Content = GetTimeInfo().ToString() ?? "未知";
-
         }
     }
 }

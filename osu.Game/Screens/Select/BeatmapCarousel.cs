@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
-        private readonly OsuScrollContainer scroll;
+        private readonly CarouselScrollContainer scroll;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -191,7 +191,9 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false);
+            // only reset scroll position if already near the scroll target.
+            // without this, during a large beatmap import it is impossible to navigate the carousel.
+            applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
             //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
@@ -404,7 +406,7 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(debounce);
         }
 
-        private void applyActiveCriteria(bool debounce)
+        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
             if (root.Children.Any() != true) return;
 
@@ -414,7 +416,9 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-                scrollPositionCache.Invalidate();
+                
+                if (alwaysResetScrollPosition || !scroll.UserScrolling)
+                    ScrollToSelected();
             }
 
             PendingFilter?.Cancel();
@@ -428,6 +432,9 @@ namespace osu.Game.Screens.Select
 
         private float? scrollTarget;
 
+        /// <summary>
+        /// Scroll to the current <see cref="SelectedBeatmap"/>.
+        /// </summary>
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -594,7 +601,7 @@ namespace osu.Game.Screens.Select
                         SelectionChanged?.Invoke(c.Beatmap);
 
                         itemsCache.Invalidate();
-                        scrollPositionCache.Invalidate();
+                        ScrollToSelected();
                     }
                 };
             }
@@ -759,6 +766,22 @@ namespace osu.Game.Screens.Select
         private class CarouselScrollContainer : OsuScrollContainer
         {
             private bool rightMouseScrollBlocked;
+            /// <summary>
+            /// Whether the last scroll event was user triggered, directly on the scroll container.
+            /// </summary>
+            public bool UserScrolling { get; private set; }
+
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+            {
+                UserScrolling = true;
+                base.OnUserScroll(value, animated, distanceDecay);
+            }
+
+            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+            {
+                UserScrolling = false;
+                base.ScrollTo(value, animated, distanceDecay);
+            }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {

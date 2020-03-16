@@ -10,10 +10,12 @@ namespace osu.Game.Overlays.CustomMenu
 {
     public class CustomMenuContent : FillFlowContainer
     {
+        public const float HORIZONTAL_PADDING = 30;
         private const float transition_time = 400;
 
         public CustomMenuContent()
         {
+            Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;

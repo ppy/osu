@@ -121,3 +121,9 @@
     *   [m] [Improve beatmap carousel / song select fallback logic pathing #8246]
     *   [m] [Fix osu!catch trail animating (and displaying incorrect frame) #8213]
     *   [m] [Add the ability to click filtered difficulty icons #8247]
+    *   [m] [Add the ability to click grouped beatmap difficulty icons #8248]
+    *   [m] [Fix carousel scrolling being inoperable during beatmap import #8255]
+
+*   优化了"关于Mf-osu"的界面排版。
+*   修复了o!c输入翻译缺失的问题。
+*   将StandAloneChatDisplay的Placeholder和ChatOverlay同步为"在这里输入你要发送的消息"
