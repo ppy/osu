@@ -296,7 +296,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private void updatePanel()
                     {
-                        drawableContainer.Child = new UserPanel(user) { Width = 300 };
+                        drawableContainer.Child = new UserGridPanel(user) { Width = 300 };
                     }
                 }
             }
