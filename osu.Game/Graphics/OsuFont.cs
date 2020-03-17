@@ -136,5 +136,10 @@ namespace osu.Game.Graphics
         /// Equivalent to weight 700.
         /// </summary>
         Bold = 700,
+
+        /// <summary>
+        /// Equivalent to weight 900.
+        /// </summary>
+        Black = 900
     }
 }
