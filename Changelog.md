@@ -149,3 +149,10 @@
     *   [m] [Update framework #8306]
     *   [m] [Fix header-text scaling on intro/winner screens #8301]
     *   [m] [Automatically mark the currently selected match as started on entering gameplay screen #8302]
+    *   [m] [Fix replay scores not being populated via player #8305]
+    *   [m] [Update framework #8306]
+    *   [m] [Implement the results screen score panel #8308]
+    *   [m] [Implement a circle that displays the user's accuracy #8304]
+    *   [m] [Implement the top score panel contents #8309]
+    *   [m] [Implement the middle score panel contents #8310]
+    *   **[m] [实现新的结算页面 #8311]**
