@@ -9,12 +9,20 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
+    /// <summary>
+    /// A <see cref="StatisticDisplay"/> to display general numeric values.
+    /// </summary>
     public class CounterStatistic : StatisticDisplay
     {
         private readonly int count;
 
         private RollingCounter<int> counter;
 
+        /// <summary>
+        /// Creates a new <see cref="CounterStatistic"/>.
+        /// </summary>
+        /// <param name="header">The name of the statistic.</param>
+        /// <param name="count">The value to display.</param>
         public CounterStatistic(string header, int count)
             : base(header)
         {
