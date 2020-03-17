@@ -81,14 +81,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((score.Beatmap.Metadata.Title, score.Beatmap.Metadata.TitleUnicode)),
+                                Text = new LocalisedString((score.Beatmap.Metadata.TitleUnicode, score.Beatmap.Metadata.Title)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((score.Beatmap.Metadata.Artist, score.Beatmap.Metadata.ArtistUnicode)),
+                                Text = new LocalisedString((score.Beatmap.Metadata.Artist, score.Beatmap.Metadata.Artist)),
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
                             },
                             new Container

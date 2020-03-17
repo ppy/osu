@@ -147,8 +147,8 @@
     *   [m] [Add black font weighting #8307]
     *   [m] [Implement a circle that displays the user's accuracy #8304]
     *   [m] [Fix replay scores not being populated via player #8305]
-    *   [o] [Update framework #8306]
-    *   [o] [Implement the results screen score panel #8308]
+    *   [m] [Implement the results screen score panel #8308]
+    *   [m] [Update framework #8306]
     *   [o] [Implement the middle score panel contents #8310]
     *   [o] [Implement the top score panel contents #8309]
     *   **[o] [实现新的结算页面 #8311]**
