@@ -3,7 +3,9 @@
 
 using System.Globalization;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -40,6 +42,10 @@ namespace osu.Game.Screens.Ranking.Expanded
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
+            ColourInfo backgroundColour = beatmap.DifficultyRating == DifficultyRating.ExpertPlus
+                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
+                : (ColourInfo)colours.ForDifficultyRating(beatmap.DifficultyRating);
+
             InternalChildren = new Drawable[]
             {
                 new CircularContainer
@@ -51,7 +57,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.ForDifficultyRating(beatmap.DifficultyRating)
+                            Colour = backgroundColour
                         },
                     }
                 },
