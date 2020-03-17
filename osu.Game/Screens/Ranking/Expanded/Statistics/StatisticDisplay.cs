@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     new CircularContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 12,
+                        Height = 20,
                         Masking = true,
                         Children = new Drawable[]
                         {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                 Text = header.ToUpperInvariant(),
                             }
                         }

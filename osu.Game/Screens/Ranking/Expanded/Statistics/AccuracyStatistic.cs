@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// </summary>
         /// <param name="accuracy">The accuracy to display.</param>
         public AccuracyStatistic(double accuracy)
-            : base("accuracy")
+            : base("准确率")
         {
             this.accuracy = accuracy;
         }
