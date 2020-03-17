@@ -103,38 +103,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("return value", () => config.Set<bool>(OsuSetting.KeyOverlay, keyCounterVisibleValue));
         }
 
-        [Test]
-        public void TestChangeHealthValue()
-        {
-            void applyToHealthDisplays(double value)
-            {
-                if (hudOverlay == null) return;
-
-                hudOverlay.LowHealthDisplay.Current.Value = value;
-                hudOverlay.HealthDisplay.Current.Value = value;
-            }
-
-            createNew();
-            AddSliderStep("health value", 0, 1, 0.5, applyToHealthDisplays);
-
-            AddStep("enable low health display", () =>
-            {
-                config.Set(OsuSetting.FadePlayfieldWhenLowHealth, true);
-                hudOverlay.LowHealthDisplay.FinishTransforms(true);
-            });
-            AddAssert("low health display is visible", () => hudOverlay.LowHealthDisplay.IsPresent);
-            AddStep("set health to 30%", () => applyToHealthDisplays(0.3));
-            AddAssert("hud is not faded to red", () => !hudOverlay.LowHealthDisplay.Child.IsPresent);
-            AddStep("set health to < 10%", () => applyToHealthDisplays(0.1f));
-            AddAssert("hud is faded to red", () => hudOverlay.LowHealthDisplay.Child.IsPresent);
-            AddStep("disable low health display", () =>
-            {
-                config.Set(OsuSetting.FadePlayfieldWhenLowHealth, false);
-                hudOverlay.LowHealthDisplay.FinishTransforms(true);
-            });
-            AddAssert("low health display is not visible", () => !hudOverlay.LowHealthDisplay.IsPresent);
-        }
-
         private void createNew(Action<HUDOverlay> action = null)
         {
             AddStep("create overlay", () =>
