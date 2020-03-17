@@ -10,7 +10,6 @@ using osu.Game.Users;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using NUnit.Framework;
-using System.Linq;
 using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
@@ -32,7 +31,7 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private TestFriendsLayout layout;
+        private FriendsLayout layout;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -40,21 +39,19 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = layout = new TestFriendsLayout()
+                Child = layout = new FriendsLayout()
             };
         });
 
         [Test]
-        public void TestOnline()
+        public void TestOffline()
         {
-            // Skip online test if user is not logged-in
-            AddUntilStep("Users loaded", () => !api.IsLoggedIn || (layout?.StatusControl.Items.Any() ?? false));
+            AddStep("Populate", () => layout.Users = getUsers());
         }
 
         [Test]
-        public void TestPopulate()
+        public void TestOnline()
         {
-            AddStep("Populate", () => layout.Users = getUsers());
         }
 
         private List<User> getUsers() => new List<User>
@@ -89,10 +86,5 @@ namespace osu.Game.Tests.Visual.Online
                 LastVisit = DateTimeOffset.Now
             }
         };
-
-        private class TestFriendsLayout : FriendsLayout
-        {
-            public FriendsOnlineStatusControl StatusControl => OnlineStatusControl;
-        }
     }
 }

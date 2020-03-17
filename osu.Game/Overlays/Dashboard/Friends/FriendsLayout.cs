@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
                 users = value;
 
-                OnlineStatusControl.Populate(value);
+                onlineStatusControl.Populate(value);
             }
         }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private Drawable currentContent;
 
-        protected readonly FriendsOnlineStatusControl OnlineStatusControl;
+        private readonly FriendsOnlineStatusControl onlineStatusControl;
         private readonly Box background;
         private readonly Box controlBackground;
         private readonly UserListToolbar userListToolbar;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                     Top = 20,
                                     Horizontal = 45
                                 },
-                                Child = OnlineStatusControl = new FriendsOnlineStatusControl(),
+                                Child = onlineStatusControl = new FriendsOnlineStatusControl(),
                             }
                         }
                     },
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             base.LoadComplete();
 
-            OnlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
+            onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
 
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             if (itemsPlaceholder.Any())
                 loading.Show();
 
-            var groupedUsers = OnlineStatusControl.Current.Value?.Users ?? new List<User>();
+            var groupedUsers = onlineStatusControl.Current.Value?.Users ?? new List<User>();
 
             var sortedUsers = sortUsers(groupedUsers);
 
