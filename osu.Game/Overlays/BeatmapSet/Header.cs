@@ -293,7 +293,6 @@ namespace osu.Game.Overlays.BeatmapSet
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
                     break;
             }
-            downloadButtonsContainer.Child = new HeaderOpenInBrowserButton(BeatmapSet.Value);
         }
     }
 }
