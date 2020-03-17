@@ -3,6 +3,7 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -34,6 +35,35 @@ namespace osu.Game.Graphics
 
                 case DifficultyRating.ExpertPlus:
                     return useLighterColour ? Gray9 : Gray0;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the colour for a <see cref="ScoreRank"/>.
+        /// </summary>
+        public static Color4 ForRank(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.XH:
+                case ScoreRank.X:
+                    return Color4Extensions.FromHex(@"ce1c9d");
+
+                case ScoreRank.SH:
+                case ScoreRank.S:
+                    return Color4Extensions.FromHex(@"00a8b5");
+
+                case ScoreRank.A:
+                    return Color4Extensions.FromHex(@"7cce14");
+
+                case ScoreRank.B:
+                    return Color4Extensions.FromHex(@"e3b130");
+
+                case ScoreRank.C:
+                    return Color4Extensions.FromHex(@"f18252");
+
+                default:
+                    return Color4Extensions.FromHex(@"e95353");
             }
         }
 
