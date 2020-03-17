@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public FaillingLayer()
         {
+            RelativeSizeAxes = Axes.Both;
             Child = box = new Box
             {
                 RelativeSizeAxes = Axes.Both,

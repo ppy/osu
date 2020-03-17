@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -13,5 +14,10 @@ namespace osu.Game.Screens.Play.HUD
             MinValue = 0,
             MaxValue = 1
         };
+        
+        public virtual void BindHealthProcessor(HealthProcessor processor)
+        {
+            Current.BindTo(processor.Health);
+        }
     }
 }

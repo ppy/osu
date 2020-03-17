@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -27,6 +29,12 @@ namespace osu.Game.Rulesets.Osu.UI
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Overlays.Add(new FaillingLayer());
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
