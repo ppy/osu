@@ -222,9 +222,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     if (badge.Accuracy > score.Accuracy)
                         continue;
 
-                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, badge.Accuracy / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
+                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
                         badge.Appear();
                 }
+
 
                 using (BeginDelayedSequence(TEXT_APPEAR_DELAY, true))
                     rankText.Appear();

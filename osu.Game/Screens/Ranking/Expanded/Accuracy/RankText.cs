@@ -4,11 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {
@@ -19,7 +21,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     {
         private readonly ScoreRank rank;
 
-        private Drawable flash;
+        private BufferedContainer flash;
+        private BufferedContainer superFlash;
+        private GlowingSpriteText rankText;
 
         public RankText(ScoreRank rank)
         {
@@ -35,16 +39,37 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                new GlowingSpriteText
+                rankText = new GlowingSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    GlowColour = OsuColour.ForRank(rank),
                     Spacing = new Vector2(-15, 0),
                     Text = DrawableRank.GetRankName(rank),
                     Font = OsuFont.Numeric.With(size: 76),
                     UseFullGlyphHeight = false
+                },
+                superFlash = new BufferedContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    BlurSigma = new Vector2(85),
+                    Size = new Vector2(600),
+                    CacheDrawnFrameBuffer = true,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.White,
+                            Size = new Vector2(150),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    },
                 },
                 flash = new BufferedContainer
                 {
@@ -53,8 +78,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     BlurSigma = new Vector2(35),
                     BypassAutoSizeAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
+                    CacheDrawnFrameBuffer = true,
                     Blending = BlendingParameters.Additive,
-                    Size = new Vector2(2f),
+                    Alpha = 0,
+                    Size = new Vector2(2f), // increase buffer size to allow for scale
                     Scale = new Vector2(1.8f),
                     Children = new[]
                     {
@@ -75,9 +102,36 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         public void Appear()
         {
-            this.FadeIn(0, Easing.In);
+            this.FadeIn();
 
-            flash.FadeIn(0, Easing.In).Then().FadeOut(800, Easing.OutQuint);
+            if (rank < ScoreRank.A)
+            {
+                this
+                    .MoveToOffset(new Vector2(0, -20))
+                    .MoveToOffset(new Vector2(0, 20), 200, Easing.OutBounce);
+
+                if (rank <= ScoreRank.D)
+                {
+                    this.Delay(700)
+                        .RotateTo(5, 150, Easing.In)
+                        .MoveToOffset(new Vector2(0, 3), 150, Easing.In);
+                }
+
+                this.FadeInFromZero(200, Easing.OutQuint);
+                return;
+            }
+
+            flash.Colour = OsuColour.ForRank(rank);
+            flash.FadeIn().Then().FadeOut(1200, Easing.OutQuint);
+
+            if (rank >= ScoreRank.S)
+                rankText.ScaleTo(1.05f).ScaleTo(1, 3000, Easing.OutQuint);
+
+            if (rank >= ScoreRank.X)
+            {
+                flash.FadeIn().Then().FadeOut(3000);
+                superFlash.FadeIn().Then().FadeOut(800, Easing.OutQuint);
+            }
         }
     }
 }

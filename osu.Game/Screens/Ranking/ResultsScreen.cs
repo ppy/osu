@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
@@ -43,11 +44,14 @@ namespace osu.Game.Screens.Ranking
         {
             InternalChildren = new[]
             {
-                new ScorePanel(score)
+                new ResultsScrollContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    State = PanelState.Expanded
+                    Child = new ScorePanel(score)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        State = PanelState.Expanded
+                    },
                 },
                 bottomPanel = new Container
                 {
@@ -109,6 +113,30 @@ namespace osu.Game.Screens.Ranking
             Background.FadeTo(1, 250);
 
             return base.OnExiting(next);
+        }
+
+        private class ResultsScrollContainer : OsuScrollContainer
+        {
+            private readonly Container content;
+
+            protected override Container<Drawable> Content => content;
+
+            public ResultsScrollContainer()
+            {
+                base.Content.Add(content = new Container
+                {
+                    RelativeSizeAxes = Axes.X
+                });
+
+                RelativeSizeAxes = Axes.Both;
+                ScrollbarVisible = false;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                content.Height = DrawHeight;
+            }
         }
     }
 }
