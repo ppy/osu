@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = working.Value.BeatmapInfo;
             var metadata = beatmap.Metadata;
-            var creator = beatmap.Metadata.Author?.Username;
+            var creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
             {
