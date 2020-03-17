@@ -12,10 +12,17 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded
 {
+    /// <summary>
+    /// The content that appears in the middle section of the <see cref="ScorePanel"/>.
+    /// </summary>
     public class ExpandedPanelTopContent : CompositeDrawable
     {
         private readonly User user;
 
+        /// <summary>
+        /// Creates a new <see cref="ExpandedPanelTopContent"/>.
+        /// </summary>
+        /// <param name="user">The <see cref="User"/> to display.</param>
         public ExpandedPanelTopContent(User user)
         {
             this.user = user;
