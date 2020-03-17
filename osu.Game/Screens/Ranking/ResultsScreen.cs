@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
@@ -24,6 +25,9 @@ namespace osu.Game.Screens.Ranking
         public override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
+
+        [Resolved(CanBeNull = true)]
+        private Player player { get; set; }
 
         private readonly ScoreInfo score;
 
@@ -75,6 +79,19 @@ namespace osu.Game.Screens.Ranking
                     }
                 }
             };
+
+            if (player != null)
+            {
+                AddInternal(new HotkeyRetryOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        player?.Restart();
+                    },
+                });
+            }
         }
 
         public override void OnEntering(IScreen last)
