@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.News
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(Typeface.Torus, 12, FontWeight.Black, false, false),
+                        Font = OsuFont.GetFont(Typeface.Torus, 12, FontWeight.Bold, false, false),
                         Text = date.ToString("d MMM yyy").ToUpper(),
                         Margin = new MarginPadding
                         {

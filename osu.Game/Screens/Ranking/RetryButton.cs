@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 using osuTK;
 
-namespace osu.Game.Screens.Ranking.Pages
+namespace osu.Game.Screens.Ranking
 {
     public class RetryButton : OsuAnimatedButton
     {
