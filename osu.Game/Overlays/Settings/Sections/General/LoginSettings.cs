@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
-                            Font = OsuFont.GetFont(weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         },
                         form = new LoginForm
                         {
