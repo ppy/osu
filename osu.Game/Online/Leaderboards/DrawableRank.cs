@@ -28,7 +28,7 @@ namespace osu.Game.Online.Leaderboards
             FillMode = FillMode.Fit;
             FillAspectRatio = 2;
 
-            var rankColour = getRankColour();
+            var rankColour = OsuColour.ForRank(rank);
             InternalChild = new DrawSizePreservingFillContainer
             {
                 TargetDrawSize = new Vector2(64, 32),
@@ -70,35 +70,6 @@ namespace osu.Game.Online.Leaderboards
         }
 
         private string getRankName() => rank.GetDescription().TrimEnd('+');
-
-        /// <summary>
-        ///  Retrieves the grade background colour.
-        /// </summary>
-        private Color4 getRankColour()
-        {
-            switch (rank)
-            {
-                case ScoreRank.XH:
-                case ScoreRank.X:
-                    return Color4Extensions.FromHex(@"ce1c9d");
-
-                case ScoreRank.SH:
-                case ScoreRank.S:
-                    return Color4Extensions.FromHex(@"00a8b5");
-
-                case ScoreRank.A:
-                    return Color4Extensions.FromHex(@"7cce14");
-
-                case ScoreRank.B:
-                    return Color4Extensions.FromHex(@"e3b130");
-
-                case ScoreRank.C:
-                    return Color4Extensions.FromHex(@"f18252");
-
-                default:
-                    return Color4Extensions.FromHex(@"e95353");
-            }
-        }
 
         /// <summary>
         ///  Retrieves the grade text colour.
