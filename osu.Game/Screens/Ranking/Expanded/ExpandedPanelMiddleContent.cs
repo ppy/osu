@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -45,8 +46,16 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapManager beatmaps)
         {
+            var metadata = score.Beatmap.Metadata;
+
+            if (metadata == null)
+            {
+                var beatmap = beatmaps.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
+                metadata = beatmap.Metadata ?? beatmap.BeatmapSet.Metadata;
+            }
+
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
@@ -81,14 +90,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((score.Beatmap.Metadata.Title, score.Beatmap.Metadata.TitleUnicode)),
+                                Text = new LocalisedString((metadata.Title, metadata.TitleUnicode)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((score.Beatmap.Metadata.Artist, score.Beatmap.Metadata.ArtistUnicode)),
+                                Text = new LocalisedString((metadata.Artist, metadata.ArtistUnicode)),
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
                             },
                             new Container
