@@ -48,6 +48,7 @@ namespace osu.Game.Tests.Visual.Ranking
             base.LoadComplete();
 
             var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
+
             if (beatmapInfo != null)
             {
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
@@ -64,16 +65,19 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestScoreWithNullAuthor()
         {
-            AddStep("set author to null", () => {
+            AddStep("set author to null", () =>
+            {
                 Beatmap.Value.Metadata.Author = null;
             });
             addScoreStep(createTestScore());
-            AddStep("set author to not null", () => {
+            AddStep("set author to not null", () =>
+            {
                 Beatmap.Value.Metadata.Author = author;
             });
         }
 
-        private void addScoreStep(ScoreInfo score) => AddStep("add panel", () => {
+        private void addScoreStep(ScoreInfo score) => AddStep("add panel", () =>
+        {
             Child = new Container
             {
                 Anchor = Anchor.Centre,
