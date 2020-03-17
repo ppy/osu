@@ -20,6 +20,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded
 {
+    /// <summary>
+    /// The content that appears in the middle section of the <see cref="ScorePanel"/>.
+    /// </summary>
     public class ExpandedPanelMiddleContent : CompositeDrawable
     {
         private readonly ScoreInfo score;
@@ -27,6 +30,10 @@ namespace osu.Game.Screens.Ranking.Expanded
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
         private RollingCounter<long> scoreCounter;
 
+        /// <summary>
+        /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
+        /// </summary>
+        /// <param name="score">The score to display.</param>
         public ExpandedPanelMiddleContent(ScoreInfo score)
         {
             this.score = score;

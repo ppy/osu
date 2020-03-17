@@ -11,12 +11,19 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
+    /// <summary>
+    /// A statistic from the score to be displayed in the <see cref="ExpandedPanelMiddleContent"/>.
+    /// </summary>
     public abstract class StatisticDisplay : CompositeDrawable
     {
         private readonly string header;
 
         private Drawable content;
 
+        /// <summary>
+        /// Creates a new <see cref="StatisticDisplay"/>.
+        /// </summary>
+        /// <param name="header">The name of the statistic.</param>
         protected StatisticDisplay(string header)
         {
             this.header = header;
@@ -75,8 +82,14 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             };
         }
 
+        /// <summary>
+        /// Shows the statistic value.
+        /// </summary>
         public virtual void Appear() => content.FadeIn(100);
 
+        /// <summary>
+        /// Creates the content for this <see cref="StatisticDisplay"/>.
+        /// </summary>
         protected abstract Drawable CreateContent();
     }
 }

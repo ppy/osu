@@ -15,10 +15,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded
 {
+    /// <summary>
+    /// A pill that displays the star rating of a <see cref="BeatmapInfo"/>.
+    /// </summary>
     public class StarRatingDisplay : CompositeDrawable
     {
         private readonly BeatmapInfo beatmap;
 
+        /// <summary>
+        /// Creates a new <see cref="StarRatingDisplay"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="BeatmapInfo"/> to display the star difficulty of.</param>
         public StarRatingDisplay(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;

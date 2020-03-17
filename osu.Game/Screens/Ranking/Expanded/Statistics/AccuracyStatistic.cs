@@ -10,12 +10,19 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
+    /// <summary>
+    /// A <see cref="StatisticDisplay"/> to display the player's accuracy.
+    /// </summary>
     public class AccuracyStatistic : StatisticDisplay
     {
         private readonly double accuracy;
 
         private RollingCounter<double> counter;
 
+        /// <summary>
+        /// Creates a new <see cref="AccuracyStatistic"/>.
+        /// </summary>
+        /// <param name="accuracy">The accuracy to display.</param>
         public AccuracyStatistic(double accuracy)
             : base("accuracy")
         {

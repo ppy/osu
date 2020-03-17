@@ -12,12 +12,20 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
+    /// <summary>
+    /// A <see cref="StatisticDisplay"/> to display the player's combo.
+    /// </summary>
     public class ComboStatistic : CounterStatistic
     {
         private readonly bool isPerfect;
 
         private Drawable perfectText;
 
+        /// <summary>
+        /// Creates a new <see cref="ComboStatistic"/>.
+        /// </summary>
+        /// <param name="combo">The combo to be displayed.</param>
+        /// <param name="isPerfect">Whether this is a perfect combo.</param>
         public ComboStatistic(int combo, bool isPerfect)
             : base("combo", combo)
         {
@@ -35,32 +43,29 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             }
         }
 
-        protected override Drawable CreateContent()
+        protected override Drawable CreateContent() => new FillFlowContainer
         {
-            return new FillFlowContainer
+            AutoSizeAxes = Axes.Both,
+            Direction = FillDirection.Horizontal,
+            Spacing = new Vector2(10, 0),
+            Children = new[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(10, 0),
-                Children = new[]
+                base.CreateContent().With(d =>
                 {
-                    base.CreateContent().With(d =>
-                    {
-                        Anchor = Anchor.CentreLeft;
-                        Origin = Anchor.CentreLeft;
-                    }),
-                    perfectText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = "PERFECT",
-                        Font = OsuFont.Torus.With(size: 11, weight: FontWeight.SemiBold),
-                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#66FFCC"), Color4Extensions.FromHex("#FF9AD7")),
-                        Alpha = 0,
-                        UseFullGlyphHeight = false,
-                    }
+                    Anchor = Anchor.CentreLeft;
+                    Origin = Anchor.CentreLeft;
+                }),
+                perfectText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Text = "PERFECT",
+                    Font = OsuFont.Torus.With(size: 11, weight: FontWeight.SemiBold),
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#66FFCC"), Color4Extensions.FromHex("#FF9AD7")),
+                    Alpha = 0,
+                    UseFullGlyphHeight = false,
                 }
-            };
-        }
+            }
+        };
     }
 }

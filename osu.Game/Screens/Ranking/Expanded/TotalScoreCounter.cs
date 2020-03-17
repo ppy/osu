@@ -9,6 +9,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded
 {
+    /// <summary>
+    /// A counter for the player's total score to be displayed in the <see cref="ExpandedPanelMiddleContent"/>.
+    /// </summary>
     public class TotalScoreCounter : RollingCounter<long>
     {
         protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
