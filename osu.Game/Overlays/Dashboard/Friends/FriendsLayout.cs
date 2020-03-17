@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osuTK;
 
@@ -19,9 +18,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class FriendsLayout : CompositeDrawable
     {
-        private List<APIFriend> users = new List<APIFriend>();
+        private List<User> users = new List<User>();
 
-        public List<APIFriend> Users
+        public List<User> Users
         {
             get => users;
             set
@@ -172,7 +171,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             if (itemsPlaceholder.Any())
                 loading.Show();
 
-            var groupedUsers = OnlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
+            var groupedUsers = OnlineStatusControl.Current.Value?.Users ?? new List<User>();
 
             var sortedUsers = sortUsers(groupedUsers);
 
@@ -195,7 +194,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             currentContent.FadeIn(200, Easing.OutQuint);
         }
 
-        private FillFlowContainer createTable(List<APIFriend> users)
+        private FillFlowContainer createTable(List<User> users)
         {
             var style = userListToolbar.DisplayStyle.Value;
 
@@ -226,7 +225,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        private List<APIFriend> sortUsers(List<APIFriend> unsorted)
+        private List<User> sortUsers(List<User> unsorted)
         {
             switch (userListToolbar.SortCriteria.Value)
             {
