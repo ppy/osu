@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     }.With(t =>
                                     {
                                         t.AddText("mapped by ");
-                                        t.AddText(score.Beatmap.Metadata.Author.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                                        t.AddText(metadata.Author.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
                                     })
                                 }
                             },
