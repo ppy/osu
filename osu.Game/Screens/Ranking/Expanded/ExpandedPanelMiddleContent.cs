@@ -4,10 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -45,8 +47,11 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(Bindable<WorkingBeatmap> working)
         {
+            var beatmap = working.Value.BeatmapInfo;
+            var metadata = beatmap.Metadata;
+
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
@@ -81,14 +86,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((score.Beatmap.Metadata.Title, score.Beatmap.Metadata.TitleUnicode)),
+                                Text = new LocalisedString((metadata.Title, metadata.TitleUnicode)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((score.Beatmap.Metadata.Artist, score.Beatmap.Metadata.ArtistUnicode)),
+                                Text = new LocalisedString((metadata.Artist, metadata.ArtistUnicode)),
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
                             },
                             new Container
@@ -120,7 +125,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new StarRatingDisplay(score.Beatmap)
+                                    new StarRatingDisplay(beatmap)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft
@@ -148,7 +153,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = score.Beatmap.Version,
+                                        Text = beatmap.Version,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
