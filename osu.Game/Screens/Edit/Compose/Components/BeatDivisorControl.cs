@@ -281,6 +281,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             protected override void OnDragEnd(DragEndEvent e)
             {
+                handleMouseInput(e.ScreenSpaceMousePosition);
             }
 
             private void handleMouseInput(Vector2 screenSpaceMousePosition)
