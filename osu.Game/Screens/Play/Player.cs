@@ -401,13 +401,17 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = DrawableRuleset.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            var score = new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = rulesetInfo,
                 Mods = Mods.Value.ToArray(),
-                User = api.LocalUser.Value,
             };
+
+            if (DrawableRuleset.ReplayScore != null)
+                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
+            else
+                score.User = api.LocalUser.Value;
 
             ScoreProcessor.PopulateScore(score);
 
