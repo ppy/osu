@@ -11,9 +11,13 @@ namespace osu.Game.Tournament.Components
 {
     public class DrawableTournamentHeaderText : CompositeDrawable
     {
-        public DrawableTournamentHeaderText()
+        public DrawableTournamentHeaderText(bool center = true)
         {
-            InternalChild = new TextSprite();
+            InternalChild = new TextSprite
+            {
+                Anchor = center ? Anchor.Centre : Anchor.TopLeft,
+                Origin = center ? Anchor.Centre : Anchor.TopLeft,
+            };
 
             Height = 22;
             RelativeSizeAxes = Axes.X;
@@ -26,9 +30,6 @@ namespace osu.Game.Tournament.Components
             {
                 RelativeSizeAxes = Axes.Both;
                 FillMode = FillMode.Fit;
-
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
 
                 Texture = textures.Get("header-text");
             }
