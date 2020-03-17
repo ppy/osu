@@ -3,13 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -27,9 +32,7 @@ namespace osu.Game.Tests.Visual.Ranking
     public class TestSceneExpandedPanelMiddleContent : OsuTestScene
     {
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
-        private User author;
+        private RulesetStore rulesetStore { get; set; }
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -43,57 +46,37 @@ namespace osu.Game.Tests.Visual.Ranking
             typeof(TotalScoreCounter)
         };
 
-        protected override void LoadComplete()
+        [Test]
+        public void TestMapWithKnownMapper()
         {
-            base.LoadComplete();
+            var author = new User { Username = "mapper_name" };
 
-            var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
+            AddStep("show example score", () => showPanel(createTestBeatmap(author), createTestScore()));
 
-            if (beatmapInfo != null)
-            {
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
-                author = Beatmap.Value.Metadata.Author;
-            }
+            AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Text == "mapper_name"));
         }
 
         [Test]
-        public void TestExampleScore()
+        public void TestMapWithUnknownMapper()
         {
-            addScoreStep(createTestScore());
+            AddStep("show example score", () => showPanel(createTestBeatmap(null), createTestScore()));
+
+            AddAssert("mapped by text not present", () =>
+                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text, "mapped", "by")));
         }
 
-        [Test]
-        public void TestScoreWithNullAuthor()
+        private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)
         {
-            AddStep("set author to null", () =>
-            {
-                Beatmap.Value.Metadata.Author = null;
-            });
-            addScoreStep(createTestScore());
-            AddStep("set author to not null", () =>
-            {
-                Beatmap.Value.Metadata.Author = author;
-            });
+            Child = new ExpandedPanelMiddleContentContainer(workingBeatmap, score);
         }
 
-        private void addScoreStep(ScoreInfo score) => AddStep("add panel", () =>
+        private WorkingBeatmap createTestBeatmap(User author)
         {
-            Child = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(500, 700),
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex("#444"),
-                    },
-                    new ExpandedPanelMiddleContent(score)
-                }
-            };
-        });
+            var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0));
+            beatmap.Metadata.Author = author;
+
+            return new TestWorkingBeatmap(beatmap);
+        }
 
         private ScoreInfo createTestScore() => new ScoreInfo
         {
@@ -117,5 +100,31 @@ namespace osu.Game.Tests.Visual.Ranking
                 { HitResult.Great, 300 },
             }
         };
+
+        private bool containsAny(string text, params string[] stringsToMatch) => stringsToMatch.Any(text.Contains);
+
+        private class ExpandedPanelMiddleContentContainer : Container
+        {
+            [Cached]
+            private Bindable<WorkingBeatmap> workingBeatmap { get; set; }
+
+            public ExpandedPanelMiddleContentContainer(WorkingBeatmap beatmap, ScoreInfo score)
+            {
+                workingBeatmap = new Bindable<WorkingBeatmap>(beatmap);
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Size = new Vector2(500, 700);
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4Extensions.FromHex("#444"),
+                    },
+                    new ExpandedPanelMiddleContent(score)
+                };
+            }
+        }
     }
 }
