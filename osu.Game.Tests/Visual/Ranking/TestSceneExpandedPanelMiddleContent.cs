@@ -3,10 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -23,6 +26,11 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneExpandedPanelMiddleContent : OsuTestScene
     {
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
+        private User author;
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ExpandedPanelMiddleContent),
@@ -35,8 +43,37 @@ namespace osu.Game.Tests.Visual.Ranking
             typeof(TotalScoreCounter)
         };
 
-        public TestSceneExpandedPanelMiddleContent()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
+            if (beatmapInfo != null)
+            {
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+                author = Beatmap.Value.Metadata.Author;
+            }
+        }
+
+        [Test]
+        public void TestExampleScore()
+        {
+            addScoreStep(createTestScore());
+        }
+
+        [Test]
+        public void TestScoreWithNullAuthor()
+        {
+            AddStep("set author to null", () => {
+                Beatmap.Value.Metadata.Author = null;
+            });
+            addScoreStep(createTestScore());
+            AddStep("set author to not null", () => {
+                Beatmap.Value.Metadata.Author = author;
+            });
+        }
+
+        private void addScoreStep(ScoreInfo score) => AddStep("add panel", () => {
             Child = new Container
             {
                 Anchor = Anchor.Centre,
@@ -49,10 +86,10 @@ namespace osu.Game.Tests.Visual.Ranking
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex("#444"),
                     },
-                    new ExpandedPanelMiddleContent(createTestScore())
+                    new ExpandedPanelMiddleContent(score)
                 }
             };
-        }
+        });
 
         private ScoreInfo createTestScore() => new ScoreInfo
         {
