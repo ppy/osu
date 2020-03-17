@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Ranking
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new ReplayDownloadButton(score),
-                                new RetryButton()
+                                new ReplayDownloadButton(score) { Width = 300 },
+                                new RetryButton { Width = 300 },
                             }
                         }
                     }
