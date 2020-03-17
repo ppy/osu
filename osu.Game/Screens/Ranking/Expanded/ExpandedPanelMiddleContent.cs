@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -46,15 +47,10 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
+        private void load(Bindable<WorkingBeatmap> working)
         {
-            var metadata = score.Beatmap.Metadata;
-
-            if (metadata == null)
-            {
-                var beatmap = beatmaps.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
-                metadata = beatmap.Metadata ?? beatmap.BeatmapSet.Metadata;
-            }
+            var beatmap = working.Value.BeatmapInfo;
+            var metadata = beatmap.Metadata;
 
             var topStatistics = new List<StatisticDisplay>
             {
@@ -129,7 +125,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new StarRatingDisplay(score.Beatmap)
+                                    new StarRatingDisplay(beatmap)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft
@@ -157,7 +153,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = score.Beatmap.Version,
+                                        Text = beatmap.Version,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
