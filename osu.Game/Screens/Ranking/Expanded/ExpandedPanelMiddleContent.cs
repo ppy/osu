@@ -158,6 +158,8 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
                                     }.With(t =>
