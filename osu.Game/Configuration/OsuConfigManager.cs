@@ -88,7 +88,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
-            Set(OsuSetting.FadePlayfieldWhenLowHealth, true);
             Set(OsuSetting.KeyOverlay, false);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
@@ -184,7 +183,6 @@ namespace osu.Game.Configuration
         ShowInterface,
         ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
-        FadePlayfieldWhenLowHealth,
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,
