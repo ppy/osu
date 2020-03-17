@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -14,6 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -28,6 +30,12 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Overlays.Add(new FaillingLayer());
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
