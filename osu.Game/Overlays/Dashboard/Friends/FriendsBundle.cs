@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
@@ -12,9 +12,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         public int Count => Users.Count;
 
-        public List<APIFriend> Users { get; }
+        public List<User> Users { get; }
 
-        public FriendsBundle(FriendsOnlineStatus status, List<APIFriend> users)
+        public FriendsBundle(FriendsOnlineStatus status, List<User> users)
         {
             Status = status;
             Users = users;
