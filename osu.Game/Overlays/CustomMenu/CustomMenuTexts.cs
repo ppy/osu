@@ -69,22 +69,22 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.NewParagraph();
             textFlow.AddUserLink(new User
                         {
-                            Username = "MATRIX-feather (主要翻译，项目发起和维护)",
+                            Username = "MATRIX-feather (主要翻译, 项目发起和维护)",
                             Id = 13870362
                         });
             textFlow.NewParagraph();
             textFlow.AddUserLink(new User
                         {
-                            Username = "poly000 (游戏内翻译修正)",
+                            Username = "pedajilao (游戏内翻译修正)",
                             Id = 13851970
                         });
             textFlow.NewParagraph();
 
             textFlow.NewParagraph();
-            textFlow.AddParagraph("Bug反馈", Titlefont);
+            textFlow.AddParagraph("Bug反馈/提出建议", Titlefont);
             textFlow.NewParagraph();
 
-            textFlow.AddText("如果你觉得某条翻译文本与功能相差过大或有待改进, 请前往");
+            textFlow.AddText("任何与翻译文本、字体大小等有关的问题, 请前往");
             textFlow.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
             textFlow.AddText("提交新的issue来讨论。");
             textFlow.AddParagraph("如果你在游玩时发现了一个游戏功能bug, 请先");
@@ -101,16 +101,13 @@ namespace osu.Game.Overlays.CustomMenu
 
             textFlow.AddText("虽然osu!lazer和他的框架osu!framework是基于");
             textFlow.AddLink("MIT协议","https://opensource.org/licenses/MIT");
-            textFlow.AddText("开源的, 这允许你只要在软件/源代码的任何副本中包含原始版权和许可声明，你可以做任何事情。");
+            textFlow.AddText("开源的, 但这并不覆盖有关\"osu\"和\"ppy\"的任何用法, 因为这些都是注册商标并受商标法的保护, ");
 
-            textFlow.AddParagraph("但这并不覆盖有关\"osu\"和\"ppy\"的任何用法，因为这些都是注册商标并受商标法的保护，");
-            textFlow.AddText("请不要公开分发包含这些内容的项目，如果有疑惑请发送邮件至");
+            textFlow.AddText("请不要公开分发包含这些内容的项目, 详细信息可以通过");
+            textFlow.AddLink("官方README","https://github.com/ppy/osu#licence");
+            textFlow.AddText("查询。");
+            textFlow.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
             textFlow.AddLink("contact@ppy.sh","mailto:contact@ppy.sh");
-
-            textFlow.AddParagraph("如果汉化版侵犯到了您的相关权益，请发送邮件至");
-            textFlow.AddLink("midnightcarnival@outlook.com","mailto:midnightcarnival@outlook.com");
-            textFlow.AddText("以商讨相关问题");
-
         }
         protected override void Update()
         {

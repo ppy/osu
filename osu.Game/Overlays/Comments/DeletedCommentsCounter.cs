@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Comments
         {
             if (!ShowDeleted.Value && Count.Value != 0)
             {
-                countText.Text = @"条已删除的评论".ToQuantity(Count.Value);
+                countText.Text = $"{Count.Value}条已删除的评论";
                 Show();
             }
             else

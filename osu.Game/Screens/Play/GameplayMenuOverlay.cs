@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Play
                 },
                 new OsuSpriteText
                 {
-                    Text = " ".ToQuantity(retries),
+                    Text = $"{retries}",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),

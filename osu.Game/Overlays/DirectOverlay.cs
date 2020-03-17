@@ -166,9 +166,9 @@ namespace osu.Game.Overlays
             resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, Easing.OutQuint);
             if (ResultAmounts == null) return;
 
-            resultCountsText.Text = "个艺术家".ToQuantity(ResultAmounts.Artists) + ", " +
-                                    "首歌".ToQuantity(ResultAmounts.Songs) + ", " +
-                                    "个标签".ToQuantity(ResultAmounts.Tags);
+            resultCountsText.Text = $"{ResultAmounts.Artists}个艺术家" + ", " +
+                                    $"{ResultAmounts.Songs}首歌" + ", " +
+                                    $"{ResultAmounts.Tags}个标签";
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)

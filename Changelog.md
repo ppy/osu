@@ -124,6 +124,7 @@
     *   [m] [Add the ability to click grouped beatmap difficulty icons #8248]
     *   [m] [Fix carousel scrolling being inoperable during beatmap import #8255]
     *   [m] [Update user panel design #8132]
+    *   [m] [Use new logo name for showcase screen #8291]
 
 *   更新上游pr
     *   [o] [Replace SocialOverlay with DashboardOverlay #805_1] 
@@ -135,3 +136,7 @@
 *   优化了[比赛端图池界面](osu.Game.Tournament/Screens/MapPool/MapPoolScreen.cs)中谱面panel的高度
 *   将[比赛端队伍编辑器界面](osu.Game.Tournament/Screens/Editors/TeamEditorScreen.cs)中的"编辑随机结果"改为"编辑选手介绍信息"
 *   优化了"关于Mf-osu"的界面排版。
+
+### 2020/03/17
+*   优化了多处翻译
+*   优化了"关于Mf-osu"的文本

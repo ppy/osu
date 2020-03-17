@@ -159,7 +159,7 @@ namespace osu.Game.Users
 
                 if (User.LastVisit.HasValue)
                 {
-                    text.AddText(@"上次登入:");
+                    text.AddText(@"上次在线：");
                     text.AddText(new DrawableDate(User.LastVisit.Value, italic: false)
                     {
                         Shadow = false

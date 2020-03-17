@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 }
             }, true);
 
-            ParticipantCount.BindValueChanged(count => summary.Text = "人参与".ToQuantity(count.NewValue), true);
+            ParticipantCount.BindValueChanged(count => summary.Text = $"{count.NewValue}人参与", true);
         }
     }
 }

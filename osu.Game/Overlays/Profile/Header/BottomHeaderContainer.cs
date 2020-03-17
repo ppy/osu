@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Profile.Header
                 topLinkContainer.AddText("元老级玩家");
             else
             {
-                topLinkContainer.AddText("加入时间 ");
+                topLinkContainer.AddText("加入时间：");
                 topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false), embolden);
             }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
             else if (user.LastVisit.HasValue)
             {
-                topLinkContainer.AddText("上次在线");
+                topLinkContainer.AddText("上次在线：");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false), embolden);
 
                 addSpacer(topLinkContainer);

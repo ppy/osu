@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"删除 {"个滑条点".ToQuantity(count, ShowQuantityAs.Numeric)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem($"删除{count}个滑条点", MenuItemType.Destructive, () => deleteSelected()),
                     new OsuMenuItem("曲线类型")
                     {
                         Items = items
