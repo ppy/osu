@@ -10,29 +10,27 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Ranking.Pages;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 
-namespace osu.Game.Tests.Visual.Gameplay
+namespace osu.Game.Tests.Visual.Ranking
 {
     [TestFixture]
-    public class TestSceneResults : ScreenTestScene
+    public class TestSceneResultsScreen : ScreenTestScene
     {
         private BeatmapManager beatmaps;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Results),
-            typeof(ResultsPage),
-            typeof(ScoreResultsPage),
+            typeof(ResultsScreen),
             typeof(RetryButton),
             typeof(ReplayDownloadButton),
-            typeof(LocalLeaderboardPage),
             typeof(TestPlayer)
         };
 
@@ -65,6 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 { HitResult.Meh, 50 },
                 { HitResult.Miss, 1 }
             },
+            Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
             User = new User
             {
                 Username = "peppy",
@@ -119,7 +118,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestSoloResults : SoloResults
+        private class TestSoloResults : ResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 
