@@ -145,10 +145,10 @@
     *   [m] [Limit Torus font weight to bold #8300]
     *   [m] [Add beatmap loading timeout to prevent runaway loading scenarios #8260]
     *   [m] [Add black font weighting #8307]
-    *   [m] [Implement a circle that displays the user's accuracy #8304]
     *   [m] [Fix replay scores not being populated via player #8305]
-    *   [m] [Implement the results screen score panel #8308]
     *   [m] [Update framework #8306]
-    *   [o] [Implement the middle score panel contents #8310]
-    *   [o] [Implement the top score panel contents #8309]
-    *   **[o] [实现新的结算页面 #8311]**
+    *   [m] [Implement the results screen score panel #8308]
+    *   [m] [Implement a circle that displays the user's accuracy #8304]
+    *   [m] [Implement the top score panel contents #8309]
+    *   [m] [Implement the middle score panel contents #8310]
+    *   **[m] [实现新的结算页面 #8311]**
