@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = working.Value.BeatmapInfo;
             var metadata = beatmap.Metadata;
+            var creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
             {
@@ -162,8 +163,11 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Direction = FillDirection.Horizontal,
                                     }.With(t =>
                                     {
-                                        t.AddText("mapped by ");
-                                        t.AddText(score.UserString, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                                        if (!string.IsNullOrEmpty(creator))
+                                        {
+                                            t.AddText("mapped by ");
+                                            t.AddText(creator, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                                        }
                                     })
                                 }
                             },
