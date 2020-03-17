@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         new OsuSpriteText
                         {
                             Text = MainText,
-                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                         },
                         new OsuSpriteText
                         {

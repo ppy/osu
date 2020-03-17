@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.OSD
                 {
                     Padding = new MarginPadding(10),
                     Name = "Description",
-                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Black),
+                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                     Spacing = new Vector2(1, 0),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

@@ -23,6 +23,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -311,20 +312,27 @@ namespace osu.Game.Screens.Select
                         Content = getBPMRange(b),
                     }));
 
-                    IBeatmap playableBeatmap;
-
                     try
                     {
-                        // Try to get the beatmap with the user's ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
-                    }
-                    catch (BeatmapInvalidForRulesetException)
-                    {
-                        // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
-                    }
+                        IBeatmap playableBeatmap;
 
-                    labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));
+                        try
+                        {
+                            // Try to get the beatmap with the user's ruleset
+                            playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
+                        }
+                        catch (BeatmapInvalidForRulesetException)
+                        {
+                            // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
+                            playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
+                        }
+
+                        labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Could not load beatmap successfully!");
+                    }
                 }
 
                 return labels.ToArray();
@@ -350,8 +358,8 @@ namespace osu.Game.Screens.Select
                 {
                     new OsuSpriteText
                     {
-                        Text = "作图者 ",
-                        Font = OsuFont.GetFont(size: 17),
+                        Text = "作图者：",
+                        Font = OsuFont.GetFont(size: 15),
                     },
                     new OsuSpriteText
                     {

@@ -140,3 +140,9 @@
 ### 2020/03/17
 *   优化了多处翻译
 *   优化了"关于Mf-osu"的文本
+
+*   合并上游pr
+    *   [m] [Limit Torus font weight to bold #8300]
+    *   [m] [Add beatmap loading timeout to prevent runaway loading scenarios #8260]
+    *   [m] [Add black font weighting #8307]
+    *   [o] [Update framework #8306]
