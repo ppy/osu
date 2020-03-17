@@ -42,6 +42,18 @@ namespace osu.Game.Graphics.Sprites
             get => blurredText.Colour;
             set => blurredText.Colour = value;
         }
+        
+        public Vector2 Spacing
+        {
+            get => spriteText.Spacing;
+            set => spriteText.Spacing = blurredText.Spacing = value;
+        }
+
+        public bool UseFullGlyphHeight
+        {
+            get => spriteText.UseFullGlyphHeight;
+            set => spriteText.UseFullGlyphHeight = blurredText.UseFullGlyphHeight = value;
+        }
 
         public GlowingSpriteText()
         {

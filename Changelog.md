@@ -146,3 +146,4 @@
     *   [m] [Add beatmap loading timeout to prevent runaway loading scenarios #8260]
     *   [m] [Add black font weighting #8307]
     *   [o] [Update framework #8306]
+    *   [o] [Implement a circle that displays the user's accuracy #83_04]
