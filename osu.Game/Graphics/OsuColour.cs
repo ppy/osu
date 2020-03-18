@@ -47,23 +47,23 @@ namespace osu.Game.Graphics
             {
                 case ScoreRank.XH:
                 case ScoreRank.X:
-                    return Color4Extensions.FromHex(@"ce1c9d");
+                    return Color4Extensions.FromHex(@"de31ae");
 
                 case ScoreRank.SH:
                 case ScoreRank.S:
-                    return Color4Extensions.FromHex(@"00a8b5");
+                    return Color4Extensions.FromHex(@"02b5c3");
 
                 case ScoreRank.A:
-                    return Color4Extensions.FromHex(@"7cce14");
+                    return Color4Extensions.FromHex(@"88da20");
 
                 case ScoreRank.B:
                     return Color4Extensions.FromHex(@"e3b130");
 
                 case ScoreRank.C:
-                    return Color4Extensions.FromHex(@"f18252");
+                    return Color4Extensions.FromHex(@"ff8e5d");
 
                 default:
-                    return Color4Extensions.FromHex(@"e95353");
+                    return Color4Extensions.FromHex(@"ff5a5a");
             }
         }
 
