@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             var lastObject = HitObjectContainer.AliveObjects.GetPrevious(osuHitObject);
 
-            // Ensure the last object is not alive anymore, in which case always allow the hit.
+            // If there is no previous object alive, allow the hit.
             if (lastObject == null)
                 return true;
 
