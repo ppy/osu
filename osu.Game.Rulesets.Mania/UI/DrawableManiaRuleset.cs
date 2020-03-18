@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, TimeRange);
 
-            Overlays.Add(new FaillingLayer());
+            Overlays.Add(new FailingLayer());
         }
 
         /// <summary>

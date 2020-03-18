@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Overlays.Add(new FaillingLayer());
+            Overlays.Add(new FailingLayer());
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
