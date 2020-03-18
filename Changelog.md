@@ -156,3 +156,21 @@
     *   [m] [Implement the top score panel contents #8309]
     *   [m] [Implement the middle score panel contents #8310]
     *   **[m] [实现新的结算页面 #8311]**
+
+### 2020/03/19
+*   合并上游pr
+    *   [m] [Fix mapper name in score panel #8318]
+    *   [m] [Fix results' beatmap title and artist language setting being swapped #8334]
+    *   [m] [Fix mapper info alignment in score panel #8320]
+    *   [m] [Update loader animation #8212]
+    *   [m] [Update incorrect file path causing error on rider solution load #8335]
+    *   [m] [Fix perfect display showing when misses are present #8336]
+    *   [m] [Re-use colors defined for each rank in result screen accuracy circle #8323]
+    *   [m] [Fix perfect display showing when misses are present #8336]
+    *   [m] [Colourise results screen hit statistics #8338]
+    *   [m] [Add date played to score panel #8340]
+    *   [m] [Update rank badge colours #8339]
+    *   [m] [Make score panel scroll if off-screen #8341]
+
+*   暂不合并
+    *   [m] [Chat overlay test scene improvements (#8297)]

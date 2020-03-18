@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = working.Value.BeatmapInfo;
             var metadata = beatmap.Metadata;
+            var creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
             {
@@ -158,13 +159,22 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 16))
                                     {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
                                     }.With(t =>
                                     {
                                         t.AddText("作图者：");
                                         t.AddText(beatmap.Metadata.Author?.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
-                                    })
+                                    }),
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
+                                        Text = $"于 {score.Date.ToLocalTime():g} 游玩"
+                                    }
                                 }
                             },
                         }
