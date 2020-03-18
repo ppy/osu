@@ -20,12 +20,13 @@ namespace osu.Game.Updater
     public class SimpleUpdateManager : UpdateManager
     {
         private string version;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, GameHost host)
+        private void load(OsuGameBase game)
         {
-            this.host = host;
             version = game.Version;
 
             if (game.IsDeployedBuild)
@@ -75,6 +76,10 @@ namespace osu.Game.Updater
 
                 case RuntimeInfo.Platform.MacOsx:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
+                    break;
+
+                case RuntimeInfo.Platform.Linux:
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage"));
                     break;
 
                 case RuntimeInfo.Platform.Android:

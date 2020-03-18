@@ -20,7 +20,11 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             positionCache = new Dictionary<double, double>();
         }
 
-        public double GetDisplayStartTime(double time, double timeRange) => time - timeRange - 1000;
+        public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
+        {
+            double adjustedTime = TimeAt(-offset, originTime, timeRange, scrollLength);
+            return adjustedTime - timeRange - 1000;
+        }
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {

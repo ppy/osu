@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             switch (state)
             {
                 case PlacementState.Initial:
+                    BeginPlacement();
                     HitObject.Position = ToLocalSpace(screenSpacePosition);
                     break;
 
@@ -125,14 +126,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void beginCurve()
         {
-            BeginPlacement();
+            BeginPlacement(commitStart: true);
             setState(PlacementState.Body);
         }
 
         private void endCurve()
         {
             updateSlider();
-            EndPlacement();
+            EndPlacement(true);
         }
 
         protected override void Update()

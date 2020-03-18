@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         {
                             Masking = true,
                             RelativeSizeAxes = Axes.X,
-                            Height = 5,
+                            Height = 2,
                             Child = lineBackground = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -128,10 +128,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                lineBackground.Colour = colours.Yellow;
-                DescriptionText.Colour = colours.GreySeafoamLighter;
+                lineBackground.Colour = colourProvider.Highlight1;
+                DescriptionText.Colour = colourProvider.Foreground1;
             }
         }
     }

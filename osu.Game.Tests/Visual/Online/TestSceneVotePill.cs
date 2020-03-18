@@ -7,6 +7,8 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Allocation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -17,6 +19,9 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(VotePill)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private VotePill votePill;
 

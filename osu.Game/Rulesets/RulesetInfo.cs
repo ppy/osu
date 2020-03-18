@@ -50,6 +50,6 @@ namespace osu.Game.Rulesets
             }
         }
 
-        public override string ToString() => $"{Name} ({ShortName}) ID: {ID}";
+        public override string ToString() => Name ?? $"{Name} ({ShortName}) ID: {ID}";
     }
 }

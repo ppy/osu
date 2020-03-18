@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set name", () => Room.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo }));
+            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => Room.Name.Value = "");

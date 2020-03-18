@@ -50,14 +50,29 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Gray,
                                     },
-                                    title = CreateTitle().With(title =>
+                                    new Container
                                     {
-                                        title.Margin = new MarginPadding
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding
                                         {
+                                            Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                                             Vertical = 10,
-                                            Left = UserProfileOverlay.CONTENT_X_MARGIN
-                                        };
-                                    })
+                                        },
+                                        Children = new[]
+                                        {
+                                            title = CreateTitle().With(title =>
+                                            {
+                                                title.Anchor = Anchor.CentreLeft;
+                                                title.Origin = Anchor.CentreLeft;
+                                            }),
+                                            CreateTitleContent().With(content =>
+                                            {
+                                                content.Anchor = Anchor.CentreRight;
+                                                content.Origin = Anchor.CentreRight;
+                                            })
+                                        }
+                                    }
                                 }
                             },
                         }
@@ -75,10 +90,16 @@ namespace osu.Game.Overlays
         }
 
         [NotNull]
-        protected virtual Drawable CreateContent() => Drawable.Empty();
+        protected virtual Drawable CreateContent() => Empty();
 
         [NotNull]
-        protected virtual Drawable CreateBackground() => Drawable.Empty();
+        protected virtual Drawable CreateBackground() => Empty();
+
+        /// <summary>
+        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="ScreenTitle"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
+        /// </summary>
+        [NotNull]
+        protected virtual Drawable CreateTitleContent() => Empty();
 
         protected abstract ScreenTitle CreateTitle();
     }

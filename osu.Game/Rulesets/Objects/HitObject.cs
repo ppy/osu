@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public event Action DefaultsApplied;
 
-        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
+        public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
         /// <summary>
         /// The time at which the HitObject starts.
@@ -144,9 +144,9 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
-        /// May be null.
         /// </summary>
-        public virtual Judgement CreateJudgement() => null;
+        [NotNull]
+        public virtual Judgement CreateJudgement() => new Judgement();
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.

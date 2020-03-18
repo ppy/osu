@@ -7,12 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
-using osu.Game.Tournament.Screens.Showcase;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.TeamWin
 {
@@ -33,21 +30,17 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
             InternalChildren = new Drawable[]
             {
-                blueWinVideo = new TourneyVideo(storage.GetStream(@"BG Team - Win Blue.m4v"))
+                blueWinVideo = new TourneyVideo("teamwin-blue")
                 {
                     Alpha = 1,
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                redWinVideo = new TourneyVideo(storage.GetStream(@"BG Team - Win Red.m4v"))
+                redWinVideo = new TourneyVideo("teamwin-red")
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
-                },
-                new TournamentLogo(false)
-                {
-                    Y = 40,
                 },
                 mainContainer = new Container
                 {
@@ -69,7 +62,9 @@ namespace osu.Game.Tournament.Screens.TeamWin
             update();
         }
 
-        private void update()
+        private bool firstDisplay = true;
+
+        private void update() => Schedule(() =>
         {
             var match = currentMatch.Value;
 
@@ -79,147 +74,53 @@ namespace osu.Game.Tournament.Screens.TeamWin
                 return;
             }
 
-            bool redWin = match.Winner == match.Team1.Value;
-            redWinVideo.Alpha = redWin ? 1 : 0;
-            blueWinVideo.Alpha = redWin ? 0 : 1;
+            redWinVideo.Alpha = match.WinnerColour == TeamColour.Red ? 1 : 0;
+            blueWinVideo.Alpha = match.WinnerColour == TeamColour.Blue ? 1 : 0;
+
+            if (firstDisplay)
+            {
+                if (match.WinnerColour == TeamColour.Red)
+                    redWinVideo.Reset();
+                else
+                    blueWinVideo.Reset();
+                firstDisplay = false;
+            }
 
             mainContainer.Children = new Drawable[]
             {
-                new TeamWithPlayers(match.Winner, redWin)
+                new DrawableTeamFlag(match.Winner)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Height = 0.6f,
+                    Size = new Vector2(300, 200),
+                    Scale = new Vector2(0.5f),
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Origin = Anchor.Centre,
+                    Position = new Vector2(-300, 10),
                 },
-                new RoundDisplay(match)
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.25f,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                }
-            };
-        }
-
-        private class RoundDisplay : CompositeDrawable
-        {
-            public RoundDisplay(TournamentMatch match)
-            {
-                var col = OsuColour.Gray(0.33f);
-
-                InternalChildren = new Drawable[]
-                {
-                    new FillFlowContainer
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    X = 260,
+                    Children = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10),
-                        Children = new Drawable[]
+                        new RoundDisplay(match)
                         {
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Colour = col,
-                                Text = "WINNER",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 15, FontWeight.Regular),
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Colour = col,
-                                Text = match.Round.Value?.Name.Value ?? "Unknown Round",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 50, FontWeight.Light),
-                                Spacing = new Vector2(10, 0),
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Colour = col,
-                                Text = match.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 20, FontWeight.Light),
-                            },
-                        }
+                            Margin = new MarginPadding { Bottom = 30 },
+                        },
+                        new TournamentSpriteText
+                        {
+                            Text = "WINNER",
+                            Font = OsuFont.Torus.With(size: 100, weight: FontWeight.Bold),
+                            Margin = new MarginPadding { Bottom = 50 },
+                        },
+                        new DrawableTeamWithPlayers(match.Winner, match.WinnerColour)
                     }
-                };
-            }
-        }
-
-        private class TeamWithPlayers : CompositeDrawable
-        {
-            private readonly Color4 red = new Color4(129, 68, 65, 255);
-            private readonly Color4 blue = new Color4(41, 91, 97, 255);
-
-            public TeamWithPlayers(TournamentTeam team, bool left = false)
-            {
-                var colour = left ? red : blue;
-                InternalChildren = new Drawable[]
-                {
-                    new TeamDisplay(team, left ? "Team Red" : "Team Blue", colour)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new FillFlowContainer
-                    {
-                        Direction = FillDirection.Vertical,
-                        AutoSizeAxes = Axes.Both,
-                        Spacing = new Vector2(0, 5),
-                        Padding = new MarginPadding(20),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativePositionAxes = Axes.Both,
-                    },
-                };
-            }
-
-            private class TeamDisplay : DrawableTournamentTeam
-            {
-                public TeamDisplay(TournamentTeam team, string teamName, Color4 colour)
-                    : base(team)
-                {
-                    AutoSizeAxes = Axes.Both;
-
-                    Flag.Anchor = Flag.Origin = Anchor.TopCentre;
-                    Flag.RelativeSizeAxes = Axes.None;
-                    Flag.Size = new Vector2(300, 200);
-                    Flag.Scale = new Vector2(0.4f);
-                    Flag.Margin = new MarginPadding { Bottom = 20 };
-
-                    InternalChild = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
-                        Children = new Drawable[]
-                        {
-                            Flag,
-                            new OsuSpriteText
-                            {
-                                Text = team?.FullName.Value.ToUpper() ?? "???",
-                                Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 40, FontWeight.Light),
-                                Colour = Color4.Black,
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = teamName.ToUpper(),
-                                Font = OsuFont.GetFont(size: 20),
-                                Colour = colour,
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
-                            }
-                        }
-                    };
-                }
-            }
-        }
+                },
+            };
+            mainContainer.FadeOut();
+            mainContainer.Delay(2000).FadeIn(1600, Easing.OutQuint);
+        });
     }
 }

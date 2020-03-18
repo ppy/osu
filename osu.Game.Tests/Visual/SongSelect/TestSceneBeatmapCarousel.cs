@@ -399,7 +399,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap == null);
 
             AddStep("remove mixed set", () =>
             {
@@ -497,7 +497,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
 
             bool changed = false;
-            AddStep($"Load {beatmapSets.Count} Beatmaps", () =>
+            AddStep($"Load {(beatmapSets.Count > 0 ? beatmapSets.Count.ToString() : "some")} beatmaps", () =>
             {
                 carousel.Filter(new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
@@ -697,6 +697,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             public new List<DrawableCarouselItem> Items => base.Items;
 
             public bool PendingFilterTask => PendingFilter != null;
+
+            protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }
     }
 }

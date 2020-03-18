@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -60,20 +62,32 @@ namespace osu.Game.Tests.Visual.Navigation
                 var frameworkConfig = host.Dependencies.Get<FrameworkConfigManager>();
                 frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).Disabled = false;
 
-                Game = new TestOsuGame(LocalStorage, API);
-                Game.SetHost(host);
-
-                // todo: this can be removed once we can run audio tracks without a device present
-                // see https://github.com/ppy/osu/issues/1302
-                Game.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
-
-                Add(Game);
+                CreateGame();
             });
 
             AddUntilStep("Wait for load", () => Game.IsLoaded);
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
 
             ConfirmAtMainMenu();
+        }
+
+        protected void CreateGame()
+        {
+            Game = new TestOsuGame(LocalStorage, API);
+            Game.SetHost(host);
+
+            // todo: this can be removed once we can run audio tracks without a device present
+            // see https://github.com/ppy/osu/issues/1302
+            Game.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
+
+            Add(Game);
+        }
+
+        protected void PushAndConfirm(Func<Screen> newScreen)
+        {
+            Screen screen = null;
+            AddStep("Push new screen", () => Game.ScreenStack.Push(screen = newScreen()));
+            AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
         }
 
         protected void ConfirmAtMainMenu() => AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
@@ -88,13 +102,20 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new SettingsPanel Settings => base.Settings;
 
+            public new MusicController MusicController => base.MusicController;
+
             public new OsuConfigManager LocalConfig => base.LocalConfig;
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
+            // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
+            public override string Version => "test game";
+
             protected override Loader CreateLoader() => new TestLoader();
+
+            public new void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null) => base.PerformFromScreen(action, validScreens);
 
             public TestOsuGame(Storage storage, IAPIProvider api)
             {
@@ -106,6 +127,8 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 base.LoadComplete();
                 API.Login("Rhythm Champion", "osu!");
+
+                Dependencies.Get<SessionStatics>().Set(Static.MutedAudioNotificationShownOnce, true);
             }
         }
 

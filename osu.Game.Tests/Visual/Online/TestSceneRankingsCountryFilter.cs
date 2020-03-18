@@ -11,6 +11,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -21,6 +23,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(CountryFilter),
             typeof(CountryPill)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         public TestSceneRankingsCountryFilter()
         {

@@ -53,9 +53,10 @@ namespace osu.Game.Tests.Visual
         {
         }
 
-        public void EndPlacement(HitObject hitObject)
+        public void EndPlacement(HitObject hitObject, bool commit)
         {
-            AddHitObject(CreateHitObject(hitObject));
+            if (commit)
+                AddHitObject(CreateHitObject(hitObject));
 
             Remove(currentBlueprint);
             Add(currentBlueprint = CreateBlueprint());

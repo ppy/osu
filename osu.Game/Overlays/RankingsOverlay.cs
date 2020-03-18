@@ -6,13 +6,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using System.Threading;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 
@@ -20,13 +19,15 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
-        protected readonly Bindable<Country> Country = new Bindable<Country>();
-        protected readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        protected Bindable<Country> Country => header.Country;
+
+        protected Bindable<RankingsScope> Scope => header.Current;
 
         private readonly BasicScrollContainer scrollFlow;
-        private readonly Container tableContainer;
-        private readonly DimmedLoadingLayer loading;
+        private readonly Container contentContainer;
+        private readonly LoadingLayer loading;
+        private readonly Box background;
+        private readonly RankingsOverlayHeader header;
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
@@ -39,10 +40,9 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f),
+                    RelativeSizeAxes = Axes.Both
                 },
                 scrollFlow = new BasicScrollContainer
                 {
@@ -55,13 +55,11 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new RankingsHeader
+                            header = new RankingsOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Country = { BindTarget = Country },
-                                Scope = { BindTarget = Scope },
-                                Ruleset = { BindTarget = ruleset }
+                                Depth = -float.MaxValue
                             },
                             new Container
                             {
@@ -69,15 +67,15 @@ namespace osu.Game.Overlays
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    tableContainer = new Container
+                                    contentContainer = new Container
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Vertical = 10 }
+                                        Margin = new MarginPadding { Bottom = 10 }
                                     },
-                                    loading = new DimmedLoadingLayer(),
+                                    loading = new LoadingLayer(contentContainer),
                                 }
                             }
                         }
@@ -86,8 +84,21 @@ namespace osu.Game.Overlays
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            background.Colour = ColourProvider.Background5;
+        }
+
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
+
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            header.Ruleset.BindTo(ruleset);
+
             Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
@@ -95,7 +106,7 @@ namespace osu.Game.Overlays
                     Scope.Value = RankingsScope.Performance;
 
                 Scheduler.AddOnce(loadNewContent);
-            }, true);
+            });
 
             Scope.BindValueChanged(_ =>
             {
@@ -104,11 +115,17 @@ namespace osu.Game.Overlays
                     Country.Value = null;
 
                 Scheduler.AddOnce(loadNewContent);
-            }, true);
+            });
 
-            ruleset.BindValueChanged(_ => Scheduler.AddOnce(loadNewContent), true);
+            ruleset.BindValueChanged(_ =>
+            {
+                if (Scope.Value == RankingsScope.Spotlights)
+                    return;
 
-            base.LoadComplete();
+                Scheduler.AddOnce(loadNewContent);
+            });
+
+            Scheduler.AddOnce(loadNewContent);
         }
 
         public void ShowCountry(Country requested)
@@ -121,6 +138,12 @@ namespace osu.Game.Overlays
             Country.Value = requested;
         }
 
+        public void ShowSpotlights()
+        {
+            Scope.Value = RankingsScope.Spotlights;
+            Show();
+        }
+
         private void loadNewContent()
         {
             loading.Show();
@@ -128,17 +151,26 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             lastRequest?.Cancel();
 
+            if (Scope.Value == RankingsScope.Spotlights)
+            {
+                loadContent(new SpotlightsLayout
+                {
+                    Ruleset = { BindTarget = ruleset }
+                });
+                return;
+            }
+
             var request = createScopedRequest();
             lastRequest = request;
 
             if (request == null)
             {
-                loadTable(null);
+                loadContent(null);
                 return;
             }
 
-            request.Success += () => loadTable(createTableFromResponse(request));
-            request.Failure += _ => loadTable(null);
+            request.Success += () => Schedule(() => loadContent(createTableFromResponse(request)));
+            request.Failure += _ => Schedule(() => loadContent(null));
 
             api.Queue(request);
         }
@@ -183,22 +215,30 @@ namespace osu.Game.Overlays
             return null;
         }
 
-        private void loadTable(Drawable table)
+        private void loadContent(Drawable content)
         {
             scrollFlow.ScrollToStart();
 
-            if (table == null)
+            if (content == null)
             {
-                tableContainer.Clear();
+                contentContainer.Clear();
                 loading.Hide();
                 return;
             }
 
-            LoadComponentAsync(table, t =>
+            LoadComponentAsync(content, loaded =>
             {
                 loading.Hide();
-                tableContainer.Child = table;
+                contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            lastRequest?.Cancel();
+            cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
         }
     }
 }

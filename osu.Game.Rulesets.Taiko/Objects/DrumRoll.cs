@@ -18,7 +18,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         private const float base_distance = 100;
 
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
 

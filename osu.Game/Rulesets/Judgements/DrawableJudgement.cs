@@ -23,7 +23,8 @@ namespace osu.Game.Rulesets.Judgements
     {
         private const float judgement_size = 128;
 
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         protected readonly JudgementResult Result;
 
@@ -56,10 +57,8 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             InternalChild = JudgementBody = new Container
             {
                 Anchor = Anchor.Centre,

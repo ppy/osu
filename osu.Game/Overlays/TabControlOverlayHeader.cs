@@ -3,6 +3,7 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -17,9 +18,17 @@ namespace osu.Game.Overlays
     /// An overlay header which contains a <see cref="OsuTabControl{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of item to be represented by tabs.</typeparam>
-    public abstract class TabControlOverlayHeader<T> : OverlayHeader
+    public abstract class TabControlOverlayHeader<T> : OverlayHeader, IHasCurrentValue<T>
     {
         protected OsuTabControl<T> TabControl;
+
+        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
+
+        public Bindable<T> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
         private readonly Box controlBackground;
 
@@ -35,7 +44,11 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    TabControl = CreateTabControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
+                    TabControl = CreateTabControl().With(control =>
+                    {
+                        control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN };
+                        control.Current = Current;
+                    })
                 }
             });
         }

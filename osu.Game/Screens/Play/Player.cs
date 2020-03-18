@@ -65,7 +65,8 @@ namespace osu.Game.Screens.Play
 
         private Ruleset ruleset;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private SampleChannel sampleRestart;
 
@@ -110,11 +111,16 @@ namespace osu.Game.Screens.Play
             this.showResults = showResults;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
-        {
-            this.api = api;
+        private GameplayBeatmap gameplayBeatmap;
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuConfigManager config)
+        {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)
@@ -142,6 +148,10 @@ namespace osu.Game.Screens.Play
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
+
+            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
+
+            dependencies.CacheAs(gameplayBeatmap);
 
             addUnderlayComponents(GameplayClockContainer);
             addGameplayComponents(GameplayClockContainer, Beatmap.Value);
@@ -174,7 +184,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
                 mod.ApplyToHealthProcessor(HealthProcessor);
 
-            BreakOverlay.IsBreakTime.ValueChanged += _ => updatePauseOnFocusLostState();
+            BreakOverlay.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
         private void addUnderlayComponents(Container target)
@@ -219,7 +229,11 @@ namespace osu.Game.Screens.Play
                         IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                     },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
-                    KeyCounter = { Visible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
+                    KeyCounter =
+                    {
+                        AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
+                        IsCounting = false
+                    },
                     RequestSeek = GameplayClockContainer.Seek,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -274,6 +288,12 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.Overlays.Add(HealthProcessor);
 
             HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+        }
+
+        private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
+        {
+            updatePauseOnFocusLostState();
+            HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -381,13 +401,17 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = DrawableRuleset.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            var score = new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = rulesetInfo,
                 Mods = Mods.Value.ToArray(),
-                User = api.LocalUser.Value,
             };
+
+            if (DrawableRuleset.ReplayScore != null)
+                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
+            else
+                score.User = api.LocalUser.Value;
 
             ScoreProcessor.PopulateScore(score);
 
@@ -396,7 +420,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score);
 
         #region Fail Logic
 
@@ -599,9 +623,9 @@ namespace osu.Game.Screens.Play
             {
                 var score = CreateScore();
                 if (DrawableRuleset.ReplayScore == null)
-                    scoreManager.Import(score).Wait();
-
-                this.Push(CreateResults(score));
+                    scoreManager.Import(score).ContinueWith(_ => Schedule(() => this.Push(CreateResults(score))));
+                else
+                    this.Push(CreateResults(score));
             });
         }
 

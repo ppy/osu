@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.Break
 {
@@ -85,6 +86,6 @@ namespace osu.Game.Screens.Play.Break
         {
         }
 
-        protected override string Format(double count) => $@"{count:P2}";
+        protected override string Format(double count) => count.FormatAccuracy();
     }
 }

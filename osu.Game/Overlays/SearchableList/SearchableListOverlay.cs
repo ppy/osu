@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.SearchableList
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding { Horizontal = WIDTH_PADDING, Bottom = 50 },
+                                Padding = new MarginPadding { Horizontal = 10, Bottom = 50 },
                                 Direction = FillDirection.Vertical,
                             },
                         },

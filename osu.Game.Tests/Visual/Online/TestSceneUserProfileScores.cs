@@ -28,7 +28,30 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneUserProfileScores()
         {
-            var score = new ScoreInfo
+            var firstScore = new ScoreInfo
+            {
+                PP = 1047.21,
+                Rank = ScoreRank.SH,
+                Beatmap = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Title = "JUSTadICE (TV Size)",
+                        Artist = "Oomori Seiko"
+                    },
+                    Version = "Extreme"
+                },
+                Date = DateTimeOffset.Now,
+                Mods = new Mod[]
+                {
+                    new OsuModHidden(),
+                    new OsuModHardRock(),
+                    new OsuModDoubleTime()
+                },
+                Accuracy = 0.9813
+            };
+
+            var secondScore = new ScoreInfo
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
@@ -48,6 +71,23 @@ namespace osu.Game.Tests.Visual.Online
                     new OsuModDoubleTime(),
                 },
                 Accuracy = 0.998546
+            };
+
+            var thirdScore = new ScoreInfo
+            {
+                PP = 96.83,
+                Rank = ScoreRank.S,
+                Beatmap = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Title = "Idolize",
+                        Artist = "Creo"
+                    },
+                    Version = "Insane"
+                },
+                Date = DateTimeOffset.Now,
+                Accuracy = 0.9726
             };
 
             var noPPScore = new ScoreInfo
@@ -76,9 +116,12 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(0, 10),
                 Children = new[]
                 {
-                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(score)),
+                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(firstScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(secondScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore)),
-                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(score, 0.85))
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, 0.97)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, 0.85)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(thirdScore, 0.66)),
                 }
             });
         }

@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<float> scaleBindable = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()

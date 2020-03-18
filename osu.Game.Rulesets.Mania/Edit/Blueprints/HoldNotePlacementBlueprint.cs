@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.UpdatePosition(screenSpacePosition);
 
-            if (PlacementBegun)
+            if (PlacementActive)
             {
                 var endTime = TimeAt(screenSpacePosition);
 

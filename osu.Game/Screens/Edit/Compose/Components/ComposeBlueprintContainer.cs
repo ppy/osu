@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -62,18 +61,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void refreshTool()
         {
-            placementBlueprintContainer.Clear();
-            currentPlacement = null;
-
-            var blueprint = CurrentTool?.CreatePlacementBlueprint();
-
-            if (blueprint != null)
-            {
-                placementBlueprintContainer.Child = currentPlacement = blueprint;
-
-                // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
-            }
+            removePlacement();
+            createPlacement();
         }
 
         private void updatePlacementPosition(Vector2 screenSpacePosition)
@@ -86,33 +75,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            if (currentPlacement != null)
-            {
-                updatePlacementPosition(e.ScreenSpaceMousePosition);
-                return true;
-            }
-
-            return base.OnMouseMove(e);
-        }
-
         protected override void Update()
         {
             base.Update();
 
+            if (composer.CursorInPlacementArea)
+                createPlacement();
+            else if (currentPlacement?.PlacementActive == false)
+                removePlacement();
+
             if (currentPlacement != null)
-            {
-                if (composer.CursorInPlacementArea)
-                    currentPlacement.State = PlacementState.Shown;
-                else if (currentPlacement?.PlacementBegun == false)
-                    currentPlacement.State = PlacementState.Hidden;
-            }
+                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
             var drawable = drawableHitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+
             if (drawable == null)
                 return null;
 
@@ -127,6 +106,30 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.AddBlueprintFor(hitObject);
         }
 
+        private void createPlacement()
+        {
+            if (currentPlacement != null) return;
+
+            var blueprint = CurrentTool?.CreatePlacementBlueprint();
+
+            if (blueprint != null)
+            {
+                placementBlueprintContainer.Child = currentPlacement = blueprint;
+
+                // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
+            }
+        }
+
+        private void removePlacement()
+        {
+            if (currentPlacement == null) return;
+
+            currentPlacement.EndPlacement(false);
+            currentPlacement.Expire();
+            currentPlacement = null;
+        }
+
         private HitObjectCompositionTool currentTool;
 
         /// <summary>
@@ -135,6 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public HitObjectCompositionTool CurrentTool
         {
             get => currentTool;
+
             set
             {
                 if (currentTool == value)

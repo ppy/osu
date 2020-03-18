@@ -19,7 +19,8 @@ namespace osu.Game.Online
     {
         protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
-        private TModelManager manager;
+        [Resolved(CanBeNull = true)]
+        private TModelManager manager { get; set; }
 
         /// <summary>
         /// Holds the current download state of the <typeparamref name="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
@@ -34,10 +35,8 @@ namespace osu.Game.Online
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(TModelManager manager)
+        private void load()
         {
-            this.manager = manager;
-
             Model.BindValueChanged(modelInfo =>
             {
                 if (modelInfo.NewValue == null)
@@ -54,17 +53,17 @@ namespace osu.Game.Online
             manager.ItemRemoved += itemRemoved;
         }
 
-        private void downloadBegan(ArchiveDownloadRequest<TModel> request)
+        private void downloadBegan(ArchiveDownloadRequest<TModel> request) => Schedule(() =>
         {
             if (request.Model.Equals(Model.Value))
                 attachDownload(request);
-        }
+        });
 
-        private void downloadFailed(ArchiveDownloadRequest<TModel> request)
+        private void downloadFailed(ArchiveDownloadRequest<TModel> request) => Schedule(() =>
         {
             if (request.Model.Equals(Model.Value))
                 attachDownload(null);
-        }
+        });
 
         private ArchiveDownloadRequest<TModel> attachedRequest;
 

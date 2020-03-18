@@ -13,7 +13,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("Player instantiated with a replay.")]
-    public class TestSceneReplay : AllPlayersTestScene
+    public class TestSceneReplay : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
