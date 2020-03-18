@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
         /// </summary>
-        protected double LowHealthThreshold { get; set; } = 0.20f;
+        public double LowHealthThreshold = 0.20f;
 
         public FailingLayer()
         {
