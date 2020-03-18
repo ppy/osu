@@ -65,7 +65,6 @@ namespace osu.Game.Tests.Visual.Editor
                 InputManager.ReleaseButton(osuTK.Input.MouseButton.Left);
             });
             AddAssert("Position clamped to 8", () => bindableBeatDivisor.Value == 8);
-
         }
 
         private void reset()
