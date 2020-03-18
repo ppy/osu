@@ -132,7 +132,7 @@ namespace osu.Desktop
 
             protected override string LocateBasePath()
             {
-                static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+                static bool checkExists(string p) => File.Exists(Path.Combine(p, "osu!.exe"));
 
                 string stableInstallPath;
 
