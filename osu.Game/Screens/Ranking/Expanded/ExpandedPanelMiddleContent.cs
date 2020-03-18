@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, true),
+                new ComboStatistic(score.MaxCombo, score.Statistics[HitResult.Miss] == 0),
                 new CounterStatistic("pp", (int)(score.PP ?? 0)),
             };
 
