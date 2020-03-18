@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                 if (api.IsLoggedIn)
                 {
                     var request = new GetUserRequest(fallback.Id);
-                    request.Success += user => header.User.Value = user;
+                    request.Success += user => header.User.Value = user.ToUser();
                     api.Queue(request);
                 }
                 else

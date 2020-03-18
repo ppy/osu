@@ -296,10 +296,12 @@ namespace osu.Game.Tournament
 
             req.Success += res =>
             {
-                user.Username = res.Username;
-                user.Statistics = res.Statistics;
-                user.Country = res.Country;
-                user.Cover = res.Cover;
+                var resUser = res.ToUser();
+
+                user.Username = resUser.Username;
+                user.Statistics = resUser.Statistics;
+                user.Country = resUser.Country;
+                user.Cover = resUser.Cover;
 
                 success?.Invoke();
             };

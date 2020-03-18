@@ -153,7 +153,7 @@ namespace osu.Game.Online.API
                         var userReq = new GetUserRequest();
                         userReq.Success += u =>
                         {
-                            LocalUser.Value = u;
+                            LocalUser.Value = u.ToUser();
 
                             // todo: save/pull from settings
                             LocalUser.Value.Status.Value = new UserStatusOnline();

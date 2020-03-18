@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Online
             request = new GetUserRequest(userId, ruleset);
             request.Success += user =>
             {
-                this.user.Value = user;
+                this.user.Value = user.ToUser();
                 loading.Hide();
             };
             api.Queue(request);

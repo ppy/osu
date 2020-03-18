@@ -30,12 +30,12 @@ namespace osu.Game.Overlays.Rankings.Tables
             new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         }).ToArray();
 
-        protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
+        protected sealed override Country GetCountry(UserStatistics item) => item.User.ToUser().Country;
 
         protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true)) { AutoSizeAxes = Axes.Both };
-            username.AddUserLink(item.User);
+            username.AddUserLink(item.User.ToUser());
             return username;
         }
 

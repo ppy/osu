@@ -120,13 +120,13 @@ namespace osu.Game.Overlays
             {
                 case SocialTab.Friends:
                     var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
-                    friendRequest.Success += users => Users = users.ToArray();
+                    friendRequest.Success += users => Users = users.Select(u => u.ToUser()).ToArray();
                     API.Queue(getUsersRequest = friendRequest);
                     break;
 
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
-                    userRequest.Success += res => Users = res.Users.Select(r => r.User).ToArray();
+                    userRequest.Success += res => Users = res.Users.Select(r => r.User.ToUser()).ToArray();
                     API.Queue(getUsersRequest = userRequest);
                     break;
             }

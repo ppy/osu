@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("online user (Angelsim)", () =>
             {
                 var request = new GetUserRequest(1777162);
-                request.Success += user => this.user.Value = user;
+                request.Success += user => this.user.Value = user.ToUser();
                 api.Queue(request);
             });
         }

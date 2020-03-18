@@ -3,7 +3,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
@@ -11,42 +10,31 @@ namespace osu.Game.Users
 {
     public class User : IEquatable<User>
     {
-        [JsonProperty(@"id")]
-        public long Id = 1;
+        public long Id { get; set; } = 1;
 
-        [JsonProperty(@"join_date")]
-        public DateTimeOffset JoinDate;
+        public DateTimeOffset JoinDate { get; set; }
 
-        [JsonProperty(@"username")]
-        public string Username;
+        public string Username { get; set; }
 
-        [JsonProperty(@"previous_usernames")]
-        public string[] PreviousUsernames;
+        public string[] PreviousUsernames { get; set; }
 
-        [JsonProperty(@"country")]
-        public Country Country;
+        public Country Country { get; set; }
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
         public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-        //public Team Team;
+        public string Colour { get; set; }
 
-        [JsonProperty(@"profile_colour")]
-        public string Colour;
+        public string AvatarUrl { get; set; }
 
-        [JsonProperty(@"avatar_url")]
-        public string AvatarUrl;
-
-        [JsonProperty(@"cover_url")]
         public string CoverUrl
         {
             get => Cover?.Url;
             set => Cover = new UserCover { Url = value };
         }
 
-        [JsonProperty(@"cover")]
-        public UserCover Cover;
+        public UserCover Cover { get; set; }
 
         public class UserCover
         {
@@ -60,106 +48,69 @@ namespace osu.Game.Users
             public int? Id;
         }
 
-        [JsonProperty(@"is_admin")]
-        public bool IsAdmin;
+        public bool IsAdmin { get; set; }
 
-        [JsonProperty(@"is_supporter")]
-        public bool IsSupporter;
+        public bool IsSupporter { get; set; }
 
-        [JsonProperty(@"support_level")]
-        public int SupportLevel;
+        public int SupportLevel { get; set; }
 
-        [JsonProperty(@"is_gmt")]
-        public bool IsGMT;
+        public bool IsGMT { get; set; }
 
-        [JsonProperty(@"is_qat")]
-        public bool IsQAT;
+        public bool IsQAT { get; set; }
 
-        [JsonProperty(@"is_bng")]
-        public bool IsBNG;
+        public bool IsBNG { get; set; }
 
-        [JsonProperty(@"is_bot")]
-        public bool IsBot;
+        public bool IsBot { get; set; }
 
-        [JsonProperty(@"is_active")]
-        public bool Active;
+        public bool Active { get; set; }
 
-        [JsonProperty(@"is_online")]
-        public bool IsOnline;
+        public bool IsOnline { get; set; }
 
-        [JsonProperty(@"pm_friends_only")]
-        public bool PMFriendsOnly;
+        public bool PMFriendsOnly { get; set; }
 
-        [JsonProperty(@"interests")]
-        public string Interests;
+        public string Interests { get; set; }
 
-        [JsonProperty(@"occupation")]
-        public string Occupation;
+        public string Occupation { get; set; }
 
-        [JsonProperty(@"title")]
-        public string Title;
+        public string Title { get; set; }
 
-        [JsonProperty(@"location")]
-        public string Location;
+        public string Location { get; set; }
 
-        [JsonProperty(@"last_visit")]
-        public DateTimeOffset? LastVisit;
+        public DateTimeOffset? LastVisit { get; set; }
 
-        [JsonProperty(@"twitter")]
-        public string Twitter;
+        public string Twitter { get; set; }
 
-        [JsonProperty(@"lastfm")]
-        public string Lastfm;
+        public string Lastfm { get; set; }
 
-        [JsonProperty(@"skype")]
-        public string Skype;
+        public string Skype { get; set; }
 
-        [JsonProperty(@"discord")]
-        public string Discord;
+        public string Discord { get; set; }
 
-        [JsonProperty(@"website")]
-        public string Website;
+        public string Website { get; set; }
 
-        [JsonProperty(@"post_count")]
-        public int PostCount;
+        public int PostCount { get; set; }
 
-        [JsonProperty(@"follower_count")]
-        public int FollowerCount;
+        public int FollowerCount { get; set; }
 
-        [JsonProperty(@"favourite_beatmapset_count")]
-        public int FavouriteBeatmapsetCount;
+        public int FavouriteBeatmapsetCount { get; set; }
 
-        [JsonProperty(@"graveyard_beatmapset_count")]
-        public int GraveyardBeatmapsetCount;
+        public int GraveyardBeatmapsetCount { get; set; }
 
-        [JsonProperty(@"loved_beatmapset_count")]
-        public int LovedBeatmapsetCount;
+        public int LovedBeatmapsetCount { get; set; }
 
-        [JsonProperty(@"ranked_and_approved_beatmapset_count")]
-        public int RankedAndApprovedBeatmapsetCount;
+        public int RankedAndApprovedBeatmapsetCount { get; set; }
 
-        [JsonProperty(@"unranked_beatmapset_count")]
-        public int UnrankedBeatmapsetCount;
+        public int UnrankedBeatmapsetCount { get; set; }
 
-        [JsonProperty(@"scores_first_count")]
-        public int ScoresFirstCount;
+        public int ScoresFirstCount { get; set; }
 
-        [JsonProperty]
-        private string[] playstyle
-        {
-            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
-        }
+        public PlayStyle[] PlayStyles { get; set; }
 
-        public PlayStyle[] PlayStyles;
+        public string PlayMode { get; set; }
 
-        [JsonProperty(@"playmode")]
-        public string PlayMode;
+        public string[] ProfileOrder { get; set; }
 
-        [JsonProperty(@"profile_order")]
-        public string[] ProfileOrder;
-
-        [JsonProperty(@"kudosu")]
-        public KudosuCount Kudosu;
+        public KudosuCount Kudosu { get; set; }
 
         public class KudosuCount
         {
@@ -170,8 +121,7 @@ namespace osu.Game.Users
             public int Available;
         }
 
-        [JsonProperty(@"statistics")]
-        public UserStatistics Statistics;
+        public UserStatistics Statistics { get; set; }
 
         public class RankHistoryData
         {
@@ -182,17 +132,9 @@ namespace osu.Game.Users
             public int[] Data;
         }
 
-        [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set => Statistics.RankHistory = value;
-        }
+        public Badge[] Badges { get; set; }
 
-        [JsonProperty("badges")]
-        public Badge[] Badges;
-
-        [JsonProperty("user_achievements")]
-        public UserAchievement[] Achievements;
+        public UserAchievement[] Achievements { get; set; }
 
         public class UserAchievement
         {
@@ -203,11 +145,9 @@ namespace osu.Game.Users
             public int ID;
         }
 
-        [JsonProperty("monthly_playcounts")]
-        public UserHistoryCount[] MonthlyPlaycounts;
+        public UserHistoryCount[] MonthlyPlaycounts { get; set; }
 
-        [JsonProperty("replays_watched_counts")]
-        public UserHistoryCount[] ReplaysWatchedCounts;
+        public UserHistoryCount[] ReplaysWatchedCounts { get; set; }
 
         public class UserHistoryCount
         {
