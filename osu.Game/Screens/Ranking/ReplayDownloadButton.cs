@@ -9,7 +9,7 @@ using osu.Game.Online;
 using osu.Game.Scoring;
 using osuTK;
 
-namespace osu.Game.Screens.Ranking.Pages
+namespace osu.Game.Screens.Ranking
 {
     public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
     {
