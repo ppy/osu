@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             ApplyPositionOffsets(Beatmap);
 
-            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
-
             int index = 0;
 
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
@@ -76,6 +74,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         break;
 
                     case JuiceStream juiceStream:
+                        // Todo: BUG!! Stable used the last control point as the final position of the path, but it should use the computed path instead.
+                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X / CatchPlayfield.BASE_WIDTH;
+
+                        // Todo: BUG!! Stable attempted to use the end time of the stream, but referenced it too early in execution and used the start time instead.
+                        lastStartTime = juiceStream.StartTime;
+
                         foreach (var nested in juiceStream.NestedHitObjects)
                         {
                             var catchObject = (CatchHitObject)nested;
@@ -90,20 +94,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         break;
                 }
             }
+
+            initialiseHyperDash(beatmap);
         }
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
         {
-            if (hitObject is JuiceStream stream)
-            {
-                lastPosition = stream.EndX;
-                lastStartTime = stream.EndTime;
-                return;
-            }
-
-            if (!(hitObject is Fruit))
-                return;
-
             float offsetPosition = hitObject.X;
             double startTime = hitObject.StartTime;
 
@@ -116,7 +112,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
 
             float positionDiff = offsetPosition - lastPosition.Value;
-            double timeDiff = startTime - lastStartTime;
+
+            // Todo: BUG!! Stable calculated time deltas as ints, which affects randomisation. This should be changed to a double.
+            int timeDiff = (int)(startTime - lastStartTime);
 
             if (timeDiff > 1000)
             {
@@ -132,7 +130,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 return;
             }
 
-            if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3d)
+            // ReSharper disable once PossibleLossOfFraction
+            if (Math.Abs(positionDiff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3)
                 applyOffset(ref offsetPosition, positionDiff);
 
             hitObject.XOffset = offsetPosition - hitObject.X;
@@ -191,14 +190,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
         }
 
-        private void initialiseHyperDash(List<CatchHitObject> objects)
+        private static void initialiseHyperDash(IBeatmap beatmap)
         {
             List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
 
-            foreach (var currentObject in objects)
+            foreach (var currentObject in beatmap.HitObjects)
             {
-                if (currentObject is Fruit)
-                    objectWithDroplets.Add(currentObject);
+                if (currentObject is Fruit fruitObject)
+                    objectWithDroplets.Add(fruitObject);
 
                 if (currentObject is JuiceStream)
                 {
@@ -212,7 +211,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-            double halfCatcherWidth = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
+            double halfCatcherWidth = CatcherArea.GetCatcherSize(beatmap.BeatmapInfo.BaseDifficulty) / 2;
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
@@ -221,10 +220,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 CatchHitObject currentObject = objectWithDroplets[i];
                 CatchHitObject nextObject = objectWithDroplets[i + 1];
 
+                // Reset variables in-case values have changed (e.g. after applying HR)
+                currentObject.HyperDashTarget = null;
+                currentObject.DistanceToHyperDash = 0;
+
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
-                float distanceToHyper = (float)(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext);
+                float distanceToHyper = (float)(timeToNext * Catcher.BASE_SPEED - distanceToNext);
 
                 if (distanceToHyper < 0)
                 {

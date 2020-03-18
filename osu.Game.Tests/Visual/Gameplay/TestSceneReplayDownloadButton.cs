@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Ranking.Pages;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {

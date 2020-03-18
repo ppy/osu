@@ -30,8 +30,15 @@ namespace osu.Game.Graphics
         /// <param name="italics">Whether the font is italic.</param>
         /// <param name="fixedWidth">Whether all characters should be spaced the same distance apart.</param>
         /// <returns>The <see cref="FontUsage"/>.</returns>
-        public static FontUsage GetFont(Typeface typeface = Typeface.Exo, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
-            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), italics, fixedWidth);
+        public static FontUsage GetFont(Typeface typeface = Typeface.Torus, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
+            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), getItalics(italics), fixedWidth);
+
+        private static bool getItalics(in bool italicsRequested)
+        {
+            // right now none of our fonts support italics.
+            // should add exceptions to this rule if they come up.
+            return false;
+        }
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="Typeface"/>.
@@ -42,9 +49,6 @@ namespace osu.Game.Graphics
         {
             switch (typeface)
             {
-                case Typeface.Exo:
-                    return "Exo2.0";
-
                 case Typeface.Venera:
                     return "Venera";
 
@@ -62,7 +66,13 @@ namespace osu.Game.Graphics
         /// <param name="weight">The <see cref="FontWeight"/>.</param>
         /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="typeface"/>.</returns>
         public static string GetWeightString(Typeface typeface, FontWeight weight)
-            => GetWeightString(GetFamilyString(typeface), weight);
+        {
+            if (typeface == Typeface.Torus && weight == FontWeight.Medium)
+                // torus doesn't have a medium; fallback to regular.
+                weight = FontWeight.Regular;
+
+            return GetWeightString(GetFamilyString(typeface), weight);
+        }
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.
@@ -96,7 +106,6 @@ namespace osu.Game.Graphics
 
     public enum Typeface
     {
-        Exo,
         Venera,
         Torus
     }
