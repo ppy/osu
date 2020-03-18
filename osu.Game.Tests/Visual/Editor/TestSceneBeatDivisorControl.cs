@@ -3,8 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -18,6 +22,9 @@ namespace osu.Game.Tests.Visual.Editor
         private BeatDivisorControl beatDivisorControl;
         private BindableBeatDivisor bindableBeatDivisor;
 
+        private SliderBar<int> tickSliderBar;
+        private EquilateralTriangle tickMarkerHead;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
@@ -27,42 +34,52 @@ namespace osu.Game.Tests.Visual.Editor
                 Origin = Anchor.Centre,
                 Size = new Vector2(90, 90)
             };
+
+            tickSliderBar = beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
+            tickMarkerHead = tickSliderBar.ChildrenOfType<EquilateralTriangle>().Single();
         });
 
         [Test]
         public void TestBindableBeatDivisor()
         {
-            AddRepeatStep("Move previous", () => bindableBeatDivisor.Previous(), 4);
-            AddAssert("Position at 4", () => bindableBeatDivisor.Value == 4);
-            AddRepeatStep("Move next", () => bindableBeatDivisor.Next(), 3);
-            AddAssert("Position at 12", () => bindableBeatDivisor.Value == 12);
+            AddRepeatStep("move previous", () => bindableBeatDivisor.Previous(), 4);
+            AddAssert("divisor is 4", () => bindableBeatDivisor.Value == 4);
+            AddRepeatStep("move next", () => bindableBeatDivisor.Next(), 3);
+            AddAssert("divisor is 12", () => bindableBeatDivisor.Value == 12);
         }
 
         [Test]
         public void TestMouseInput()
         {
-            AddStep("Move to marker", () =>
+            AddStep("hold marker", () =>
             {
-                InputManager.MoveMouseTo(beatDivisorControl, new Vector2(38, -18));
+                InputManager.MoveMouseTo(tickMarkerHead.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });
-            AddStep("Mote to divisor 8", () =>
+            AddStep("move to 8 and release", () =>
             {
-                InputManager.MoveMouseTo(beatDivisorControl, new Vector2(0, -18));
+                InputManager.MoveMouseTo(tickSliderBar.ScreenSpaceDrawQuad.Centre);
                 InputManager.ReleaseButton(MouseButton.Left);
             });
-            AddAssert("Position at 8", () => bindableBeatDivisor.Value == 8);
-            AddStep("Prepare to move marker", () => { InputManager.PressButton(MouseButton.Left); });
-            AddStep("Trigger marker jump", () =>
+            AddAssert("divisor is 8", () => bindableBeatDivisor.Value == 8);
+            AddStep("hold marker", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move to 16", () => InputManager.MoveMouseTo(getPositionForDivisor(16)));
+            AddStep("move to ~10 and release", () =>
             {
-                InputManager.MoveMouseTo(beatDivisorControl, new Vector2(30, -18));
-            });
-            AddStep("Move to divisor ~10", () =>
-            {
-                InputManager.MoveMouseTo(beatDivisorControl, new Vector2(10, -18));
+                InputManager.MoveMouseTo(getPositionForDivisor(10));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
-            AddAssert("Position clamped to 8", () => bindableBeatDivisor.Value == 8);
+            AddAssert("divisor clamped to 8", () => bindableBeatDivisor.Value == 8);
+        }
+
+        private Vector2 getPositionForDivisor(int divisor)
+        {
+            var relativePosition = (float)Math.Clamp(divisor, 0, 16) / 16;
+            var sliderDrawQuad = tickSliderBar.ScreenSpaceDrawQuad;
+            return new Vector2(
+                sliderDrawQuad.TopLeft.X + sliderDrawQuad.Width * relativePosition,
+                sliderDrawQuad.Centre.Y
+            );
         }
     }
 }
