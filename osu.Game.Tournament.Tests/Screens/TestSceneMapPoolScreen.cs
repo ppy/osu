@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -38,7 +39,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
 
-            AddAssert("ensure layout width is 2", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y > 0);
+            assertTwoWide();
         }
 
         [Test]
@@ -58,7 +59,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
 
-            AddAssert("ensure layout width is 2", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y > 0);
+            assertTwoWide();
         }
 
         [Test]
@@ -78,7 +79,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
 
-            AddAssert("ensure layout width is 3", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y == 0);
+            assertThreeWide();
         }
 
         [Test]
@@ -98,8 +99,14 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
 
-            AddAssert("ensure layout width is 2", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y > 0);
+            assertTwoWide();
         }
+
+        private void assertTwoWide() =>
+            AddAssert("ensure layout width is 2", () => screen.ChildrenOfType<FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>>().First().Padding.Left > 0);
+
+        private void assertThreeWide() =>
+            AddAssert("ensure layout width is 3", () => screen.ChildrenOfType<FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>>().First().Padding.Left == 0);
 
         [Test]
         public void TestManyMods()
@@ -118,7 +125,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
 
-            AddAssert("ensure layout width is 3", () => screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(2).Y == 0);
+            assertThreeWide();
         }
 
         private void addBeatmap(string mods = "nm")
