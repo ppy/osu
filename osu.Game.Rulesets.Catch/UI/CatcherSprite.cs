@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
-        public CatcherSprite()
-            : base(new CatchSkinComponent(CatchSkinComponents.CatcherIdle), _ =>
-                new DefaultCatcherSprite(), confineMode: ConfineMode.ScaleDownToFit)
+        public CatcherSprite(CatcherAnimationState state)
+            : base(new CatchSkinComponent(componentFromState(state)), _ =>
+                new DefaultCatcherSprite(state), confineMode: ConfineMode.ScaleDownToFit)
         {
             RelativeSizeAxes = Axes.None;
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
@@ -25,12 +25,34 @@ namespace osu.Game.Rulesets.Catch.UI
             OriginPosition = new Vector2(0.5f, 0.06f) * CatcherArea.CATCHER_SIZE;
         }
 
+        private static CatchSkinComponents componentFromState(CatcherAnimationState state)
+        {
+            switch (state)
+            {
+                case CatcherAnimationState.Fail:
+                    return CatchSkinComponents.CatcherFail;
+
+                case CatcherAnimationState.Kiai:
+                    return CatchSkinComponents.CatcherKiai;
+
+                default:
+                    return CatchSkinComponents.CatcherIdle;
+            }
+        }
+
         private class DefaultCatcherSprite : Sprite
         {
+            private readonly CatcherAnimationState state;
+
+            public DefaultCatcherSprite(CatcherAnimationState state)
+            {
+                this.state = state;
+            }
+
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                Texture = textures.Get("Gameplay/catch/fruit-catcher-idle");
+                Texture = textures.Get($"Gameplay/catch/fruit-catcher-{state.ToString().ToLower()}");
             }
         }
     }
