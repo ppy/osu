@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 if (finalsdpp >= 1)
                 {
-                    finalsdpp = (-1) * (Log(finalsdpp, 0.9));
+                    finalsdpp = (-1) * (Log(finalsdpp, 0.001));
                 }
             }
             }
@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
-            return aimValue + finalsdpp;
+            return aimValue * Math.Max(1.0, finalsdpp);
         }
 
         private double computeSpeedValue()
