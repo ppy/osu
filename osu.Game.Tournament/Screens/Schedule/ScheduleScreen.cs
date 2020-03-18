@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new DrawableTournamentTitleText(),
+                                            new DrawableTournamentHeaderText(),
                                             new Container
                                             {
                                                 Margin = new MarginPadding { Top = 40 },
