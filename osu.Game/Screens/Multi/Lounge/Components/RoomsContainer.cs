@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private Bindable<FilterCriteria> filter { get; set; }
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
+        private Bindable<Room> selectedRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -47,22 +47,15 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            rooms.BindTo(roomManager.Rooms);
-
-            rooms.ItemsAdded += addRooms;
-            rooms.ItemsRemoved += removeRooms;
-
-            roomManager.RoomsUpdated += updateSorting;
-
-            addRooms(rooms);
-        }
-
         protected override void LoadComplete()
         {
-            filter?.BindValueChanged(f => Filter(f.NewValue), true);
+            rooms.ItemsAdded += addRooms;
+            rooms.ItemsRemoved += removeRooms;
+            roomManager.RoomsUpdated += updateSorting;
+
+            rooms.BindTo(roomManager.Rooms);
+
+            filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
         }
 
         public void Filter(FilterCriteria criteria)
@@ -74,7 +67,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 else
                 {
                     bool matchingFilter = true;
-                    matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+                    matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
+
+                    if (!string.IsNullOrEmpty(criteria.SearchString))
+                        matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                     switch (criteria.SecondaryFilter)
                     {
@@ -94,8 +91,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
                 roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
 
-            if (filter != null)
-                Filter(filter.Value);
+            Filter(filter?.Value);
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
@@ -126,7 +122,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
-            currentRoom.Value = room;
+            selectedRoom.Value = room;
         }
 
         protected override void Dispose(bool isDisposing)

@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -21,7 +22,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
         private DragEvent lastDragEvent;
+
+        private Bindable<HitObject> placement;
+
+        private SelectionBlueprint placementBlueprint;
 
         public TimelineBlueprintContainer()
         {
@@ -43,26 +51,38 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
             DragBox.Alpha = 0;
+
+            placement = beatmap.PlacementObject.GetBoundCopy();
+            placement.ValueChanged += placementChanged;
+        }
+
+        private void placementChanged(ValueChangedEvent<HitObject> obj)
+        {
+            if (obj.NewValue == null)
+            {
+                if (placementBlueprint != null)
+                {
+                    SelectionBlueprints.Remove(placementBlueprint);
+                    placementBlueprint = null;
+                }
+            }
+            else
+            {
+                placementBlueprint = CreateBlueprintFor(obj.NewValue);
+
+                placementBlueprint.Colour = Color4.MediumPurple;
+
+                SelectionBlueprints.Add(placementBlueprint);
+            }
         }
 
         protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override void OnDrag(DragEvent e)
         {
-            if (timeline != null)
-            {
-                var timelineQuad = timeline.ScreenSpaceDrawQuad;
-                var mouseX = e.ScreenSpaceMousePosition.X;
-
-                // scroll if in a drag and dragging outside visible extents
-                if (mouseX > timelineQuad.TopRight.X)
-                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
-                else if (mouseX < timelineQuad.TopLeft.X)
-                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
-            }
+            handleScrollViaDrag(e);
 
             base.OnDrag(e);
-            lastDragEvent = e;
         }
 
         protected override void OnDragEnd(DragEndEvent e)
@@ -74,7 +94,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void Update()
         {
             // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
-            if (IsDragged)
+            if (lastDragEvent != null)
                 OnDrag(lastDragEvent);
 
             base.Update();
@@ -82,9 +102,32 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject);
+        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject)
+        {
+            OnDragHandled = handleScrollViaDrag
+        };
 
         protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
+
+        private void handleScrollViaDrag(DragEvent e)
+        {
+            lastDragEvent = e;
+
+            if (lastDragEvent == null)
+                return;
+
+            if (timeline != null)
+            {
+                var timelineQuad = timeline.ScreenSpaceDrawQuad;
+                var mouseX = e.ScreenSpaceMousePosition.X;
+
+                // scroll if in a drag and dragging outside visible extents
+                if (mouseX > timelineQuad.TopRight.X)
+                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
+                else if (mouseX < timelineQuad.TopLeft.X)
+                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
+            }
+        }
 
         internal class TimelineSelectionHandler : SelectionHandler
         {

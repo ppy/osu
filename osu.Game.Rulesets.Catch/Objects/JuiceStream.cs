@@ -7,6 +7,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -19,10 +20,12 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
+
         public int RepeatCount { get; set; }
 
-        public double Velocity;
-        public double TickDistance;
+        public double Velocity { get; private set; }
+        public double TickDistance { get; private set; }
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
@@ -46,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.CreateNestedHitObjects();
 
-            var tickSamples = Samples.Select(s => new HitSampleInfo
+            var dropletSamples = Samples.Select(s => new HitSampleInfo
             {
                 Bank = s.Bank,
                 Name = @"slidertick",
@@ -72,10 +75,9 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             AddNested(new TinyDroplet
                             {
-                                Samples = tickSamples,
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
-                                        lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
                             });
                         }
                     }
@@ -90,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     case SliderEventType.Tick:
                         AddNested(new Droplet
                         {
-                            Samples = tickSamples,
+                            Samples = dropletSamples,
                             StartTime = e.Time,
                             X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
                         });
@@ -110,7 +112,11 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime
+        {
+            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
 
         public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 

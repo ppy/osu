@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected DragBox DragBox { get; private set; }
 
-        private Container<SelectionBlueprint> selectionBlueprints;
+        protected Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
 
         private SelectionHandler selectionHandler;
 
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 DragBox = CreateDragBox(select),
                 selectionHandler,
-                selectionBlueprints = CreateSelectionBlueprintContainer(),
+                SelectionBlueprints = CreateSelectionBlueprintContainer(),
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
@@ -70,18 +71,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 AddBlueprintFor(obj);
 
             selectedHitObjects.BindTo(beatmap.SelectedHitObjects);
-            selectedHitObjects.ItemsAdded += objects =>
+            selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
             {
-                foreach (var o in objects)
-                    selectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Select();
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var o in args.NewItems)
+                            SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Select();
+                        break;
 
-                SelectionChanged?.Invoke(selectedHitObjects);
-            };
-
-            selectedHitObjects.ItemsRemoved += objects =>
-            {
-                foreach (var o in objects)
-                    selectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var o in args.OldItems)
+                            SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+                        break;
+                }
 
                 SelectionChanged?.Invoke(selectedHitObjects);
             };
@@ -230,7 +233,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removeBlueprintFor(HitObject hitObject)
         {
-            var blueprint = selectionBlueprints.SingleOrDefault(m => m.HitObject == hitObject);
+            var blueprint = SelectionBlueprints.SingleOrDefault(m => m.HitObject == hitObject);
             if (blueprint == null)
                 return;
 
@@ -239,7 +242,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected -= onBlueprintSelected;
             blueprint.Deselected -= onBlueprintDeselected;
 
-            selectionBlueprints.Remove(blueprint);
+            SelectionBlueprints.Remove(blueprint);
         }
 
         protected virtual void AddBlueprintFor(HitObject hitObject)
@@ -251,7 +254,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
 
-            selectionBlueprints.Add(blueprint);
+            SelectionBlueprints.Add(blueprint);
         }
 
         #endregion
@@ -278,7 +281,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!allowDeselection && selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
                 return;
 
-            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveChildren)
+            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren)
             {
                 if (blueprint.IsHovered)
                 {
@@ -308,7 +311,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         private void select(RectangleF rect)
         {
-            foreach (var blueprint in selectionBlueprints)
+            foreach (var blueprint in SelectionBlueprints)
             {
                 if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
                     blueprint.Select();
@@ -322,7 +325,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void selectAll()
         {
-            selectionBlueprints.ToList().ForEach(m => m.Select());
+            SelectionBlueprints.ToList().ForEach(m => m.Select());
             selectionHandler.UpdateVisibility();
         }
 
@@ -334,14 +337,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleSelected(blueprint);
-            selectionBlueprints.ChangeChildDepth(blueprint, 1);
+            SelectionBlueprints.ChangeChildDepth(blueprint, 1);
             beatmap.SelectedHitObjects.Add(blueprint.HitObject);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleDeselected(blueprint);
-            selectionBlueprints.ChangeChildDepth(blueprint, 0);
+            SelectionBlueprints.ChangeChildDepth(blueprint, 0);
             beatmap.SelectedHitObjects.Remove(blueprint.HitObject);
         }
 

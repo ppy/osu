@@ -125,8 +125,6 @@ namespace osu.Game.Rulesets.Scoring
                     simulate(nested);
 
                 var judgement = obj.CreateJudgement();
-                if (judgement == null)
-                    return;
 
                 var result = CreateResult(obj, judgement);
                 if (result == null)

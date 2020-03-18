@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Tests.Visual;
 
@@ -18,7 +18,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(BananaShower),
+            typeof(Banana),
             typeof(DrawableBananaShower),
+            typeof(DrawableBanana),
 
             typeof(CatchRuleset),
             typeof(DrawableCatchRuleset),
@@ -27,6 +29,12 @@ namespace osu.Game.Rulesets.Catch.Tests
         public TestSceneBananaShower()
             : base(new CatchRuleset())
         {
+        }
+
+        [Test]
+        public void TestBananaShower()
+        {
+            AddUntilStep("player is done", () => !Player.ValidForResume);
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
@@ -40,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 5000, NewCombo = true });
+            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 3000, NewCombo = true });
 
             return beatmap;
         }

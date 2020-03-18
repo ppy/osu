@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -289,7 +290,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         #region HitObject
 
-        private class TestHitObject : HitObject, IHasEndTime
+        private class TestHitObject : ConvertHitObject, IHasEndTime
         {
             public double EndTime { get; set; }
 

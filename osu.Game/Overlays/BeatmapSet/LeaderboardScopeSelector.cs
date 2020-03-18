@@ -3,7 +3,6 @@
 
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -26,10 +25,10 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            AccentColour = colours.Blue;
-            LineColour = Color4.Gray;
+            AccentColour = colourProvider.Highlight1;
+            LineColour = colourProvider.Background1;
         }
 
         private class ScopeSelectorTabItem : PageTabItem
@@ -37,7 +36,6 @@ namespace osu.Game.Overlays.BeatmapSet
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
                 : base(value)
             {
-                Text.Font = OsuFont.GetFont(size: 16);
             }
 
             protected override bool OnHover(HoverEvent e)

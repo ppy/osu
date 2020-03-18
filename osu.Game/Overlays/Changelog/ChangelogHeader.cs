@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -14,30 +16,38 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
-        public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
+        public readonly Bindable<APIChangelogBuild> Build = new Bindable<APIChangelogBuild>();
 
         public Action ListingSelected;
 
-        public UpdateStreamBadgeArea Streams;
+        public ChangelogUpdateStreamControl Streams;
 
         private const string listing_string = "listing";
+
+        private Box streamsBackground;
 
         public ChangelogHeader()
         {
             TabControl.AddItem(listing_string);
-            TabControl.Current.ValueChanged += e =>
+            Current.ValueChanged += e =>
             {
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
             };
 
-            Current.ValueChanged += showBuild;
+            Build.ValueChanged += showBuild;
 
             Streams.Current.ValueChanged += e =>
             {
-                if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Current.Value?.UpdateStream))
-                    Current.Value = e.NewValue.LatestBuild;
+                if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
+                    Build.Value = e.NewValue.LatestBuild;
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            streamsBackground.Colour = colourProvider.Background5;
         }
 
         private ChangelogHeaderTitle title;
@@ -50,7 +60,7 @@ namespace osu.Game.Overlays.Changelog
             if (e.NewValue != null)
             {
                 TabControl.AddItem(e.NewValue.ToString());
-                TabControl.Current.Value = e.NewValue.ToString();
+                Current.Value = e.NewValue.ToString();
 
                 updateCurrentStream();
 
@@ -58,7 +68,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                TabControl.Current.Value = listing_string;
+                Current.Value = listing_string;
                 Streams.Current.Value = null;
                 title.Version = null;
             }
@@ -72,7 +82,21 @@ namespace osu.Game.Overlays.Changelog
             AutoSizeAxes = Axes.Y,
             Children = new Drawable[]
             {
-                Streams = new UpdateStreamBadgeArea(),
+                streamsBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 65,
+                        Vertical = 20
+                    },
+                    Child = Streams = new ChangelogUpdateStreamControl()
+                }
             }
         };
 
@@ -86,10 +110,10 @@ namespace osu.Game.Overlays.Changelog
 
         private void updateCurrentStream()
         {
-            if (Current.Value == null)
+            if (Build.Value == null)
                 return;
 
-            Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Current.Value.UpdateStream.Name);
+            Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
         private class ChangelogHeaderTitle : ScreenTitle

@@ -11,7 +11,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Input;
@@ -36,6 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             confirmClockRunning(true);
         }
@@ -281,14 +281,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool AllowFail => true;
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new PausePlayer();
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new PausePlayer();
 
         protected class PausePlayer : TestPlayer
         {
-            public new HealthProcessor HealthProcessor => base.HealthProcessor;
-
-            public new HUDOverlay HUDOverlay => base.HUDOverlay;
-
             public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
