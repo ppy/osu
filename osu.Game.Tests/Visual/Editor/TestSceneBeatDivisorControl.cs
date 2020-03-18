@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -18,21 +17,20 @@ namespace osu.Game.Tests.Visual.Editor
         private BeatDivisorControl beatDivisorControl;
         private BindableBeatDivisor bindableBeatDivisor;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            Child = beatDivisorControl = new BeatDivisorControl(bindableBeatDivisor = new BindableBeatDivisor())
+            Child = beatDivisorControl = new BeatDivisorControl(bindableBeatDivisor = new BindableBeatDivisor(16))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(90, 90)
             };
-        }
+        });
 
         [Test]
         public void TestBindableBeatDivisor()
         {
-            AddStep("Reset", () => reset());
             AddRepeatStep("Move previous", () => bindableBeatDivisor.Previous(), 4);
             AddAssert("Position at 4", () => bindableBeatDivisor.Value == 4);
             AddRepeatStep("Move next", () => bindableBeatDivisor.Next(), 3);
@@ -42,7 +40,6 @@ namespace osu.Game.Tests.Visual.Editor
         [Test]
         public void TestMouseInput()
         {
-            AddStep("Reset", () => reset());
             AddStep("Move to marker", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(38, -18));
@@ -65,12 +62,6 @@ namespace osu.Game.Tests.Visual.Editor
                 InputManager.ReleaseButton(osuTK.Input.MouseButton.Left);
             });
             AddAssert("Position clamped to 8", () => bindableBeatDivisor.Value == 8);
-        }
-
-        private void reset()
-        {
-            bindableBeatDivisor.Value = 16;
-            InputManager.MoveMouseTo(beatDivisorControl, new Vector2(beatDivisorControl.Width, beatDivisorControl.Height));
         }
     }
 }
