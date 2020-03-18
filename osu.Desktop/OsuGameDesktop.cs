@@ -117,6 +117,19 @@ namespace osu.Desktop
         /// </summary>
         private class StableStorage : WindowsStorage
         {
+            private const string default_songs_path = "Songs";
+
+            private string songsPath;
+            private bool usesCustomSongsPath;
+            private DesktopGameHost host;
+
+            public StableStorage(DesktopGameHost host)
+                : base(string.Empty, host)
+            {
+                this.host = host;
+                songsPath = locateSongsDirectory();
+            }
+
             protected override string LocateBasePath()
             {
                 static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
@@ -146,9 +159,50 @@ namespace osu.Desktop
                 return null;
             }
 
-            public StableStorage(DesktopGameHost host)
-                : base(string.Empty, host)
+            /// <summary>
+            /// osu! stable Songs folder can be moved to another location by changing the 'BeatmapDirectory' setting in the stable configuration file.
+            /// This locates the Songs folder location for this stable instalation and sets flags if the songs folder location has been customized.
+            /// </summary>
+            /// <returns></returns>
+            private string locateSongsDirectory()
             {
+                //we get the user config file.
+                var configFile = GetStream(GetFiles(".", "osu!.*.cfg").First());
+                var textReader = new StreamReader(configFile);
+
+                while (!textReader.EndOfStream)
+                {
+                    var line = textReader.ReadLine();
+
+                    if (line.StartsWith("BeatmapDirectory"))
+                    {
+                        var dir = line.Split('=')[1].TrimStart();
+                        if (!dir.Equals(default_songs_path, StringComparison.Ordinal))
+                        {
+                            usesCustomSongsPath = true;
+                            return Path.GetFullPath(dir);
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            public override Storage GetStorageForDirectory(string directory)
+            {
+                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && usesCustomSongsPath)
+                    return new StableSongsStorage(songsPath, host);
+
+                return base.GetStorageForDirectory(directory);
+            }
+
+            private class StableSongsStorage : WindowsStorage
+            {
+                public StableSongsStorage(string basePath, DesktopGameHost host)
+                    : base(string.Empty, host)
+                {
+                    BasePath = basePath;
+                }
             }
         }
     }
