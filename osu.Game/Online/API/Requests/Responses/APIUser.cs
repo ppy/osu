@@ -12,206 +12,206 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIUser
     {
         [JsonProperty(@"id")]
-        private long id { get; set; }
+        public long Id { get; set; }
 
         [JsonProperty(@"join_date")]
-        private DateTimeOffset joinDate { get; set; }
+        public DateTimeOffset JoinDate { get; set; }
 
         [JsonProperty(@"username")]
-        private string username { get; set; }
+        public string Username { get; set; }
 
         [JsonProperty(@"previous_usernames")]
-        private string[] previousUsernames { get; set; }
+        public string[] PreviousUsernames { get; set; }
 
         [JsonProperty(@"country")]
-        private Country country { get; set; }
+        public Country Country { get; set; }
 
         [JsonProperty(@"profile_colour")]
-        private string colour { get; set; }
+        public string Colour { get; set; }
 
         [JsonProperty(@"avatar_url")]
-        private string avatarUrl { get; set; }
+        public string AvatarUrl { get; set; }
 
         [JsonProperty(@"cover_url")]
-        private string coverUrl
+        public string CoverUrl
         {
-            get => cover?.Url;
-            set => cover = new UserCover { Url = value };
+            get => Cover?.Url;
+            set => Cover = new UserCover { Url = value };
         }
 
         [JsonProperty(@"cover")]
-        private UserCover cover { get; set; }
+        public UserCover Cover { get; set; }
 
         [JsonProperty(@"is_admin")]
-        private bool isAdmin { get; set; }
+        public bool IsAdmin { get; set; }
 
         [JsonProperty(@"is_supporter")]
-        private bool isSupporter { get; set; }
+        public bool IsSupporter { get; set; }
 
         [JsonProperty(@"support_level")]
-        private int supportLevel { get; set; }
+        public int SupportLevel { get; set; }
 
         [JsonProperty(@"is_gmt")]
-        private bool isGMT { get; set; }
+        public bool IsGMT { get; set; }
 
         [JsonProperty(@"is_qat")]
-        private bool isQAT { get; set; }
+        public bool IsQAT { get; set; }
 
         [JsonProperty(@"is_bng")]
-        private bool isBNG { get; set; }
+        public bool IsBNG { get; set; }
 
         [JsonProperty(@"is_bot")]
-        private bool isBot { get; set; }
+        public bool IsBot { get; set; }
 
         [JsonProperty(@"is_active")]
-        private bool active { get; set; }
+        public bool Active { get; set; }
 
         [JsonProperty(@"is_online")]
-        private bool isOnline { get; set; }
+        public bool IsOnline { get; set; }
 
         [JsonProperty(@"pm_friends_only")]
-        private bool pmFriendsOnly { get; set; }
+        public bool PMFriendsOnly { get; set; }
 
         [JsonProperty(@"interests")]
-        private string interests { get; set; }
+        public string Interests { get; set; }
 
         [JsonProperty(@"occupation")]
-        private string occupation { get; set; }
+        public string Occupation { get; set; }
 
         [JsonProperty(@"title")]
-        private string title { get; set; }
+        public string Title { get; set; }
 
         [JsonProperty(@"location")]
-        private string location { get; set; }
+        public string Location { get; set; }
 
         [JsonProperty(@"last_visit")]
-        private DateTimeOffset? lastVisit { get; set; }
+        public DateTimeOffset? LastVisit { get; set; }
 
         [JsonProperty(@"twitter")]
-        private string twitter { get; set; }
+        public string Twitter { get; set; }
 
         [JsonProperty(@"lastfm")]
-        private string lastfm { get; set; }
+        public string Lastfm { get; set; }
 
         [JsonProperty(@"skype")]
-        private string skype { get; set; }
+        public string Skype { get; set; }
 
         [JsonProperty(@"discord")]
-        private string discord { get; set; }
+        public string Discord { get; set; }
 
         [JsonProperty(@"website")]
-        private string website { get; set; }
+        public string Website { get; set; }
 
         [JsonProperty(@"post_count")]
-        private int postCount { get; set; }
+        public int PostCount { get; set; }
 
         [JsonProperty(@"follower_count")]
-        private int followerCount { get; set; }
+        public int FollowerCount { get; set; }
 
         [JsonProperty(@"favourite_beatmapset_count")]
-        private int favouriteBeatmapsetCount { get; set; }
+        public int FavouriteBeatmapsetCount { get; set; }
 
         [JsonProperty(@"graveyard_beatmapset_count")]
-        private int graveyardBeatmapsetCount { get; set; }
+        public int GraveyardBeatmapsetCount { get; set; }
 
         [JsonProperty(@"loved_beatmapset_count")]
-        private int lovedBeatmapsetCount { get; set; }
+        public int LovedBeatmapsetCount { get; set; }
 
         [JsonProperty(@"ranked_and_approved_beatmapset_count")]
-        private int rankedAndApprovedBeatmapsetCount { get; set; }
+        public int RankedAndApprovedBeatmapsetCount { get; set; }
 
         [JsonProperty(@"unranked_beatmapset_count")]
-        private int unrankedBeatmapsetCount { get; set; }
+        public int UnrankedBeatmapsetCount { get; set; }
 
         [JsonProperty(@"scores_first_count")]
-        private int scoresFirstCount { get; set; }
+        public int ScoresFirstCount { get; set; }
 
         [JsonProperty]
-        private string[] playstyle
+        public string[] Playstyle
         {
-            set => playStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
+            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
         }
 
-        private PlayStyle[] playStyles { get; set; }
+        public PlayStyle[] PlayStyles { get; set; }
 
         [JsonProperty(@"playmode")]
-        private string playMode { get; set; }
+        public string PlayMode { get; set; }
 
         [JsonProperty(@"profile_order")]
-        private string[] profileOrder { get; set; }
+        public string[] ProfileOrder { get; set; }
 
         [JsonProperty(@"kudosu")]
-        private KudosuCount kudosu { get; set; }
+        public KudosuCount Kudosu { get; set; }
 
         [JsonProperty(@"statistics")]
-        private UserStatistics statistics { get; set; }
+        public UserStatistics Statistics { get; set; }
 
         [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
+        public RankHistoryData RankHistory
         {
-            set => statistics.RankHistory = value;
+            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]
-        private Badge[] badges { get; set; }
+        public Badge[] Badges { get; set; }
 
         [JsonProperty("user_achievements")]
-        private UserAchievement[] achievements { get; set; }
+        public UserAchievement[] Achievements { get; set; }
 
         [JsonProperty("monthly_playcounts")]
-        private UserHistoryCount[] monthlyPlaycounts { get; set; }
+        public UserHistoryCount[] MonthlyPlaycounts { get; set; }
 
         [JsonProperty("replays_watched_counts")]
-        private UserHistoryCount[] replaysWatchedCounts { get; set; }
+        public UserHistoryCount[] ReplaysWatchedCounts { get; set; }
 
         public User ToUser() => new User
         {
-            Id = id,
-            JoinDate = joinDate,
-            Username = username,
-            PreviousUsernames = previousUsernames,
-            Country = country,
-            Colour = colour,
-            AvatarUrl = avatarUrl,
-            CoverUrl = coverUrl,
-            Cover = cover,
-            IsAdmin = isAdmin,
-            IsSupporter = isSupporter,
-            SupportLevel = supportLevel,
-            IsGMT = isGMT,
-            IsQAT = isQAT,
-            IsBNG = isBNG,
-            IsBot = isBot,
-            Active = active,
-            IsOnline = isOnline,
-            PMFriendsOnly = pmFriendsOnly,
-            Interests = interests,
-            Occupation = occupation,
-            Title = title,
-            Location = location,
-            LastVisit = lastVisit,
-            Twitter = twitter,
-            Lastfm = lastfm,
-            Skype = skype,
-            Discord = discord,
-            Website = website,
-            PostCount = postCount,
-            FollowerCount = followerCount,
-            FavouriteBeatmapsetCount = favouriteBeatmapsetCount,
-            GraveyardBeatmapsetCount = graveyardBeatmapsetCount,
-            LovedBeatmapsetCount = lovedBeatmapsetCount,
-            RankedAndApprovedBeatmapsetCount = rankedAndApprovedBeatmapsetCount,
-            UnrankedBeatmapsetCount = unrankedBeatmapsetCount,
-            ScoresFirstCount = scoresFirstCount,
-            PlayStyles = playStyles,
-            PlayMode = playMode,
-            ProfileOrder = profileOrder,
-            Kudosu = kudosu,
-            Statistics = statistics,
-            Badges = badges,
-            Achievements = achievements,
-            MonthlyPlaycounts = monthlyPlaycounts,
-            ReplaysWatchedCounts = replaysWatchedCounts
+            Id = Id,
+            JoinDate = JoinDate,
+            Username = Username,
+            PreviousUsernames = PreviousUsernames,
+            Country = Country,
+            Colour = Colour,
+            AvatarUrl = AvatarUrl,
+            CoverUrl = CoverUrl,
+            Cover = Cover,
+            IsAdmin = IsAdmin,
+            IsSupporter = IsSupporter,
+            SupportLevel = SupportLevel,
+            IsGMT = IsGMT,
+            IsQAT = IsQAT,
+            IsBNG = IsBNG,
+            IsBot = IsBot,
+            Active = Active,
+            IsOnline = IsOnline,
+            PMFriendsOnly = PMFriendsOnly,
+            Interests = Interests,
+            Occupation = Occupation,
+            Title = Title,
+            Location = Location,
+            LastVisit = LastVisit,
+            Twitter = Twitter,
+            Lastfm = Lastfm,
+            Skype = Skype,
+            Discord = Discord,
+            Website = Website,
+            PostCount = PostCount,
+            FollowerCount = FollowerCount,
+            FavouriteBeatmapsetCount = FavouriteBeatmapsetCount,
+            GraveyardBeatmapsetCount = GraveyardBeatmapsetCount,
+            LovedBeatmapsetCount = LovedBeatmapsetCount,
+            RankedAndApprovedBeatmapsetCount = RankedAndApprovedBeatmapsetCount,
+            UnrankedBeatmapsetCount = UnrankedBeatmapsetCount,
+            ScoresFirstCount = ScoresFirstCount,
+            PlayStyles = PlayStyles,
+            PlayMode = PlayMode,
+            ProfileOrder = ProfileOrder,
+            Kudosu = Kudosu,
+            Statistics = Statistics,
+            Badges = Badges,
+            Achievements = Achievements,
+            MonthlyPlaycounts = MonthlyPlaycounts,
+            ReplaysWatchedCounts = ReplaysWatchedCounts
         };
     }
 }
