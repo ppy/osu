@@ -19,8 +19,6 @@ namespace osu.Game.Overlays.CustomMenu
     {
         private LinkFlowContainer textFlow;
 
-        //private OverlinedInfoContainer timeBar;
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -108,10 +106,14 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.AddText("查询。");
             textFlow.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
             textFlow.AddLink("contact@ppy.sh","mailto:contact@ppy.sh");
-        }
-        protected override void Update()
-        {
-            base.Update();
+
+            textFlow.NewParagraph();
+            textFlow.AddParagraph("项目引用", Titlefont );
+            textFlow.NewParagraph();
+
+            textFlow.AddText("如果你觉得下面的某个功能很赞，请前往该项目页面点个Star以支持原作者。");
+            textFlow.NewParagraph();
+            textFlow.AddLink("osu!tau模式 → Altenhh/tau","https://github.com/Altenhh/tau");
         }
     }
 }

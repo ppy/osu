@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+      <StartupObject>osu.Game.Rulesets.Tau.Tests.VisualTestRunner</StartupObject>
+      <LangVersion>7.3</LangVersion>
+    </PropertyGroup>
+    <ItemGroup Label="Service">
+      <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+    </ItemGroup>
+    <PropertyGroup>
+      <GenerateProgramFile>false</GenerateProgramFile>
+    </PropertyGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu.Game.Rulesets.Tau\osu.Game.Rulesets.Tau.csproj" />
+  </ItemGroup>
+  <PropertyGroup Label="Project">
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>osu.Game.Rulesets.Tau.Tests</RootNamespace>
+  </PropertyGroup>
+</Project>
