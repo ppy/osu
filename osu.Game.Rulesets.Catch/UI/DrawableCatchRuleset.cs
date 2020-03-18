@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Overlays.Add(new FaillingLayer());
+            Overlays.Add(new FailingLayer());
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
