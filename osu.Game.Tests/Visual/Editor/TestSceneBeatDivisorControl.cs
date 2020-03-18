@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Editor
         [Test]
         public void TestBindableBeatDivisor()
         {
-            AddStep("Reset", () => reset());
+            AddStep("Reset", reset);
             AddRepeatStep("Move previous", () => bindableBeatDivisor.Previous(), 4);
             AddAssert("Position at 4", () => bindableBeatDivisor.Value == 4);
             AddRepeatStep("Move next", () => bindableBeatDivisor.Next(), 3);
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editor
         [Test]
         public void TestMouseInput()
         {
-            AddStep("Reset", () => reset());
+            AddStep("Reset", reset);
             AddStep("Move to marker", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(38, -18));
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Editor
                 InputManager.ReleaseButton(osuTK.Input.MouseButton.Left);
             });
             AddAssert("Position at 8", () => bindableBeatDivisor.Value == 8);
-            AddStep("Prepare to move marker", () => { InputManager.PressButton(osuTK.Input.MouseButton.Left); });
+            AddStep("Prepare to move marker", () => InputManager.PressButton(osuTK.Input.MouseButton.Left));
             AddStep("Trigger marker jump", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(30, -18));
