@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, score.Statistics[HitResult.Miss] == 0),
+                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out var missCount) || missCount == 0),
                 new CounterStatistic("pp", (int)(score.PP ?? 0)),
             };
 
