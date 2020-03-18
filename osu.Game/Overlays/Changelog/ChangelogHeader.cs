@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Changelog
 
         public Action ListingSelected;
 
-        public UpdateStreamBadgeArea Streams;
+        public ChangelogUpdateStreamControl Streams;
 
         private const string listing_string = "listing";
 
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Changelog
                         Horizontal = 65,
                         Vertical = 20
                     },
-                    Child = Streams = new UpdateStreamBadgeArea()
+                    Child = Streams = new ChangelogUpdateStreamControl()
                 }
             }
         };
