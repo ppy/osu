@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editor
 {
@@ -43,15 +44,15 @@ namespace osu.Game.Tests.Visual.Editor
             AddStep("Move to marker", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(38, -18));
-                InputManager.PressButton(osuTK.Input.MouseButton.Left);
+                InputManager.PressButton(MouseButton.Left);
             });
             AddStep("Mote to divisor 8", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(0, -18));
-                InputManager.ReleaseButton(osuTK.Input.MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
             });
             AddAssert("Position at 8", () => bindableBeatDivisor.Value == 8);
-            AddStep("Prepare to move marker", () => { InputManager.PressButton(osuTK.Input.MouseButton.Left); });
+            AddStep("Prepare to move marker", () => { InputManager.PressButton(MouseButton.Left); });
             AddStep("Trigger marker jump", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(30, -18));
@@ -59,7 +60,7 @@ namespace osu.Game.Tests.Visual.Editor
             AddStep("Move to divisor ~10", () =>
             {
                 InputManager.MoveMouseTo(beatDivisorControl, new Vector2(10, -18));
-                InputManager.ReleaseButton(osuTK.Input.MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
             });
             AddAssert("Position clamped to 8", () => bindableBeatDivisor.Value == 8);
         }
