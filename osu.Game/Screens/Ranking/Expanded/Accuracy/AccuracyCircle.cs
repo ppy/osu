@@ -119,42 +119,42 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         new SmoothCircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#BE0089"),
+                            Colour = OsuColour.ForRank(ScoreRank.X),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 1 }
                         },
                         new SmoothCircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#0096A2"),
+                            Colour = OsuColour.ForRank(ScoreRank.S),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 1 - virtual_ss_percentage }
                         },
                         new SmoothCircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#72C904"),
+                            Colour = OsuColour.ForRank(ScoreRank.A),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.95f }
                         },
                         new SmoothCircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#D99D03"),
+                            Colour = OsuColour.ForRank(ScoreRank.B),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.9f }
                         },
                         new SmoothCircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#EA7948"),
+                            Colour = OsuColour.ForRank(ScoreRank.C),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.8f }
                         },
                         new SmoothCircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#FF5858"),
+                            Colour = OsuColour.ForRank(ScoreRank.D),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = 0.7f }
                         },

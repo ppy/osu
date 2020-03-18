@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -14,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
@@ -56,13 +56,13 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, true),
+                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out var missCount) || missCount == 0),
                 new CounterStatistic("pp", (int)(score.PP ?? 0)),
             };
 
             var bottomStatistics = new List<StatisticDisplay>();
             foreach (var stat in score.SortedStatistics)
-                bottomStatistics.Add(new CounterStatistic(stat.Key.GetDescription(), stat.Value));
+                bottomStatistics.Add(new HitResultStatistic(stat.Key, stat.Value));
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
@@ -204,6 +204,13 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 }
                             }
                         }
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
+                        Text = $"Played on {score.Date.ToLocalTime():g}"
                     }
                 }
             };
