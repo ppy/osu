@@ -3,6 +3,7 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osuTK.Graphics;
 
@@ -64,6 +65,32 @@ namespace osu.Game.Graphics
 
                 default:
                     return Color4Extensions.FromHex(@"e95353");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the colour for a <see cref="HitResult"/>.
+        /// </summary>
+        public Color4 ForHitResult(HitResult judgement)
+        {
+            switch (judgement)
+            {
+                case HitResult.Perfect:
+                case HitResult.Great:
+                    return Blue;
+
+                case HitResult.Ok:
+                case HitResult.Good:
+                    return Green;
+
+                case HitResult.Meh:
+                    return Yellow;
+
+                case HitResult.Miss:
+                    return Red;
+
+                default:
+                    return Color4.White;
             }
         }
 
