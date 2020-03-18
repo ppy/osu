@@ -142,7 +142,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private class MetadataSection : FillFlowContainer
         {
             private readonly MetadataType type;
-            private readonly OsuSpriteText header;
             private readonly LinkFlowContainer textFlow;
 
             public string Text
