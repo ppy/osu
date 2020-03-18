@@ -4,9 +4,14 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD
 {
+    /// <summary>
+    /// A container for components displaying the current player health.
+    /// Gets bound automatically to the <see cref="HealthProcessor"/> when inserted to <see cref="DrawableRuleset.Overlays"/> hierarchy.
+    /// </summary>
     public abstract class HealthDisplay : Container
     {
         public readonly BindableDouble Current = new BindableDouble
@@ -14,7 +19,11 @@ namespace osu.Game.Screens.Play.HUD
             MinValue = 0,
             MaxValue = 1
         };
-        
+
+        /// <summary>
+        /// Bind the tracked fields of <see cref="HealthProcessor"/> to this health display.
+        /// </summary>
+        /// <param name="processor"></param>
         public virtual void BindHealthProcessor(HealthProcessor processor)
         {
             Current.BindTo(processor.Health);

@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
-    /// An overlay layer on top of the player HUD which fades to red when the current player health falls a certain threshold defined by <see cref="LowHealthThreshold"/>.
+    /// An overlay layer on top of the playfield which fades to red when the current player health falls a certain threshold defined by <see cref="LowHealthThreshold"/>.
     /// </summary>
     public class FaillingLayer : HealthDisplay
     {
