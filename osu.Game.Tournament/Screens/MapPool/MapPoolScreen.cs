@@ -249,6 +249,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
+                        Height = 42,
                     });
                 }
             }

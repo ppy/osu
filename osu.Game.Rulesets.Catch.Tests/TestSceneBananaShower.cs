@@ -18,7 +18,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(BananaShower),
+            typeof(Banana),
             typeof(DrawableBananaShower),
+            typeof(DrawableBanana),
 
             typeof(CatchRuleset),
             typeof(DrawableCatchRuleset),

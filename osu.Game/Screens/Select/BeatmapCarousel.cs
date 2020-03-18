@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
-        private readonly OsuScrollContainer scroll;
+        private readonly CarouselScrollContainer scroll;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -153,8 +153,10 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapHidden += beatmapHidden;
             beatmaps.BeatmapRestored += beatmapRestored;
 
-            loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
+            loadBeatmapSets(GetLoadableBeatmaps());
         }
+
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -189,7 +191,9 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false);
+            // only reset scroll position if already near the scroll target.
+            // without this, during a large beatmap import it is impossible to navigate the carousel.
+            applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
             //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
@@ -201,9 +205,6 @@ namespace osu.Game.Screens.Select
 
         /// <summary>
         /// Selects a given beatmap on the carousel.
-        ///
-        /// If bypassFilters is false, we will try to select another unfiltered beatmap in the same set. If the
-        /// entire set is filtered, no selection is made.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
@@ -225,25 +226,21 @@ namespace osu.Game.Screens.Select
                     continue;
 
                 if (!bypassFilters && item.Filtered.Value)
-                    // The beatmap exists in this set but is filtered, so look for the first unfiltered map in the set
-                    item = set.Beatmaps.FirstOrDefault(b => !b.Filtered.Value);
+                    return false;
 
-                if (item != null)
+                select(item);
+
+                // if we got here and the set is filtered, it means we were bypassing filters.
+                // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
+                // (since it is forcefully being included in the carousel).
+                if (set.Filtered.Value)
                 {
-                    select(item);
+                    Debug.Assert(bypassFilters);
 
-                    // if we got here and the set is filtered, it means we were bypassing filters.
-                    // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
-                    // (since it is forcefully being included in the carousel).
-                    if (set.Filtered.Value)
-                    {
-                        Debug.Assert(bypassFilters);
-
-                        applyActiveCriteria(false);
-                    }
-
-                    return true;
+                    applyActiveCriteria(false);
                 }
+
+                return true;
             }
 
             return false;
@@ -409,7 +406,7 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(debounce);
         }
 
-        private void applyActiveCriteria(bool debounce)
+        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
             if (root.Children.Any() != true) return;
 
@@ -419,7 +416,9 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-                scrollPositionCache.Invalidate();
+
+                if (alwaysResetScrollPosition || !scroll.UserScrolling)
+                    ScrollToSelected();
             }
 
             PendingFilter?.Cancel();
@@ -433,6 +432,9 @@ namespace osu.Game.Screens.Select
 
         private float? scrollTarget;
 
+        /// <summary>
+        /// Scroll to the current <see cref="SelectedBeatmap"/>.
+        /// </summary>
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -599,7 +601,7 @@ namespace osu.Game.Screens.Select
                         SelectionChanged?.Invoke(c.Beatmap);
 
                         itemsCache.Invalidate();
-                        scrollPositionCache.Invalidate();
+                        ScrollToSelected();
                     }
                 };
             }
@@ -764,6 +766,23 @@ namespace osu.Game.Screens.Select
         private class CarouselScrollContainer : OsuScrollContainer
         {
             private bool rightMouseScrollBlocked;
+
+            /// <summary>
+            /// Whether the last scroll event was user triggered, directly on the scroll container.
+            /// </summary>
+            public bool UserScrolling { get; private set; }
+
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+            {
+                UserScrolling = true;
+                base.OnUserScroll(value, animated, distanceDecay);
+            }
+
+            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+            {
+                UserScrolling = false;
+                base.ScrollTo(value, animated, distanceDecay);
+            }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {

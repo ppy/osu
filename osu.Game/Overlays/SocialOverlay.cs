@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
     public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
     {
         private readonly LoadingSpinner loading;
-        private FillFlowContainer<SocialPanel> panels;
+        private FillFlowContainer<UserPanel> panels;
 
         protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"60284b");
         protected override Color4 TrianglesColourLight => Color4Extensions.FromHex(@"672b51");
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays
             if (Filter.DisplayStyleControl.Dropdown.Current.Value == SortDirection.Descending)
                 sortedUsers = sortedUsers.Reverse();
 
-            var newPanels = new FillFlowContainer<SocialPanel>
+            var newPanels = new FillFlowContainer<UserPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -166,20 +166,21 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding { Top = 10 },
                 ChildrenEnumerable = sortedUsers.Select(u =>
                 {
-                    SocialPanel panel;
+                    UserPanel panel;
 
                     switch (Filter.DisplayStyleControl.DisplayStyle.Value)
                     {
                         case PanelDisplayStyle.Grid:
-                            panel = new SocialGridPanel(u)
+                            panel = new UserGridPanel(u)
                             {
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
+                                Origin = Anchor.TopCentre,
+                                Width = 290,
                             };
                             break;
 
                         default:
-                            panel = new SocialListPanel(u);
+                            panel = new UserListPanel(u);
                             break;
                     }
 
