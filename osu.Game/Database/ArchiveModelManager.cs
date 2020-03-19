@@ -560,7 +560,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Select paths to import from stable. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
         /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStoage) => stableStoage.GetDirectories(".");
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStorage) => stableStorage.GetDirectories(".");
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.

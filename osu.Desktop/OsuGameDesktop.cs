@@ -119,9 +119,8 @@ namespace osu.Desktop
         {
             private const string default_songs_path = "Songs";
 
-            private string songsPath;
-            private bool usesCustomSongsPath;
-            private DesktopGameHost host;
+            private readonly string songsPath;
+            private readonly DesktopGameHost host;
 
             public StableStorage(DesktopGameHost host)
                 : base(string.Empty, host)
@@ -160,10 +159,9 @@ namespace osu.Desktop
             }
 
             /// <summary>
-            /// osu! stable Songs folder can be moved to another location by changing the 'BeatmapDirectory' setting in the stable configuration file.
-            /// This locates the Songs folder location for this stable instalation and sets flags if the songs folder location has been customized.
+            /// osu!stable <c>Songs</c> folder can be moved to another location by changing the <c>BeatmapDirectory</c> setting in the stable configuration file.
+            /// This locates the <c>Songs</c> folder location for this stable installation and sets flags if the song folder location has been customized.
             /// </summary>
-            /// <returns></returns>
             private string locateSongsDirectory()
             {
                 //we get the user config file.
@@ -174,24 +172,17 @@ namespace osu.Desktop
                 {
                     var line = textReader.ReadLine();
 
-                    if (line.StartsWith("BeatmapDirectory"))
-                    {
-                        var dir = line.Split('=')[1].TrimStart();
-                        if (!dir.Equals(default_songs_path, StringComparison.Ordinal))
-                        {
-                            usesCustomSongsPath = true;
-                            return Path.GetFullPath(dir);
-                        }
-                    }
+                    if (line?.StartsWith("BeatmapDirectory") == true)
+                        return line.Split('=')[1].TrimStart();
                 }
 
-                return null;
+                return default_songs_path;
             }
 
             public override Storage GetStorageForDirectory(string directory)
             {
-                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && usesCustomSongsPath)
-                    return new StableSongsStorage(songsPath, host);
+                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && !songsPath.Equals(default_songs_path, StringComparison.Ordinal))
+                    return new StableSongsStorage(Path.GetFullPath(songsPath), host);
 
                 return base.GetStorageForDirectory(directory);
             }
