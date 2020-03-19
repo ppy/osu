@@ -33,6 +33,16 @@ namespace osu.Game.Tests.Visual.Ranking
         };
 
         [Test]
+        public void TestLowDRank()
+        {
+            var score = createScore();
+            score.Accuracy = 0.2;
+            score.Rank = ScoreRank.D;
+
+            addCircleStep(score);
+        }
+
+        [Test]
         public void TestDRank()
         {
             var score = createScore();
