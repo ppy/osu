@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class SliderRepeatPoint : OsuHitObject
+    public class SliderRepeat : OsuHitObject
     {
         public int RepeatIndex { get; set; }
         public double SpanDuration { get; set; }
@@ -30,9 +30,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        public override Judgement CreateJudgement() => new SliderRepeatPointJudgement();
+        public override Judgement CreateJudgement() => new SliderRepeatJudgement();
 
-        public class SliderRepeatPointJudgement : OsuJudgement
+        public class SliderRepeatJudgement : OsuJudgement
         {
             public override bool IsBonus => true;
 
