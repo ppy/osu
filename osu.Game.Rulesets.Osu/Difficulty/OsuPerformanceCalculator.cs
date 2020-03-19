@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 if (finalsdpp >= 1)
                 {
-                    finalsdpp = (-1) * (Log(finalsdpp, 0.001));
+                    finalsdpp = (-1) * (Log(finalsdpp, 0.007));
                 }
             }
             }
