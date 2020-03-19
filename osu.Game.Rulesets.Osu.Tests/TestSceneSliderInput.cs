@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
-        private bool assertGreatJudge() => judgementResults.Last().Type == HitResult.Great;
+        private bool assertGreatJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == HitResult.Great);
 
         private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
 
