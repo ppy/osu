@@ -99,13 +99,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     // Console.WriteLine(osuCurrent.StrainTime);
                     // Console.ReadKey();
                     sdsplitcounter++;
-            }
-            
-            if (sdsplitcounter > 0)
+            } 
+            else 
             {
+
+            if (sdsplitcounter > 0)
+              {
               JumpDistances.Add(CalculateStandardDeviation(JumpDistances2));
+              JumpDistances2.Clear();
+              JumpDistances2.TrimExcess();
               sdsplitcounter = 0;
+              }
+
             }
+
 
             if (Previous.Count > 0)
             {
