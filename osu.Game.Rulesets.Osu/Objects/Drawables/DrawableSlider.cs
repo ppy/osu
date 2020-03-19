@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case SliderTick tick:
                     return new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
 
-                case SliderRepeatPoint repeat:
+                case SliderRepeat repeat:
                     return new DrawableSliderRepeat(repeat, this) { Position = repeat.Position - slider.Position };
             }
 

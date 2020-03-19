@@ -16,17 +16,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
-        private readonly SliderRepeatPoint sliderRepeatPoint;
+        private readonly SliderRepeat sliderRepeat;
         private readonly DrawableSlider drawableSlider;
 
         private double animDuration;
 
         private readonly Drawable scaleContainer;
 
-        public DrawableSliderRepeat(SliderRepeatPoint sliderRepeatPoint, DrawableSlider drawableSlider)
-            : base(sliderRepeatPoint)
+        public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
+            : base(sliderRepeat)
         {
-            this.sliderRepeatPoint = sliderRepeatPoint;
+            this.sliderRepeat = sliderRepeat;
             this.drawableSlider = drawableSlider;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -48,13 +48,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (sliderRepeatPoint.StartTime <= Time.Current)
+            if (sliderRepeat.StartTime <= Time.Current)
                 ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(300, sliderRepeatPoint.SpanDuration);
+            animDuration = Math.Min(300, sliderRepeat.SpanDuration);
 
             this.Animate(
                 d => d.FadeIn(animDuration),
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
-            bool isRepeatAtEnd = sliderRepeatPoint.RepeatIndex % 2 == 0;
+            bool isRepeatAtEnd = sliderRepeat.RepeatIndex % 2 == 0;
             List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
