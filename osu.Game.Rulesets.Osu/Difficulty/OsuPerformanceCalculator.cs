@@ -96,46 +96,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalValue;
         }
 
-        public double[] Main()
-        {
-            return Attributes.JumpDistances;
-        }
-
-        public double Main2()
-        {
-            return Attributes.StrainTimes.Sum();
-        }
-
         private double computeAimValue()
         {
-            double[] JumpDistanceArray = Main();
-            double finalsumstrain = Main2();
-            double finalsdpp = 0;
-            if (finalsumstrain != 0)
-            {
-            // var Aim = new Aim();
-            // Array.ForEach(JumpDistanceArray, Console.WriteLine);
-            double average = JumpDistanceArray.Average();
-            double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
-            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
-            // Console.WriteLine(finalsd);
-            // double bpm = (60000 * countHitCircles) / (4*finalsumstrain);
-            // Console.WriteLine(bpm);
-            double finalsd2 = finalsd;
-            // Console.WriteLine(finalsd2);
-            if (countMiss == 0)
-            {
-                finalsdpp = finalsdpp + (finalsd2 / stdevconst);
-                // Console.WriteLine(finalsdpp);
-
-                if (finalsdpp >= 1)
-                {
-                    finalsdpp = (-1) * (Log(finalsdpp, 0.08));
-                    // Console.WriteLine(finalsdpp);
-                }
-            }
-            }
-
             double rawAim = Attributes.AimStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
@@ -186,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to also consider accuracy difficulty when doing that
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
-            return aimValue * Math.Max(1.0, finalsdpp);
+            return aimValue;
         }
 
         private double computeSpeedValue()
