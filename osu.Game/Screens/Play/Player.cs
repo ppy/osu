@@ -626,13 +626,16 @@ namespace osu.Game.Screens.Play
             completionProgressDelegate = Schedule(delegate
             {
                 var score = CreateScore();
+
                 if (DrawableRuleset.ReplayScore == null)
+                {
                     scoreManager.Import(score).ContinueWith(_ => Schedule(() =>
                     {
                         // screen may be in the exiting transition phase.
                         if (this.IsCurrentScreen())
                             this.Push(CreateResults(score));
                     }));
+                }
                 else
                     this.Push(CreateResults(score));
             });
