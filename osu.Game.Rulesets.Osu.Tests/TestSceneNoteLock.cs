@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Time = time_first_circle, Position = position_second_circle, Actions = { OsuAction.LeftButton } }
             });
 
-            addJudgementAssert(HitResult.Miss, HitResult.Miss);
+            addJudgementAssert(HitResult.Miss, HitResult.Great);
         }
 
         /// <summary>
