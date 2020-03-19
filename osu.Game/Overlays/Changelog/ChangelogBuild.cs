@@ -93,6 +93,7 @@ namespace osu.Game.Overlays.Changelog
                                 Direction = FillDirection.Full,
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
+                                TextAnchor = Anchor.BottomLeft,
                             }
                         }
                     };
@@ -125,7 +126,7 @@ namespace osu.Game.Overlays.Changelog
 
                     title.AddText("by ", t =>
                     {
-                        t.Font = fontMedium.With(italics: true);
+                        t.Font = fontMedium;
                         t.Colour = entryColour;
                         t.Padding = new MarginPadding { Left = 10 };
                     });
@@ -138,7 +139,7 @@ namespace osu.Game.Overlays.Changelog
                             Id = entry.GithubUser.UserId.Value
                         }, t =>
                         {
-                            t.Font = fontMedium.With(italics: true);
+                            t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
                     }
@@ -146,7 +147,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
                         {
-                            t.Font = fontMedium.With(italics: true);
+                            t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
                     }
@@ -154,7 +155,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         title.AddText(entry.GithubUser.DisplayName, t =>
                         {
-                            t.Font = fontMedium.With(italics: true);
+                            t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
                     }

@@ -61,7 +61,7 @@ namespace osu.Game.Skinning
             {
                 var iniRate = source.GetConfig<GlobalSkinConfiguration, int>(GlobalSkinConfiguration.AnimationFramerate);
 
-                if (iniRate != null)
+                if (iniRate?.Value > 0)
                     return 1000f / iniRate.Value;
 
                 return 1000f / textures.Length;

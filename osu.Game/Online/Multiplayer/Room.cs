@@ -59,8 +59,8 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<int?> MaxParticipants { get; private set; } = new Bindable<int?>();
 
         [Cached]
-        [JsonIgnore]
-        public BindableList<User> Participants { get; private set; } = new BindableList<User>();
+        [JsonProperty("recent_participants")]
+        public BindableList<User> RecentParticipants { get; private set; } = new BindableList<User>();
 
         [Cached]
         public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
@@ -118,25 +118,16 @@ namespace osu.Game.Online.Multiplayer
             if (DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            // transfer local beatmaps across to ensure we have Metadata available (CreateRoomRequest does not give us metadata as expected)
-            foreach (var item in other.Playlist)
-            {
-                var localItem = Playlist.FirstOrDefault(i => i.BeatmapID == item.BeatmapID);
-
-                if (localItem != null)
-                    item.Beatmap.Value.Metadata = localItem.Beatmap.Value.Metadata;
-            }
-
             if (!Playlist.SequenceEqual(other.Playlist))
             {
                 Playlist.Clear();
                 Playlist.AddRange(other.Playlist);
             }
 
-            if (!Participants.SequenceEqual(other.Participants))
+            if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
             {
-                Participants.Clear();
-                Participants.AddRange(other.Participants);
+                RecentParticipants.Clear();
+                RecentParticipants.AddRange(other.RecentParticipants);
             }
 
             Position = other.Position;

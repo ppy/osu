@@ -47,21 +47,22 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Key testKey = ((KeyCounterKeyboard)kc.Children.First()).Key;
 
-            AddStep($"Press {testKey} key", () =>
+            void addPressKeyStep()
             {
-                InputManager.PressKey(testKey);
-                InputManager.ReleaseKey(testKey);
-            });
+                AddStep($"Press {testKey} key", () =>
+                {
+                    InputManager.PressKey(testKey);
+                    InputManager.ReleaseKey(testKey);
+                });
+            }
 
+            addPressKeyStep();
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 1);
-
-            AddStep($"Press {testKey} key", () =>
-            {
-                InputManager.PressKey(testKey);
-                InputManager.ReleaseKey(testKey);
-            });
-
+            addPressKeyStep();
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 2);
+            AddStep("Disable counting", () => testCounter.IsCounting = false);
+            addPressKeyStep();
+            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses == 2);
 
             Add(kc);
         }

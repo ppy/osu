@@ -18,10 +18,9 @@ namespace osu.Game.Tests.Visual.Online
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(UserPanel),
-            typeof(SocialPanel),
             typeof(FilterControl),
-            typeof(SocialGridPanel),
-            typeof(SocialListPanel)
+            typeof(UserGridPanel),
+            typeof(UserListPanel)
         };
 
         public TestSceneSocialOverlay()

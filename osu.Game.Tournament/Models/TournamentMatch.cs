@@ -90,6 +90,8 @@ namespace osu.Game.Tournament.Models
         [JsonIgnore]
         public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
+        public TeamColour WinnerColour => Winner == Team1.Value ? TeamColour.Red : TeamColour.Blue;
+
         public int PointsToWin => Round.Value?.BestOf.Value / 2 + 1 ?? 0;
 
         /// <summary>

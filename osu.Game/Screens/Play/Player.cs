@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
                 mod.ApplyToHealthProcessor(HealthProcessor);
 
-            BreakOverlay.IsBreakTime.ValueChanged += _ => updatePauseOnFocusLostState();
+            BreakOverlay.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
         private void addUnderlayComponents(Container target)
@@ -229,7 +229,11 @@ namespace osu.Game.Screens.Play
                         IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                     },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
-                    KeyCounter = { AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
+                    KeyCounter =
+                    {
+                        AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
+                        IsCounting = false
+                    },
                     RequestSeek = GameplayClockContainer.Seek,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -284,6 +288,12 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.Overlays.Add(HealthProcessor);
 
             HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+        }
+
+        private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
+        {
+            updatePauseOnFocusLostState();
+            HUDOverlay.KeyCounter.IsCounting = !isBreakTime.NewValue;
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -377,6 +387,10 @@ namespace osu.Game.Screens.Play
 
         private void onCompletion()
         {
+            // screen may be in the exiting transition phase.
+            if (!this.IsCurrentScreen())
+                return;
+
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed || completionProgressDelegate != null)
                 return;
@@ -391,13 +405,17 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = DrawableRuleset.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            var score = new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = rulesetInfo,
                 Mods = Mods.Value.ToArray(),
-                User = api.LocalUser.Value,
             };
+
+            if (DrawableRuleset.ReplayScore != null)
+                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
+            else
+                score.User = api.LocalUser.Value;
 
             ScoreProcessor.PopulateScore(score);
 
@@ -406,7 +424,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score);
 
         #region Fail Logic
 
@@ -567,7 +585,7 @@ namespace osu.Game.Screens.Play
             if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
                 // proceed to result screen if beatmap already finished playing
-                scheduleGotoRanking();
+                completionProgressDelegate.RunTask();
                 return true;
             }
 
@@ -608,10 +626,18 @@ namespace osu.Game.Screens.Play
             completionProgressDelegate = Schedule(delegate
             {
                 var score = CreateScore();
-                if (DrawableRuleset.ReplayScore == null)
-                    scoreManager.Import(score).Wait();
 
-                this.Push(CreateResults(score));
+                if (DrawableRuleset.ReplayScore == null)
+                {
+                    scoreManager.Import(score).ContinueWith(_ => Schedule(() =>
+                    {
+                        // screen may be in the exiting transition phase.
+                        if (this.IsCurrentScreen())
+                            this.Push(CreateResults(score));
+                    }));
+                }
+                else
+                    this.Push(CreateResults(score));
             });
         }
 
