@@ -113,7 +113,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        protected override void ApplySpecialHiddenState(DrawableHitObject drawable, ArmedState state)
+        /// <summary>
+        /// A hidden state that keeps the approach circle visible by only fading out circlepiece.
+        /// true This state is applied to the first circle or slider
+        /// when <see cref="ModHidden.IncreaseFirstObjectVisibility"/> is set to true.
+        /// </summary>
+        protected void ApplySpecialHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
@@ -124,7 +129,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawable)
             {
                 case DrawableHitCircle circle:
-                    //keep the approach circle visible, only fade out circlepiece
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
                         circle.CirclePiece.FadeOut(fadeOutDuration);
 
