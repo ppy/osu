@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Catch.Mods
             Value = 5,
         };
 
+        public override string IconTooltip => ($"{Name} ({(CircleSize.IsDefault ? "" : $"CS {CircleSize.Value.ToString()}, ")}" +
+                                              $"{(DrainRate.IsDefault ? "" : $"HP {DrainRate.Value.ToString()}, ")}" +
+                                              $"{(OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value.ToString()}, ")}" +
+                                              $"{(ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value.ToString()}")}").TrimEnd(new char[] { ',', ' ' }) + ")";
+
         protected override void TransferSettings(BeatmapDifficulty difficulty)
         {
             base.TransferSettings(difficulty);

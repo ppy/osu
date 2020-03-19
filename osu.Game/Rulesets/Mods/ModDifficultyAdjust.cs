@@ -52,6 +52,9 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
+        public override string IconTooltip => $"{Name} ({(DrainRate.IsDefault ? $"HP {DrainRate.Value.ToString()}, " : "")}" +
+                                              $"{(OverallDifficulty.IsDefault ? $"OD {OverallDifficulty.Value.ToString()}, " : "")})";
+
         private BeatmapDifficulty difficulty;
 
         public void ReadFromDifficulty(BeatmapDifficulty difficulty)

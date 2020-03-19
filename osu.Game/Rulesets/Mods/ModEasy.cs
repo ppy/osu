@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
+        public override string IconTooltip => $"{Name}{(Retries.IsDefault ? "" : $" ({Retries.Value} lives)")}";
+
         private int retries;
 
         private BindableNumber<double> health;

@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.IO.Serialization;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -41,6 +42,16 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual string Description => string.Empty;
+
+        /// <summary>
+        /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.
+        /// </summary>
+        /// <remarks>
+        /// Differs from <see cref="Name"/>, as the value of attributes (AR, CS, etc) changeable via the mod
+        /// are displayed in the tooltip.
+        /// </remarks>
+        [JsonIgnore]
+        public virtual string IconTooltip => Name;
 
         /// <summary>
         /// The score multiplier of this mod.
