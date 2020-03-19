@@ -23,7 +23,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        private double fadeOutStartTime, fadeOutDuration, longFadeDuration;
+        private double fadeOutStartTime { get; set; }
+        private double fadeOutDuration { get; set; }
+        private double longFadeDuration { get; set; }
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
@@ -68,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             var h = d.HitObject;
-            getFadeTimes(h);
+            setFadeTimes(h);
 
             switch (drawable)
             {
@@ -117,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             var h = d.HitObject;
-            getFadeTimes(h);
+            setFadeTimes(h);
 
             switch (drawable)
             {
@@ -151,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return startingSpinnersCount;
         }
 
-        private void getFadeTimes(OsuHitObject h)
+        private void setFadeTimes(OsuHitObject h)
         {
             fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
             fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
