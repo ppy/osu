@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
@@ -24,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private const double time_first_circle = 1500;
         private const double time_second_circle = 1600;
+        private const double early_miss_window = 1000; // time after -1000 to -500 is considered a miss
+        private const double late_miss_window = 500; // time after +500 is considered a miss
 
         private static readonly Vector2 position_first_circle = Vector2.Zero;
         private static readonly Vector2 position_second_circle = new Vector2(80);
@@ -40,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(HitResult.Miss, HitResult.Miss);
+            addJudgementOffsetAssert(late_miss_window);
         }
 
         /// <summary>
@@ -54,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(HitResult.Miss, HitResult.Great);
+            addJudgementOffsetAssert(0);
         }
 
         /// <summary>
@@ -68,6 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(HitResult.Miss, HitResult.Great);
+            addJudgementOffsetAssert(100);
         }
 
         /// <summary>
@@ -89,6 +95,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddAssert($"first circle judgement is {firstCircle}", () => judgementResults.Single(r => r.HitObject.StartTime == time_first_circle).Type == firstCircle);
             AddAssert($"second circle judgement is {secondCircle}", () => judgementResults.Single(r => r.HitObject.StartTime == time_second_circle).Type == secondCircle);
+        }
+
+        private void addJudgementOffsetAssert(double offset)
+        {
+            AddAssert($"first circle judged at {offset}", () => Precision.AlmostEquals(judgementResults.Single(r => r.HitObject.StartTime == time_first_circle).TimeOffset, offset, 100));
         }
 
         private ScoreAccessibleReplayPlayer currentPlayer;
@@ -157,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             private static readonly DifficultyRange[] ranges =
             {
                 new DifficultyRange(HitResult.Great, 500, 500, 500),
-                new DifficultyRange(HitResult.Miss, 1000, 1000, 1000),
+                new DifficultyRange(HitResult.Miss, early_miss_window, early_miss_window, early_miss_window),
             };
 
             public override bool IsHitResultAllowed(HitResult result) => result == HitResult.Great || result == HitResult.Miss;
