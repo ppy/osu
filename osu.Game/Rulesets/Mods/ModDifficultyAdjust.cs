@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mods
 
         /// <summary>
         /// Transfer a setting from <see cref="BeatmapDifficulty"/> to a configuration bindable.
-        /// Only performs the transfer if the user it not currently overriding..
+        /// Only performs the transfer if the user is not currently overriding.
         /// </summary>
         protected void TransferSetting<T>(BindableNumber<T> bindable, T beatmapDefault)
             where T : struct, IComparable<T>, IConvertible, IEquatable<T>
