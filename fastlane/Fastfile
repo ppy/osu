@@ -97,7 +97,7 @@ platform :ios do
     changelog.gsub!('$BUILD_ID', options[:build])
 
     pilot(
-      wait_processing_interval: 1800,
+      wait_processing_interval: 900,
       changelog: changelog,
       groups: ['osu! supporters', 'public'],
       distribute_external: true,
