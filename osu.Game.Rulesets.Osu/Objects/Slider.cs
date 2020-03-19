@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
-        public override Judgement CreateJudgement() => new OsuJudgement();
+        public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
