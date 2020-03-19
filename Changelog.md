@@ -170,6 +170,8 @@
     *   [m] [Add date played to score panel #8340]
     *   [m] [Update rank badge colours #8339]
     *   [m] [Make score panel scroll if off-screen #8341]
+    *   [m] [Show 'D' rank badge on accuracy circle #8349]
+    *   [m] [Add testflight distribution step automation #8345]
 
 *   暂不合并
     *   [m] [Chat overlay test scene improvements (#8297)]
