@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Tau.Replays
 
                 Debug.Assert(CurrentTime != null);
 
-                return Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time);
+                return NextFrame != null ? Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
             }
         }
 

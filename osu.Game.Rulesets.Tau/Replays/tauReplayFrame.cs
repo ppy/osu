@@ -12,8 +12,10 @@ namespace osu.Game.Rulesets.Tau.Replays
         public List<TauAction> Actions = new List<TauAction>();
         public Vector2 Position;
 
-        public TauReplayFrame(TauAction? button = null)
+        public TauReplayFrame(double time, Vector2 position, TauAction? button = null) : base(time)
         {
+            Position = position;
+
             if (button.HasValue)
                 Actions.Add(button.Value);
         }

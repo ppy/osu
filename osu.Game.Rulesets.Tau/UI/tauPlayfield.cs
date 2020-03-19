@@ -42,8 +42,11 @@ namespace osu.Game.Rulesets.Tau.UI
             {
                 judgementLayer = new JudgementContainer<DrawableTauJudgement>
                 {
+                    Scale = Vector2.One * (4f / 3),
                     RelativeSizeAxes = Axes.Both,
                     Depth = 1,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 },
                 new VisualisationContainer(),
                 playfieldBackground = new Circle
@@ -102,6 +105,7 @@ namespace osu.Game.Rulesets.Tau.UI
                     Name = "Kiai hit explosions",
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
+                    Scale = Vector2.One * (4f / 3),
                     Blending = BlendingParameters.Additive,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,

@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Tau.Beatmaps
                 default:
                     return new TauHitObject
                     {
-                        Samples = original.Samples,
+                        Samples = original is IHasCurve ? ((IHasCurve)original).NodeSamples[0] : original.Samples,
                         StartTime = original.StartTime,
                         PositionToEnd = position,
                         NewCombo = comboData?.NewCombo ?? false,
