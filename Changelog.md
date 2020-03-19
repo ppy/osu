@@ -172,6 +172,7 @@
     *   [m] [Make score panel scroll if off-screen #8341]
     *   [m] [Show 'D' rank badge on accuracy circle #8349]
     *   [m] [Add testflight distribution step automation #8345]
+    *   [m] [Reduce allocations of followpoints by reusing existing #8346]
 
 *   暂不合并
     *   [m] [Chat overlay test scene improvements (#8297)]
