@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
@@ -56,7 +58,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, true),
+                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out var missCount) || missCount == 0),
                 new CounterStatistic("pp", (int)(score.PP ?? 0)),
             };
 
@@ -87,14 +89,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((metadata.Title, metadata.TitleUnicode)),
+                                Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((metadata.Artist, metadata.ArtistUnicode)),
+                                Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
                             },
                             new Container
@@ -179,37 +181,37 @@ namespace osu.Game.Screens.Ranking.Expanded
                             },
                         }
                     },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
-                        Children = new Drawable[]
-                        {
-                            new GridContainer
+                            new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Content = new[] { topStatistics.Cast<Drawable>().ToArray() },
-                                RowDimensions = new[]
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 5),
+                                Children = new Drawable[]
                                 {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                }
-                            },
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Content = new[] { bottomStatistics.Cast<Drawable>().ToArray() },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
+                                    new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Content = new[] { topStatistics.Cast<Drawable>().ToArray() },
+                                        RowDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        }
+                                    },
+                                    new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Content = new[] { bottomStatistics.Cast<Drawable>().ToArray() },
+                                        RowDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
             };
         }
 

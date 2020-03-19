@@ -166,7 +166,6 @@
     *   [m] [Update incorrect file path causing error on rider solution load #8335]
     *   [m] [Fix perfect display showing when misses are present #8336]
     *   [m] [Re-use colors defined for each rank in result screen accuracy circle #8323]
-    *   [m] [Fix perfect display showing when misses are present #8336]
     *   [m] [Colourise results screen hit statistics #8338]
     *   [m] [Add date played to score panel #8340]
     *   [m] [Update rank badge colours #8339]
