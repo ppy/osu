@@ -177,3 +177,8 @@
 
 *   暂不合并
     *   [m] [Chat overlay test scene improvements (#8297)]
+
+### 2020/03/20
+*   合并上游pr
+    *   [m] [Fix potentially invalid push in player while already exiting #8355]
+    *   [m] [Fix slider ticks/repeats contributing to accuracy #8362]
