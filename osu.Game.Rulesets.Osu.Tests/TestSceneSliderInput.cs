@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(SliderBall),
             typeof(DrawableSlider),
             typeof(DrawableSliderTick),
-            typeof(DrawableRepeatPoint),
+            typeof(DrawableSliderRepeat),
             typeof(DrawableOsuHitObject),
             typeof(DrawableSliderHead),
             typeof(DrawableSliderTail),

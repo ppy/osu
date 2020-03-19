@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container<DrawableSliderHead> headContainer;
         private readonly Container<DrawableSliderTail> tailContainer;
         private readonly Container<DrawableSliderTick> tickContainer;
-        private readonly Container<DrawableRepeatPoint> repeatContainer;
+        private readonly Container<DrawableSliderRepeat> repeatContainer;
 
         private readonly Slider slider;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
-                repeatContainer = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
+                repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     tickContainer.Add(tick);
                     break;
 
-                case DrawableRepeatPoint repeat:
+                case DrawableSliderRepeat repeat:
                     repeatContainer.Add(repeat);
                     break;
             }
@@ -129,8 +129,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case SliderTick tick:
                     return new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
 
-                case RepeatPoint repeat:
-                    return new DrawableRepeatPoint(repeat, this) { Position = repeat.Position - slider.Position };
+                case SliderRepeatPoint repeat:
+                    return new DrawableSliderRepeat(repeat, this) { Position = repeat.Position - slider.Position };
             }
 
             return base.CreateNestedHitObject(hitObject);
