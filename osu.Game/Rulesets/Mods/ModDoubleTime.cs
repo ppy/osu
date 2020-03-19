@@ -30,5 +30,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 1.5,
             Precision = 0.01,
         };
+
+        public override string IconTooltip => $"{Name}{(SpeedChange.IsDefault ? "" : $" ({SpeedChange.Value}x)")}";
     }
 }

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
 
             type = mod.Type;
 
-            TooltipText = mod.Name;
+            TooltipText = mod.IconTooltip;
 
             Size = new Vector2(size);
 
