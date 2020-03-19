@@ -94,8 +94,9 @@ namespace osu.Game.Rulesets.Osu.UI
             if (lastObject == null)
                 return true;
 
-            // Ensure that either the last object has received a judgement or the hit time occurs after the last object's start time.
-            if (lastObject.Judged || Time.Current > lastObject.HitObject.StartTime)
+            // Ensure that either the last object has received a judgement or the hit time occurs at or after the last object's start time.
+            // Simultaneous hitobjects are allowed to be hit at the same time value to account for edge-cases such as Centipede.
+            if (lastObject.Judged || Time.Current >= lastObject.HitObject.StartTime)
                 return true;
 
             return false;
