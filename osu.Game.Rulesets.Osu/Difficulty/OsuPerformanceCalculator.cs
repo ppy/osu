@@ -114,18 +114,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (finalsumstrain != 0)
             {
             // var Aim = new Aim();
+            // Array.ForEach(JumpDistanceArray, Console.WriteLine);
             double average = JumpDistanceArray.Average();
             double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
             double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
-            double bpm = (60000 * countHitCircles) / finalsumstrain;
-            double finalsd2 = (bpm / 375) * finalsd;
+            // Console.WriteLine(finalsd);
+            // double bpm = (60000 * countHitCircles) / (4*finalsumstrain);
+            // Console.WriteLine(bpm);
+            double finalsd2 = finalsd;
+            // Console.WriteLine(finalsd2);
             if (countMiss == 0)
             {
                 finalsdpp = finalsdpp + (finalsd2 / stdevconst);
+                // Console.WriteLine(finalsdpp);
 
                 if (finalsdpp >= 1)
                 {
-                    finalsdpp = (-1) * (Log(finalsdpp, 0.007));
+                    finalsdpp = (-1) * (Log(finalsdpp, 0.08));
+                    // Console.WriteLine(finalsdpp);
                 }
             }
             }
