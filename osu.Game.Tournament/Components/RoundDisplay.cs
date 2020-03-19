@@ -12,19 +12,27 @@ namespace osu.Game.Tournament.Components
     {
         public RoundDisplay(TournamentMatch match)
         {
-            AutoSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
 
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new DrawableTournamentHeaderText(),
+                        new DrawableTournamentHeaderText(false)
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                        },
                         new TournamentSpriteText
                         {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
                             Text = match.Round.Value?.Name.Value ?? "Unknown Round",
                             Font = OsuFont.Torus.With(size: 26, weight: FontWeight.SemiBold)
                         },
