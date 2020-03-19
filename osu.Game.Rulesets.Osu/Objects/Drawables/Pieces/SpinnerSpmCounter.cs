@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = @"转每分钟",
-                    Font = OsuFont.Numeric.With(size: 24),
+                    Text = @"SPINS PER MINUTE",
+                    Font = OsuFont.Numeric.With(size: 12),
                     Y = 30
                 }
             };

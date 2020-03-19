@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat
+                        AddNested(new RepeatPoint
                         {
                             RepeatIndex = e.SpanIndex,
                             SpanDuration = SpanDuration,
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;
 
-            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
+            foreach (var repeat in NestedHitObjects.OfType<RepeatPoint>())
                 repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
