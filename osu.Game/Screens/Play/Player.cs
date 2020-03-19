@@ -277,8 +277,9 @@ namespace osu.Game.Screens.Play
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             });
 
-            DrawableRuleset.Overlays.Add(BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
+            DrawableRuleset.Overlays.Add(BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset, DrawableRuleset.GameplayStartTime, ScoreProcessor)
             {
+                BreakSettingsOverlay = {},
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Breaks = working.Beatmap.Breaks

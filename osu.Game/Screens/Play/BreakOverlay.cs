@@ -10,7 +10,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.Break;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Play
 {
@@ -63,9 +65,14 @@ namespace osu.Game.Screens.Play
         private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
         private readonly double gameplayStartTime;
+        private readonly DrawableRuleset drawableRuleset;
+        private readonly BindableBool replayLoaded = new BindableBool();
+        public readonly BreakSettingsOverlay BreakSettingsOverlay;
+        protected virtual BreakSettingsOverlay CreateBreakSettingsOverlay() => new BreakSettingsOverlay();
 
-        public BreakOverlay(bool letterboxing, double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, DrawableRuleset drawableRuleset, double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
         {
+            this.drawableRuleset = drawableRuleset;
             this.gameplayStartTime = gameplayStartTime;
             this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
@@ -75,6 +82,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    BreakSettingsOverlay = CreateBreakSettingsOverlay(),
                     new LetterboxOverlay
                     {
                         Alpha = letterboxing ? 1 : 0,
@@ -126,6 +134,11 @@ namespace osu.Game.Screens.Play
         private void load(GameplayClock clock)
         {
             if (clock != null) Clock = clock;
+            if (drawableRuleset != null)
+            {
+                BindDrawableRuleset(drawableRuleset);
+            }
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         protected override void LoadComplete()
@@ -206,12 +219,32 @@ namespace osu.Game.Screens.Play
                     }
                 }
             }
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         private void bindProcessor(ScoreProcessor processor)
         {
             info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
             info.GradeDisplay.Current.BindTo(processor.Rank);
+        }
+
+        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
+        {
+            BreakSettingsOverlay.ReplayLoaded = e.NewValue;
+
+            if (e.NewValue)
+            {
+                BreakSettingsOverlay.Hide();
+            }
+            else
+            {
+                BreakSettingsOverlay.Show();
+            }
+        }
+
+        protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
+        {
+            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
         }
     }
 }
