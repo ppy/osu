@@ -14,19 +14,19 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableRepeatPoint : DrawableOsuHitObject, ITrackSnaking
+    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
-        private readonly RepeatPoint repeatPoint;
+        private readonly SliderRepeatPoint sliderRepeatPoint;
         private readonly DrawableSlider drawableSlider;
 
         private double animDuration;
 
         private readonly Drawable scaleContainer;
 
-        public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
-            : base(repeatPoint)
+        public DrawableSliderRepeat(SliderRepeatPoint sliderRepeatPoint, DrawableSlider drawableSlider)
+            : base(sliderRepeatPoint)
         {
-            this.repeatPoint = repeatPoint;
+            this.sliderRepeatPoint = sliderRepeatPoint;
             this.drawableSlider = drawableSlider;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -48,13 +48,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (repeatPoint.StartTime <= Time.Current)
+            if (sliderRepeatPoint.StartTime <= Time.Current)
                 ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(300, repeatPoint.SpanDuration);
+            animDuration = Math.Min(300, sliderRepeatPoint.SpanDuration);
 
             this.Animate(
                 d => d.FadeIn(animDuration),
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
-            bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
+            bool isRepeatAtEnd = sliderRepeatPoint.RepeatIndex % 2 == 0;
             List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
