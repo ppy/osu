@@ -99,6 +99,8 @@ platform :ios do
     pilot(
       wait_processing_interval: 1800,
       changelog: changelog,
+      groups: ['osu! supporters', 'public'],
+      distribute_external: true,
       ipa: './osu.iOS/bin/iPhone/Release/osu.iOS.ipa'
     )
   end
