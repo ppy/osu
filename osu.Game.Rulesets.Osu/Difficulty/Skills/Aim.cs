@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (sdsplitcounter > 0)
               {
+              // JumpDistances2.ForEach(Console.WriteLine);
+              // Console.ReadKey();
               JumpDistances.Add(CalculateStandardDeviation(JumpDistances2));
               JumpDistances2.Clear();
               JumpDistances2.TrimExcess();
