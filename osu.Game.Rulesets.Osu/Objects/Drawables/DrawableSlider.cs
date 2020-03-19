@@ -6,13 +6,11 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
-using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -25,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly SliderBall Ball;
         public readonly SkinnableDrawable Body;
+
+        public override bool DisplayResult => false;
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
@@ -193,22 +193,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < slider.EndTime)
                 return;
 
-            ApplyResult(r =>
-            {
-                var judgementsCount = NestedHitObjects.Count;
-                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
-
-                var hitFraction = (double)judgementsHit / judgementsCount;
-
-                if (hitFraction == 1 && HeadCircle.Result.Type == HitResult.Great)
-                    r.Type = HitResult.Great;
-                else if (hitFraction >= 0.5 && HeadCircle.Result.Type >= HitResult.Good)
-                    r.Type = HitResult.Good;
-                else if (hitFraction > 0)
-                    r.Type = HitResult.Meh;
-                else
-                    r.Type = HitResult.Miss;
-            });
+            ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
