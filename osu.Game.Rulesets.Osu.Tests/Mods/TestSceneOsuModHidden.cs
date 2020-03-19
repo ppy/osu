@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModHidden(),
             Autoplay = true,
+            PassCondition = checkSomeHit
         });
 
         [Test]
@@ -58,7 +59,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         StartTime = 4200,
                     }
                 }
-            }
+            },
+            PassCondition = checkSomeHit
         });
 
         [Test]
@@ -92,7 +94,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
                     }
                 }
-            }
+            },
+            PassCondition = checkSomeHit
         });
+
+        private bool checkSomeHit()
+        {
+            return Player.ScoreProcessor.JudgedHits >= 4;
+        }
     }
 }
