@@ -19,6 +19,8 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using Humanizer;
 using osu.Framework.Graphics.Effects;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Screens.Play
 {
@@ -134,6 +136,19 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
                         }
+                    }
+                },
+                new FillFlowContainer<PlayerSettingsGroup>
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 20),
+                    Margin = new MarginPadding(25),
+                    Children = new PlayerSettingsGroup[]
+                    {
+                        new VisualSettings(),
                     }
                 },
             };
@@ -254,26 +269,17 @@ namespace osu.Game.Screens.Play
             {
                 new OsuSpriteText
                 {
-                    Text = "你这次已经尝试了",
-                    Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    Font = OsuFont.GetFont(size: 18),
-                },
-                new OsuSpriteText
-                {
-                    Text = $"{retries}",
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                    Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                },
-                new OsuSpriteText
-                {
-                    Text = "次",
+                    Text = $"你这次已经尝试了{retries}次",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),
                 }
             };
+        }
+
+        private void BreakSettingsOverlayContainer()
+        {
+
         }
 
         private class Button : DialogButton

@@ -183,3 +183,6 @@
     *   [m] [Fix potentially invalid push in player while already exiting #8355]
     *   [m] [Fix slider ticks/repeats contributing to accuracy #8362]
     *   [m] [Remove slider implicit judgement #8358]
+
+*   添加了在休息时段，暂停界面和死亡界面直接调整视觉设置的功能
+*   优化关于界面的文案
