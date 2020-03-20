@@ -23,8 +23,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
 
-        private const double streamaimconst = 2.42;
-        private const double stdevconst = 0.149820;
+       // private const double streamaimconst = 2.42;
+      //  private const double stdevconst = 0.149820;
+
+      //  private int sdsplitcounter = 0;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -51,31 +53,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
-            double[] JumpDistanceArray = ((Aim)skills[0]).JumpDistances.ToArray();
-            double[] finalsumstrain2 = ((Aim)skills[0]).StrainTimes.ToArray();
-            double finalsumstrain = finalsumstrain2.Sum();
-            double finalsdpp = 0;
-            if (finalsumstrain != 0)
-            {
-            // var Aim = new Aim();
-            // Array.ForEach(JumpDistanceArray, Console.WriteLine);
-            double average = JumpDistanceArray.Average();
-            double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
-            double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
-            // Console.WriteLine(finalsd);
-            // double bpm = (60000 * countHitCircles) / (4*finalsumstrain);
-            // Console.WriteLine(bpm);
-            double finalsd2 = finalsd;
-            // Console.WriteLine(finalsd2);
-            finalsdpp = finalsdpp + (finalsd2 / stdevconst);
-            // Console.WriteLine(finalsdpp);
-                if (finalsdpp >= 1)
-                {
-                    finalsdpp = (-1) * (Log(finalsdpp, 0.04));
-                    // Console.WriteLine(finalsdpp);
-                }
-            }
-
             return new OsuDifficultyAttributes
             {
           //    JumpDistances = ((Aim)skills[0]).JumpDistances.ToArray(),
@@ -83,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StarRating = starRating,
                 Mods = mods,
                 AimStrain = aimRating,
-                SpeedStrain = speedRating * Math.Max(1.0, finalsdpp),
+                SpeedStrain = speedRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo,
