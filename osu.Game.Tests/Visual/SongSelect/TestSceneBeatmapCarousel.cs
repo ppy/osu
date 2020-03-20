@@ -227,6 +227,32 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count);
         }
 
+        [Test]
+        public void TestSelectionEnteringFromEmptyRuleset()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            AddStep("Create beatmaps for taiko only", () =>
+            {
+                var rulesetBeatmapSet = createTestBeatmapSet(1);
+                var taikoRuleset = rulesets.AvailableRulesets.ElementAt(1);
+                rulesetBeatmapSet.Beatmaps.ForEach(b =>
+                {
+                    b.Ruleset = taikoRuleset;
+                    b.RulesetID = 1;
+                });
+
+                sets.Add(rulesetBeatmapSet);
+            });
+
+            loadBeatmaps(sets, () => new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) });
+
+            AddStep("Set non-empty mode filter", () =>
+                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(1) }, false));
+
+            AddAssert("Something is selected", () => carousel.SelectedBeatmap != null);
+        }
+
         /// <summary>
         /// Test sorting
         /// </summary>
@@ -399,7 +425,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap == null);
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmap.RulesetID == 0);
 
             AddStep("remove mixed set", () =>
             {
@@ -484,7 +510,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null)
         {
             createCarousel();
 
@@ -499,7 +525,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             bool changed = false;
             AddStep($"Load {(beatmapSets.Count > 0 ? beatmapSets.Count.ToString() : "some")} beatmaps", () =>
             {
-                carousel.Filter(new FilterCriteria());
+                carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
                 carousel.BeatmapSets = beatmapSets;
             });
