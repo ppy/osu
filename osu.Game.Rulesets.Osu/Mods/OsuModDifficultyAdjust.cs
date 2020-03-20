@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value}";
                 string approachRate = ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value}";
 
-                string[] settings = new string[] { circleSize, drainRate, overallDifficulty, approachRate };
+                string[] settings = { circleSize, drainRate, overallDifficulty, approachRate };
                 // filter out empty strings so we don't have orphaned commas
                 settings = Array.FindAll(settings, s => !string.IsNullOrEmpty(s));
                 return string.Join(", ", settings);
