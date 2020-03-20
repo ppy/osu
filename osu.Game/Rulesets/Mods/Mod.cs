@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                List<string> attributes = new List<string>();
+                var attributes = new List<string>();
 
                 foreach ((SettingSourceAttribute attr, System.Reflection.PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
