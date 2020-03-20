@@ -318,12 +318,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(1, 4), ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(2, 5), ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(2, 5), ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(3, 6), ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(4, 11), ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(5, 14), ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
             }
         }
 
@@ -341,12 +341,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(1, 4), ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(2, 5), ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(2, 5), ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(3, 6), ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(4, 11), ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
+                Assert.AreEqual(new ComboIndex(5, 14), ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
             }
         }
 

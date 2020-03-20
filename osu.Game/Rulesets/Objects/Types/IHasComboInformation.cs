@@ -17,12 +17,12 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         int IndexInCurrentCombo { get; set; }
 
-        Bindable<int> ComboIndexBindable { get; }
+        Bindable<ComboIndex> ComboIndexBindable { get; }
 
         /// <summary>
         /// The offset of this combo in relation to the beatmap.
         /// </summary>
-        int ComboIndex { get; set; }
+        ComboIndex ComboIndex { get; set; }
 
         Bindable<bool> LastInComboBindable { get; }
 

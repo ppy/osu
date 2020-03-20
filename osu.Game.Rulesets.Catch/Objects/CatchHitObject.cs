@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => IndexInCurrentComboBindable.Value = value;
         }
 
-        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
+        public Bindable<ComboIndex> ComboIndexBindable { get; } = new Bindable<ComboIndex>();
 
-        public int ComboIndex
+        public ComboIndex ComboIndex
         {
             get => ComboIndexBindable.Value;
             set => ComboIndexBindable.Value = value;

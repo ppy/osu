@@ -2,13 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneHitCircleComboChange : TestSceneHitCircle
     {
-        private readonly Bindable<int> comboIndex = new Bindable<int>();
+        private readonly Bindable<ComboIndex> comboIndex = new Bindable<ComboIndex>();
 
         protected override void LoadComplete()
         {
@@ -19,7 +20,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto)
         {
             circle.ComboIndexBindable.BindTo(comboIndex);
-            circle.IndexInCurrentComboBindable.BindTo(comboIndex);
+            circle.ComboIndexBindable.BindValueChanged(ci =>
+            {
+                circle.IndexInCurrentCombo = ci.NewValue.Automated;
+            }, true);
+
             return base.CreateDrawableHitCircle(circle, auto);
         }
     }

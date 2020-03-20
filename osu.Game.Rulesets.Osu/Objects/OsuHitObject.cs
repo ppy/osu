@@ -83,9 +83,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => IndexInCurrentComboBindable.Value = value;
         }
 
-        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
+        public Bindable<ComboIndex> ComboIndexBindable { get; } = new Bindable<ComboIndex>();
 
-        public virtual int ComboIndex
+        public virtual ComboIndex ComboIndex
         {
             get => ComboIndexBindable.Value;
             set => ComboIndexBindable.Value = value;

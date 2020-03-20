@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
@@ -9,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneSliderComboChange : TestSceneSlider
     {
-        private readonly Bindable<int> comboIndex = new Bindable<int>();
+        private readonly Bindable<ComboIndex> comboIndex = new Bindable<ComboIndex>();
 
         protected override void LoadComplete()
         {
@@ -20,7 +21,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override DrawableSlider CreateDrawableSlider(Slider slider)
         {
             slider.ComboIndexBindable.BindTo(comboIndex);
-            slider.IndexInCurrentComboBindable.BindTo(comboIndex);
+            slider.ComboIndexBindable.BindValueChanged(ci =>
+            {
+                slider.IndexInCurrentCombo = ci.NewValue.Automated;
+            }, true);
 
             return base.CreateDrawableSlider(slider);
         }
