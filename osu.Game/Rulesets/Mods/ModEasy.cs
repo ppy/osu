@@ -21,12 +21,14 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
 
-        [SettingSource("Extra Lives", "Number of extra lives", "{0} lives")]
+        [SettingSource("Extra Lives", "Number of extra lives")]
         public Bindable<int> Retries { get; } = new BindableInt(2)
         {
             MinValue = 0,
             MaxValue = 10
         };
+
+        public override string IconTooltip => $"{Name}{(Retries.IsDefault ? "" : $" ({Retries.Value} lives)")}";
 
         private int retries;
 

@@ -2,12 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
 
@@ -55,39 +51,7 @@ namespace osu.Game.Rulesets.Mods
         /// are displayed in the tooltip.
         /// </remarks>
         [JsonIgnore]
-        public virtual string IconTooltip
-        {
-            get
-            {
-                var attributes = new List<string>();
-
-                foreach ((SettingSourceAttribute attr, System.Reflection.PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
-                {
-                    // use TooltipText from SettingSource if available, but fall back to Label, which has to be provided
-                    string tooltipText = attr.TooltipText ?? attr.Label + " {0}";
-                    object bindableObj = property.GetValue(this);
-
-                    if (bindableObj is BindableInt bindableInt && !bindableInt.IsDefault)
-                    {
-                        attributes.Add(string.Format(tooltipText, bindableInt.Value));
-                        continue;
-                    }
-
-                    if (bindableObj is BindableFloat bindableFloat && !bindableFloat.IsDefault)
-                    {
-                        attributes.Add(string.Format(tooltipText, bindableFloat.Value));
-                        continue;
-                    }
-
-                    if (bindableObj is BindableDouble bindableDouble && !bindableDouble.IsDefault)
-                    {
-                        attributes.Add(string.Format(tooltipText, bindableDouble.Value));
-                    }
-                }
-
-                return $"{Name}{(attributes.Any() ? $" ({string.Join(", ", attributes)})" : "")}";
-            }
-        }
+        public virtual string IconTooltip => Name;
 
         /// <summary>
         /// The score multiplier of this mod.
