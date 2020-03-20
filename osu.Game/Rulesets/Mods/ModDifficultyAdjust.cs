@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value.ToString()}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value.ToString()}";
+                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value}";
 
                 string[] settings = { drainRate, overallDifficulty };
                 // filter out empty strings so we don't have orphaned commas
