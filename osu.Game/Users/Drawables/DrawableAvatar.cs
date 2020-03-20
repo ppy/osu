@@ -68,7 +68,7 @@ namespace osu.Game.Users.Drawables
             if (!OpenOnClick.Value)
                 return;
 
-            if (user != null && user.Id != 1)
+            if (user?.Id > 1)
                 game?.ShowUser(user.Id);
         }
 
