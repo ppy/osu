@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using osu.Game.Configuration;
-using System.Linq;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -60,7 +59,7 @@ namespace osu.Game.Rulesets.Mods
                 string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value.ToString()}";
                 string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value.ToString()}";
 
-                string[] settings = new string[] { drainRate, overallDifficulty };
+                string[] settings = { drainRate, overallDifficulty };
                 // filter out empty strings so we don't have orphaned commas
                 settings = Array.FindAll(settings, s => !string.IsNullOrEmpty(s));
                 return string.Join(", ", settings);
