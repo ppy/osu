@@ -6,6 +6,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Tau.Objects;
+using osu.Game.Rulesets.Tau.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Tau.Replays
@@ -34,8 +35,8 @@ namespace osu.Game.Rulesets.Tau.Replays
         /// </summary>
         private int buttonIndex;
 
-        private const float offset = 305;
-        private const float cursorDistance = 280;
+        private const float offset = (768 / 2f) * TauPlayfield.UNIVERSAL_SCALE;
+        private const float cursorDistance = 250;
 
         public override Replay Generate()
         {
