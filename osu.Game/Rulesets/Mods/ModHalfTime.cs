@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
 
-        [SettingSource("Speed decrease", "The actual decrease to apply", "{0}x")]
+        [SettingSource("Speed decrease", "The actual decrease to apply")]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             MinValue = 0.5,
@@ -30,5 +30,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.75,
             Precision = 0.01,
         };
+
+        public override string IconTooltip => $"{Name}{(SpeedChange.IsDefault ? "" : $" ({SpeedChange.Value}x)")}";
     }
 }
