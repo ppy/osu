@@ -432,13 +432,18 @@ namespace osu.Game.Tests.Visual.SongSelect
                 carousel.RemoveBeatmapSet(testMixed);
                 testMixed = null;
             });
-            var testSingle = createTestBeatmapSet(set_count + 2);
-            testSingle.Beatmaps.ForEach(b =>
+            BeatmapSetInfo testSingle = null;
+            AddStep("add single ruleset beatmapset", () =>
             {
-                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
-                b.RulesetID = b.Ruleset.ID ?? 1;
+                testSingle = createTestBeatmapSet(set_count + 2);
+                testSingle.Beatmaps.ForEach(b =>
+                {
+                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
+                    b.RulesetID = b.Ruleset.ID ?? 1;
+                });
+
+                carousel.UpdateBeatmapSet(testSingle);
             });
-            AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
             checkNoSelection();
             AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
