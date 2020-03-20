@@ -333,8 +333,7 @@ namespace osu.Game.Screens.Select
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered.Value).ToList();
-            select(visibleBeatmaps[RNG.Next(visibleBeatmaps.Count)]);
+            select(set);
             return true;
         }
 
@@ -756,7 +755,7 @@ namespace osu.Game.Screens.Select
 
             protected override void PerformSelection()
             {
-                if (LastSelected == null)
+                if (LastSelected == null || LastSelected.Filtered.Value)
                     carousel.SelectNextRandom();
                 else
                     base.PerformSelection();
