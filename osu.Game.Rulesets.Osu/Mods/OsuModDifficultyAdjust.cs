@@ -35,10 +35,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             get
             {
-                string circleSize = CircleSize.IsDefault ? "" : $"CS {CircleSize.Value.ToString()}";
-                string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value.ToString()}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value.ToString()}";
-                string approachRate = ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value.ToString()}";
+                string circleSize = CircleSize.IsDefault ? "" : $"CS {CircleSize.Value}";
+                string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value}";
+                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value}";
+                string approachRate = ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value}";
 
                 string[] settings = new string[] { circleSize, drainRate, overallDifficulty, approachRate };
                 // filter out empty strings so we don't have orphaned commas
