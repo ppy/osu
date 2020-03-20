@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
     {
         public ScrollToTopButton Button { get; }
 
-        private bool animationIsRunning;
+        private float currentTarget;
 
         public OverlayScrollContainer()
         {
@@ -32,11 +32,8 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding(20),
                 Action = () =>
                 {
-                    if (animationIsRunning)
-                        return;
-
-                    animationIsRunning = true;
                     ScrollToStart();
+                    currentTarget = Target;
                     Button.State.Value = Visibility.Hidden;
                 }
             });
@@ -46,30 +43,11 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            if (animationIsRunning)
+            if (Target == currentTarget)
                 return;
 
+            currentTarget = Target;
             Button.State.Value = Current > 200 ? Visibility.Visible : Visibility.Hidden;
-        }
-
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            animationIsRunning = false;
-            return base.OnScroll(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            animationIsRunning = false;
-            return base.OnDragStart(e);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (animationIsRunning)
-                return false;
-
-            return base.OnMouseDown(e);
         }
 
         public class ScrollToTopButton : VisibilityContainer
@@ -82,6 +60,8 @@ namespace osu.Game.Overlays
                 set => button.Action = value;
             }
 
+            public override bool PropagatePositionalInputSubTree => true;
+
             protected override bool StartHidden => true;
 
             private readonly Button button;
@@ -92,12 +72,16 @@ namespace osu.Game.Overlays
                 Child = button = new Button();
             }
 
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+
             protected override void PopIn() => button.FadeIn(fade_duration, Easing.OutQuint);
 
             protected override void PopOut() => button.FadeOut(fade_duration, Easing.OutQuint);
 
             private class Button : OsuHoverContainer
             {
+                public override bool PropagatePositionalInputSubTree => Alpha == 1;
+
                 protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
                 private Color4 flashColour;
@@ -165,8 +149,6 @@ namespace osu.Game.Overlays
                     content.ScaleTo(1, 1000, Easing.OutElastic);
                     base.OnMouseUp(e);
                 }
-
-                protected override bool OnDragStart(DragStartEvent e) => true;
             }
         }
     }
