@@ -13,7 +13,8 @@
     <AssemblyName>osu.Android</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
-    <EnableLLVM>false</EnableLLVM> <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
+    <EnableLLVM>false</EnableLLVM>
+    <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
@@ -43,6 +44,10 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Tau\osu.Game.Rulesets.Tau.csproj">
+      <Project>{be14421e-703f-44f9-91cf-9d7c542177c7}</Project>
+      <Name>osu.Game.Rulesets.Tau</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>

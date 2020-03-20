@@ -115,11 +115,13 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.AddParagraph("大部分功能会保持其原有的实现方式。");
             textFlow.AddParagraph("如果你觉得下面的某个功能很赞，您可以前往该项目页面点个Star以支持原作者, 或者帮助其完善和发展。");
             textFlow.NewParagraph();
-            textFlow.AddLink("osu!下的Mirror Mod → pr7334","https://github.com/ppy/osu/pull/7334");
+            textFlow.AddLink("osu!下的Mirror Mod → pr7334[Open]","https://github.com/ppy/osu/pull/7334");
             textFlow.NewParagraph();
             textFlow.AddLink("osu!tau模式 → Altenhh/tau","https://github.com/Altenhh/tau");
             textFlow.NewParagraph();
             textFlow.AddLink("谱面在线列表 → pr7912[Merged]","https://github.com/ppy/osu/pull/7912");
+            textFlow.NewParagraph();
+            textFlow.AddLink("看板 → pr8051[Open]","https://github.com/ppy/osu/pull/8051");
             textFlow.AddParagraph("tau模式无法使用任何在线功能");
         }
     }
