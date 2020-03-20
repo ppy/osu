@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     sdstrainmult = calculateStandardDeviation(JumpDistances2) / stdevconst;
                     if (sdstrainmult >= 1)
                     {
-                        sdstrainmult = (-1) * (Log(sdstrainmult, 0.04));
+                        sdstrainmult = (-1) * (Log(sdstrainmult, 0.01));
                     }
                 }
             }
