@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -76,8 +77,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public JudgementResult Result { get; private set; }
 
         private BindableList<HitSampleInfo> samplesBindable;
+        private Bindable<ComboIndex> comboIndexBindable;
         private Bindable<double> startTimeBindable;
-        private Bindable<int> comboIndexBindable;
+
+        private Bindable<bool> beatmapSkins;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -95,13 +98,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             var judgement = HitObject.CreateJudgement();
 
             Result = CreateResult(judgement);
             if (Result == null)
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+
+            beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins).GetBoundCopy();
+            beatmapSkins.BindValueChanged(_ => updateComboColour());
 
             loadSamples();
         }
@@ -328,7 +334,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!(HitObject is IHasComboInformation combo))
                 throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
 
-            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            // Use manual combo indices (that account for combo skipping) for the beatmap skin only.
+            // To avoid assigning combo colour of incorrect sets (of current skin) to this object.
+            int comboIndex = beatmapSkins.Value ? combo.ComboIndex.Manual : combo.ComboIndex.Automated;
+
+            return comboColours?.Count > 0 ? comboColours[comboIndex % comboColours.Count] : Color4.White;
         }
 
         /// <summary>
