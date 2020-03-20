@@ -60,25 +60,28 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 List<string> attributes = new List<string>();
+
                 foreach ((SettingSourceAttribute attr, System.Reflection.PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
                     // use TooltipText from SettingSource if available, but fall back to Label, which has to be provided
                     string tooltipText = attr.TooltipText ?? attr.Label + " {0}";
                     object bindableObj = property.GetValue(this);
+
                     if (bindableObj is BindableInt bindableInt && !bindableInt.IsDefault)
                     {
                         attributes.Add(string.Format(tooltipText, bindableInt.Value));
                         continue;
                     }
+
                     if (bindableObj is BindableFloat bindableFloat && !bindableFloat.IsDefault)
                     {
                         attributes.Add(string.Format(tooltipText, bindableFloat.Value));
                         continue;
                     }
+
                     if (bindableObj is BindableDouble bindableDouble && !bindableDouble.IsDefault)
                     {
                         attributes.Add(string.Format(tooltipText, bindableDouble.Value));
-                        continue;
                     }
                 }
                 return $"{Name}{(attributes.Any() ? $" ({string.Join(", ", attributes)})" : "")}";

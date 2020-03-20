@@ -45,11 +45,11 @@ namespace osu.Game.Configuration
             TooltipText = tooltipText;
         }
 
-        public SettingSourceAttribute(string label, string description, string tooltipText) : this(label, description)
+        public SettingSourceAttribute(string label, string description, string tooltipText)
+            : this(label, description)
         {
             TooltipText = tooltipText;
         }
-
     }
 
     public static class SettingSourceExtensions
