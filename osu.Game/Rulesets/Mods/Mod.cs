@@ -84,6 +84,7 @@ namespace osu.Game.Rulesets.Mods
                         attributes.Add(string.Format(tooltipText, bindableDouble.Value));
                     }
                 }
+
                 return $"{Name}{(attributes.Any() ? $" ({string.Join(", ", attributes)})" : "")}";
             }
         }
