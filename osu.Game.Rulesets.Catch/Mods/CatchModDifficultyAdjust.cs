@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("Circle Size", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1)]
+        [SettingSource("Circle Size", "Override a beatmap's set CS.", "CS {0}", FIRST_SETTING_ORDER - 1)]
         public BindableNumber<float> CircleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             Value = 5,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
+        [SettingSource("Approach Rate", "Override a beatmap's set AR.", "AR {0}", LAST_SETTING_ORDER + 1)]
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -29,11 +29,6 @@ namespace osu.Game.Rulesets.Catch.Mods
             Default = 5,
             Value = 5,
         };
-
-        public override string IconTooltip => ($"{Name} ({(CircleSize.IsDefault ? "" : $"CS {CircleSize.Value}, ")}" +
-                                       $"{(DrainRate.IsDefault ? "" : $"HP {DrainRate.Value}, ")}" +
-                                       $"{(OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value}, ")}" +
-                                       $"{(ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value}")}").TrimEnd(new char[] { ',', ' ' }) + ")";
 
         protected override void TransferSettings(BeatmapDifficulty difficulty)
         {

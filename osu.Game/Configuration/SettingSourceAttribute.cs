@@ -30,17 +30,26 @@ namespace osu.Game.Configuration
 
         public int? OrderPosition { get; }
 
+        public string TooltipText { get; }
+
         public SettingSourceAttribute(string label, string description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
         }
 
-        public SettingSourceAttribute(string label, string description, int orderPosition)
+        public SettingSourceAttribute(string label, string description, string tooltipText, int orderPosition)
             : this(label, description)
         {
             OrderPosition = orderPosition;
+            TooltipText = tooltipText;
         }
+
+        public SettingSourceAttribute(string label, string description, string tooltipText) : this(label, description)
+        {
+            TooltipText = tooltipText;
+        }
+
     }
 
     public static class SettingSourceExtensions

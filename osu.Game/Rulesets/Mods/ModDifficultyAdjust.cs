@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected const int LAST_SETTING_ORDER = 2;
 
-        [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER)]
+        [SettingSource("HP Drain", "Override a beatmap's set HP.", "HP {0}", FIRST_SETTING_ORDER)]
         public BindableNumber<float> DrainRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
+        [SettingSource("Accuracy", "Override a beatmap's set OD.", "OD {0}", LAST_SETTING_ORDER)]
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -51,9 +51,6 @@ namespace osu.Game.Rulesets.Mods
             Default = 5,
             Value = 5,
         };
-
-        public override string IconTooltip => $"{Name} ({(DrainRate.IsDefault ? $"HP {DrainRate.Value.ToString()}, " : "")}" +
-                                              $"{(OverallDifficulty.IsDefault ? $"OD {OverallDifficulty.Value.ToString()}, " : "")})";
 
         private BeatmapDifficulty difficulty;
 
