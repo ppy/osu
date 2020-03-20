@@ -751,13 +751,17 @@ namespace osu.Game.Screens.Select
 
             public CarouselRoot(BeatmapCarousel carousel)
             {
+                // root should always remaing selected. if not, PerformSelection will not be called.
+                State.Value = CarouselItemState.Selected;
+                State.ValueChanged += state => State.Value = CarouselItemState.Selected;
+
                 this.carousel = carousel;
             }
 
             protected override void PerformSelection()
             {
                 if (LastSelected == null)
-                    carousel.SelectNextRandom();
+                    carousel?.SelectNextRandom();
                 else
                     base.PerformSelection();
             }
