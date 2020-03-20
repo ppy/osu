@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
                         new OsuSpriteText
                         {
                             Text = InfoText,
-                            Font = OsuFont.GetFont(size: 10),
+                            Font = OsuFont.GetFont(size: 15),
                             Colour = colourProvider.Foreground1
                         },
                     }
