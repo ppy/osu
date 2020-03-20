@@ -24,19 +24,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
-        private const double streamaimconst = 2.42;
+       // private const double streamaimconst = 2.42;
 
-        private const double stdevconst = 0.149820;
+       // private const double stdevconst = 0.149820;
         // public static double[] JumpDistanceArray;
 
-        private int sdsplitcounter = 0;
+       // private int sdsplitcounter = 0;
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
-        public readonly List<double> JumpDistances = new List<double>();
-        public readonly List<double> StrainTimes = new List<double>();
-        public List<double> JumpDistances2 = new List<double>();
+       // public readonly List<double> JumpDistances = new List<double>();
+       // public readonly List<double> StrainTimes = new List<double>();
+       // public List<double> JumpDistances2 = new List<double>();
 
         // Standard Deviation Calculation Code courtesy of Roman http://csharphelper.com/blog/2015/12/make-an-extension-method-that-calculates-standard-deviation-in-c/
         // public static double GetStandardDeviation(List values)
@@ -52,24 +52,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // double sumOfSquaresOfDifferences = JumpDistanceArray.Select(val => (val - average) * (val - average)).Sum();
         // double finalsd = Math.Sqrt(sumOfSquaresOfDifferences / JumpDistanceArray.Length);
         // double finalsdpp = finalsd/stdevconst when missCount = 0;
-        private double CalculateStandardDeviation(IEnumerable<double> values)
-          {   
-                double standardDeviation = 0;
-
-                if (values.Any()) 
-                   {      
-                       // Compute the average.     
-                       double avg = values.Average();
-
-                       // Perform the Sum of (value-avg)_2_2.      
-                       double sum = values.Sum(d => Math.Pow(d - avg, 2));
-
-                       // Put it all together.      
-                       standardDeviation = Math.Sqrt((sum) / (values.Count()));   
-                   }  
-
-                return standardDeviation;
-          }
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -78,43 +60,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             double result = 0;
-
-            // Console.WriteLine(osuCurrent.JumpDistance);
-            // Console.ReadKey();
-            // Console.WriteLine(osuCurrent.StrainTime);
-            // Console.ReadKey();
-            
-            double sectionvelocity = osuCurrent.JumpDistance / osuCurrent.StrainTime;
-
-            if (osuCurrent.JumpDistance < 150 && sectionvelocity < streamaimconst && Previous.Count > 0 && osuCurrent.Angle != null &&  osuCurrent.Angle.Value >= Math.PI/2 && osuCurrent.StrainTime < 100)
-            {
-                    // Attempts to ban mapID 2058788 but failed, JUSTadICE too strong.
-                    // var mc = new BeatmapInfo();
-                    // mc.OnlineBeatmapID != 2058788 && 
-                    JumpDistances2.Add(osuCurrent.JumpDistance);
-                    // Console.X are all for debugging purposes
-                    // Console.WriteLine(osuCurrent.JumpDistance);
-                    // Console.ReadKey();
-                    StrainTimes.Add(osuCurrent.StrainTime);
-                    // Console.WriteLine(osuCurrent.StrainTime);
-                    // Console.ReadKey();
-                    sdsplitcounter++;
-            } 
-            else 
-            {
-
-            if (sdsplitcounter > 0)
-              {
-              // JumpDistances2.ForEach(Console.WriteLine);
-              // Console.ReadKey();
-              JumpDistances.Add(CalculateStandardDeviation(JumpDistances2));
-              JumpDistances2.Clear();
-              JumpDistances2.TrimExcess();
-              sdsplitcounter = 0;
-              }
-
-            }
-
 
             if (Previous.Count > 0)
             {
