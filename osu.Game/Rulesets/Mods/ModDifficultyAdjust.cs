@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using osu.Game.Configuration;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -52,8 +53,19 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        public override string IconTooltip => $"{Name} ({(DrainRate.IsDefault ? $"HP {DrainRate.Value.ToString()}, " : "")}" +
-                                              $"{(OverallDifficulty.IsDefault ? $"OD {OverallDifficulty.Value.ToString()}, " : "")})";
+        public override string SettingDescription
+        {
+            get
+            {
+                string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value.ToString()}";
+                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value.ToString()}";
+
+                string[] settings = new string[] { drainRate, overallDifficulty };
+                // filter out empty strings so we don't have orphaned commas
+                settings = Array.FindAll(settings, s => !string.IsNullOrEmpty(s));
+                return string.Join(", ", settings);
+            }
+        }
 
         private BeatmapDifficulty difficulty;
 

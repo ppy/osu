@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -30,10 +31,21 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = 5,
         };
 
-        public override string IconTooltip => ($"{Name} ({(CircleSize.IsDefault ? "" : $"CS {CircleSize.Value}, ")}" +
-                                       $"{(DrainRate.IsDefault ? "" : $"HP {DrainRate.Value}, ")}" +
-                                       $"{(OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value}, ")}" +
-                                       $"{(ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value}")}").TrimEnd(new char[] { ',', ' ' }) + ")";
+        public override string SettingDescription
+        {
+            get
+            {
+                string circleSize = CircleSize.IsDefault ? "" : $"CS {CircleSize.Value.ToString()}";
+                string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value.ToString()}";
+                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value.ToString()}";
+                string approachRate = ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value.ToString()}";
+
+                string[] settings = new string[] { circleSize, drainRate, overallDifficulty, approachRate };
+                // filter out empty strings so we don't have orphaned commas
+                settings = Array.FindAll(settings, s => !string.IsNullOrEmpty(s));
+                return string.Join(", ", settings);
+            }
+        }
 
         protected override void TransferSettings(BeatmapDifficulty difficulty)
         {

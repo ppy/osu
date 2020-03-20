@@ -51,7 +51,23 @@ namespace osu.Game.Rulesets.Mods
         /// are displayed in the tooltip.
         /// </remarks>
         [JsonIgnore]
-        public virtual string IconTooltip => Name;
+        public string IconTooltip
+        {
+            get
+            {
+                string settingDescription = string.IsNullOrEmpty(SettingDescription) ? "" : $" ({SettingDescription})";
+                return $"{Name}{settingDescription}";
+            }
+        }
+
+        /// <summary>
+        /// The description of editable settings of a mod to use in the <see cref="IconTooltip"/>.
+        /// </summary>
+        /// <remarks>
+        /// Parentheses are added to the tooltip, surrounding the value of this property. If this property is <c>string.Empty</c>,
+        /// the tooltip will not have parentheses.
+        /// </remarks>
+        public virtual string SettingDescription => string.Empty;
 
         /// <summary>
         /// The score multiplier of this mod.

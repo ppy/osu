@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
-        public override string IconTooltip => $"{Name}{(Retries.IsDefault ? "" : $" ({Retries.Value} lives)")}";
+        public override string SettingDescription => Retries.IsDefault ? "" : $" ({Retries.Value} lives)";
 
         private int retries;
 
