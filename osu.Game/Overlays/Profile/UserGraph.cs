@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -79,11 +80,11 @@ namespace osu.Game.Overlays.Profile
         /// <summary>
         /// Set of values which will be used to create a graph.
         /// </summary>
+        [CanBeNull]
         protected KeyValuePair<TKey, TValue>[] Data
         {
             set
             {
-                value ??= Array.Empty<KeyValuePair<TKey, TValue>>();
                 data = value;
                 redrawGraph();
             }

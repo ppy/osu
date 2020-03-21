@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class UserHistoryGraph : UserGraph<DateTime, long>
     {
+        [CanBeNull]
         public UserHistoryCount[] Values
         {
             set => Data = value?.Select(v => new KeyValuePair<DateTime, long>(v.Date, v.Count)).ToArray();
