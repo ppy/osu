@@ -356,6 +356,13 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
+            if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
+            {
+                // proceed to result screen if beatmap already finished playing
+                completionProgressDelegate.RunTask();
+                return;
+            }
+
             if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
             {
                 failAnimation.FinishTransforms(true);
@@ -582,13 +589,6 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
-            {
-                // proceed to result screen if beatmap already finished playing
-                completionProgressDelegate.RunTask();
-                return true;
-            }
-
             // ValidForResume is false when restarting
             if (ValidForResume)
             {
