@@ -253,25 +253,43 @@ namespace osu.Game.Overlays
 
         private Action pendingBeatmapSwitch;
 
+        private void setMetadata(WorkingBeatmap beatmap)
+        {
+            if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
+            {
+                title.Text = @"Nothing to play";
+                artist.Text = @"Nothing to play";
+            }
+            else
+            {
+                BeatmapMetadata metadata = beatmap.Metadata;
+                title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
+                artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
+            }
+        }
+
         private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
         {
+            if (State.Value == Visibility.Hidden)
+            {
+                setMetadata(beatmap);
+                LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
+                {
+                    background.Expire();
+                    background = newBackground;
+
+                    playerContainer.Add(newBackground);
+                });
+                return;
+            }
+
             // avoid using scheduler as our scheduler may not be run for a long time, holding references to beatmaps.
             pendingBeatmapSwitch = delegate
             {
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
                 {
-                    if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
-                    {
-                        title.Text = @"Nothing to play";
-                        artist.Text = @"Nothing to play";
-                    }
-                    else
-                    {
-                        BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
-                        artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
-                    }
+                    setMetadata(beatmap);
                 });
 
                 LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
