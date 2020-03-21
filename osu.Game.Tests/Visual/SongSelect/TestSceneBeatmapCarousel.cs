@@ -480,57 +480,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestRandomFallbackOnNonMatchingPrevious()
-        {
-            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
-
-            AddStep("populate maps", () =>
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    var set = createTestBeatmapSet(i);
-
-                    foreach (var b in set.Beatmaps)
-                    {
-                        // all taiko except for first
-                        int ruleset = i > 0 ? 1 : 0;
-
-                        b.Ruleset = rulesets.GetRuleset(ruleset);
-                        b.RulesetID = ruleset;
-                    }
-
-                    manySets.Add(set);
-                }
-            });
-
-            loadBeatmaps(manySets);
-
-            for (int i = 0; i < 10; i++)
-            {
-                AddStep("Reset filter", () => carousel.Filter(new FilterCriteria(), false));
-
-                AddStep("select first beatmap", () => carousel.SelectBeatmap(manySets.First().Beatmaps.First()));
-
-                AddStep("Toggle non-matching filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { SearchText = Guid.NewGuid().ToString() }, false);
-                });
-
-                AddAssert("selection lost", () => carousel.SelectedBeatmap == null);
-
-                AddStep("Restore different ruleset filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-                });
-
-                AddAssert("selection changed", () => carousel.SelectedBeatmap != manySets.First().Beatmaps.First());
-            }
-
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 2);
-        }
-
-        [Test]
         public void TestCarouselSelectsNextWhenPreviousIsFiltered()
         {
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
