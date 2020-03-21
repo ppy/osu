@@ -479,51 +479,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection was remembered", () => eagerSelectedIDs.Count == 1);
         }
 
-        [Test]
-        public void TestCarouselSelectsNextWhenPreviousIsFiltered()
+        [TestCase(10, 1)]
+        [TestCase(10, 10)]
+        public void TestCarouselSelectsNextWhenPreviousIsFiltered(int makeThisManyGroups, int haveThisManySetsInGroup)
         {
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
-            const int make_this_many_sets = 10;
 
-            for (int i = 1; i <= make_this_many_sets; i++)
+            for (int i = 0; i < makeThisManyGroups; i++)
             {
-                var testBeatmap = createTestBeatmapSet(i);
-                var rulesetID = i % 3;
-                testBeatmap.Beatmaps.ForEach(b =>
+                for (int j = 0; j < haveThisManySetsInGroup; j++)
                 {
-                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
-                    b.RulesetID = rulesetID;
-                });
-                sets.Add(testBeatmap);
-            }
-
-            loadBeatmaps(sets);
-            advanceSelection(true);
-
-            for (int i = 2; i <= make_this_many_sets; i++)
-            {
-                var rulesetID = i % 3;
-                AddStep($"Toggle filter to ruleset {rulesetID}", () =>
-                {
-                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID) }, false);
-                    carousel.Filter(new FilterCriteria(), false);
-                });
-                waitForSelection(i);
-            }
-        }
-
-        [Test]
-        public void TestCarouselSelectsNextThatIsFarAwayWhenPreviousIsFiltered()
-        {
-            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
-            const int make_this_many_groups = 10;
-            const int have_this_many_sets_in_group = 10;
-
-            for (int i = 0; i < make_this_many_groups; i++)
-            {
-                for (int j = 0; j < have_this_many_sets_in_group; j++)
-                {
-                    var testBeatmap = createTestBeatmapSet(i * have_this_many_sets_in_group + j + 1);
+                    var testBeatmap = createTestBeatmapSet(i * haveThisManySetsInGroup + j + 1);
                     var rulesetID = i % 3;
                     testBeatmap.Beatmaps.ForEach(b =>
                     {
@@ -537,7 +503,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
             advanceSelection(true);
 
-            for (int i = 1; i < make_this_many_groups; i++)
+            for (int i = 1; i < makeThisManyGroups; i++)
             {
                 var rulesetID = i % 3;
                 AddStep($"Toggle filter to ruleset {rulesetID}", () =>
@@ -545,7 +511,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID) }, false);
                     carousel.Filter(new FilterCriteria(), false);
                 });
-                waitForSelection(i * have_this_many_sets_in_group + 1);
+                waitForSelection(i * haveThisManySetsInGroup + 1);
             }
         }
 
