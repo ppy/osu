@@ -106,7 +106,6 @@ namespace osu.Game.Overlays.Profile
         /// Function used to convert <see cref="Data"/> point to it's Y-axis position on the graph.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        /// <returns></returns>
         protected abstract float GetDataPointHeight(TValue value);
 
         protected virtual void ShowGraph() => graph.FadeIn(FADE_DURATION, Easing.Out);
