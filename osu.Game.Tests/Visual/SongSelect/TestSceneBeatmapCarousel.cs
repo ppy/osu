@@ -513,6 +513,74 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCarouselSelectsNextThatIsFarAwayWhenPreviousIsFiltered()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+            const int make_this_many_groups = 10;
+            const int have_this_many_sets_in_group = 10;
+
+            for (int i = 0; i < make_this_many_groups; i++)
+            {
+                for (int j = 0; j < have_this_many_sets_in_group; j++)
+                {
+                    var testBeatmap = createTestBeatmapSet(i * have_this_many_sets_in_group + j + 1);
+                    var rulesetID = i % 3;
+                    testBeatmap.Beatmaps.ForEach(b =>
+                    {
+                        b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
+                        b.RulesetID = rulesetID;
+                    });
+                    sets.Add(testBeatmap);
+                }
+            }
+
+            loadBeatmaps(sets);
+            advanceSelection(true);
+
+            for (int i = 1; i < make_this_many_groups; i++)
+            {
+                var rulesetID = i % 3;
+                AddStep($"Toggle filter to ruleset {rulesetID}", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID) }, false);
+                    carousel.Filter(new FilterCriteria(), false);
+                });
+                waitForSelection(i * have_this_many_sets_in_group + 1);
+            }
+        }
+
+        [Test]
+        public void TestCarouselSelectsBackwardsWhenPreviousIsFilteredNearTheEnd()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            for (int i = 1; i <= 40; i++)
+            {
+                var testBeatmap = createTestBeatmapSet(i);
+                var rulesetID = (i - 1) / 10;
+                testBeatmap.Beatmaps.ForEach(b =>
+                {
+                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
+                    b.RulesetID = rulesetID;
+                });
+                sets.Add(testBeatmap);
+            }
+
+            loadBeatmaps(sets);
+
+            for (int i = 1; i < 4; i++)
+            {
+                setSelected(i * 10 + 1, 1);
+                AddStep("Toggle filter to ruleset 0", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false);
+                    carousel.Filter(new FilterCriteria(), false);
+                });
+                waitForSelection(10);
+            }
+        }
+
+        [Test]
         public void TestFilteringByUserStarDifficulty()
         {
             BeatmapSetInfo set = null;
