@@ -64,20 +64,30 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert(@"Check action is not restart", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
         }
 
-        [Test]
-        public void TestBackgroundNotScrolling()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestBackgroundNotScrolling(bool goNext)
         {
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
             AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
-            AddStep("next track", () => musicController.NextTrack());
+            if (goNext)
+                AddStep("next track", () => musicController.NextTrack());
+            else
+                AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
             AddStep(@"show", () => nowPlayingOverlay.Show());
             AddAssert("Background isn't scrolling", () => !nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First().Transforms.Any());
         }
 
-        [Test]
-        public void TestBackgroundScrolling()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestBackgroundScrolling(bool goNext)
         {
-            AddStep("next track", () => musicController.NextTrack());
+            AddStep(@"show", () => nowPlayingOverlay.Show());
+            AddUntilStep("Is Visible", () => nowPlayingOverlay.Alpha > 0);
+            if (goNext)
+                AddStep("next track", () => musicController.NextTrack());
+            else
+                AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
             AddAssert("Background is scrolling", () => nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First().Transforms.Any());
         }
     }
