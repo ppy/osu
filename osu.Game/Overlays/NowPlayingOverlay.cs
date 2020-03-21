@@ -270,7 +270,7 @@ namespace osu.Game.Overlays
 
         private void trackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction = TrackChangeDirection.None)
         {
-            if (State.Value == Visibility.Hidden)
+            if (Alpha == 0)
             {
                 setMetadata(beatmap);
                 LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
