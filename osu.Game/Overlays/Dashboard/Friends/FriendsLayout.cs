@@ -171,9 +171,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
             if (itemsPlaceholder.Any())
                 loading.Show();
 
-            var groupedUsers = onlineStatusControl.Current.Value?.Users ?? new List<User>();
+            var usersInCurrentGroup = onlineStatusControl.Current.Value?.Users ?? new List<User>();
 
-            var sortedUsers = sortUsers(groupedUsers);
+            var sortedUsers = sortUsers(usersInCurrentGroup);
 
             LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
         }
