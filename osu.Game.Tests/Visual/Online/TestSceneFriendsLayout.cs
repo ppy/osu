@@ -10,7 +10,6 @@ using osu.Game.Users;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using NUnit.Framework;
-using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -27,9 +26,6 @@ namespace osu.Game.Tests.Visual.Online
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         private FriendsLayout layout;
 
@@ -52,6 +48,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOnline()
         {
+            AddStep("Fetch online", () => layout?.Fetch());
         }
 
         private List<User> getUsers() => new List<User>
