@@ -120,6 +120,7 @@ namespace osu.Desktop
             private const string default_songs_path = "Songs";
 
             private readonly string songsPath;
+            private bool usesCustomSongPath;
             private readonly DesktopGameHost host;
 
             public StableStorage(DesktopGameHost host)
@@ -173,7 +174,17 @@ namespace osu.Desktop
                     var line = textReader.ReadLine();
 
                     if (line?.StartsWith("BeatmapDirectory") == true)
-                        return line.Split('=')[1].TrimStart();
+                    {
+                        var directory = line.Split('=')[1].TrimStart();
+
+                        if (!directory.Equals(default_songs_path, StringComparison.Ordinal))
+                        {
+                            usesCustomSongPath = true;
+                            return Path.GetFullPath(directory);
+                        }
+
+                        break;
+                    }
                 }
 
                 return default_songs_path;
@@ -181,10 +192,18 @@ namespace osu.Desktop
 
             public override Storage GetStorageForDirectory(string directory)
             {
-                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && !songsPath.Equals(default_songs_path, StringComparison.Ordinal))
+                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && usesCustomSongPath)
                     return new StableSongsStorage(Path.GetFullPath(songsPath), host);
 
                 return base.GetStorageForDirectory(directory);
+            }
+
+            public override bool ExistsDirectory(string directory)
+            {
+                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && usesCustomSongPath)
+                    return Directory.Exists(songsPath);
+
+                return base.ExistsDirectory(directory);
             }
 
             private class StableSongsStorage : WindowsStorage
