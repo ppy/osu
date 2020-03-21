@@ -5,9 +5,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
+using osu.Framework.Graphics.Containers;
+using System.Linq;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -62,20 +65,20 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestBackground()
+        public void TestBackgroundNotScrolling()
         {
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
             AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
             AddStep("next track", () => musicController.NextTrack());
             AddStep(@"show", () => nowPlayingOverlay.Show());
+            AddAssert("Background isn't scrolling", () => !nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First().Transforms.Any());
         }
 
         [Test]
-        public void TestBackgroundNoWait()
+        public void TestBackgroundScrolling()
         {
-            AddStep(@"hide", () => nowPlayingOverlay.Hide());
             AddStep("next track", () => musicController.NextTrack());
-            AddStep(@"show", () => nowPlayingOverlay.Show());
+            AddAssert("Background is scrolling", () => nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First().Transforms.Any());
         }
     }
 }
