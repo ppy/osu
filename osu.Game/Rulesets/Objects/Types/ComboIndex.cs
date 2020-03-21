@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Objects.Types
     public readonly struct ComboIndex : IEquatable<ComboIndex>
     {
         /// <summary>
-        /// The automated index value of the combo in relation to the beatmap.
+        /// The automated index value of the combo in relation to the beatmap. Ignores <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
         /// <remarks>
         /// This is separated from <see cref="Manual"/> to disallow
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Objects.Types
         public readonly int Automated;
 
         /// <summary>
-        /// The manual index value of the combo, this accounts for <see cref="IHasCombo.ComboOffset"/>.
+        /// The manual index value of the combo. Accounts for <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
         public readonly int Manual;
 
