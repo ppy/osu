@@ -759,7 +759,7 @@ namespace osu.Game.Screens.Select
 
             protected override void PerformSelection()
             {
-                if (LastSelected == null || LastSelected.Filtered.Value)
+                if (LastSelected == null )
                     carousel?.SelectNextRandom();
                 else
                     base.PerformSelection();
