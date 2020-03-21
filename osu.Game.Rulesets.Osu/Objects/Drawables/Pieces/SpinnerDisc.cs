@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
+            Rotation = (float)Interpolation.Lerp(Rotation, currentRotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
         }
     }
 }
