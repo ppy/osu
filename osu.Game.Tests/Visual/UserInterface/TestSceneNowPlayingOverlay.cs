@@ -60,5 +60,22 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert(@"Check track didn't change", () => currentBeatmap == Beatmap.Value);
             AddAssert(@"Check action is not restart", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
         }
+
+        [Test]
+        public void TestBackground()
+        {
+            AddStep(@"hide", () => nowPlayingOverlay.Hide());
+            AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
+            AddStep("next track", () => musicController.NextTrack());
+            AddStep(@"show", () => nowPlayingOverlay.Show());
+        }
+
+        [Test]
+        public void TestBackgroundNoWait()
+        {
+            AddStep(@"hide", () => nowPlayingOverlay.Hide());
+            AddStep("next track", () => musicController.NextTrack());
+            AddStep(@"show", () => nowPlayingOverlay.Show());
+        }
     }
 }
