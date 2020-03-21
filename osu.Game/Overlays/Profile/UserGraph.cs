@@ -92,15 +92,15 @@ namespace osu.Game.Overlays.Profile
 
         private void redrawGraph()
         {
-            if (!(data?.Length > 1))
+            if (data?.Length > 1)
             {
-                HideGraph();
+                graph.DefaultValueCount = data.Length;
+                graph.Values = data.Select(pair => GetDataPointHeight(pair.Value)).ToArray();
+                ShowGraph();
                 return;
             }
 
-            graph.DefaultValueCount = data.Length;
-            graph.Values = data.Select(pair => GetDataPointHeight(pair.Value)).ToArray();
-            ShowGraph();
+            HideGraph();
         }
 
         /// <summary>
@@ -120,11 +120,13 @@ namespace osu.Game.Overlays.Profile
         {
             get
             {
-                if (!(data?.Length > 1))
-                    return null;
+                if (data?.Length > 1)
+                {
+                    var (key, value) = data[dataIndex];
+                    return GetTooltipContent(key, value);
+                }
 
-                var (key, value) = data[dataIndex];
-                return GetTooltipContent(key, value);
+                return null;
             }
         }
 
