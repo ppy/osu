@@ -25,8 +25,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             get => users;
             set
             {
-                request?.Cancel();
-
                 users = value;
 
                 onlineStatusControl.Populate(value);
@@ -152,7 +150,10 @@ namespace osu.Game.Overlays.Dashboard.Friends
             onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
+        }
 
+        public void Fetch()
+        {
             if (!api.IsLoggedIn)
                 return;
 
