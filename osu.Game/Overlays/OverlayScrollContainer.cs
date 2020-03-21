@@ -43,6 +43,12 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
+            if (ScrollContent.DrawHeight < DrawHeight)
+            {
+                Button.State.Value = Visibility.Hidden;
+                return;
+            }
+
             if (Target == currentTarget)
                 return;
 
