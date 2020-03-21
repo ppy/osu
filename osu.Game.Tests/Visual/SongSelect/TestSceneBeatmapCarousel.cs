@@ -438,6 +438,39 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCarouselSelectsNextWhenPreviousIsFiltered()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+            const int make_this_many_sets = 10;
+
+            for (int i = 1; i <= make_this_many_sets; i++)
+            {
+                var testBeatmap = createTestBeatmapSet(i);
+                var rulesetID = i % 3;
+                testBeatmap.Beatmaps.ForEach(b =>
+                {
+                    b.Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID);
+                    b.RulesetID = rulesetID;
+                });
+                sets.Add(testBeatmap);
+            }
+
+            loadBeatmaps(sets);
+            advanceSelection(true);
+
+            for (int i = 2; i <= make_this_many_sets; i++)
+            {
+                var rulesetID = i % 3;
+                AddStep($"Toggle filter to ruleset {rulesetID}", () =>
+                {
+                    carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(rulesetID) }, false);
+                    carousel.Filter(new FilterCriteria(), false);
+                });
+                waitForSelection(i);
+            }
+        }
+
+        [Test]
         public void TestFilteringByUserStarDifficulty()
         {
             BeatmapSetInfo set = null;
