@@ -21,7 +21,7 @@
   </ItemGroup>
   <PropertyGroup Label="Project">
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>osu.Game.Rulesets.Tau.Tests</RootNamespace>
   </PropertyGroup>
 </Project>

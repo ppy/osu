@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
         public readonly BreakSettingsOverlay BreakSettingsOverlay;
         protected virtual BreakSettingsOverlay CreateBreakSettingsOverlay() => new BreakSettingsOverlay();
 
-        public BreakOverlay(bool letterboxing, DrawableRuleset drawableRuleset, double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, DrawableRuleset drawableRuleset = null, double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
         {
             this.drawableRuleset = drawableRuleset;
             this.gameplayStartTime = gameplayStartTime;
