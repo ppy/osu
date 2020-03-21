@@ -121,7 +121,7 @@ namespace osu.Game.Overlays
                         }
                     });
 
-                    TooltipText = @"Scroll to top";
+                    TooltipText = "Scroll to top";
                 }
 
                 [BackgroundDependencyLoader]
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays
                 protected override bool OnMouseDown(MouseDownEvent e)
                 {
                     content.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                    return base.OnMouseDown(e);
+                    return true;
                 }
 
                 protected override void OnMouseUp(MouseUpEvent e)
