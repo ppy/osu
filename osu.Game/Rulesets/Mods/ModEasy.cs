@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
-        public override string SettingDescription => Retries.IsDefault ? "" : $"{"lives".ToQuantity(Retries.Value)}";
+        public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{"lives".ToQuantity(Retries.Value)}";
 
         private int retries;
 
