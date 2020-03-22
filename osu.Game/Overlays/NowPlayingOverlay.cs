@@ -198,15 +198,6 @@ namespace osu.Game.Overlays
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
-
-            State.BindValueChanged(s =>
-            {
-                if (pendingBeatmapSwitch != null)
-                {
-                    pendingBeatmapSwitch();
-                    pendingBeatmapSwitch = null;
-                }
-            });
         }
 
         protected override void PopIn()
