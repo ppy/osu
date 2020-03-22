@@ -11,6 +11,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Framework.Graphics.Containers;
 using System.Linq;
+using System;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -70,13 +71,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
 
-            BufferedContainer currentBackground;
+            BufferedContainer currentBackground = null;
+            float currentX = 0;
             void step()
             {
                 AddStep(@"hide", () => nowPlayingOverlay.Hide());
                 AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
 
-                currentBackground = getFirstBackground();
+                AddStep("Assign current background", () => currentBackground = getFirstBackground());
                 if (goNext)
                     AddStep("next track", () => musicController.NextTrack());
                 else
@@ -86,13 +88,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             step();
-            AddAssert("Background changed", () => getFirstBackground() != currentBackground);
+            AddUntilStep("Background changed", () => getFirstBackground() != currentBackground);
             step();
-            AddAssert("Previous background not present", () => !currentBackground.IsPresent);
+            AddAssert("Background count is 1", () => nowPlayingOverlay.ChildrenOfType<BufferedContainer>().Count() == 1);
             step();
             AddAssert("New background is present", () => getFirstBackground().IsPresent);
             step();
-            AddUntilStep("Background isn't scrolling", () => !getFirstBackground().Transforms.Any());
+            AddStep("Get new background position", () => currentX = getFirstBackground().X);
+            AddAssert("New background didn't scroll", () => currentX == getFirstBackground().X);
         }
 
         [TestCase(true)]
@@ -103,10 +106,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"show", () => nowPlayingOverlay.Show());
             AddUntilStep("Is Visible", () => nowPlayingOverlay.Alpha > 0);
 
-            BufferedContainer currentBackground;
+            BufferedContainer currentBackground = null;
+            float currentX = 0;
             void step()
             {
-                currentBackground = getFirstBackground();
+                AddStep("Assign current background", () => currentBackground = getFirstBackground());
                 if (goNext)
                     AddStep("next track", () => musicController.NextTrack());
                 else
@@ -114,20 +118,28 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             step();
-            AddAssert("Background changed", () => getFirstBackground() != currentBackground);
+            AddUntilStep("Background changed", () => getFirstBackground() != currentBackground);
             step();
-            AddAssert("Previous background is present", () => currentBackground.IsPresent);
+            AddAssert("Background count is 2", () => nowPlayingOverlay.ChildrenOfType<BufferedContainer>().Count() == 2);
+            step();
+            AddAssert("Previous background is present", () => getSecondBackground().IsPresent);
             step();
             AddAssert("New background is present", () => getFirstBackground().IsPresent);
             step();
-            AddUntilStep("Previous Background is scrolling", () => currentBackground.Transforms.Any());
+            AddStep("Get new background position", () => currentX = getFirstBackground().X);
+            AddUntilStep("New background scrolled", () => currentX != getFirstBackground().X);
             step();
-            AddUntilStep("New Background is scrolling", () => getFirstBackground().Transforms.Any());
+            AddStep("Get previous background position", () => currentX = getSecondBackground().X);
+            AddUntilStep("Previous background scrolled", () => currentX != getSecondBackground().X);
         }
 
         private BufferedContainer getFirstBackground()
         {
             return nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First();
+        }
+        private BufferedContainer getSecondBackground()
+        {
+            return nowPlayingOverlay.ChildrenOfType<BufferedContainer>().Skip(1).First();
         }
     }
 }
