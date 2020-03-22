@@ -172,11 +172,25 @@ namespace osu.Game.Overlays.Dashboard.Friends
             if (itemsPlaceholder.Any())
                 loading.Show();
 
-            var usersInCurrentGroup = onlineStatusControl.Current.Value?.Users ?? new List<User>();
-
-            var sortedUsers = sortUsers(usersInCurrentGroup);
+            var sortedUsers = sortUsers(getUsersInCurrentGroup());
 
             LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private List<User> getUsersInCurrentGroup()
+        {
+            switch (onlineStatusControl.Current.Value?.Status)
+            {
+                default:
+                case FriendsOnlineStatus.All:
+                    return users;
+
+                case FriendsOnlineStatus.Offline:
+                    return users.Where(u => !u.IsOnline).ToList();
+
+                case FriendsOnlineStatus.Online:
+                    return users.Where(u => u.IsOnline).ToList();
+            }
         }
 
         private void addContentToPlaceholder(Drawable content)

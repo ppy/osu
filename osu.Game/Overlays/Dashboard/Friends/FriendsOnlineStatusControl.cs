@@ -15,9 +15,12 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             Clear();
 
-            AddItem(new FriendsBundle(FriendsOnlineStatus.All, users));
-            AddItem(new FriendsBundle(FriendsOnlineStatus.Online, users.Where(u => u.IsOnline).ToList()));
-            AddItem(new FriendsBundle(FriendsOnlineStatus.Offline, users.Where(u => !u.IsOnline).ToList()));
+            var userCount = users.Count;
+            var onlineUsersCount = users.Count(user => user.IsOnline);
+
+            AddItem(new FriendsBundle(FriendsOnlineStatus.All, userCount));
+            AddItem(new FriendsBundle(FriendsOnlineStatus.Online, onlineUsersCount));
+            AddItem(new FriendsBundle(FriendsOnlineStatus.Offline, userCount - onlineUsersCount));
 
             Current.Value = Items.FirstOrDefault();
         }
