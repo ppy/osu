@@ -48,19 +48,43 @@ namespace osu.Game.Rulesets.Objects.Types
 
         #region Operator overloading
 
+        /// <summary>
+        /// Converts <paramref name="i"/> to a <see cref="ComboIndex"/> by constructing one
+        /// with <paramref name="i"/> set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.
+        /// </summary>
+        /// <param name="i">The value to convert to.</param>
+        /// <returns>The <see cref="ComboIndex"/> resulted from the conversion.</returns>
         public static implicit operator ComboIndex(int i) => FromInt32(i);
 
         public static bool operator ==(ComboIndex left, ComboIndex right) => left.Equals(right);
         public static bool operator !=(ComboIndex left, ComboIndex right) => !(left == right);
 
-        public static ComboIndex FromInt32(int i) => new ComboIndex(i);
+        /// <summary>
+        /// Converts <paramref name="index"/> to a <see cref="ComboIndex"/> by constructing one
+        /// with <paramref name="index"/> set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.
+        /// </summary>
+        /// <param name="index">The value to convert to.</param>
+        /// <returns>The <see cref="ComboIndex"/> resulted from the conversion.</returns>
+        public static ComboIndex FromInt32(int index) => new ComboIndex(index);
 
         public bool Equals(ComboIndex other) => Ordinal == other.Ordinal && WithOffset == other.WithOffset;
         public override bool Equals(object obj) => obj is ComboIndex other && Equals(other);
         public override int GetHashCode() => HashCode.Combine(Ordinal, WithOffset);
 
+        /// <summary>
+        /// Adds <paramref name="amount"/> to both <see cref="Ordinal"/> and <see cref="WithOffset"/> of <paramref name="ci"/>.
+        /// </summary>
+        /// <param name="ci">The <see cref="ComboIndex"/> to perform the addition on.</param>
+        /// <param name="amount">The amount to add to <paramref name="ci"/>.</param>
+        /// <returns>The <see cref="ComboIndex"/> post-operation.</returns>
         public static ComboIndex Add(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal + amount, ci.WithOffset + amount);
 
+        /// <summary>
+        /// Subtracts <paramref name="amount"/> from both <see cref="Ordinal"/> and <see cref="WithOffset"/> of <paramref name="ci"/>.
+        /// </summary>
+        /// <param name="ci">The <see cref="ComboIndex"/> to perform the subtraction on.</param>
+        /// <param name="amount">The amount to subtract from <paramref name="ci"/>.</param>
+        /// <returns>The <see cref="ComboIndex"/> post-operation.</returns>
         public static ComboIndex Subtract(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal - amount, ci.WithOffset - amount);
 
         #endregion
