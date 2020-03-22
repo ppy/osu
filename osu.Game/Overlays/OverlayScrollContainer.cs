@@ -17,8 +17,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
+    /// <summary>
+    /// <see cref="OsuScrollContainer"/> which provides <see cref="ScrollToTopButton"/>. Mostly used in <see cref="ScrollableFullScreenOverlay"/>.
+    /// </summary>
     public class OverlayScrollContainer : OsuScrollContainer
     {
+        /// <summary>
+        /// Scroll position at which the <see cref="ScrollToTopButton"/> will be shown.
+        /// </summary>
+        private const int button_scroll_position = 200;
+
         public ScrollToTopButton Button { get; }
 
         private float currentTarget;
@@ -43,7 +51,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            if (ScrollContent.DrawHeight < DrawHeight)
+            if (ScrollContent.DrawHeight + button_scroll_position < DrawHeight)
             {
                 Button.State.Value = Visibility.Hidden;
                 return;
@@ -53,7 +61,7 @@ namespace osu.Game.Overlays
                 return;
 
             currentTarget = Target;
-            Button.State.Value = Current > 200 ? Visibility.Visible : Visibility.Hidden;
+            Button.State.Value = Current > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
         }
 
         public class ScrollToTopButton : VisibilityContainer
