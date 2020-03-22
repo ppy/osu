@@ -201,10 +201,10 @@ namespace osu.Game.Overlays
 
             State.BindValueChanged(s =>
             {
-                if (pendingVisibilitySwitch != null)
+                if (pendingBeatmapSwitch != null)
                 {
-                    pendingVisibilitySwitch();
-                    pendingVisibilitySwitch = null;
+                    pendingBeatmapSwitch();
+                    pendingBeatmapSwitch = null;
                 }
             });
         }
@@ -261,7 +261,6 @@ namespace osu.Game.Overlays
         }
 
         private Action pendingBeatmapSwitch;
-        private Action pendingVisibilitySwitch;
 
         private void setMetadata(WorkingBeatmap beatmap)
         {
@@ -283,11 +282,13 @@ namespace osu.Game.Overlays
             if (Alpha == 0)
             {
                 setMetadata(beatmap);
-                pendingVisibilitySwitch = delegate
+                background.Hide();
+                background.Expire();
+                pendingBeatmapSwitch = delegate
                 {
                     LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
                     {
-                        background.Expire();
+                        newBackground.FadeInFromZero(500, Easing.OutCubic);
                         background = newBackground;
 
                         playerContainer.Add(newBackground);
