@@ -68,6 +68,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(false)]
         public void TestBackgroundNotScrolling(bool goNext)
         {
+            AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
             AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
             if (goNext)
@@ -82,6 +83,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(false)]
         public void TestBackgroundScrolling(bool goNext)
         {
+            AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
             AddStep(@"show", () => nowPlayingOverlay.Show());
             AddUntilStep("Is Visible", () => nowPlayingOverlay.Alpha > 0);
             if (goNext)
