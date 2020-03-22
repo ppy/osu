@@ -69,14 +69,30 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestBackgroundNotScrolling(bool goNext)
         {
             AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
-            AddStep(@"hide", () => nowPlayingOverlay.Hide());
-            AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
-            if (goNext)
-                AddStep("next track", () => musicController.NextTrack());
-            else
-                AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
-            AddStep(@"show", () => nowPlayingOverlay.Show());
-            AddAssert("Background isn't scrolling", () => !nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First().Transforms.Any());
+
+            BufferedContainer currentBackground;
+            void step()
+            {
+                AddStep(@"hide", () => nowPlayingOverlay.Hide());
+                AddUntilStep("Is hidden", () => nowPlayingOverlay.Alpha == 0);
+
+                currentBackground = getFirstBackground();
+                if (goNext)
+                    AddStep("next track", () => musicController.NextTrack());
+                else
+                    AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
+
+                AddStep(@"show", () => nowPlayingOverlay.Show());
+            }
+
+            step();
+            AddAssert("Background changed", () => getFirstBackground() != currentBackground);
+            step();
+            AddAssert("Previous background not present", () => !currentBackground.IsPresent);
+            step();
+            AddAssert("New background is present", () => getFirstBackground().IsPresent);
+            step();
+            AddUntilStep("Background isn't scrolling", () => !getFirstBackground().Transforms.Any());
         }
 
         [TestCase(true)]
@@ -86,11 +102,32 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
             AddStep(@"show", () => nowPlayingOverlay.Show());
             AddUntilStep("Is Visible", () => nowPlayingOverlay.Alpha > 0);
-            if (goNext)
-                AddStep("next track", () => musicController.NextTrack());
-            else
-                AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
-            AddAssert("Background is scrolling", () => nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First().Transforms.Any());
+
+            BufferedContainer currentBackground;
+            void step()
+            {
+                currentBackground = getFirstBackground();
+                if (goNext)
+                    AddStep("next track", () => musicController.NextTrack());
+                else
+                    AddUntilStep("previous track", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
+            }
+
+            step();
+            AddAssert("Background changed", () => getFirstBackground() != currentBackground);
+            step();
+            AddAssert("Previous background is present", () => currentBackground.IsPresent);
+            step();
+            AddAssert("New background is present", () => getFirstBackground().IsPresent);
+            step();
+            AddUntilStep("Previous Background is scrolling", () => currentBackground.Transforms.Any());
+            step();
+            AddUntilStep("New Background is scrolling", () => getFirstBackground().Transforms.Any());
+        }
+
+        private BufferedContainer getFirstBackground()
+        {
+            return nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First();
         }
     }
 }
