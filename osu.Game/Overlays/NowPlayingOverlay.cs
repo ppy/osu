@@ -198,6 +198,15 @@ namespace osu.Game.Overlays
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
+
+            State.BindValueChanged(s =>
+            {
+                if (pendingVisibilitySwitch != null)
+                {
+                    pendingVisibilitySwitch();
+                    pendingVisibilitySwitch = null;
+                }
+            });
         }
 
         protected override void PopIn()
@@ -252,6 +261,7 @@ namespace osu.Game.Overlays
         }
 
         private Action pendingBeatmapSwitch;
+        private Action pendingVisibilitySwitch;
 
         private void setMetadata(WorkingBeatmap beatmap)
         {
@@ -273,13 +283,16 @@ namespace osu.Game.Overlays
             if (Alpha == 0)
             {
                 setMetadata(beatmap);
-                LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
+                pendingVisibilitySwitch = delegate
                 {
-                    background.Expire();
-                    background = newBackground;
+                    LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
+                    {
+                        background.Expire();
+                        background = newBackground;
 
-                    playerContainer.Add(newBackground);
-                });
+                        playerContainer.Add(newBackground);
+                    });
+                };
                 return;
             }
 
