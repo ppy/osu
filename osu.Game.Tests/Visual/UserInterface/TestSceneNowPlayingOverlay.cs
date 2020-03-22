@@ -11,7 +11,6 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Framework.Graphics.Containers;
 using System.Linq;
-using System;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -69,10 +68,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(false)]
         public void TestBackgroundNotScrolling(bool goNext)
         {
-            AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
+            AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count > 1);
 
             BufferedContainer currentBackground = null;
             float currentX = 0;
+
             void step()
             {
                 AddStep(@"hide", () => nowPlayingOverlay.Hide());
@@ -102,12 +102,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(false)]
         public void TestBackgroundScrolling(bool goNext)
         {
-            AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count() > 1);
+            AddAssert("More than one in playlist", () => musicController.BeatmapSets.Count > 1);
             AddStep(@"show", () => nowPlayingOverlay.Show());
             AddUntilStep("Is Visible", () => nowPlayingOverlay.Alpha > 0);
 
             BufferedContainer currentBackground = null;
             float currentX = 0;
+
             void step()
             {
                 AddStep("Assign current background", () => currentBackground = getFirstBackground());
@@ -137,6 +138,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             return nowPlayingOverlay.ChildrenOfType<BufferedContainer>().First();
         }
+
         private BufferedContainer getSecondBackground()
         {
             return nowPlayingOverlay.ChildrenOfType<BufferedContainer>().Skip(1).First();
