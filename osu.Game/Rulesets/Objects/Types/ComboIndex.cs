@@ -11,31 +11,40 @@ namespace osu.Game.Rulesets.Objects.Types
     public readonly struct ComboIndex : IEquatable<ComboIndex>
     {
         /// <summary>
-        /// The automated index value of the combo in relation to the beatmap. Ignores <see cref="IHasCombo.ComboOffset"/>.
+        /// The ordinal index value of the combo in relation to the beatmap. Ignores <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
         /// <remarks>
-        /// This is separated from <see cref="Manual"/> to disallow
+        /// This is separated from <see cref="WithOffset"/> to disallow
         /// manual combo colouring when not on the right skin to apply.
         /// </remarks>
-        public readonly int Automated;
+        public readonly int Ordinal;
 
         /// <summary>
         /// The manual index value of the combo. Accounts for <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
-        public readonly int Manual;
+        public readonly int WithOffset;
 
-        public ComboIndex(int automated, int manual)
+        /// <summary>
+        /// Constructs a new <see cref="ComboIndex"/> with <paramref name="ordinal"/> set to <see cref="Ordinal"/> and <paramref name="withOffset"/> set to <see cref="WithOffset"/>.
+        /// </summary>
+        /// <param name="ordinal">The value to be set to <see cref="Ordinal"/>.</param>
+        /// <param name="withOffset">The value to be set to <see cref="WithOffset"/>.</param>
+        public ComboIndex(int ordinal, int withOffset)
         {
-            Automated = automated;
-            Manual = manual;
+            Ordinal = ordinal;
+            WithOffset = withOffset;
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="ComboIndex"/> with <paramref name="index"/> set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.
+        /// </summary>
+        /// <param name="index">The value to be set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.</param>
         public ComboIndex(int index)
             : this(index, index)
         {
         }
 
-        public override string ToString() => $"(Automated: {Automated}, Manual: {Manual})";
+        public override string ToString() => $"(Ordinal: {Ordinal}, WithOffset: {WithOffset})";
 
         #region Operator overloading
 
@@ -54,9 +63,9 @@ namespace osu.Game.Rulesets.Objects.Types
 
         public static ComboIndex FromInt32(int i) => new ComboIndex(i);
 
-        public bool Equals(ComboIndex other) => Automated == other.Automated && Manual == other.Manual;
+        public bool Equals(ComboIndex other) => Ordinal == other.Ordinal && WithOffset == other.WithOffset;
         public override bool Equals(object obj) => obj is ComboIndex other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(Automated, Manual);
+        public override int GetHashCode() => HashCode.Combine(Ordinal, WithOffset);
 
         public static ComboIndex Add(ComboIndex a, ComboIndex b) => new ComboIndex(a.Automated + b.Automated, a.Manual + b.Manual);
         public static ComboIndex Subtract(ComboIndex a, ComboIndex b) => new ComboIndex(a.Automated - b.Automated, a.Manual - b.Manual);

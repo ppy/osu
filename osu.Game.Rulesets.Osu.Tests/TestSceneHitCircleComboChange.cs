@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             circle.ComboIndexBindable.BindTo(comboIndex);
             circle.ComboIndexBindable.BindValueChanged(ci =>
             {
-                circle.IndexInCurrentCombo = ci.NewValue.Automated;
+                circle.IndexInCurrentCombo = ci.NewValue.Ordinal;
             }, true);
 
             return base.CreateDrawableHitCircle(circle, auto);

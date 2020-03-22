@@ -334,9 +334,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!(HitObject is IHasComboInformation combo))
                 throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
 
-            // Use manual combo indices (that account for combo skipping) for the beatmap skin only.
-            // To avoid assigning combo colour of incorrect sets (of current skin) to this object.
-            int comboIndex = beatmapSkins.Value ? combo.ComboIndex.Manual : combo.ComboIndex.Automated;
+            // Use with-offset combo indices for the beatmap skin only to avoid
+            // assigning combo colour of incorrect sets (of current skin) to this object.
+            int comboIndex = beatmapSkins.Value ? combo.ComboIndex.WithOffset : combo.ComboIndex.Ordinal;
 
             return comboColours?.Count > 0 ? comboColours[comboIndex % comboColours.Count] : Color4.White;
         }

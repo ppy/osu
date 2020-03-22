@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider.ComboIndexBindable.BindTo(comboIndex);
             slider.ComboIndexBindable.BindValueChanged(ci =>
             {
-                slider.IndexInCurrentCombo = ci.NewValue.Automated;
+                slider.IndexInCurrentCombo = ci.NewValue.Ordinal;
             }, true);
 
             return base.CreateDrawableSlider(slider);
