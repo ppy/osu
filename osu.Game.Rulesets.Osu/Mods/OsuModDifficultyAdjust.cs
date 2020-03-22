@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -35,15 +36,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             get
             {
-                string circleSize = CircleSize.IsDefault ? "" : $"CS {CircleSize.Value}";
-                string drainRate = DrainRate.IsDefault ? "" : $"HP {DrainRate.Value}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? "" : $"OD {OverallDifficulty.Value}";
-                string approachRate = ApproachRate.IsDefault ? "" : $"AR {ApproachRate.Value}";
+                string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value}";
+                string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value}";
 
-                string[] settings = { circleSize, drainRate, overallDifficulty, approachRate };
-                // filter out empty strings so we don't have orphaned commas
-                settings = Array.FindAll(settings, s => !string.IsNullOrEmpty(s));
-                return string.Join(", ", settings);
+                return string.Join(", ", new[]
+                {
+                    circleSize,
+                    base.SettingDescription,
+                    approachRate
+                }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }
 

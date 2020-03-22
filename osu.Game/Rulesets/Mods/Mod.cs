@@ -2,8 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
 
@@ -67,7 +72,26 @@ namespace osu.Game.Rulesets.Mods
         /// Parentheses are added to the tooltip, surrounding the value of this property. If this property is <c>string.Empty</c>,
         /// the tooltip will not have parentheses.
         /// </remarks>
-        public virtual string SettingDescription => string.Empty;
+        public virtual string SettingDescription
+        {
+            get
+            {
+                var tooltipTexts = new List<string>();
+
+                foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
+                {
+                    object bindableObj = property.GetValue(this);
+                    bool? settingIsDefault = (bindableObj as IHasDefaultValue)?.IsDefault;
+                    string tooltipText = settingIsDefault == true ? string.Empty : attr.Label + " " + bindableObj.ToString();
+                    tooltipTexts.Add(tooltipText);
+                }
+
+                // filter out empty strings so we don't have orphaned commas
+                //tooltipTexts = tooltipTexts.Where(s => !string.IsNullOrEmpty(s)).ToList();
+                string joinedTooltipText = string.Join(", ", tooltipTexts);
+                return $"{Name}{joinedTooltipText}";
+            }
+        }
 
         /// <summary>
         /// The score multiplier of this mod.
