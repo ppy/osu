@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Scheduler.AddDelayed(() => comboIndex.Value++, 250, true);
+            Scheduler.AddDelayed(() => comboIndex.Value = ComboIndex.Add(comboIndex.Value, 1), 250, true);
         }
 
         protected override TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto)

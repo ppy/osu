@@ -53,27 +53,15 @@ namespace osu.Game.Rulesets.Objects.Types
         public static bool operator ==(ComboIndex left, ComboIndex right) => left.Equals(right);
         public static bool operator !=(ComboIndex left, ComboIndex right) => !(left == right);
 
-        public static ComboIndex operator +(ComboIndex left, ComboIndex right) => Add(left, right);
-        public static ComboIndex operator -(ComboIndex left, ComboIndex right) => Subtract(left, right);
-        public static ComboIndex operator *(ComboIndex left, ComboIndex right) => Multiply(left, right);
-        public static ComboIndex operator /(ComboIndex left, ComboIndex right) => Divide(left, right);
-
-        public static ComboIndex operator ++(ComboIndex ci) => Increment(ci);
-        public static ComboIndex operator --(ComboIndex ci) => Decrement(ci);
-
         public static ComboIndex FromInt32(int i) => new ComboIndex(i);
 
         public bool Equals(ComboIndex other) => Ordinal == other.Ordinal && WithOffset == other.WithOffset;
         public override bool Equals(object obj) => obj is ComboIndex other && Equals(other);
         public override int GetHashCode() => HashCode.Combine(Ordinal, WithOffset);
 
-        public static ComboIndex Add(ComboIndex a, ComboIndex b) => new ComboIndex(a.Automated + b.Automated, a.Manual + b.Manual);
-        public static ComboIndex Subtract(ComboIndex a, ComboIndex b) => new ComboIndex(a.Automated - b.Automated, a.Manual - b.Manual);
-        public static ComboIndex Multiply(ComboIndex a, ComboIndex b) => new ComboIndex(a.Automated * b.Automated, a.Manual * b.Manual);
-        public static ComboIndex Divide(ComboIndex a, ComboIndex b) => new ComboIndex(a.Automated / b.Automated, a.Manual / b.Manual);
+        public static ComboIndex Add(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal + amount, ci.WithOffset + amount);
 
-        public static ComboIndex Increment(ComboIndex ci) => ci + 1;
-        public static ComboIndex Decrement(ComboIndex ci) => ci - 1;
+        public static ComboIndex Subtract(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal - amount, ci.WithOffset - amount);
 
         #endregion
     }
