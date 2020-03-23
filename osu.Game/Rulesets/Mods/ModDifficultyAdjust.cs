@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                string drainRate = DrainRate.IsDefault ? string.Empty : $"HP {DrainRate.Value}";
-                string overallDifficulty = OverallDifficulty.IsDefault ? string.Empty : $"OD {OverallDifficulty.Value}";
+                string drainRate = DrainRate.IsDefault ? string.Empty : $"HP {DrainRate.Value:0.#}";
+                string overallDifficulty = OverallDifficulty.IsDefault ? string.Empty : $"OD {OverallDifficulty.Value:0.#}";
 
                 return string.Join(", ", new[]
                 {
