@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -26,6 +27,21 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
         where T : struct
     {
+        private ReplayRecorder recorder;
+
+        public ReplayRecorder Recorder
+        {
+            set
+            {
+                if (recorder != null)
+                    throw new InvalidOperationException("Cannot attach more than one recorder");
+
+                recorder = value;
+
+                KeyBindingContainer.Add(recorder);
+            }
+        }
+
         protected override InputState CreateInitialState()
         {
             var state = base.CreateInitialState();
