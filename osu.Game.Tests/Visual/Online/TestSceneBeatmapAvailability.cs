@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 
 namespace osu.Game.Tests.Visual.Online
@@ -11,6 +13,9 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneBeatmapAvailability : OsuTestScene
     {
         private readonly BeatmapAvailability container;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public TestSceneBeatmapAvailability()
         {

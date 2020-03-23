@@ -5,12 +5,12 @@ using osu.Game.Overlays.Profile.Sections.Kudosu;
 using System.Collections.Generic;
 using System;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -20,6 +20,9 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(DrawableKudosuHistoryItem),
         };
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         private readonly Box background;
 
@@ -32,6 +35,7 @@ namespace osu.Game.Tests.Visual.Online
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5
                 },
                 content = new FillFlowContainer<DrawableKudosuHistoryItem>
                 {
@@ -44,12 +48,6 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             items.ForEach(t => content.Add(new DrawableKudosuHistoryItem(t)));
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            background.Colour = colours.GreySeafoam;
         }
 
         private readonly IEnumerable<APIKudosuHistory> items = new[]
