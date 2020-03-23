@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Navigation
     /// <summary>
     /// A scene which tests full game flow.
     /// </summary>
-    public abstract class OsuGameTestScene : ManualInputManagerTestScene
+    public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
     {
         private GameHost host;
 
