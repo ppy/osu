@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 
@@ -13,8 +15,20 @@ namespace osu.Game.Tournament.Tests
     [TestFixture]
     public abstract class LadderTestScene : TournamentTestScene
     {
+        [Cached]
+        protected LadderInfo Ladder { get; private set; } = new LadderInfo();
+
         [Resolved]
-        protected LadderInfo Ladder { get; private set; }
+        private RulesetStore rulesetStore { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (Ladder.Ruleset.Value == null)
+                Ladder.Ruleset.Value = rulesetStore.AvailableRulesets.First();
+
+            Ruleset.BindTo(Ladder.Ruleset);
+        }
 
         protected override void LoadComplete()
         {
@@ -22,13 +36,8 @@ namespace osu.Game.Tournament.Tests
 
             TournamentMatch match = CreateSampleMatch();
 
-            Ladder.Rounds.Clear();
             Ladder.Rounds.Add(match.Round.Value);
-
-            Ladder.Matches.Clear();
             Ladder.Matches.Add(match);
-
-            Ladder.Teams.Clear();
             Ladder.Teams.Add(match.Team1.Value);
             Ladder.Teams.Add(match.Team2.Value);
 
