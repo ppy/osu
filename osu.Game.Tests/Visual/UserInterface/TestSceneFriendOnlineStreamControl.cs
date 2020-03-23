@@ -13,11 +13,10 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFriendsOnlineStatusControl : OsuTestScene
+    public class TestSceneFriendOnlineStreamControl : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(FriendOnlineStreamControl),
             typeof(FriendsOnlineStatusItem),
             typeof(OverlayStreamControl<>),
             typeof(OverlayStreamItem<>),
