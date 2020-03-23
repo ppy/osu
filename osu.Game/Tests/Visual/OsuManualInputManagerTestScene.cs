@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class ManualInputManagerTestScene : OsuTestScene
+    public abstract class OsuManualInputManagerTestScene : OsuTestScene
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
         private readonly TriangleButton buttonTest;
         private readonly TriangleButton buttonLocal;
 
-        protected ManualInputManagerTestScene()
+        protected OsuManualInputManagerTestScene()
         {
             base.Content.AddRange(new Drawable[]
             {
