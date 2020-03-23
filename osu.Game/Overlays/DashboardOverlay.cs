@@ -104,7 +104,7 @@ namespace osu.Game.Overlays
                     return;
 
                 case HomeOverlayTabs.Friends:
-                    loadLayout(new FriendsLayout());
+                    loadLayout(new FriendDisplay());
                     return;
             }
         }

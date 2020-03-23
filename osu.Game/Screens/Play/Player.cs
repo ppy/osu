@@ -387,6 +387,10 @@ namespace osu.Game.Screens.Play
 
         private void onCompletion()
         {
+            // screen may be in the exiting transition phase.
+            if (!this.IsCurrentScreen())
+                return;
+
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed || completionProgressDelegate != null)
                 return;
@@ -401,13 +405,17 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = DrawableRuleset.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            var score = new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = rulesetInfo,
                 Mods = Mods.Value.ToArray(),
-                User = api.LocalUser.Value,
             };
+
+            if (DrawableRuleset.ReplayScore != null)
+                score.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
+            else
+                score.User = api.LocalUser.Value;
 
             ScoreProcessor.PopulateScore(score);
 
@@ -416,7 +424,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score);
 
         #region Fail Logic
 
@@ -577,7 +585,7 @@ namespace osu.Game.Screens.Play
             if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
                 // proceed to result screen if beatmap already finished playing
-                scheduleGotoRanking();
+                completionProgressDelegate.RunTask();
                 return true;
             }
 
@@ -618,8 +626,16 @@ namespace osu.Game.Screens.Play
             completionProgressDelegate = Schedule(delegate
             {
                 var score = CreateScore();
+
                 if (DrawableRuleset.ReplayScore == null)
-                    scoreManager.Import(score).ContinueWith(_ => Schedule(() => this.Push(CreateResults(score))));
+                {
+                    scoreManager.Import(score).ContinueWith(_ => Schedule(() =>
+                    {
+                        // screen may be in the exiting transition phase.
+                        if (this.IsCurrentScreen())
+                            this.Push(CreateResults(score));
+                    }));
+                }
                 else
                     this.Push(CreateResults(score));
             });

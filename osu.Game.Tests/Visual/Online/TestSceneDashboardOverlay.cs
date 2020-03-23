@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(DashboardOverlay),
             typeof(DashboardOverlayHeader),
-            typeof(FriendsLayout),
+            typeof(FriendDisplay),
         };
 
         protected override bool UseOnlineAPI => true;
