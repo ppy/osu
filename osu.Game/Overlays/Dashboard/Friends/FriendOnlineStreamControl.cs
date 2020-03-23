@@ -7,9 +7,9 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsOnlineStatusControl : OverlayStreamControl<FriendsBundle>
+    public class FriendOnlineStreamControl : OverlayStreamControl<FriendStream>
     {
-        protected override OverlayStreamItem<FriendsBundle> CreateStreamItem(FriendsBundle value) => new FriendsOnlineStatusItem(value);
+        protected override OverlayStreamItem<FriendStream> CreateStreamItem(FriendStream value) => new FriendsOnlineStatusItem(value);
 
         public void Populate(List<User> users)
         {
@@ -18,9 +18,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
             var userCount = users.Count;
             var onlineUsersCount = users.Count(user => user.IsOnline);
 
-            AddItem(new FriendsBundle(FriendsOnlineStatus.All, userCount));
-            AddItem(new FriendsBundle(FriendsOnlineStatus.Online, onlineUsersCount));
-            AddItem(new FriendsBundle(FriendsOnlineStatus.Offline, userCount - onlineUsersCount));
+            AddItem(new FriendStream(OnlineStatus.All, userCount));
+            AddItem(new FriendStream(OnlineStatus.Online, onlineUsersCount));
+            AddItem(new FriendStream(OnlineStatus.Offline, userCount - onlineUsersCount));
 
             Current.Value = Items.FirstOrDefault();
         }
