@@ -3,14 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.States;
-using osu.Framework.Logging;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -206,10 +207,6 @@ namespace osu.Game.Tests.Gameplay
 
         public List<TestAction> Actions = new List<TestAction>();
 
-        public TestReplayFrame()
-        {
-        }
-
         public TestReplayFrame(double time, Vector2 position, params TestAction[] actions)
             : base(time)
         {
@@ -230,7 +227,7 @@ namespace osu.Game.Tests.Gameplay
         {
         }
 
-        protected override ReplayFrame HandleFrame(InputState state, List<TestAction> pressedActions) =>
+        protected override ReplayFrame HandleFrame(InputState state, List<TestAction> pressedActions, ReplayFrame previousFrame) =>
             new TestReplayFrame(Time.Current, ToLocalSpace(state.Mouse.Position), pressedActions.ToArray());
     }
 
@@ -241,6 +238,10 @@ namespace osu.Game.Tests.Gameplay
 
         private readonly List<T> pressedActions = new List<T>();
 
+        private InputManager inputManager;
+
+        public int RecordFrameRate = 60;
+
         protected ReplayRecorder(Replay target)
         {
             this.target = target;
@@ -250,33 +251,45 @@ namespace osu.Game.Tests.Gameplay
             Depth = float.MinValue;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            recordFrame();
+            recordFrame(false);
             return base.OnMouseMove(e);
         }
 
         public bool OnPressed(T action)
         {
             pressedActions.Add(action);
-            recordFrame();
+            recordFrame(true);
             return false;
         }
 
         public void OnReleased(T action)
         {
             pressedActions.Remove(action);
-            recordFrame();
+            recordFrame(true);
         }
 
-        private void recordFrame()
+        private void recordFrame(bool important)
         {
-            var frame = HandleFrame(GetContainingInputManager().CurrentState, pressedActions);
+            var last = target.Frames.LastOrDefault();
+
+            if (!important && last != null && Time.Current - last.Time < (1000d / RecordFrameRate))
+                return;
+
+            var frame = HandleFrame(inputManager.CurrentState, pressedActions, last);
 
             if (frame != null)
                 target.Frames.Add(frame);
         }
 
-        protected abstract ReplayFrame HandleFrame(InputState state, List<T> pressedActions);
+        protected abstract ReplayFrame HandleFrame(InputState state, List<T> testActions, ReplayFrame previousFrame);
     }
 }
