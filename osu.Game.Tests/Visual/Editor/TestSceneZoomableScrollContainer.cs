@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    public class TestSceneZoomableScrollContainer : ManualInputManagerTestScene
+    public class TestSceneZoomableScrollContainer : OsuManualInputManagerTestScene
     {
         private ZoomableScrollContainer scrollContainer;
         private Drawable innerBox;
