@@ -35,7 +35,7 @@ namespace osu.Game.Online.Chat
             Action = action;
         }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             IdleColour = colours.Blue;
