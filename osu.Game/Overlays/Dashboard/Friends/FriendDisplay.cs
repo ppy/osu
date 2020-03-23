@@ -11,48 +11,38 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsLayout : CompositeDrawable
+    public class FriendDisplay : DashboardDisplay<List<User>>
     {
-        private List<APIFriend> users = new List<APIFriend>();
+        private List<User> users = new List<User>();
 
-        public List<APIFriend> Users
+        public List<User> Users
         {
             get => users;
             set
             {
                 users = value;
-
-                usersLoaded = true;
-
-                onlineStatusControl.Populate(value);
+                onlineStreamControl.Populate(value);
             }
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
 
         private Drawable currentContent;
 
+        private readonly FriendOnlineStreamControl onlineStreamControl;
         private readonly Box background;
         private readonly Box controlBackground;
-        private readonly FriendsOnlineStatusControl onlineStatusControl;
         private readonly UserListToolbar userListToolbar;
         private readonly Container itemsPlaceholder;
         private readonly LoadingLayer loading;
 
-        public FriendsLayout()
+        public FriendDisplay()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -78,7 +68,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                     Top = 20,
                                     Horizontal = 45
                                 },
-                                Child = onlineStatusControl = new FriendsOnlineStatusControl(),
+                                Child = onlineStreamControl = new FriendOnlineStreamControl(),
                             }
                         }
                     },
@@ -146,40 +136,47 @@ namespace osu.Game.Overlays.Dashboard.Friends
             controlBackground.Colour = colourProvider.Background5;
         }
 
-        private bool usersLoaded;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
+            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
-
-            if (!api.IsLoggedIn)
-                return;
-
-            request = new GetFriendsRequest();
-            request.Success += response => Schedule(() => Users = response);
-            api.Queue(request);
         }
+
+        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
+
+        protected override void OnSuccess(List<User> response) => Users = response;
 
         private void recreatePanels()
         {
-            // Don't allow any changes until we have users loaded
-            if (!usersLoaded)
+            if (!users.Any())
                 return;
 
             cancellationToken?.Cancel();
 
-            if (itemsPlaceholder.Any())
-                loading.Show();
+            loading.Show();
 
-            var groupedUsers = onlineStatusControl.Current.Value?.Users ?? new List<APIFriend>();
-
-            var sortedUsers = sortUsers(groupedUsers);
+            var sortedUsers = sortUsers(getUsersInCurrentGroup());
 
             LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private List<User> getUsersInCurrentGroup()
+        {
+            switch (onlineStreamControl.Current.Value?.Status)
+            {
+                default:
+                case OnlineStatus.All:
+                    return users;
+
+                case OnlineStatus.Offline:
+                    return users.Where(u => !u.IsOnline).ToList();
+
+                case OnlineStatus.Online:
+                    return users.Where(u => u.IsOnline).ToList();
+            }
         }
 
         private void addContentToPlaceholder(Drawable content)
@@ -198,7 +195,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             currentContent.FadeIn(200, Easing.OutQuint);
         }
 
-        private FillFlowContainer createTable(List<APIFriend> users)
+        private FillFlowContainer createTable(List<User> users)
         {
             var style = userListToolbar.DisplayStyle.Value;
 
@@ -229,16 +226,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        private List<APIFriend> sortUsers(List<APIFriend> unsorted)
+        private List<User> sortUsers(List<User> unsorted)
         {
             switch (userListToolbar.SortCriteria.Value)
             {
                 default:
                 case UserSortCriteria.LastVisit:
-                    return unsorted.OrderBy(u => u.LastVisit).Reverse().ToList();
+                    return unsorted.OrderByDescending(u => u.LastVisit).ToList();
 
                 case UserSortCriteria.Rank:
-                    return unsorted.Where(u => u.CurrentModeRank.HasValue).OrderBy(u => u.CurrentModeRank).Concat(unsorted.Where(u => u.CurrentModeRank == null)).ToList();
+                    return unsorted.OrderByDescending(u => u.CurrentModeRank.HasValue).ThenBy(u => u.CurrentModeRank ?? 0).ToList();
 
                 case UserSortCriteria.Username:
                     return unsorted.OrderBy(u => u.Username).ToList();
@@ -247,9 +244,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }

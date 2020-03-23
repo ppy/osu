@@ -47,6 +47,8 @@ namespace osu.Game
     {
         public const string CLIENT_STREAM_NAME = "lazer";
 
+        public const int SAMPLE_CONCURRENCY = 6;
+
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
@@ -151,6 +153,8 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera-Black");
+
+            Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             runMigrations();
 

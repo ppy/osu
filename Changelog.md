@@ -127,7 +127,7 @@
     *   [m] [Use new logo name for showcase screen #8291]
 
 *   更新上游pr
-    *   [o] [Replace SocialOverlay with DashboardOverlay #805_1] 
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8051] 
             -[依赖]-> #8132
             -[依赖]-> #8288
 
@@ -194,6 +194,17 @@
     *   [m] [Add better flow logic to map pool layout when few beatmaps are present #8172]
     *   [m] [Fix carousel not returning to previous selection after filter #8368]
     *   [m] [Fix selection not occurring when switching away from empty ruleset #8370]
+    *   [m] [Increase sample concurrency to better match stable #8389]
+    *   [m] [Fix very long spinners degrading in performance #8394]
+    *   [m] [Hide scrollbars in tournament chat display #8404]
+    *   [m] [Add ability to adjust (and save) chroma-key area width #8403]
+    *   [m] [Fix some pieces of SettingsItem getting dimmed twice when disabled #8408]
+    *   [m] [Remove taiko CentreHit/RimHit hitobject abstraction #8405]
+    *   [m] [Bump Sentry from 2.1.0 to 2.1.1 #8410]
+    *   [m] [Implement FriendDisplay component #8288]
+
+*   更新上游pr
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8051] 
 
 *   暂不合并
     *   [m] [Fix test scene potentially missing dependencies #8402]
