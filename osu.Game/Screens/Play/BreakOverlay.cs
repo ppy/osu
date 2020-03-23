@@ -82,7 +82,6 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    BreakSettingsOverlay = CreateBreakSettingsOverlay(),
                     new LetterboxOverlay
                     {
                         Alpha = letterboxing ? 1 : 0,
@@ -123,7 +122,8 @@ namespace osu.Game.Screens.Play
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    },
+                    BreakSettingsOverlay = CreateBreakSettingsOverlay()
                 }
             };
 
