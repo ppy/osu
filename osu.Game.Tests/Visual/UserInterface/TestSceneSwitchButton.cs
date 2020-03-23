@@ -9,7 +9,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneSwitchButton : ManualInputManagerTestScene
+    public class TestSceneSwitchButton : OsuManualInputManagerTestScene
     {
         private SwitchButton switchButton;
 

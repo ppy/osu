@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneHitCircleArea : ManualInputManagerTestScene
+    public class TestSceneHitCircleArea : OsuManualInputManagerTestScene
     {
         private HitCircle hitCircle;
         private DrawableHitCircle drawableHitCircle;
