@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mods
                 {
                     object bindableObj = property.GetValue(this);
                     bool? settingIsDefault = (bindableObj as IHasDefaultValue)?.IsDefault;
-                    string tooltipText = settingIsDefault == true ? string.Empty : attr.Label + " " + bindableObj.ToString();
+                    string tooltipText = settingIsDefault == true ? string.Empty : attr.Label + " " + bindableObj;
                     tooltipTexts.Add(tooltipText);
                 }
 
