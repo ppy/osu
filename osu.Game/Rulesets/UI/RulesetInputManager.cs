@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        protected virtual RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
         public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
