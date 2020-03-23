@@ -38,6 +38,9 @@ namespace osu.Game.Online.Chat
         {
             if (idleColour == default)
                 IdleColour = colourProvider.Light2;
+            else
+                // this is needed to prevent the base class from overwriting our colour with the default blue
+                IdleColour = idleColour;
 
             if (hoverColour == default)
                 HoverColour = colourProvider.Light1;

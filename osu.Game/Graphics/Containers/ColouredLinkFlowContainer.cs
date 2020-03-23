@@ -40,7 +40,11 @@ namespace osu.Game.Graphics.Containers
         }
 
         protected override DrawableLinkCompiler CreateLinkCompiler(List<Drawable> parts, string tooltipText, Action action)
-            => new ColouredDrawableLinkCompiler(parts, tooltipText, action);
+            => new ColouredDrawableLinkCompiler(parts, tooltipText, action)
+            {
+                IdleColour = IdleColour,
+                HoverColour = HoverColour
+            };
 
         public ColouredLinkFlowContainer(Action<SpriteText> defaultCreationParameters = null)
             : base(defaultCreationParameters)
