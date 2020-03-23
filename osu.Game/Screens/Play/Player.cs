@@ -19,6 +19,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -117,6 +118,23 @@ namespace osu.Game.Screens.Play
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            PrepareReplay();
+        }
+
+        private Replay recordingReplay;
+
+        /// <summary>
+        /// Run any recording / playback setup for replays.
+        /// </summary>
+        protected virtual void PrepareReplay()
+        {
+            DrawableRuleset.SetRecordTarget(recordingReplay = new Replay());
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
