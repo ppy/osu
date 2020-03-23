@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
-using osu.Framework.Input.States;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -25,6 +24,8 @@ namespace osu.Game.Tests.Gameplay
     {
         private readonly TestRulesetInputManager playbackManager;
 
+        private readonly TestRulesetInputManager recordingManager;
+
         public TestSceneReplayRecording()
         {
             Replay replay = new Replay();
@@ -36,9 +37,12 @@ namespace osu.Game.Tests.Gameplay
                 {
                     new Drawable[]
                     {
-                        new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                        recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = new TestReplayRecorder(replay),
+                            Recorder = new TestReplayRecorder(replay)
+                            {
+                                ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos)
+                            },
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -211,7 +215,7 @@ namespace osu.Game.Tests.Gameplay
         {
         }
 
-        protected override ReplayFrame HandleFrame(InputState state, List<TestAction> pressedActions, ReplayFrame previousFrame) =>
-            new TestReplayFrame(Time.Current, ToLocalSpace(state.Mouse.Position), pressedActions.ToArray());
+        protected override ReplayFrame HandleFrame(Vector2 position, List<TestAction> actions, ReplayFrame previousFrame) =>
+            new TestReplayFrame(Time.Current, position, actions.ToArray());
     }
 }
