@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 {
     public abstract class DashboardDisplay : CompositeDrawable
     {
-        public DashboardDisplay()
+        protected DashboardDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
