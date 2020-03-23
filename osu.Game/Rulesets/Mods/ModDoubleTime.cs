@@ -30,7 +30,5 @@ namespace osu.Game.Rulesets.Mods
             Value = 1.5,
             Precision = 0.01,
         };
-
-        public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N1}x";
     }
 }
