@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -86,10 +86,8 @@ namespace osu.Game.Rulesets.Mods
                     tooltipTexts.Add(tooltipText);
                 }
 
-                // filter out empty strings so we don't have orphaned commas
-                //tooltipTexts = tooltipTexts.Where(s => !string.IsNullOrEmpty(s)).ToList();
-                string joinedTooltipText = string.Join(", ", tooltipTexts);
-                return $"{Name}{joinedTooltipText}";
+                string joinedTooltipText = string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
+                return $"{joinedTooltipText}";
             }
         }
 
