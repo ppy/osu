@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                                 icon.Origin = Anchor.Centre;
                             })
                         },
-                        content = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: font_size))
+                        content = new ColouredLinkFlowContainer(t => t.Font = OsuFont.GetFont(size: font_size))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,

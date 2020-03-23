@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Comments
                                                     Spacing = new Vector2(7, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                        username = new ColouredLinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
                                                         {
                                                             AutoSizeAxes = Axes.Both,
                                                         },
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Comments
                                                         }
                                                     }
                                                 },
-                                                message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                                                message = new ColouredLinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,

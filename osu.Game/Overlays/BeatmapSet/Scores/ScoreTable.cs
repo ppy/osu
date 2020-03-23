@@ -104,7 +104,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private Drawable[] createContent(int index, ScoreInfo score)
         {
-            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
+            var username = new ColouredLinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size))
+            {
+                IdleColour = Color4.White,
+                AutoSizeAxes = Axes.Both
+            };
             username.AddUserLink(score.User);
 
             var content = new List<Drawable>

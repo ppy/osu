@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             RelativeSizeAxes = Axes.X;
             AddRangeInternal(new Drawable[]
             {
-                linkFlowContainer = new LinkFlowContainer
+                linkFlowContainer = new ColouredLinkFlowContainer
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,

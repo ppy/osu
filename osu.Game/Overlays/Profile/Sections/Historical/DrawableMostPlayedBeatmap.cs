@@ -78,12 +78,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                 Children = new Drawable[]
                                                 {
                                                     new MostPlayedBeatmapMetadataContainer(beatmap),
-                                                    new LinkFlowContainer(t =>
+                                                    new ColouredLinkFlowContainer(t =>
                                                     {
                                                         t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
                                                         t.Colour = colourProvider.Foreground1;
                                                     })
                                                     {
+                                                        IdleColour = colourProvider.Foreground1,
                                                         AutoSizeAxes = Axes.Both,
                                                         Direction = FillDirection.Horizontal,
                                                     }.With(d =>

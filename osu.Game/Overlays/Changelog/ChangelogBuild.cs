@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Changelog
                                 Colour = entryColour.Opacity(0.5f),
                                 Margin = new MarginPadding { Right = 5 },
                             },
-                            title = new LinkFlowContainer
+                            title = new ColouredLinkFlowContainer
                             {
                                 Direction = FillDirection.Full,
                                 RelativeSizeAxes = Axes.X,

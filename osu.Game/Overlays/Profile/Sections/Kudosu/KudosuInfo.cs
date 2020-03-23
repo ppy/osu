@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                             UseFullGlyphHeight = false,
                         },
-                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
+                        DescriptionText = new ColouredLinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

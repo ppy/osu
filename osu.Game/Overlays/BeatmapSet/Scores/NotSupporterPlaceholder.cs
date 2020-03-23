@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Text = @"You need to be an osu!supporter to access the friend and country rankings!",
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                     },
-                    text = new LinkFlowContainer(t => t.Font = t.Font.With(size: 11))
+                    text = new ColouredLinkFlowContainer(t => t.Font = t.Font.With(size: 11))
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

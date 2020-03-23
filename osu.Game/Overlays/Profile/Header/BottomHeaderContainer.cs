@@ -53,12 +53,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        topLinkContainer = new ColouredLinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        bottomLinkContainer = new ColouredLinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

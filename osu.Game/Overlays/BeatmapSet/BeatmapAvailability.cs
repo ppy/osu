@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.6f),
                 },
-                textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
+                textContainer = new ColouredLinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                 {
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,

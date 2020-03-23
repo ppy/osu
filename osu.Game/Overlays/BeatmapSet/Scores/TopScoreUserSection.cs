@@ -86,8 +86,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(0, 3),
                         Children = new Drawable[]
                         {
-                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true))
+                            usernameText = new ColouredLinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold))
                             {
+                                IdleColour = Color4.White,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
