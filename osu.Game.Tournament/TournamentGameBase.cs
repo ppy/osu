@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Tournament
         private LadderInfo ladder;
 
         private Storage storage;
+
+        private TournamentStorage tournamentStorage;
 
         private DependencyContainer dependencies;
 
@@ -53,14 +56,16 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
+            dependencies.CacheAs(tournamentStorage = new TournamentStorage(storage));
+
+            Textures.AddStore(new TextureLoaderStore(tournamentStorage));
 
             this.storage = storage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
             {
-                var minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
+                var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
 
                 heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
             }), true);
@@ -74,16 +79,40 @@ namespace osu.Game.Tournament
 
             AddRange(new[]
             {
-                new TourneyButton
+                new Container
                 {
-                    Text = "Save Changes",
-                    Width = 140,
-                    Height = 50,
+                    CornerRadius = 10,
                     Depth = float.MinValue,
+                    Position = new Vector2(5),
+                    Masking = true,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Padding = new MarginPadding(10),
-                    Action = SaveChanges,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = OsuColour.Gray(0.2f),
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new TourneyButton
+                        {
+                            Text = "Save Changes",
+                            Width = 140,
+                            Height = 50,
+                            Padding = new MarginPadding
+                            {
+                                Top = 10,
+                                Left = 10,
+                            },
+                            Margin = new MarginPadding
+                            {
+                                Right = 10,
+                                Bottom = 10,
+                            },
+                            Action = SaveChanges,
+                        },
+                    }
                 },
                 heightWarning = new Container
                 {

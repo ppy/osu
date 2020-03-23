@@ -88,8 +88,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private void refresh()
         {
-            ClearInternal();
-
             OsuHitObject osuStart = Start.HitObject;
             double startTime = osuStart.GetEndTime();
 
@@ -104,8 +102,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 return;
             }
 
-            Vector2 startPosition = osuStart.EndPosition;
-            Vector2 endPosition = osuEnd.Position;
+            Vector2 startPosition = osuStart.StackedEndPosition;
+            Vector2 endPosition = osuEnd.StackedPosition;
             double endTime = osuEnd.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;
@@ -115,6 +113,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             double? firstTransformStartTime = null;
             double finalTransformEndTime = startTime;
+
+            int point = 0;
 
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
             {
@@ -126,13 +126,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 FollowPoint fp;
 
-                AddInternal(fp = new FollowPoint
+                if (InternalChildren.Count > point)
                 {
-                    Position = pointStartPosition,
-                    Rotation = rotation,
-                    Alpha = 0,
-                    Scale = new Vector2(1.5f * osuEnd.Scale),
-                });
+                    fp = (FollowPoint)InternalChildren[point];
+                    fp.ClearTransforms();
+                }
+                else
+                    AddInternal(fp = new FollowPoint());
+
+                fp.Position = pointStartPosition;
+                fp.Rotation = rotation;
+                fp.Alpha = 0;
+                fp.Scale = new Vector2(1.5f * osuEnd.Scale);
 
                 if (firstTransformStartTime == null)
                     firstTransformStartTime = fadeInTime;
@@ -146,7 +151,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                     finalTransformEndTime = fadeOutTime + osuEnd.TimeFadeIn;
                 }
+
+                point++;
             }
+
+            int excessPoints = InternalChildren.Count - point;
+            for (int i = 0; i < excessPoints; i++)
+                RemoveInternal(InternalChildren[^1]);
 
             // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
             LifetimeStart = firstTransformStartTime ?? startTime;
