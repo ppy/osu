@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Final rate", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
 
-        public override string SettingDescription => $"{InitialRate.Value:0.#} to {FinalRate.Value:N1}";
+        public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
         private double finalRateTime;
         private double beginRampTime;
