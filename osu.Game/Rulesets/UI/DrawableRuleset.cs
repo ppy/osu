@@ -302,6 +302,8 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
+        protected virtual ReplayRecorder CreateReplayRecorder(Replay replay) => null;
+
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
