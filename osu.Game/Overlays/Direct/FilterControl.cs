@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.Direct
     {
         private DirectRulesetSelector rulesetSelector;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"384552");
         protected override DirectSortCriteria DefaultTab => DirectSortCriteria.Ranked;
         protected override BeatmapSearchCategory DefaultCategory => BeatmapSearchCategory.Leaderboard;
 

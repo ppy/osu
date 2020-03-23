@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly SpriteIcon symbol;
 
-        private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
-        private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
+        private readonly Color4 baseColour = Color4Extensions.FromHex(@"002c3c");
+        private readonly Color4 fillColour = Color4Extensions.FromHex(@"005b7c");
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 

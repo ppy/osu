@@ -172,19 +172,6 @@ namespace osu.Game.Tournament.Screens.Editors
                 drawableContainer.Child = new DrawableTeamFlag(Model);
             }
 
-            private class DrawableTeamFlag : DrawableTournamentTeam
-            {
-                public DrawableTeamFlag(TournamentTeam team)
-                    : base(team)
-                {
-                    InternalChild = Flag;
-                    RelativeSizeAxes = Axes.Both;
-
-                    Flag.Anchor = Anchor.Centre;
-                    Flag.Origin = Anchor.Centre;
-                }
-            }
-
             public class PlayerEditor : CompositeDrawable
             {
                 private readonly TournamentTeam team;
@@ -202,8 +189,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
                     };
                 }
@@ -311,7 +296,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private void updatePanel()
                     {
-                        drawableContainer.Child = new UserPanel(user) { Width = 300 };
+                        drawableContainer.Child = new UserGridPanel(user) { Width = 300 };
                     }
                 }
             }

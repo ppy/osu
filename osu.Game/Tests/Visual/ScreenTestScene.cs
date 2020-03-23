@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A test case which can be used to test a screen (that relies on OnEntering being called to execute startup instructions).
     /// </summary>
-    public abstract class ScreenTestScene : ManualInputManagerTestScene
+    public abstract class ScreenTestScene : OsuManualInputManagerTestScene
     {
         protected readonly OsuScreenStack Stack;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
         public virtual void SetUpSteps() => addExitAllScreensStep();
 
         [TearDownSteps]
-        public void TearDownSteps() => addExitAllScreensStep();
+        public virtual void TearDownSteps() => addExitAllScreensStep();
 
         private void addExitAllScreensStep()
         {

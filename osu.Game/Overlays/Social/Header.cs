@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.ComponentModel;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Social
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Social
     {
         private OsuSpriteText browser;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"38202e");
 
         protected override SocialTab DefaultTab => SocialTab.AllPlayers;
         protected override IconUsage Icon => FontAwesome.Solid.Users;
