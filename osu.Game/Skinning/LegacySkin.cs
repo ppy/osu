@@ -52,7 +52,11 @@ namespace osu.Game.Skinning
 
             if (storage != null)
             {
-                Samples = audioManager?.GetSampleStore(storage);
+                var samples = audioManager?.GetSampleStore(storage);
+                if (samples != null)
+                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                Samples = samples;
                 Textures = new TextureStore(new TextureLoaderStore(storage));
 
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
