@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }
 
-        public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N1}x";
+        public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";
     }
 }
