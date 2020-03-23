@@ -10,6 +10,9 @@ using osu.Game.Users;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using NUnit.Framework;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API;
+using System.Threading;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -18,39 +21,56 @@ namespace osu.Game.Tests.Visual.Online
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(FriendDisplay),
-            typeof(DashboardDisplay<>),
-            typeof(DashboardDisplay),
             typeof(FriendOnlineStreamControl),
             typeof(UserListToolbar)
         };
 
         protected override bool UseOnlineAPI => true;
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private FriendDisplay display;
+        private GetFriendsRequest request;
+        private CancellationTokenSource cancellationToken;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = new BasicScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = display = new FriendDisplay()
-            };
+            request?.Cancel();
+            cancellationToken?.Cancel();
+            Clear();
         });
 
         [Test]
         public void TestOffline()
         {
-            AddStep("Populate", () => display.Users = getUsers());
+            AddStep("local data", () => createDisplay(getUsers()));
         }
 
         [Test]
         public void TestOnline()
         {
-            AddStep("Fetch online", () => display?.Fetch());
+            AddStep("online data", () =>
+            {
+                if (!api?.IsLoggedIn ?? false)
+                    return;
+
+                request = new GetFriendsRequest();
+                request.Success += response => Schedule(() => createDisplay(response));
+                api.Queue(request);
+            });
+        }
+
+        private void createDisplay(List<User> users)
+        {
+            LoadComponentAsync(new BasicScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = new FriendDisplay(users)
+            }, Add, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private List<User> getUsers() => new List<User>
@@ -85,5 +105,12 @@ namespace osu.Game.Tests.Visual.Online
                 LastVisit = DateTimeOffset.Now
             }
         };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            request?.Cancel();
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
+        }
     }
 }

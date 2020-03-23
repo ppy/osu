@@ -9,40 +9,34 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : DashboardDisplay<List<User>>
+    public class FriendDisplay : CompositeDrawable
     {
-        private List<User> users = new List<User>();
-
-        public List<User> Users
-        {
-            get => users;
-            set
-            {
-                users = value;
-                onlineStreamControl.Populate(value);
-            }
-        }
+        private readonly List<User> users;
 
         private CancellationTokenSource cancellationToken;
 
         private Drawable currentContent;
 
-        private readonly FriendOnlineStreamControl onlineStreamControl;
-        private readonly Box background;
-        private readonly Box controlBackground;
-        private readonly UserListToolbar userListToolbar;
-        private readonly Container itemsPlaceholder;
-        private readonly LoadingLayer loading;
+        private FriendOnlineStreamControl onlineStreamControl;
+        private UserListToolbar userListToolbar;
+        private Container itemsPlaceholder;
+        private LoadingLayer loading;
 
-        public FriendDisplay()
+        public FriendDisplay(List<User> users)
         {
+            this.users = users;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -55,9 +49,10 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            controlBackground = new Box
+                            new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Background5
                             },
                             new Container
                             {
@@ -79,9 +74,10 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            background = new Box
+                            new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Background4
                             },
                             new FillFlowContainer
                             {
@@ -127,40 +123,36 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            background.Colour = colourProvider.Background4;
-            controlBackground.Colour = colourProvider.Background5;
+            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
+            onlineStreamControl.Populate(users);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
-
-        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
-
-        protected override void OnSuccess(List<User> response) => Users = response;
 
         private void recreatePanels()
         {
             if (!users.Any())
                 return;
 
-            cancellationToken?.Cancel();
-
-            loading.Show();
-
             var sortedUsers = sortUsers(getUsersInCurrentGroup());
 
-            LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+            if (!IsLoaded)
+            {
+                addContentToPlaceholder(createTable(sortedUsers));
+            }
+            else
+            {
+                cancellationToken?.Cancel();
+                loading.Show();
+                LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+            }
         }
 
         private List<User> getUsersInCurrentGroup()
