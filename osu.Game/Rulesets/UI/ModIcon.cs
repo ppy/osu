@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly ModType type;
 
-        public virtual string TooltipText { get; }
+        public virtual string TooltipText => mod.IconTooltip;
 
         private Mod mod;
 
@@ -47,8 +47,6 @@ namespace osu.Game.Rulesets.UI
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
 
             type = mod.Type;
-
-            TooltipText = mod.IconTooltip;
 
             Size = new Vector2(size);
 
