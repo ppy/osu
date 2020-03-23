@@ -124,24 +124,13 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             bool isRim = currentSamples.Any(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE);
                             strong = currentSamples.Any(s => s.Name == HitSampleInfo.HIT_FINISH);
 
-                            if (isRim)
+                            yield return new Hit
                             {
-                                yield return new RimHit
-                                {
-                                    StartTime = j,
-                                    Samples = currentSamples,
-                                    IsStrong = strong
-                                };
-                            }
-                            else
-                            {
-                                yield return new CentreHit
-                                {
-                                    StartTime = j,
-                                    Samples = currentSamples,
-                                    IsStrong = strong
-                                };
-                            }
+                                StartTime = j,
+                                Type = isRim ? HitType.Rim : HitType.Centre,
+                                Samples = currentSamples,
+                                IsStrong = strong
+                            };
 
                             i = (i + 1) % allSamples.Count;
                         }
@@ -180,24 +169,13 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     bool isRim = samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE);
 
-                    if (isRim)
+                    yield return new Hit
                     {
-                        yield return new RimHit
-                        {
-                            StartTime = obj.StartTime,
-                            Samples = obj.Samples,
-                            IsStrong = strong
-                        };
-                    }
-                    else
-                    {
-                        yield return new CentreHit
-                        {
-                            StartTime = obj.StartTime,
-                            Samples = obj.Samples,
-                            IsStrong = strong
-                        };
-                    }
+                        StartTime = obj.StartTime,
+                        Type = isRim ? HitType.Rim : HitType.Centre,
+                        Samples = obj.Samples,
+                        IsStrong = strong
+                    };
 
                     break;
                 }
