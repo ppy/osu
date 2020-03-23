@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             get
             {
-                string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value}";
-                string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value}";
+                string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value:0.#}";
+                string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value:0.#}";
 
                 return string.Join(", ", new[]
                 {
