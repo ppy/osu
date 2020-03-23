@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneFriendsLayout : OsuTestScene
+    public class TestSceneFriendDisplay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
