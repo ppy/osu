@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Rulesets.Objects.Types
 {
     /// <summary>
-    /// Represents a manual and automated combo indices.
+    /// Represents an <see cref="Ordinal"/> and <see cref="WithOffset"/> combo indices.
     /// </summary>
     public readonly struct ComboIndex : IEquatable<ComboIndex>
     {
@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         /// <remarks>
         /// This is separated from <see cref="WithOffset"/> to disallow
-        /// manual combo colouring when not on the right skin to apply.
+        /// manual combo colouring when not on the beatmap's skin.
         /// </remarks>
         public readonly int Ordinal;
 
