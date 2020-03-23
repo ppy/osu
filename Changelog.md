@@ -176,7 +176,7 @@
     *   [m] [Update framework #8360]
 
 *   暂不合并
-    *   [m] [Chat overlay test scene improvements (#8297)]
+    *   [m] [Chat overlay test scene improvements #8297]
 
 ### 2020/03/20
 *   合并上游pr
@@ -186,3 +186,14 @@
 
 *   添加了在休息时段，暂停界面和死亡界面直接调整视觉设置的功能
 *   优化关于界面的文案
+
+### 2020/03/23
+*   合并上游pr
+    *   [m] [Don't open profile if it's Autoplay #8374]
+    *   [m] [Fix beat divisor control selecting invalid divisors on drag end #8329]
+    *   [m] [Add better flow logic to map pool layout when few beatmaps are present #8172]
+    *   [m] [Fix carousel not returning to previous selection after filter #8368]
+    *   [m] [Fix selection not occurring when switching away from empty ruleset #8370]
+
+*   暂不合并
+    *   [m] [Fix test scene potentially missing dependencies #8402]

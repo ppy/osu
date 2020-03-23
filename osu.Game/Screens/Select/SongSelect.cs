@@ -150,6 +150,7 @@ namespace osu.Game.Screens.Select
                                         },
                                         Child = Carousel = new BeatmapCarousel
                                         {
+                                            AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             RelativeSizeAxes = Axes.Both,
@@ -654,6 +655,8 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             bindBindables();
+
+            Carousel.AllowSelection = true;
 
             // If a selection was already obtained, do not attempt to update the selected beatmap.
             if (Carousel.SelectedBeatmapSet != null)
