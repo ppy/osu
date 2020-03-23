@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Beatmaps;
@@ -34,10 +33,11 @@ namespace osu.Game.Rulesets.Catch.Replays
             // todo: add support for HT DT
             const double dash_speed = Catcher.BASE_SPEED;
             const double movement_speed = dash_speed / 2;
-            float lastPosition = 0.5f;
+            float position = 0.5f;
             double lastTime = 0;
+            bool hyperTarget = false;
 
-            void moveToNext(CatchHitObject h)
+            void moveToNext(CatchHitObject h, ref float lastPosition)
             {
                 float positionChange = Math.Abs(lastPosition - h.X);
                 double timeAvailable = h.StartTime - lastTime;
@@ -48,48 +48,42 @@ namespace osu.Game.Rulesets.Catch.Replays
                 double speedRequired = positionChange == 0 ? 0 : positionChange / timeAvailable;
 
                 bool dashRequired = speedRequired > movement_speed;
-                bool impossibleJump = speedRequired > movement_speed * 2;
 
-                // todo: get correct catcher size, based on difficulty CS.
-                const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
+                float catcherWidthHalf = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
 
-                if (lastPosition - catcher_width_half < h.X && lastPosition + catcher_width_half > h.X)
+                if (lastPosition - catcherWidthHalf <= h.X && lastPosition + catcherWidthHalf >= h.X)
                 {
                     //we are already in the correct range.
                     lastTime = h.StartTime;
                     addFrame(h.StartTime, lastPosition);
                     return;
                 }
-
-                if (impossibleJump)
+                else if (h is Banana)
                 {
-                    addFrame(h.StartTime, h.X);
-                }
-                else if (h.HyperDash)
-                {
-                    addFrame(h.StartTime - timeAvailable, lastPosition);
-                    addFrame(h.StartTime, h.X);
+                    // auto bananas unrealistically warp to catch 100% combo.
+                    Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
                 else if (dashRequired)
                 {
                     //we do a movement in two parts - the dash part then the normal part...
-                    double timeAtNormalSpeed = positionChange / movement_speed;
-                    double timeWeNeedToSave = timeAtNormalSpeed - timeAvailable;
-                    double timeAtDashSpeed = timeWeNeedToSave / 2;
+                    double timeAtDashSpeed = (positionChange - movement_speed * timeAvailable) / (dash_speed - movement_speed);
 
-                    float midPosition = (float)Interpolation.Lerp(lastPosition, h.X, (float)timeAtDashSpeed / timeAvailable);
-
-                    //dash movement
-                    addFrame(h.StartTime - timeAvailable + 1, lastPosition, true);
-                    addFrame(h.StartTime - timeAvailable + timeAtDashSpeed, midPosition);
-                    addFrame(h.StartTime, h.X);
+                    if (timeAtDashSpeed <= timeAvailable)
+                    {
+                        float midPosition = lastPosition + Math.Sign(h.X - lastPosition) * (float)(timeAtDashSpeed * dash_speed);
+                        //dash movement
+                        Replay.Frames.Add(new CatchReplayFrame(lastTime + timeAtDashSpeed, midPosition, true));
+                        Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
+                    }
+                    else
+                        Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X, true));
                 }
                 else
                 {
                     double timeBefore = positionChange / movement_speed;
 
-                    addFrame(h.StartTime - timeBefore, lastPosition);
-                    addFrame(h.StartTime, h.X);
+                    Replay.Frames.Add(new CatchReplayFrame(lastTime + timeBefore, h.X));
+                    Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
 
                 lastTime = h.StartTime;
@@ -101,7 +95,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                 switch (obj)
                 {
                     case Fruit _:
-                        moveToNext(obj);
+                        moveToNext(obj, ref position);
+                        hyperTarget = obj.HyperDash;
                         break;
                 }
 
@@ -111,9 +106,14 @@ namespace osu.Game.Rulesets.Catch.Replays
                     {
                         case Banana _:
                         case TinyDroplet _:
+                            if (!hyperTarget)
+                                moveToNext(nestedObj, ref position);
+                            break;
+
                         case Droplet _:
                         case Fruit _:
-                            moveToNext(nestedObj);
+                            moveToNext(nestedObj, ref position);
+                            hyperTarget = nestedObj.HyperDash;
                             break;
                     }
                 }
