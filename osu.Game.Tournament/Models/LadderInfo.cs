@@ -24,7 +24,13 @@ namespace osu.Game.Tournament.Models
         // only used for serialisation
         public List<TournamentProgression> Progressions = new List<TournamentProgression>();
 
-        [JsonIgnore]
+        [JsonIgnore] // updated manually in TournamentGameBase
         public Bindable<TournamentMatch> CurrentMatch = new Bindable<TournamentMatch>();
+
+        public Bindable<int> ChromaKeyWidth = new BindableInt(1024)
+        {
+            MinValue = 640,
+            MaxValue = 1366,
+        };
     }
 }
