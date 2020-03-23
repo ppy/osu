@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
 
         private readonly Box background;
         private readonly DashboardOverlayHeader header;
-        private readonly Container content;
+        private readonly Container<DashboardDisplay> content;
         private readonly LoadingLayer loading;
 
         public DashboardOverlay()
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre,
                                 Depth = -float.MaxValue
                             },
-                            content = new Container
+                            content = new Container<DashboardDisplay>
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y
@@ -95,33 +95,39 @@ namespace osu.Game.Overlays
 
             // We may want to use OnlineViewContainer after https://github.com/ppy/osu/pull/8044 merge
             if (!api.IsLoggedIn)
+            {
+                content.Clear();
                 return;
+            }
 
             switch (header.Current.Value)
             {
                 default:
-                    loadLayout(null);
+                    loadDisplay(null);
                     return;
 
                 case HomeOverlayTabs.Friends:
-                    loadLayout(new FriendDisplay());
+                    loadDisplay(new FriendDisplay());
                     return;
             }
         }
 
-        private void loadLayout(Drawable layout)
+        private void loadDisplay(DashboardDisplay display)
         {
-            if (layout == null)
+            if (display == null)
             {
                 content.Clear();
                 loading.Hide();
                 return;
             }
 
-            LoadComponentAsync(layout, loaded =>
+            LoadComponentAsync(display, loaded =>
             {
                 content.Clear();
+
                 content.Add(loaded);
+                loaded.Fetch();
+
                 loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }

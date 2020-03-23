@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : CompositeDrawable
+    public class FriendDisplay : DashboardDisplay<List<User>>
     {
         private List<User> users = new List<User>();
 
@@ -26,15 +26,10 @@ namespace osu.Game.Overlays.Dashboard.Friends
             set
             {
                 users = value;
-
                 onlineStreamControl.Populate(value);
             }
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
 
         private Drawable currentContent;
@@ -48,8 +43,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         public FriendDisplay()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -152,15 +145,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
 
-        public void Fetch()
-        {
-            if (!api.IsLoggedIn)
-                return;
+        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
 
-            request = new GetFriendsRequest();
-            request.Success += response => Schedule(() => Users = response);
-            api.Queue(request);
-        }
+        protected override void OnSuccess(List<User> response) => Users = response;
 
         private void recreatePanels()
         {
@@ -169,8 +156,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             cancellationToken?.Cancel();
 
-            if (itemsPlaceholder.Any())
-                loading.Show();
+            loading.Show();
 
             var sortedUsers = sortUsers(getUsersInCurrentGroup());
 
@@ -258,9 +244,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }

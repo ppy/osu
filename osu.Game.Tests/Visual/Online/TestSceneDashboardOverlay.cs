@@ -17,6 +17,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DashboardOverlay),
             typeof(DashboardOverlayHeader),
             typeof(FriendDisplay),
+            typeof(DashboardDisplay),
+            typeof(DashboardDisplay<>),
         };
 
         protected override bool UseOnlineAPI => true;

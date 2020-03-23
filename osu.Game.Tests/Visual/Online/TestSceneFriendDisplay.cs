@@ -18,6 +18,8 @@ namespace osu.Game.Tests.Visual.Online
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(FriendDisplay),
+            typeof(DashboardDisplay<>),
+            typeof(DashboardDisplay),
             typeof(FriendOnlineStreamControl),
             typeof(UserListToolbar)
         };
