@@ -20,7 +20,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomPlaylist : ManualInputManagerTestScene
+    public class TestSceneDrawableRoomPlaylist : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
