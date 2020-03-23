@@ -60,8 +60,9 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                string settingDescription = string.IsNullOrEmpty(SettingDescription) ? string.Empty : $" ({SettingDescription})";
-                return $"{Name}{settingDescription}";
+                string description = SettingDescription;
+
+                return string.IsNullOrEmpty(description) ? Name : $"{Name} ({description})";
             }
         }
 
@@ -81,13 +82,14 @@ namespace osu.Game.Rulesets.Mods
                 foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
                     object bindableObj = property.GetValue(this);
-                    bool? settingIsDefault = (bindableObj as IHasDefaultValue)?.IsDefault;
-                    string tooltipText = settingIsDefault == true ? string.Empty : attr.Label + " " + bindableObj;
-                    tooltipTexts.Add(tooltipText);
+
+                    if ((bindableObj as IHasDefaultValue)?.IsDefault == true)
+                        continue;
+
+                    tooltipTexts.Add($"{attr.Label} {bindableObj}");
                 }
 
-                string joinedTooltipText = string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
-                return $"{joinedTooltipText}";
+                return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
             }
         }
 
