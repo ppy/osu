@@ -33,6 +33,8 @@ namespace osu.Game.Overlays
 
         private List<APIChangelogBuild> builds;
 
+        private OsuScrollContainer scrollContainer;
+
         protected List<APIUpdateStream> Streams;
 
         public ChangelogOverlay()
@@ -50,7 +52,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourProvider.Background4,
                 },
-                new OsuScrollContainer
+                scrollContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -138,6 +140,7 @@ namespace osu.Game.Overlays
                     {
                         Current.Value = null;
                         sampleBack?.Play();
+                        scrollContainer.ScrollToStart();
                     }
 
                     return true;
