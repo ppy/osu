@@ -36,11 +36,8 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            if (idleColour == default)
-                IdleColour = colourProvider.Light2;
-            else
-                // this is needed to prevent the base class from overwriting our colour with the default blue
-                IdleColour = idleColour;
+            // the IdleColour has to always be set here to prevent the base class from overwriting our colour with the default blue
+            IdleColour = idleColour == default ? colourProvider.Light2 : idleColour;
 
             if (hoverColour == default)
                 HoverColour = colourProvider.Light1;
