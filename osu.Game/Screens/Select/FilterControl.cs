@@ -187,5 +187,7 @@ namespace osu.Game.Screens.Select
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
 
         protected override bool OnClick(ClickEvent e) => true;
+
+        protected override bool OnHover(HoverEvent e) => true;
     }
 }
