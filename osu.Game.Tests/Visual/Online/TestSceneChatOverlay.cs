@@ -22,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneChatOverlay : ManualInputManagerTestScene
+    public class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
