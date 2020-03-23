@@ -234,6 +234,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Create beatmaps for taiko only", () =>
             {
+                sets.Clear();
+
                 var rulesetBeatmapSet = createTestBeatmapSet(1);
                 var taikoRuleset = rulesets.AvailableRulesets.ElementAt(1);
                 rulesetBeatmapSet.Beatmaps.ForEach(b =>
