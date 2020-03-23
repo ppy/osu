@@ -116,7 +116,7 @@ namespace osu.Game.Tournament.Screens
                     {
                         windowSize.Value = new Size((int)(1920 / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), 1080);
                     }
-                }
+                },
             };
         }
 
