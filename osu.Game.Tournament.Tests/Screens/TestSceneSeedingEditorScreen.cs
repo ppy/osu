@@ -14,7 +14,7 @@ namespace osu.Game.Tournament.Tests.Screens
 
         public TestSceneSeedingEditorScreen()
         {
-            var match = TestSceneSeedingScreen.CreateSampleSeededMatch();
+            var match = CreateSampleMatch();
 
             Add(new SeedingEditorScreen(match.Team1.Value)
             {
