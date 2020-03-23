@@ -24,7 +24,7 @@ using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
         private ReplayRecorder recorder;
@@ -182,6 +182,11 @@ namespace osu.Game.Rulesets.UI
     public interface IHasReplayHandler
     {
         ReplayInputHandler ReplayInputHandler { get; set; }
+    }
+
+    public interface IHasRecordingHandler
+    {
+        public ReplayRecorder Recorder { set; }
     }
 
     /// <summary>

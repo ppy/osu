@@ -262,6 +262,17 @@ namespace osu.Game.Rulesets.UI
             Playfield.Add(drawableObject);
         }
 
+        public override void SetRecordTarget(Replay recordingReplay)
+        {
+            if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputHandler))
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
+
+            var recorder = CreateReplayRecorder(recordingReplay);
+            recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
+
+            recordingInputHandler.Recorder = recorder;
+        }
+
         public override void SetReplayScore(Score replayScore)
         {
             if (!(KeyBindingInputManager is IHasReplayHandler replayInputManager))
@@ -471,6 +482,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
         public abstract void SetReplayScore(Score replayScore);
+
+        /// <summary>
+        /// Sets a replay to be used to record gameplay.
+        /// </summary>
+        /// <param name="recordingReplay">The target to be recorded to.</param>
+        public abstract void SetRecordTarget(Replay recordingReplay);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.
