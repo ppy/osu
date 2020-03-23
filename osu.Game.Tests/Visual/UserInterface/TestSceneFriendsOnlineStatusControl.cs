@@ -17,20 +17,20 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(FriendsOnlineStatusControl),
+            typeof(FriendOnlineStreamControl),
             typeof(FriendsOnlineStatusItem),
             typeof(OverlayStreamControl<>),
             typeof(OverlayStreamItem<>),
-            typeof(FriendsBundle)
+            typeof(FriendStream)
         };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private FriendsOnlineStatusControl control;
+        private FriendOnlineStreamControl control;
 
         [SetUp]
-        public void SetUp() => Schedule(() => Child = control = new FriendsOnlineStatusControl
+        public void SetUp() => Schedule(() => Child = control = new FriendOnlineStreamControl
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -55,9 +55,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             }));
 
-            AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.All)?.Count == 3);
-            AddAssert("1 online user", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Online)?.Count == 1);
-            AddAssert("2 offline users", () => control.Items.FirstOrDefault(item => item.Status == FriendsOnlineStatus.Offline)?.Count == 2);
+            AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.All)?.Count == 3);
+            AddAssert("1 online user", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.Online)?.Count == 1);
+            AddAssert("2 offline users", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.Offline)?.Count == 2);
         }
     }
 }

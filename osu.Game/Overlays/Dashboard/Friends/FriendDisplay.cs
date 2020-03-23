@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsLayout : CompositeDrawable
+    public class FriendDisplay : CompositeDrawable
     {
         private List<User> users = new List<User>();
 
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             {
                 users = value;
 
-                onlineStatusControl.Populate(value);
+                onlineStreamControl.Populate(value);
             }
         }
 
@@ -39,14 +39,14 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private Drawable currentContent;
 
-        private readonly FriendsOnlineStatusControl onlineStatusControl;
+        private readonly FriendOnlineStreamControl onlineStreamControl;
         private readonly Box background;
         private readonly Box controlBackground;
         private readonly UserListToolbar userListToolbar;
         private readonly Container itemsPlaceholder;
         private readonly LoadingLayer loading;
 
-        public FriendsLayout()
+        public FriendDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                     Top = 20,
                                     Horizontal = 45
                                 },
-                                Child = onlineStatusControl = new FriendsOnlineStatusControl(),
+                                Child = onlineStreamControl = new FriendOnlineStreamControl(),
                             }
                         }
                     },
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             base.LoadComplete();
 
-            onlineStatusControl.Current.BindValueChanged(_ => recreatePanels());
+            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
@@ -179,16 +179,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private List<User> getUsersInCurrentGroup()
         {
-            switch (onlineStatusControl.Current.Value?.Status)
+            switch (onlineStreamControl.Current.Value?.Status)
             {
                 default:
-                case FriendsOnlineStatus.All:
+                case OnlineStatus.All:
                     return users;
 
-                case FriendsOnlineStatus.Offline:
+                case OnlineStatus.Offline:
                     return users.Where(u => !u.IsOnline).ToList();
 
-                case FriendsOnlineStatus.Online:
+                case OnlineStatus.Online:
                     return users.Where(u => u.IsOnline).ToList();
             }
         }

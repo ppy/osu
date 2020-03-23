@@ -3,23 +3,16 @@
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendsBundle
+    public class FriendStream
     {
-        public FriendsOnlineStatus Status { get; }
+        public OnlineStatus Status { get; }
 
         public int Count { get; }
 
-        public FriendsBundle(FriendsOnlineStatus status, int count)
+        public FriendStream(OnlineStatus status, int count)
         {
             Status = status;
             Count = count;
         }
-    }
-
-    public enum FriendsOnlineStatus
-    {
-        All,
-        Online,
-        Offline
     }
 }

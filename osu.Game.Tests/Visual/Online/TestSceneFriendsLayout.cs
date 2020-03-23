@@ -17,8 +17,8 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(FriendsLayout),
-            typeof(FriendsOnlineStatusControl),
+            typeof(FriendDisplay),
+            typeof(FriendOnlineStreamControl),
             typeof(UserListToolbar)
         };
 
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private FriendsLayout layout;
+        private FriendDisplay display;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -35,20 +35,20 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = layout = new FriendsLayout()
+                Child = display = new FriendDisplay()
             };
         });
 
         [Test]
         public void TestOffline()
         {
-            AddStep("Populate", () => layout.Users = getUsers());
+            AddStep("Populate", () => display.Users = getUsers());
         }
 
         [Test]
         public void TestOnline()
         {
-            AddStep("Fetch online", () => layout?.Fetch());
+            AddStep("Fetch online", () => display?.Fetch());
         }
 
         private List<User> getUsers() => new List<User>
