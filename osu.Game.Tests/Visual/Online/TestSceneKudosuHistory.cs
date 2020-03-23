@@ -24,15 +24,13 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private readonly Box background;
-
         public TestSceneKudosuHistory()
         {
             FillFlowContainer<DrawableKudosuHistoryItem> content;
 
             AddRange(new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5
