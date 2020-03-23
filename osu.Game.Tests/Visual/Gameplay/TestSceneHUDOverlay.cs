@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneHUDOverlay : ManualInputManagerTestScene
+    public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
         private HUDOverlay hudOverlay;
 
