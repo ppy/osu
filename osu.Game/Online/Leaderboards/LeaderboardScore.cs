@@ -73,6 +73,8 @@ namespace osu.Game.Online.Leaderboards
         {
             var user = score.User;
 
+            TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
+
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
             DrawableAvatar innerAvatar;
