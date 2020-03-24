@@ -268,6 +268,10 @@ namespace osu.Game.Rulesets.UI
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
 
             var recorder = CreateReplayRecorder(recordingReplay);
+
+            if (recorder == null)
+                return;
+
             recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
 
             recordingInputHandler.Recorder = recorder;
