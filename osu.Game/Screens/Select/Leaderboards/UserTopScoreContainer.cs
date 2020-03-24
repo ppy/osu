@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var scoreInfo = newScore.Score.CreateScoreInfo(rulesets);
 
-            LoadComponentAsync(new LeaderboardScore(scoreInfo, newScore.Position, false)
+            LoadComponentAsync(new LeaderboardScore(scoreInfo, newScore.Position, false, true)
             {
                 Action = () => ScoreSelected?.Invoke(scoreInfo)
             }, drawableScore =>

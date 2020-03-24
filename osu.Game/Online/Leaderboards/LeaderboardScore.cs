@@ -54,15 +54,17 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<ModIcon> modsContainer;
 
         private List<ScoreComponentLabel> statisticsLabels;
+        private bool isSongSelect;
 
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
-        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true, bool isSongSelect = false)
         {
             this.score = score;
             this.rank = rank;
             this.allowHighlight = allowHighlight;
+            this.isSongSelect = isSongSelect;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -73,7 +75,8 @@ namespace osu.Game.Online.Leaderboards
         {
             var user = score.User;
 
-            TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
+            if ( isSongSelect == true )
+                TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 

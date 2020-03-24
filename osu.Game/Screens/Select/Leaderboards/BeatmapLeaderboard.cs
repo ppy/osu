@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope, true)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
