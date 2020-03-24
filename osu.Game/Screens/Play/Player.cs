@@ -650,24 +650,28 @@ namespace osu.Game.Screens.Play
                     this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
                 else
                 {
-                    var score = new Score
-                    {
-                        ScoreInfo = CreateScore(),
-                        Replay = recordingReplay
-                    };
+                    var score = new Score { ScoreInfo = CreateScore() };
 
-                    using (var stream = new MemoryStream())
-                    {
-                        new LegacyScoreEncoder(score, gameplayBeatmap).Encode(stream);
+                    LegacyByteArrayReader replayReader = null;
 
-                        scoreManager.Import(score.ScoreInfo, new LegacyByteArrayReader(stream.ToArray(), "replay.osr"))
-                                    .ContinueWith(imported => Schedule(() =>
-                                    {
-                                        // screen may be in the exiting transition phase.
-                                        if (this.IsCurrentScreen())
-                                            this.Push(CreateResults(imported.Result));
-                                    }));
+                    if (recordingReplay?.Frames.Count > 0)
+                    {
+                        score.Replay = recordingReplay;
+
+                        using (var stream = new MemoryStream())
+                        {
+                            new LegacyScoreEncoder(score, gameplayBeatmap).Encode(stream);
+                            replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                        }
                     }
+
+                    scoreManager.Import(score.ScoreInfo, replayReader)
+                                .ContinueWith(imported => Schedule(() =>
+                                {
+                                    // screen may be in the exiting transition phase.
+                                    if (this.IsCurrentScreen())
+                                        this.Push(CreateResults(imported.Result));
+                                }));
                 }
             });
         }
