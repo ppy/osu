@@ -34,7 +34,7 @@ namespace osu.Game.Scoring.Legacy
         {
             using (SerializationWriter sw = new SerializationWriter(stream))
             {
-                sw.Write((byte)score.ScoreInfo.RulesetID);
+                sw.Write((byte)(score.ScoreInfo.Ruleset.ID ?? 0));
                 sw.Write(LATEST_VERSION);
                 sw.Write(score.ScoreInfo.Beatmap.MD5Hash);
                 sw.Write(score.ScoreInfo.UserString);
