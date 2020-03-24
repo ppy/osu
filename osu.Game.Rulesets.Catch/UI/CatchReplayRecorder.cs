@@ -12,12 +12,15 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchReplayRecorder : ReplayRecorder<CatchAction>
     {
-        public CatchReplayRecorder(Replay target)
+        private readonly CatchPlayfield playfield;
+
+        public CatchReplayRecorder(Replay target, CatchPlayfield playfield)
             : base(target)
         {
+            this.playfield = playfield;
         }
 
-        protected override ReplayFrame HandleFrame(Vector2 position, List<CatchAction> actions, ReplayFrame previousFrame)
-            => new CatchReplayFrame(Time.Current, position.X, actions.Contains(CatchAction.Dash), previousFrame as CatchReplayFrame);
+        protected override ReplayFrame HandleFrame(Vector2 mousePosition, List<CatchAction> actions, ReplayFrame previousFrame)
+            => new CatchReplayFrame(Time.Current, playfield.CatcherArea.MovableCatcher.X, actions.Contains(CatchAction.Dash), previousFrame as CatchReplayFrame);
     }
 }
