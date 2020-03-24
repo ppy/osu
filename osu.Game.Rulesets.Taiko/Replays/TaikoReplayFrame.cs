@@ -30,5 +30,17 @@ namespace osu.Game.Rulesets.Taiko.Replays
             if (currentFrame.MouseLeft1) Actions.Add(TaikoAction.LeftCentre);
             if (currentFrame.MouseLeft2) Actions.Add(TaikoAction.RightCentre);
         }
+
+        public LegacyReplayFrame ConvertTo(IBeatmap beatmap)
+        {
+            ReplayButtonState state = ReplayButtonState.None;
+
+            if (Actions.Contains(TaikoAction.LeftRim)) state |= ReplayButtonState.Right1;
+            if (Actions.Contains(TaikoAction.RightRim)) state |= ReplayButtonState.Right2;
+            if (Actions.Contains(TaikoAction.LeftCentre)) state |= ReplayButtonState.Left1;
+            if (Actions.Contains(TaikoAction.RightCentre)) state |= ReplayButtonState.Left2;
+
+            return new LegacyReplayFrame(Time, null, null, state);
+        }
     }
 }

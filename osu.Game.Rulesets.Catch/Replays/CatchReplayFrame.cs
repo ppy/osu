@@ -56,5 +56,14 @@ namespace osu.Game.Rulesets.Catch.Replays
                     Actions.Add(CatchAction.MoveLeft);
             }
         }
+
+        public LegacyReplayFrame ConvertTo(IBeatmap beatmap)
+        {
+            ReplayButtonState state = ReplayButtonState.None;
+
+            if (Actions.Contains(CatchAction.Dash)) state |= ReplayButtonState.Left1;
+
+            return new LegacyReplayFrame(Time, Position * CatchPlayfield.BASE_WIDTH, null, state);
+        }
     }
 }
