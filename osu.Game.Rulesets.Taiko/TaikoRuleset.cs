@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Conversion:
                     return new Mod[]
                     {
+                        new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
                     };
 

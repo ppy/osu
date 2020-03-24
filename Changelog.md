@@ -208,3 +208,10 @@
 
 *   暂不合并
     *   [m] [Fix test scene potentially missing dependencies #8402]
+
+### 2020/3/24
+*   合并上游pr
+    *   [m] [Fix crash when holding a key down while entering player #8409]
+    *   [m] [Fix autoplay keyboard shortcut not working with keypad enter key #8415]
+    *   [m] [Fix song select filter and footer not absorbing input from carousel #8414]
+    *   [m] [Implement random mod for taiko #8406]

@@ -3,24 +3,17 @@
 
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModRandom : Mod, IApplicableToBeatmap
+    public class ManiaModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override string Name => "随机";
-        public override string Acronym => "RD";
-        public override ModType Type => ModType.Conversion;
-        public override IconUsage? Icon => OsuIcon.Dice;
-        public override string Description => @"随机排列所有物件!";
-        public override double ScoreMultiplier => 1;
+        public override string Description => @"随机排列!";
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
