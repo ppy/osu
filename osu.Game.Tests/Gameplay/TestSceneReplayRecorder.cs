@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -9,6 +11,8 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.States;
+using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -18,16 +22,23 @@ using osu.Game.Tests.Visual;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Gameplay
 {
-    public class TestSceneReplayRecording : OsuTestScene
+    public class TestSceneReplayRecorder : OsuManualInputManagerTestScene
     {
-        private readonly TestRulesetInputManager playbackManager;
+        private TestRulesetInputManager playbackManager;
+        private TestRulesetInputManager recordingManager;
 
-        public TestSceneReplayRecording()
+        private Replay replay;
+
+        private TestReplayRecorder recorder;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            Replay replay = new Replay();
+            replay = new Replay();
 
             Add(new GridContainer
             {
@@ -36,9 +47,9 @@ namespace osu.Game.Tests.Gameplay
                 {
                     new Drawable[]
                     {
-                        new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
+                        recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = new TestReplayRecorder(replay),
+                            Recorder = recorder = new TestReplayRecorder(replay),
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -93,13 +104,65 @@ namespace osu.Game.Tests.Gameplay
                     }
                 }
             });
+        });
+
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("one frame recorded", () => replay.Frames.Count == 1);
+            AddAssert("position matches", () => playbackManager.ChildrenOfType<Box>().First().Position == recordingManager.ChildrenOfType<Box>().First().Position);
+        }
+
+        [Test]
+        public void TestHighFrameRate()
+        {
+            ScheduledDelegate moveFunction = null;
+
+            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
+            AddStep("much move", () => moveFunction = Scheduler.AddDelayed(() =>
+                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
+            AddWaitStep("move", 10);
+            AddStep("stop move", () => moveFunction.Cancel());
+            AddAssert("at least 60 frames recorded", () => replay.Frames.Count > 60);
+        }
+
+        [Test]
+        public void TestLimitedFrameRate()
+        {
+            ScheduledDelegate moveFunction = null;
+
+            AddStep("lower rate", () => recorder.RecordFrameRate = 2);
+            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
+            AddStep("much move", () => moveFunction = Scheduler.AddDelayed(() =>
+                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0)), 10, true));
+            AddWaitStep("move", 10);
+            AddStep("stop move", () => moveFunction.Cancel());
+            AddAssert("less than 10 frames recorded", () => replay.Frames.Count < 10);
+        }
+
+        [Test]
+        public void TestLimitedFrameRateWithImportantFrames()
+        {
+            ScheduledDelegate moveFunction = null;
+
+            AddStep("lower rate", () => recorder.RecordFrameRate = 2);
+            AddStep("move to center", () => InputManager.MoveMouseTo(recordingManager.ScreenSpaceDrawQuad.Centre));
+            AddStep("much move with press", () => moveFunction = Scheduler.AddDelayed(() =>
+            {
+                InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(-1, 0));
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            }, 10, true));
+            AddWaitStep("move", 10);
+            AddStep("stop move", () => moveFunction.Cancel());
+            AddAssert("at least 60 frames recorded", () => replay.Frames.Count > 60);
         }
 
         protected override void Update()
         {
             base.Update();
-
-            playbackManager.ReplayInputHandler.SetFrameFromTime(Time.Current - 500);
+            playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
         }
 
         public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
