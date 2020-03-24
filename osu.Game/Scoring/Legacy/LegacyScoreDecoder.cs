@@ -19,7 +19,7 @@ using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
 {
-    public abstract class LegacyScoreParser
+    public abstract class LegacyScoreDecoder
     {
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
