@@ -43,18 +43,21 @@ namespace osu.Game.Screens.Edit
         {
             base.ProcessFrame();
 
-            var playbackAlreadyStopped = playbackFinished;
-            playbackFinished = CurrentTime >= TrackLength;
-
-            if (playbackFinished && IsRunning)
+            if (IsRunning)
             {
-                if (!playbackAlreadyStopped)
+                var playbackAlreadyStopped = playbackFinished;
+                playbackFinished = CurrentTime >= TrackLength;
+
+                if (playbackFinished)
                 {
-                    Stop();
-                    Seek(TrackLength);
+                    if (!playbackAlreadyStopped)
+                    {
+                        Stop();
+                        Seek(TrackLength);
+                    }
+                    else
+                        Seek(0);
                 }
-                else
-                    Seek(0);
             }
         }
 

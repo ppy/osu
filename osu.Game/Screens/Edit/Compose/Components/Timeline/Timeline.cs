@@ -130,7 +130,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded)
                 return;
 
-            adjustableClock.Seek(Current / Content.DrawWidth * track.Length);
+            double target = Current / Content.DrawWidth * track.Length;
+
+            adjustableClock.Seek(Math.Min(track.Length, target));
         }
 
         private void scrollToTrackTime()
