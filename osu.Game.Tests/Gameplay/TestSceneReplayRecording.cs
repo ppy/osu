@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Gameplay
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                     },
-                                    new TestConsumer()
+                                    new TestInputConsumer()
                                 }
                             },
                         }
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Gameplay
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                     },
-                                    new TestConsumer()
+                                    new TestInputConsumer()
                                 }
                             },
                         }
@@ -101,117 +101,117 @@ namespace osu.Game.Tests.Gameplay
 
             playbackManager.ReplayInputHandler.SetFrameFromTime(Time.Current - 500);
         }
-    }
 
-    public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
-    {
-        public TestFramedReplayInputHandler(Replay replay)
-            : base(replay)
+        public class TestFramedReplayInputHandler : FramedReplayInputHandler<TestReplayFrame>
         {
-        }
-
-        public override List<IInput> GetPendingInputs()
-        {
-            return new List<IInput>
+            public TestFramedReplayInputHandler(Replay replay)
+                : base(replay)
             {
-                new MousePositionAbsoluteInput
-                {
-                    Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero)
-                },
-                new ReplayState<TestAction>
-                {
-                    PressedActions = CurrentFrame?.Actions ?? new List<TestAction>()
-                }
-            };
-        }
-    }
+            }
 
-    public class TestConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
-    {
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
-
-        private readonly Box box;
-
-        public TestConsumer()
-        {
-            Size = new Vector2(30);
-
-            Origin = Anchor.Centre;
-
-            InternalChildren = new Drawable[]
+            public override List<IInput> GetPendingInputs()
             {
-                box = new Box
+                return new List<IInput>
                 {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
-                },
-            };
+                    new MousePositionAbsoluteInput
+                    {
+                        Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero)
+                    },
+                    new ReplayState<TestAction>
+                    {
+                        PressedActions = CurrentFrame?.Actions ?? new List<TestAction>()
+                    }
+                };
+            }
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        public class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
-            Position = e.MousePosition;
-            return base.OnMouseMove(e);
-        }
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
 
-        public bool OnPressed(TestAction action)
-        {
-            box.Colour = Color4.White;
-            return true;
-        }
+            private readonly Box box;
 
-        public void OnReleased(TestAction action)
-        {
-            box.Colour = Color4.Black;
-        }
-    }
-
-    public class TestRulesetInputManager : RulesetInputManager<TestAction>
-    {
-        public TestRulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
-            : base(ruleset, variant, unique)
-        {
-        }
-
-        protected override KeyBindingContainer<TestAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
-            => new TestKeyBindingContainer();
-
-        internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
-        {
-            public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
+            public TestInputConsumer()
             {
-                new KeyBinding(InputKey.MouseLeft, TestAction.Down),
-            };
+                Size = new Vector2(30);
+
+                Origin = Anchor.Centre;
+
+                InternalChildren = new Drawable[]
+                {
+                    box = new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                };
+            }
+
+            protected override bool OnMouseMove(MouseMoveEvent e)
+            {
+                Position = e.MousePosition;
+                return base.OnMouseMove(e);
+            }
+
+            public bool OnPressed(TestAction action)
+            {
+                box.Colour = Color4.White;
+                return true;
+            }
+
+            public void OnReleased(TestAction action)
+            {
+                box.Colour = Color4.Black;
+            }
         }
-    }
 
-    public class TestReplayFrame : ReplayFrame
-    {
-        public Vector2 Position;
-
-        public List<TestAction> Actions = new List<TestAction>();
-
-        public TestReplayFrame(double time, Vector2 position, params TestAction[] actions)
-            : base(time)
+        public class TestRulesetInputManager : RulesetInputManager<TestAction>
         {
-            Position = position;
-            Actions.AddRange(actions);
+            public TestRulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+                : base(ruleset, variant, unique)
+            {
+            }
+
+            protected override KeyBindingContainer<TestAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+                => new TestKeyBindingContainer();
+
+            internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
+            {
+                public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
+                {
+                    new KeyBinding(InputKey.MouseLeft, TestAction.Down),
+                };
+            }
         }
-    }
 
-    public enum TestAction
-    {
-        Down,
-    }
-
-    internal class TestReplayRecorder : ReplayRecorder<TestAction>
-    {
-        public TestReplayRecorder(Replay target)
-            : base(target)
+        public class TestReplayFrame : ReplayFrame
         {
+            public Vector2 Position;
+
+            public List<TestAction> Actions = new List<TestAction>();
+
+            public TestReplayFrame(double time, Vector2 position, params TestAction[] actions)
+                : base(time)
+            {
+                Position = position;
+                Actions.AddRange(actions);
+            }
         }
 
-        protected override ReplayFrame HandleFrame(InputState state, List<TestAction> pressedActions, ReplayFrame previousFrame) =>
-            new TestReplayFrame(Time.Current, ToLocalSpace(state.Mouse.Position), pressedActions.ToArray());
+        public enum TestAction
+        {
+            Down,
+        }
+
+        internal class TestReplayRecorder : ReplayRecorder<TestAction>
+        {
+            public TestReplayRecorder(Replay target)
+                : base(target)
+            {
+            }
+
+            protected override ReplayFrame HandleFrame(InputState state, List<TestAction> pressedActions, ReplayFrame previousFrame) =>
+                new TestReplayFrame(Time.Current, ToLocalSpace(state.Mouse.Position), pressedActions.ToArray());
+        }
     }
 }
