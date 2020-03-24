@@ -63,7 +63,7 @@ namespace osu.Game.Overlays
             public OverlayTitleIcon(string textureName)
             {
                 this.textureName = textureName;
-                
+
                 RelativeSizeAxes = Axes.Both;
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
