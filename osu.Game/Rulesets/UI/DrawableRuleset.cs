@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void SetRecordTarget(Replay recordingReplay)
         {
-            if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputHandler))
+            if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
 
             var recorder = CreateReplayRecorder(recordingReplay);
@@ -274,7 +274,7 @@ namespace osu.Game.Rulesets.UI
 
             recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
 
-            recordingInputHandler.Recorder = recorder;
+            recordingInputManager.Recorder = recorder;
         }
 
         public override void SetReplayScore(Score replayScore)
