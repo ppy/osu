@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();

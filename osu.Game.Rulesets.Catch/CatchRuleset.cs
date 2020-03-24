@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new CatchModNightcore();

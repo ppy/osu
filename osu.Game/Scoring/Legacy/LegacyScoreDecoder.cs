@@ -19,7 +19,7 @@ using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
 {
-    public abstract class LegacyScoreParser
+    public abstract class LegacyScoreDecoder
     {
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
@@ -66,7 +66,7 @@ namespace osu.Game.Scoring.Legacy
                 /* score.Perfect = */
                 sr.ReadBoolean();
 
-                scoreInfo.Mods = currentRuleset.ConvertLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+                scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
 
                 /* score.HpGraphString = */
                 sr.ReadString();

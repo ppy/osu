@@ -32,5 +32,17 @@ namespace osu.Game.Rulesets.Osu.Replays
             if (currentFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
             if (currentFrame.MouseRight) Actions.Add(OsuAction.RightButton);
         }
+
+        public LegacyReplayFrame ConvertTo(IBeatmap beatmap)
+        {
+            ReplayButtonState state = ReplayButtonState.None;
+
+            if (Actions.Contains(OsuAction.LeftButton))
+                state |= ReplayButtonState.Left1;
+            if (Actions.Contains(OsuAction.RightButton))
+                state |= ReplayButtonState.Right1;
+
+            return new LegacyReplayFrame(Time, Position.X, Position.Y, state);
+        }
     }
 }

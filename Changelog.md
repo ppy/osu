@@ -215,3 +215,5 @@
     *   [m] [Fix autoplay keyboard shortcut not working with keypad enter key #8415]
     *   [m] [Fix song select filter and footer not absorbing input from carousel #8414]
     *   [m] [Implement random mod for taiko #8406]
+    *   [m] [Add replay recorder functionality #8427]
+    *   [m] [Add local replay support for all rulesets #8428]

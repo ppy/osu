@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Tau
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
 
-        protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        protected override KeyBindingContainer<TauAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new TauKeyBindingContainer(ruleset, variant, unique);
 
         public TauInputManager(RulesetInfo ruleset)
