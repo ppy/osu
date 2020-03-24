@@ -137,6 +137,8 @@ namespace osu.Game.Screens.Select
 
         public void Deactivate()
         {
+            searchTextBox.ReadOnly = true;
+
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
                 GetContainingInputManager().ChangeFocus(searchTextBox);
@@ -144,6 +146,7 @@ namespace osu.Game.Screens.Select
 
         public void Activate()
         {
+            searchTextBox.ReadOnly = false;
             searchTextBox.HoldFocus = true;
         }
 
