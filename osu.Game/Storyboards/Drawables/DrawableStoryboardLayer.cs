@@ -22,6 +22,7 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             Enabled = layer.EnabledWhenPassing;
+            Masking = layer.Masking;
         }
 
         [BackgroundDependencyLoader]
