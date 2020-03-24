@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Gameplay
         {
         }
 
-        protected override ReplayFrame HandleFrame(Vector2 position, List<TestAction> actions, ReplayFrame previousFrame) =>
-            new TestReplayFrame(Time.Current, position, actions.ToArray());
+        protected override ReplayFrame HandleFrame(Vector2 mousePosition, List<TestAction> actions, ReplayFrame previousFrame) =>
+            new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
     }
 }

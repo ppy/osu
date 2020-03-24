@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.UI
                 target.Frames.Add(frame);
         }
 
-        protected abstract ReplayFrame HandleFrame(Vector2 position, List<T> actions, ReplayFrame previousFrame);
+        protected abstract ReplayFrame HandleFrame(Vector2 mousePosition, List<T> actions, ReplayFrame previousFrame);
     }
 
     public abstract class ReplayRecorder : Component

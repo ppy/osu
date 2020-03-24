@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new CatchReplayRecorder(replay);
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new CatchReplayRecorder(replay, (CatchPlayfield)Playfield);
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
 
