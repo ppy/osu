@@ -23,8 +23,8 @@ namespace osu.Game.Storyboards
         {
             layers.Add("Video", new StoryboardLayer("Video", 4));
             layers.Add("Background", new StoryboardLayer("Background", 3));
-            layers.Add("Fail", new StoryboardLayer("Fail", 2) { EnabledWhenPassing = false, });
-            layers.Add("Pass", new StoryboardLayer("Pass", 1) { EnabledWhenFailing = false, });
+            layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
+            layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
             layers.Add("Foreground", new StoryboardLayer("Foreground", 0));
         }
 
