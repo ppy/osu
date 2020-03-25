@@ -16,6 +16,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Select
 {
@@ -187,5 +188,9 @@ namespace osu.Game.Screens.Select
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
+
+        protected override bool OnClick(ClickEvent e) => true;
+
+        protected override bool OnHover(HoverEvent e) => true;
     }
 }
