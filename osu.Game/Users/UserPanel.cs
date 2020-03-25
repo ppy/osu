@@ -36,9 +36,10 @@ namespace osu.Game.Users
 
         protected DelayedLoadUnloadWrapper Background { get; private set; }
 
+        protected TextFlowContainer LastVisitMessage { get; private set; }
+
         private SpriteIcon statusIcon;
         private OsuSpriteText statusMessage;
-        private TextFlowContainer lastVisitMessage;
 
         protected UserPanel(User user)
         {
@@ -153,7 +154,7 @@ namespace osu.Game.Users
 
             var alignment = rightAlignedChildren ? Anchor.CentreRight : Anchor.CentreLeft;
 
-            statusContainer.Add(lastVisitMessage = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)).With(text =>
+            statusContainer.Add(LastVisitMessage = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)).With(text =>
             {
                 text.Anchor = alignment;
                 text.Origin = alignment;
@@ -193,7 +194,7 @@ namespace osu.Game.Users
                 }
 
                 // Otherwise use only status
-                lastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
+                LastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
                 statusMessage.Text = status.Message;
                 statusIcon.FadeColour(status.GetAppropriateColour(colours), 500, Easing.OutQuint);
 
