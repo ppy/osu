@@ -572,6 +572,9 @@ namespace osu.Game.Screens.Select
 
             BeatmapOptions.Hide();
 
+            if (Beatmap.Value.Track != null)
+                Beatmap.Value.Track.Looping = false;
+
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
             this.FadeOut(250);

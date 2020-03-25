@@ -85,7 +85,6 @@ namespace osu.Game.Screens.Play
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         public DimmableStoryboard DimmableStoryboard { get; private set; }
-        public DimmableVideo DimmableVideo { get; private set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -189,7 +188,6 @@ namespace osu.Game.Screens.Play
 
         private void addUnderlayComponents(Container target)
         {
-            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video) { RelativeSizeAxes = Axes.Both });
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
@@ -557,7 +555,6 @@ namespace osu.Game.Screens.Play
             // bind component bindables.
             Background.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
             DimmableStoryboard.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
-            DimmableVideo.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
