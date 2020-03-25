@@ -1,15 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -66,16 +67,19 @@ namespace osu.Game.Rulesets.UI
             if (!important && last != null && Time.Current - last.Time < (1000d / RecordFrameRate))
                 return;
 
-            var frame = HandleFrame(inputManager.CurrentState, pressedActions, last);
+            var position = ScreenSpaceToGamefield?.Invoke(inputManager.CurrentState.Mouse.Position) ?? inputManager.CurrentState.Mouse.Position;
+
+            var frame = HandleFrame(position, pressedActions, last);
 
             if (frame != null)
                 target.Frames.Add(frame);
         }
 
-        protected abstract ReplayFrame HandleFrame(InputState state, List<T> testActions, ReplayFrame previousFrame);
+        protected abstract ReplayFrame HandleFrame(Vector2 mousePosition, List<T> actions, ReplayFrame previousFrame);
     }
 
     public abstract class ReplayRecorder : Component
     {
+        public Func<Vector2, Vector2> ScreenSpaceToGamefield;
     }
 }
