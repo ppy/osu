@@ -185,6 +185,8 @@ namespace osu.Game.Users
         {
             if (status != null)
             {
+                LastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
+
                 // Set status message based on activity (if we have one) and status is not offline
                 if (activity != null && !(status is UserStatusOffline))
                 {
@@ -194,7 +196,6 @@ namespace osu.Game.Users
                 }
 
                 // Otherwise use only status
-                LastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
                 statusMessage.Text = status.Message;
                 statusIcon.FadeColour(status.GetAppropriateColour(colours), 500, Easing.OutQuint);
 
