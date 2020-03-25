@@ -104,7 +104,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateSelected(CarouselItem newSelection)
         {
-            LastSelected = newSelection;
+            if (newSelection != null)
+                LastSelected = newSelection;
             updateSelectedIndex();
         }
 
