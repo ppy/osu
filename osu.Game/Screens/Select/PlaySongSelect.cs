@@ -85,8 +85,6 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            Beatmap.Value.Track.Looping = false;
-
             SampleConfirm?.Play();
 
             this.Push(player = new PlayerLoader(() => new Player()));
