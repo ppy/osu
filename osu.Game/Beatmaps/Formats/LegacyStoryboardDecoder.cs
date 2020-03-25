@@ -90,9 +90,9 @@ namespace osu.Game.Beatmaps.Formats
                     case LegacyEventType.Video:
                     {
                         var offset = Parsing.ParseInt(split[1]);
-                        var filename = CleanFilename(split[2]);
+                        var path = CleanFilename(split[2]);
 
-                        storyboard.GetLayer("Video").Add(new StoryboardVideo(filename, offset));
+                        storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
                         break;
                     }
 
