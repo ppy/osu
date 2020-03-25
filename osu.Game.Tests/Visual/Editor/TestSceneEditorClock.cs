@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Editor
             AddUntilStep("Clock stops", () => !Clock.IsRunning);
             AddAssert("Clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
             AddStep("Start clock again", Clock.Start);
-            AddAssert("Clock looped", () => Clock.IsRunning && Clock.CurrentTime < Clock.TrackLength);
+            AddAssert("Clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
     }
 }
