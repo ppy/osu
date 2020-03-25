@@ -215,3 +215,7 @@
     *   [m] [Fix autoplay keyboard shortcut not working with keypad enter key #8415]
     *   [m] [Fix song select filter and footer not absorbing input from carousel #8414]
     *   [m] [Implement random mod for taiko #8406]
+
+### 2020/3/25
+*   合并上游pr
+    *   [m] [Allow individual storyboard layers to disable masking #8426]
