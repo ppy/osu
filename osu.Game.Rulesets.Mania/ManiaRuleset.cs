@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override ISkin CreateLegacySkinProvider(ISkinSource source) => new ManiaLegacySkinTransformer(source);
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new ManiaModNightcore();
@@ -116,6 +116,59 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
+        }
+
+        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = base.ConvertToLegacyMods(mods);
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case ManiaModKey1 _:
+                        value |= LegacyMods.Key1;
+                        break;
+
+                    case ManiaModKey2 _:
+                        value |= LegacyMods.Key2;
+                        break;
+
+                    case ManiaModKey3 _:
+                        value |= LegacyMods.Key3;
+                        break;
+
+                    case ManiaModKey4 _:
+                        value |= LegacyMods.Key4;
+                        break;
+
+                    case ManiaModKey5 _:
+                        value |= LegacyMods.Key5;
+                        break;
+
+                    case ManiaModKey6 _:
+                        value |= LegacyMods.Key6;
+                        break;
+
+                    case ManiaModKey7 _:
+                        value |= LegacyMods.Key7;
+                        break;
+
+                    case ManiaModKey8 _:
+                        value |= LegacyMods.Key8;
+                        break;
+
+                    case ManiaModKey9 _:
+                        value |= LegacyMods.Key9;
+                        break;
+
+                    case ManiaModFadeIn _:
+                        value |= LegacyMods.FadeIn;
+                        break;
+                }
+            }
+
+            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
