@@ -222,9 +222,7 @@
 *   合并上游pr
     *   [m] [Allow individual storyboard layers to disable masking #8426]
     *   [m] [Start background video playback based on provided offset #8167]
-<<<<<<< HEAD
-=======
     *   [m] [Remove unused text transform helpers #8430]
     *   [m] [Fix track looping state not being reset when entering editor from song select #8433]
     *   [m] [Fix intro tests not asserting pass or working at all #8431]
->>>>>>> daily
+    *   [m] [Fix beat divisor control selecting invalid divisors on drag end #8329]
