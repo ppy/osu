@@ -4,19 +4,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
+        private readonly Bindable<User> localUser;
+
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, Bindable<User> localUser)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
@@ -24,9 +28,31 @@ namespace osu.Game.Screens.Select.Carousel
                       .Where(b => !b.Hidden)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
+
+            this.localUser = localUser;
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
+
+        protected override CarouselItem GetNextToSelect()
+        {
+            if (LastSelected == null)
+            {
+                decimal? pp = localUser.Value?.Statistics?.PP ?? 60; // TODO: This needs to get ruleset specific statistics
+
+                var recommendedDifficulty = Math.Pow((double)pp, 0.4) * 0.195;
+                return Children.OfType<CarouselBeatmap>()
+                               .Where(b => !b.Filtered.Value)
+                               .OrderBy(b =>
+                               {
+                                   var difference = b.Beatmap.StarDifficulty - recommendedDifficulty;
+                                   return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
+                               })
+                               .FirstOrDefault();
+            }
+
+            return base.GetNextToSelect();
+        }
 
         public override int CompareTo(FilterCriteria criteria, CarouselItem other)
         {
