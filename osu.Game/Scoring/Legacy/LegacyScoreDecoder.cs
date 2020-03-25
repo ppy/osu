@@ -264,7 +264,7 @@ namespace osu.Game.Scoring.Legacy
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 
-            convertible.ConvertFrom(currentFrame, currentBeatmap, lastFrame);
+            convertible.FromLegacy(currentFrame, currentBeatmap, lastFrame);
 
             var frame = (ReplayFrame)convertible;
             frame.Time = currentFrame.Time;

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Tau.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+        public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             Position = currentFrame.Position;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Tau.Replays
         }
 
 
-        public LegacyReplayFrame ConvertTo(IBeatmap beatmap)
+        public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
         {
             ReplayButtonState state = ReplayButtonState.None;
 
