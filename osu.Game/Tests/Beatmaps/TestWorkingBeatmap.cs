@@ -3,7 +3,6 @@
 
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Storyboards;
 
@@ -31,8 +30,6 @@ namespace osu.Game.Tests.Beatmaps
         protected override Storyboard GetStoryboard() => storyboard ?? base.GetStoryboard();
 
         protected override Texture GetBackground() => null;
-
-        protected override VideoSprite GetVideo() => null;
 
         protected override Track GetTrack() => null;
     }

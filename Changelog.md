@@ -217,3 +217,8 @@
     *   [m] [Implement random mod for taiko #8406]
     *   [m] [Add replay recorder functionality #8427]
     *   [m] [Add local replay support for all rulesets #8428]
+
+### 2020/3/25
+*   合并上游pr
+    *   [m] [Allow individual storyboard layers to disable masking #8426]
+    *   [m] [Start background video playback based on provided offset #8167]
