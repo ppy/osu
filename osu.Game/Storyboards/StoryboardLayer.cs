@@ -8,11 +8,15 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardLayer
     {
-        public string Name;
-        public int Depth;
-        public bool Masking;
-        public bool EnabledWhenPassing = true;
-        public bool EnabledWhenFailing = true;
+        public readonly string Name;
+
+        public readonly int Depth;
+
+        public readonly bool Masking;
+
+        public bool VisibleWhenPassing = true;
+
+        public bool VisibleWhenFailing = true;
 
         public List<IStoryboardElement> Elements = new List<IStoryboardElement>();
 
