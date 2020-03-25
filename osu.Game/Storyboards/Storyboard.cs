@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
@@ -21,6 +21,7 @@ namespace osu.Game.Storyboards
 
         public Storyboard()
         {
+            layers.Add("Video", new StoryboardLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
             layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
             layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
@@ -45,6 +46,9 @@ namespace osu.Game.Storyboards
                 var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
                 if (backgroundPath == null)
                     return false;
+
+                if (GetLayer("Video").Elements.Any())
+                    return true;
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }

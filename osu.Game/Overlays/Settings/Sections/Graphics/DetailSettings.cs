@@ -18,13 +18,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "故事板",
+                    LabelText = "故事板 / 背景视频",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "背景视频",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVideoBackground)
                 },
                 new SettingsCheckbox
                 {
