@@ -33,5 +33,7 @@ namespace osu.Game.Rulesets.Tau.UI
         protected override PassThroughInputManager CreateInputManager() => new TauInputManager(Ruleset?.RulesetInfo);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TauPlayfieldAdjustmentContainer();
+
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new TauReplayRecorder(replay);
     }
 }
