@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(CatcherArea.Catcher),
+            typeof(Catcher),
             typeof(DrawableCatchRuleset),
             typeof(DrawableFruit),
             typeof(DrawableJuiceStream),
@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         private DrawableCatchRuleset drawableRuleset;
         private double playfieldTime => drawableRuleset.Playfield.Time.Current;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
             var controlPointInfo = new ControlPointInfo();
             controlPointInfo.Add(0, new TimingControlPoint());
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 ControlPointInfo = controlPointInfo
             });
 
-            Add(new Container
+            Child = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -66,15 +66,48 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap.GetPlayableBeatmap(new CatchRuleset().RulesetInfo))
                 }
-            });
+            };
+        });
+
+        [Test]
+        public void TestFruits()
+        {
+            AddStep("hit fruits", () => spawnFruits(true));
+            AddUntilStep("wait for completion", () => playfieldIsEmpty);
+            AddAssert("catcher state is idle", () => catcherState == CatcherAnimationState.Idle);
 
             AddStep("miss fruits", () => spawnFruits());
-            AddStep("hit fruits", () => spawnFruits(true));
-            AddStep("miss juicestream", () => spawnJuiceStream());
-            AddStep("hit juicestream", () => spawnJuiceStream(true));
-            AddStep("miss bananas", () => spawnBananas());
-            AddStep("hit bananas", () => spawnBananas(true));
+            AddUntilStep("wait for completion", () => playfieldIsEmpty);
+            AddAssert("catcher state is failed", () => catcherState == CatcherAnimationState.Fail);
         }
+
+        [Test]
+        public void TestJuicestream()
+        {
+            AddStep("hit juicestream", () => spawnJuiceStream(true));
+            AddUntilStep("wait for completion", () => playfieldIsEmpty);
+            AddAssert("catcher state is idle", () => catcherState == CatcherAnimationState.Idle);
+
+            AddStep("miss juicestream", () => spawnJuiceStream());
+            AddUntilStep("wait for completion", () => playfieldIsEmpty);
+            AddAssert("catcher state is failed", () => catcherState == CatcherAnimationState.Fail);
+        }
+
+        [Test]
+        public void TestBananas()
+        {
+            AddStep("hit bananas", () => spawnBananas(true));
+            AddUntilStep("wait for completion", () => playfieldIsEmpty);
+            AddAssert("catcher state is idle", () => catcherState == CatcherAnimationState.Idle);
+
+            AddStep("miss bananas", () => spawnBananas());
+            AddUntilStep("wait for completion", () => playfieldIsEmpty);
+            AddAssert("catcher state is idle", () => catcherState == CatcherAnimationState.Idle);
+        }
+
+        private bool playfieldIsEmpty => !((CatchPlayfield)drawableRuleset.Playfield).AllHitObjects.Any(h => h.IsAlive);
+
+        private CatcherAnimationState catcherState => ((CatchPlayfield)drawableRuleset.Playfield).CatcherArea.MovableCatcher.CurrentState;
 
         private void spawnFruits(bool hit = false)
         {
