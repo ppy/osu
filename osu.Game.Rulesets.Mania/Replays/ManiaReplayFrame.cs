@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+        public void FromLegacy(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             // We don't need to fully convert, just create the converter
             var converter = new ManiaBeatmapConverter(beatmap, new ManiaRuleset());
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             }
         }
 
-        public LegacyReplayFrame ConvertTo(IBeatmap beatmap)
+        public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
         {
             int keys = 0;
 

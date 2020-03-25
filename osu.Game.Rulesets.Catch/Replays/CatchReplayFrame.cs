@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+        public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             Position = currentFrame.Position.X / CatchPlayfield.BASE_WIDTH;
             Dashing = currentFrame.ButtonState == ReplayButtonState.Left1;
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public LegacyReplayFrame ConvertTo(IBeatmap beatmap)
+        public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
         {
             ReplayButtonState state = ReplayButtonState.None;
 
