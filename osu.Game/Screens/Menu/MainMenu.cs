@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Menu
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
         }
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         private void confirmAndExit()
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Menu
             if (exitConfirmed) return;
 
             exitConfirmed = true;
-            game.PerformFromScreen(menu => menu.Exit());
+            game?.PerformFromScreen(menu => menu.Exit());
         }
 
         private void preloadSongSelect()
