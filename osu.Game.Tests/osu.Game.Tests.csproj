@@ -17,6 +17,5 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
-    <ProjectReference Include="..\osu.Game.Rulesets.Tau\osu.Game.Rulesets.Tau.csproj" />
   </ItemGroup>
 </Project>
