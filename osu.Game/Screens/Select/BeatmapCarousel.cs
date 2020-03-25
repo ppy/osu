@@ -23,6 +23,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
+using osu.Game.Online.API;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Select
 {
@@ -30,6 +32,8 @@ namespace osu.Game.Screens.Select
     {
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
+
+        private readonly Bindable<User> localUser = new Bindable<User>();
 
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
@@ -140,7 +144,7 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, IAPIProvider api)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
@@ -154,6 +158,8 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapRestored += beatmapRestored;
 
             loadBeatmapSets(GetLoadableBeatmaps());
+
+            localUser.BindTo(api.LocalUser);
         }
 
         protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
@@ -588,7 +594,7 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet);
+            var set = new CarouselBeatmapSet(beatmapSet, localUser);
 
             foreach (var c in set.Beatmaps)
             {
