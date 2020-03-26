@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -15,6 +16,8 @@ namespace osu.Game.Screens.Play.HUD
     public class FailingLayer : HealthDisplay
     {
         private const float max_alpha = 0.4f;
+
+        private const int fade_time = 400;
 
         private readonly Box box;
 
@@ -41,7 +44,9 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
-            box.Alpha = (float)Math.Clamp(max_alpha * (1 - Current.Value / LowHealthThreshold), 0, max_alpha);
+            box.Alpha = (float)Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, fade_time), box.Alpha,
+                Math.Clamp(max_alpha * (1 - Current.Value / LowHealthThreshold), 0, max_alpha), 0, fade_time, Easing.Out);
+
             base.Update();
         }
     }
