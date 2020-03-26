@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -579,6 +580,34 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
+        [Test]
+        public void TestSelectRecommendedDifficulty()
+        {
+            void setRecommendedAndExpect(double recommended, int expectedSet, int expectedDiff)
+            {
+                AddStep($"Recommend SR {recommended}", () => carousel.RecommendedStarDifficulty.Value = recommended);
+                advanceSelection(direction: 1, diff: false);
+                waitForSelection(expectedSet, expectedDiff);
+            }
+
+            createCarousel();
+            AddStep("Add beatmaps", () =>
+            {
+                for (int i = 1; i <= 7; i++)
+                {
+                    var set = createTestBeatmapSet(i);
+                    carousel.UpdateBeatmapSet(set);
+                }
+            });
+            waitForSelection(1, 1);
+            setRecommendedAndExpect(1, 2, 1);
+            setRecommendedAndExpect(3.9, 3, 1);
+            setRecommendedAndExpect(4.1, 4, 2);
+            setRecommendedAndExpect(5.6, 5, 2);
+            setRecommendedAndExpect(5.7, 6, 3);
+            setRecommendedAndExpect(10, 7, 3);
+        }
+
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null)
         {
             createCarousel();
@@ -780,6 +809,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         private class TestBeatmapCarousel : BeatmapCarousel
         {
             public new List<DrawableCarouselItem> Items => base.Items;
+
+            public new Bindable<double> RecommendedStarDifficulty => base.RecommendedStarDifficulty;
 
             public bool PendingFilterTask => PendingFilter != null;
 

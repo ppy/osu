@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
 
-        private readonly Bindable<double> recommendedStarDifficulty = new Bindable<double>();
+        protected readonly Bindable<double> RecommendedStarDifficulty = new Bindable<double>();
 
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Select
         {
             if (api.LocalUser.Value is GuestUser)
             {
-                recommendedStarDifficulty.Value = 0;
+                RecommendedStarDifficulty.Value = 0;
                 return;
             }
 
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Select
             req.Success += result =>
             {
                 // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                recommendedStarDifficulty.Value = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
+                RecommendedStarDifficulty.Value = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
             };
 
             api.PerformAsync(req);
@@ -617,7 +617,7 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet, recommendedStarDifficulty);
+            var set = new CarouselBeatmapSet(beatmapSet, RecommendedStarDifficulty);
 
             foreach (var c in set.Beatmaps)
             {
