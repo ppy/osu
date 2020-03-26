@@ -87,8 +87,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestTraversalHold()
         {
             var sets = new List<BeatmapSetInfo>();
+            const int create_this_many_sets = 200;
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < create_this_many_sets; i++)
             {
                 var set = createTestBeatmapSet(i);
                 sets.Add(set);
@@ -109,7 +110,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 waitForSelection(amount + 1);
             }
 
-            for (int i = 1; i < 15; i += i)
+            for (int i = 1; i < create_this_many_sets; i += i)
             {
                 selectNextAndAssert(i);
             }
