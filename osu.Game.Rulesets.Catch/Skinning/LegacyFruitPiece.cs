@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
@@ -53,10 +54,15 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
             if (drawableCatchObject.HitObject.HyperDash)
             {
+                var hyperDashColour =
+                    skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDashFruit)?.Value ??
+                    skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDash)?.Value ??
+                    Catcher.DefaultHyperDashColour;
+
                 var hyperDash = new Sprite
                 {
                     Texture = skin.GetTexture(lookupName),
-                    Colour = Color4.Red,
+                    Colour = hyperDashColour,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Blending = BlendingParameters.Additive,
