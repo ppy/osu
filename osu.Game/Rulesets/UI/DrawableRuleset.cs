@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
-        private Container overlays;
+        public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override Container Overlays => overlays;
+        public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
@@ -187,11 +187,12 @@ namespace osu.Game.Rulesets.UI
                     FrameStablePlayback = FrameStablePlayback,
                     Children = new Drawable[]
                     {
+                        FrameStableComponents,
                         KeyBindingInputManager
                             .WithChild(CreatePlayfieldAdjustmentContainer()
                                 .WithChild(Playfield)
                             ),
-                        overlays = new Container { RelativeSizeAxes = Axes.Both }
+                        Overlays,
                     }
                 },
             };
@@ -409,6 +410,11 @@ namespace osu.Game.Rulesets.UI
         /// Content to be placed above hitobjects. Will be affected by frame stability.
         /// </summary>
         public abstract Container Overlays { get; }
+
+        /// <summary>
+        /// Components to be run potentially multiple times in line with frame-stable gameplay.
+        /// </summary>
+        public abstract Container FrameStableComponents { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
