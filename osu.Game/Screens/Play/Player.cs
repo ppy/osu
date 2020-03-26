@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        private BreakTracker breakTracker;
+
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -204,7 +206,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
                 mod.ApplyToHealthProcessor(HealthProcessor);
 
-            BreakOverlay.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+            breakTracker.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
         private void addUnderlayComponents(Container target)
@@ -231,6 +233,18 @@ namespace osu.Game.Screens.Play
                 DrawableRuleset,
                 new ComboEffects(ScoreProcessor)
             });
+
+            DrawableRuleset.FrameStableComponents.AddRange(new Drawable[]
+            {
+                ScoreProcessor,
+                HealthProcessor,
+                breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
+                {
+                    Breaks = working.Beatmap.Breaks
+                }
+            });
+
+            HealthProcessor.IsBreakTime.BindTo(breakTracker.IsBreakTime);
         }
 
         private void addOverlayComponents(Container target, WorkingBeatmap working)
@@ -294,26 +308,13 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
-                new Container
+                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks)
                 {
-                    Name = "Frame-stable elements",
                     Clock = DrawableRuleset.FrameStableClock,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        ScoreProcessor,
-                        HealthProcessor,
-                        BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Breaks = working.Beatmap.Breaks
-                        },
-                    }
+                    ProcessCustomClock = false,
+                    Breaks = working.Beatmap.Breaks
                 },
             });
-
-            HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
@@ -325,7 +326,7 @@ namespace osu.Game.Screens.Play
         private void updatePauseOnFocusLostState() =>
             HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
                                                      && !DrawableRuleset.HasReplayLoaded.Value
-                                                     && !BreakOverlay.IsBreakTime.Value;
+                                                     && !breakTracker.IsBreakTime.Value;
 
         private IBeatmap loadPlayableBeatmap()
         {
@@ -547,7 +548,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (BreakOverlay.IsBreakTime.Value)
+            if (breakTracker.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -581,8 +582,8 @@ namespace osu.Game.Screens.Play
             Background.BlurAmount.Value = 0;
 
             // bind component bindables.
-            Background.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
-            DimmableStoryboard.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+            Background.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
