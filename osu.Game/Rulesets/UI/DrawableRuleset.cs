@@ -406,7 +406,7 @@ namespace osu.Game.Rulesets.UI
         public abstract Playfield Playfield { get; }
 
         /// <summary>
-        /// Place to put drawables above hit objects but below UI.
+        /// Content to be placed above hitobjects. Will be affected by frame stability.
         /// </summary>
         public abstract Container Overlays { get; }
 
