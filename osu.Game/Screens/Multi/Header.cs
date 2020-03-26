@@ -75,23 +75,18 @@ namespace osu.Game.Screens.Multi
 
         private class MultiHeaderTitle : CompositeDrawable, IHasAccentColour
         {
-            public const float ICON_WIDTH = ICON_SIZE + spacing;
+            public const float ICON_WIDTH = icon_size + spacing;
 
-            public const float ICON_SIZE = 25;
+            private const float icon_size = 25;
             private const float spacing = 6;
             private const int text_offset = 2;
 
             private readonly SpriteIcon iconSprite;
-            private readonly OsuSpriteText titleText, pageText;
+            private readonly OsuSpriteText title, pageText;
 
             public IMultiplayerSubScreen Screen
             {
                 set => pageText.Text = value.ShortTitle.ToLowerInvariant();
-            }
-
-            protected string Title
-            {
-                set => titleText.Text = value;
             }
 
             public Color4 AccentColour
@@ -115,11 +110,11 @@ namespace osu.Game.Screens.Multi
                         {
                             iconSprite = new SpriteIcon
                             {
-                                Size = new Vector2(ICON_SIZE),
+                                Size = new Vector2(icon_size),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre
                             },
-                            titleText = new OsuSpriteText
+                            title = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -148,7 +143,7 @@ namespace osu.Game.Screens.Multi
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Title = "multi";
+                title.Text = "multi";
                 iconSprite.Icon = OsuIcon.Multi;
                 AccentColour = colours.Yellow;
             }
