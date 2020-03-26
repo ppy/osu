@@ -28,6 +28,77 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneHyperDashColouring : OsuTestScene
     {
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestHyperDashFruitColour(bool legacyFruit)
+        {
+            DrawableFruit drawableFruit = null;
+
+            AddStep("setup fruit", () =>
+            {
+                var fruit = new Fruit { IndexInBeatmap = legacyFruit ? 0 : 1, HyperDashTarget = new Banana() };
+                fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                Child = setupSkinHierarchy(() =>
+                    drawableFruit = new DrawableFruit(fruit)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, false, false);
+            });
+
+            AddAssert("fruit colour default-hyperdash", () => checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour, legacyFruit));
+        }
+
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        public void TestCustomHyperDashFruitColour(bool legacyFruit, bool customCatcherHyperDashColour)
+        {
+            DrawableFruit drawableFruit = null;
+
+            AddStep("setup fruit", () =>
+            {
+                var fruit = new Fruit { IndexInBeatmap = legacyFruit ? 0 : 1, HyperDashTarget = new Banana() };
+                fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                Child = setupSkinHierarchy(() =>
+                    drawableFruit = new DrawableFruit(fruit)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, customCatcherHyperDashColour, true);
+            });
+
+            AddAssert("fruit colour custom-hyperdash", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashFruitColour, legacyFruit));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestCustomHyperDashFruitColourFallback(bool legacyFruit)
+        {
+            DrawableFruit drawableFruit = null;
+
+            AddStep("setup fruit", () =>
+            {
+                var fruit = new Fruit { IndexInBeatmap = legacyFruit ? 0 : 1, HyperDashTarget = new Banana() };
+                fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                Child = setupSkinHierarchy(() =>
+                    drawableFruit = new DrawableFruit(fruit)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, true, false);
+            });
+
+            AddAssert("fruit colour catcher-custom-hyperdash", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashColour, legacyFruit));
+        }
+
         private Drawable setupSkinHierarchy(Func<Drawable> getChild, bool customHyperDashCatcherColour = false, bool customHyperDashFruitColour = false, bool customHyperDashAfterColour = false)
         {
             var testSkinProvider = new SkinProvidingContainer(new TestLegacySkin(customHyperDashCatcherColour, customHyperDashFruitColour, customHyperDashAfterColour));
