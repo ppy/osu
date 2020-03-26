@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private CancellationTokenSource cancellationToken;
 
-        private Drawable currentContent;
+        private FillFlowContainer<UserPanel> currentTable;
 
         private FriendOnlineStreamControl onlineStreamControl;
         private UserListToolbar userListToolbar;
@@ -124,14 +124,15 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 }
             };
 
-            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             onlineStreamControl.Populate(users);
+            addTableToPlaceholder(createTable());
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
@@ -141,18 +142,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
             if (!users.Any())
                 return;
 
-            var sortedUsers = sortUsers(getUsersInCurrentGroup());
-
-            if (!IsLoaded)
-            {
-                addContentToPlaceholder(createTable(sortedUsers));
-            }
-            else
-            {
-                cancellationToken?.Cancel();
-                loading.Show();
-                LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
-            }
+            cancellationToken?.Cancel();
+            loading.Show();
+            LoadComponentAsync(createTable(), addTableToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private List<User> getUsersInCurrentGroup()
@@ -171,32 +163,33 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        private void addContentToPlaceholder(Drawable content)
+        private void addTableToPlaceholder(FillFlowContainer<UserPanel> table)
         {
             loading.Hide();
 
-            var lastContent = currentContent;
+            var lastTable = currentTable;
 
-            if (lastContent != null)
+            if (lastTable != null)
             {
-                lastContent.FadeOut(100, Easing.OutQuint).Expire();
-                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
+                lastTable.FadeOut(100, Easing.OutQuint).Expire();
+                lastTable.Delay(25).Schedule(() => lastTable.BypassAutoSizeAxes = Axes.Y);
             }
 
-            itemsPlaceholder.Add(currentContent = content);
-            currentContent.FadeIn(200, Easing.OutQuint);
+            itemsPlaceholder.Add(currentTable = table);
+            currentTable.FadeIn(200, Easing.OutQuint);
         }
 
-        private FillFlowContainer createTable(List<User> users)
+        private FillFlowContainer<UserPanel> createTable()
         {
+            var sortedUsers = sortUsers(getUsersInCurrentGroup());
             var style = userListToolbar.DisplayStyle.Value;
 
-            return new FillFlowContainer
+            return new FillFlowContainer<UserPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
-                Children = users.Select(u => createUserPanel(u, style)).ToList()
+                Children = sortedUsers.Select(u => createUserPanel(u, style)).ToList()
             };
         }
 
