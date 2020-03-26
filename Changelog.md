@@ -226,3 +226,9 @@
     *   [m] [Fix track looping state not being reset when entering editor from song select #8433]
     *   [m] [Fix intro tests not asserting pass or working at all #8431]
     *   [m] [Fix beat divisor control selecting invalid divisors on drag end #8329]
+*   实现了tau模式的回放功能
+
+### 2020/3/26
+*   合并上游pr
+    *   [m] [Fix last seen date being visible in user panel when it shouldn't #8441]
+*   关于页面文案调整
