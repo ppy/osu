@@ -28,6 +28,140 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneHyperDashColouring : OsuTestScene
     {
+        [Test]
+        public void TestHyperDashCatcherColour()
+        {
+            CatcherArea catcherArea = null;
+
+            AddStep("setup catcher", () =>
+            {
+                Child = setupSkinHierarchy(() =>
+                    catcherArea = new CatcherArea
+                    {
+                        RelativePositionAxes = Axes.None,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, false);
+            });
+
+            AddStep("set hyper-dash", () =>
+            {
+                catcherArea.MovableCatcher.SetHyperDashState(2);
+                catcherArea.MovableCatcher.FinishTransforms();
+            });
+
+            AddAssert("catcher colour default-hyperdash", () => catcherArea.MovableCatcher.Colour == Color4.OrangeRed);
+            AddAssert("catcher trails colour default-hyperdash", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == Catcher.DefaultHyperDashColour));
+
+            AddStep("clear hyper-dash", () =>
+            {
+                catcherArea.MovableCatcher.SetHyperDashState(1);
+                catcherArea.MovableCatcher.FinishTransforms();
+            });
+
+            AddAssert("catcher colour white", () => catcherArea.MovableCatcher.Colour == Color4.White);
+        }
+
+        [Test]
+        public void TestCustomHyperDashCatcherColour()
+        {
+            CatcherArea catcherArea = null;
+
+            AddStep("setup catcher", () =>
+            {
+                Child = setupSkinHierarchy(() =>
+                    catcherArea = new CatcherArea
+                    {
+                        RelativePositionAxes = Axes.None,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, true);
+            });
+
+            AddStep("set hyper-dash", () =>
+            {
+                catcherArea.MovableCatcher.SetHyperDashState(2);
+                catcherArea.MovableCatcher.FinishTransforms();
+            });
+
+            AddAssert("catcher colour custom-hyperdash", () => catcherArea.MovableCatcher.Colour == TestLegacySkin.CustomHyperDashColour);
+            AddAssert("catcher trails colour custom-hyperdash", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == TestLegacySkin.CustomHyperDashColour));
+
+            AddStep("clear hyper-dash", () =>
+            {
+                catcherArea.MovableCatcher.SetHyperDashState(1);
+                catcherArea.MovableCatcher.FinishTransforms();
+            });
+
+            AddAssert("catcher colour white", () => catcherArea.MovableCatcher.Colour == Color4.White);
+        }
+
+        [Test]
+        public void TestHyperDashCatcherEndGlowColour()
+        {
+            CatcherArea catcherArea = null;
+
+            AddStep("setup catcher", () =>
+            {
+                Child = setupSkinHierarchy(() =>
+                    catcherArea = new CatcherArea
+                    {
+                        RelativePositionAxes = Axes.None,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, false, false, false);
+            });
+
+            AddStep("set hyper-dash", () => catcherArea.MovableCatcher.SetHyperDashState(2));
+            AddAssert("end-glow sprite colour default-hyperdash", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == Catcher.DefaultHyperDashColour));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestCustomHyperDashCatcherEndGlowColour(bool customHyperDashCatcherColour)
+        {
+            CatcherArea catcherArea = null;
+
+            AddStep("setup catcher", () =>
+            {
+                Child = setupSkinHierarchy(() =>
+                    catcherArea = new CatcherArea
+                    {
+                        RelativePositionAxes = Axes.None,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, customHyperDashCatcherColour, false, true);
+            });
+
+            AddStep("set hyper-dash", () => catcherArea.MovableCatcher.SetHyperDashState(2));
+            AddAssert("end-glow sprite colour custom-hyperdash", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == TestLegacySkin.CustomHyperDashAfterColour));
+        }
+
+        [Test]
+        public void TestCustomHyperDashCatcherEndGlowColourFallback()
+        {
+            CatcherArea catcherArea = null;
+
+            AddStep("setup catcher", () =>
+            {
+                Child = setupSkinHierarchy(() =>
+                    catcherArea = new CatcherArea
+                    {
+                        RelativePositionAxes = Axes.None,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(4f),
+                    }, true, false, false);
+            });
+
+            AddStep("set hyper-dash", () => catcherArea.MovableCatcher.SetHyperDashState(2));
+            AddAssert("end-glow sprite colour catcher-custom-hyperdash", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == TestLegacySkin.CustomHyperDashColour));
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestHyperDashFruitColour(bool legacyFruit)
