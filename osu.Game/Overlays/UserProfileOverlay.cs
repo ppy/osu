@@ -67,7 +67,6 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Height = 34
             };
 
             Add(new Box
@@ -160,6 +159,7 @@ namespace osu.Game.Overlays
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
 
+                Height = 36 + bar_height;
                 BarHeight = bar_height;
             }
 
@@ -180,6 +180,8 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.Title;
+                    Text.Font = Text.Font.With(size: 16);
+                    Text.Margin = new MarginPadding { Bottom = 10 + bar_height };
                     Bar.ExpandedSize = 10;
                     Bar.Margin = new MarginPadding { Bottom = bar_height };
                 }
