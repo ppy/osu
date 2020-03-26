@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -193,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < slider.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyResult(r => r.Type = Ball.Tracking ? r.Judgement.MaxResult : HitResult.Miss);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
