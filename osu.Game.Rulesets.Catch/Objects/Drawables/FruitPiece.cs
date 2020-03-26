@@ -7,7 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
@@ -31,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
+        private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
             DrawableCatchHitObject drawableCatchObject = (DrawableCatchHitObject)drawableObject;
             hitObject = drawableCatchObject.HitObject;
@@ -60,6 +63,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 },
             });
 
+            var hyperDashColour =
+                skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDashFruit)?.Value ??
+                skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDash)?.Value ??
+                Catcher.DefaultHyperDashColour;
+
             if (hitObject.HyperDash)
             {
                 AddInternal(new Circle
@@ -67,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    BorderColour = Color4.Red,
+                    BorderColour = hyperDashColour,
                     BorderThickness = 12f * RADIUS_ADJUST,
                     Children = new Drawable[]
                     {
@@ -77,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                             Alpha = 0.3f,
                             Blending = BlendingParameters.Additive,
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Red,
+                            Colour = hyperDashColour,
                         }
                     }
                 });
