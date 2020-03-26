@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -44,8 +43,6 @@ namespace osu.Game.Beatmaps
         protected override IBeatmap GetBeatmap() => new Beatmap();
 
         protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
-
-        protected override VideoSprite GetVideo() => null;
 
         protected override Track GetTrack() => GetVirtualTrack();
 

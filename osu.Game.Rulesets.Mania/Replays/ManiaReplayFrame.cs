@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
+        public void FromLegacy(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             // We don't need to fully convert, just create the converter
             var converter = new ManiaBeatmapConverter(beatmap, new ManiaRuleset());
@@ -55,6 +55,43 @@ namespace osu.Game.Rulesets.Mania.Replays
                 counter++;
                 activeColumns >>= 1;
             }
+        }
+
+        public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
+        {
+            int keys = 0;
+
+            var converter = new ManiaBeatmapConverter(beatmap, new ManiaRuleset());
+
+            var stage = new StageDefinition { Columns = converter.TargetColumns };
+
+            var specialColumns = new List<int>();
+
+            for (int i = 0; i < converter.TargetColumns; i++)
+            {
+                if (stage.IsSpecialColumn(i))
+                    specialColumns.Add(i);
+            }
+
+            foreach (var action in Actions)
+            {
+                switch (action)
+                {
+                    case ManiaAction.Special1:
+                        keys |= 1 << specialColumns[0];
+                        break;
+
+                    case ManiaAction.Special2:
+                        keys |= 1 << specialColumns[1];
+                        break;
+
+                    default:
+                        keys |= 1 << (action - ManiaAction.Key1);
+                        break;
+                }
+            }
+
+            return new LegacyReplayFrame(Time, keys, null, ReplayButtonState.None);
         }
     }
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -17,13 +18,16 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
+using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -85,7 +89,6 @@ namespace osu.Game.Screens.Play
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         public DimmableStoryboard DimmableStoryboard { get; private set; }
-        public DimmableVideo DimmableVideo { get; private set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -117,6 +120,23 @@ namespace osu.Game.Screens.Play
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            PrepareReplay();
+        }
+
+        private Replay recordingReplay;
+
+        /// <summary>
+        /// Run any recording / playback setup for replays.
+        /// </summary>
+        protected virtual void PrepareReplay()
+        {
+            DrawableRuleset.SetRecordTarget(recordingReplay = new Replay());
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -189,7 +209,6 @@ namespace osu.Game.Screens.Play
 
         private void addUnderlayComponents(Container target)
         {
-            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video) { RelativeSizeAxes = Axes.Both });
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
@@ -557,7 +576,6 @@ namespace osu.Game.Screens.Play
             // bind component bindables.
             Background.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
             DimmableStoryboard.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
-            DimmableVideo.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -625,19 +643,33 @@ namespace osu.Game.Screens.Play
             completionProgressDelegate?.Cancel();
             completionProgressDelegate = Schedule(delegate
             {
-                var score = CreateScore();
-
-                if (DrawableRuleset.ReplayScore == null)
-                {
-                    scoreManager.Import(score).ContinueWith(_ => Schedule(() =>
-                    {
-                        // screen may be in the exiting transition phase.
-                        if (this.IsCurrentScreen())
-                            this.Push(CreateResults(score));
-                    }));
-                }
+                if (DrawableRuleset.ReplayScore != null)
+                    this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
                 else
-                    this.Push(CreateResults(score));
+                {
+                    var score = new Score { ScoreInfo = CreateScore() };
+
+                    LegacyByteArrayReader replayReader = null;
+
+                    if (recordingReplay?.Frames.Count > 0)
+                    {
+                        score.Replay = recordingReplay;
+
+                        using (var stream = new MemoryStream())
+                        {
+                            new LegacyScoreEncoder(score, gameplayBeatmap).Encode(stream);
+                            replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                        }
+                    }
+
+                    scoreManager.Import(score.ScoreInfo, replayReader)
+                                .ContinueWith(imported => Schedule(() =>
+                                {
+                                    // screen may be in the exiting transition phase.
+                                    if (this.IsCurrentScreen())
+                                        this.Push(CreateResults(imported.Result));
+                                }));
+                }
             });
         }
 
