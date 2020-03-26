@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class Catcher : Container, IKeyBindingHandler<CatchAction>
     {
+        public static Color4 DefaultHyperDashColour { get; } = Color4.Red;
+
         /// <summary>
         /// Whether we are hyper-dashing or not.
         /// </summary>
