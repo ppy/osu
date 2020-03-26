@@ -293,18 +293,25 @@ namespace osu.Game.Screens.Play
                         performImmediateExit();
                     },
                 },
-                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
+                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
+                new Container
+                {
+                    Name = "Frame-stable elements",
+                    Clock = DrawableRuleset.FrameStableClock,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        ScoreProcessor,
+                        HealthProcessor,
+                        BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Breaks = working.Beatmap.Breaks
+                        },
+                    }
+                },
             });
-
-            DrawableRuleset.Overlays.Add(BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Breaks = working.Beatmap.Breaks
-            });
-
-            DrawableRuleset.Overlays.Add(ScoreProcessor);
-            DrawableRuleset.Overlays.Add(HealthProcessor);
 
             HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
