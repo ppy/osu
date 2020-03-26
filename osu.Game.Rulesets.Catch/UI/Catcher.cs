@@ -13,13 +13,15 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class Catcher : Container, IKeyBindingHandler<CatchAction>
+    public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
     {
         public static Color4 DefaultHyperDashColour { get; } = Color4.Red;
 
@@ -133,7 +135,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 caughtFruit = new Container<DrawableHitObject>
                 {
@@ -184,7 +186,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtFruit.Add(fruit);
 
-            Add(new HitExplosion(fruit)
+            AddInternal(new HitExplosion(fruit)
             {
                 X = fruit.X,
                 Scale = new Vector2(fruit.HitObject.Scale)
@@ -376,6 +378,15 @@ namespace osu.Game.Rulesets.Catch.UI
                 f.MoveToX(f.X + originalX * 6, 1000);
                 f.FadeOut(750);
             });
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            hyperDashColour = skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDash)?.Value ?? DefaultHyperDashColour;
+            hyperDashEndGlowColour = skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDashAfterImage)?.Value ?? hyperDashColour;
+            updateCatcherColour();
         }
 
         protected override void Update()
