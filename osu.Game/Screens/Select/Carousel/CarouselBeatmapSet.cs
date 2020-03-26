@@ -8,19 +8,18 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
-        private readonly Bindable<User> localUser;
+        private readonly Bindable<double> recommendedStarDifficulty = new Bindable<double>();
 
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, Bindable<User> localUser)
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, Bindable<double> recommendedStarDifficulty)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
 
-            this.localUser = localUser;
+            this.recommendedStarDifficulty.BindTo(recommendedStarDifficulty);
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
@@ -38,14 +37,11 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (LastSelected == null)
             {
-                decimal? pp = localUser.Value?.Statistics?.PP ?? 60; // TODO: This needs to get ruleset specific statistics
-
-                var recommendedDifficulty = Math.Pow((double)pp, 0.4) * 0.195;
                 return Children.OfType<CarouselBeatmap>()
                                .Where(b => !b.Filtered.Value)
                                .OrderBy(b =>
                                {
-                                   var difference = b.Beatmap.StarDifficulty - recommendedDifficulty;
+                                   var difference = b.Beatmap.StarDifficulty - recommendedStarDifficulty.Value;
                                    return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
                                })
                                .FirstOrDefault();
