@@ -26,6 +26,7 @@ using osuTK;
 using osuTK.Graphics;
 using Humanizer;
 using osu.Game.Online.API;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -44,6 +45,7 @@ namespace osu.Game.Online.Leaderboards
         private readonly int? rank;
         private readonly bool allowHighlight;
 
+        private Triangles triangles;
         private Box background;
         private Container content;
         private Drawable avatar;
@@ -110,8 +112,15 @@ namespace osu.Game.Online.Leaderboards
                             RelativeSizeAxes = Axes.Both,
                             CornerRadius = corner_radius,
                             Masking = true,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
+                                triangles = new Triangles
+                                {
+                                    TriangleScale = 2,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.Gray(0.2f),
+                                    Alpha = 0.65f,
+                                },
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
