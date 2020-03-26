@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -14,7 +13,6 @@ namespace osu.Game.Overlays
     public abstract class OverlayHeader : Container
     {
         private readonly Box titleBackground;
-        private readonly OverlayTitle title;
 
         protected readonly FillFlowContainer HeaderInfo;
 
@@ -60,7 +58,7 @@ namespace osu.Game.Overlays
                                         },
                                         Children = new[]
                                         {
-                                            title = CreateTitle().With(title =>
+                                            CreateTitle().With(title =>
                                             {
                                                 title.Anchor = Anchor.CentreLeft;
                                                 title.Origin = Anchor.CentreLeft;
