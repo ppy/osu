@@ -83,6 +83,38 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count, 3);
         }
 
+        [Test]
+        public void TestTraversalHold()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                var set = createTestBeatmapSet(i);
+                sets.Add(set);
+            }
+
+            loadBeatmaps(sets);
+
+            void selectNextAndAssert(int amount)
+            {
+                setSelected(1, 1);
+                AddStep($"Next beatmap {amount} times", () =>
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        carousel.SelectNext();
+                    }
+                });
+                waitForSelection(amount + 1);
+            }
+
+            for (int i = 1; i < 15; i += i)
+            {
+                selectNextAndAssert(i);
+            }
+        }
+
         /// <summary>
         /// Test filtering
         /// </summary>
