@@ -158,6 +158,7 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(textureStore);
 
                 localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
+                localSampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
                 dependencies.CacheAs<ISampleStore>(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
             }
 
@@ -261,6 +262,21 @@ namespace osu.Game.Rulesets.UI
             Playfield.Add(drawableObject);
         }
 
+        public override void SetRecordTarget(Replay recordingReplay)
+        {
+            if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
+
+            var recorder = CreateReplayRecorder(recordingReplay);
+
+            if (recorder == null)
+                return;
+
+            recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
+
+            recordingInputManager.Recorder = recorder;
+        }
+
         public override void SetReplayScore(Score replayScore)
         {
             if (!(KeyBindingInputManager is IHasReplayHandler replayInputManager))
@@ -300,6 +316,8 @@ namespace osu.Game.Rulesets.UI
         protected abstract PassThroughInputManager CreateInputManager();
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
+
+        protected virtual ReplayRecorder CreateReplayRecorder(Replay replay) => null;
 
         /// <summary>
         /// Creates a Playfield.
@@ -468,6 +486,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
         public abstract void SetReplayScore(Score replayScore);
+
+        /// <summary>
+        /// Sets a replay to be used to record gameplay.
+        /// </summary>
+        /// <param name="recordingReplay">The target to be recorded to.</param>
+        public abstract void SetRecordTarget(Replay recordingReplay);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.

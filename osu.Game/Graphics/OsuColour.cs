@@ -3,6 +3,8 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -34,6 +36,61 @@ namespace osu.Game.Graphics
 
                 case DifficultyRating.ExpertPlus:
                     return useLighterColour ? Gray9 : Gray0;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the colour for a <see cref="ScoreRank"/>.
+        /// </summary>
+        public static Color4 ForRank(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.XH:
+                case ScoreRank.X:
+                    return Color4Extensions.FromHex(@"de31ae");
+
+                case ScoreRank.SH:
+                case ScoreRank.S:
+                    return Color4Extensions.FromHex(@"02b5c3");
+
+                case ScoreRank.A:
+                    return Color4Extensions.FromHex(@"88da20");
+
+                case ScoreRank.B:
+                    return Color4Extensions.FromHex(@"e3b130");
+
+                case ScoreRank.C:
+                    return Color4Extensions.FromHex(@"ff8e5d");
+
+                default:
+                    return Color4Extensions.FromHex(@"ff5a5a");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the colour for a <see cref="HitResult"/>.
+        /// </summary>
+        public Color4 ForHitResult(HitResult judgement)
+        {
+            switch (judgement)
+            {
+                case HitResult.Perfect:
+                case HitResult.Great:
+                    return Blue;
+
+                case HitResult.Ok:
+                case HitResult.Good:
+                    return Green;
+
+                case HitResult.Meh:
+                    return Yellow;
+
+                case HitResult.Miss:
+                    return Red;
+
+                default:
+                    return Color4.White;
             }
         }
 

@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -301,10 +301,6 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case LegacyEventType.Background:
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
-                    break;
-
-                case LegacyEventType.Video:
-                    beatmap.BeatmapInfo.Metadata.VideoFile = CleanFilename(split[2]);
                     break;
 
                 case LegacyEventType.Break:

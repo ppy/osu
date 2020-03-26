@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new OsuReplayRecorder(replay);
+
         public override double GameplayStartTime
         {
             get
