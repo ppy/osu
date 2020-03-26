@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Multi
             private const float spacing = 6;
             private const int text_offset = 2;
 
-            private SpriteIcon iconSprite;
+            private readonly SpriteIcon iconSprite;
             private readonly OsuSpriteText titleText, pageText;
 
             public IMultiplayerSubScreen Screen
@@ -101,7 +101,6 @@ namespace osu.Game.Screens.Multi
             }
 
             public MultiHeaderTitle()
-                : base()
             {
                 AutoSizeAxes = Axes.Both;
 
