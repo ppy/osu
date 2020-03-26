@@ -194,7 +194,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < slider.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = Ball.Tracking ? r.Judgement.MaxResult : HitResult.Miss);
+            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+        }
+
+        public override void PlaySamples()
+        {
+            // rather than doing it this way, we should probably attach the sample to the tail circle.
+            // this can only be done after we stop using LegacyLastTick.
+            if (TailCircle.Result.Type != HitResult.Miss)
+                base.PlaySamples();
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
