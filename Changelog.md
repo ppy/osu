@@ -232,3 +232,11 @@
 *   合并上游pr
     *   [m] [Fix last seen date being visible in user panel when it shouldn't #8441]
 *   关于页面文案调整
+
+### 2020/3/27
+*   合并上游pr
+    *   [m] [Fix break overlay scaling with gameplay #8447]
+    *   [m] [Reduce spread of stacked fruit #8450]
+    *   [m] [Make slider judgements count towards base score / accuracy #8452]
+    *   [m] [Only play slider end sounds if tracking #8451]
+    *   [m] [Fix osu!mania replays recording incorrectly when key mod applied #8461]
