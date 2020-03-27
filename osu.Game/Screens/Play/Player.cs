@@ -665,7 +665,7 @@ namespace osu.Game.Screens.Play
 
                         using (var stream = new MemoryStream())
                         {
-                            new LegacyScoreEncoder(score, gameplayBeatmap).Encode(stream);
+                            new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
                             replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
                         }
                     }
