@@ -246,12 +246,19 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
+        private readonly Queue<Tuple<int, bool>> selectionQueue = new Queue<Tuple<int, bool>>();
+
         /// <summary>
         /// Increment selection in the carousel in a chosen direction.
         /// </summary>
         /// <param name="direction">The direction to increment. Negative is backwards.</param>
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
+        {
+            selectionQueue.Enqueue(new Tuple<int, bool>(direction, skipDifficulties));
+        }
+
+        private void selectNext(int direction, bool skipDifficulties)
         {
             var visibleItems = Items.Where(s => !s.Item.Filtered.Value).ToList();
 
@@ -475,6 +482,12 @@ namespace osu.Game.Screens.Select
         protected override void Update()
         {
             base.Update();
+
+            if (selectionQueue.Any())
+            {
+                var queued = selectionQueue.Dequeue();
+                selectNext(queued.Item1, queued.Item2);
+            }
 
             if (!itemsCache.IsValid)
                 updateItems();
