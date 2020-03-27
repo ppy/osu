@@ -26,6 +26,20 @@ namespace osu.Game.Overlays.Chat
         protected FillFlowContainer ChatLineFlow;
         private OsuScrollContainer scroll;
 
+        private bool scrollbarVisible = true;
+
+        public bool ScrollbarVisible
+        {
+            set
+            {
+                if (scrollbarVisible == value) return;
+
+                scrollbarVisible = value;
+                if (scroll != null)
+                    scroll.ScrollbarVisible = value;
+            }
+        }
+
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -44,6 +58,7 @@ namespace osu.Game.Overlays.Chat
                 Masking = true,
                 Child = scroll = new OsuScrollContainer
                 {
+                    ScrollbarVisible = scrollbarVisible,
                     RelativeSizeAxes = Axes.Both,
                     // Some chat lines have effects that slightly protrude to the bottom,
                     // which we do not want to mask away, hence the padding.
