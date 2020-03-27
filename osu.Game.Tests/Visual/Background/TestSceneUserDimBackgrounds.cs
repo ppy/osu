@@ -37,7 +37,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : ManualInputManagerTestScene
+    public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -278,6 +278,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private void setupUserSettings()
         {
+            AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
             AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {

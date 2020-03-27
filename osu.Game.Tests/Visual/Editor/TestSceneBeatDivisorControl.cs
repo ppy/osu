@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    public class TestSceneBeatDivisorControl : ManualInputManagerTestScene
+    public class TestSceneBeatDivisorControl : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(BindableBeatDivisor) };
         private BeatDivisorControl beatDivisorControl;

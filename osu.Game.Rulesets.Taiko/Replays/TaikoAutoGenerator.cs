@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     {
                         TaikoAction[] actions;
 
-                        if (hit is CentreHit)
+                        if (hit.Type == HitType.Centre)
                         {
                             actions = h.IsStrong
                                 ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
