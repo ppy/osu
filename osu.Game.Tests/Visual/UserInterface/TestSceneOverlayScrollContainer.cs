@@ -15,7 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayScrollContainer : ManualInputManagerTestScene
+    public class TestSceneOverlayScrollContainer : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
