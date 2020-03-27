@@ -118,7 +118,7 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     TriangleScale = 2,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.2f),
+                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : OsuColour.Gray(0.2f),
                                     Alpha = 0.65f,
                                 },
                                 background = new Box
