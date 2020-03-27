@@ -65,6 +65,7 @@ namespace osu.Game.Screens.Select
         {
             Children = new Drawable[]
             {
+                new Footer.BackgroundTriangles(100),
                 Background = new Box
                 {
                     Colour = Color4.Black,
