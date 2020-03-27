@@ -83,15 +83,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count, 3);
         }
 
-        [Test]
-        public void TestTraversalHold()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestTraversalHold(bool forwards)
         {
             var sets = new List<BeatmapSetInfo>();
             const int create_this_many_sets = 200;
 
             for (int i = 0; i < create_this_many_sets; i++)
             {
-                var set = createTestBeatmapSet(i);
+                var set = createTestBeatmapSet(i + 1);
                 sets.Add(set);
             }
 
@@ -99,15 +100,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             void selectNextAndAssert(int amount)
             {
-                setSelected(1, 1);
-                AddStep($"Next beatmap {amount} times", () =>
+                setSelected(forwards ? 1 : create_this_many_sets, 1);
+                string text = forwards ? "Next" : "Previous";
+                AddStep($"{text} beatmap {amount} times", () =>
                 {
                     for (int i = 0; i < amount; i++)
                     {
-                        carousel.SelectNext();
+                        carousel.SelectNext(forwards ? 1 : -1);
                     }
                 });
-                waitForSelection(amount + 1);
+                waitForSelection(forwards ? amount + 1 : create_this_many_sets - amount);
             }
 
             for (int i = 1; i < create_this_many_sets; i += i)
