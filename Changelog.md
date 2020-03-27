@@ -240,3 +240,6 @@
     *   [m] [Make slider judgements count towards base score / accuracy #8452]
     *   [m] [Only play slider end sounds if tracking #8451]
     *   [m] [Fix osu!mania replays recording incorrectly when key mod applied #8461]
+    *   [m] [Disable raw input toggle on all but windows #8407]
+    *   [m] [Fix NullReferenceException when starting the no-video version of a beatmap with video #8455]
+    *   [m] [Update framework #8467]
