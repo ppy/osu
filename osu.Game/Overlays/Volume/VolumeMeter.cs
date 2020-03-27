@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Volume
                 },
                 new Container
                 {
-                    Size = new Vector2(120, 20),
+                    Size = new Vector2(80, 20),
                     CornerRadius = 10,
                     Masking = true,
                     Margin = new MarginPadding { Left = circleSize + 10 },

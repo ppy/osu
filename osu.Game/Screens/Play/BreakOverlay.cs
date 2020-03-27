@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,8 +17,6 @@ namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
-        private readonly ScoreProcessor scoreProcessor;
-
         /// <summary>
         /// The duration of the break overlay fading.
         /// </summary>
@@ -39,10 +36,6 @@ namespace osu.Game.Screens.Play
             {
                 breaks = value;
 
-                // reset index in case the new breaks list is smaller than last one
-                isBreakTime.Value = false;
-                CurrentBreakIndex = 0;
-
                 if (IsLoaded)
                     initializeBreaks();
             }
@@ -50,32 +43,22 @@ namespace osu.Game.Screens.Play
 
         public override bool RemoveCompletedTransforms => false;
 
-        /// <summary>
-        /// Whether the gameplay is currently in a break.
-        /// </summary>
-        public IBindable<bool> IsBreakTime => isBreakTime;
-
-        protected int CurrentBreakIndex;
-
-        private readonly BindableBool isBreakTime = new BindableBool();
-
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
-        private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
-        private readonly double gameplayStartTime;
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableBool replayLoaded = new BindableBool();
         public readonly BreakSettingsOverlay BreakSettingsOverlay;
         protected virtual BreakSettingsOverlay CreateBreakSettingsOverlay() => new BreakSettingsOverlay();
 
-        public BreakOverlay(bool letterboxing, DrawableRuleset drawableRuleset = null, double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, DrawableRuleset drawableRuleset = null, ScoreProcessor scoreProcessor = null)
         {
             this.drawableRuleset = drawableRuleset;
-            this.gameplayStartTime = gameplayStartTime;
-            this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
+
+            BreakInfo info;
+
             Child = fadeContainer = new Container
             {
                 Alpha = 0,
@@ -127,60 +110,22 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            if (scoreProcessor != null) bindProcessor(scoreProcessor);
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
-        {
-            if (clock != null) Clock = clock;
-            if (drawableRuleset != null)
+            if (scoreProcessor != null)
             {
-                BindDrawableRuleset(drawableRuleset);
+                info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
+                info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
             }
-            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             initializeBreaks();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            updateBreakTimeBindable();
-        }
-
-        private void updateBreakTimeBindable() =>
-            isBreakTime.Value = getCurrentBreak()?.HasEffect == true
-                                || Clock.CurrentTime < gameplayStartTime
-                                || scoreProcessor?.HasCompleted == true;
-
-        private BreakPeriod getCurrentBreak()
-        {
-            if (breaks?.Count > 0)
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+            if (drawableRuleset != null)
             {
-                var time = Clock.CurrentTime;
-
-                if (time > breaks[CurrentBreakIndex].EndTime)
-                {
-                    while (time > breaks[CurrentBreakIndex].EndTime && CurrentBreakIndex < breaks.Count - 1)
-                        CurrentBreakIndex++;
-                }
-                else
-                {
-                    while (time < breaks[CurrentBreakIndex].StartTime && CurrentBreakIndex > 0)
-                        CurrentBreakIndex--;
-                }
-
-                var closest = breaks[CurrentBreakIndex];
-
-                return closest.Contains(time) ? closest : null;
+                BindDrawableRuleset(drawableRuleset);
             }
-
-            return null;
         }
 
         private void initializeBreaks()
@@ -220,12 +165,6 @@ namespace osu.Game.Screens.Play
                 }
             }
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
-        }
-
-        private void bindProcessor(ScoreProcessor processor)
-        {
-            info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
-            info.GradeDisplay.Current.BindTo(processor.Rank);
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)

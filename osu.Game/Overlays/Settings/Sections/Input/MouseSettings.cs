@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "绝对输入(在Linux上有问题)",
+                    LabelText = "绝对输入",
                     Bindable = rawInputToggle
                 },
                 sensitivity = new SensitivitySetting
@@ -56,24 +57,32 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
             };
 
-            rawInputToggle.ValueChanged += enabled =>
+            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {
-                // this is temporary until we support per-handler settings.
-                const string raw_mouse_handler = @"OsuTKRawMouseHandler";
-                const string standard_mouse_handler = @"OsuTKMouseHandler";
-
-                ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
-            };
-
-            ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
-            ignoredInputHandler.ValueChanged += handler =>
+                rawInputToggle.Disabled = true;
+                sensitivity.Bindable.Disabled = true;
+            }
+            else
             {
-                bool raw = !handler.NewValue.Contains("Raw");
-                rawInputToggle.Value = raw;
-                sensitivity.Bindable.Disabled = !raw;
-            };
+                rawInputToggle.ValueChanged += enabled =>
+                {
+                    // this is temporary until we support per-handler settings.
+                    const string raw_mouse_handler = @"OsuTKRawMouseHandler";
+                    const string standard_mouse_handler = @"OsuTKMouseHandler";
 
-            ignoredInputHandler.TriggerChange();
+                    ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
+                };
+
+                ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
+                ignoredInputHandler.ValueChanged += handler =>
+                {
+                    bool raw = !handler.NewValue.Contains("Raw");
+                    rawInputToggle.Value = raw;
+                    sensitivity.Bindable.Disabled = !raw;
+                };
+
+                ignoredInputHandler.TriggerChange();
+            }
         }
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>

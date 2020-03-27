@@ -55,6 +55,8 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.LoadComplete();
 
+            if (videoSprite == null) return;
+
             using (videoSprite.BeginAbsoluteSequence(0))
                 videoSprite.FadeIn(500);
         }

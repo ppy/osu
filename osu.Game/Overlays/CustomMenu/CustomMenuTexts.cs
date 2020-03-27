@@ -106,6 +106,8 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.AddText("查询。");
             textFlow.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
             textFlow.AddLink("contact@ppy.sh","mailto:contact@ppy.sh");
+            textFlow.AddParagraph("与汉化版有关的一些问题，您也可以发送邮件至");
+            textFlow.AddLink("midnightcarnival@outlook.com","mailto:midnightcarnival@outlook.com");
 
             textFlow.NewParagraph();
             textFlow.AddParagraph("项目引用", Titlefont );

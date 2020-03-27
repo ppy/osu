@@ -1,4 +1,5 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿ 
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
@@ -30,8 +31,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimePreempt = (StartTime - SpanStartTime) / 2 + offset;
         }
 
-        public override Judgement CreateJudgement() => new OsuJudgement();
-
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override Judgement CreateJudgement() => new SliderTickJudgement();
+
+        public class SliderTickJudgement : OsuJudgement
+        {
+            protected override int NumericResultFor(HitResult result) => result == MaxResult ? 10 : 0;
+        }
     }
 }

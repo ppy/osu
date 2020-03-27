@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Select
 {
@@ -68,6 +70,11 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
+                new FooterTriangles
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -102,6 +109,30 @@ namespace osu.Game.Screens.Select
             };
 
             updateModeLight();
+        }
+
+        private class FooterTriangles : Container
+        {
+            private readonly Triangles triangles;
+
+            public FooterTriangles()
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 50;
+                Masking = true;
+                Children = new Drawable[]
+                {
+                    triangles = new Triangles
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        TriangleScale = 2,
+                        Alpha = 0.6f,
+                        Colour = OsuColour.Gray(0.2f),
+                    },
+                };
+            }
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
