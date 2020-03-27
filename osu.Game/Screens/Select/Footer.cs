@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new FooterTriangles
+                new BackgroundTriangles()
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -111,14 +111,14 @@ namespace osu.Game.Screens.Select
             updateModeLight();
         }
 
-        private class FooterTriangles : Container
+        public class BackgroundTriangles : Container
         {
             private readonly Triangles triangles;
 
-            public FooterTriangles()
+            public BackgroundTriangles(float height = HEIGHT)
             {
                 RelativeSizeAxes = Axes.X;
-                Height = 50;
+                Height = height;
                 Masking = true;
                 Children = new Drawable[]
                 {
