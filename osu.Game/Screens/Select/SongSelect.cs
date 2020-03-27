@@ -345,6 +345,8 @@ namespace osu.Game.Screens.Select
             if (!Carousel.BeatmapSetsLoaded)
                 return;
 
+            Carousel.DequeueFromSelectionQueue(true);
+
             transferRulesetValue();
 
             // while transferRulesetValue will flush, it only does so if the ruleset changes.

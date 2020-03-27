@@ -302,6 +302,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        internal void DequeueFromSelectionQueue(bool dequeueAll = false)
+        {
+            do
+            {
+                if (selectionQueue.Any())
+                {
+                    var queued = selectionQueue.Dequeue();
+                    selectNext(queued.Item1, queued.Item2);
+                }
+            } while (selectionQueue.Any() && dequeueAll);
+        }
+
         /// <summary>
         /// Select the next beatmap in the random sequence.
         /// </summary>
@@ -483,11 +495,7 @@ namespace osu.Game.Screens.Select
         {
             base.Update();
 
-            if (selectionQueue.Any())
-            {
-                var queued = selectionQueue.Dequeue();
-                selectNext(queued.Item1, queued.Item2);
-            }
+            DequeueFromSelectionQueue();
 
             if (!itemsCache.IsValid)
                 updateItems();
