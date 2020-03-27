@@ -308,7 +308,7 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
-                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks)
+                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Clock = DrawableRuleset.FrameStableClock,
                     ProcessCustomClock = false,
