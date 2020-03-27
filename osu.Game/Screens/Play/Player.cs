@@ -254,6 +254,13 @@ namespace osu.Game.Screens.Play
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
+                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset)
+                {
+                    BreakSettingsOverlay = { },
+                    Clock = DrawableRuleset.FrameStableClock,
+                    ProcessCustomClock = false,
+                    Breaks = working.Beatmap.Breaks
+                },
                 HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value)
                 {
                     HoldToQuit =
@@ -276,13 +283,6 @@ namespace osu.Game.Screens.Play
                     RequestSkip = GameplayClockContainer.Skip
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
-                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset)
-                {
-                    BreakSettingsOverlay = { },
-                    Clock = DrawableRuleset.FrameStableClock,
-                    ProcessCustomClock = false,
-                    Breaks = working.Beatmap.Breaks
-                },
                 FailOverlay = new FailOverlay
                 {
                     OnRetry = Restart,
