@@ -45,9 +45,6 @@ namespace osu.Game.Scoring.Legacy
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
 
-                currentBeatmap = workingBeatmap.Beatmap;
-                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
-
                 scoreInfo.User = new User { Username = sr.ReadString() };
 
                 // MD5Hash
@@ -67,6 +64,9 @@ namespace osu.Game.Scoring.Legacy
                 sr.ReadBoolean();
 
                 scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+
+                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
+                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
