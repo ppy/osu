@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly BreakArrows breakArrows;
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
         {
             RelativeSizeAxes = Axes.Both;
 
