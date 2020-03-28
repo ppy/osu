@@ -118,6 +118,50 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
         }
 
+        [Test]
+        public void TestTraversalHoldDifficulties()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                var set = createTestBeatmapSet(i + 1);
+                sets.Add(set);
+            }
+
+            loadBeatmaps(sets);
+
+            void selectNextAndAssert(int amount, bool forwards, int expectedSet, int expectedDiff)
+            {
+                // Select very first or very last difficulty
+                setSelected(forwards ? 1 : 20, forwards ? 1 : 3);
+                string text = forwards ? "Next" : "Previous";
+                AddStep($"{text} difficulty {amount} times", () =>
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        carousel.SelectNext(forwards ? 1 : -1, false);
+                    }
+                });
+                waitForSelection(expectedSet, expectedDiff);
+            }
+
+            // Selects next set once, difficulty index doesn't change
+            selectNextAndAssert(3, true, 2, 1);
+            // Selects next set 16 times (50 // 3 == 16), difficulty index changes twice (50 % 3 == 2)
+            selectNextAndAssert(50, true, 17, 3);
+            // Travels around the carousel thrice (200/60 == 3)
+            // continues to select 20 times (200 % 60 == 20)
+            // selects next set 6 times (20 // 3 == 6)
+            // difficulty index changes twice (20 % 3 == 2)
+            selectNextAndAssert(200, true, 7, 3);
+
+            // All same but in reverse
+            selectNextAndAssert(3, false, 19, 3);
+            selectNextAndAssert(50, false, 4, 1);
+            selectNextAndAssert(200, false, 14, 1);
+        }
+
         /// <summary>
         /// Test filtering
         /// </summary>
