@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Play
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset)
+                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor, DrawableRuleset)
                 {
                     BreakSettingsOverlay = { },
                     Clock = DrawableRuleset.FrameStableClock,
