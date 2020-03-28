@@ -489,6 +489,17 @@ namespace osu.Game.Screens.Select
                 Carousel.SelectNextRandom();
         }
 
+        internal static double DifferenceToRecommended(BeatmapInfo beatmap, double recommendedStarDifficulty)
+        {
+            var difference = beatmap.StarDifficulty - recommendedStarDifficulty;
+            return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
+        }
+
+        internal bool IsRecommended(BeatmapInfo beatmap)
+        {
+            return Carousel.IsRecommended(beatmap);
+        }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);

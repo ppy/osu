@@ -39,11 +39,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 return Children.OfType<CarouselBeatmap>()
                                .Where(b => !b.Filtered.Value)
-                               .OrderBy(b =>
-                               {
-                                   var difference = b.Beatmap.StarDifficulty - recommendedStarDifficulty.Value;
-                                   return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
-                               })
+                               .OrderBy(b => SongSelect.DifferenceToRecommended(b.Beatmap, recommendedStarDifficulty.Value))
                                .FirstOrDefault();
             }
 

@@ -185,6 +185,16 @@ namespace osu.Game.Screens.Select
             api.PerformAsync(req);
         }
 
+        internal bool IsRecommended(BeatmapInfo beatmap)
+        {
+            if (RecommendedStarDifficulty.Value == 0)
+                return false;
+
+            BeatmapSetInfo set = beatmap.BeatmapSet;
+            BeatmapInfo recommended = set.Beatmaps.OrderBy(b => SongSelect.DifferenceToRecommended(b, RecommendedStarDifficulty.Value)).FirstOrDefault();
+            return beatmap == recommended && Math.Abs(beatmap.StarDifficulty - RecommendedStarDifficulty.Value) < 1.5;
+        }
+
         protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>

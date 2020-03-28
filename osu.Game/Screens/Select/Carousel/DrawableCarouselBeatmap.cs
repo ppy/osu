@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Triangles triangles;
         private StarCounter starCounter;
+        private bool isRecommended;
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
@@ -55,6 +56,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
                 editRequested = songSelect.Edit;
+                isRecommended = songSelect.IsRecommended(beatmap);
             }
 
             if (manager != null)
@@ -124,6 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 },
                                 starCounter = new StarCounter
                                 {
+                                    Colour = isRecommended ? Color4.Yellow : Color4.White,
                                     Current = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
