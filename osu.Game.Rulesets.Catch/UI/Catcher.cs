@@ -143,14 +143,14 @@ namespace osu.Game.Rulesets.Catch.UI
             var ourRadius = fruit.DisplayRadius;
             float theirRadius = 0;
 
-            const float allowance = 6;
+            const float allowance = 10;
 
             while (caughtFruit.Any(f =>
                 f.LifetimeEnd == double.MaxValue &&
                 Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = f.DrawSize.X / 2 * f.Scale.X)) / (allowance / 2)))
             {
                 var diff = (ourRadius + theirRadius) / allowance;
-                fruit.X += (RNG.NextSingle() - 0.5f) * 2 * diff;
+                fruit.X += (RNG.NextSingle() - 0.5f) * diff * 2;
                 fruit.Y -= RNG.NextSingle() * diff;
             }
 
