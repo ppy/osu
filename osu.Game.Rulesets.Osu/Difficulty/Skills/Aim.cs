@@ -2,18 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using osu.Game;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using static osu.Game.Beatmaps.BeatmapInfo;
-using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {

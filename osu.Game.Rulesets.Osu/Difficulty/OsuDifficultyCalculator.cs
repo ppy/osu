@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
-using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
