@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Break;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -27,7 +28,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to break time", () => Player.GameplayClockContainer.Seek(Player.ChildrenOfType<BreakTracker>().First().Breaks.First().StartTime));
             AddUntilStep("wait for seek to complete", () =>
                 Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= Player.BreakOverlay.Breaks.First().StartTime);
-            AddAssert("test keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
+            AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
+            AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
         }
