@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < create_this_many_sets; i++)
             {
-                var set = createTestBeatmapSet(i);
+                var set = createTestBeatmapSet(i + 1);
                 sets.Add(set);
             }
 
