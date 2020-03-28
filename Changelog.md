@@ -248,3 +248,4 @@
 *   合并上游pr
     *   [m] [Improve robustness of loader tests #8476]
     *   [m] [Fix break overlay not displaying progress information #8474]
+    *   [m] [Fix break overlay displaying in front of all other player overlays #8475]

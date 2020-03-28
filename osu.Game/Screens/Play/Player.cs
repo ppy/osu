@@ -251,9 +251,6 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                // display the cursor above some HUD elements.
-                DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
                 BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor, DrawableRuleset)
                 {
                     BreakSettingsOverlay = { },
@@ -261,6 +258,9 @@ namespace osu.Game.Screens.Play
                     ProcessCustomClock = false,
                     Breaks = working.Beatmap.Breaks
                 },
+                // display the cursor above some HUD elements.
+                DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
+                DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
                 HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value)
                 {
                     HoldToQuit =
