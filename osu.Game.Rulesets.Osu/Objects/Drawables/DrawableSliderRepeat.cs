@@ -87,6 +87,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
+            if (IsHit) return;
+
             bool isRepeatAtEnd = sliderRepeat.RepeatIndex % 2 == 0;
             List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
 
