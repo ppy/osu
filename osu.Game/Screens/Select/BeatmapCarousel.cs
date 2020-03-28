@@ -253,46 +253,35 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            var visibleItems = Items.Where(s => !s.Item.Filtered.Value).ToList();
-
-            if (!visibleItems.Any())
+            if (!root.Children.Where(s => !s.Filtered.Value).ToList().Any())
                 return;
 
-            DrawableCarouselItem drawable = null;
+            if (skipDifficulties)
+                selectNextSet(direction, true);
+            else
+                selectNextDifficulty(direction);
+        }
 
-            if (selectedBeatmap != null && (drawable = selectedBeatmap.Drawables.FirstOrDefault()) == null)
-                // if the selected beatmap isn't present yet, we can't correctly change selection.
-                // we can fix this by changing this method to not reference drawables / Items in the first place.
-                return;
+        private void selectNextSet(int direction, bool skipDifficulties)
+        {
+            var visibleSets = root.Children.OfType<CarouselBeatmapSet>().Where(s => !s.Filtered.Value).ToList();
 
-            int originalIndex = visibleItems.IndexOf(drawable);
-            int currentIndex = originalIndex;
+            var item = visibleSets[(visibleSets.IndexOf(selectedBeatmapSet) + direction + visibleSets.Count) % visibleSets.Count];
 
-            // local function to increment the index in the required direction, wrapping over extremities.
-            int incrementIndex() => currentIndex = (currentIndex + direction + visibleItems.Count) % visibleItems.Count;
+            if (skipDifficulties)
+                select(item);
+            else
+                select(direction > 0 ? item.Beatmaps.First(b => !b.Filtered.Value) : item.Beatmaps.Last(b => !b.Filtered.Value));
+        }
 
-            while (incrementIndex() != originalIndex)
-            {
-                var item = visibleItems[currentIndex].Item;
-
-                if (item.Filtered.Value || item.State.Value == CarouselItemState.Selected) continue;
-
-                switch (item)
-                {
-                    case CarouselBeatmap beatmap:
-                        if (skipDifficulties) continue;
-
-                        select(beatmap);
-                        return;
-
-                    case CarouselBeatmapSet set:
-                        if (skipDifficulties)
-                            select(set);
-                        else
-                            select(direction > 0 ? set.Beatmaps.First(b => !b.Filtered.Value) : set.Beatmaps.Last(b => !b.Filtered.Value));
-                        return;
-                }
-            }
+        private void selectNextDifficulty(int direction)
+        {
+            var difficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
+            int index = difficulties.IndexOf(selectedBeatmap);
+            if (index + direction < 0 || index + direction >= difficulties.Count)
+                selectNextSet(direction, false);
+            else
+                select(difficulties[index + direction]);
         }
 
         /// <summary>
