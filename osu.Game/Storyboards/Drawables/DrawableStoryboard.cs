@@ -75,7 +75,7 @@ namespace osu.Game.Storyboards.Drawables
         private void updateLayerVisibility()
         {
             foreach (var layer in Children)
-                layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
+                layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
     }
 }
