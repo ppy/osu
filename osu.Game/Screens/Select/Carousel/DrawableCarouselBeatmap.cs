@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -122,10 +123,23 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                     }
                                 },
-                                starCounter = new StarCounter
+                                new FillFlowContainer
                                 {
-                                    Current = (float)beatmap.StarDifficulty,
-                                    Scale = new Vector2(0.8f),
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4, 0),
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new CarouselBeatmapRank(beatmap)
+                                        {
+                                            Scale = new Vector2(0.8f)
+                                        },
+                                        starCounter = new StarCounter
+                                        {
+                                            Current = (float)beatmap.StarDifficulty,
+                                            Scale = new Vector2(0.8f),
+                                        }
+                                    }
                                 }
                             }
                         }
