@@ -266,12 +266,12 @@ namespace osu.Game.Screens.Select
         {
             var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
 
-            var item = visibleSets[(visibleSets.IndexOf(selectedBeatmapSet) + direction + visibleSets.Count) % visibleSets.Count];
+            var nextSet = visibleSets[(visibleSets.IndexOf(selectedBeatmapSet) + direction + visibleSets.Count) % visibleSets.Count];
 
             if (skipDifficulties)
-                select(item);
+                select(nextSet);
             else
-                select(direction > 0 ? item.Beatmaps.First(b => !b.Filtered.Value) : item.Beatmaps.Last(b => !b.Filtered.Value));
+                select(direction > 0 ? nextSet.Beatmaps.First(b => !b.Filtered.Value) : nextSet.Beatmaps.Last(b => !b.Filtered.Value));
         }
 
         private void selectNextDifficulty(int direction)
