@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select
             switch (e.Key)
             {
                 case Key.Enter:
+                case Key.KeypadEnter:
                     // this is a special hard-coded case; we can't rely on OnPressed (of SongSelect) as GlobalActionContainer is
                     // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
                     FinaliseSelection();
@@ -83,8 +84,6 @@ namespace osu.Game.Screens.Select
                     removeAutoModOnResume = true;
                 }
             }
-
-            Beatmap.Value.Track.Looping = false;
 
             SampleConfirm?.Play();
 

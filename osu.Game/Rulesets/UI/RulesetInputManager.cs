@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,9 +24,24 @@ using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
+        private ReplayRecorder recorder;
+
+        public ReplayRecorder Recorder
+        {
+            set
+            {
+                if (recorder != null)
+                    throw new InvalidOperationException("Cannot attach more than one recorder");
+
+                recorder = value;
+
+                KeyBindingContainer.Add(recorder);
+            }
+        }
+
         protected override InputState CreateInitialState()
         {
             var state = base.CreateInitialState();
@@ -148,7 +164,7 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        protected virtual RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        protected virtual KeyBindingContainer<T> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
 
         public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
@@ -166,6 +182,11 @@ namespace osu.Game.Rulesets.UI
     public interface IHasReplayHandler
     {
         ReplayInputHandler ReplayInputHandler { get; set; }
+    }
+
+    public interface IHasRecordingHandler
+    {
+        public ReplayRecorder Recorder { set; }
     }
 
     /// <summary>
