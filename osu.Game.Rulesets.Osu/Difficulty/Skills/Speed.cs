@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using static System.Math;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -25,20 +24,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double streamaimconst = 2.42;
 
-        //  private const double stdevconst = 0.149820;
-
         private int sdsplitcounter = 0;
         private int sdsplitcounter2 = 0;
-        // private int runcheck1 = 0;
 
         private double sdstrainmult = 0;
-        // private double sdstrainmult2;
 
-        // private double sdstrainmult2;
-
-        public readonly List<double> JumpDistances = new List<double>();
-        public readonly List<double> StrainTimes = new List<double>();
-        public List<double> JumpDistances2 = new List<double>();
+        private readonly List<double> jumpDistances = new List<double>();
+        private readonly List<double> strainTimes = new List<double>();
+        private readonly List<double> jumpDistances2 = new List<double>();
 
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
@@ -53,18 +46,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (values.Any())
             {
-                // Compute the average.     
                 double avg = values.Average();
 
-                // Perform the Sum of (value-avg)_2_2.      
                 double sum = values.Sum(d => Math.Pow(d - avg, 2));
 
-                // Put it all together.      
                 standardDeviation = Math.Sqrt((sum) / (values.Count()));
             }
 
             return standardDeviation;
         }
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -76,25 +67,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (osuCurrent.JumpDistance < 150 && sectionvelocity < streamaimconst && sectionvelocity > 0.9 && Previous.Count > 0 && osuCurrent.Angle != null && osuCurrent.Angle.Value >= Math.PI / 2 && osuCurrent.StrainTime < 100)
             {
+                jumpDistances2.Add(sectionvelocity);
 
-                JumpDistances2.Add(sectionvelocity);
-
-                StrainTimes.Add(osuCurrent.StrainTime);
+                strainTimes.Add(osuCurrent.StrainTime);
 
                 sdsplitcounter++;
 
-                if (JumpDistances2.Count > 1)
+                if (jumpDistances2.Count > 1)
                 {
                     var osuPrevious = (OsuDifficultyHitObject)Previous[0];
                     double oldsectionvelocity = osuPrevious.JumpDistance / osuPrevious.StrainTime;
                     double acr = (sectionvelocity - oldsectionvelocity) / osuPrevious.StrainTime;
+
                     if (acr > 0)
                     {
-                        JumpDistances.Add(acr);
+                        jumpDistances.Add(acr);
                     }
-                    if (JumpDistances.Count > 1)
+
+                    if (jumpDistances.Count > 1)
                     {
-                        sdstrainmult = calculateStandardDeviation(JumpDistances);
+                        sdstrainmult = calculateStandardDeviation(jumpDistances);
                         // sdstrainmult *= Log(osuCurrent.StrainTime, 2);
                         // sdstrainmult2 = Pow(0.93, osuCurrent.StrainTime - 100) - 1;
                         // sdstrainmult *= sdstrainmult2;
@@ -107,8 +99,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         if (sdsplitcounter2 > 0)
                         {
-                            JumpDistances.Clear();
-                            JumpDistances.TrimExcess();
+                            jumpDistances.Clear();
+                            jumpDistances.TrimExcess();
                             sdsplitcounter2 = 0;
                         }
                     }
@@ -118,20 +110,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 if (sdsplitcounter > 0)
                 {
-                    JumpDistances2.Clear();
-                    JumpDistances2.TrimExcess();
+                    jumpDistances2.Clear();
+                    jumpDistances2.TrimExcess();
                     sdsplitcounter = 0;
                 }
-
             }
-
-            // if (osuCurrent.LastObject != null)
-            // {
-            //     sdstrainmult = calculateStandardDeviation(JumpDistances);
-            //     runcheck1++;
-            // }
-
-            // Console.WriteLine(runcheck1);
 
             double distance = Math.Min(single_spacing_threshold, osuCurrent.TravelDistance + osuCurrent.JumpDistance);
             double deltaTime = Math.Max(max_speed_bonus, current.DeltaTime);
