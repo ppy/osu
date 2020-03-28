@@ -19,7 +19,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;

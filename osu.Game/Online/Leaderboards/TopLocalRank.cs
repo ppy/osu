@@ -17,11 +17,11 @@ namespace osu.Game.Online.Leaderboards
     public class TopLocalRank : Container
     {
         private readonly BeatmapInfo beatmap;
+        private readonly UpdateableRank rank;
 
         private ScoreManager scores;
         private IBindable<RulesetInfo> ruleset;
         private IAPIProvider api;
-        private UpdateableRank rank;
 
         /// <summary>
         /// Raised when the top score is loaded
