@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     }, false, false);
             });
 
-            AddAssert("fruit colour default-hyperdash", () => checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour, legacyFruit));
+            AddAssert("default colour", () => checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour, legacyFruit));
         }
 
         [TestCase(false, true)]
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     }, customCatcherHyperDashColour, true);
             });
 
-            AddAssert("fruit colour custom-hyperdash", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashFruitColour, legacyFruit));
+            AddAssert("custom colour", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashFruitColour, legacyFruit));
         }
 
         [TestCase(false)]
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     }, true, false);
             });
 
-            AddAssert("fruit colour catcher-custom-hyperdash", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashColour, legacyFruit));
+            AddAssert("catcher custom colour", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashColour, legacyFruit));
         }
 
         private Drawable setupSkinHierarchy(Func<Drawable> getChild, bool customHyperDashCatcherColour = false, bool customHyperDashFruitColour = false, bool customHyperDashAfterColour = false)
@@ -139,13 +139,12 @@ namespace osu.Game.Rulesets.Catch.Tests
                 if (componentName == "fruit-pear")
                 {
                     // convince CatchLegacySkinTransformer to use the LegacyFruitPiece for pear fruit.
-                    var texture = new Texture(Texture.WhitePixel.TextureGL)
+                    return new Texture(Texture.WhitePixel.TextureGL)
                     {
                         Width = 1,
                         Height = 1,
                         ScaleAdjust = 1 / 96f
                     };
-                    return texture;
                 }
 
                 return null;
@@ -155,25 +154,16 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
-                switch (lookup)
+                if (lookup is CatchSkinConfiguration config)
                 {
-                    case CatchSkinConfiguration config when config == CatchSkinConfiguration.HyperDash:
-                        if (customHyperDashCatcherColour)
-                            return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashColour));
+                    if (config == CatchSkinConfiguration.HyperDash && customHyperDashCatcherColour)
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashColour));
 
-                        return null;
+                    if (config == CatchSkinConfiguration.HyperDashFruit && customHyperDashFruitColour)
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashFruitColour));
 
-                    case CatchSkinConfiguration config when config == CatchSkinConfiguration.HyperDashFruit:
-                        if (customHyperDashFruitColour)
-                            return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashFruitColour));
-
-                        return null;
-
-                    case CatchSkinConfiguration config when config == CatchSkinConfiguration.HyperDashAfterImage:
-                        if (customHyperDashAfterColour)
-                            return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashAfterColour));
-
-                        return null;
+                    if (config == CatchSkinConfiguration.HyperDashAfterImage && customHyperDashAfterColour)
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashAfterColour));
                 }
 
                 return null;
