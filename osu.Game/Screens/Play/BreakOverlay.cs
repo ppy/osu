@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
         public readonly BreakSettingsOverlay BreakSettingsOverlay;
         protected virtual BreakSettingsOverlay CreateBreakSettingsOverlay() => new BreakSettingsOverlay();
 
-        public BreakOverlay(bool letterboxing, DrawableRuleset drawableRuleset = null, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset = null)
         {
             this.drawableRuleset = drawableRuleset;
             RelativeSizeAxes = Axes.Both;

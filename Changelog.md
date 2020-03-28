@@ -243,3 +243,8 @@
     *   [m] [Disable raw input toggle on all but windows #8407]
     *   [m] [Fix NullReferenceException when starting the no-video version of a beatmap with video #8455]
     *   [m] [Update framework #8467]
+
+### 2020/3/28
+*   合并上游pr
+    *   [m] [Improve robustness of loader tests #8476]
+    *   [m] [Fix break overlay not displaying progress information #8474]
