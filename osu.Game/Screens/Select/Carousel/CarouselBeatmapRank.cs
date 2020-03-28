@@ -6,10 +6,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
-namespace osu.Game.Online.Leaderboards
+namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapRank : Container
     {
