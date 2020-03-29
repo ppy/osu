@@ -117,7 +117,7 @@ namespace osu.Desktop
         /// </summary>
         private class StableStorage : WindowsStorage
         {
-            private const string default_songs_path = "Songs";
+            private const string songs_path = "Songs";
 
             private readonly string songsPath;
             private bool usesCustomSongPath;
@@ -132,7 +132,7 @@ namespace osu.Desktop
 
             protected override string LocateBasePath()
             {
-                static bool checkExists(string p) => File.Exists(Path.Combine(p, "osu!.exe"));
+                static bool checkExists(string p) => Directory.EnumerateFiles(p, "osu!.*.cfg").Any();
 
                 string stableInstallPath;
 
@@ -159,6 +159,22 @@ namespace osu.Desktop
                 return null;
             }
 
+            public override Storage GetStorageForDirectory(string directory)
+            {
+                if (usesCustomSongPath && directory.Equals(songs_path, StringComparison.Ordinal))
+                    return new StableSongsStorage(Path.GetFullPath(songsPath), host);
+
+                return base.GetStorageForDirectory(directory);
+            }
+
+            public override bool ExistsDirectory(string directory)
+            {
+                if (usesCustomSongPath && directory.Equals(songs_path, StringComparison.Ordinal))
+                    return Directory.Exists(songsPath);
+
+                return base.ExistsDirectory(directory);
+            }
+
             /// <summary>
             /// osu!stable <c>Songs</c> folder can be moved to another location by changing the <c>BeatmapDirectory</c> setting in the stable configuration file.
             /// This locates the <c>Songs</c> folder location for this stable installation and sets flags if the song folder location has been customized.
@@ -175,9 +191,9 @@ namespace osu.Desktop
 
                     if (line?.StartsWith("BeatmapDirectory") == true)
                     {
-                        var directory = line.Split('=')[1].TrimStart();
+                        string directory = line.Split('=')[1].TrimStart();
 
-                        if (!directory.Equals(default_songs_path, StringComparison.Ordinal))
+                        if (!directory.Equals(songs_path, StringComparison.Ordinal))
                         {
                             usesCustomSongPath = true;
                             return Path.GetFullPath(directory);
@@ -187,23 +203,7 @@ namespace osu.Desktop
                     }
                 }
 
-                return default_songs_path;
-            }
-
-            public override Storage GetStorageForDirectory(string directory)
-            {
-                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && usesCustomSongPath)
-                    return new StableSongsStorage(Path.GetFullPath(songsPath), host);
-
-                return base.GetStorageForDirectory(directory);
-            }
-
-            public override bool ExistsDirectory(string directory)
-            {
-                if (directory.Equals(default_songs_path, StringComparison.Ordinal) && usesCustomSongPath)
-                    return Directory.Exists(songsPath);
-
-                return base.ExistsDirectory(directory);
+                return songs_path;
             }
 
             private class StableSongsStorage : WindowsStorage
