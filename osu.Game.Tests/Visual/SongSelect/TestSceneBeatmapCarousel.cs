@@ -148,11 +148,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             // Selects next set once, difficulty index doesn't change
             selectNextAndAssert(3, true, 2, 1);
-            // Selects next set 16 times (50 // 3 == 16), difficulty index changes twice (50 % 3 == 2)
+
+            // Selects next set 16 times (50 \ 3 == 16), difficulty index changes twice (50 % 3 == 2)
             selectNextAndAssert(50, true, 17, 3);
-            // Travels around the carousel thrice (200/60 == 3)
-            // continues to select 20 times (200 % 60 == 20)
-            // selects next set 6 times (20 // 3 == 6)
+
+            // Travels around the carousel thrice (200 \ 60 == 3)
+            // continues to select 20 times (200 \ 60 == 20)
+            // selects next set 6 times (20 \ 3 == 6)
             // difficulty index changes twice (20 % 3 == 2)
             selectNextAndAssert(200, true, 7, 3);
 
