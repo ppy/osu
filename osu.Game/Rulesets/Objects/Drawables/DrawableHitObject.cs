@@ -336,7 +336,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             // Use with-offset combo indices for the beatmap skin only to avoid
             // assigning combo colour of incorrect sets (of current skin) to this object.
-            int comboIndex = beatmapSkins.Value ? combo.ComboIndex.WithOffset : combo.ComboIndex.Ordinal;
+            int comboIndex = beatmapSkins.Value ? combo.ComboIndex.WithBeatmapOffset : combo.ComboIndex.Ordinal;
 
             return comboColours?.Count > 0 ? comboColours[comboIndex % comboColours.Count] : Color4.White;
         }

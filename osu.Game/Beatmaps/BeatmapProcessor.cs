@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
                     obj.IndexInCurrentCombo = 0;
 
                     var ordinal = (lastObj?.ComboIndex.Ordinal ?? 0) + 1;
-                    var withOffset = (lastObj?.ComboIndex.WithOffset ?? 0) + obj.ComboOffset + 1;
+                    var withOffset = (lastObj?.ComboIndex.WithBeatmapOffset ?? 0) + obj.ComboOffset + 1;
                     obj.ComboIndex = new ComboIndex(ordinal, withOffset);
 
                     if (lastObj != null)
