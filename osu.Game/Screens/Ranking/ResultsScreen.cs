@@ -33,16 +33,21 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
 
+        private readonly bool allowRetry;
+
         private Drawable bottomPanel;
 
-        public ResultsScreen(ScoreInfo score)
+        public ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
             Score = score;
+            this.allowRetry = allowRetry;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            FillFlowContainer buttons;
+
             InternalChildren = new[]
             {
                 new ResultsScrollContainer
@@ -68,7 +73,7 @@ namespace osu.Game.Screens.Ranking
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4Extensions.FromHex("#333")
                         },
-                        new FillFlowContainer
+                        buttons = new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -78,7 +83,6 @@ namespace osu.Game.Screens.Ranking
                             Children = new Drawable[]
                             {
                                 new ReplayDownloadButton(Score) { Width = 300 },
-                                new RetryButton { Width = 300 },
                             }
                         }
                     }
@@ -87,15 +91,20 @@ namespace osu.Game.Screens.Ranking
 
             if (player != null)
             {
-                AddInternal(new HotkeyRetryOverlay
+                if (allowRetry)
                 {
-                    Action = () =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
+                    buttons.Add(new RetryButton { Width = 300 });
 
-                        player?.Restart();
-                    },
-                });
+                    AddInternal(new HotkeyRetryOverlay
+                    {
+                        Action = () =>
+                        {
+                            if (!this.IsCurrentScreen()) return;
+
+                            player?.Restart();
+                        },
+                    });
+                }
             }
         }
 
