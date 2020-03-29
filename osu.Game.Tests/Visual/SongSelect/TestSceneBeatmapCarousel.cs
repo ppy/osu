@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var sets = new List<BeatmapSetInfo>();
 
-            const int total_set_count = 200;
+            const int total_set_count = 20;
 
             for (int i = 0; i < total_set_count; i++)
                 sets.Add(createTestBeatmapSet(i + 1));
