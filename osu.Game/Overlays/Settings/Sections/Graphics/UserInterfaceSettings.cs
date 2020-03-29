@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
-                    LabelText = "\"按住已确认\" 激活时间",
+                    LabelText = "\"按压以确认\" 激活时间",
                     Bindable = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },
