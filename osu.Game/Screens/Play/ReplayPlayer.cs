@@ -18,9 +18,8 @@ namespace osu.Game.Screens.Play
             this.score = score;
         }
 
-        protected override void LoadComplete()
+        protected override void PrepareReplay()
         {
-            base.LoadComplete();
             DrawableRuleset?.SetReplayScore(score);
         }
 

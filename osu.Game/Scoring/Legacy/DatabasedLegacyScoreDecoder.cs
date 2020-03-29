@@ -7,15 +7,15 @@ using osu.Game.Rulesets;
 namespace osu.Game.Scoring.Legacy
 {
     /// <summary>
-    /// A <see cref="LegacyScoreParser"/> which retrieves the applicable <see cref="Beatmap"/> and <see cref="Ruleset"/>
+    /// A <see cref="LegacyScoreDecoder"/> which retrieves the applicable <see cref="Beatmap"/> and <see cref="Ruleset"/>
     /// for the score from the database.
     /// </summary>
-    public class DatabasedLegacyScoreParser : LegacyScoreParser
+    public class DatabasedLegacyScoreDecoder : LegacyScoreDecoder
     {
         private readonly RulesetStore rulesets;
         private readonly BeatmapManager beatmaps;
 
-        public DatabasedLegacyScoreParser(RulesetStore rulesets, BeatmapManager beatmaps)
+        public DatabasedLegacyScoreDecoder(RulesetStore rulesets, BeatmapManager beatmaps)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;

@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Overlays.Home.Friends
+namespace osu.Game.Overlays.Dashboard.Friends
 {
     public class UserSortTabControl : OverlaySortTabControl<UserSortCriteria>
     {

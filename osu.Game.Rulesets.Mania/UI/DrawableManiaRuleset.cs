@@ -85,5 +85,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
+
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new ManiaReplayRecorder(replay);
     }
 }
