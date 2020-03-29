@@ -30,21 +30,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (hitObject is DrawableSpinner spinner)
                 {
-                    spinner.Disc.Enabled = false;
-                    spinner.OnUpdate += autoSpin;
+                    spinner.HandleUserInput = false;
+                    spinner.OnUpdate += onSpinnerUpdate;
                 }
             }
         }
 
-        private void autoSpin(Drawable drawable)
+        private void onSpinnerUpdate(Drawable drawable)
         {
-            if (drawable is DrawableSpinner spinner)
-            {
-                if (spinner.Disc.Valid)
-                    spinner.Disc.Rotate(MathUtils.RadiansToDegrees((float)spinner.Clock.ElapsedFrameTime * 0.03f));
-                if (!spinner.SpmCounter.IsPresent)
-                    spinner.SpmCounter.FadeIn(spinner.HitObject.TimeFadeIn);
-            }
+            var spinner = (DrawableSpinner)drawable;
+
+            spinner.Disc.Tracking = true;
+            spinner.Disc.Rotate(MathUtils.RadiansToDegrees((float)spinner.Clock.ElapsedFrameTime * 0.03f));
         }
     }
 }
