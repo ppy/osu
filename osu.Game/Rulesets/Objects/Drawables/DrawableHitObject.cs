@@ -334,8 +334,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!(HitObject is IHasComboInformation combo))
                 throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
 
-            // Use with-offset combo indices for the beatmap skin only to avoid
-            // assigning combo colour of incorrect sets (of current skin) to this object.
+            // only beatmap skins take combo offset into account, to allow mappers to modify combo colours
+            // default skin & user skins use the index of the combo in the beatmap only, ignoring offset
             int comboIndex = beatmapSkins.Value ? combo.ComboIndex.WithBeatmapOffset : combo.ComboIndex.Ordinal;
 
             return comboColours?.Count > 0 ? comboColours[comboIndex % comboColours.Count] : Color4.White;
