@@ -22,35 +22,35 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The index value of the combo with account for <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
-        public readonly int WithOffset;
+        public readonly int WithBeatmapOffset;
 
         /// <summary>
-        /// Constructs a new <see cref="ComboIndex"/> with <paramref name="ordinal"/> set to <see cref="Ordinal"/> and <paramref name="withOffset"/> set to <see cref="WithOffset"/>.
+        /// Constructs a new <see cref="ComboIndex"/> with <paramref name="ordinal"/> set to <see cref="Ordinal"/> and <paramref name="withBeatmapOffset"/> set to <see cref="WithBeatmapOffset"/>.
         /// </summary>
         /// <param name="ordinal">The value to be set to <see cref="Ordinal"/>.</param>
-        /// <param name="withOffset">The value to be set to <see cref="WithOffset"/>.</param>
-        public ComboIndex(int ordinal, int withOffset)
+        /// <param name="withBeatmapOffset">The value to be set to <see cref="WithBeatmapOffset"/>.</param>
+        public ComboIndex(int ordinal, int withBeatmapOffset)
         {
             Ordinal = ordinal;
-            WithOffset = withOffset;
+            WithBeatmapOffset = withBeatmapOffset;
         }
 
         /// <summary>
-        /// Constructs a new <see cref="ComboIndex"/> with <paramref name="index"/> set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.
+        /// Constructs a new <see cref="ComboIndex"/> with <paramref name="index"/> set to both <see cref="Ordinal"/> and <see cref="WithBeatmapOffset"/>.
         /// </summary>
-        /// <param name="index">The value to be set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.</param>
+        /// <param name="index">The value to be set to both <see cref="Ordinal"/> and <see cref="WithBeatmapOffset"/>.</param>
         public ComboIndex(int index)
             : this(index, index)
         {
         }
 
-        public override string ToString() => $"(Ordinal: {Ordinal}, WithOffset: {WithOffset})";
+        public override string ToString() => $"(Ordinal: {Ordinal}, WithBeatmapOffset: {WithBeatmapOffset})";
 
         #region Operator overloading & simple operation methods
 
         /// <summary>
         /// Converts <paramref name="i"/> to a <see cref="ComboIndex"/> by constructing one
-        /// with <paramref name="i"/> set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.
+        /// with <paramref name="i"/> set to both <see cref="Ordinal"/> and <see cref="WithBeatmapOffset"/>.
         /// </summary>
         /// <param name="i">The value to convert to.</param>
         /// <returns>The <see cref="ComboIndex"/> resulted from the conversion.</returns>
@@ -61,31 +61,31 @@ namespace osu.Game.Rulesets.Objects.Types
 
         /// <summary>
         /// Converts <paramref name="index"/> to a <see cref="ComboIndex"/> by constructing one
-        /// with <paramref name="index"/> set to both <see cref="Ordinal"/> and <see cref="WithOffset"/>.
+        /// with <paramref name="index"/> set to both <see cref="Ordinal"/> and <see cref="WithBeatmapOffset"/>.
         /// </summary>
         /// <param name="index">The value to convert to.</param>
         /// <returns>The <see cref="ComboIndex"/> resulted from the conversion.</returns>
         public static ComboIndex FromInt32(int index) => new ComboIndex(index);
 
-        public bool Equals(ComboIndex other) => Ordinal == other.Ordinal && WithOffset == other.WithOffset;
+        public bool Equals(ComboIndex other) => Ordinal == other.Ordinal && WithBeatmapOffset == other.WithBeatmapOffset;
         public override bool Equals(object obj) => obj is ComboIndex other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(Ordinal, WithOffset);
+        public override int GetHashCode() => HashCode.Combine(Ordinal, WithBeatmapOffset);
 
         /// <summary>
-        /// Adds <paramref name="amount"/> to both <see cref="Ordinal"/> and <see cref="WithOffset"/> of <paramref name="ci"/>.
+        /// Adds <paramref name="amount"/> to both <see cref="Ordinal"/> and <see cref="WithBeatmapOffset"/> of <paramref name="ci"/>.
         /// </summary>
         /// <param name="ci">The <see cref="ComboIndex"/> to perform the addition on.</param>
         /// <param name="amount">The amount to add to <paramref name="ci"/>.</param>
         /// <returns>The <see cref="ComboIndex"/> post-operation.</returns>
-        public static ComboIndex Add(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal + amount, ci.WithOffset + amount);
+        public static ComboIndex Add(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal + amount, ci.WithBeatmapOffset + amount);
 
         /// <summary>
-        /// Subtracts <paramref name="amount"/> from both <see cref="Ordinal"/> and <see cref="WithOffset"/> of <paramref name="ci"/>.
+        /// Subtracts <paramref name="amount"/> from both <see cref="Ordinal"/> and <see cref="WithBeatmapOffset"/> of <paramref name="ci"/>.
         /// </summary>
         /// <param name="ci">The <see cref="ComboIndex"/> to perform the subtraction on.</param>
         /// <param name="amount">The amount to subtract from <paramref name="ci"/>.</param>
         /// <returns>The <see cref="ComboIndex"/> post-operation.</returns>
-        public static ComboIndex Subtract(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal - amount, ci.WithOffset - amount);
+        public static ComboIndex Subtract(ComboIndex ci, int amount) => new ComboIndex(ci.Ordinal - amount, ci.WithBeatmapOffset - amount);
 
         #endregion
     }
