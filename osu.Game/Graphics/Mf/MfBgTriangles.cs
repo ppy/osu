@@ -13,7 +13,6 @@ namespace osu.Game.Graphics
 {
     public class MfBgTriangles : Container
     {
-        public const float HEIGHT = 50;
         private readonly Bindable<bool> Optui = new Bindable<bool>();
         private BackgroundTriangles BackgroundTriangle;
         
@@ -26,17 +25,15 @@ namespace osu.Game.Graphics
             UpdateIcons();
         }
 
-        public MfBgTriangles(float height = HEIGHT, float alpha = 0.65f, bool highLight = false)
+        public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f)
         {
-            this.Height = height;
             this.Alpha = alpha;
-            RelativeSizeAxes = Axes.X;
-            Height = height;
+            RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                BackgroundTriangle = new BackgroundTriangles(height, highLight)
+                BackgroundTriangle = new BackgroundTriangles(highLight, triangleScale)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -48,10 +45,9 @@ namespace osu.Game.Graphics
         {
             private readonly Triangles triangles;
 
-            public BackgroundTriangles(float height = HEIGHT, bool highLight = false)
+            public BackgroundTriangles(bool highLight = false, float triangleScaleValue = 2f)
             {
-                RelativeSizeAxes = Axes.X;
-                Height = height;
+                RelativeSizeAxes = Axes.Both;
                 Masking = true;
                 Children = new Drawable[]
                 {
@@ -60,7 +56,7 @@ namespace osu.Game.Graphics
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.Both,
-                        TriangleScale = 2,
+                        TriangleScale = triangleScaleValue,
                         Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
                     },
                 };
@@ -79,8 +75,6 @@ namespace osu.Game.Graphics
                     BackgroundTriangle.FadeOut(250);
                     break;
             }
-
         }
-
     }
 }

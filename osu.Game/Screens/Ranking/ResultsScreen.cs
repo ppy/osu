@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
@@ -45,6 +46,16 @@ namespace osu.Game.Screens.Ranking
         {
             InternalChildren = new[]
             {
+                new VerticalMaskingContainer
+                {
+                    Children = new Drawable[]
+                    {
+                        new ParallaxContainer
+                        {
+                            Child = new MfBgTriangles(0.5f, false, 5f),
+                        },
+                    }
+                },
                 new ResultsScrollContainer
                 {
                     Child = new ScorePanel(score)
@@ -99,6 +110,28 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        private class VerticalMaskingContainer : Container
+        {
+            private const float panel_overflow = 1.2f;
+
+            protected override Container<Drawable> Content { get; }
+
+            public VerticalMaskingContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Masking = true;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                InternalChild = Content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 1 / panel_overflow,
+                };
+            }
+        }
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);

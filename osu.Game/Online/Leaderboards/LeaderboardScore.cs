@@ -113,7 +113,7 @@ namespace osu.Game.Online.Leaderboards
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new MfBgTriangles(HEIGHT, 0.65f, (user.Id == api.LocalUser.Value.Id && allowHighlight ? true : false) ),
+                                new MfBgTriangles(0.65f, (user.Id == api.LocalUser.Value.Id && allowHighlight ? true : false) ),
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,

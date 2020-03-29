@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new MfBgTriangles(HEIGHT),
+                new MfBgTriangles(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,

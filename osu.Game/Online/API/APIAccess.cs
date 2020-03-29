@@ -288,7 +288,7 @@ namespace osu.Game.Online.API
             {
                 Logger.Error(ex, "Error occurred while handling an API request.");
                 return false;
-            }
+            }   
         }
 
         private APIState state;
