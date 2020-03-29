@@ -188,12 +188,12 @@ namespace osu.Game.Screens.Menu
                 case true:
                     if ( state == ButtonSystemState.Play )
                         buttonsP2C.ForEach( b => b.FadeIn(250) );
-                    buttonsCustom.ForEach(b => {b.FadeIn(250); b.VisibleState = ButtonSystemState.Custom;} );
                     break;
 
                 case false:
                     buttonsP2C.ForEach( b => b.FadeOut(250) );
-                    buttonsCustom.ForEach(b => {b.FadeOut(250); b.VisibleState = ButtonSystemState.Hide;} );
+                    if ( state == ButtonSystemState.Custom )
+                        backButton1.Click();
                     break;
             }
         }
@@ -299,8 +299,7 @@ namespace osu.Game.Screens.Menu
                     return false;
 
                 case ButtonSystemState.Custom:
-                    if ( buttonsCustom.First().VisibleState == ButtonSystemState.Custom )
-                        buttonsCustom.First().Click();
+                    buttonsCustom.First().Click();
                     return false;
             }
         }
@@ -413,7 +412,6 @@ namespace osu.Game.Screens.Menu
         TopLevel,
         Play,
         EnteringMode,
-        Custom,
-        Hide
+        Custom
     }
 }
