@@ -22,15 +22,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
 
+        /// <summary>
+        /// streamaimconst is derived from the last stream of Megalovania [Excors] 9* map (Unit:pixel/ms)
+        /// </summary>
         private const double streamaimconst = 2.42;
 
+        /// <summary>
+        /// splitter value for jumpDistances2 list
+        /// </summary>
         private int sdsplitcounter;
+
+        /// <summary>
+        /// splitter value for jumpDistances list
+        /// </summary>
         private int sdsplitcounter2;
 
+        /// <summary>
+        /// Final result of SD calculation and scaling added at the result of StrainValueOf(DifficultyHitObject current)
+        /// </summary>
         private double sdstrainmult;
 
+        /// <summary>
+        /// jumpDistances stores acceleration as a list
+        /// </summary>
         private readonly List<double> jumpDistances = new List<double>();
+
+        /// <summary>
+        /// strainTimes store StrainTime(s) as a list
+        /// </summary>
         private readonly List<double> strainTimes = new List<double>();
+
+        /// <summary>
+        /// jumpDistances2 store sectionvelocity as a list.
+        /// </summary>
         private readonly List<double> jumpDistances2 = new List<double>();
 
         protected override double SkillMultiplier => 1400;
