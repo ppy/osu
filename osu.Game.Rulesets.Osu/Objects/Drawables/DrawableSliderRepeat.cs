@@ -87,6 +87,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
+            // When the repeat is hit, the arrow should fade out on spot,
+            // it should no longer follow snaking
             if (IsHit) return;
 
             bool isRepeatAtEnd = sliderRepeat.RepeatIndex % 2 == 0;
