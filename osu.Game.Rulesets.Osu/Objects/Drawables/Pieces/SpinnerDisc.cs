@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             get => tracking;
             set
             {
-                if ((Enabled && value) == tracking) return;
+                if (value == tracking) return;
 
-                tracking = Enabled && value;
+                tracking = value;
 
                 background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
             }
@@ -73,9 +73,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        public bool Valid => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
-
-        public bool Enabled { get; set; } = true;
+        /// <summary>
+        /// Whether currently in the correct time range to allow spinning.
+        /// </summary>
+        private bool isSpinnableTime => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -101,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             var delta = thisAngle - lastAngle;
 
-            if (Valid && tracking)
+            if (tracking)
                 Rotate(delta);
 
             lastAngle = thisAngle;
@@ -118,8 +119,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Rotation = (float)Interpolation.Lerp(Rotation, currentRotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
         }
 
+        /// <summary>
+        /// Rotate the disc by the provided angle (in addition to any existing rotation).
+        /// </summary>
+        /// <remarks>
+        /// Will be a no-op if not a valid time to spin.
+        /// </remarks>
+        /// <param name="angle">The delta angle.</param>
         public void Rotate(float angle)
         {
+            if (!isSpinnableTime)
+                return;
+
             if (!rotationTransferred)
             {
                 currentRotation = Rotation * 2;

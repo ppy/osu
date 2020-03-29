@@ -176,16 +176,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void Update()
         {
-            Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
-            if (!SpmCounter.IsPresent && Disc.Tracking)
-                SpmCounter.FadeIn(HitObject.TimeFadeIn);
-
             base.Update();
+            if (HandleUserInput)
+                Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            if (!SpmCounter.IsPresent && Disc.Tracking)
+                SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
