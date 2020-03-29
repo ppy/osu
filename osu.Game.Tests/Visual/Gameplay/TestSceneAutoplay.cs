@@ -5,8 +5,11 @@ using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -17,8 +20,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
-            return new TestPlayer(false, false);
+            SelectedMods.Value = new[] { ruleset.GetAutoplayMod() };
+            return new TestPlayer(false);
         }
 
         protected override void AddCheckSteps()
@@ -32,6 +35,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+
+            AddStep("complete", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
+            AddUntilStep("results displayed", () => getResultsScreen() != null);
+
+            AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
+            AddAssert("score has no misses", () => getResultsScreen().Score.Statistics[HitResult.Miss] == 0);
+
+            ResultsScreen getResultsScreen() => Stack.CurrentScreen as ResultsScreen;
         }
     }
 }
