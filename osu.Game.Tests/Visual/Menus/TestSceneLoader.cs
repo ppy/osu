@@ -36,8 +36,6 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestInstantLoad()
         {
-            // visual only, very impossible to test this using asserts.
-
             AddStep("load immediately", () =>
             {
                 loader = new TestLoader();
@@ -46,11 +44,16 @@ namespace osu.Game.Tests.Visual.Menus
                 LoadScreen(loader);
             });
 
-            AddAssert("spinner did not display", () => loader.LoadingSpinner?.Alpha == 0);
+            spinnerNotPresentOrHidden();
 
             AddUntilStep("loaded", () => loader.ScreenLoaded);
             AddUntilStep("not current", () => !loader.IsCurrentScreen());
+
+            spinnerNotPresentOrHidden();
         }
+
+        private void spinnerNotPresentOrHidden() =>
+            AddAssert("spinner did not display", () => loader.LoadingSpinner == null || loader.LoadingSpinner.Alpha == 0);
 
         [Test]
         public void TestDelayedLoad()

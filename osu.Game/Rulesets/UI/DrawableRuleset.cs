@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
-        private Container overlays;
+        public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override Container Overlays => overlays;
+        public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
@@ -187,11 +187,12 @@ namespace osu.Game.Rulesets.UI
                     FrameStablePlayback = FrameStablePlayback,
                     Children = new Drawable[]
                     {
+                        FrameStableComponents,
                         KeyBindingInputManager
                             .WithChild(CreatePlayfieldAdjustmentContainer()
                                 .WithChild(Playfield)
                             ),
-                        overlays = new Container { RelativeSizeAxes = Axes.Both }
+                        Overlays,
                     }
                 },
             };
@@ -262,6 +263,21 @@ namespace osu.Game.Rulesets.UI
             Playfield.Add(drawableObject);
         }
 
+        public override void SetRecordTarget(Replay recordingReplay)
+        {
+            if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
+
+            var recorder = CreateReplayRecorder(recordingReplay);
+
+            if (recorder == null)
+                return;
+
+            recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
+
+            recordingInputManager.Recorder = recorder;
+        }
+
         public override void SetReplayScore(Score replayScore)
         {
             if (!(KeyBindingInputManager is IHasReplayHandler replayInputManager))
@@ -301,6 +317,8 @@ namespace osu.Game.Rulesets.UI
         protected abstract PassThroughInputManager CreateInputManager();
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
+
+        protected virtual ReplayRecorder CreateReplayRecorder(Replay replay) => null;
 
         /// <summary>
         /// Creates a Playfield.
@@ -389,9 +407,14 @@ namespace osu.Game.Rulesets.UI
         public abstract Playfield Playfield { get; }
 
         /// <summary>
-        /// Place to put drawables above hit objects but below UI.
+        /// Content to be placed above hitobjects. Will be affected by frame stability.
         /// </summary>
         public abstract Container Overlays { get; }
+
+        /// <summary>
+        /// Components to be run potentially multiple times in line with frame-stable gameplay.
+        /// </summary>
+        public abstract Container FrameStableComponents { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
@@ -469,6 +492,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
         public abstract void SetReplayScore(Score replayScore);
+
+        /// <summary>
+        /// Sets a replay to be used to record gameplay.
+        /// </summary>
+        /// <param name="recordingReplay">The target to be recorded to.</param>
+        public abstract void SetRecordTarget(Replay recordingReplay);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.
