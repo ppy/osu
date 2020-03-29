@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -28,21 +29,30 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("score above zero", () => Player.ScoreProcessor.TotalScore.Value > 0);
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
-            AddStep("seek to break time", () => Player.GameplayClockContainer.Seek(Player.ChildrenOfType<BreakTracker>().First().Breaks.First().StartTime));
-            AddUntilStep("wait for seek to complete", () =>
-                Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= Player.BreakOverlay.Breaks.First().StartTime);
+            seekToBreak(0);
             AddAssert("keys not counting", () => !Player.HUDOverlay.KeyCounter.IsCounting);
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
 
-            AddStep("complete", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
+            seekToBreak(0);
+            seekToBreak(1);
+
+            AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
             AddUntilStep("results displayed", () => getResultsScreen() != null);
 
             AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
             AddAssert("score has no misses", () => getResultsScreen().Score.Statistics[HitResult.Miss] == 0);
 
             ResultsScreen getResultsScreen() => Stack.CurrentScreen as ResultsScreen;
+        }
+
+        private void seekToBreak(int breakIndex)
+        {
+            AddStep($"seek to break {breakIndex}", () => Player.GameplayClockContainer.Seek(destBreak().StartTime));
+            AddUntilStep("wait for seek to complete", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= destBreak().StartTime);
+
+            BreakPeriod destBreak() => Player.ChildrenOfType<BreakTracker>().First().Breaks.ElementAt(breakIndex);
         }
     }
 }
