@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Ranking
 
         public ResultsScreen(ScoreInfo score)
         {
-            this.Score = score;
+            Score = score;
         }
 
         [BackgroundDependencyLoader]
