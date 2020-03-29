@@ -85,66 +85,47 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [TestCase(true)]
         [TestCase(false)]
-        public void TestTraversalHold(bool forwards)
+        public void TestTraversalBeyondVisible(bool forwards)
         {
             var sets = new List<BeatmapSetInfo>();
-            const int create_this_many_sets = 200;
 
-            for (int i = 0; i < create_this_many_sets; i++)
-            {
-                var set = createTestBeatmapSet(i + 1);
-                sets.Add(set);
-            }
+            const int total_set_count = 200;
+
+            for (int i = 0; i < total_set_count; i++)
+                sets.Add(createTestBeatmapSet(i + 1));
 
             loadBeatmaps(sets);
 
+            for (int i = 1; i < total_set_count; i += i)
+                selectNextAndAssert(i);
+
             void selectNextAndAssert(int amount)
             {
-                setSelected(forwards ? 1 : create_this_many_sets, 1);
-                string text = forwards ? "Next" : "Previous";
-                AddStep($"{text} beatmap {amount} times", () =>
+                setSelected(forwards ? 1 : total_set_count, 1);
+
+                AddStep($"{(forwards ? "Next" : "Previous")} beatmap {amount} times", () =>
                 {
                     for (int i = 0; i < amount; i++)
                     {
                         carousel.SelectNext(forwards ? 1 : -1);
                     }
                 });
-                waitForSelection(forwards ? amount + 1 : create_this_many_sets - amount);
-            }
 
-            for (int i = 1; i < create_this_many_sets; i += i)
-            {
-                selectNextAndAssert(i);
+                waitForSelection(forwards ? amount + 1 : total_set_count - amount);
             }
         }
 
         [Test]
-        public void TestTraversalHoldDifficulties()
+        public void TestTraversalBeyondVisibleDifficulties()
         {
             var sets = new List<BeatmapSetInfo>();
 
-            for (int i = 0; i < 20; i++)
-            {
-                var set = createTestBeatmapSet(i + 1);
-                sets.Add(set);
-            }
+            const int total_set_count = 200;
+
+            for (int i = 0; i < total_set_count; i++)
+                sets.Add(createTestBeatmapSet(i + 1));
 
             loadBeatmaps(sets);
-
-            void selectNextAndAssert(int amount, bool forwards, int expectedSet, int expectedDiff)
-            {
-                // Select very first or very last difficulty
-                setSelected(forwards ? 1 : 20, forwards ? 1 : 3);
-                string text = forwards ? "Next" : "Previous";
-                AddStep($"{text} difficulty {amount} times", () =>
-                {
-                    for (int i = 0; i < amount; i++)
-                    {
-                        carousel.SelectNext(forwards ? 1 : -1, false);
-                    }
-                });
-                waitForSelection(expectedSet, expectedDiff);
-            }
 
             // Selects next set once, difficulty index doesn't change
             selectNextAndAssert(3, true, 2, 1);
@@ -162,6 +143,20 @@ namespace osu.Game.Tests.Visual.SongSelect
             selectNextAndAssert(3, false, 19, 3);
             selectNextAndAssert(50, false, 4, 1);
             selectNextAndAssert(200, false, 14, 1);
+
+            void selectNextAndAssert(int amount, bool forwards, int expectedSet, int expectedDiff)
+            {
+                // Select very first or very last difficulty
+                setSelected(forwards ? 1 : 20, forwards ? 1 : 3);
+
+                AddStep($"{(forwards ? "Next" : "Previous")} difficulty {amount} times", () =>
+                {
+                    for (int i = 0; i < amount; i++)
+                        carousel.SelectNext(forwards ? 1 : -1, false);
+                });
+
+                waitForSelection(expectedSet, expectedDiff);
+            }
         }
 
         /// <summary>
