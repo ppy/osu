@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "显示Mf自定义UI",
+                    LabelText = "启用Mf自定义UI",
                     Bindable = config.GetBindable<bool>(OsuSetting.OptUI)
                 },
             };

@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarMusicButton : ToolbarOverlayToggleButton
+    public class ToolbarMusicButton : ToolbarOverlayToggleButtonRightSide
     {
         public ToolbarMusicButton()
         {

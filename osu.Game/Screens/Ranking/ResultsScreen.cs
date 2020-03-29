@@ -46,25 +46,26 @@ namespace osu.Game.Screens.Ranking
         {
             InternalChildren = new[]
             {
-                new VerticalMaskingContainer
+                new ParallaxContainer
                 {
-                    Children = new Drawable[]
-                    {
-                        new ParallaxContainer
-                        {
-                            Child = new MfBgTriangles(0.5f, false, 5f),
-                        },
-                    }
+                    Masking = true,
+                    Child = new MfBgTriangles(0.5f, false, 5f),
                 },
-                new ResultsScrollContainer
+                new Graphics.Mf.Resources.ParallaxContainer
                 {
-                    Child = new ScorePanel(score)
+                    Masking = true,
+                    ParallaxAmount = 0.01f,
+                    Child = new ResultsScrollContainer
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        State = PanelState.Expanded
+                        Child = new ScorePanel(score)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            State = PanelState.Expanded
+                        },
                     },
                 },
+
                 bottomPanel = new Container
                 {
                     Anchor = Anchor.BottomLeft,
@@ -110,28 +111,6 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private class VerticalMaskingContainer : Container
-        {
-            private const float panel_overflow = 1.2f;
-
-            protected override Container<Drawable> Content { get; }
-
-            public VerticalMaskingContainer()
-            {
-                RelativeSizeAxes = Axes.Both;
-                Masking = true;
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                InternalChild = Content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 1 / panel_overflow,
-                };
-            }
-        }
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
