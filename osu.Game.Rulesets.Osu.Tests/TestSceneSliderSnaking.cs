@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private TrackVirtualManual track;
 
-        protected override bool Autoplay => true;
+        protected override bool Autoplay => autoplay;
+        private bool autoplay;
 
         private readonly Bindable<bool> snakingIn = new Bindable<bool>();
         private readonly Bindable<bool> snakingOut = new Bindable<bool>();
@@ -57,16 +58,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Vector2 vector;
 
         [SetUpSteps]
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
-        }
+        public override void SetUpSteps() { }
 
         [Test]
         public void TestSnaking()
         {
+            AddStep("have autoplay", () => autoplay = true);
+            base.SetUpSteps();
+            AddUntilStep("wait for track to start running", () => track.IsRunning);
+
             AddStep("retrieve 1st slider", () => slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.First());
             testLinear(true);
             testLinear(false);
@@ -76,9 +76,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("retrieve 3rd slider", () => slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.Skip(2).First());
             testDoubleRepeating(true);
             testDoubleRepeating(false);
+        }
 
-            // Test arrow stays in place
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestArrowStays(bool isHit)
+        {
+            var isSame = isHit ? "is same" : "decreased";
+            var enable = isHit ? "enable" : "disable";
+
+            AddStep($"{enable} autoplay", () => autoplay = isHit);
             setSnaking(true);
+            base.SetUpSteps();
+
             addSeekStep(13500);
             AddStep("retrieve 2nd slider repeat", () =>
             {
@@ -87,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             AddStep("Save repeat vector", () => vector = repeat.Position);
             addSeekStep(13700);
-            AddAssert("Repeat vector is same", () => Precision.AlmostEquals(vector.X, repeat.Position.X, 1) && Precision.AlmostEquals(vector.Y, repeat.Position.Y, 1));
+            AddAssert($"Repeat vector {isSame}", () => isHit ? Precision.AlmostEquals(vector.X, repeat.X, 1) && Precision.AlmostEquals(vector.Y, repeat.Y, 1) : repeat.X < vector.X && repeat.Y < vector.Y);
         }
 
         private void testLinear(bool snaking)
