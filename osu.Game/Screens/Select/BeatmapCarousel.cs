@@ -264,9 +264,9 @@ namespace osu.Game.Screens.Select
 
         private void selectNextSet(int direction, bool skipDifficulties)
         {
-            var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
+            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
 
-            var nextSet = visibleSets[(visibleSets.IndexOf(selectedBeatmapSet) + direction + visibleSets.Count) % visibleSets.Count];
+            var nextSet = unfilteredSets[(unfilteredSets.IndexOf(selectedBeatmapSet) + direction + unfilteredSets.Count) % unfilteredSets.Count];
 
             if (skipDifficulties)
                 select(nextSet);
@@ -276,12 +276,14 @@ namespace osu.Game.Screens.Select
 
         private void selectNextDifficulty(int direction)
         {
-            var difficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
-            int index = difficulties.IndexOf(selectedBeatmap);
-            if (index + direction < 0 || index + direction >= difficulties.Count)
+            var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
+
+            int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
+
+            if (index + direction < 0 || index + direction >= unfilteredDifficulties.Count)
                 selectNextSet(direction, false);
             else
-                select(difficulties[index + direction]);
+                select(unfilteredDifficulties[index + direction]);
         }
 
         /// <summary>
