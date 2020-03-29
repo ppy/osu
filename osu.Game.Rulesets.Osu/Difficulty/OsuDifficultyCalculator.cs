@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
 
-        public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap) : base(ruleset, beatmap)
+        public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
-
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -74,16 +74,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[] {
-            new Aim (),
-            new Speed ()
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        {
+            new Aim(),
+            new Speed()
         };
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[] {
-            new OsuModDoubleTime (),
-            new OsuModHalfTime (),
-            new OsuModEasy (),
-            new OsuModHardRock (),
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new OsuModDoubleTime(),
+            new OsuModHalfTime(),
+            new OsuModEasy(),
+            new OsuModHardRock(),
         };
     }
 }

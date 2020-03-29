@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private const double streamaimconst = 2.42;
 
-        private int sdsplitcounter = 0;
-        private int sdsplitcounter2 = 0;
+        private int sdsplitcounter;
+        private int sdsplitcounter2;
 
-        private double sdstrainmult = 0;
+        private double sdstrainmult;
 
         private readonly List<double> jumpDistances = new List<double>();
         private readonly List<double> strainTimes = new List<double>();
@@ -87,13 +87,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     if (jumpDistances.Count > 1)
                     {
                         sdstrainmult = calculateStandardDeviation(jumpDistances);
-                        // sdstrainmult *= Log(osuCurrent.StrainTime, 2);
-                        // sdstrainmult2 = Pow(0.93, osuCurrent.StrainTime - 100) - 1;
-                        // sdstrainmult *= sdstrainmult2;
                         sdstrainmult *= 3;
-                        // sdstrainmult = Pow(1.002, sdstrainmult);
                         sdsplitcounter2++;
-                        //    JumpDistances.Add(sdstrainmult);
                     }
                     else
                     {

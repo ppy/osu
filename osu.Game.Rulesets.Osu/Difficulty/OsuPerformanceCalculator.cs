@@ -30,9 +30,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        private const double streamaimconst = 2.42;
-        private const double stdevconst = 0.149820;
-
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {

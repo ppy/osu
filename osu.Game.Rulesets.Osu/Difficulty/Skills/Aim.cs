@@ -16,8 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
+
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -36,9 +38,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     const double scale = 90;
 
                     var angleBonus = Math.Sqrt(
-                        Math.Max(osuPrevious.JumpDistance - scale, 0) *
-                        Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2) *
-                        Math.Max(osuCurrent.JumpDistance - scale, 0));
+                        Math.Max(osuPrevious.JumpDistance - scale, 0)
+                        * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
+                        * Math.Max(osuCurrent.JumpDistance - scale, 0));
                     result = 1.5 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
                 }
             }
