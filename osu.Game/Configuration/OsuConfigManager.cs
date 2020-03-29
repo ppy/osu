@@ -18,6 +18,7 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
+            Set(OsuSetting.OptUI, true);
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
@@ -221,6 +222,7 @@ namespace osu.Game.Configuration
         IntroSequence,
         UIHoldActivationDelay,
         HitLighting,
-        MenuBackgroundSource
+        MenuBackgroundSource,
+        OptUI,
     }
 }

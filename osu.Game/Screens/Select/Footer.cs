@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Select
 {
@@ -30,7 +29,7 @@ namespace osu.Game.Screens.Select
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        /// <param name="button">THe button to be added.</param>
+        /// <param name="button">The button to be added.</param>
         /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
         public void AddButton(FooterButton button, OverlayContainer overlay)
         {
@@ -70,11 +69,7 @@ namespace osu.Game.Screens.Select
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                new BackgroundTriangles()
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                },
+                new MfBgTriangles(HEIGHT),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -109,30 +104,6 @@ namespace osu.Game.Screens.Select
             };
 
             updateModeLight();
-        }
-
-        public class BackgroundTriangles : Container
-        {
-            private readonly Triangles triangles;
-
-            public BackgroundTriangles(float height = HEIGHT)
-            {
-                RelativeSizeAxes = Axes.X;
-                Height = height;
-                Masking = true;
-                Children = new Drawable[]
-                {
-                    triangles = new Triangles
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        TriangleScale = 2,
-                        Alpha = 0.6f,
-                        Colour = OsuColour.Gray(0.2f),
-                    },
-                };
-            }
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;

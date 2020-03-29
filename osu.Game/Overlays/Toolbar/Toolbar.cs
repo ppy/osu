@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -23,6 +24,9 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
+        private Bindable<bool> optUI { get; set; }
+        protected ToolbarTimeButton ToolbarTimeButton { get; private set; }
+        protected ToolbarMfButton ToolbarMfButton { get; private set; }
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
 
@@ -40,8 +44,10 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
+            optUI = config.GetBindable<bool>(OsuSetting.OptUI);
+
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
@@ -57,7 +63,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        new ToolbarMfButton(),
+                        ToolbarMfButton =  new ToolbarMfButton(),
                         rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
@@ -70,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ToolbarTimeButton(),
+                        ToolbarTimeButton = new ToolbarTimeButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
                         new ToolbarDirectButton(),
@@ -98,6 +104,32 @@ namespace osu.Game.Overlays.Toolbar
 
             if (osuGame != null)
                 overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
+            UpdateIcons();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            optUI.ValueChanged += _ => UpdateIcons();
+        }
+
+        private void UpdateIcons()
+        {
+            switch (optUI.Value)
+            {
+                case true:
+                    ToolbarMfButton.FadeTo(1f, 250);
+                    ToolbarTimeButton.FadeTo(1f, 250);
+                    break;
+
+                case false:
+                    ToolbarMfButton.FadeTo(0f, 250);
+                    ToolbarTimeButton.FadeTo(0f, 250);
+                    break;
+            }
+
         }
 
         public class ToolbarBackground : Container

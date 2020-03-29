@@ -16,6 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
+                new MfSettings(),
                 new LanguageSettings(),
                 new UpdateSettings(),
             };

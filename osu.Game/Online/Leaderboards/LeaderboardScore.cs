@@ -45,7 +45,6 @@ namespace osu.Game.Online.Leaderboards
         private readonly int? rank;
         private readonly bool allowHighlight;
 
-        private Triangles triangles;
         private Box background;
         private Container content;
         private Drawable avatar;
@@ -114,13 +113,7 @@ namespace osu.Game.Online.Leaderboards
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                triangles = new Triangles
-                                {
-                                    TriangleScale = 2,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : OsuColour.Gray(0.2f),
-                                    Alpha = 0.65f,
-                                },
+                                new MfBgTriangles(HEIGHT, 0.65f, (user.Id == api.LocalUser.Value.Id && allowHighlight ? true : false) ),
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
