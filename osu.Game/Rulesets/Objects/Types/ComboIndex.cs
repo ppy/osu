@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Rulesets.Objects.Types
 {
     /// <summary>
-    /// Represents an <see cref="Ordinal"/> and <see cref="WithOffset"/> combo indices.
+    /// Represents a structure providing an ordinal combo index and also one that accounts for <see cref="IHasCombo.ComboOffset"/>.
     /// </summary>
     public readonly struct ComboIndex : IEquatable<ComboIndex>
     {
@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Objects.Types
         /// The ordinal index value of the combo in relation to the beatmap. Ignores <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
         /// <remarks>
-        /// This is separated from <see cref="WithOffset"/> to disallow
-        /// manual combo colouring when not on the beatmap's skin.
+        /// This is separated from <see cref="WithBeatmapOffset"/> to
+        /// disallow manual combo colouring when not on the beatmap's skin.
         /// </remarks>
         public readonly int Ordinal;
 
         /// <summary>
-        /// The manual index value of the combo. Accounts for <see cref="IHasCombo.ComboOffset"/>.
+        /// The index value of the combo with account for <see cref="IHasCombo.ComboOffset"/>.
         /// </summary>
         public readonly int WithOffset;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Objects.Types
 
         public override string ToString() => $"(Ordinal: {Ordinal}, WithOffset: {WithOffset})";
 
-        #region Operator overloading
+        #region Operator overloading & simple operation methods
 
         /// <summary>
         /// Converts <paramref name="i"/> to a <see cref="ComboIndex"/> by constructing one
