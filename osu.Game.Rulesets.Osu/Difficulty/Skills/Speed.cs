@@ -28,12 +28,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double streamaimconst = 2.42;
 
         /// <summary>
-        /// splitter value for jumpDistances2 list
+        /// splitter value for sectionvelocities list
         /// </summary>
         private int sdsplitcounter;
 
         /// <summary>
-        /// splitter value for jumpDistances list
+        /// splitter value for acrs list
         /// </summary>
         private int sdsplitcounter2;
 
@@ -43,9 +43,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double sdstrainmult;
 
         /// <summary>
-        /// jumpDistances stores acceleration as a list
+        /// acrs stores acceleration as a list
         /// </summary>
-        private readonly List<double> jumpDistances = new List<double>();
+        private readonly List<double> acrs = new List<double>();
 
         /// <summary>
         /// strainTimes store StrainTime(s) as a list
@@ -53,9 +53,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly List<double> strainTimes = new List<double>();
 
         /// <summary>
-        /// jumpDistances2 store sectionvelocity as a list.
+        /// sectionvelocities store sectionvelocity as a list.
         /// </summary>
-        private readonly List<double> jumpDistances2 = new List<double>();
+        private readonly List<double> sectionvelocities = new List<double>();
 
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
@@ -80,6 +80,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return standardDeviation;
         }
 
+        private double streamdeterminant(double jumpdistance, double velocity)
+        {
+            double detstreamconst = jumpdistance * velocity;
+            double resultdet = -0.000001 * Math.Pow(detstreamconst - 363, 3) + 1;
+            return resultdet;
+        }
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -89,49 +96,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double sectionvelocity = osuCurrent.JumpDistance / osuCurrent.StrainTime;
 
-            if (osuCurrent.JumpDistance < 150 && sectionvelocity < streamaimconst && sectionvelocity > 0.9 && Previous.Count > 0 && osuCurrent.Angle != null && osuCurrent.Angle.Value >= Math.PI / 2 && osuCurrent.StrainTime < 100)
+            double detmultiplier = streamdeterminant(osuCurrent.JumpDistance, sectionvelocity);
+
+            sectionvelocities.Add(sectionvelocity);
+
+            strainTimes.Add(osuCurrent.StrainTime);
+
+            sdsplitcounter++;
+
+            if (sectionvelocities.Count > 1)
             {
-                jumpDistances2.Add(sectionvelocity);
+                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+                double oldsectionvelocity = osuPrevious.JumpDistance / osuPrevious.StrainTime;
+                double acr = (sectionvelocity - oldsectionvelocity) / osuPrevious.StrainTime;
 
-                strainTimes.Add(osuCurrent.StrainTime);
-
-                sdsplitcounter++;
-
-                if (jumpDistances2.Count > 1)
+                if (acr > 0)
                 {
-                    var osuPrevious = (OsuDifficultyHitObject)Previous[0];
-                    double oldsectionvelocity = osuPrevious.JumpDistance / osuPrevious.StrainTime;
-                    double acr = (sectionvelocity - oldsectionvelocity) / osuPrevious.StrainTime;
-
-                    if (acr > 0)
-                    {
-                        jumpDistances.Add(acr);
-                    }
-
-                    if (jumpDistances.Count > 1)
-                    {
-                        sdstrainmult = calculateStandardDeviation(jumpDistances);
-                        sdstrainmult *= 3;
-                        sdsplitcounter2++;
-                    }
-                    else
-                    {
-                        if (sdsplitcounter2 > 0)
-                        {
-                            jumpDistances.Clear();
-                            jumpDistances.TrimExcess();
-                            sdsplitcounter2 = 0;
-                        }
-                    }
+                    acrs.Add(acr);
                 }
-            }
-            else
-            {
-                if (sdsplitcounter > 0)
+
+                if (acrs.Count > 1)
                 {
-                    jumpDistances2.Clear();
-                    jumpDistances2.TrimExcess();
-                    sdsplitcounter = 0;
+                    sdstrainmult = calculateStandardDeviation(acrs);
+                    sdstrainmult *= detmultiplier;
+                    sdstrainmult *= 0.02;
+                    sdsplitcounter2++;
+                }
+                else
+                {
+                    if (sdsplitcounter2 > 0)
+                    {
+                        acrs.Clear();
+                        acrs.TrimExcess();
+                        sdsplitcounter2 = 0;
+                    }
                 }
             }
 
