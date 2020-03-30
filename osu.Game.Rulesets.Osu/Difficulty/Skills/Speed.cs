@@ -23,11 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double pi_over_2 = Math.PI / 2;
 
         /// <summary>
-        /// streamaimconst is derived from the last stream of Megalovania [Excors] 9* map (Unit:pixel/ms)
-        /// </summary>
-        private const double streamaimconst = 2.42;
-
-        /// <summary>
         /// splitter value for acrs list
         /// </summary>
         private int sdsplitcounter2;
