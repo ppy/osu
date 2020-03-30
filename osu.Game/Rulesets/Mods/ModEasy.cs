@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0,
             MaxValue = 10
         };
+
+        public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{"lives".ToQuantity(Retries.Value)}";
 
         private int retries;
 
