@@ -48,11 +48,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             switch (h)
             {
-                case CentreHit centreHit:
-                    return new DrawableCentreHit(centreHit);
-
-                case RimHit rimHit:
-                    return new DrawableRimHit(rimHit);
+                case Hit hit:
+                    if (hit.Type == HitType.Centre)
+                        return new DrawableCentreHit(hit);
+                    else
+                        return new DrawableRimHit(hit);
 
                 case DrumRoll drumRoll:
                     return new DrawableDrumRoll(drumRoll);
@@ -65,5 +65,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
+
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new TaikoReplayRecorder(replay);
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Screens;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -18,10 +19,14 @@ namespace osu.Game.Screens.Play
             this.score = score;
         }
 
-        protected override void LoadComplete()
+        protected override void PrepareReplay()
         {
-            base.LoadComplete();
             DrawableRuleset?.SetReplayScore(score);
+        }
+
+        protected override void GotoRanking()
+        {
+            this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
         }
 
         protected override ScoreInfo CreateScore() => score.ScoreInfo;

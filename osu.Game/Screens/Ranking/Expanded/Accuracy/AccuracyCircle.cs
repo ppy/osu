@@ -196,6 +196,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         new RankBadge(0.9f, ScoreRank.A),
                         new RankBadge(0.8f, ScoreRank.B),
                         new RankBadge(0.7f, ScoreRank.C),
+                        new RankBadge(0.35f, ScoreRank.D),
                     }
                 },
                 rankText = new RankText(score.Rank)
