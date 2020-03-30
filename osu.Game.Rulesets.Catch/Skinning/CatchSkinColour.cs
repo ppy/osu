@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
-    public enum CatchSkinConfiguration
+    public enum CatchSkinColour
     {
         /// <summary>
         /// The colour to be used for the catcher while on hyper-dashing state.

@@ -158,15 +158,15 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
-                if (lookup is CatchSkinConfiguration config)
+                if (lookup is CatchSkinColour config)
                 {
-                    if (config == CatchSkinConfiguration.HyperDash && customCatcherColour)
+                    if (config == CatchSkinColour.HyperDash && customCatcherColour)
                         return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashColour));
 
-                    if (config == CatchSkinConfiguration.HyperDashFruit && customFruitColour)
+                    if (config == CatchSkinColour.HyperDashFruit && customFruitColour)
                         return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashFruitColour));
 
-                    if (config == CatchSkinConfiguration.HyperDashAfterImage && customAfterColour)
+                    if (config == CatchSkinColour.HyperDashAfterImage && customAfterColour)
                         return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashAfterColour));
                 }
 

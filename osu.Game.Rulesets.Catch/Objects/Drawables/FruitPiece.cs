@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             });
 
             var hyperDashColour =
-                skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDashFruit)?.Value ??
-                skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDash)?.Value ??
+                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
+                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
                 Catcher.DefaultHyperDashColour;
 
             if (hitObject.HyperDash)
