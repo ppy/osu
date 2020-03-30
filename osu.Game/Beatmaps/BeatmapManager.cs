@@ -451,12 +451,15 @@ namespace osu.Game.Beatmaps
 
                     var res = req.Result;
 
-                    beatmap.Status = res.Status;
-                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+                    if (res != null)
+                    {
+                        beatmap.Status = res.Status;
+                        beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
+                        beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                        beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
 
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
+                        LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
+                    }
                 }
                 catch (Exception e)
                 {
