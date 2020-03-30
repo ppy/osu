@@ -35,14 +35,14 @@ namespace osu.Game.Screens.Ranking
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
-        private readonly ScoreInfo score;
+        public readonly ScoreInfo Score;
 
         private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
         private Drawable bottomPanel;
 
         public ResultsScreen(ScoreInfo score)
         {
-            this.score = score;
+            Score = score;
         }
 
         [BackgroundDependencyLoader]
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Ranking
                     ParallaxAmount = 0.01f,
                     Child = new ResultsScrollContainer
                     {
-                        Child = new ScorePanel(score)
+                        Child = new ScorePanel(Score)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Ranking
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new ReplayDownloadButton(score) { Width = 300 },
+                                new ReplayDownloadButton(Score) { Width = 300 },
                                 new RetryButton { Width = 300 },
                             }
                         }

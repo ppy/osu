@@ -268,3 +268,12 @@
         *   结算菜单的视差效果动画
 
 * **!!! [Toolbar](osu.Game/Overlays/Toolbar/Toolbar.cs)过渡动画相关逻辑仍需改进 !!!**
+
+### 2020/3/30
+*   合并上游pr
+    *   [m] [Rewrite beatmap carousel's select next logic to not use drawables #8481]
+    *   [m] [Fix auto mod results screen not displaying correctly #8488]
+    *   [m] [Implement Spun Out mod #7764]
+
+*   暂不合并
+    *   [m] [Move non-headless tests to correct namespace #8493]
