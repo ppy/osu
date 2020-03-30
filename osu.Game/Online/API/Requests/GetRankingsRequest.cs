@@ -6,7 +6,8 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public abstract class GetRankingsRequest<TModel> : APIRequest<TModel>
+    public abstract class GetRankingsRequest<TModel> : APIRequest<TModel> where TModel : class
+
     {
         private readonly RulesetInfo ruleset;
         private readonly int page;
