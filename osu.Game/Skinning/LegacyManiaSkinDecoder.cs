@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
@@ -42,7 +43,10 @@ namespace osu.Game.Skinning
                     {
                         case "Keys":
                             currentConfig = new LegacyManiaSkinConfiguration(int.Parse(pair.Value, CultureInfo.InvariantCulture));
-                            output.Add(currentConfig);
+
+                            // Silently ignore duplicate configurations.
+                            if (output.All(c => c.Keys != currentConfig.Keys))
+                                output.Add(currentConfig);
 
                             // All existing lines can be flushed now that we have a valid configuration.
                             flushPendingLines();
