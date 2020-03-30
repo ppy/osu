@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
-        protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
+        protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps = createBeatmapDifficulties(beatmapSet.Files);
@@ -103,7 +103,11 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            return updateQueue.UpdateAsync(beatmapSet, cancellationToken);
+            await updateQueue.UpdateAsync(beatmapSet, cancellationToken);
+
+            // ensure at least one beatmap was able to retrieve an online ID, else drop the set ID.
+            if (!beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
+                beatmapSet.OnlineBeatmapSetID = null;
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
