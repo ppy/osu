@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -20,6 +22,8 @@ namespace osu.Game.Screens.Play.HUD
         private const int fade_time = 400;
 
         private readonly Box box;
+
+        private Bindable<bool> enabled;
 
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
@@ -37,9 +41,11 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour color)
+        private void load(OsuColour color, OsuConfigManager config)
         {
             box.Colour = color.Red;
+            enabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
+            enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0, fade_time, Easing.OutQuint), true);
         }
 
         protected override void Update()
