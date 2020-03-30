@@ -75,6 +75,20 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestClick()
+        {
+            AddStep("scroll to end", () => scroll.ScrollToEnd(false));
+
+            AddStep("click button", () =>
+            {
+                InputManager.MoveMouseTo(scroll.Button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 0, 0.1f));
+        }
+
+        [Test]
         public void TestMultipleClicks()
         {
             AddStep("scroll to end", () => scroll.ScrollToEnd(false));
