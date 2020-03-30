@@ -43,10 +43,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public bool HandleUserInput { get; set; } = true;
 
-        public override bool HandlePositionalInput => HandleUserInput;
-
-        public override bool HandleNonPositionalInput => HandleUserInput;
-
         public override bool PropagatePositionalInputSubTree => HandleUserInput;
 
         public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
