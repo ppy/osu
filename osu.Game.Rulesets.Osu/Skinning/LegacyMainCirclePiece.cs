@@ -80,6 +80,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 return tex ?? skin.GetTexture($"hitcircle{name}");
             }
+
+            bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
+
+            if (!overlayAboveNumber)
+                ChangeInternalChildDepth(hitCircleText, -float.MaxValue);
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)
