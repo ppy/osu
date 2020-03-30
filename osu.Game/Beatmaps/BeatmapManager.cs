@@ -103,11 +103,19 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
+            bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
+
             await updateQueue.UpdateAsync(beatmapSet, cancellationToken);
 
-            // ensure at least one beatmap was able to retrieve an online ID, else drop the set ID.
-            if (!beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
-                beatmapSet.OnlineBeatmapSetID = null;
+            // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
+            if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
+            {
+                if (beatmapSet.OnlineBeatmapSetID != null)
+                {
+                    beatmapSet.OnlineBeatmapSetID = null;
+                    LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
+                }
+            }
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
