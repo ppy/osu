@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Select
 
             BeatmapSetInfo set = beatmap.BeatmapSet;
             BeatmapInfo recommended = set.Beatmaps.OrderBy(b => SongSelect.DifferenceToRecommended(b, RecommendedStarDifficulty.Value)).FirstOrDefault();
-            return beatmap == recommended && Math.Abs(beatmap.StarDifficulty - RecommendedStarDifficulty.Value) < 1.5;
+            return beatmap == recommended && Math.Abs(beatmap.StarDifficulty - RecommendedStarDifficulty.Value) < 0.5;
         }
 
         protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
