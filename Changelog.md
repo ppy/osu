@@ -266,3 +266,5 @@
     *   动画效果变更
         *   音乐播放器切歌动画
         *   结算菜单的视差效果动画
+
+* **!!! [Toolbar](osu.Game/Overlays/Toolbar/Toolbar.cs)过渡动画相关逻辑仍需改进 !!!**

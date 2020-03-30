@@ -3,11 +3,13 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -20,6 +22,7 @@ namespace osu.Game.Screens.Ranking
 {
     public class ResultsScreen : OsuScreen
     {
+        private Bindable<bool> OptUIEnabled;
         protected const float BACKGROUND_BLUR = 20;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -34,6 +37,7 @@ namespace osu.Game.Screens.Ranking
 
         private readonly ScoreInfo score;
 
+        private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
         private Drawable bottomPanel;
 
         public ResultsScreen(ScoreInfo score)
@@ -42,8 +46,9 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            OptUIEnabled = config.GetBindable<bool>(OsuSetting.OptUI);
             InternalChildren = new[]
             {
                 new ParallaxContainer
@@ -51,7 +56,7 @@ namespace osu.Game.Screens.Ranking
                     Masking = true,
                     Child = new MfBgTriangles(0.5f, false, 5f),
                 },
-                new Graphics.Mf.Resources.ParallaxContainer
+                scorePanelParallax = new Graphics.Mf.Resources.ParallaxContainer
                 {
                     Masking = true,
                     ParallaxAmount = 0.01f,
@@ -65,7 +70,6 @@ namespace osu.Game.Screens.Ranking
                         },
                     },
                 },
-
                 bottomPanel = new Container
                 {
                     Anchor = Anchor.BottomLeft,
@@ -118,13 +122,29 @@ namespace osu.Game.Screens.Ranking
             ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
 
             Background.FadeTo(0.5f, 250);
-            bottomPanel.FadeTo(1, 250);
+            switch (OptUIEnabled.Value)
+            {
+                case true:
+                    bottomPanel.Y = TwoLayerButton.SIZE_EXTENDED.Y;
+                    bottomPanel.Delay(250).FadeTo(1, 200).MoveToY(0, 550, Easing.OutExpo);
+                    break;
+
+                case false:
+                    bottomPanel.FadeTo(1, 250);
+                    break;
+            };
         }
 
         public override bool OnExiting(IScreen next)
         {
             Background.FadeTo(1, 250);
-
+            switch (OptUIEnabled.Value)
+            {
+                case true:
+                    bottomPanel.FadeTo(0, 250).MoveToY(TwoLayerButton.SIZE_EXTENDED.Y, 250);
+                    this.FadeOut(100);
+                    break;
+            };
             return base.OnExiting(next);
         }
 
