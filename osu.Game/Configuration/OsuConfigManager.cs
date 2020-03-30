@@ -18,7 +18,6 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
-            Set(OsuSetting.OptUI, true);
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, -1, int.MaxValue);
 
@@ -122,6 +121,10 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+
+            //Optimize Settings
+            Set(OsuSetting.OptUI, true);
+            Set(OsuSetting.TrianglesEnabled, true);
         }
 
         public OsuConfigManager(Storage storage)
@@ -224,5 +227,6 @@ namespace osu.Game.Configuration
         HitLighting,
         MenuBackgroundSource,
         OptUI,
+        TrianglesEnabled,
     }
 }

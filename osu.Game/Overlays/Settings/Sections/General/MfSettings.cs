@@ -21,6 +21,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     LabelText = "启用Mf自定义UI",
                     Bindable = config.GetBindable<bool>(OsuSetting.OptUI)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "启用三角形粒子动画",
+                    Bindable = config.GetBindable<bool>(OsuSetting.TrianglesEnabled)
+                },
             };
         }
     }
