@@ -19,6 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    [Cached]
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         public const float COLUMN_WIDTH = 80;

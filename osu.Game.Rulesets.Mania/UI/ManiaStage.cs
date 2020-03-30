@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
+    [Cached]
     public class ManiaStage : ScrollingPlayfield
     {
         public const float COLUMN_SPACING = 1;
