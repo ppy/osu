@@ -89,22 +89,19 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            if (player != null)
+            if (player != null && allowRetry)
             {
-                if (allowRetry)
+                buttons.Add(new RetryButton { Width = 300 });
+
+                AddInternal(new HotkeyRetryOverlay
                 {
-                    buttons.Add(new RetryButton { Width = 300 });
-
-                    AddInternal(new HotkeyRetryOverlay
+                    Action = () =>
                     {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
+                        if (!this.IsCurrentScreen()) return;
 
-                            player?.Restart();
-                        },
-                    });
-                }
+                        player?.Restart();
+                    },
+                });
             }
         }
 
