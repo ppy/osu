@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class RepeatPoint : OsuHitObject
+    public class SliderRepeat : OsuHitObject
     {
         public int RepeatIndex { get; set; }
         public double SpanDuration { get; set; }
@@ -28,8 +28,13 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TimePreempt = Math.Min(SpanDuration * 2, TimePreempt);
         }
 
-        public override Judgement CreateJudgement() => new OsuJudgement();
-
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override Judgement CreateJudgement() => new SliderRepeatJudgement();
+
+        public class SliderRepeatJudgement : OsuJudgement
+        {
+            protected override int NumericResultFor(HitResult result) => result == MaxResult ? 30 : 0;
+        }
     }
 }
