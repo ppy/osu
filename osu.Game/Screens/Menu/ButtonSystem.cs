@@ -154,10 +154,10 @@ namespace osu.Game.Screens.Menu
             if (host.CanExit)
                 buttonsTopLevel.Add(new Button(@"退出", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
 
-            buttonArea.AddRange(buttonsPlay);
-            buttonArea.AddRange(buttonsTopLevel);
             buttonArea.AddRange(buttonsCustom);
+            buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsP2C);
+            buttonArea.AddRange(buttonsTopLevel);
 
             buttonArea.ForEach(b =>
             {
