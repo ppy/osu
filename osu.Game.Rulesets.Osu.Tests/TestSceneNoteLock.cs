@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -23,8 +24,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneNoteLock : RateAdjustedBeatmapTestScene
     {
-        private const double time_first_circle = 1500;
-        private const double time_second_circle = 1600;
         private const double early_miss_window = 1000; // time after -1000 to -500 is considered a miss
         private const double late_miss_window = 500; // time after +500 is considered a miss
 
@@ -37,13 +36,31 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestClickSecondCircleBeforeFirstCircleTime()
         {
-            performTest(new List<ReplayFrame>
+            const double time_first_circle = 1500;
+            const double time_second_circle = 1600;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new TestHitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = position_first_circle
+                },
+                new TestHitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = position_second_circle
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_first_circle - 100, Position = position_second_circle, Actions = { OsuAction.LeftButton } }
             });
 
-            addJudgementAssert(HitResult.Miss, HitResult.Miss);
-            addJudgementOffsetAssert(late_miss_window);
+            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            addJudgementAssert(hitObjects[1], HitResult.Miss);
+            addJudgementOffsetAssert(hitObjects[0], late_miss_window);
         }
 
         /// <summary>
@@ -52,13 +69,31 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestClickSecondCircleAtFirstCircleTime()
         {
-            performTest(new List<ReplayFrame>
+            const double time_first_circle = 1500;
+            const double time_second_circle = 1600;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new TestHitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = position_first_circle
+                },
+                new TestHitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = position_second_circle
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_first_circle, Position = position_second_circle, Actions = { OsuAction.LeftButton } }
             });
 
-            addJudgementAssert(HitResult.Miss, HitResult.Great);
-            addJudgementOffsetAssert(0);
+            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[0], 0);
         }
 
         /// <summary>
@@ -67,13 +102,31 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestClickSecondCircleAfterFirstCircleTime()
         {
-            performTest(new List<ReplayFrame>
+            const double time_first_circle = 1500;
+            const double time_second_circle = 1600;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new TestHitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = position_first_circle
+                },
+                new TestHitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = position_second_circle
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_first_circle + 100, Position = position_second_circle, Actions = { OsuAction.LeftButton } }
             });
 
-            addJudgementAssert(HitResult.Miss, HitResult.Great);
-            addJudgementOffsetAssert(100);
+            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[0], 100);
         }
 
         /// <summary>
@@ -82,49 +135,58 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestClickSecondCircleBeforeFirstCircleTimeWithFirstCircleJudged()
         {
-            performTest(new List<ReplayFrame>
+            const double time_first_circle = 1500;
+            const double time_second_circle = 1600;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new TestHitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = position_first_circle
+                },
+                new TestHitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = position_second_circle
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_first_circle - 200, Position = position_first_circle, Actions = { OsuAction.LeftButton } },
                 new OsuReplayFrame { Time = time_first_circle - 100, Position = position_second_circle, Actions = { OsuAction.RightButton } }
             });
 
-            addJudgementAssert(HitResult.Great, HitResult.Great);
+            addJudgementAssert(hitObjects[0], HitResult.Great);
+            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
+            addJudgementOffsetAssert(hitObjects[0], -200); // time_second_circle - first_circle_time - 100
         }
 
-        private void addJudgementAssert(HitResult firstCircle, HitResult secondCircle)
+        private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
-            AddAssert($"first circle judgement is {firstCircle}", () => judgementResults.Single(r => r.HitObject.StartTime == time_first_circle).Type == firstCircle);
-            AddAssert($"second circle judgement is {secondCircle}", () => judgementResults.Single(r => r.HitObject.StartTime == time_second_circle).Type == secondCircle);
+            AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
+                () => judgementResults.Single(r => r.HitObject == hitObject).Type == result);
         }
 
-        private void addJudgementOffsetAssert(double offset)
+        private void addJudgementOffsetAssert(OsuHitObject hitObject, double offset)
         {
-            AddAssert($"first circle judged at {offset}", () => Precision.AlmostEquals(judgementResults.Single(r => r.HitObject.StartTime == time_first_circle).TimeOffset, offset, 100));
+            AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judged at {offset}",
+                () => Precision.AlmostEquals(judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, offset, 100));
         }
 
         private ScoreAccessibleReplayPlayer currentPlayer;
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
 
-        private void performTest(List<ReplayFrame> frames)
+        private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames)
         {
             AddStep("load player", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
-                    HitObjects =
-                    {
-                        new TestHitCircle
-                        {
-                            StartTime = time_first_circle,
-                            Position = position_first_circle
-                        },
-                        new TestHitCircle
-                        {
-                            StartTime = time_second_circle,
-                            Position = position_second_circle
-                        }
-                    },
+                    HitObjects = hitObjects,
                     BeatmapInfo =
                     {
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
