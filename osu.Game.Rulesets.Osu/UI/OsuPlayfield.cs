@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="result">The <see cref="JudgementResult"/> of the judged <see cref="OsuHitObject"/>.</param>
         private void missAllEarlier(JudgementResult result)
         {
-            if (!contributesToNoteLock(result.HitObject))
+            if (!causesNoteLockMisses(result.HitObject))
                 return;
 
             // The minimum start time required for hitobjects so that they aren't missed.
@@ -159,21 +159,18 @@ namespace osu.Game.Rulesets.Osu.UI
             if (osuObject.Judged)
                 return;
 
-            // Hitobjects that count as bonus should not be missed.
-            // For the sequence slider-head -> slider-tick -> circle, hitting the circle before the tick should not cause the tick to be missed.
-            if (!contributesToNoteLock(obj.HitObject))
+            if (!causesNoteLockMisses(obj.HitObject))
                 return;
 
             osuObject.MissForcefully();
         }
 
         /// <summary>
-        /// Whether a hitobject contributes to notelock.
-        /// Only hit circles and slider start circles contribute to notelock.
+        /// Whether a <see cref="HitObject"/> can be missed and causes other hitobjects to be missed during notelock.
         /// </summary>
-        /// <param name="hitObject">The hitobject to test.</param>
-        /// <returns>Whether <paramref name="hitObject"/> contributes to notelock.</returns>
-        private bool contributesToNoteLock(HitObject hitObject)
+        /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
+        /// <returns>Whether <paramref name="hitObject"/> contributes to notelock misses.</returns>
+        private bool causesNoteLockMisses(HitObject hitObject)
             => hitObject is HitCircle && !(hitObject is SliderTailCircle);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
