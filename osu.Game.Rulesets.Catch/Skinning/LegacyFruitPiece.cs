@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Catch.Skinning
             if (drawableCatchObject.HitObject.HyperDash)
             {
                 var hyperDashColour =
-                    skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDashFruit)?.Value ??
-                    skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDash)?.Value ??
+                    skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
+                    skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
                     Catcher.DefaultHyperDashColour;
 
                 var hyperDash = new Sprite
