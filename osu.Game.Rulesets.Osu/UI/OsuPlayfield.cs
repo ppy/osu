@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
 
@@ -126,10 +127,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="result">The <see cref="JudgementResult"/> of the judged <see cref="OsuHitObject"/>.</param>
         private void missAllEarlier(JudgementResult result)
         {
-            // Hitobjects that count as bonus should not cause other hitobjects to get missed.
-            // E.g. For the sequence slider-head -> circle -> slider-tick, hitting the tick before the circle should not cause the circle to be missed.
-            // E.g. For the sequence spinner -> circle -> spinner-bonus, hitting the bonus before the circle should not cause the circle to be missed.
-            if (result.Judgement.IsBonus)
+            if (!contributesToNoteLock(result.HitObject))
                 return;
 
             // The minimum start time required for hitobjects so that they aren't missed.
@@ -140,34 +138,43 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (obj.HitObject.StartTime >= minimumTime)
                     break;
 
-                attemptMiss(obj);
+                performMiss(obj);
 
                 foreach (var n in obj.NestedHitObjects)
                 {
                     if (n.HitObject.StartTime >= minimumTime)
                         break;
 
-                    attemptMiss(n);
+                    performMiss(n);
                 }
             }
-
-            static void attemptMiss(DrawableHitObject obj)
-            {
-                if (!(obj is DrawableOsuHitObject osuObject))
-                    throw new InvalidOperationException($"{obj.GetType()} is not a {nameof(DrawableOsuHitObject)}.");
-
-                // Hitobjects that have already been judged cannot be missed.
-                if (osuObject.Judged)
-                    return;
-
-                // Hitobjects that count as bonus should not be missed.
-                // For the sequence slider-head -> slider-tick -> circle, hitting the circle before the tick should not cause the tick to be missed.
-                if (osuObject.Result.Judgement.IsBonus)
-                    return;
-
-                osuObject.MissForcefully();
-            }
         }
+
+        private void performMiss(DrawableHitObject obj)
+        {
+            if (!(obj is DrawableOsuHitObject osuObject))
+                throw new InvalidOperationException($"{obj.GetType()} is not a {nameof(DrawableOsuHitObject)}.");
+
+            // Hitobjects that have already been judged cannot be missed.
+            if (osuObject.Judged)
+                return;
+
+            // Hitobjects that count as bonus should not be missed.
+            // For the sequence slider-head -> slider-tick -> circle, hitting the circle before the tick should not cause the tick to be missed.
+            if (!contributesToNoteLock(obj.HitObject))
+                return;
+
+            osuObject.MissForcefully();
+        }
+
+        /// <summary>
+        /// Whether a hitobject contributes to notelock.
+        /// Only hit circles and slider start circles contribute to notelock.
+        /// </summary>
+        /// <param name="hitObject">The hitobject to test.</param>
+        /// <returns>Whether <paramref name="hitObject"/> contributes to notelock.</returns>
+        private bool contributesToNoteLock(HitObject hitObject)
+            => hitObject is HitCircle && !(hitObject is SliderTailCircle);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 

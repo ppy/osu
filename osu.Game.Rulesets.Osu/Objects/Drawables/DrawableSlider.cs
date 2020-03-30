@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case SliderTailCircle tail:
                     return new DrawableSliderTail(slider, tail);
 
-                case HitCircle head:
+                case SliderHeadCircle head:
                     return new DrawableSliderHead(slider, head) { OnShake = Shake };
 
                 case SliderTick tick:
