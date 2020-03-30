@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneHyperDashColouring : OsuTestScene
     {
+        [Resolved]
+        private SkinManager skins { get; set; }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestHyperDashFruitColour(bool legacyFruit)
@@ -36,19 +39,21 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("setup fruit", () =>
             {
-                var fruit = new Fruit { IndexInBeatmap = legacyFruit ? 0 : 1, HyperDashTarget = new Banana() };
+                var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                Child = setupSkinHierarchy(() =>
-                    drawableFruit = new DrawableFruit(fruit)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(4f),
-                    }, false, false);
+                Child = setupSkinHierarchy(drawableFruit = new DrawableFruit(fruit)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(4f),
+                }, false, false, false, legacyFruit);
             });
 
-            AddAssert("default colour", () => checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour, legacyFruit));
+            AddAssert("default colour", () =>
+                legacyFruit
+                    ? checkLegacyFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour)
+                    : checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour));
         }
 
         [TestCase(false, true)]
@@ -61,19 +66,21 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("setup fruit", () =>
             {
-                var fruit = new Fruit { IndexInBeatmap = legacyFruit ? 0 : 1, HyperDashTarget = new Banana() };
+                var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                Child = setupSkinHierarchy(() =>
-                    drawableFruit = new DrawableFruit(fruit)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(4f),
-                    }, customCatcherHyperDashColour, true);
+                Child = setupSkinHierarchy(drawableFruit = new DrawableFruit(fruit)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(4f),
+                }, customCatcherHyperDashColour, false, true, legacyFruit);
             });
 
-            AddAssert("custom colour", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashFruitColour, legacyFruit));
+            AddAssert("custom colour", () =>
+                legacyFruit
+                    ? checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour)
+                    : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour));
         }
 
         [TestCase(false)]
@@ -84,71 +91,68 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("setup fruit", () =>
             {
-                var fruit = new Fruit { IndexInBeatmap = legacyFruit ? 0 : 1, HyperDashTarget = new Banana() };
+                var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                Child = setupSkinHierarchy(() =>
+                Child = setupSkinHierarchy(
                     drawableFruit = new DrawableFruit(fruit)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Scale = new Vector2(4f),
-                    }, true, false);
+                    }, true, false, false, legacyFruit);
             });
 
-            AddAssert("catcher custom colour", () => checkFruitHyperDashColour(drawableFruit, TestLegacySkin.CustomHyperDashColour, legacyFruit));
+            AddAssert("catcher custom colour", () =>
+                legacyFruit
+                    ? checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour)
+                    : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour));
         }
 
-        private Drawable setupSkinHierarchy(Func<Drawable> getChild, bool customHyperDashCatcherColour = false, bool customHyperDashFruitColour = false, bool customHyperDashAfterColour = false)
+        private Drawable setupSkinHierarchy(Drawable child, bool customCatcherColour = false, bool customAfterColour = false, bool customFruitColour = false, bool legacySkin = true)
         {
-            var testSkinProvider = new SkinProvidingContainer(new TestLegacySkin(customHyperDashCatcherColour, customHyperDashFruitColour, customHyperDashAfterColour));
+            var testSkinProvider = new SkinProvidingContainer(new TestSkin(customCatcherColour, customAfterColour, customFruitColour));
 
-            var legacySkinTransformer = new SkinProvidingContainer(new CatchLegacySkinTransformer(testSkinProvider));
+            if (legacySkin)
+            {
+                var legacySkinProvider = new SkinProvidingContainer(skins.GetSkin(DefaultLegacySkin.Info));
+                var legacySkinTransformer = new SkinProvidingContainer(new CatchLegacySkinTransformer(testSkinProvider));
 
-            return testSkinProvider
-                .WithChild(legacySkinTransformer
-                    .WithChild(getChild.Invoke()));
+                return legacySkinProvider
+                    .WithChild(testSkinProvider
+                        .WithChild(legacySkinTransformer
+                            .WithChild(child)));
+            }
+
+            return testSkinProvider.WithChild(child);
         }
 
-        private bool checkFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour, bool isLegacyFruit) =>
-            isLegacyFruit
-                ? fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Sprite>().Any(c => c.Colour == expectedColour)
-                : fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Circle>().Single(c => c.BorderColour == expectedColour).Any(d => d.Colour == expectedColour);
+        private bool checkFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour) =>
+            fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Circle>().Single(c => c.BorderColour == expectedColour).Any(d => d.Colour == expectedColour);
 
-        private class TestLegacySkin : ISkin
+        private bool checkLegacyFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour) =>
+            fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Sprite>().Any(c => c.Colour == expectedColour);
+
+        private class TestSkin : ISkin
         {
             public static Color4 CustomHyperDashColour { get; } = Color4.Goldenrod;
             public static Color4 CustomHyperDashFruitColour { get; } = Color4.Cyan;
             public static Color4 CustomHyperDashAfterColour { get; } = Color4.Lime;
 
-            private readonly bool customHyperDashCatcherColour;
-            private readonly bool customHyperDashFruitColour;
-            private readonly bool customHyperDashAfterColour;
+            private readonly bool customCatcherColour;
+            private readonly bool customAfterColour;
+            private readonly bool customFruitColour;
 
-            public TestLegacySkin(bool customHyperDashCatcherColour = false, bool customHyperDashFruitColour = false, bool customHyperDashAfterColour = false)
+            public TestSkin(bool customCatcherColour = false, bool customAfterColour = false, bool customFruitColour = false)
             {
-                this.customHyperDashCatcherColour = customHyperDashCatcherColour;
-                this.customHyperDashFruitColour = customHyperDashFruitColour;
-                this.customHyperDashAfterColour = customHyperDashAfterColour;
+                this.customCatcherColour = customCatcherColour;
+                this.customAfterColour = customAfterColour;
+                this.customFruitColour = customFruitColour;
             }
 
             public Drawable GetDrawableComponent(ISkinComponent component) => null;
 
-            public Texture GetTexture(string componentName)
-            {
-                if (componentName == "fruit-pear")
-                {
-                    // convince CatchLegacySkinTransformer to use the LegacyFruitPiece for pear fruit.
-                    return new Texture(Texture.WhitePixel.TextureGL)
-                    {
-                        Width = 1,
-                        Height = 1,
-                        ScaleAdjust = 1 / 96f
-                    };
-                }
-
-                return null;
-            }
+            public Texture GetTexture(string componentName) => null;
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
 
@@ -156,13 +160,13 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 if (lookup is CatchSkinConfiguration config)
                 {
-                    if (config == CatchSkinConfiguration.HyperDash && customHyperDashCatcherColour)
+                    if (config == CatchSkinConfiguration.HyperDash && customCatcherColour)
                         return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashColour));
 
-                    if (config == CatchSkinConfiguration.HyperDashFruit && customHyperDashFruitColour)
+                    if (config == CatchSkinConfiguration.HyperDashFruit && customFruitColour)
                         return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashFruitColour));
 
-                    if (config == CatchSkinConfiguration.HyperDashAfterImage && customHyperDashAfterColour)
+                    if (config == CatchSkinConfiguration.HyperDashAfterImage && customAfterColour)
                         return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashAfterColour));
                 }
 
