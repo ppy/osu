@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double late_miss_window = 500; // time after +500 is considered a miss
 
         /// <summary>
-        /// Tests clicking the second circle before the first hitobject's start time, while the first hitobject HAS NOT been judged.
+        /// Tests clicking a future circle before the first circle's start time, while the first circle HAS NOT been judged.
         /// </summary>
         [Test]
         public void TestClickSecondCircleBeforeFirstCircleTime()
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Tests clicking the second circle at the first hitobject's start time, while the first hitobject HAS NOT been judged.
+        /// Tests clicking a future circle at the first circle's start time, while the first circle HAS NOT been judged.
         /// </summary>
         [Test]
         public void TestClickSecondCircleAtFirstCircleTime()
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Tests clicking the second circle after the first hitobject's start time, while the first hitobject HAS NOT been judged.
+        /// Tests clicking a future circle after the first circle's start time, while the first circle HAS NOT been judged.
         /// </summary>
         [Test]
         public void TestClickSecondCircleAfterFirstCircleTime()
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Tests clicking the second circle before the first hitobject's start time, while the first hitobject HAS been judged.
+        /// Tests clicking a future circle before the first circle's start time, while the first circle HAS been judged.
         /// </summary>
         [Test]
         public void TestClickSecondCircleBeforeFirstCircleTimeWithFirstCircleJudged()
@@ -172,6 +172,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementOffsetAssert(hitObjects[0], -200); // time_second_circle - first_circle_time - 100
         }
 
+        /// <summary>
+        /// Tests clicking a future circle after a slider's start time, but hitting all slider ticks.
+        /// </summary>
         [Test]
         public void TestMissSliderHeadAndHitAllSliderTicks()
         {
@@ -211,6 +214,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.Great);
         }
 
+        /// <summary>
+        /// Tests clicking hitting future slider ticks before a circle.
+        /// </summary>
         [Test]
         public void TestHitSliderTicksBeforeCircle()
         {
@@ -251,11 +257,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.Great);
         }
 
+        /// <summary>
+        /// Tests clicking a future circle before a spinner.
+        /// </summary>
         [Test]
         public void TestHitCircleBeforeSpinner()
         {
             const double time_spinner = 1500;
-            const double time_circle = 1510;
+            const double time_circle = 1800;
             Vector2 positionCircle = Vector2.Zero;
 
             var hitObjects = new List<OsuHitObject>
@@ -275,7 +284,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_spinner, Position = positionCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_spinner - 100, Position = positionCircle, Actions = { OsuAction.LeftButton } },
                 new OsuReplayFrame { Time = time_spinner + 10, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
                 new OsuReplayFrame { Time = time_spinner + 20, Position = new Vector2(256, 172), Actions = { OsuAction.RightButton } },
                 new OsuReplayFrame { Time = time_spinner + 30, Position = new Vector2(276, 192), Actions = { OsuAction.RightButton } },
