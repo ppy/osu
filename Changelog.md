@@ -274,6 +274,9 @@
     *   [m] [Rewrite beatmap carousel's select next logic to not use drawables #8481]
     *   [m] [Fix auto mod results screen not displaying correctly #8488]
     *   [m] [Implement Spun Out mod #7764]
+    *   [m] [Add support for legacy skin sliderstartcircle / sliderstartcircleoverlay #8477]
+    *   [m] [Add mania skin decoder #8496]
+    *   [m] [Make reverse arrows not follow snaking when they are already hit #8486]
 
 *   暂不合并
     *   [m] [Move non-headless tests to correct namespace #8493]
