@@ -90,7 +90,14 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private bool checkHittable(DrawableOsuHitObject osuHitObject)
         {
-            var lastObject = HitObjectContainer.AliveObjects.GetPrevious(osuHitObject);
+            DrawableHitObject lastObject = osuHitObject;
+
+            // Get the last hitobject that contributes to note lock
+            while ((lastObject = HitObjectContainer.AliveObjects.GetPrevious(lastObject)) != null)
+            {
+                if (contributesToNoteLock(lastObject.HitObject))
+                    break;
+            }
 
             // If there is no previous object alive, allow the hit.
             if (lastObject == null)
@@ -166,10 +173,19 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         /// <summary>
-        /// Whether a <see cref="HitObject"/> can be missed and causes other hitobjects to be missed during notelock.
+        /// Whether a <see cref="HitObject"/> is contributes to note lock.
+        /// Future contributing <see cref="HitObject"/>s will not be hittable until the start time of the last contributing <see cref="HitObject"/> is reached.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
-        /// <returns>Whether <paramref name="hitObject"/> contributes to notelock misses.</returns>
+        /// <returns>Whether <paramref name="hitObject"/> causes note lock.</returns>
+        private bool contributesToNoteLock(HitObject hitObject)
+            => hitObject is HitCircle || hitObject is Slider;
+
+        /// <summary>
+        /// Whether a <see cref="HitObject"/> can be missed and causes other <see cref="HitObject"/>s to be missed when hit out-of-order during note lock.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
+        /// <returns>Whether <paramref name="hitObject"/> contributes to note lock misses.</returns>
         private bool causesNoteLockMisses(HitObject hitObject)
             => hitObject is HitCircle && !(hitObject is SliderTailCircle);
 
