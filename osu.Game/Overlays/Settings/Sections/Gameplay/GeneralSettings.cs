@@ -54,6 +54,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Fade playfield to red when health is low",
+                    Bindable = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
+                    Keywords = new[] { "hp", "low", "playfield", "red" }
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
