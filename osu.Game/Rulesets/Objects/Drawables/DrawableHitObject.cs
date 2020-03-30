@@ -39,6 +39,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
 
         /// <summary>
+        /// Whether this object should handle any user input events.
+        /// </summary>
+        public bool HandleUserInput { get; set; } = true;
+
+        public override bool PropagatePositionalInputSubTree => HandleUserInput;
+
+        public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
+
+        /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
         /// </summary>
         public event Action<DrawableHitObject, JudgementResult> OnNewResult;
@@ -344,7 +353,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
-        public void PlaySamples() => Samples?.Play();
+        public virtual void PlaySamples() => Samples?.Play();
 
         protected override void Update()
         {

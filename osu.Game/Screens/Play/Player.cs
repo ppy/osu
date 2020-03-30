@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        private BreakTracker breakTracker;
+
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -208,7 +210,7 @@ namespace osu.Game.Screens.Play
             foreach (var overlay in DrawableRuleset.Overlays.OfType<HealthDisplay>())
                 overlay.BindHealthProcessor(HealthProcessor);
 
-            BreakOverlay.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+            breakTracker.IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
         private void addUnderlayComponents(Container target)
@@ -235,12 +237,30 @@ namespace osu.Game.Screens.Play
                 DrawableRuleset,
                 new ComboEffects(ScoreProcessor)
             });
+
+            DrawableRuleset.FrameStableComponents.AddRange(new Drawable[]
+            {
+                ScoreProcessor,
+                HealthProcessor,
+                breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
+                {
+                    Breaks = working.Beatmap.Breaks
+                }
+            });
+
+            HealthProcessor.IsBreakTime.BindTo(breakTracker.IsBreakTime);
         }
 
         private void addOverlayComponents(Container target, WorkingBeatmap working)
         {
             target.AddRange(new[]
             {
+                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                {
+                    Clock = DrawableRuleset.FrameStableClock,
+                    ProcessCustomClock = false,
+                    Breaks = working.Beatmap.Breaks
+                },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
@@ -297,20 +317,8 @@ namespace osu.Game.Screens.Play
                         performImmediateExit();
                     },
                 },
-                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
+                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
             });
-
-            DrawableRuleset.Overlays.Add(BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Breaks = working.Beatmap.Breaks
-            });
-
-            DrawableRuleset.Overlays.Add(ScoreProcessor);
-            DrawableRuleset.Overlays.Add(HealthProcessor);
-
-            HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
@@ -322,7 +330,7 @@ namespace osu.Game.Screens.Play
         private void updatePauseOnFocusLostState() =>
             HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
                                                      && !DrawableRuleset.HasReplayLoaded.Value
-                                                     && !BreakOverlay.IsBreakTime.Value;
+                                                     && !breakTracker.IsBreakTime.Value;
 
         private IBeatmap loadPlayableBeatmap()
         {
@@ -544,7 +552,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (BreakOverlay.IsBreakTime.Value)
+            if (breakTracker.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -578,8 +586,8 @@ namespace osu.Game.Screens.Play
             Background.BlurAmount.Value = 0;
 
             // bind component bindables.
-            Background.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
-            DimmableStoryboard.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+            Background.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -633,6 +641,39 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
+        protected virtual void GotoRanking()
+        {
+            if (DrawableRuleset.ReplayScore != null)
+            {
+                // if a replay is present, we likely don't want to import into the local database.
+                this.Push(CreateResults(CreateScore()));
+                return;
+            }
+
+            LegacyByteArrayReader replayReader = null;
+
+            var score = new Score { ScoreInfo = CreateScore() };
+
+            if (recordingReplay?.Frames.Count > 0)
+            {
+                score.Replay = recordingReplay;
+
+                using (var stream = new MemoryStream())
+                {
+                    new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                }
+            }
+
+            scoreManager.Import(score.ScoreInfo, replayReader)
+                        .ContinueWith(imported => Schedule(() =>
+                        {
+                            // screen may be in the exiting transition phase.
+                            if (this.IsCurrentScreen())
+                                this.Push(CreateResults(imported.Result));
+                        }));
+        }
+
         private void fadeOut(bool instant = false)
         {
             float fadeOutDuration = instant ? 0 : 250;
@@ -645,36 +686,7 @@ namespace osu.Game.Screens.Play
         private void scheduleGotoRanking()
         {
             completionProgressDelegate?.Cancel();
-            completionProgressDelegate = Schedule(delegate
-            {
-                if (DrawableRuleset.ReplayScore != null)
-                    this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
-                else
-                {
-                    var score = new Score { ScoreInfo = CreateScore() };
-
-                    LegacyByteArrayReader replayReader = null;
-
-                    if (recordingReplay?.Frames.Count > 0)
-                    {
-                        score.Replay = recordingReplay;
-
-                        using (var stream = new MemoryStream())
-                        {
-                            new LegacyScoreEncoder(score, gameplayBeatmap).Encode(stream);
-                            replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
-                        }
-                    }
-
-                    scoreManager.Import(score.ScoreInfo, replayReader)
-                                .ContinueWith(imported => Schedule(() =>
-                                {
-                                    // screen may be in the exiting transition phase.
-                                    if (this.IsCurrentScreen())
-                                        this.Push(CreateResults(imported.Result));
-                                }));
-                }
-            });
+            completionProgressDelegate = Schedule(GotoRanking);
         }
 
         #endregion
