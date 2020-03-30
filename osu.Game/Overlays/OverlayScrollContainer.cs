@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -83,7 +84,10 @@ namespace osu.Game.Overlays
             public ScrollToTopButton()
             {
                 Size = new Vector2(50);
-                Child = button = new Button();
+                Child = button = new Button
+                {
+                    AreaState = { BindTarget = State }
+                };
             }
 
             protected override bool OnMouseDown(MouseDownEvent e) => true;
@@ -94,7 +98,9 @@ namespace osu.Game.Overlays
 
             private class Button : OsuHoverContainer
             {
-                public override bool PropagatePositionalInputSubTree => Alpha == 1;
+                public readonly Bindable<Visibility> AreaState = new Bindable<Visibility>();
+
+                public override bool HandlePositionalInput => AreaState.Value == Visibility.Visible;
 
                 protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
