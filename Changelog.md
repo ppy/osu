@@ -277,6 +277,9 @@
     *   [m] [Add support for legacy skin sliderstartcircle / sliderstartcircleoverlay #8477]
     *   [m] [Add mania skin decoder #8496]
     *   [m] [Make reverse arrows not follow snaking when they are already hit #8486]
+    *   [m] [Fix tooltips not showing inside ManualInputManagerTestScenes #8501]
+    *   [m] [Bump Microsoft.Build.Traversal from 2.0.24 to 2.0.32 #8499]
+    *   [m] [Hide "retry" button on results screen after watching a replay #8490]
 
 *   暂不合并
     *   [m] [Move non-headless tests to correct namespace #8493]

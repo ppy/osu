@@ -3,21 +3,20 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Settings.Sections.General;
+using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public class GeneralSection : SettingsSection
+    public class MfSection : SettingsSection
     {
-        public override string Header => "整体";
-        public override IconUsage Icon => FontAwesome.Solid.Cog;
+        public override string Header => "Mf-osu";
+        public override IconUsage Icon => FontAwesome.Solid.Lemon;
 
-        public GeneralSection()
+        public MfSection(MfSettingsPanel mfpanel)
         {
             Children = new Drawable[]
             {
-                new LanguageSettings(),
-                new UpdateSettings(),
+                new MfSettingsEnteranceButton(mfpanel),
             };
         }
     }

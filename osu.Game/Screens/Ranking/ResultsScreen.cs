@@ -36,19 +36,23 @@ namespace osu.Game.Screens.Ranking
         private Player player { get; set; }
 
         public readonly ScoreInfo Score;
-
-        private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
+        FillFlowContainer buttons;
+        private readonly bool allowRetry;
         private Drawable bottomPanel;
 
-        public ResultsScreen(ScoreInfo score)
+        private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
+
+        public ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
             Score = score;
+            this.allowRetry = allowRetry;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             OptUIEnabled = config.GetBindable<bool>(OsuSetting.OptUI);
+
             InternalChildren = new[]
             {
                 new ParallaxContainer
@@ -84,7 +88,7 @@ namespace osu.Game.Screens.Ranking
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4Extensions.FromHex("#333")
                         },
-                        new FillFlowContainer
+                        buttons = new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -94,15 +98,16 @@ namespace osu.Game.Screens.Ranking
                             Children = new Drawable[]
                             {
                                 new ReplayDownloadButton(Score) { Width = 300 },
-                                new RetryButton { Width = 300 },
                             }
                         }
                     }
                 }
             };
 
-            if (player != null)
+            if (player != null && allowRetry)
             {
+                buttons.Add(new RetryButton { Width = 300 });
+
                 AddInternal(new HotkeyRetryOverlay
                 {
                     Action = () =>
@@ -127,6 +132,9 @@ namespace osu.Game.Screens.Ranking
                 case true:
                     bottomPanel.Y = TwoLayerButton.SIZE_EXTENDED.Y;
                     bottomPanel.Delay(250).FadeTo(1, 200).MoveToY(0, 550, Easing.OutExpo);
+                    buttons.FadeTo(0).MoveToX(200)
+                           .Then().Delay(250)
+                           .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
                     break;
 
                 case false:
