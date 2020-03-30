@@ -28,11 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double streamaimconst = 2.42;
 
         /// <summary>
-        /// splitter value for sectionvelocities list
-        /// </summary>
-        private int sdsplitcounter;
-
-        /// <summary>
         /// splitter value for acrs list
         /// </summary>
         private int sdsplitcounter2;
@@ -101,8 +96,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             sectionvelocities.Add(sectionvelocity);
 
             strainTimes.Add(osuCurrent.StrainTime);
-
-            sdsplitcounter++;
 
             if (sectionvelocities.Count > 1)
             {
