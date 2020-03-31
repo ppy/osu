@@ -64,14 +64,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 hitTarget.Anchor = hitTarget.Origin = Anchor.TopLeft;
 
                 Padding = new MarginPadding { Top = hitPosition };
-                Explosions.Padding = new MarginPadding { Top = NotePiece.NOTE_HEIGHT };
+                Explosions.Padding = new MarginPadding { Top = DefaultNotePiece.NOTE_HEIGHT };
             }
             else
             {
                 hitTarget.Anchor = hitTarget.Origin = Anchor.BottomLeft;
 
                 Padding = new MarginPadding { Bottom = hitPosition };
-                Explosions.Padding = new MarginPadding { Bottom = NotePiece.NOTE_HEIGHT };
+                Explosions.Padding = new MarginPadding { Bottom = DefaultNotePiece.NOTE_HEIGHT };
             }
         }
     }

@@ -26,6 +26,9 @@ namespace osu.Game.Skinning
         HitTargetImage,
         ShowJudgementLine,
         KeyImage,
-        KeyImageDown
+        KeyImageDown,
+        NoteImage,
+        HoldNoteHeadImage,
+        HoldNoteTailImage
     }
 }
