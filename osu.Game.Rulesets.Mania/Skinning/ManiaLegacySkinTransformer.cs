@@ -44,11 +44,23 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                     switch (maniaComponent.Component)
                     {
+                        case ManiaSkinComponents.ColumnBackground:
+                            return new LegacyColumnBackground();
+
+                        case ManiaSkinComponents.HitTarget:
+                            return new LegacyHitTarget();
+
                         case ManiaSkinComponents.KeyArea:
                             return new LegacyKeyArea();
 
-                        case ManiaSkinComponents.ColumnBackground:
-                            return new LegacyColumnBackground();
+                        case ManiaSkinComponents.Note:
+                            return new LegacyNotePiece();
+
+                        case ManiaSkinComponents.HoldNoteHead:
+                            return new LegacyHoldNoteHeadPiece();
+
+                        case ManiaSkinComponents.HoldNoteTail:
+                            return new LegacyHoldNoteTailPiece();
                     }
 
                     break;

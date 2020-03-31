@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 RelativePositionAxes = Axes.Y,
                 Y = -0.25f,
-                Size = new Vector2(Column.COLUMN_WIDTH, NotePiece.NOTE_HEIGHT),
+                Size = new Vector2(Column.COLUMN_WIDTH, DefaultNotePiece.NOTE_HEIGHT),
             };
 
             int runcount = 0;

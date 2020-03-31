@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -37,8 +36,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal readonly Container TopLevelContainer;
 
-        private readonly Container explosionContainer;
-
         public Column(int index)
         {
             Index = index;
@@ -51,29 +48,11 @@ namespace osu.Game.Rulesets.Mania.UI
                 RelativeSizeAxes = Axes.Both
             };
 
-            Container hitTargetContainer;
-
             InternalChildren = new[]
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitTargetContainer = new Container
-                {
-                    Name = "Hit target + hit objects",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        hitObjectArea = new ColumnHitObjectArea(HitObjectContainer)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        explosionContainer = new Container
-                        {
-                            Name = "Hit explosions",
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                },
+                hitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
@@ -82,22 +61,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(explosionContainer.CreateProxy());
-
-            Direction.BindValueChanged(dir =>
-            {
-                hitTargetContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
-                };
-
-                explosionContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
-                };
-            }, true);
+            TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -118,21 +82,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                hitObjectArea.AccentColour = value;
-            }
-        }
+        public Color4 AccentColour { get; set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -167,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            explosionContainer.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
+            hitObjectArea.Explosions.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
             {
                 Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
                 Origin = Anchor.Centre
