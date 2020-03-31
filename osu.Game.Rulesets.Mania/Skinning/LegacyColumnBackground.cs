@@ -35,9 +35,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
                                 ?? "mania-stage-light";
 
             float leftLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)
-                                      ?.Value ?? 1;
+                                  ?.Value ?? 1;
             float rightLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.RightLineWidth)
-                                       ?.Value ?? 1;
+                                   ?.Value ?? 1;
 
             bool hasLeftLine = leftLineWidth > 0;
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
