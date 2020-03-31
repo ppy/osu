@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             typeof(Column),
             typeof(ColumnBackground),
-            typeof(ColumnKeyArea),
             typeof(ColumnHitObjectArea)
         };
 

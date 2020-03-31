@@ -44,6 +44,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                     switch (maniaComponent.Component)
                     {
+                        case ManiaSkinComponents.KeyArea:
+                            return new LegacyKeyArea();
+
                         case ManiaSkinComponents.ColumnBackground:
                             return new LegacyColumnBackground();
                     }
