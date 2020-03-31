@@ -26,11 +26,15 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
+        protected virtual bool AllowManiaSkin => true;
+
         public new LegacySkinConfiguration Configuration
         {
             get => base.Configuration as LegacySkinConfiguration;
             set => base.Configuration = value;
         }
+
+        private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
@@ -40,15 +44,26 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
-            Stream stream = storage?.GetStream(filename);
-
-            if (stream != null)
+            using (var stream = storage?.GetStream(filename))
             {
-                using (LineBufferedReader reader = new LineBufferedReader(stream))
-                    Configuration = new LegacySkinDecoder().Decode(reader);
+                if (stream != null)
+                {
+                    using (LineBufferedReader reader = new LineBufferedReader(stream, true))
+                        Configuration = new LegacySkinDecoder().Decode(reader);
+
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    using (LineBufferedReader reader = new LineBufferedReader(stream))
+                    {
+                        var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
+
+                        foreach (var config in maniaList)
+                            maniaConfigurations[config.Keys] = config;
+                    }
+                }
+                else
+                    Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
             }
-            else
-                Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
 
             if (storage != null)
             {
@@ -104,6 +119,15 @@ namespace osu.Game.Skinning
 
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
+
+                case LegacyManiaSkinConfigurationLookup legacy:
+                    if (!AllowManiaSkin)
+                        return null;
+
+                    if (!maniaConfigurations.TryGetValue(legacy.Keys, out _))
+                        maniaConfigurations[legacy.Keys] = new LegacyManiaSkinConfiguration(legacy.Keys);
+
+                    break;
 
                 default:
                     // handles lookups like GlobalSkinConfiguration
