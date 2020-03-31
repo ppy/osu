@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
-        protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
+        protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps = createBeatmapDifficulties(beatmapSet.Files);
@@ -103,7 +103,19 @@ namespace osu.Game.Beatmaps
 
             validateOnlineIds(beatmapSet);
 
-            return updateQueue.UpdateAsync(beatmapSet, cancellationToken);
+            bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
+
+            await updateQueue.UpdateAsync(beatmapSet, cancellationToken);
+
+            // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
+            if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
+            {
+                if (beatmapSet.OnlineBeatmapSetID != null)
+                {
+                    beatmapSet.OnlineBeatmapSetID = null;
+                    LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
+                }
+            }
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet)
@@ -447,12 +459,15 @@ namespace osu.Game.Beatmaps
 
                     var res = req.Result;
 
-                    beatmap.Status = res.Status;
-                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+                    if (res != null)
+                    {
+                        beatmap.Status = res.Status;
+                        beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
+                        beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                        beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
 
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
+                        LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
+                    }
                 }
                 catch (Exception e)
                 {
