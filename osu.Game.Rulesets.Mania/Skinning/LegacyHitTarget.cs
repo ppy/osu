@@ -7,14 +7,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyHitTarget : LegacyManiaColumnElement
+    public class LegacyHitTarget : LegacyManiaElement
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
