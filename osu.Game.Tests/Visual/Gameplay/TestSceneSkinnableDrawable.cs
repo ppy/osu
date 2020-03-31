@@ -43,16 +43,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             new ExposedSkinnableDrawable("default", _ => new DefaultBox(), _ => true),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.ScaleToFit),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.NoScaling)
                         }
                     },
                 };
             });
 
-            AddAssert("check sizes", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 30, 30, 30, 50 }));
+            AddAssert("check sizes", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 30, 30, 50 }));
             AddStep("adjust scale", () => fill.Scale = new Vector2(2));
-            AddAssert("check sizes unchanged by scale", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 30, 30, 30, 50 }));
+            AddAssert("check sizes unchanged by scale", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 30, 30, 50 }));
         }
 
         [Test]
@@ -74,7 +73,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Children = new[]
                         {
                             new ExposedSkinnableDrawable("default", _ => new DefaultBox(), _ => true),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.ScaleToFit),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.NoScaling)
                         }
@@ -82,9 +80,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddAssert("check sizes", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 50, 30, 50, 30 }));
+            AddAssert("check sizes", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 50, 50, 30 }));
             AddStep("adjust scale", () => fill.Scale = new Vector2(2));
-            AddAssert("check sizes unchanged by scale", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 50, 30, 50, 30 }));
+            AddAssert("check sizes unchanged by scale", () => fill.Children.Select(c => c.Drawable.DrawWidth).SequenceEqual(new float[] { 50, 50, 30 }));
         }
 
         [Test]
