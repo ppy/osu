@@ -144,6 +144,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
+            if (current.BaseObject is Slider && osuCurrent.TravelDistance == 0) // Bandaid Fix For Zero-length slider(s)
+            {
+                return ((1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrent.StrainTime);
+            }
+
             return ((1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / osuCurrent.StrainTime) + Math.Max(0, sdstrainmult);
         }
     }
