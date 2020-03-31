@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Mania
     {
         ColumnBackground,
         HitTarget,
-        KeyArea
+        KeyArea,
+        Note,
+        HoldNoteHead,
+        HoldNoteTail,
     }
 }

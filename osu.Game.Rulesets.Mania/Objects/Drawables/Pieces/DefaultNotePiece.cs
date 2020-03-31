@@ -7,8 +7,9 @@ using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
@@ -16,20 +17,24 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// <summary>
     /// Represents the static hit markers of notes.
     /// </summary>
-    internal class NotePiece : Container, IHasAccentColour
+    internal class DefaultNotePiece : CompositeDrawable
     {
         public const float NOTE_HEIGHT = 12;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         private readonly Box colouredBox;
 
-        public NotePiece()
+        public DefaultNotePiece()
         {
             RelativeSizeAxes = Axes.X;
             Height = NOTE_HEIGHT;
 
-            Children = new[]
+            CornerRadius = 5;
+            Masking = true;
+
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -45,29 +50,32 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         }
 
         [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo, DrawableHitObject drawableObject)
         {
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(dir =>
-            {
-                colouredBox.Anchor = colouredBox.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-            }, true);
+            direction.BindValueChanged(onDirectionChanged, true);
+
+            accentColour.BindTo(drawableObject.AccentColour);
+            accentColour.BindValueChanged(onAccentChanged, true);
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
+        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            get => accentColour;
-            set
+            colouredBox.Anchor = colouredBox.Origin = direction.NewValue == ScrollingDirection.Up
+                ? Anchor.TopCentre
+                : Anchor.BottomCentre;
+        }
+
+        private void onAccentChanged(ValueChangedEvent<Color4> accent)
+        {
+            colouredBox.Colour = accent.NewValue.Lighten(0.9f);
+
+            EdgeEffect = new EdgeEffectParameters
             {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                colouredBox.Colour = AccentColour.Lighten(0.9f);
-            }
+                Type = EdgeEffectType.Glow,
+                Colour = accent.NewValue.Lighten(1f).Opacity(0.2f),
+                Radius = 10,
+            };
         }
     }
 }

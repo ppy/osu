@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 hitTargetBar = new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = NotePiece.NOTE_HEIGHT,
+                    Height = DefaultNotePiece.NOTE_HEIGHT,
                     Alpha = 0.6f,
                     Colour = Color4.Black
                 },
