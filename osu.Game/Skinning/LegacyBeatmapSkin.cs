@@ -9,6 +9,8 @@ namespace osu.Game.Skinning
 {
     public class LegacyBeatmapSkin : LegacySkin
     {
+        protected override bool AllowManiaSkin => false;
+
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), audioManager, beatmap.Path)
         {
