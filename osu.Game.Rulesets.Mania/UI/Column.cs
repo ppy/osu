@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -33,7 +34,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         private readonly ColumnBackground background;
-        private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
@@ -71,10 +71,9 @@ namespace osu.Game.Rulesets.Mania.UI
                         }
                     }
                 },
-                keyArea = new ColumnKeyArea
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = ManiaStage.HIT_TARGET_POSITION,
+                    RelativeSizeAxes = Axes.Both
                 },
                 background,
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
@@ -95,8 +94,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
                     Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
                 };
-
-                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
 
@@ -131,7 +128,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 accentColour = value;
 
                 background.AccentColour = value;
-                keyArea.AccentColour = value;
                 hitObjectArea.AccentColour = value;
             }
         }
