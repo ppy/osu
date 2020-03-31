@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osuTK.Graphics;
@@ -49,14 +50,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo, DrawableHitObject drawableObject)
+        [BackgroundDependencyLoader(true)]
+        private void load([NotNull] IScrollingInfo scrollingInfo, [CanBeNull] DrawableHitObject drawableObject)
         {
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
 
-            accentColour.BindTo(drawableObject.AccentColour);
-            accentColour.BindValueChanged(onAccentChanged, true);
+            if (drawableObject != null)
+            {
+                accentColour.BindTo(drawableObject.AccentColour);
+                accentColour.BindValueChanged(onAccentChanged, true);
+            }
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
