@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Skinning;
 
@@ -19,20 +20,30 @@ namespace osu.Game.Rulesets.Mania.Skinning
         protected Column Column { get; private set; }
 
         /// <summary>
-        /// The column index to use for texture lookups, in the case of no user-provided configuration.
+        /// The column type identifier to use for texture lookups, in the case of no user-provided configuration.
         /// </summary>
-        protected int FallbackColumnIndex { get; private set; }
+        protected string FallbackColumnIndex { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             if (Stage == null)
-                FallbackColumnIndex = Column.Index % 2 + 1;
+                FallbackColumnIndex = (Column.Index % 2 + 1).ToString();
             else
-            {
-                int dist = Math.Min(Column.Index, Stage.Columns.Count - Column.Index - 1);
-                FallbackColumnIndex = dist % 2 + 1;
-            }
+                switch (Column.ColumnType)
+                {
+                    case ColumnType.Special:
+                        FallbackColumnIndex = "S";
+                        break;
+
+                    case ColumnType.Odd:
+                        FallbackColumnIndex = "1";
+                        break;
+
+                    case ColumnType.Even:
+                        FallbackColumnIndex = "2";
+                        break;
+                }
         }
 
         protected override IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
