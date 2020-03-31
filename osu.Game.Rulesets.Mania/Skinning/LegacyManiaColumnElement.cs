@@ -40,7 +40,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
             }
         }
 
-        protected IBindable<T> GetManiaSkinConfig<T>(ISkinSource skin, LegacyManiaSkinConfigurationLookups lookup)
+        /// <summary>
+        /// Retrieve a per-column skin configuration.
+        /// </summary>
+        /// <param name="skin">The skin from which configuration is retrieved.</param>
+        /// <param name="lookup">The value to retrieve.</param>
+        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
             => skin.GetConfig<LegacyManiaSkinConfigurationLookup, T>(
                 new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, Column.Index));
     }
