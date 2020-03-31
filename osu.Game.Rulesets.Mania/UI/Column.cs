@@ -34,6 +34,9 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         private readonly ColumnBackground background;
+
+        private readonly ColumnKeyArea keyArea;
+
         private readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
@@ -46,7 +49,10 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             Container hitTargetContainer;
 
@@ -128,6 +134,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 accentColour = value;
 
                 background.AccentColour = value;
+                keyArea.AccentColour = value;
                 hitObjectArea.AccentColour = value;
             }
         }
