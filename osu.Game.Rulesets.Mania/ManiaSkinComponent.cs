@@ -16,4 +16,8 @@ namespace osu.Game.Rulesets.Mania
 
         protected override string ComponentName => Component.ToString().ToLower();
     }
+
+    public enum ManiaSkinComponents
+    {
+    }
 }
