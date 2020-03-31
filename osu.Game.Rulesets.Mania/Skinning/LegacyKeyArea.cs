@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyKeyArea : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public class LegacyKeyArea : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -36,15 +36,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            int fallbackColumn = column.Index % 2 + 1;
-
             string upImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
                                  new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.KeyImage, column.Index))?.Value
-                             ?? $"mania-key{fallbackColumn}";
+                             ?? $"mania-key{FallbackColumnIndex}";
 
             string downImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
                                    new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.KeyImageDown, column.Index))?.Value
-                               ?? $"mania-key{fallbackColumn}D";
+                               ?? $"mania-key{FallbackColumnIndex}D";
 
             InternalChild = directionContainer = new Container
             {
