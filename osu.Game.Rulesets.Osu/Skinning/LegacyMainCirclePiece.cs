@@ -62,6 +62,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 }
             };
 
+            bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
+
+            if (!overlayAboveNumber)
+                ChangeInternalChildDepth(hitCircleText, -float.MaxValue);
+
             state.BindTo(drawableObject.State);
             state.BindValueChanged(updateState, true);
 
