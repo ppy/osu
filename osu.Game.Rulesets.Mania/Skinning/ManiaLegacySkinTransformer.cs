@@ -38,9 +38,15 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 case GameplaySkinComponent<HitResult> resultComponent:
                     return getResult(resultComponent);
 
-                case ManiaSkinComponent _:
+                case ManiaSkinComponent maniaComponent:
                     if (!isLegacySkin.Value)
                         return null;
+
+                    switch (maniaComponent.Component)
+                    {
+                        case ManiaSkinComponents.ColumnBackground:
+                            return new LegacyColumnBackground();
+                    }
 
                     break;
             }
