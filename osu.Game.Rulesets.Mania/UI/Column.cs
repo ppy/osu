@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnKeyArea keyArea;
+        private readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
 
@@ -53,21 +53,15 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
                 hitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                keyArea = new ColumnKeyArea
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = ManiaStage.HIT_TARGET_POSITION,
+                    RelativeSizeAxes = Axes.Both
                 },
                 background,
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
             TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
-
-            Direction.BindValueChanged(dir =>
-            {
-                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-            }, true);
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -88,21 +82,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                keyArea.AccentColour = value;
-            }
-        }
+        public Color4 AccentColour { get; set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {

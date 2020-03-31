@@ -21,5 +21,6 @@ namespace osu.Game.Rulesets.Mania
     {
         ColumnBackground
         HitTarget
+        KeyArea
     }
 }
