@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
@@ -380,9 +379,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             currentCatcher.Show();
-
-            if (currentCatcher.Drawable.Clock is FramedOffsetClock offsetClock)
-                offsetClock.Offset = -Time.Current;
+            (currentCatcher.Drawable as IAnimation)?.GotoFrame(0);
         }
 
         private void beginTrail()
