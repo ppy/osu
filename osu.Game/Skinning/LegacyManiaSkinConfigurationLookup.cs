@@ -20,6 +20,7 @@ namespace osu.Game.Skinning
     public enum LegacyManiaSkinConfigurationLookups
     {
         HitPosition,
-        HitTargetImage
+        HitTargetImage,
+        ShowJudgementLine
     }
 }

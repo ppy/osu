@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -34,17 +35,31 @@ namespace osu.Game.Rulesets.Mania.Skinning
                                      new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.HitTargetImage))?.Value
                                  ?? "mania-stage-hint";
 
+            bool showJudgementLine = skin.GetConfig<LegacyManiaSkinConfigurationLookup, bool>(
+                                         new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.ShowJudgementLine))?.Value
+                                     ?? true;
+
             InternalChild = directionContainer = new Container
             {
                 Origin = Anchor.CentreLeft,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = new Sprite
+                Children = new Drawable[]
                 {
-                    Texture = skin.GetTexture(targetImage),
-                    Scale = new Vector2(1, 0.9f * 1.6025f),
-                    RelativeSizeAxes = Axes.X,
-                    Width = 1
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture(targetImage),
+                        Scale = new Vector2(1, 0.9f * 1.6025f),
+                        RelativeSizeAxes = Axes.X,
+                        Width = 1
+                    },
+                    new Box
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 1,
+                        Alpha = showJudgementLine ? 0.9f : 0
+                    }
                 }
             };
 
