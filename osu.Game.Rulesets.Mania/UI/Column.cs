@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -32,12 +31,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
+        private readonly ColumnHitObjectArea hitObjectArea;
         private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
-        private readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
-        private readonly Container explosionContainer;
 
         public Column(int index)
         {
@@ -48,29 +46,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
-            Container hitTargetContainer;
-
             InternalChildren = new[]
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitTargetContainer = new Container
-                {
-                    Name = "Hit target + hit objects",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        hitObjectArea = new ColumnHitObjectArea(HitObjectContainer)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        explosionContainer = new Container
-                        {
-                            Name = "Hit explosions",
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                },
+                hitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
                 keyArea = new ColumnKeyArea
                 {
                     RelativeSizeAxes = Axes.X,
@@ -80,22 +60,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(explosionContainer.CreateProxy());
+            TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
 
             Direction.BindValueChanged(dir =>
             {
-                hitTargetContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
-                };
-
-                explosionContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
-                };
-
                 keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
@@ -132,7 +100,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 background.AccentColour = value;
                 keyArea.AccentColour = value;
-                hitObjectArea.AccentColour = value;
             }
         }
 
@@ -169,7 +136,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            explosionContainer.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
+            hitObjectArea.Explosions.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
             {
                 Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
                 Origin = Anchor.Centre

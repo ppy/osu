@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    internal class HitExplosion : CompositeDrawable
+    public class HitExplosion : CompositeDrawable
     {
         public override bool RemoveWhenNotAlive => true;
 
