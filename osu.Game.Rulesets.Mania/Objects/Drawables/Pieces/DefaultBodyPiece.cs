@@ -81,15 +81,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 }
             };
 
-            var holdNote = (DrawableHoldNote)drawableObject;
-
             if (drawableObject != null)
             {
+                var holdNote = (DrawableHoldNote)drawableObject;
+
                 AccentColour.BindTo(drawableObject.AccentColour);
-                AccentColour.BindValueChanged(onAccentChanged, true);
+                isHitting.BindTo(holdNote.IsHitting);
             }
 
-            isHitting.BindTo(holdNote.IsHitting);
+            AccentColour.BindValueChanged(onAccentChanged, true);
             isHitting.BindValueChanged(_ => onAccentChanged(new ValueChangedEvent<Color4>(AccentColour.Value, AccentColour.Value)), true);
         }
 
