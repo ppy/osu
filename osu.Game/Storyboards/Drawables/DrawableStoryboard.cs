@@ -50,7 +50,7 @@ namespace osu.Game.Storyboards.Drawables
 
             AddInternal(Content = new Container<DrawableStoryboardLayer>
             {
-                Size = new Vector2(640, 480),
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });

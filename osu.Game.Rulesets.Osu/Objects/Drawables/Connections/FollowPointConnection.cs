@@ -116,6 +116,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             int point = 0;
 
+            ClearInternal();
+
             for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
             {
                 float fraction = (float)d / distance;
@@ -126,13 +128,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 FollowPoint fp;
 
-                if (InternalChildren.Count > point)
-                {
-                    fp = (FollowPoint)InternalChildren[point];
-                    fp.ClearTransforms();
-                }
-                else
-                    AddInternal(fp = new FollowPoint());
+                AddInternal(fp = new FollowPoint());
 
                 fp.Position = pointStartPosition;
                 fp.Rotation = rotation;
@@ -141,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 if (firstTransformStartTime == null)
                     firstTransformStartTime = fadeInTime;
+
+                fp.AnimationStartTime = fadeInTime;
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
