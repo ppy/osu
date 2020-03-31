@@ -39,8 +39,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
         {
-            { ColumnType.Even, new Color4(94, 0, 57, 255) },
-            { ColumnType.Odd, new Color4(6, 84, 0, 255) },
+            { ColumnType.Even, new Color4(6, 84, 0, 255) },
+            { ColumnType.Odd, new Color4(94, 0, 57, 255) },
             { ColumnType.Special, new Color4(0, 48, 63, 255) }
         };
 
