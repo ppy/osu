@@ -14,12 +14,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
     /// <summary>
     /// A <see cref="CompositeDrawable"/> which is placed somewhere within a <see cref="Column"/>.
     /// </summary>
-    public class LegacyManiaColumnElement : CompositeDrawable
+    public class LegacyManiaColumnElement : LegacyManiaElement
     {
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        protected ManiaStage Stage { get; private set; }
-
         [Resolved]
         protected Column Column { get; private set; }
 
@@ -39,16 +35,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 FallbackColumnIndex = dist % 2 + 1;
             }
         }
-
-        /// <summary>
-        /// Retrieve a per-column-count skin configuration.
-        /// </summary>
-        /// <param name="skin">The skin from which configuration is retrieved.</param>
-        /// <param name="lookup">The value to retrieve.</param>
-        /// <param name="index">If not null, denotes the index of the column to which the entry applies.</param>
-        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
-            => skin.GetConfig<LegacyManiaSkinConfigurationLookup, T>(
-                new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, index));
 
         /// <summary>
         /// Retrieve a per-column skin configuration.
