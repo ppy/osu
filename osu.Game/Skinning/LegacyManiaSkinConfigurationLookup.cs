@@ -19,5 +19,7 @@ namespace osu.Game.Skinning
 
     public enum LegacyManiaSkinConfigurationLookups
     {
+        KeyImage,
+        KeyImageDown
     }
 }
