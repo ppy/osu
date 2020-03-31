@@ -22,5 +22,8 @@ namespace osu.Game.Skinning
         LightImage,
         LeftLineWidth,
         RightLineWidth
+        HitPosition,
+        HitTargetImage,
+        ShowJudgementLine
     }
 }
