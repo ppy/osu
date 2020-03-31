@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
+                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold)
                             },
                             new Container
                             {
