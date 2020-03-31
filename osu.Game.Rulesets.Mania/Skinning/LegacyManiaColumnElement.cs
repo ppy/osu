@@ -45,8 +45,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
         /// </summary>
         /// <param name="skin">The skin from which configuration is retrieved.</param>
         /// <param name="lookup">The value to retrieve.</param>
-        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
+        /// <param name="index">The index of the column to which the entry applies.</param>
+        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
             => skin.GetConfig<LegacyManiaSkinConfigurationLookup, T>(
-                new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, Column.Index));
+                new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, index ?? Column.Index));
     }
 }
