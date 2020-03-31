@@ -131,6 +131,9 @@ namespace osu.Game.Skinning
                     {
                         case LegacyManiaSkinConfigurationLookups.HitPosition:
                             return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
+
+                        case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
+                            return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
                     }
 
                     break;
