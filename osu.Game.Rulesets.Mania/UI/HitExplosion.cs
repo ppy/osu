@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    internal class HitExplosion : CompositeDrawable
+    public class HitExplosion : CompositeDrawable
     {
         public override bool RemoveWhenNotAlive => true;
 
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public HitExplosion(Color4 objectColour, bool isSmall = false)
         {
             RelativeSizeAxes = Axes.X;
-            Height = NotePiece.NOTE_HEIGHT;
+            Height = DefaultNotePiece.NOTE_HEIGHT;
 
             // scale roughly in-line with visual appearance of notes
             Scale = new Vector2(1f, 0.6f);

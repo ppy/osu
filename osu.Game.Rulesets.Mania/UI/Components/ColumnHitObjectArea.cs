@@ -3,34 +3,35 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnHitObjectArea : CompositeDrawable, IHasAccentColour
+    public class ColumnHitObjectArea : SkinReloadableDrawable
     {
-        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        public readonly Container<HitExplosion> Explosions;
 
+        [Resolved(CanBeNull = true)]
+        private ManiaStage stage { get; set; }
+
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly Drawable hitTarget;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
             InternalChildren = new[]
             {
-                hitTarget = new DefaultHitTarget
+                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
                 },
-                hitObjectContainer
+                hitObjectContainer,
+                Explosions = new Container<HitExplosion> { RelativeSizeAxes = Axes.Both }
             };
         }
 
@@ -38,106 +39,39 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(dir =>
-            {
-                Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-
-                hitTarget.Anchor = hitTarget.Origin = anchor;
-            }, true);
+            direction.BindValueChanged(onDirectionChanged, true);
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                if (hitTarget is IHasAccentColour colouredHitTarget)
-                    colouredHitTarget.AccentColour = accentColour;
-            }
+            base.SkinChanged(skin, allowFallback);
+            updateHitPosition();
         }
 
-        private class DefaultHitTarget : CompositeDrawable, IHasAccentColour
+        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            private const float hit_target_bar_height = 2;
-            private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+            updateHitPosition();
+        }
 
-            private readonly Container hitTargetLine;
-            private readonly Drawable hitTargetBar;
+        private void updateHitPosition()
+        {
+            float hitPosition = CurrentSkin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
+                                    new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
+                                ?? ManiaStage.HIT_TARGET_POSITION;
 
-            public DefaultHitTarget()
+            if (direction.Value == ScrollingDirection.Up)
             {
-                InternalChildren = new[]
-                {
-                    hitTargetBar = new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = NotePiece.NOTE_HEIGHT,
-                        Alpha = 0.6f,
-                        Colour = Color4.Black
-                    },
-                    hitTargetLine = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = hit_target_bar_height,
-                        Masking = true,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
-                    },
-                };
+                hitTarget.Anchor = hitTarget.Origin = Anchor.TopLeft;
+
+                Padding = new MarginPadding { Top = hitPosition };
+                Explosions.Padding = new MarginPadding { Top = DefaultNotePiece.NOTE_HEIGHT };
             }
-
-            [BackgroundDependencyLoader]
-            private void load(IScrollingInfo scrollingInfo)
+            else
             {
-                direction.BindTo(scrollingInfo.Direction);
-                direction.BindValueChanged(dir =>
-                {
-                    Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                hitTarget.Anchor = hitTarget.Origin = Anchor.BottomLeft;
 
-                    hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
-                    hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
-                }, true);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                updateColours();
-            }
-
-            private Color4 accentColour;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    if (accentColour == value)
-                        return;
-
-                    accentColour = value;
-
-                    updateColours();
-                }
-            }
-
-            private void updateColours()
-            {
-                if (!IsLoaded)
-                    return;
-
-                hitTargetLine.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = accentColour.Opacity(0.5f),
-                };
+                Padding = new MarginPadding { Bottom = hitPosition };
+                Explosions.Padding = new MarginPadding { Bottom = DefaultNotePiece.NOTE_HEIGHT };
             }
         }
     }

@@ -289,3 +289,21 @@
     *   [m] [Move non-headless tests to correct namespace #8493]
 
 *   同步Tests
+
+### 2020/3/31
+*   合并上游pr
+    *   [m] [Add support for HitCircleOverlayAboveNumber legacy skin property #8502]
+    *   [m] [Fix replay imports failing for certain mod combinations #8525]
+    *   [m] [Support widescreen per-layer storyboard masking #8509]
+    *   [m] [Fix relax mod pressing too many keys #8522]
+    *   [m] [Fix osu!catch catcher hit area being too large #8526]
+    *   [m] [Remove ScaleDownToFit as it was implemented without enough safety #8521]
+
+    *   [m] [Add mania key area skinning #8516]
+    *   [m] [Implement basis for mania skinning #8513]
+    *   [m] [Add mania column background skinning #8514]
+    *   [m] [Add mania hit target skinning #8518]
+    *   [m] [Add mania note skinning #8523]
+
+*   暂不合并
+    *   [m] [Fix catcher test resources being at wrong dpi definition #8520]

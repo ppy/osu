@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
+    [Cached]
     public class ManiaStage : ScrollingPlayfield
     {
         public const float COLUMN_SPACING = 1;
@@ -116,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150
+                            Y = HIT_TARGET_POSITION + 150,
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }

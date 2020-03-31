@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.Edit
     public class HoldNoteCompositionTool : HitObjectCompositionTool
     {
         public HoldNoteCompositionTool()
-            : base("滑条")
+            : base("Hold")
         {
         }
 
