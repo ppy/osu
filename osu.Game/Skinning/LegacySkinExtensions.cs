@@ -71,8 +71,6 @@ namespace osu.Game.Skinning
 
                 if (timeReference != null)
                     Clock = new FramedOffsetClock(timeReference.Clock) { Offset = -timeReference.AnimationStartTime };
-                else
-                    Clock = new FramedOffsetClock(Clock);
             }
         }
 
