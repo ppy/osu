@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo, DrawableHitObject drawableObject)
         {
-            string imageName = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                   new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage, column.Index))?.Value
+            string imageName = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage)?.Value
                                ?? $"mania-note{FallbackColumnIndex}L";
 
             sprite = skin.GetAnimation(imageName, true, true).With(d =>

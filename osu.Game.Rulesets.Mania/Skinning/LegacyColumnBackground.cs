@@ -31,15 +31,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string lightImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                    new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LightImage, 0))?.Value
+            string lightImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.LightImage, 0)?.Value
                                 ?? "mania-stage-light";
 
-            float leftLineWidth = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                          new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LeftLineWidth, Column.Index))
+            float leftLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)
                                       ?.Value ?? 1;
-            float rightLineWidth = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                           new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.RightLineWidth, Column.Index))
+            float rightLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.RightLineWidth)
                                        ?.Value ?? 1;
 
             bool hasLeftLine = leftLineWidth > 0;

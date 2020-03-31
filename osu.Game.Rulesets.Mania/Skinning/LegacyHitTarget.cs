@@ -28,12 +28,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string targetImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                     new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.HitTargetImage))?.Value
+            string targetImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.HitTargetImage)?.Value
                                  ?? "mania-stage-hint";
 
-            bool showJudgementLine = skin.GetConfig<LegacyManiaSkinConfigurationLookup, bool>(
-                                         new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.ShowJudgementLine))?.Value
+            bool showJudgementLine = GetManiaSkinConfig<bool>(skin, LegacyManiaSkinConfigurationLookups.ShowJudgementLine)?.Value
                                      ?? true;
 
             InternalChild = directionContainer = new Container
