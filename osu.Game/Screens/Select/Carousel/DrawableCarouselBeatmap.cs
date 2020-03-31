@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -38,6 +39,9 @@ namespace osu.Game.Screens.Select.Carousel
         private Triangles triangles;
         private StarCounter starCounter;
         private bool isRecommended;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
@@ -124,16 +128,30 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                     }
                                 },
-                                starCounter = new StarCounter
-                                {
-                                    Colour = isRecommended ? Color4.Yellow : Color4.White,
-                                    Current = (float)beatmap.StarDifficulty,
-                                    Scale = new Vector2(0.8f),
-                                }
+                                starCounter = getStarCounter(),
                             }
                         }
                     }
                 }
+            };
+        }
+
+        private StarCounter getStarCounter()
+        {
+            if (isRecommended)
+            {
+                return new RecommendedStarCounter
+                {
+                    Colour = colours.Yellow,
+                    Current = (float)beatmap.StarDifficulty,
+                    Scale = new Vector2(0.8f),
+                };
+            }
+            return new StarCounter
+            {
+                Colour = Color4.White,
+                Current = (float)beatmap.StarDifficulty,
+                Scale = new Vector2(0.8f),
             };
         }
 
@@ -188,6 +206,11 @@ namespace osu.Game.Screens.Select.Carousel
 
                 return items.ToArray();
             }
+        }
+
+        private class RecommendedStarCounter : StarCounter, IHasTooltip
+        {
+            public string TooltipText => "Recommended difficulty";
         }
     }
 }
