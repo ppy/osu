@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -36,13 +35,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             }
         }
 
-        /// <summary>
-        /// Retrieve a per-column skin configuration.
-        /// </summary>
-        /// <param name="skin">The skin from which configuration is retrieved.</param>
-        /// <param name="lookup">The value to retrieve.</param>
-        /// <param name="index">The index of the column to which the entry applies. Defaults to the column index.</param>
-        protected IBindable<T> GetPerColumnSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
-            => GetManiaSkinConfig<T>(skin, lookup, index ?? Column.Index);
+        protected override IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
+            => base.GetManiaSkinConfig<T>(skin, lookup, index ?? Column.Index);
     }
 }
