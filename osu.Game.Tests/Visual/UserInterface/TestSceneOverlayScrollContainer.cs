@@ -55,13 +55,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestButtonVisibility()
         {
-            AddAssert("button is hidden", () => scroll.Button.State.Value == Visibility.Hidden);
+            AddAssert("button is hidden", () => scroll.Button.Current.Value == Visibility.Hidden);
 
             AddStep("scroll to end", () => scroll.ScrollToEnd(false));
-            AddAssert("button is visible", () => scroll.Button.State.Value == Visibility.Visible);
+            AddAssert("button is visible", () => scroll.Button.Current.Value == Visibility.Visible);
 
             AddStep("scroll to start", () => scroll.ScrollToStart(false));
-            AddAssert("button is hidden", () => scroll.Button.State.Value == Visibility.Hidden);
+            AddAssert("button is hidden", () => scroll.Button.Current.Value == Visibility.Hidden);
         }
 
         [Test]

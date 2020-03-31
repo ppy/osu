@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
                 {
                     ScrollToStart();
                     currentTarget = Target;
-                    Button.State.Value = Visibility.Hidden;
+                    Button.Current.Value = Visibility.Hidden;
                 }
             });
         }
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
 
             if (ScrollContent.DrawHeight + button_scroll_position < DrawHeight)
             {
-                Button.State.Value = Visibility.Hidden;
+                Button.Current.Value = Visibility.Hidden;
                 return;
             }
 
@@ -62,113 +62,98 @@ namespace osu.Game.Overlays
                 return;
 
             currentTarget = Target;
-            Button.State.Value = Current > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
+            Button.Current.Value = Current > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
         }
 
-        public class ScrollToTopButton : VisibilityContainer
+        public class ScrollToTopButton : OsuHoverContainer, IHasCurrentValue<Visibility>
         {
             private const int fade_duration = 500;
 
-            public Action Action
+            private readonly BindableWithCurrent<Visibility> current = new BindableWithCurrent<Visibility>();
+
+            public Bindable<Visibility> Current
             {
-                get => button.Action;
-                set => button.Action = value;
+                get => current.Current;
+                set => current.Current = value;
             }
 
-            public override bool PropagatePositionalInputSubTree => true;
+            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-            protected override bool StartHidden => true;
+            private Color4 flashColour;
 
-            private readonly Button button;
+            private readonly Container content;
+            private readonly Box background;
 
             public ScrollToTopButton()
             {
                 Size = new Vector2(50);
-                Child = button = new Button
+                Alpha = 0;
+                Add(content = new CircularContainer
                 {
-                    AreaState = { BindTarget = State }
-                };
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Offset = new Vector2(0f, 1f),
+                        Radius = 3f,
+                        Colour = Color4.Black.Opacity(0.25f),
+                    },
+                    Children = new Drawable[]
+                    {
+                        background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(15),
+                            Icon = FontAwesome.Solid.ChevronUp
+                        }
+                    }
+                });
+
+                TooltipText = "Scroll to top";
             }
 
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override void PopIn() => button.FadeIn(fade_duration, Easing.OutQuint);
-
-            protected override void PopOut() => button.FadeOut(fade_duration, Easing.OutQuint);
-
-            private class Button : OsuHoverContainer
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
-                public readonly Bindable<Visibility> AreaState = new Bindable<Visibility>();
+                IdleColour = colourProvider.Background6;
+                HoverColour = colourProvider.Background5;
+                flashColour = colourProvider.Light1;
+            }
 
-                public override bool HandlePositionalInput => AreaState.Value == Visibility.Visible;
-
-                protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-                private Color4 flashColour;
-
-                private readonly Container content;
-                private readonly Box background;
-
-                public Button()
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Current.BindValueChanged(visibility =>
                 {
-                    RelativeSizeAxes = Axes.Both;
-                    Add(content = new CircularContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Masking = true,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow,
-                            Offset = new Vector2(0f, 1f),
-                            Radius = 3f,
-                            Colour = Color4.Black.Opacity(0.25f),
-                        },
-                        Children = new Drawable[]
-                        {
-                            background = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            new SpriteIcon
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(15),
-                                Icon = FontAwesome.Solid.ChevronUp
-                            }
-                        }
-                    });
+                    Enabled.Value = visibility.NewValue == Visibility.Visible;
+                    this.FadeTo(visibility.NewValue == Visibility.Visible ? 1 : 0, fade_duration, Easing.OutQuint);
+                }, true);
+            }
 
-                    TooltipText = "Scroll to top";
-                }
+            protected override bool OnClick(ClickEvent e)
+            {
+                background.FlashColour(flashColour, 800, Easing.OutQuint);
+                return base.OnClick(e);
+            }
 
-                [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider colourProvider)
-                {
-                    IdleColour = colourProvider.Background6;
-                    HoverColour = colourProvider.Background5;
-                    flashColour = colourProvider.Light1;
-                }
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                content.ScaleTo(0.75f, 2000, Easing.OutQuint);
+                return true;
+            }
 
-                protected override bool OnClick(ClickEvent e)
-                {
-                    background.FlashColour(flashColour, 800, Easing.OutQuint);
-                    return base.OnClick(e);
-                }
-
-                protected override bool OnMouseDown(MouseDownEvent e)
-                {
-                    content.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                    return true;
-                }
-
-                protected override void OnMouseUp(MouseUpEvent e)
-                {
-                    content.ScaleTo(1, 1000, Easing.OutElastic);
-                    base.OnMouseUp(e);
-                }
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                content.ScaleTo(1, 1000, Easing.OutElastic);
+                base.OnMouseUp(e);
             }
         }
     }
