@@ -23,6 +23,7 @@ namespace osu.Game.Screens.Ranking
     public class ResultsScreen : OsuScreen
     {
         private Bindable<bool> OptUIEnabled;
+        private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 60);
         protected const float BACKGROUND_BLUR = 20;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.Ranking
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = TwoLayerButton.SIZE_EXTENDED.Y,
+                    Height = BOTTOMPANEL_SIZE.Y,
                     Alpha = 0,
                     Children = new Drawable[]
                     {
@@ -92,7 +93,9 @@ namespace osu.Game.Screens.Ranking
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.X,
+                            Height = BOTTOMPANEL_SIZE.Y - 10,
+                            Y = 5,
                             Spacing = new Vector2(5),
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
@@ -131,14 +134,19 @@ namespace osu.Game.Screens.Ranking
             {
                 case true:
                     bottomPanel.Y = TwoLayerButton.SIZE_EXTENDED.Y;
-                    bottomPanel.Delay(250).FadeTo(1, 200).MoveToY(0, 550, Easing.OutExpo);
+                    bottomPanel.Delay(250).FadeTo(1, 200).MoveToY(10, 550, Easing.OutBack);
+
                     buttons.FadeTo(0).MoveToX(200)
                            .Then().Delay(250)
                            .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
+
+                    scorePanelParallax.MoveToY(DrawHeight)
+                                      .Then().Delay(250)
+                                      .Then().MoveToY(0, 750, Easing.OutExpo);
                     break;
 
                 case false:
-                    bottomPanel.FadeTo(1, 250);
+                    bottomPanel.MoveToY(10).FadeTo(1, 250);
                     break;
             };
         }

@@ -23,6 +23,7 @@ namespace osu.Game.Graphics.Backgrounds
     public class Triangles : Drawable
     {
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
+        public bool IgnoreSettings;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
 
@@ -94,8 +95,9 @@ namespace osu.Game.Graphics.Backgrounds
         private IShader shader;
         private readonly Texture texture;
 
-        public Triangles()
+        public Triangles(bool ignoreSettings = false)
         {
+            this.IgnoreSettings = ignoreSettings;
             texture = Texture.WhitePixel;
         }
 
@@ -105,29 +107,31 @@ namespace osu.Game.Graphics.Backgrounds
             config.BindWith(OsuSetting.TrianglesEnabled, TrianglesEnabled);
 
             TrianglesEnabled.ValueChanged += _ => UpdateIcons();
-            UpdateIcons();
 
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         private void UpdateIcons()
         {
-            switch (TrianglesEnabled.Value)
-            {
-                case true:
-                    this.FadeIn(250);
-                    break;
+            if (!IgnoreSettings)
+                switch (TrianglesEnabled.Value)
+                {
+                    case true:
+                        this.FadeIn(250);
+                        break;
 
-                case false:
-                    this.FadeOut(250);
-                    break;
-            }
+                    case false:
+                        this.FadeOut(250);
+                        break;
+                }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             addTriangles(true);
+
+            UpdateIcons();
         }
 
         public float TriangleScale
