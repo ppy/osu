@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 return ColumnType.Special;
 
             int distanceToEdge = Math.Min(column, (Columns - 1) - column);
-            return distanceToEdge % 2 == 1 ? ColumnType.Odd : ColumnType.Even;
+            return distanceToEdge % 2 == 0 ? ColumnType.Odd : ColumnType.Even;
         }
     }
 }
