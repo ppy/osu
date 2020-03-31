@@ -41,13 +41,22 @@ namespace osu.Game.Rulesets.Mania.Skinning
         }
 
         /// <summary>
+        /// Retrieve a per-column-count skin configuration.
+        /// </summary>
+        /// <param name="skin">The skin from which configuration is retrieved.</param>
+        /// <param name="lookup">The value to retrieve.</param>
+        /// <param name="index">If not null, denotes the index of the column to which the entry applies.</param>
+        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
+            => skin.GetConfig<LegacyManiaSkinConfigurationLookup, T>(
+                new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, index));
+
+        /// <summary>
         /// Retrieve a per-column skin configuration.
         /// </summary>
         /// <param name="skin">The skin from which configuration is retrieved.</param>
         /// <param name="lookup">The value to retrieve.</param>
-        /// <param name="index">The index of the column to which the entry applies.</param>
-        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
-            => skin.GetConfig<LegacyManiaSkinConfigurationLookup, T>(
-                new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, index ?? Column.Index));
+        /// <param name="index">The index of the column to which the entry applies. Defaults to the column index.</param>
+        protected IBindable<T> GetPerColumnSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
+            => GetManiaSkinConfig<T>(skin, lookup, index ?? Column.Index);
     }
 }
