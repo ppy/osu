@@ -4,8 +4,10 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
@@ -37,5 +39,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 FallbackColumnIndex = dist % 2 + 1;
             }
         }
+
+        protected IBindable<T> GetManiaSkinConfig<T>(ISkinSource skin, LegacyManiaSkinConfigurationLookups lookup)
+            => skin.GetConfig<LegacyManiaSkinConfigurationLookup, T>(
+                new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, Column.Index));
     }
 }
