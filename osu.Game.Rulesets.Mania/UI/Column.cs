@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -32,7 +33,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;
 
@@ -46,7 +46,10 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             Container hitTargetContainer;
 
@@ -130,7 +133,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 accentColour = value;
 
-                background.AccentColour = value;
                 keyArea.AccentColour = value;
                 hitObjectArea.AccentColour = value;
             }
