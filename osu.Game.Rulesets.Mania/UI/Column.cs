@@ -33,13 +33,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnBackground background;
-
-        private readonly ColumnKeyArea keyArea;
-
         private readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
+
         private readonly Container explosionContainer;
 
         public Column(int index)
@@ -133,8 +130,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 accentColour = value;
 
-                background.AccentColour = value;
-                keyArea.AccentColour = value;
                 hitObjectArea.AccentColour = value;
             }
         }
