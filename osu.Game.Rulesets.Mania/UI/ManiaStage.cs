@@ -1,10 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -40,8 +38,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Container topLevelContainer;
 
-        private List<Color4> normalColumnColours = new List<Color4>();
-        private Color4 specialColumnColour;
+        private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
+        {
+            { ColumnType.Even, new Color4(6, 84, 0, 255) },
+            { ColumnType.Odd, new Color4(94, 0, 57, 255) },
+            { ColumnType.Special, new Color4(0, 48, 63, 255) }
+        };
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
 
@@ -126,11 +128,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                var isSpecial = definition.IsSpecialColumn(i);
+                var columnType = definition.GetTypeOfColumn(i);
                 var column = new Column(firstColumnIndex + i)
                 {
-                    IsSpecial = isSpecial,
-                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
+                    ColumnType = columnType,
+                    AccentColour = columnColours[columnType],
+                    Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
                 AddColumn(column);
@@ -194,38 +197,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            normalColumnColours = new List<Color4>
-            {
-                new Color4(94, 0, 57, 255),
-                new Color4(6, 84, 0, 255)
-            };
-
-            specialColumnColour = new Color4(0, 48, 63, 255);
-
-            // Set the special column + colour + key
-            foreach (var column in Columns)
-            {
-                if (!column.IsSpecial)
-                    continue;
-
-                column.AccentColour = specialColumnColour;
-            }
-
-            var nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
-
-            // We'll set the colours of the non-special columns in a separate loop, because the non-special
-            // column colours are mirrored across their centre and special styles mess with this
-            for (int i = 0; i < Math.Ceiling(nonSpecialColumns.Count / 2f); i++)
-            {
-                Color4 colour = normalColumnColours[i % normalColumnColours.Count];
-                nonSpecialColumns[i].AccentColour = colour;
-                nonSpecialColumns[nonSpecialColumns.Count - 1 - i].AccentColour = colour;
-            }
         }
 
         protected override void Update()
