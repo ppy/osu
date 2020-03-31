@@ -18,6 +18,12 @@ namespace osu.Game.Skinning
         /// </summary>
         public Drawable Drawable { get; private set; }
 
+        public new Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            set => base.AutoSizeAxes = value;
+        }
+
         private readonly ISkinComponent component;
 
         private readonly ConfineMode confineMode;
