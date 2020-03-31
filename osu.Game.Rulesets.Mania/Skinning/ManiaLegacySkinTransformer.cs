@@ -61,6 +61,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                         case ManiaSkinComponents.HoldNoteTail:
                             return new LegacyHoldNoteTailPiece();
+
+                        case ManiaSkinComponents.HoldNoteBody:
+                            return new LegacyBodyPiece();
                     }
 
                     break;
