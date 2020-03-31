@@ -124,8 +124,14 @@ namespace osu.Game.Skinning
                     if (!AllowManiaSkin)
                         return null;
 
-                    if (!maniaConfigurations.TryGetValue(legacy.Keys, out _))
-                        maniaConfigurations[legacy.Keys] = new LegacyManiaSkinConfiguration(legacy.Keys);
+                    if (!maniaConfigurations.TryGetValue(legacy.Keys, out var existing))
+                        maniaConfigurations[legacy.Keys] = existing = new LegacyManiaSkinConfiguration(legacy.Keys);
+
+                    switch (legacy.Lookup)
+                    {
+                        case LegacyManiaSkinConfigurationLookups.HitPosition:
+                            return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
+                    }
 
                     break;
 
