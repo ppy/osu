@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         {
             InternalChild = directionContainer = new Container
             {
-                Anchor = Anchor.TopCentre,
+                Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Child = noteSprite = new Sprite { Texture = GetTexture(skin) }
@@ -56,12 +56,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
         {
             if (direction.NewValue == ScrollingDirection.Up)
             {
-                directionContainer.Origin = Anchor.BottomCentre;
+                directionContainer.Anchor = Anchor.TopCentre;
                 directionContainer.Scale = new Vector2(1, -1);
             }
             else
             {
-                directionContainer.Origin = Anchor.TopCentre;
+                directionContainer.Anchor = Anchor.BottomCentre;
                 directionContainer.Scale = Vector2.One;
             }
         }
