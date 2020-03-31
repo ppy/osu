@@ -280,6 +280,12 @@
     *   [m] [Fix tooltips not showing inside ManualInputManagerTestScenes #8501]
     *   [m] [Bump Microsoft.Build.Traversal from 2.0.24 to 2.0.32 #8499]
     *   [m] [Hide "retry" button on results screen after watching a replay #8490]
+    *   [m] [Fix imports with no matching beatmap IDs still retaining a potentially invalid set ID #8494]
+
+*   更新上游pr
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8051] 
 
 *   暂不合并
     *   [m] [Move non-headless tests to correct namespace #8493]
+
+*   同步Tests
