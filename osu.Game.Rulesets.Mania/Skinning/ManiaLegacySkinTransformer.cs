@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             hasKeyTexture = new Lazy<bool>(() => source.GetAnimation(
                 source.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
                     new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
-                    ?? $"mania-key1", true, true) != null);
+                ?? "mania-key1", true, true) != null);
         }
 
         public Drawable GetDrawableComponent(ISkinComponent component)
