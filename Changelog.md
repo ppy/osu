@@ -307,3 +307,7 @@
 
 *   暂不合并
     *   [m] [Fix catcher test resources being at wrong dpi definition #8520]
+
+### 2020/04/01
+*   合并上游分支
+    *   [m] [Add mania hold note skinning #8524]
