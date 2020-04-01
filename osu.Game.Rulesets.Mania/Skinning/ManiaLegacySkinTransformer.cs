@@ -18,6 +18,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private Lazy<bool> isLegacySkin;
 
+        /// <summary>
+        /// Whether texture for the keys exists.
+        /// Used to determine if the mania ruleset is skinned.
+        /// </summary>
+        private Lazy<bool> hasKeyTexture;
+
         public ManiaLegacySkinTransformer(ISkinSource source)
         {
             this.source = source;
@@ -29,6 +35,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private void sourceChanged()
         {
             isLegacySkin = new Lazy<bool>(() => source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
+            hasKeyTexture = new Lazy<bool>(() => source.GetTexture(
+                source.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
+                    new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
+                    ?? $"mania-key1") != null);
         }
 
         public Drawable GetDrawableComponent(ISkinComponent component)
@@ -39,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     return getResult(resultComponent);
 
                 case ManiaSkinComponent maniaComponent:
-                    if (!isLegacySkin.Value)
+                    if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
 
                     switch (maniaComponent.Component)
