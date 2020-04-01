@@ -311,3 +311,4 @@
 ### 2020/04/01
 *   合并上游分支
     *   [m] [Add mania hold note skinning #8524]
+    *   [m] [Implement column width/spacing #8536]
