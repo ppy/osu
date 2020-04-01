@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -27,23 +26,20 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (Stage == null)
-                FallbackColumnIndex = (Column.Index % 2 + 1).ToString();
-            else
-                switch (Column.ColumnType)
-                {
-                    case ColumnType.Special:
-                        FallbackColumnIndex = "S";
-                        break;
+            switch (Column.ColumnType)
+            {
+                case ColumnType.Special:
+                    FallbackColumnIndex = "S";
+                    break;
 
-                    case ColumnType.Odd:
-                        FallbackColumnIndex = "1";
-                        break;
+                case ColumnType.Odd:
+                    FallbackColumnIndex = "1";
+                    break;
 
-                    case ColumnType.Even:
-                        FallbackColumnIndex = "2";
-                        break;
-                }
+                case ColumnType.Even:
+                    FallbackColumnIndex = "2";
+                    break;
+            }
         }
 
         protected override IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
