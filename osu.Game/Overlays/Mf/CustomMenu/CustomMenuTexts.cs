@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.NewParagraph();
             textFlow.AddLink("osu!下的Mirror Mod → pr7334[Open]","https://github.com/ppy/osu/pull/7334");
             textFlow.NewParagraph();
-            textFlow.AddLink("osu!tau模式 → Altenhh/tau (commit 25cce80)","https://github.com/Altenhh/tau");
+            textFlow.AddLink("osu!tau模式 → Altenhh/tau (commit f3b4a8c)","https://github.com/Altenhh/tau");
             textFlow.NewParagraph();
             textFlow.AddLink("谱面在线列表 → pr7912[Merged]","https://github.com/ppy/osu/pull/7912");
             textFlow.NewParagraph();

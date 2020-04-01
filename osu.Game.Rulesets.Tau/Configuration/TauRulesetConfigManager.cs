@@ -19,12 +19,14 @@ namespace osu.Game.Rulesets.Tau.Configuration
 
             Set(TauRulesetSettings.ShowVisualizer, true);
             Set(TauRulesetSettings.PlayfieldDim, 0.3f, 0, 1, 0.01f);
+            Set(TauRulesetSettings.BeatSize, 10f, 5, 25, 1f);
         }
     }
 
     public enum TauRulesetSettings
     {
         ShowVisualizer,
-        PlayfieldDim
+        PlayfieldDim,
+        BeatSize
     }
 }

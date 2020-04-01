@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Tau.Mods
             private const float target_clamp = 1;
 
             private readonly float targetBreakMultiplier = 0;
-            private const float easing = 1;
+            private readonly float easing = 1;
 
             private readonly CompositeDrawable restrictTo;
 

@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Tau.UI
         {
             var config = (TauRulesetConfigManager)Config;
 
-            // for an odd reason, Config seems to be passed as null when creating it. doesnt even get called...
             if (config == null)
                 return;
 
@@ -39,6 +38,12 @@ namespace osu.Game.Rulesets.Tau.UI
                     Bindable = config.GetBindable<float>(TauRulesetSettings.PlayfieldDim),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "方块大小",
+                    Bindable = config.GetBindable<float>(TauRulesetSettings.BeatSize),
+                    KeyboardStep = 1f
                 }
             };
         }

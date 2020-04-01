@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -34,17 +34,13 @@ namespace osu.Game.Rulesets.Tau.Replays
             if (currentFrame.MouseLeft2) Actions.Add(TauAction.HardButton);
         }
 
-
         public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
         {
             ReplayButtonState state = ReplayButtonState.None;
 
-            if (Actions.Contains(TauAction.LeftButton))
-                state |= ReplayButtonState.Left1;
-            if (Actions.Contains(TauAction.RightButton))
-                state |= ReplayButtonState.Right1;
-            if (Actions.Contains(TauAction.HardButton))
-                state |= ReplayButtonState.Left2;
+            if (Actions.Contains(TauAction.LeftButton)) state |= ReplayButtonState.Left1;
+            if (Actions.Contains(TauAction.RightButton)) state |= ReplayButtonState.Right1;
+            if (Actions.Contains(TauAction.HardButton)) state |= ReplayButtonState.Left2;
 
             return new LegacyReplayFrame(Time, Position.X, Position.Y, state);
         }
