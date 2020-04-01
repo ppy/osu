@@ -35,10 +35,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private void sourceChanged()
         {
             isLegacySkin = new Lazy<bool>(() => source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
-            hasKeyTexture = new Lazy<bool>(() => source.GetTexture(
+            hasKeyTexture = new Lazy<bool>(() => source.GetAnimation(
                 source.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
                     new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
-                    ?? $"mania-key1") != null);
+                    ?? $"mania-key1", true, true) != null);
         }
 
         public Drawable GetDrawableComponent(ISkinComponent component)
