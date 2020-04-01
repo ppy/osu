@@ -179,6 +179,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                           ?.Value;
 
                 if (width == null)
+                    // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
                     col.Width = col.IsSpecial ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
                 else
                     col.Width = width.Value;
