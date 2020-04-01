@@ -147,6 +147,7 @@ namespace osu.Game.Screens.Ranking
 
         protected override void Update()
         {
+            //仍需改进, 每更新一次就执行一下不太合适
             if (OptUIEnabled.Value)
             switch(bottomPanel.panel_IsHovered)
             {
