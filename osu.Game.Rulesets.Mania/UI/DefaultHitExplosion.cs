@@ -1,26 +1,33 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class HitExplosion : CompositeDrawable
+    public class DefaultHitExplosion : CompositeDrawable
     {
         public override bool RemoveWhenNotAlive => true;
+
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private readonly CircularContainer largeFaint;
         private readonly CircularContainer mainGlow1;
 
-        public HitExplosion(Color4 objectColour, bool isSmall = false)
+        public DefaultHitExplosion(Color4 objectColour, bool isSmall = false)
         {
+            Origin = Anchor.Centre;
+
             RelativeSizeAxes = Axes.X;
             Height = DefaultNotePiece.NOTE_HEIGHT;
 
@@ -109,6 +116,13 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(IScrollingInfo scrollingInfo)
+        {
+            direction.BindTo(scrollingInfo.Direction);
+            direction.BindValueChanged(onDirectionChanged, true);
+        }
+
         protected override void LoadComplete()
         {
             const double duration = 200;
@@ -123,6 +137,20 @@ namespace osu.Game.Rulesets.Mania.UI
 
             this.FadeOut(duration, Easing.Out);
             Expire(true);
+        }
+
+        private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
+        {
+            if (direction.NewValue == ScrollingDirection.Up)
+            {
+                Anchor = Anchor.TopCentre;
+                Y = DefaultNotePiece.NOTE_HEIGHT / 2;
+            }
+            else
+            {
+                Anchor = Anchor.BottomCentre;
+                Y = -DefaultNotePiece.NOTE_HEIGHT / 2;
+            }
         }
     }
 }
