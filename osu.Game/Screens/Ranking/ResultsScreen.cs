@@ -7,16 +7,19 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -38,8 +41,12 @@ namespace osu.Game.Screens.Ranking
 
         public readonly ScoreInfo Score;
         FillFlowContainer buttons;
+        OsuSpriteText texts;
+        Box colorBox;
         private readonly bool allowRetry;
-        private Drawable bottomPanel;
+        private Drawable drawableBottomPanel;
+        private BottomPanel bottomPanel;
+        private const float DURATION = 125;
 
         private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
 
@@ -75,34 +82,49 @@ namespace osu.Game.Screens.Ranking
                         },
                     },
                 },
-                bottomPanel = new Container
+                drawableBottomPanel = bottomPanel = new BottomPanel
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = BOTTOMPANEL_SIZE.Y,
-                    Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new Box
+                        colorBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4Extensions.FromHex("#333")
                         },
-                        buttons = new FillFlowContainer
+                        new Container
                         {
+                            Name = "Base Container",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.X,
-                            Height = BOTTOMPANEL_SIZE.Y - 10,
-                            Y = 5,
-                            Spacing = new Vector2(5),
-                            Direction = FillDirection.Horizontal,
+                            RelativeSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new ReplayDownloadButton(Score) { Width = 300 },
+                                texts = new OsuSpriteText
+                                {
+                                    Name = "Texts Fillflow",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Y = -23,
+                                },
+                                buttons = new FillFlowContainer
+                                {
+                                    Name = "Buttons FillFlow",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.X,
+                                    Height = BOTTOMPANEL_SIZE.Y - 10,
+                                    Y = 5,
+                                    Spacing = new Vector2(5),
+                                    Direction = FillDirection.Horizontal,
+                                    Children = new Drawable[]
+                                    {
+                                        new ReplayDownloadButton(Score) { Width = 300 },
+                                    }
+                                }
                             }
-                        }
+                        },
+
                     }
                 }
             };
@@ -123,6 +145,54 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        protected override void Update()
+        {
+            if (OptUIEnabled.Value)
+            switch(bottomPanel.panel_IsHovered)
+            {
+                case true:
+                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y + 30, DURATION);
+                    colorBox.FadeColour( Color4Extensions.FromHex("#2d2d2d"), DURATION );
+                    buttons.MoveToY(20, DURATION);
+                    switch ( Score.Rank )
+                    {
+                        case ScoreRank.X:
+                        case ScoreRank.XH:
+                            texts.Text = "加入俱乐部吧, 我们需要你这样的人!";
+                            break;
+
+                        case ScoreRank.S:
+                        case ScoreRank.SH:
+                            texts.Text = "虽然有点难, 但你克服了几乎所有的挑战!";
+                            break;
+
+                        case ScoreRank.A:
+                            texts.Text = "快要到了, 继续努力!";
+                            break;
+
+                        case ScoreRank.B:
+                        case ScoreRank.C:
+                        case ScoreRank.D:
+                            texts.Text = "加油, 你一定能行!";
+                            break;
+
+                        default:
+                            texts.Text = "???";
+                            break;
+                    }
+                    texts.FadeIn(DURATION);
+                    break;
+                
+                case false:
+                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION);
+                    colorBox.FadeColour( Color4Extensions.FromHex("#333"), DURATION );
+                    buttons.MoveToY(5, DURATION);
+                    texts.FadeOut(DURATION);
+                    break;
+            }
+            base.Update();
+        }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -130,6 +200,7 @@ namespace osu.Game.Screens.Ranking
             ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
 
             Background.FadeTo(0.5f, 250);
+            texts.Hide();
             switch (OptUIEnabled.Value)
             {
                 case true:
