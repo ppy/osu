@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// A single follow point positioned between two adjacent <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPoint : Container
+    public class FollowPoint : Container, IAnimationTimeReference
     {
         private const float width = 8;
 
@@ -45,5 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 }
             }, confineMode: ConfineMode.NoScaling);
         }
+
+        public double AnimationStartTime { get; set; }
     }
 }
