@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
-        private int breakendcounter;
+        private bool breakend;
 
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
@@ -64,10 +64,11 @@ namespace osu.Game.Rulesets.Scoring
 
             if (IsBreakTime.Value)
             {
-                breakendcounter = 0;
+                breakend = false;
             }
 
-            if (!IsBreakTime.Value && breakendcounter > 0)
+            // Health should only be drained after the first post-Break Hit is judged
+            if (!IsBreakTime.Value && breakend)
             {
                 // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
                 double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
@@ -93,7 +94,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
             healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
-            breakendcounter++;
+            breakend = true;
         }
 
         protected override void Reset(bool storeResults)
