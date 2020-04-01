@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -27,7 +28,13 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
-        protected virtual bool AllowManiaSkin => true;
+        /// <summary>
+        /// Whether texture for the keys exists.
+        /// Used to determine if the mania ruleset is skinned.
+        /// </summary>
+        private readonly Lazy<bool> hasKeyTexture;
+
+        protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
 
         public new LegacySkinConfiguration Configuration
         {
@@ -77,6 +84,12 @@ namespace osu.Game.Skinning
 
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
             }
+
+            // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
+            hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
+                GetConfig<LegacyManiaSkinConfigurationLookup, string>(
+                    new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
+                ?? "mania-key1", true, true) != null);
         }
 
         protected override void Dispose(bool isDisposing)
