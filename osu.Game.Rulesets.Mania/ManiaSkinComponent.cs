@@ -25,5 +25,6 @@ namespace osu.Game.Rulesets.Mania
         Note,
         HoldNoteHead,
         HoldNoteTail,
+        HoldNoteBody,
     }
 }

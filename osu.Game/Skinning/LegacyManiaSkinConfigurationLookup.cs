@@ -29,6 +29,7 @@ namespace osu.Game.Skinning
         KeyImageDown,
         NoteImage,
         HoldNoteHeadImage,
-        HoldNoteTailImage
+        HoldNoteTailImage,
+        HoldNoteBodyImage,
     }
 }
