@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
-        private readonly OsuScrollContainer scroll;
+        private readonly CarouselScrollContainer scroll;
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
@@ -153,8 +153,10 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapHidden += beatmapHidden;
             beatmaps.BeatmapRestored += beatmapRestored;
 
-            loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
+            loadBeatmapSets(GetLoadableBeatmaps());
         }
+
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -189,7 +191,9 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false);
+            // only reset scroll position if already near the scroll target.
+            // without this, during a large beatmap import it is impossible to navigate the carousel.
+            applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
             //check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
@@ -201,9 +205,6 @@ namespace osu.Game.Screens.Select
 
         /// <summary>
         /// Selects a given beatmap on the carousel.
-        ///
-        /// If bypassFilters is false, we will try to select another unfiltered beatmap in the same set. If the
-        /// entire set is filtered, no selection is made.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
@@ -225,25 +226,21 @@ namespace osu.Game.Screens.Select
                     continue;
 
                 if (!bypassFilters && item.Filtered.Value)
-                    // The beatmap exists in this set but is filtered, so look for the first unfiltered map in the set
-                    item = set.Beatmaps.FirstOrDefault(b => !b.Filtered.Value);
+                    return false;
 
-                if (item != null)
+                select(item);
+
+                // if we got here and the set is filtered, it means we were bypassing filters.
+                // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
+                // (since it is forcefully being included in the carousel).
+                if (set.Filtered.Value)
                 {
-                    select(item);
+                    Debug.Assert(bypassFilters);
 
-                    // if we got here and the set is filtered, it means we were bypassing filters.
-                    // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
-                    // (since it is forcefully being included in the carousel).
-                    if (set.Filtered.Value)
-                    {
-                        Debug.Assert(bypassFilters);
-
-                        applyActiveCriteria(false);
-                    }
-
-                    return true;
+                    applyActiveCriteria(false);
                 }
+
+                return true;
             }
 
             return false;
@@ -256,46 +253,37 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            var visibleItems = Items.Where(s => !s.Item.Filtered.Value).ToList();
-
-            if (!visibleItems.Any())
+            if (beatmapSets.All(s => s.Filtered.Value))
                 return;
 
-            DrawableCarouselItem drawable = null;
+            if (skipDifficulties)
+                selectNextSet(direction, true);
+            else
+                selectNextDifficulty(direction);
+        }
 
-            if (selectedBeatmap != null && (drawable = selectedBeatmap.Drawables.FirstOrDefault()) == null)
-                // if the selected beatmap isn't present yet, we can't correctly change selection.
-                // we can fix this by changing this method to not reference drawables / Items in the first place.
-                return;
+        private void selectNextSet(int direction, bool skipDifficulties)
+        {
+            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
 
-            int originalIndex = visibleItems.IndexOf(drawable);
-            int currentIndex = originalIndex;
+            var nextSet = unfilteredSets[(unfilteredSets.IndexOf(selectedBeatmapSet) + direction + unfilteredSets.Count) % unfilteredSets.Count];
 
-            // local function to increment the index in the required direction, wrapping over extremities.
-            int incrementIndex() => currentIndex = (currentIndex + direction + visibleItems.Count) % visibleItems.Count;
+            if (skipDifficulties)
+                select(nextSet);
+            else
+                select(direction > 0 ? nextSet.Beatmaps.First(b => !b.Filtered.Value) : nextSet.Beatmaps.Last(b => !b.Filtered.Value));
+        }
 
-            while (incrementIndex() != originalIndex)
-            {
-                var item = visibleItems[currentIndex].Item;
+        private void selectNextDifficulty(int direction)
+        {
+            var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
 
-                if (item.Filtered.Value || item.State.Value == CarouselItemState.Selected) continue;
+            int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
 
-                switch (item)
-                {
-                    case CarouselBeatmap beatmap:
-                        if (skipDifficulties) continue;
-
-                        select(beatmap);
-                        return;
-
-                    case CarouselBeatmapSet set:
-                        if (skipDifficulties)
-                            select(set);
-                        else
-                            select(direction > 0 ? set.Beatmaps.First(b => !b.Filtered.Value) : set.Beatmaps.Last(b => !b.Filtered.Value));
-                        return;
-                }
-            }
+            if (index + direction < 0 || index + direction >= unfilteredDifficulties.Count)
+                selectNextSet(direction, false);
+            else
+                select(unfilteredDifficulties[index + direction]);
         }
 
         /// <summary>
@@ -336,8 +324,7 @@ namespace osu.Game.Screens.Select
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered.Value).ToList();
-            select(visibleBeatmaps[RNG.Next(visibleBeatmaps.Count)]);
+            select(set);
             return true;
         }
 
@@ -409,7 +396,7 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(debounce);
         }
 
-        private void applyActiveCriteria(bool debounce)
+        private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
             if (root.Children.Any() != true) return;
 
@@ -419,7 +406,9 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-                scrollPositionCache.Invalidate();
+
+                if (alwaysResetScrollPosition || !scroll.UserScrolling)
+                    ScrollToSelected();
             }
 
             PendingFilter?.Cancel();
@@ -433,6 +422,9 @@ namespace osu.Game.Screens.Select
 
         private float? scrollTarget;
 
+        /// <summary>
+        /// Scroll to the current <see cref="SelectedBeatmap"/>.
+        /// </summary>
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -599,7 +591,7 @@ namespace osu.Game.Screens.Select
                         SelectionChanged?.Invoke(c.Beatmap);
 
                         itemsCache.Invalidate();
-                        scrollPositionCache.Invalidate();
+                        ScrollToSelected();
                     }
                 };
             }
@@ -749,13 +741,17 @@ namespace osu.Game.Screens.Select
 
             public CarouselRoot(BeatmapCarousel carousel)
             {
+                // root should always remain selected. if not, PerformSelection will not be called.
+                State.Value = CarouselItemState.Selected;
+                State.ValueChanged += state => State.Value = CarouselItemState.Selected;
+
                 this.carousel = carousel;
             }
 
             protected override void PerformSelection()
             {
-                if (LastSelected == null)
-                    carousel.SelectNextRandom();
+                if (LastSelected == null || LastSelected.Filtered.Value)
+                    carousel?.SelectNextRandom();
                 else
                     base.PerformSelection();
             }
@@ -764,6 +760,23 @@ namespace osu.Game.Screens.Select
         private class CarouselScrollContainer : OsuScrollContainer
         {
             private bool rightMouseScrollBlocked;
+
+            /// <summary>
+            /// Whether the last scroll event was user triggered, directly on the scroll container.
+            /// </summary>
+            public bool UserScrolling { get; private set; }
+
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+            {
+                UserScrolling = true;
+                base.OnUserScroll(value, animated, distanceDecay);
+            }
+
+            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
+            {
+                UserScrolling = false;
+                base.ScrollTo(value, animated, distanceDecay);
+            }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {

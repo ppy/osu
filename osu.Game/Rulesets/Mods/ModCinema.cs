@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Mods
         {
             player.Background.EnableUserDim.Value = false;
 
-            player.DimmableVideo.IgnoreUserSettings.Value = true;
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
 
             player.BreakOverlay.Hide();

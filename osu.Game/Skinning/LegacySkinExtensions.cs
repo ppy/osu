@@ -3,10 +3,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Timing;
 
 namespace osu.Game.Skinning
 {
@@ -22,7 +24,7 @@ namespace osu.Game.Skinning
 
                 if (textures.Length > 0)
                 {
-                    var animation = new TextureAnimation
+                    var animation = new SkinnableTextureAnimation
                     {
                         DefaultFrameLength = getFrameLength(source, applyConfigFrameRate, textures),
                         Repeat = looping,
@@ -53,6 +55,25 @@ namespace osu.Game.Skinning
             }
         }
 
+        public class SkinnableTextureAnimation : TextureAnimation
+        {
+            [Resolved(canBeNull: true)]
+            private IAnimationTimeReference timeReference { get; set; }
+
+            public SkinnableTextureAnimation()
+                : base(false)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (timeReference != null)
+                    Clock = new FramedOffsetClock(timeReference.Clock) { Offset = -timeReference.AnimationStartTime };
+            }
+        }
+
         private const double default_frame_time = 1000 / 60d;
 
         private static double getFrameLength(ISkin source, bool applyConfigFrameRate, Texture[] textures)
@@ -61,7 +82,7 @@ namespace osu.Game.Skinning
             {
                 var iniRate = source.GetConfig<GlobalSkinConfiguration, int>(GlobalSkinConfiguration.AnimationFramerate);
 
-                if (iniRate != null)
+                if (iniRate?.Value > 0)
                     return 1000f / iniRate.Value;
 
                 return 1000f / textures.Length;
