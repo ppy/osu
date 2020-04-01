@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
@@ -16,18 +15,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>
+    public class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container lightContainer;
         private Sprite light;
-
-        [Resolved]
-        private Column column { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ManiaStage stage { get; set; }
 
         public LegacyColumnBackground()
         {
@@ -37,20 +30,17 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string lightImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                    new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LightImage, 0))?.Value
+            string lightImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.LightImage, 0)?.Value
                                 ?? "mania-stage-light";
 
-            float leftLineWidth = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                          new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LeftLineWidth, column.Index))
-                                      ?.Value ?? 1;
-            float rightLineWidth = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                           new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.RightLineWidth, column.Index))
-                                       ?.Value ?? 1;
+            float leftLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)
+                ?.Value ?? 1;
+            float rightLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.RightLineWidth)
+                ?.Value ?? 1;
 
             bool hasLeftLine = leftLineWidth > 0;
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
-                                || stage == null || column.Index == stage.Columns.Count - 1;
+                                || Stage == null || Column.Index == Stage.Columns.Count - 1;
 
             InternalChildren = new Drawable[]
             {
@@ -109,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action == column.Action.Value)
+            if (action == Column.Action.Value)
             {
                 light.FadeIn();
                 light.ScaleTo(Vector2.One);
@@ -123,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             // Todo: Should be 400 * 100 / CurrentBPM
             const double animation_length = 250;
 
-            if (action == column.Action.Value)
+            if (action == Column.Action.Value)
             {
                 light.FadeTo(0, animation_length);
                 light.ScaleTo(new Vector2(1, 0), animation_length);

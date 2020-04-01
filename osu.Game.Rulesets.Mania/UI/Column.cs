@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -66,21 +67,23 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
-        private bool isSpecial;
+        private ColumnType columnType;
 
-        public bool IsSpecial
+        public ColumnType ColumnType
         {
-            get => isSpecial;
+            get => columnType;
             set
             {
-                if (isSpecial == value)
+                if (columnType == value)
                     return;
 
-                isSpecial = value;
+                columnType = value;
 
-                Width = isSpecial ? special_column_width : COLUMN_WIDTH;
+                Width = IsSpecial ? special_column_width : COLUMN_WIDTH;
             }
         }
+
+        public bool IsSpecial => columnType == ColumnType.Special;
 
         public Color4 AccentColour { get; set; }
 
