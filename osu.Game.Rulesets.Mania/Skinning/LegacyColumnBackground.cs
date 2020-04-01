@@ -42,6 +42,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
                                 || Stage == null || Column.Index == Stage.Columns.Count - 1;
 
+            float lightPosition = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
+                                      new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LightPosition))?.Value
+                                  ?? 0;
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -67,6 +71,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 {
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Bottom = lightPosition },
                     Child = light = new Sprite
                     {
                         Anchor = Anchor.BottomCentre,

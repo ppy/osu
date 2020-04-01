@@ -14,6 +14,7 @@ namespace osu.Game.Skinning
         public readonly float[] ColumnWidth;
 
         public float HitPosition = 124.8f; // (480 - 402) * 1.6f
+        public float LightPosition = 107.2f; // (480 - 413) * 1.6f
         public bool ShowJudgementLine = true;
 
         public LegacyManiaSkinConfiguration(int keys)
