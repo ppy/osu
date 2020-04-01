@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Ranking
         private readonly bool allowRetry;
         private Drawable drawableBottomPanel;
         private BottomPanel bottomPanel;
-        private const float DURATION = 125;
+        private const float DURATION = 500;
 
         private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
 
@@ -145,16 +145,21 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            //仍需改进, 每更新一次就执行一下不太合适
+            bottomPanel.panel_IsHovered.ValueChanged += _ => UpdateVisualEffects();
+            base.LoadComplete();
+        }
+
+        private void UpdateVisualEffects()
+        {
             if (OptUIEnabled.Value)
-            switch(bottomPanel.panel_IsHovered)
+            switch(bottomPanel.panel_IsHovered.Value)
             {
                 case true:
-                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y + 30, DURATION);
-                    colorBox.FadeColour( Color4Extensions.FromHex("#2d2d2d"), DURATION );
-                    buttons.MoveToY(20, DURATION);
+                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y + 30, DURATION, Easing.OutQuint);
+                    buttons.MoveToY(20, DURATION, Easing.OutQuint);
+                    colorBox.FadeColour( Color4Extensions.FromHex("#2d2d2d"), DURATION);
                     switch ( Score.Rank )
                     {
                         case ScoreRank.X:
@@ -183,15 +188,14 @@ namespace osu.Game.Screens.Ranking
                     }
                     texts.FadeIn(DURATION);
                     break;
-                
+
                 case false:
-                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION);
+                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint);
+                    buttons.MoveToY(5, DURATION, Easing.OutQuint);
                     colorBox.FadeColour( Color4Extensions.FromHex("#333"), DURATION );
-                    buttons.MoveToY(5, DURATION);
                     texts.FadeOut(DURATION);
                     break;
             }
-            base.Update();
         }
 
         public override void OnEntering(IScreen last)
