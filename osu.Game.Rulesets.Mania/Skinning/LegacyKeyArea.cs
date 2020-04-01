@@ -36,12 +36,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string upImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                 new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.KeyImage, column.Index))?.Value
+            string upImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.KeyImage)?.Value
                              ?? $"mania-key{FallbackColumnIndex}";
 
-            string downImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                   new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.KeyImageDown, column.Index))?.Value
+            string downImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.KeyImageDown)?.Value
                                ?? $"mania-key{FallbackColumnIndex}D";
 
             InternalChild = directionContainer = new Container
