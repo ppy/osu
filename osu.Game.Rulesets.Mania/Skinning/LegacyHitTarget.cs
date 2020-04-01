@@ -7,19 +7,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyHitTarget : CompositeDrawable
+    public class LegacyHitTarget : LegacyManiaElement
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-
-        [Resolved(CanBeNull = true)]
-        private ManiaStage stage { get; set; }
 
         private Container directionContainer;
 
@@ -31,12 +27,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string targetImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                     new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.HitTargetImage))?.Value
+            string targetImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.HitTargetImage)?.Value
                                  ?? "mania-stage-hint";
 
-            bool showJudgementLine = skin.GetConfig<LegacyManiaSkinConfigurationLookup, bool>(
-                                         new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.ShowJudgementLine))?.Value
+            bool showJudgementLine = GetManiaSkinConfig<bool>(skin, LegacyManiaSkinConfigurationLookups.ShowJudgementLine)?.Value
                                      ?? true;
 
             InternalChild = directionContainer = new Container

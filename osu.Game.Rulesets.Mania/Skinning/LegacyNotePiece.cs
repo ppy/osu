@@ -83,8 +83,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     break;
             }
 
-            string noteImage = skin.GetConfig<LegacyManiaSkinConfigurationLookup, string>(
-                                   new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, lookup, Column.Index))?.Value
+            string noteImage = GetManiaSkinConfig<string>(skin, lookup)?.Value
                                ?? $"mania-note{FallbackColumnIndex}{suffix}";
 
             return skin.GetTexture(noteImage);
