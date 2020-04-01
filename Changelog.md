@@ -312,3 +312,7 @@
 *   合并上游分支
     *   [m] [Add mania hold note skinning #8524]
     *   [m] [Implement column width/spacing #8536]
+    *   [m] [Fix barlines scrolling at different speeds in legacy skins #8538]
+    *   [m] [Fix column lights positioned incorrectly #8537]
+    *   [m] [Update framework #8544]
+    *   [m] [Fix incorrect explosion position on default skin #8541]

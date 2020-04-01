@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -33,11 +34,10 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        private readonly Container barLineContainer;
-
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
 
+        private readonly Drawable barLineContainer;
         private readonly Container topLevelContainer;
 
         private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
@@ -106,13 +106,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = barLineContainer = new Container
+                            Child = barLineContainer = new HitObjectArea(HitObjectContainer)
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
-                                Child = HitObjectContainer
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
@@ -139,15 +138,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 AddColumn(column);
             }
-
-            Direction.BindValueChanged(dir =>
-            {
-                barLineContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
-                };
-            }, true);
         }
 
         private ISkin currentSkin;
