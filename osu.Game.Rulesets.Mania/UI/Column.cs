@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.UI
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         public const float COLUMN_WIDTH = 80;
-        private const float special_column_width = 70;
+        public const float SPECIAL_COLUMN_WIDTH = 70;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -41,7 +42,6 @@ namespace osu.Game.Rulesets.Mania.UI
             Index = index;
 
             RelativeSizeAxes = Axes.Y;
-            Width = COLUMN_WIDTH;
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
@@ -66,21 +66,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
-        private bool isSpecial;
+        public ColumnType ColumnType { get; set; }
 
-        public bool IsSpecial
-        {
-            get => isSpecial;
-            set
-            {
-                if (isSpecial == value)
-                    return;
-
-                isSpecial = value;
-
-                Width = isSpecial ? special_column_width : COLUMN_WIDTH;
-            }
-        }
+        public bool IsSpecial => ColumnType == ColumnType.Special;
 
         public Color4 AccentColour { get; set; }
 

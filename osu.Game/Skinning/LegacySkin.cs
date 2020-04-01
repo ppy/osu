@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -120,17 +121,28 @@ namespace osu.Game.Skinning
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
 
-                case LegacyManiaSkinConfigurationLookup legacy:
+                case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
                         return null;
 
-                    if (!maniaConfigurations.TryGetValue(legacy.Keys, out var existing))
-                        maniaConfigurations[legacy.Keys] = existing = new LegacyManiaSkinConfiguration(legacy.Keys);
+                    if (!maniaConfigurations.TryGetValue(maniaLookup.Keys, out var existing))
+                        maniaConfigurations[maniaLookup.Keys] = existing = new LegacyManiaSkinConfiguration(maniaLookup.Keys);
 
-                    switch (legacy.Lookup)
+                    switch (maniaLookup.Lookup)
                     {
+                        case LegacyManiaSkinConfigurationLookups.ColumnWidth:
+                            Debug.Assert(maniaLookup.TargetColumn != null);
+                            return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value]));
+
+                        case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
+                            Debug.Assert(maniaLookup.TargetColumn != null);
+                            return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.TargetColumn.Value]));
+
                         case LegacyManiaSkinConfigurationLookups.HitPosition:
                             return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
+
+                        case LegacyManiaSkinConfigurationLookups.LightPosition:
+                            return SkinUtils.As<TValue>(new Bindable<float>(existing.LightPosition));
 
                         case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
                             return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
