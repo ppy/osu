@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Scoring
             if (IsBreakTime.Value)
             {
                 breakend = false;
+                return;
             }
 
             // Health should only be drained after the first post-Break Hit is judged
