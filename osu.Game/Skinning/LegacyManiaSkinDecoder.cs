@@ -91,6 +91,10 @@ namespace osu.Game.Skinning
                         currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * size_scale_factor;
                         break;
 
+                    case "LightPosition":
+                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * size_scale_factor;
+                        break;
+
                     case "JudgementLine":
                         currentConfig.ShowJudgementLine = pair.Value == "1";
                         break;
