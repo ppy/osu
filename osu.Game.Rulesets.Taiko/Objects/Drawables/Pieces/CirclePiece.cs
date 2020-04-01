@@ -87,6 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                         },
                         new Triangles
                         {
+                            IgnoreSettings = true,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
