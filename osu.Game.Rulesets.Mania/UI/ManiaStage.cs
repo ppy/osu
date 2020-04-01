@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -93,7 +94,6 @@ namespace osu.Game.Rulesets.Mania.UI
                                     AutoSizeAxes = Axes.X,
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
-                                    Spacing = new Vector2(COLUMN_SPACING, 0)
                                 },
                             }
                         },
@@ -148,6 +148,41 @@ namespace osu.Game.Rulesets.Mania.UI
                     Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
                 };
             }, true);
+        }
+
+        private ISkin currentSkin;
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
+        {
+            currentSkin = skin;
+            skin.SourceChanged += onSkinChanged;
+
+            onSkinChanged();
+        }
+
+        private void onSkinChanged()
+        {
+            foreach (var col in columnFlow)
+            {
+                if (col.Index > 0)
+                {
+                    float spacing = currentSkin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
+                                                   new LegacyManiaSkinConfigurationLookup(Columns.Count, LegacyManiaSkinConfigurationLookups.ColumnSpacing, col.Index - 1))
+                                               ?.Value ?? COLUMN_SPACING;
+
+                    col.Margin = new MarginPadding { Left = spacing };
+                }
+
+                float? width = currentSkin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
+                                              new LegacyManiaSkinConfigurationLookup(Columns.Count, LegacyManiaSkinConfigurationLookups.ColumnWidth, col.Index))
+                                          ?.Value;
+
+                if (width == null)
+                    col.Width = col.IsSpecial ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
+                else
+                    col.Width = width.Value;
+            }
         }
 
         public void AddColumn(Column c)

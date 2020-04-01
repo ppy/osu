@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.UI
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         public const float COLUMN_WIDTH = 80;
-        private const float special_column_width = 70;
+        public const float SPECIAL_COLUMN_WIDTH = 70;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Mania.UI
             Index = index;
 
             RelativeSizeAxes = Axes.Y;
-            Width = COLUMN_WIDTH;
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
@@ -67,23 +66,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
-        private ColumnType columnType;
+        public ColumnType ColumnType { get; set; }
 
-        public ColumnType ColumnType
-        {
-            get => columnType;
-            set
-            {
-                if (columnType == value)
-                    return;
-
-                columnType = value;
-
-                Width = IsSpecial ? special_column_width : COLUMN_WIDTH;
-            }
-        }
-
-        public bool IsSpecial => columnType == ColumnType.Special;
+        public bool IsSpecial => ColumnType == ColumnType.Special;
 
         public Color4 AccentColour { get; set; }
 
