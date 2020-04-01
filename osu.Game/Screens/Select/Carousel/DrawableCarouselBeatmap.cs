@@ -146,6 +146,7 @@ namespace osu.Game.Screens.Select.Carousel
                     Scale = new Vector2(0.8f),
                 };
             }
+
             return new StarCounter
             {
                 Colour = Color4.White,
