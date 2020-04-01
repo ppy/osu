@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -129,6 +130,14 @@ namespace osu.Game.Skinning
 
                     switch (maniaLookup.Lookup)
                     {
+                        case LegacyManiaSkinConfigurationLookups.ColumnWidth:
+                            Debug.Assert(maniaLookup.TargetColumn != null);
+                            return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value]));
+
+                        case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
+                            Debug.Assert(maniaLookup.TargetColumn != null);
+                            return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.TargetColumn.Value]));
+
                         case LegacyManiaSkinConfigurationLookups.HitPosition:
                             return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 
