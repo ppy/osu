@@ -40,12 +40,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             if (Direction.Value == ScrollingDirection.Up)
             {
                 hitTarget.Anchor = hitTarget.Origin = Anchor.TopLeft;
-                Explosions.Padding = new MarginPadding { Top = DefaultNotePiece.NOTE_HEIGHT };
+                Explosions.Padding = new MarginPadding { Top = DefaultNotePiece.NOTE_HEIGHT / 2 };
             }
             else
             {
                 hitTarget.Anchor = hitTarget.Origin = Anchor.BottomLeft;
-                Explosions.Padding = new MarginPadding { Bottom = DefaultNotePiece.NOTE_HEIGHT };
+                Explosions.Padding = new MarginPadding { Bottom = DefaultNotePiece.NOTE_HEIGHT / 2 };
             }
         }
     }
