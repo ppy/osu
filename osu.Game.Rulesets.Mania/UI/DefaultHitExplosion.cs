@@ -136,7 +136,6 @@ namespace osu.Game.Rulesets.Mania.UI
             mainGlow1.ScaleTo(1.4f, duration, Easing.OutQuint);
 
             this.FadeOut(duration, Easing.Out);
-            Expire(true);
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
