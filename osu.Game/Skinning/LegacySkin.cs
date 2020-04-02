@@ -192,6 +192,17 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
                     return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
+
+                case LegacyManiaSkinConfigurationLookups.ExplosionScale:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+
+                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
+
+                    if (existing.ExplosionWidth[maniaLookup.TargetColumn.Value] != 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>(existing.ExplosionWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
             }
 
             return null;

@@ -8,10 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyHitExplosion : LegacyManiaElement
+    public class LegacyHitExplosion : LegacyManiaColumnElement
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -28,6 +29,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
             string imageName = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.ExplosionImage)?.Value
                                ?? "lightingN";
 
+            float explosionScale = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.ExplosionScale)?.Value
+                                   ?? 1;
+
             InternalChild = explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true).With(d =>
             {
                 if (d == null)
@@ -35,6 +39,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                 d.Origin = Anchor.Centre;
                 d.Blending = BlendingParameters.Additive;
+                d.Scale = new Vector2(explosionScale);
 
                 if (!(d is TextureAnimation texAnimation))
                     return;

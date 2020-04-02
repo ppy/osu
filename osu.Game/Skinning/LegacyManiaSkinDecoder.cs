@@ -96,6 +96,10 @@ namespace osu.Game.Skinning
                     case "JudgementLine":
                         currentConfig.ShowJudgementLine = pair.Value == "1";
                         break;
+
+                    case "LightingNWidth":
+                        parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
+                        break;
                 }
             }
         }
