@@ -11,8 +11,6 @@ namespace osu.Game.Skinning
 {
     public class LegacyManiaSkinDecoder : LegacyDecoder<List<LegacyManiaSkinConfiguration>>
     {
-        private const float size_scale_factor = 1.6f;
-
         public LegacyManiaSkinDecoder()
             : base(1)
         {
@@ -94,15 +92,19 @@ namespace osu.Game.Skinning
                         break;
 
                     case "HitPosition":
-                        currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * size_scale_factor;
+                        currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightPosition":
-                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * size_scale_factor;
+                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":
                         currentConfig.ShowJudgementLine = pair.Value == "1";
+                        break;
+
+                    case "LightingNWidth":
+                        parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
                         break;
                 }
             }
@@ -117,7 +119,7 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * size_scale_factor;
+                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
             }
         }
     }
