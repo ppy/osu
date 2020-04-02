@@ -320,3 +320,10 @@
 ### 2020/04/02
 *   合并上游分支
     *   [m] [Add check to detect whether mania is skinned #8535]
+
+*   合并上游分支
+    *   [m] [Add startAtCurrentTime parameter to GetAnimation() #8555]
+    *   [m] [Allow hold note tail to fallback to normal note image #8562]
+    *   [m] [Fix crash caused by user json order changing #8566]
+    *   [m] [Fix weird slider ball sizing #8568]
+    *   [m] [Update framework #8570]
