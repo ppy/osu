@@ -74,6 +74,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                         case ManiaSkinComponents.HoldNoteBody:
                             return new LegacyBodyPiece();
+
+                        case ManiaSkinComponents.HitExplosion:
+                            return new LegacyHitExplosion();
                     }
 
                     break;
