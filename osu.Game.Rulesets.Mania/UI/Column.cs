@@ -105,11 +105,15 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            hitObjectArea.Explosions.Add(new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion), _ =>
+            var explosion = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion), _ =>
                 new DefaultHitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick))
             {
                 RelativeSizeAxes = Axes.Both
-            });
+            };
+
+            hitObjectArea.Explosions.Add(explosion);
+
+            explosion.Delay(200).Expire(true);
         }
 
         public bool OnPressed(ManiaAction action)
