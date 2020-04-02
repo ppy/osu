@@ -2,12 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using osu.Game.Beatmaps.Formats;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyManiaSkinConfiguration
+    public class LegacyManiaSkinConfiguration : IHasCustomColours
     {
         public readonly int Keys;
+
+        public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
         public readonly float[] ColumnLineWidth;
         public readonly float[] ColumnSpacing;
