@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// </summary>
     public abstract class ManiaSkinnableTestScene : SkinnableTestScene
     {
+        protected const double START_TIME = 1000000000;
+
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
 
@@ -52,7 +54,26 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
             IBindable<double> IScrollingInfo.TimeRange { get; } = new Bindable<double>(1000);
-            IScrollAlgorithm IScrollingInfo.Algorithm { get; } = new ConstantScrollAlgorithm();
+            IScrollAlgorithm IScrollingInfo.Algorithm { get; } = new ZeroScrollAlgorithm();
+        }
+
+        private class ZeroScrollAlgorithm : IScrollAlgorithm
+        {
+            public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
+                => double.MinValue;
+
+            public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
+                => scrollLength;
+
+            public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
+                => (float)((time - START_TIME) / timeRange) * scrollLength;
+
+            public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
+                => 0;
+
+            public void Reset()
+            {
+            }
         }
     }
 }
