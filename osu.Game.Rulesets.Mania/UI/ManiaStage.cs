@@ -72,30 +72,19 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
-                            Name = "Columns mask",
+                            Name = "Background",
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black
+                        },
+                        columnFlow = new FillFlowContainer<Column>
+                        {
+                            Name = "Columns",
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Masking = true,
-                            CornerRadius = 5,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Background",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black
-                                },
-                                columnFlow = new FillFlowContainer<Column>
-                                {
-                                    Name = "Columns",
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-                                    Direction = FillDirection.Horizontal,
-                                    Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
-                                },
-                            }
+                            Direction = FillDirection.Horizontal,
+                            Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
                         },
                         new Container
                         {
