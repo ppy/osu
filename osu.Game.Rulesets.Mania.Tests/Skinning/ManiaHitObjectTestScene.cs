@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
@@ -37,10 +36,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         Child = new ScrollingHitObjectContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Clock = new FramedClock(new StopwatchClock()),
                         }.With(c =>
                         {
-                            c.Add(CreateHitObject().With(h => h.AccentColour.Value = Color4.Orange));
+                            c.Add(CreateHitObject().With(h =>
+                            {
+                                h.HitObject.StartTime = START_TIME;
+                                h.AccentColour.Value = Color4.Orange;
+                            }));
                         })
                     },
                     new ColumnTestContainer(1, ManiaAction.Key2)
@@ -52,10 +54,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         Child = new ScrollingHitObjectContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Clock = new FramedClock(new StopwatchClock()),
                         }.With(c =>
                         {
-                            c.Add(CreateHitObject().With(h => h.AccentColour.Value = Color4.Orange));
+                            c.Add(CreateHitObject().With(h =>
+                            {
+                                h.HitObject.StartTime = START_TIME;
+                                h.AccentColour.Value = Color4.Orange;
+                            }));
                         })
                     },
                 }
