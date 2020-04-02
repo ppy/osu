@@ -57,13 +57,27 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestHealthNotDrainedDuringBreak()
         {
-            createProcessor(createBeatmap(0, 2000));
+            Beatmap beatmap = createBeatmap(0, 2000);
+
+            createProcessor(beatmap);
             setBreak(true);
 
             setTime(700);
             assertHealthEqualTo(1);
             setTime(900);
             assertHealthEqualTo(1);
+
+            setTime(1000);
+            setBreak(false);
+
+            setTime(1200);
+            assertHealthEqualTo(1);
+
+            setTime(1400);
+            AddStep("apply hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[14], new Judgement()) { Type = HitResult.Perfect }));
+
+            setTime(1600);
+            assertHealthNotEqualTo(1);
         }
 
         [Test]
