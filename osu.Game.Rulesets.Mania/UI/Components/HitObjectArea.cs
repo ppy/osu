@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -13,9 +14,6 @@ namespace osu.Game.Rulesets.Mania.UI.Components
     public class HitObjectArea : SkinReloadableDrawable
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
-
-        [Resolved(CanBeNull = true)]
-        private ManiaStage stage { get; set; }
 
         public HitObjectArea(HitObjectContainer hitObjectContainer)
         {
@@ -45,8 +43,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         protected virtual void UpdateHitPosition()
         {
-            float hitPosition = CurrentSkin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                    new LegacyManiaSkinConfigurationLookup(stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
+            float hitPosition = CurrentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                    new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
                                 ?? ManiaStage.HIT_TARGET_POSITION;
 
             Padding = Direction.Value == ScrollingDirection.Up

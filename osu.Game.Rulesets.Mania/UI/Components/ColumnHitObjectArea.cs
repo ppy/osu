@@ -14,12 +14,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         public readonly Container Explosions;
         private readonly Drawable hitTarget;
 
-        public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
+        public ColumnHitObjectArea(int columnIndex, HitObjectContainer hitObjectContainer)
             : base(hitObjectContainer)
         {
             AddRangeInternal(new[]
             {
-                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
+                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget, columnIndex), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
                     Depth = 1
