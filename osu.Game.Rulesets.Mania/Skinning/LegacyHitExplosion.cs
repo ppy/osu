@@ -32,7 +32,14 @@ namespace osu.Game.Rulesets.Mania.Skinning
             float explosionScale = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.ExplosionScale)?.Value
                                    ?? 1;
 
-            explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true).With(d =>
+            // Create a temporary animation to retrieve the number of frames, in an effort to calculate the intended frame length.
+            // This animation is discarded and re-queried with the appropriate frame length afterwards.
+            var tmp = skin.GetAnimation(imageName, true, false);
+            double frameLength = 0;
+            if (tmp is IAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
+                frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
+
+            explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true, frameLength: frameLength).With(d =>
             {
                 if (d == null)
                     return;
@@ -40,12 +47,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 d.Origin = Anchor.Centre;
                 d.Blending = BlendingParameters.Additive;
                 d.Scale = new Vector2(explosionScale);
-
-                if (!(d is TextureAnimation texAnimation))
-                    return;
-
-                if (texAnimation.FrameCount > 0)
-                    texAnimation.DefaultFrameLength = Math.Max(texAnimation.DefaultFrameLength, 170.0 / texAnimation.FrameCount);
             });
 
             if (explosion != null)
