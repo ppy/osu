@@ -7,9 +7,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -19,7 +19,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -105,7 +104,7 @@ namespace osu.Game.Screens.Ranking
                                     Name = "Texts Fillflow",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Y = -23,
+                                    Y = -10,
                                 },
                                 buttons = new FillFlowContainer
                                 {
@@ -186,18 +185,28 @@ namespace osu.Game.Screens.Ranking
                             texts.Text = "???";
                             break;
                     }
-                    texts.FadeIn(DURATION);
+                    texts.FadeIn(DURATION).MoveToY(-23, DURATION, Easing.OutQuint);
                     break;
 
                 case false:
                     bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint);
                     buttons.MoveToY(5, DURATION, Easing.OutQuint);
                     colorBox.FadeColour( Color4Extensions.FromHex("#333"), DURATION );
-                    texts.FadeOut(DURATION);
+                    texts.FadeOut(DURATION, Easing.OutExpo).MoveToY(-10, DURATION, Easing.OutQuint);
                     break;
             }
         }
 
+        private string getRandomText() //之后会用上, 取自Disclaimer
+        {
+            string[] texts =
+            {
+                "句子1",
+                "句子2",
+            };
+
+            return texts[RNG.Next(0, texts.Length)];
+        }
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
