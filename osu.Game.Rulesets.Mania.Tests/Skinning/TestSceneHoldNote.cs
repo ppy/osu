@@ -15,10 +15,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             var note = new HoldNote { Duration = 1000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            return new DrawableHoldNote(note)
-            {
-                Height = 200,
-            };
+            return new DrawableHoldNote(note);
         }
     }
 }
