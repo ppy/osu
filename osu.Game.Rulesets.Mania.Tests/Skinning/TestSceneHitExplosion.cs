@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() => new Container
+            SetContents(() => new ColumnTestContainer(0, ManiaAction.Key1)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
