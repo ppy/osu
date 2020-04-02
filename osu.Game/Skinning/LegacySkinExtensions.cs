@@ -15,7 +15,7 @@ namespace osu.Game.Skinning
     public static class LegacySkinExtensions
     {
         public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
-                                            bool startAtCurrentTime = false)
+                                            bool startAtCurrentTime = false, double? frameLength = null)
         {
             Texture texture;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Skinning
                 {
                     var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
-                        DefaultFrameLength = getFrameLength(source, applyConfigFrameRate, textures),
+                        DefaultFrameLength = frameLength ?? getFrameLength(source, applyConfigFrameRate, textures),
                         Repeat = looping,
                     };
 
