@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
-        private bool breakend;
+        private bool applyDrain;
 
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
@@ -62,21 +62,23 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Update();
 
+            // can check this first, as drain is re-enabled externally by ApplyResultInternal
+            if (!applyDrain)
+                return;
+
+            // drain is on - check if a break is starting; if yes, disable and early-return
             if (IsBreakTime.Value)
             {
-                breakend = false;
+                applyDrain = false;
                 return;
             }
 
-            // Health should only be drained after the first post-Break Hit is judged
-            if (!IsBreakTime.Value && breakend)
-            {
-                // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
-                double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
-                double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
+            // actually apply drain
+            // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
+            double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
+            double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
 
-                Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
-            }
+            Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
@@ -95,7 +97,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
             healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
-            breakend = true;
+            applyDrain = true;
         }
 
         protected override void Reset(bool storeResults)
