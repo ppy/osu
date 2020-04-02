@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
@@ -112,7 +113,7 @@ namespace osu.Game.Skinning
                             break;
 
                         default:
-                            return SkinUtils.As<TValue>(getCustomColour(colour.ToString()));
+                            return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));
                     }
 
                     break;
@@ -130,7 +131,7 @@ namespace osu.Game.Skinning
                     break;
 
                 case SkinCustomColourLookup customColour:
-                    return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
+                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
@@ -192,12 +193,16 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
                     return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
             }
 
             return null;
         }
 
-        private IBindable<Color4> getCustomColour(string lookup) => Configuration.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
+        private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
+            => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {

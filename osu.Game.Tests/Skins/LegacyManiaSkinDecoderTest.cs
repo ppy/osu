@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Skins
 {
@@ -81,6 +82,21 @@ namespace osu.Game.Tests.Skins
                 Assert.That(configs[0].Keys, Is.EqualTo(4));
                 Assert.That(configs[0].ColumnWidth, Is.EquivalentTo(new float[] { 16, 16, 16, 16 }));
                 Assert.That(configs[0].HitPosition, Is.EqualTo(16));
+            }
+        }
+
+        [Test]
+        public void TestParseColours()
+        {
+            var decoder = new LegacyManiaSkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-skin-colours.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var configs = decoder.Decode(stream);
+
+                Assert.That(configs.Count, Is.EqualTo(1));
+                Assert.That(configs[0].CustomColours, Contains.Key("ColourBarline").And.ContainValue(new Color4(50, 50, 50, 50)));
             }
         }
     }
