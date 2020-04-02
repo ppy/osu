@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -20,6 +21,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        public IBindable<bool> IsHitting => isHitting;
+
+        private readonly Bindable<bool> isHitting = new Bindable<bool>();
+
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
 
@@ -27,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTail> tailContainer;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
-        private readonly BodyPiece bodyPiece;
+        private readonly Drawable bodyPiece;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -44,18 +49,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
-                bodyPiece = new BodyPiece { RelativeSizeAxes = Axes.X },
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece())
+                {
+                    RelativeSizeAxes = Axes.X
+                },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
             });
-
-            AccentColour.BindValueChanged(colour =>
-            {
-                bodyPiece.AccentColour = colour.NewValue;
-            }, true);
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -168,7 +171,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             HoldStartTime = Time.Current;
-            bodyPiece.Hitting = true;
+            isHitting.Value = true;
         }
 
         public void OnReleased(ManiaAction action)
@@ -194,7 +197,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private void endHold()
         {
             HoldStartTime = null;
-            bodyPiece.Hitting = false;
+            isHitting.Value = false;
         }
     }
 }

@@ -1,8 +1,8 @@
 {
-    "profiles": {
-      "All Benchmarks": {
-        "commandName": "Project",
-        "commandLineArgs": "--filter *"
-      }
+  "profiles": {
+    "All Benchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter *"
     }
   }
+}

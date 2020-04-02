@@ -17,15 +17,16 @@ using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
-using Humanizer;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
     public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
+        private readonly Bindable<bool> Optui = new Bindable<bool>();
         private const int transition_duration = 200;
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
@@ -54,6 +55,7 @@ namespace osu.Game.Screens.Play
         protected internal FillFlowContainer<DialogButton> InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
+        private VisualSettings VisualSettings;
         private FillFlowContainer retryCounterContainer;
 
         protected GameplayMenuOverlay()
@@ -64,8 +66,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
+            config.BindWith(OsuSetting.OptUI, Optui);
+
             Children = new Drawable[]
             {
                 new Box
@@ -148,12 +152,30 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding(25),
                     Children = new PlayerSettingsGroup[]
                     {
-                        new VisualSettings(),
+                        VisualSettings = new VisualSettings(),
                     }
                 },
             };
 
             updateRetryCount();
+
+            Optui.ValueChanged += _ => UpdateVisibilities();
+            UpdateVisibilities();
+        }
+
+        private void UpdateVisibilities()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    VisualSettings.FadeIn(250);
+                    break;
+
+                case false:
+                    VisualSettings.FadeOut(250);
+                    break;
+            }
+
         }
 
         private int retries;

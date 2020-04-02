@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Users;
@@ -23,11 +25,13 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         private CancellationTokenSource cancellationToken;
+        private APIRequest lastRequest;
 
         private readonly Box background;
         private readonly DashboardOverlayHeader header;
-        private readonly Container<DashboardDisplay> content;
+        private readonly Container content;
         private readonly LoadingLayer loading;
+        private readonly BasicScrollContainer scrollFlow;
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple)
@@ -38,7 +42,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                new BasicScrollContainer
+                scrollFlow = new BasicScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -55,7 +59,7 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre,
                                 Depth = -float.MaxValue
                             },
-                            content = new Container<DashboardDisplay>
+                            content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y
@@ -85,35 +89,50 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            header.Current.TriggerChange();
+
+            if (!content.Any())
+                header.Current.TriggerChange();
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+            loadDisplay(null);
         }
 
         private void onTabChanged()
         {
-            loading.Show();
+            lastRequest?.Cancel();
             cancellationToken?.Cancel();
+
+            loading.Show();
 
             // We may want to use OnlineViewContainer after https://github.com/ppy/osu/pull/8044 merge
             if (!api.IsLoggedIn)
             {
-                content.Clear();
+                loadDisplay(null);
                 return;
             }
 
-            switch (header.Current.Value)
-            {
-                default:
-                    loadDisplay(null);
-                    return;
+            var request = createScopedRequest();
+            lastRequest = request;
 
-                case HomeOverlayTabs.Friends:
-                    loadDisplay(new FriendDisplay());
-                    return;
+            if (request == null)
+            {
+                loadDisplay(null);
+                return;
             }
+
+            request.Success += () => Schedule(() => loadDisplay(createDisplayFromResponse(request)));
+            request.Failure += _ => Schedule(() => loadDisplay(null));
+
+            api.Queue(request);
         }
 
-        private void loadDisplay(DashboardDisplay display)
+        private void loadDisplay(Drawable display)
         {
+            scrollFlow.ScrollToStart();
+
             if (display == null)
             {
                 content.Clear();
@@ -123,17 +142,36 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(display, loaded =>
             {
-                content.Clear();
-
-                content.Add(loaded);
-                loaded.Fetch();
-
                 loading.Hide();
+                content.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private Drawable createDisplayFromResponse(APIRequest request)
+        {
+            switch (request)
+            {
+                case GetFriendsRequest friendsRequest:
+                    return new FriendDisplay(friendsRequest.Result);
+            }
+
+            return null;
+        }
+
+        private APIRequest createScopedRequest()
+        {
+            switch (header.Current.Value)
+            {
+                case HomeOverlayTabs.Friends:
+                    return new GetFriendsRequest();
+            }
+
+            return null;
         }
 
         protected override void Dispose(bool isDisposing)
         {
+            lastRequest?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }

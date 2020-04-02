@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             void handleHitCircle(DrawableHitCircle circle)
             {
-                if (!circle.IsHovered)
+                if (!circle.HitArea.IsHovered)
                     return;
 
                 Debug.Assert(circle.HitObject.HitWindows != null);

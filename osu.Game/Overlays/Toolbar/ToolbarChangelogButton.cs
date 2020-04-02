@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarChangelogButton : ToolbarOverlayToggleButton
+    public class ToolbarChangelogButton : ToolbarOverlayToggleButtonRightSide
     {
         public ToolbarChangelogButton()
         {

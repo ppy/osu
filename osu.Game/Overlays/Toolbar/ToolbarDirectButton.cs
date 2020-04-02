@@ -6,7 +6,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarDirectButton : ToolbarOverlayToggleButton
+    public class ToolbarDirectButton : ToolbarOverlayToggleButtonRightSide
     {
         public ToolbarDirectButton()
         {

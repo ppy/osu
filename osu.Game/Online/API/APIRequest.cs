@@ -12,11 +12,11 @@ namespace osu.Game.Online.API
     /// An API request with a well-defined response type.
     /// </summary>
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    public abstract class APIRequest<T> : APIRequest
+    public abstract class APIRequest<T> : APIRequest where T : class
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
+        public T Result => ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
 
         protected APIRequest()
         {

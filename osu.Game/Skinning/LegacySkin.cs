@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -26,11 +28,21 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
+        /// <summary>
+        /// Whether texture for the keys exists.
+        /// Used to determine if the mania ruleset is skinned.
+        /// </summary>
+        private readonly Lazy<bool> hasKeyTexture;
+
+        protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
+
         public new LegacySkinConfiguration Configuration
         {
             get => base.Configuration as LegacySkinConfiguration;
             set => base.Configuration = value;
         }
+
+        private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
@@ -40,15 +52,26 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
-            Stream stream = storage?.GetStream(filename);
-
-            if (stream != null)
+            using (var stream = storage?.GetStream(filename))
             {
-                using (LineBufferedReader reader = new LineBufferedReader(stream))
-                    Configuration = new LegacySkinDecoder().Decode(reader);
+                if (stream != null)
+                {
+                    using (LineBufferedReader reader = new LineBufferedReader(stream, true))
+                        Configuration = new LegacySkinDecoder().Decode(reader);
+
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    using (LineBufferedReader reader = new LineBufferedReader(stream))
+                    {
+                        var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
+
+                        foreach (var config in maniaList)
+                            maniaConfigurations[config.Keys] = config;
+                    }
+                }
+                else
+                    Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
             }
-            else
-                Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
 
             if (storage != null)
             {
@@ -58,9 +81,13 @@ namespace osu.Game.Skinning
 
                 Samples = samples;
                 Textures = new TextureStore(new TextureLoaderStore(storage));
-                
+
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
             }
+
+            // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
+            hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
+                lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true, true) != null);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -105,6 +132,16 @@ namespace osu.Game.Skinning
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
 
+                case LegacyManiaSkinConfigurationLookup maniaLookup:
+                    if (!AllowManiaSkin)
+                        return null;
+
+                    var result = lookupForMania<TValue>(maniaLookup);
+                    if (result != null)
+                        return result;
+
+                    break;
+
                 default:
                     // handles lookups like GlobalSkinConfiguration
 
@@ -127,6 +164,34 @@ namespace osu.Game.Skinning
                     }
 
                     break;
+            }
+
+            return null;
+        }
+
+        private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
+        {
+            if (!maniaConfigurations.TryGetValue(maniaLookup.Keys, out var existing))
+                maniaConfigurations[maniaLookup.Keys] = existing = new LegacyManiaSkinConfiguration(maniaLookup.Keys);
+
+            switch (maniaLookup.Lookup)
+            {
+                case LegacyManiaSkinConfigurationLookups.ColumnWidth:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.TargetColumn.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.HitPosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
+
+                case LegacyManiaSkinConfigurationLookups.LightPosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.LightPosition));
+
+                case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
+                    return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
             }
 
             return null;

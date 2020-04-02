@@ -18,6 +18,12 @@ namespace osu.Game.Skinning
         /// </summary>
         public Drawable Drawable { get; private set; }
 
+        public new Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            set => base.AutoSizeAxes = value;
+        }
+
         private readonly ISkinComponent component;
 
         private readonly ConfineMode confineMode;
@@ -92,20 +98,13 @@ namespace osu.Game.Skinning
 
                     switch (confineMode)
                     {
-                        case ConfineMode.NoScaling:
-                            return;
-
-                        case ConfineMode.ScaleDownToFit:
-                            if (Drawable.DrawSize.X <= DrawSize.X && Drawable.DrawSize.Y <= DrawSize.Y)
-                                return;
-
+                        case ConfineMode.ScaleToFit:
+                            Drawable.RelativeSizeAxes = Axes.Both;
+                            Drawable.Size = Vector2.One;
+                            Drawable.Scale = Vector2.One;
+                            Drawable.FillMode = FillMode.Fit;
                             break;
                     }
-
-                    Drawable.RelativeSizeAxes = Axes.Both;
-                    Drawable.Size = Vector2.One;
-                    Drawable.Scale = Vector2.One;
-                    Drawable.FillMode = FillMode.Fit;
                 }
                 finally
                 {
@@ -121,7 +120,6 @@ namespace osu.Game.Skinning
         /// Don't apply any scaling. This allows the user element to be of any size, exceeding specified bounds.
         /// </summary>
         NoScaling,
-        ScaleDownToFit,
         ScaleToFit,
     }
 }

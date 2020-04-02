@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Edit
     public class NoteCompositionTool : HitObjectCompositionTool
     {
         public NoteCompositionTool()
-            : base("音符")
+            : base(nameof(Note))
         {
         }
 

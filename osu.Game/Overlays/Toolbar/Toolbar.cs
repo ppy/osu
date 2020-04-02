@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -23,10 +24,16 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
+        private Bindable<bool> optUI { get; set; }
+        protected ToolbarTimeButton ToolbarTimeButton { get; private set; }
+        protected ToolbarMfButton ToolbarMfButton { get; private set; }
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
+        private FillFlowContainer LeftSideToolbar;
 
         private const double transition_time = 500;
+        private float anim_time = 0;
+        private bool OnLaunch = true;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
@@ -40,16 +47,20 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
+            optUI = config.GetBindable<bool>(OsuSetting.OptUI);
+
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
-                new FillFlowContainer
+                LeftSideToolbar = new FillFlowContainer
                 {
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
+                    LayoutDuration = anim_time,
+                    LayoutEasing = Easing.OutBounce,
                     Children = new Drawable[]
                     {
                         new ToolbarSettingsButton(),
@@ -57,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        new ToolbarMfButton(),
+                        ToolbarMfButton =  new ToolbarMfButton(),
                         rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
@@ -70,7 +81,7 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ToolbarTimeButton(),
+                        ToolbarTimeButton = new ToolbarTimeButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
                         new ToolbarDirectButton(),
@@ -98,6 +109,32 @@ namespace osu.Game.Overlays.Toolbar
 
             if (osuGame != null)
                 overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
+            UpdateIcons();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            optUI.ValueChanged += _ => UpdateIcons();
+        }
+
+        private void UpdateIcons()
+        {
+            if (!OnLaunch) LeftSideToolbar.LayoutDuration = 600f;
+            switch (optUI.Value)
+            {
+                case true:
+                    ToolbarMfButton.FadeTo(1f, 250);
+                    ToolbarTimeButton.FadeTo(1f, 250);
+                    break;
+
+                case false:
+                    ToolbarMfButton.FadeTo(0f, 250);
+                    ToolbarTimeButton.FadeTo(0f, 250);
+                    break;
+            }
         }
 
         public class ToolbarBackground : Container
@@ -146,6 +183,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             this.MoveToY(0, transition_time, Easing.OutQuint);
             this.FadeIn(transition_time / 2, Easing.OutQuint);
+            OnLaunch = false;
         }
 
         protected override void PopOut()

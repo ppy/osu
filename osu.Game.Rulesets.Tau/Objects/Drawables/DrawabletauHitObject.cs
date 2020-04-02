@@ -11,7 +11,10 @@ using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Game.Rulesets.Tau.Configuration;
 using osu.Game.Rulesets.Tau.UI;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Tau.Objects.Drawables
 {
@@ -20,7 +23,6 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         public Box Box;
 
         public Func<DrawabletauHitObject, bool> CheckValidation;
-
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         };
 
         /// <summary>
-        /// The action that caused this <see cref="DrawabletauHitObject"/> to be hit.
+        /// The action that caused this <see cref="DrawableHitObject"/> to be hit.
         /// </summary>
         public TauAction? HitAction { get; private set; }
 
@@ -42,7 +44,6 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         public DrawabletauHitObject(TauHitObject hitObject)
             : base(hitObject)
         {
-            Size = new Vector2(10);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativePositionAxes = Axes.Both;
@@ -56,16 +57,25 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
                 Alpha = 0.05f
             });
 
-            hitObject.Angle = hitObject.PositionToEnd.GetDegreesFromPosition(Box.AnchorPosition) * 4;
+            hitObject.Angle = hitObject.PositionToEnd.GetHitObjectAngle(Vector2.Zero);
             Box.Rotation = hitObject.Angle;
 
             Position = Vector2.Zero;
         }
 
+        private Bindable<float> size;
+
+        [BackgroundDependencyLoader]
+        private void load(TauRulesetConfigManager config)
+        {
+            size = config.GetBindable<float>(TauRulesetSettings.BeatSize);
+            size.BindValueChanged(value => this.Size = new Vector2(value.NewValue), true);
+        }
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
-            var b = HitObject.PositionToEnd.GetDegreesFromPosition(Box.AnchorPosition) * 4;
+            var b = HitObject.PositionToEnd.GetHitObjectAngle(Vector2.Zero);
             var a = b *= (float)(Math.PI / 180);
 
             Box.FadeIn(HitObject.TimeFadeIn);
@@ -120,7 +130,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    var b = HitObject.PositionToEnd.GetDegreesFromPosition(Box.AnchorPosition) * 4;
+                    var b = HitObject.PositionToEnd.GetHitObjectAngle(Vector2.Zero);
                     var a = b *= (float)(Math.PI / 180);
 
                     Box.ScaleTo(2f, time_fade_hit, Easing.OutCubic)
@@ -133,7 +143,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    var c = HitObject.PositionToEnd.GetDegreesFromPosition(Box.AnchorPosition) * 4;
+                    var c = HitObject.PositionToEnd.GetHitObjectAngle(Vector2.Zero);
                     var d = c *= (float)(Math.PI / 180);
 
                     Box.ScaleTo(0.5f, time_fade_miss, Easing.InCubic)

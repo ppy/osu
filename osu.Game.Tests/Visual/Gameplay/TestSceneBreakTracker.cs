@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRange(new Drawable[]
             {
                 breakTracker = new TestBreakTracker(),
-                breakOverlay = new BreakOverlay(true)
+                breakOverlay = new BreakOverlay(true, null)
                 {
                     ProcessCustomClock = false,
                 }

@@ -248,3 +248,75 @@
 *   合并上游pr
     *   [m] [Improve robustness of loader tests #8476]
     *   [m] [Fix break overlay not displaying progress information #8474]
+    *   [m] [Fix break overlay displaying in front of all other player overlays #8475]
+    *   [m] [Show customised mod setting values in tooltip #8351]
+
+*   修复UI问题
+
+* 补全了"启用Mf自定义UI"的功能, 目前该选项将影响下列界面的样式/动画:
+    *   可见性变更
+        *   结算界面 背景动画
+        *   主界面 "一个神秘的按钮"
+        *   顶栏 "关于Mf-osu"和"时间"按钮
+        *   顶栏 右侧除"通知"按钮以外所有按钮描述
+        *   歌曲选择 底栏背景动画
+        *   歌曲选择 歌曲排行榜背景动画
+        *   多人游戏 房间排行榜背景动画
+        *   游戏内 休息时段、失败、暂停时视觉效果设置菜单的
+    *   动画效果变更
+        *   音乐播放器切歌动画
+        *   结算菜单的视差效果动画
+
+* **!!! [Toolbar](osu.Game/Overlays/Toolbar/Toolbar.cs)过渡动画相关逻辑仍需改进 !!!**
+
+### 2020/3/30
+*   合并上游pr
+    *   [m] [Rewrite beatmap carousel's select next logic to not use drawables #8481]
+    *   [m] [Fix auto mod results screen not displaying correctly #8488]
+    *   [m] [Implement Spun Out mod #7764]
+    *   [m] [Add support for legacy skin sliderstartcircle / sliderstartcircleoverlay #8477]
+    *   [m] [Add mania skin decoder #8496]
+    *   [m] [Make reverse arrows not follow snaking when they are already hit #8486]
+    *   [m] [Fix tooltips not showing inside ManualInputManagerTestScenes #8501]
+    *   [m] [Bump Microsoft.Build.Traversal from 2.0.24 to 2.0.32 #8499]
+    *   [m] [Hide "retry" button on results screen after watching a replay #8490]
+    *   [m] [Fix imports with no matching beatmap IDs still retaining a potentially invalid set ID #8494]
+
+*   更新上游pr
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8051] 
+
+*   暂不合并
+    *   [m] [Move non-headless tests to correct namespace #8493]
+
+*   同步Tests
+
+### 2020/3/31
+*   合并上游pr
+    *   [m] [Add support for HitCircleOverlayAboveNumber legacy skin property #8502]
+    *   [m] [Fix replay imports failing for certain mod combinations #8525]
+    *   [m] [Support widescreen per-layer storyboard masking #8509]
+    *   [m] [Fix relax mod pressing too many keys #8522]
+    *   [m] [Fix osu!catch catcher hit area being too large #8526]
+    *   [m] [Remove ScaleDownToFit as it was implemented without enough safety #8521]
+
+    *   [m] [Add mania key area skinning #8516]
+    *   [m] [Implement basis for mania skinning #8513]
+    *   [m] [Add mania column background skinning #8514]
+    *   [m] [Add mania hit target skinning #8518]
+    *   [m] [Add mania note skinning #8523]
+
+*   暂不合并
+    *   [m] [Fix catcher test resources being at wrong dpi definition #8520]
+
+### 2020/04/01
+*   合并上游分支
+    *   [m] [Add mania hold note skinning #8524]
+    *   [m] [Implement column width/spacing #8536]
+    *   [m] [Fix barlines scrolling at different speeds in legacy skins #8538]
+    *   [m] [Fix column lights positioned incorrectly #8537]
+    *   [m] [Update framework #8544]
+    *   [m] [Fix incorrect explosion position on default skin #8541]
+
+### 2020/04/02
+*   合并上游分支
+    *   [m] [Add check to detect whether mania is skinned #8535]

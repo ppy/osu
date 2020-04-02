@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Add(Triangles = new Triangles
+            Add(Triangles = new Triangles()
             {
                 RelativeSizeAxes = Axes.Both,
                 ColourDark = colours.BlueDarker,

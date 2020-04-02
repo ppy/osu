@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             var bottomStatistics = new List<StatisticDisplay>();
             foreach (var stat in score.SortedStatistics)
-                bottomStatistics.Add(new CounterStatistic(stat.Key.GetDescription(), stat.Value));
+                bottomStatistics.Add(new HitResultStatistic(stat.Key, stat.Value));
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
+                                Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold)
                             },
                             new Container
                             {

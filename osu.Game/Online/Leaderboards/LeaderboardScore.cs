@@ -27,6 +27,8 @@ using osuTK.Graphics;
 using Humanizer;
 using osu.Game.Online.API;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -45,7 +47,6 @@ namespace osu.Game.Online.Leaderboards
         private readonly int? rank;
         private readonly bool allowHighlight;
 
-        private Triangles triangles;
         private Box background;
         private Container content;
         private Drawable avatar;
@@ -56,6 +57,8 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<ModIcon> modsContainer;
 
         private List<ScoreComponentLabel> statisticsLabels;
+
+        private readonly Bindable<bool> Optui = new Bindable<bool>();
         private bool isSongSelect;
 
         [Resolved(CanBeNull = true)]
@@ -73,12 +76,14 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour)
+        private void load(IAPIProvider api, OsuColour colour, OsuConfigManager config)
         {
             var user = score.User;
 
-            if ( isSongSelect == true )
-                TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
+            config.BindWith(OsuSetting.OptUI, Optui);
+
+            Optui.ValueChanged += _ => UpdateTooltip();
+            UpdateTooltip();
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -114,13 +119,7 @@ namespace osu.Game.Online.Leaderboards
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                triangles = new Triangles
-                                {
-                                    TriangleScale = 2,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : OsuColour.Gray(0.2f),
-                                    Alpha = 0.65f,
-                                },
+                                new MfBgTriangles(0.65f, (user.Id == api.LocalUser.Value.Id && allowHighlight ? true : false) ),
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -249,6 +248,21 @@ namespace osu.Game.Online.Leaderboards
             };
 
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
+        }
+
+        private void UpdateTooltip()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    if ( isSongSelect )
+                        TooltipText = $"于 {score.Date.ToLocalTime():g} 游玩";
+                    break;
+
+                case false:
+                    TooltipText = "";
+                    break;
+            };
         }
 
         public override void Show()

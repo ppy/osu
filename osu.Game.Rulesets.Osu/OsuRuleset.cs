@@ -113,7 +113,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
-                        new OsuModSpunOut(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -140,6 +139,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
+                        new OsuModSpunOut(),
                     };
 
                 case ModType.Fun:

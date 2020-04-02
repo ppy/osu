@@ -7,18 +7,29 @@ using osu.Framework.Input.Events;
 using osuTK;
 using osu.Game.Screens.Play.PlayerSettings;
 using osuTK.Input;
+using osu.Framework.Bindables;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class BreakSettingsOverlay : VisibilityContainer
     {
+        private readonly Bindable<bool> Optui = new Bindable<bool>();
         private const int fade_duration = 200;
 
         public bool ReplayLoaded;
 
-        public readonly PlaybackSettings PlaybackSettings;
-
         public readonly VisualSettings VisualSettings;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.OptUI, Optui);
+
+            Optui.ValueChanged += _ => UpdateVisibilities();
+            UpdateVisibilities();
+        }
 
         public BreakSettingsOverlay()
         {
@@ -35,9 +46,24 @@ namespace osu.Game.Screens.Play.HUD
                 Margin = new MarginPadding { Top = 100, Right = 10 },
                 Children = new PlayerSettingsGroup[]
                 {
-                    VisualSettings = new VisualSettings { Expanded = false }
+                    VisualSettings = new VisualSettings { Expanded = false , OptUIEnabled = Optui.Value }
                 }
             };
+        }
+
+        private void UpdateVisibilities()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    VisualSettings.FadeTo(0.5f, 250);
+                    break;
+
+                case false:
+                    VisualSettings.FadeOut(250);
+                    break;
+            }
+
         }
 
         protected override void PopIn() => this.FadeIn(fade_duration);

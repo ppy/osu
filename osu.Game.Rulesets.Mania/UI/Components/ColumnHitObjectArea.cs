@@ -1,143 +1,51 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnHitObjectArea : CompositeDrawable, IHasAccentColour
+    public class ColumnHitObjectArea : HitObjectArea
     {
-        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-
+        public readonly Container<HitExplosion> Explosions;
         private readonly Drawable hitTarget;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
+            : base(hitObjectContainer)
         {
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
-                hitTarget = new DefaultHitTarget
+                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
+                    Depth = 1
                 },
-                hitObjectContainer
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
-        {
-            direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(dir =>
-            {
-                Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-
-                hitTarget.Anchor = hitTarget.Origin = anchor;
-            }, true);
-        }
-
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                if (hitTarget is IHasAccentColour colouredHitTarget)
-                    colouredHitTarget.AccentColour = accentColour;
-            }
-        }
-
-        private class DefaultHitTarget : CompositeDrawable, IHasAccentColour
-        {
-            private const float hit_target_bar_height = 2;
-            private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
-
-            private readonly Container hitTargetLine;
-            private readonly Drawable hitTargetBar;
-
-            public DefaultHitTarget()
-            {
-                InternalChildren = new[]
+                Explosions = new Container<HitExplosion>
                 {
-                    hitTargetBar = new Box
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = NotePiece.NOTE_HEIGHT,
-                        Alpha = 0.6f,
-                        Colour = Color4.Black
-                    },
-                    hitTargetLine = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = hit_target_bar_height,
-                        Masking = true,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
-                    },
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(IScrollingInfo scrollingInfo)
-            {
-                direction.BindTo(scrollingInfo.Direction);
-                direction.BindValueChanged(dir =>
-                {
-                    Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-
-                    hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
-                    hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
-                }, true);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                updateColours();
-            }
-
-            private Color4 accentColour;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    if (accentColour == value)
-                        return;
-
-                    accentColour = value;
-
-                    updateColours();
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = -1,
                 }
-            }
+            });
+        }
 
-            private void updateColours()
+        protected override void UpdateHitPosition()
+        {
+            base.UpdateHitPosition();
+
+            if (Direction.Value == ScrollingDirection.Up)
             {
-                if (!IsLoaded)
-                    return;
-
-                hitTargetLine.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = accentColour.Opacity(0.5f),
-                };
+                hitTarget.Anchor = hitTarget.Origin = Anchor.TopLeft;
+                Explosions.Padding = new MarginPadding { Top = DefaultNotePiece.NOTE_HEIGHT / 2 };
+            }
+            else
+            {
+                hitTarget.Anchor = hitTarget.Origin = Anchor.BottomLeft;
+                Explosions.Padding = new MarginPadding { Bottom = DefaultNotePiece.NOTE_HEIGHT / 2 };
             }
         }
     }

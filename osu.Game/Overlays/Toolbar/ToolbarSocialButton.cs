@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarSocialButton : ToolbarOverlayToggleButton
+    public class ToolbarSocialButton : ToolbarOverlayToggleButtonRightSide
     {
         public ToolbarSocialButton()
         {

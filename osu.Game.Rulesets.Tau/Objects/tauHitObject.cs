@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Tau.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
+            TimePreempt = (float) BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
             TimeFadeIn = 100;
         }
     }

@@ -3,22 +3,30 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
     public class ResultsScreen : OsuScreen
     {
+        private Bindable<bool> OptUIEnabled;
+        private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 60);
         protected const float BACKGROUND_BLUR = 20;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -31,62 +39,100 @@ namespace osu.Game.Screens.Ranking
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
-        private readonly ScoreInfo score;
+        public readonly ScoreInfo Score;
+        FillFlowContainer buttons;
+        OsuSpriteText texts;
+        Box colorBox;
+        private readonly bool allowRetry;
+        private Drawable drawableBottomPanel;
+        private BottomPanel bottomPanel;
+        private const float DURATION = 500;
 
-        private Drawable bottomPanel;
+        private Graphics.Mf.Resources.ParallaxContainer scorePanelParallax;
 
-        public ResultsScreen(ScoreInfo score)
+        public ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
-            this.score = score;
+            Score = score;
+            this.allowRetry = allowRetry;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            OptUIEnabled = config.GetBindable<bool>(OsuSetting.OptUI);
+
             InternalChildren = new[]
             {
-                new ResultsScrollContainer
+                new ParallaxContainer
                 {
-                    Child = new ScorePanel(score)
+                    Masking = true,
+                    Child = new MfBgTriangles(0.5f, false, 5f),
+                },
+                scorePanelParallax = new Graphics.Mf.Resources.ParallaxContainer
+                {
+                    Masking = true,
+                    ParallaxAmount = 0.01f,
+                    Child = new ResultsScrollContainer
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        State = PanelState.Expanded
+                        Child = new ScorePanel(Score)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            State = PanelState.Expanded
+                        },
                     },
                 },
-                bottomPanel = new Container
+                drawableBottomPanel = bottomPanel = new BottomPanel
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = TwoLayerButton.SIZE_EXTENDED.Y,
-                    Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new Box
+                        colorBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4Extensions.FromHex("#333")
                         },
-                        new FillFlowContainer
+                        new Container
                         {
+                            Name = "Base Container",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5),
-                            Direction = FillDirection.Horizontal,
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new ReplayDownloadButton(score) { Width = 300 },
-                                new RetryButton { Width = 300 },
+                                texts = new OsuSpriteText
+                                {
+                                    Name = "Texts Fillflow",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Y = -23,
+                                },
+                                buttons = new FillFlowContainer
+                                {
+                                    Name = "Buttons FillFlow",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.X,
+                                    Height = BOTTOMPANEL_SIZE.Y - 10,
+                                    Y = 5,
+                                    Spacing = new Vector2(5),
+                                    Direction = FillDirection.Horizontal,
+                                    Children = new Drawable[]
+                                    {
+                                        new ReplayDownloadButton(Score) { Width = 300 },
+                                    }
+                                }
                             }
-                        }
+                        },
+
                     }
                 }
             };
 
-            if (player != null)
+            if (player != null && allowRetry)
             {
+                buttons.Add(new RetryButton { Width = 300 });
+
                 AddInternal(new HotkeyRetryOverlay
                 {
                     Action = () =>
@@ -99,6 +145,59 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        protected override void LoadComplete()
+        {
+            bottomPanel.panel_IsHovered.ValueChanged += _ => UpdateVisualEffects();
+            base.LoadComplete();
+        }
+
+        private void UpdateVisualEffects()
+        {
+            if (OptUIEnabled.Value)
+            switch(bottomPanel.panel_IsHovered.Value)
+            {
+                case true:
+                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y + 30, DURATION, Easing.OutQuint);
+                    buttons.MoveToY(20, DURATION, Easing.OutQuint);
+                    colorBox.FadeColour( Color4Extensions.FromHex("#2d2d2d"), DURATION);
+                    switch ( Score.Rank )
+                    {
+                        case ScoreRank.X:
+                        case ScoreRank.XH:
+                            texts.Text = "加入俱乐部吧, 我们需要你这样的人!";
+                            break;
+
+                        case ScoreRank.S:
+                        case ScoreRank.SH:
+                            texts.Text = "虽然有点难, 但你克服了几乎所有的挑战!";
+                            break;
+
+                        case ScoreRank.A:
+                            texts.Text = "快要到了, 继续努力!";
+                            break;
+
+                        case ScoreRank.B:
+                        case ScoreRank.C:
+                        case ScoreRank.D:
+                            texts.Text = "加油, 你一定能行!";
+                            break;
+
+                        default:
+                            texts.Text = "???";
+                            break;
+                    }
+                    texts.FadeIn(DURATION);
+                    break;
+
+                case false:
+                    bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint);
+                    buttons.MoveToY(5, DURATION, Easing.OutQuint);
+                    colorBox.FadeColour( Color4Extensions.FromHex("#333"), DURATION );
+                    texts.FadeOut(DURATION);
+                    break;
+            }
+        }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -106,13 +205,38 @@ namespace osu.Game.Screens.Ranking
             ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
 
             Background.FadeTo(0.5f, 250);
-            bottomPanel.FadeTo(1, 250);
+            texts.Hide();
+            switch (OptUIEnabled.Value)
+            {
+                case true:
+                    bottomPanel.Y = TwoLayerButton.SIZE_EXTENDED.Y;
+                    bottomPanel.Delay(250).FadeTo(1, 200).MoveToY(10, 550, Easing.OutBack);
+
+                    buttons.FadeTo(0).MoveToX(200)
+                           .Then().Delay(250)
+                           .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
+
+                    scorePanelParallax.MoveToY(DrawHeight)
+                                      .Then().Delay(250)
+                                      .Then().MoveToY(0, 750, Easing.OutExpo);
+                    break;
+
+                case false:
+                    bottomPanel.MoveToY(10).FadeTo(1, 250);
+                    break;
+            };
         }
 
         public override bool OnExiting(IScreen next)
         {
             Background.FadeTo(1, 250);
-
+            switch (OptUIEnabled.Value)
+            {
+                case true:
+                    bottomPanel.FadeTo(0, 250).MoveToY(TwoLayerButton.SIZE_EXTENDED.Y, 250);
+                    this.FadeOut(100);
+                    break;
+            };
             return base.OnExiting(next);
         }
 

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays
         private const float progress_height = 10;
         private const float bottom_black_area_height = 55;
 
+        private Bindable<bool> optUI { get; set; }
         private Drawable background;
         private ProgressBar progressBar;
 
@@ -68,8 +70,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            optUI = config.GetBindable<bool>(OsuSetting.OptUI);
             Children = new Drawable[]
             {
                 dragContainer = new DragContainer
@@ -276,20 +279,41 @@ namespace osu.Game.Overlays
 
                 LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
                 {
-                    switch (direction)
-                    {
-                        case TrackChangeDirection.Next:
-                            newBackground.Position = new Vector2(400, 0);
-                            newBackground.MoveToX(0, 500, Easing.OutCubic);
-                            background.MoveToX(-400, 500, Easing.OutCubic);
-                            break;
+                        if (optUI.Value)
+                        { 
+                            switch (direction)
+                            {
+                                case TrackChangeDirection.Next:
+                                    newBackground.Position = new Vector2(-400, 0);
+                                    newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                    background.MoveToY(0, 500, Easing.OutCubic);
+                                    break;
+                            
+                                case TrackChangeDirection.Prev:
+                                    newBackground.Position = new Vector2(400, 0);
+                                    newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                    background.MoveToY(0, 500, Easing.OutCubic);
+                                    break;
+                            }
+                        }
 
-                        case TrackChangeDirection.Prev:
-                            newBackground.Position = new Vector2(-400, 0);
-                            newBackground.MoveToX(0, 500, Easing.OutCubic);
-                            background.MoveToX(400, 500, Easing.OutCubic);
-                            break;
-                    }
+                        if (!optUI.Value)
+                        {
+                                switch (direction)
+                                {
+                                    case TrackChangeDirection.Next:
+                                        newBackground.Position = new Vector2(400, 0);
+                                        newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                        background.MoveToX(-400, 500, Easing.OutCubic);
+                                        break;
+
+                                    case TrackChangeDirection.Prev:
+                                        newBackground.Position = new Vector2(-400, 0);
+                                        newBackground.MoveToX(0, 500, Easing.OutCubic);
+                                        background.MoveToX(400, 500, Easing.OutCubic);
+                                        break;
+                                } 
+                        }
 
                     background.Expire();
                     background = newBackground;
