@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             float explosionScale = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.ExplosionScale)?.Value
                                    ?? 1;
 
-            InternalChild = explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true).With(d =>
+            explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true).With(d =>
             {
                 if (d == null)
                     return;
@@ -47,6 +47,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 if (texAnimation.FrameCount > 0)
                     texAnimation.DefaultFrameLength = Math.Max(texAnimation.DefaultFrameLength, 170.0 / texAnimation.FrameCount);
             });
+
+            if (explosion != null)
+                InternalChild = explosion;
 
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(onDirectionChanged, true);
