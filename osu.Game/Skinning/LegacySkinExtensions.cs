@@ -14,7 +14,8 @@ namespace osu.Game.Skinning
 {
     public static class LegacySkinExtensions
     {
-        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-")
+        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
+                                            bool startAtCurrentTime = false)
         {
             Texture texture;
 
@@ -24,7 +25,7 @@ namespace osu.Game.Skinning
 
                 if (textures.Length > 0)
                 {
-                    var animation = new SkinnableTextureAnimation
+                    var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
                         DefaultFrameLength = getFrameLength(source, applyConfigFrameRate, textures),
                         Repeat = looping,
@@ -60,8 +61,8 @@ namespace osu.Game.Skinning
             [Resolved(canBeNull: true)]
             private IAnimationTimeReference timeReference { get; set; }
 
-            public SkinnableTextureAnimation()
-                : base(false)
+            public SkinnableTextureAnimation(bool startAtCurrentTime = true)
+                : base(startAtCurrentTime)
             {
             }
 

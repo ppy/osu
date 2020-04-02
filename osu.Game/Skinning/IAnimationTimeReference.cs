@@ -9,6 +9,10 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Denotes an object which provides a reference time to start animations from.
     /// </summary>
+    /// <remarks>
+    /// This should not be used to start an animation immediately at the current time.
+    /// To do so, use <see cref="LegacySkinExtensions.GetAnimation"/> with <code>startAtCurrentTime = true</code> instead.
+    /// </remarks>
     [Cached]
     public interface IAnimationTimeReference
     {
