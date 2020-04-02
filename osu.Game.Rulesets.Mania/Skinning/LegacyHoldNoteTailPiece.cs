@@ -21,7 +21,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
         protected override Texture GetTexture(ISkinSource skin)
         {
             return GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteTailImage)
-                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage);
+                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage)
+                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
         }
     }
 }
