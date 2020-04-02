@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -20,12 +19,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
 
         private Drawable sprite;
-
-        [Resolved(CanBeNull = true)]
-        private ManiaStage stage { get; set; }
-
-        [Resolved]
-        private Column column { get; set; }
 
         public LegacyBodyPiece()
         {

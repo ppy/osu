@@ -22,9 +22,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private Sprite upSprite;
         private Sprite downSprite;
 
-        [Resolved(CanBeNull = true)]
-        private ManiaStage stage { get; set; }
-
         [Resolved]
         private Column column { get; set; }
 

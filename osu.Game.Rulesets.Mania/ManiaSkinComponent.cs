@@ -7,9 +7,12 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaSkinComponent : GameplaySkinComponent<ManiaSkinComponents>
     {
-        public ManiaSkinComponent(ManiaSkinComponents component)
+        public readonly int TargetColumn;
+
+        public ManiaSkinComponent(ManiaSkinComponents component, int targetColumn)
             : base(component)
         {
+            TargetColumn = targetColumn;
         }
 
         protected override string RulesetPrefix => ManiaRuleset.SHORT_NAME;
