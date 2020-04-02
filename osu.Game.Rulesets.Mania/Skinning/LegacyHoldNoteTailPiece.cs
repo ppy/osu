@@ -20,8 +20,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         protected override Texture GetTexture(ISkinSource skin)
         {
+            // TODO: Should fallback to the head from default legacy skin instead of note.
             return GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteTailImage)
-                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage);
+                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage)
+                   ?? GetTextureFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
         }
     }
 }
