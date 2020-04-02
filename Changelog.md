@@ -316,3 +316,7 @@
     *   [m] [Fix column lights positioned incorrectly #8537]
     *   [m] [Update framework #8544]
     *   [m] [Fix incorrect explosion position on default skin #8541]
+
+### 2020/04/02
+*   合并上游分支
+    *   [m] [Add check to detect whether mania is skinned #8535]
