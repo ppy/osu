@@ -9,9 +9,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Lists;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -180,6 +182,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
+        /// <summary>
+        /// Adjusts the scroll speed of <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="amount">The amount to adjust by. Greater than 0 if the scroll speed should be increased, less than 0 if it should be decreased.</param>
+        protected virtual void AdjustScrollSpeed(int amount) => this.TransformBindableTo(TimeRange, TimeRange.Value - amount * time_span_step, 200, Easing.OutQuint);
+
         public bool OnPressed(GlobalAction action)
         {
             if (!UserScrollSpeedAdjustment)
@@ -188,19 +196,29 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
+                    scheduleScrollSpeedAdjustment(1);
                     return true;
 
                 case GlobalAction.DecreaseScrollSpeed:
-                    this.TransformBindableTo(TimeRange, TimeRange.Value + time_span_step, 200, Easing.OutQuint);
+                    scheduleScrollSpeedAdjustment(-1);
                     return true;
             }
 
             return false;
         }
 
+        private ScheduledDelegate scheduledScrollSpeedAdjustment;
+
         public void OnReleased(GlobalAction action)
         {
+            scheduledScrollSpeedAdjustment?.Cancel();
+            scheduledScrollSpeedAdjustment = null;
+        }
+
+        private void scheduleScrollSpeedAdjustment(int amount)
+        {
+            scheduledScrollSpeedAdjustment?.Cancel();
+            scheduledScrollSpeedAdjustment = this.BeginKeyRepeat(Scheduler, () => AdjustScrollSpeed(amount));
         }
 
         private class LocalScrollingInfo : IScrollingInfo
