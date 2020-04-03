@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             DrawableFruit drawableFruit = null;
 
-            AddStep("setup fruit", () =>
+            AddStep("setup hyper-dash fruit", () =>
             {
                 var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }, false, false, false, legacyFruit);
             });
 
-            AddAssert("default colour", () =>
+            AddAssert("hyper-dash fruit has default colour", () =>
                 legacyFruit
                     ? checkLegacyFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour)
                     : checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour));
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             DrawableFruit drawableFruit = null;
 
-            AddStep("setup fruit", () =>
+            AddStep("setup hyper-dash fruit", () =>
             {
                 var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }, customCatcherHyperDashColour, false, true, legacyFruit);
             });
 
-            AddAssert("custom colour", () =>
+            AddAssert("hyper-dash fruit use fruit colour from skin", () =>
                 legacyFruit
                     ? checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour)
                     : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour));
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             DrawableFruit drawableFruit = null;
 
-            AddStep("setup fruit", () =>
+            AddStep("setup hyper-dash fruit", () =>
             {
                 var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     }, true, false, false, legacyFruit);
             });
 
-            AddAssert("catcher custom colour", () =>
+            AddAssert("hyper-dash fruit colour falls back to catcher colour from skin", () =>
                 legacyFruit
                     ? checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour)
                     : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour));
