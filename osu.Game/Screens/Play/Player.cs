@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(gameplayBeatmap);
 
             addUnderlayComponents(GameplayClockContainer);
-            addGameplayComponents(GameplayClockContainer, Beatmap.Value);
+            addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -214,13 +214,13 @@ namespace osu.Game.Screens.Play
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
-        private void addGameplayComponents(Container target, WorkingBeatmap working)
+        private void addGameplayComponents(Container target, WorkingBeatmap working, IBeatmap playableBeatmap)
         {
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(working.Skin);
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -637,6 +637,39 @@ namespace osu.Game.Screens.Play
             return base.OnExiting(next);
         }
 
+        protected virtual void GotoRanking()
+        {
+            if (DrawableRuleset.ReplayScore != null)
+            {
+                // if a replay is present, we likely don't want to import into the local database.
+                this.Push(CreateResults(CreateScore()));
+                return;
+            }
+
+            LegacyByteArrayReader replayReader = null;
+
+            var score = new Score { ScoreInfo = CreateScore() };
+
+            if (recordingReplay?.Frames.Count > 0)
+            {
+                score.Replay = recordingReplay;
+
+                using (var stream = new MemoryStream())
+                {
+                    new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                }
+            }
+
+            scoreManager.Import(score.ScoreInfo, replayReader)
+                        .ContinueWith(imported => Schedule(() =>
+                        {
+                            // screen may be in the exiting transition phase.
+                            if (this.IsCurrentScreen())
+                                this.Push(CreateResults(imported.Result));
+                        }));
+        }
+
         private void fadeOut(bool instant = false)
         {
             float fadeOutDuration = instant ? 0 : 250;
@@ -649,36 +682,7 @@ namespace osu.Game.Screens.Play
         private void scheduleGotoRanking()
         {
             completionProgressDelegate?.Cancel();
-            completionProgressDelegate = Schedule(delegate
-            {
-                if (DrawableRuleset.ReplayScore != null)
-                    this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
-                else
-                {
-                    var score = new Score { ScoreInfo = CreateScore() };
-
-                    LegacyByteArrayReader replayReader = null;
-
-                    if (recordingReplay?.Frames.Count > 0)
-                    {
-                        score.Replay = recordingReplay;
-
-                        using (var stream = new MemoryStream())
-                        {
-                            new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
-                            replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
-                        }
-                    }
-
-                    scoreManager.Import(score.ScoreInfo, replayReader)
-                                .ContinueWith(imported => Schedule(() =>
-                                {
-                                    // screen may be in the exiting transition phase.
-                                    if (this.IsCurrentScreen())
-                                        this.Push(CreateResults(imported.Result));
-                                }));
-                }
-            });
+            completionProgressDelegate = Schedule(GotoRanking);
         }
 
         #endregion

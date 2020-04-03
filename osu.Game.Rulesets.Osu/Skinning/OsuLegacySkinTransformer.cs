@@ -62,23 +62,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                     if (sliderBallContent != null)
-                    {
-                        var size = sliderBallContent.Size;
-
-                        sliderBallContent.RelativeSizeAxes = Axes.Both;
-                        sliderBallContent.Size = Vector2.One;
-
-                        return new LegacySliderBall(sliderBallContent)
-                        {
-                            Size = size
-                        };
-                    }
+                        return new LegacySliderBall(sliderBallContent);
 
                     return null;
 
                 case OsuSkinComponents.SliderBody:
                     if (hasHitCircle.Value)
                         return new LegacySliderBody();
+
+                    return null;
+
+                case OsuSkinComponents.SliderHeadHitCircle:
+                    if (hasHitCircle.Value)
+                        return new LegacyMainCirclePiece("sliderstartcircle");
 
                     return null;
 
