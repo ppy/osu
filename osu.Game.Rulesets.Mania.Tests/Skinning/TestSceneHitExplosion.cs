@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
                 CreatedDrawables.OfType<Container>().ForEach(c =>
                 {
-                    c.Add(new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion),
+                    c.Add(new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion, 0),
                         _ => new DefaultHitExplosion((runcount / 15) % 2 == 0 ? new Color4(94, 0, 57, 255) : new Color4(6, 84, 0, 255), runcount % 6 != 0)
                         {
                             Anchor = Anchor.Centre,
