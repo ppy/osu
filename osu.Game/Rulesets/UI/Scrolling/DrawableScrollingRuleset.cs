@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         }
 
         /// <summary>
-        /// Adjusts the scroll speed of the <see cref="HitObject"/>.
+        /// Adjusts the scroll speed of <see cref="HitObject"/>s.
         /// </summary>
         /// <param name="amount">The amount to adjust by. Greater than 0 if the scroll speed should be increased, less than 0 if it should be decreased.</param>
         protected virtual void AdjustScrollSpeed(int amount) => this.TransformBindableTo(TimeRange, TimeRange.Value - amount * time_span_step, 200, Easing.OutQuint);
