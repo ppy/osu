@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour));
         }
 
-        private Drawable setupSkinHierarchy(Drawable child, bool customCatcherColour = false, bool customAfterColour = false, bool customFruitColour = false, bool legacySkin = true)
+        private Drawable setupSkinHierarchy(Drawable child, bool customCatcherColour, bool customAfterColour, bool customFruitColour, bool legacySkin = true)
         {
             var testSkinProvider = new SkinProvidingContainer(new TestSkin(customCatcherColour, customAfterColour, customFruitColour));
 
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             private readonly bool customAfterColour;
             private readonly bool customFruitColour;
 
-            public TestSkin(bool customCatcherColour = false, bool customAfterColour = false, bool customFruitColour = false)
+            public TestSkin(bool customCatcherColour, bool customAfterColour, bool customFruitColour)
             {
                 this.customCatcherColour = customCatcherColour;
                 this.customAfterColour = customAfterColour;
