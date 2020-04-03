@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         {
             AddRangeInternal(new[]
             {
-                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
+                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget, columnIndex), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
                     Depth = 1

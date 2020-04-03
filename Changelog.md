@@ -335,3 +335,11 @@
     *   [m] [Add skinning support for column line colour #8565]
     *   [m] [Implement mania normal-note hit-explosion skinning #8556]
     *   [m] [Fix GetDecoder getting fallback decoder too often #8584]
+
+### 2020/04/04
+*   合并上游分支
+    *   [m] [Fix dynamic recompilation in intro test scenes #8590]
+    *   [m] [Update usages of Animation and Video in line with framework changes #8592]
+    *   [m] [Rework mania skin lookups to not require total playfield columns #8586]
+    *   [m] [Fix mania scrolling at incorrect speeds #8589]
+    *   [m] [Implement more familiar scroll speed options in mania #8597]

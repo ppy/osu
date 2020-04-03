@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             RelativeSizeAxes = Axes.Y;
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both
             };
@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                hitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var explosion = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion), _ =>
+            var explosion = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion, Index), _ =>
                 new DefaultHitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick))
             {
                 RelativeSizeAxes = Axes.Both

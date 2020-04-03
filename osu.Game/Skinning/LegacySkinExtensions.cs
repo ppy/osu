@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Timing;
 
 namespace osu.Game.Skinning
 {
@@ -28,7 +27,7 @@ namespace osu.Game.Skinning
                     var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
                         DefaultFrameLength = frameLength ?? getFrameLength(source, applyConfigFrameRate, textures),
-                        Repeat = looping,
+                        Loop = looping,
                     };
 
                     foreach (var t in textures)
@@ -71,7 +70,10 @@ namespace osu.Game.Skinning
                 base.LoadComplete();
 
                 if (timeReference != null)
-                    Clock = new FramedOffsetClock(timeReference.Clock) { Offset = -timeReference.AnimationStartTime };
+                {
+                    Clock = timeReference.Clock;
+                    PlaybackPosition = timeReference.AnimationStartTime - timeReference.Clock.CurrentTime;
+                }
             }
         }
 
