@@ -127,6 +127,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 .Assert();
         }
 
+        [Test]
+        public void TestGetJsonDecoder()
+        {
+            Decoder<Beatmap> decoder;
+
+            using (var stream = TestResources.OpenResource(normal))
+            using (var sr = new LineBufferedReader(stream))
+            {
+                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+
+                using (var ms = new MemoryStream())
+                using (var sw = new StreamWriter(ms))
+                using (var sr2 = new LineBufferedReader(ms))
+                {
+                    sw.Write(legacyDecoded.Serialize());
+                    sw.Flush();
+
+                    ms.Position = 0;
+                    decoder = Decoder.GetDecoder<Beatmap>(sr2);
+                }
+            }
+
+            Assert.IsInstanceOf(typeof(JsonBeatmapDecoder), decoder);
+        }
+
         /// <summary>
         /// Reads a .osu file first with a <see cref="LegacyBeatmapDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
         /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="JsonBeatmapDecoder"/>.
