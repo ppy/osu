@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                        Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, 0), _ => new DefaultKeyArea())
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
+                        Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, 1), _ => new DefaultKeyArea())
                         {
                             RelativeSizeAxes = Axes.Both
                         },
