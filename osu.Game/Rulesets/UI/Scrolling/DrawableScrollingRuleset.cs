@@ -74,11 +74,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual bool RelativeScaleBeatLengths => false;
 
         /// <summary>
-        /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
-        /// inside this <see cref="DrawableRuleset{TObject}"/>.
+        /// The <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s inside this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
-        /// <returns></returns>
-        private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
+        protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
         protected IScrollingInfo ScrollingInfo => scrollingInfo;
 
@@ -95,11 +93,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (VisualisationMethod)
             {
                 case ScrollVisualisationMethod.Sequential:
-                    scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
+                    scrollingInfo.Algorithm = new SequentialScrollAlgorithm(ControlPoints);
                     break;
 
                 case ScrollVisualisationMethod.Overlapping:
-                    scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
+                    scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(ControlPoints);
                     break;
 
                 case ScrollVisualisationMethod.Constant:
@@ -168,10 +166,18 @@ namespace osu.Game.Rulesets.UI.Scrolling
                             // Collapse sections with the same start time
                             .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
 
-            controlPoints.AddRange(timingChanges);
+            ControlPoints.AddRange(timingChanges);
 
-            if (controlPoints.Count == 0)
-                controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
+            if (ControlPoints.Count == 0)
+                ControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (!(Playfield is ScrollingPlayfield))
+                throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
         public bool OnPressed(GlobalAction action)
@@ -191,14 +197,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
 
             return false;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (!(Playfield is ScrollingPlayfield))
-                throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
         public void OnReleased(GlobalAction action)
