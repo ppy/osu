@@ -16,7 +16,7 @@ namespace osu.Game.Tournament.Components
     {
         private readonly string filename;
         private readonly bool drawFallbackGradient;
-        private VideoSprite video;
+        private Video video;
 
         private ManualClock manualClock;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Components
 
             if (stream != null)
             {
-                InternalChild = video = new VideoSprite(stream, false)
+                InternalChild = video = new Video(stream, false)
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
