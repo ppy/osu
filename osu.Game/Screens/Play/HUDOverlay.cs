@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
-            Margin = new MarginPadding { Top = 20, Right = 10 },
+            Margin = new MarginPadding { Top = 20, Right = 20 },
         };
 
         protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);

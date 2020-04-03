@@ -56,7 +56,6 @@ namespace osu.Game.Screens.Play.HUD
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Left = 10, Right = 10 },
                 },
                 unrankedText = new OsuSpriteText
                 {

@@ -124,6 +124,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     new StarRatingDisplay(beatmap)

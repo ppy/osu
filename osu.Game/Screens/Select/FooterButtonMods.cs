@@ -92,7 +92,6 @@ namespace osu.Game.Screens.Select
             public FooterModDisplay()
             {
                 ExpansionMode = ExpansionMode.AlwaysContracted;
-                IconsContainer.Margin = new MarginPadding();
             }
         }
     }
