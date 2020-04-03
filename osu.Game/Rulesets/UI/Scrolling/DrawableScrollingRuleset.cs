@@ -182,14 +182,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (!(Playfield is ScrollingPlayfield))
-                throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
-        }
-
         /// <summary>
         /// Adjusts the scroll speed of <see cref="HitObject"/>s.
         /// </summary>
