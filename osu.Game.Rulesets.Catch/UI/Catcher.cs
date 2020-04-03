@@ -384,7 +384,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             currentCatcher.Show();
-            (currentCatcher.Drawable as IAnimation)?.GotoFrame(0);
+            (currentCatcher.Drawable as IFramedAnimation)?.GotoFrame(0);
         }
 
         private void beginTrail()
