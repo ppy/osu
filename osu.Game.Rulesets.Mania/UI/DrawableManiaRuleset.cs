@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
@@ -25,6 +26,16 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
+        /// <summary>
+        /// The minimum time range. This occurs at a <see cref="relativeTimeRange"/> of 40.
+        /// </summary>
+        public const double MIN_TIME_RANGE = 150;
+
+        /// <summary>
+        /// The maximum time range. This occurs at a <see cref="relativeTimeRange"/> of 1.
+        /// </summary>
+        public const double MAX_TIME_RANGE = 6000;
+
         protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
@@ -52,6 +63,17 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, TimeRange);
+        }
+
+        protected override void AdjustScrollSpeed(int amount)
+        {
+            this.TransformTo(nameof(relativeTimeRange), relativeTimeRange + amount, 200, Easing.OutQuint);
+        }
+
+        private double relativeTimeRange
+        {
+            get => MAX_TIME_RANGE / TimeRange.Value;
+            set => TimeRange.Value = MAX_TIME_RANGE / value;
         }
 
         /// <summary>
