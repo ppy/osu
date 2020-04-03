@@ -8,6 +8,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -57,6 +58,18 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            bool isForCurrentRuleset = Beatmap.BeatmapInfo.Ruleset.Equals(Ruleset.RulesetInfo);
+
+            foreach (var p in ControlPoints)
+            {
+                // Mania doesn't care about global velocity
+                p.Velocity = 1;
+
+                // For non-mania beatmap, speed changes should only happen through timing points
+                if (!isForCurrentRuleset)
+                    p.DifficultyPoint = new DifficultyControlPoint();
+            }
+
             BarLines.ForEach(Playfield.Add);
 
             Config.BindWith(ManiaRulesetSetting.ScrollDirection, configDirection);

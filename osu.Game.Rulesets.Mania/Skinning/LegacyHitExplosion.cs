@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             // This animation is discarded and re-queried with the appropriate frame length afterwards.
             var tmp = skin.GetAnimation(imageName, true, false);
             double frameLength = 0;
-            if (tmp is IAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
+            if (tmp is IFramedAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
                 frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
 
             explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true, frameLength: frameLength).With(d =>
