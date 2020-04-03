@@ -327,3 +327,11 @@
     *   [m] [Fix crash caused by user json order changing #8566]
     *   [m] [Fix weird slider ball sizing #8568]
     *   [m] [Update framework #8570]
+
+### 2020/04/03
+*   合并上游分支
+    *   [m] [Fix hold note animation not being reset #8564]
+    *   [m] [Expand mania to fit vertical screen bounds #8563]
+    *   [m] [Add skinning support for column line colour #8565]
+    *   [m] [Implement mania normal-note hit-explosion skinning #8556]
+    *   [m] [Fix GetDecoder getting fallback decoder too often #8584]

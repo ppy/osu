@@ -73,7 +73,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                    handleColours(output, line);
+                    HandleColours(output, line);
                     return;
             }
         }
@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        private void handleColours(T output, string line)
+        protected void HandleColours<TModel>(TModel output, string line)
         {
             var pair = SplitKeyVal(line);
 
