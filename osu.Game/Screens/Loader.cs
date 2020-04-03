@@ -126,13 +126,13 @@ namespace osu.Game.Screens
             if (spinner.State.Value == Visibility.Visible)
             {
                 spinner.Hide();
-                logoContainer.FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
-                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION);
+                logoContainer.Delay(1000).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + 1000);
             }
             else
             {
-                logoContainer.FadeTo(1).Then().Delay(500).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
-                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + 500);
+                logoContainer.FadeTo(1).Then().Delay(1000).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + 1000);
             }
         }
 
