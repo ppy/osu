@@ -69,6 +69,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             if (!(sprite is TextureAnimation animation))
                 return;
 
+            animation.GotoFrame(0);
             animation.IsPlaying = isHitting.NewValue;
         }
 

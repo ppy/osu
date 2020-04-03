@@ -173,8 +173,27 @@ namespace osu.Game.Users
             public int Available;
         }
 
+        private UserStatistics statistics;
+
         [JsonProperty(@"statistics")]
-        public UserStatistics Statistics;
+        public UserStatistics Statistics
+        {
+            get => statistics ??= new UserStatistics();
+            set
+            {
+                if (statistics != null)
+                    // we may already have rank history populated
+                    value.RankHistory = statistics.RankHistory;
+
+                statistics = value;
+            }
+        }
+
+        [JsonProperty(@"rankHistory")]
+        private RankHistoryData rankHistory
+        {
+            set => statistics.RankHistory = value;
+        }
 
         public class RankHistoryData
         {
@@ -183,12 +202,6 @@ namespace osu.Game.Users
 
             [JsonProperty(@"data")]
             public int[] Data;
-        }
-
-        [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]
@@ -247,6 +260,7 @@ namespace osu.Game.Users
             [Description("触摸屏")]
             Touch,
         }
+
         public bool Equals(User other)
         {
             if (ReferenceEquals(null, other)) return false;
