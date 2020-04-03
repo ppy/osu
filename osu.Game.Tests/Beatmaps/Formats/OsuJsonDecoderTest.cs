@@ -137,15 +137,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
 
-                using (var ms = new MemoryStream())
-                using (var sw = new StreamWriter(ms))
-                using (var sr2 = new LineBufferedReader(ms))
+                using (var memStream = new MemoryStream())
+                using (var memWriter = new StreamWriter(memStream))
+                using (var memReader = new LineBufferedReader(memStream))
                 {
-                    sw.Write(legacyDecoded.Serialize());
-                    sw.Flush();
+                    memWriter.Write(legacyDecoded.Serialize());
+                    memWriter.Flush();
 
-                    ms.Position = 0;
-                    decoder = Decoder.GetDecoder<Beatmap>(sr2);
+                    memStream.Position = 0;
+                    decoder = Decoder.GetDecoder<Beatmap>(memReader);
                 }
             }
 
