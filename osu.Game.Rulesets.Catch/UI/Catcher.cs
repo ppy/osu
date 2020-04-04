@@ -392,7 +392,7 @@ namespace osu.Game.Rulesets.Catch.UI
             base.SkinChanged(skin, allowFallback);
 
             hyperDashColour = skin.GetHyperDashCatcherColour()?.Value ?? DefaultHyperDashColour;
-            hyperDashEndGlowColour = skin.GetHyperDashEndGlowColour()?.Value ?? DefaultHyperDashColour;
+            hyperDashEndGlowColour = skin.GetHyperDashCatcherAfterImageColour()?.Value ?? DefaultHyperDashColour;
             updateCatcherColour(HyperDashing);
         }
 

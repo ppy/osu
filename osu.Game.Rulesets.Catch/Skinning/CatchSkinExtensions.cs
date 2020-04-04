@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
         public static IBindable<Color4> GetHyperDashCatcherColour(this ISkin skin)
             => skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash);
 
-        public static IBindable<Color4> GetHyperDashEndGlowColour(this ISkin skin)
+        public static IBindable<Color4> GetHyperDashCatcherAfterImageColour(this ISkin skin)
             => skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage) ??
                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash);
 
