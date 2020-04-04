@@ -9,6 +9,13 @@ namespace osu.Game.Rulesets.Catch.Skinning
 {
     internal static class CatchSkinExtensions
     {
+        public static IBindable<Color4> GetHyperDashCatcherColour(this ISkin skin)
+            => skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash);
+
+        public static IBindable<Color4> GetHyperDashEndGlowColour(this ISkin skin)
+            => skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage) ??
+               skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash);
+
         public static IBindable<Color4> GetHyperDashFruitColour(this ISkin skin)
             => skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit) ??
                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash);
