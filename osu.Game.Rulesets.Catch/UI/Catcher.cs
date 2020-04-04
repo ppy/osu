@@ -294,7 +294,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 this.FadeTo(1f, hyper_dash_transition_length, Easing.OutQuint);
             }
 
-            // update hyper-dash colour of the hyper-dashing catcher sprites containers.
             hyperDashTrails?.FadeColour(hyperDashColour, hyper_dash_transition_length, Easing.OutQuint);
             endGlowSprites?.FadeColour(hyperDashEndGlowColour, hyper_dash_transition_length, Easing.OutQuint);
         }
