@@ -132,6 +132,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                                 return SkinUtils.As<TValue>(new BindableFloat(LEGACY_CIRCLE_RADIUS));
 
                             break;
+
+                        case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
+                            // Quote from https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
+                            // Old command: HitCircleOverlayAboveNumer (with typo) still works for legacy support
+                            var rv = source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber);
+                            return rv ?? source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
                     }
 
                     break;

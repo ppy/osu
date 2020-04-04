@@ -62,9 +62,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 }
             };
 
-            bool? numberSetting = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value;
-            bool? numerSetting = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumer)?.Value;
-            bool overlayAboveNumber = numberSetting ?? numerSetting ?? true;
+            bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
             if (!overlayAboveNumber)
                 ChangeInternalChildDepth(hitCircleText, -float.MaxValue);
