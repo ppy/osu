@@ -47,10 +47,10 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
-        private double lastHitTime;
+        private int hitObjectCounter = 0;
+        private int breakCounter = 0;
 
         private bool applyDrain;
-        private bool firstObjectIsHit;
 
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
@@ -71,14 +71,6 @@ namespace osu.Game.Rulesets.Scoring
 
             // drain is on - check if a break is starting; if yes, disable and early-return
             if (IsBreakTime.Value)
-            {
-                applyDrain = false;
-                return;
-            }
-
-            // Bandaid Fix for pre-break HP drain
-            // Checks if the first object is Hit. After that, checks if the difference between Current time and lastHitTime exceeds 600ms
-            if (firstObjectIsHit && (Time.Current - lastHitTime) > 600)
             {
                 applyDrain = false;
                 return;
@@ -108,8 +100,16 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
             healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
-            lastHitTime = result.HitObject.GetEndTime();
-            firstObjectIsHit = true;
+
+            if (beatmap.HitObjects[hitObjectCounter + 1].StartTime >= beatmap.Breaks[breakCounter].EndTime)
+            {
+                applyDrain = false;
+                breakCounter++;
+                hitObjectCounter++;
+                return;
+            }
+
+            hitObjectCounter++;
             applyDrain = true;
         }
 
