@@ -21,7 +21,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected override double LoadDelay => 250;
 
-        public TopLocalRank(BeatmapInfo beatmap) : base(null)
+        public TopLocalRank(BeatmapInfo beatmap)
+            : base(null)
         {
             this.beatmap = beatmap;
         }
