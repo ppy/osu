@@ -86,14 +86,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             setSnaking(true);
             base.SetUpSteps();
 
-            addSeekStep(13500);
+            addSeekStep(16500);
             AddStep("retrieve 2nd slider repeat", () =>
             {
                 var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.Skip(1).First();
                 repeat = drawable.ChildrenOfType<Container<DrawableSliderRepeat>>().First().Children.First();
             });
             AddStep("Save repeat vector", () => savedVector = repeat.Position);
-            addSeekStep(13700);
+            addSeekStep(16700);
 
             AddAssert($"Repeat vector {(isHit ? "is same" : "decreased")}", () =>
             {
