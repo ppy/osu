@@ -136,8 +136,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
                             // Quote from https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
                             // Old command: HitCircleOverlayAboveNumer (with typo) still works for legacy support
-                            var rv = source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber);
-                            return rv ?? source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
+                            return source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ?? source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);                       
                     }
 
                     break;
