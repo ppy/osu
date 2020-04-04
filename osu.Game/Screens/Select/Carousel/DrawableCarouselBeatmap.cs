@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -129,9 +130,10 @@ namespace osu.Game.Screens.Select.Carousel
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new CarouselBeatmapRank(beatmap)
+                                        new TopLocalRank(beatmap)
                                         {
-                                            Scale = new Vector2(0.8f)
+                                            Scale = new Vector2(0.8f),
+                                            Size = new Vector2(40, 20)
                                         },
                                         starCounter = new StarCounter
                                         {
