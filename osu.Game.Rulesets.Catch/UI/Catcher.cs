@@ -65,9 +65,14 @@ namespace osu.Game.Rulesets.Catch.UI
         public CatcherAnimationState CurrentState { get; private set; }
 
         /// <summary>
+        /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
+        /// </summary>
+        private const float allowed_catch_range = 0.8f;
+
+        /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        internal float CatchWidth => CatcherArea.CATCHER_SIZE * Math.Abs(Scale.X);
+        internal float CatchWidth => CatcherArea.CATCHER_SIZE * Math.Abs(Scale.X) * allowed_catch_range;
 
         protected bool Dashing
         {
@@ -171,14 +176,14 @@ namespace osu.Game.Rulesets.Catch.UI
             var ourRadius = fruit.DisplayRadius;
             float theirRadius = 0;
 
-            const float allowance = 6;
+            const float allowance = 10;
 
             while (caughtFruit.Any(f =>
                 f.LifetimeEnd == double.MaxValue &&
                 Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = f.DrawSize.X / 2 * f.Scale.X)) / (allowance / 2)))
             {
                 var diff = (ourRadius + theirRadius) / allowance;
-                fruit.X += (RNG.NextSingle() - 0.5f) * 2 * diff;
+                fruit.X += (RNG.NextSingle() - 0.5f) * diff * 2;
                 fruit.Y -= RNG.NextSingle() * diff;
             }
 
@@ -384,8 +389,8 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.SkinChanged(skin, allowFallback);
 
-            hyperDashColour = skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDash)?.Value ?? DefaultHyperDashColour;
-            hyperDashEndGlowColour = skin.GetConfig<CatchSkinConfiguration, Color4>(CatchSkinConfiguration.HyperDashAfterImage)?.Value ?? hyperDashColour;
+            hyperDashColour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ?? DefaultHyperDashColour;
+            hyperDashEndGlowColour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashColour;
             updateCatcherColour();
         }
 
@@ -431,7 +436,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             currentCatcher.Show();
-            (currentCatcher.Drawable as IAnimation)?.GotoFrame(0);
+            (currentCatcher.Drawable as IFramedAnimation)?.GotoFrame(0);
         }
 
         private void beginTrail()

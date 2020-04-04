@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,8 +19,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public class LegacyMainCirclePiece : CompositeDrawable
     {
-        public LegacyMainCirclePiece()
+        private readonly string priorityLookup;
+
+        public LegacyMainCirclePiece(string priorityLookup = null)
         {
+            this.priorityLookup = priorityLookup;
+
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
@@ -39,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 hitCircleSprite = new Sprite
                 {
-                    Texture = skin.GetTexture("hitcircle"),
+                    Texture = getTextureWithFallback(string.Empty),
                     Colour = drawableObject.AccentColour.Value,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -51,11 +56,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 }, confineMode: ConfineMode.NoScaling),
                 new Sprite
                 {
-                    Texture = skin.GetTexture("hitcircleoverlay"),
+                    Texture = getTextureWithFallback("overlay"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 }
             };
+
+            bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
+
+            if (!overlayAboveNumber)
+                ChangeInternalChildDepth(hitCircleText, -float.MaxValue);
 
             state.BindTo(drawableObject.State);
             state.BindValueChanged(updateState, true);
@@ -65,6 +75,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
             indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+
+            Texture getTextureWithFallback(string name)
+            {
+                Texture tex = null;
+
+                if (!string.IsNullOrEmpty(priorityLookup))
+                    tex = skin.GetTexture($"{priorityLookup}{name}");
+
+                return tex ?? skin.GetTexture($"hitcircle{name}");
+            }
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)
