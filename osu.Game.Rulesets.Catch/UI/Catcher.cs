@@ -42,25 +42,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private Container<CatcherTrailSprite> hyperDashTrails;
         private Container<CatcherTrailSprite> endGlowSprites;
 
-        public Container AdditiveTarget
-        {
-            get => additiveTarget;
-            set
-            {
-                if (additiveTarget == value)
-                    return;
-
-                additiveTarget?.RemoveRange(new[] { dashTrails, hyperDashTrails, endGlowSprites });
-
-                additiveTarget = value;
-                additiveTarget?.AddRange(new[]
-                {
-                    dashTrails ??= new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Color4.White },
-                    hyperDashTrails ??= new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = hyperDashColour },
-                    endGlowSprites ??= new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = hyperDashEndGlowColour },
-                });
-            }
-        }
 
         public CatcherAnimationState CurrentState { get; private set; }
 
@@ -165,6 +146,26 @@ namespace osu.Game.Rulesets.Catch.UI
             };
 
             updateCatcher();
+        }
+
+        /// <summary>
+        /// Sets container target to provide catcher additive trails content in.
+        /// </summary>
+        /// <param name="target">The container to add catcher trails in.</param>
+        public void SetAdditiveTarget(Container target)
+        {
+            if (additiveTarget == target)
+                return;
+
+            additiveTarget?.RemoveRange(new[] { dashTrails, hyperDashTrails, endGlowSprites });
+
+            additiveTarget = target;
+            additiveTarget?.AddRange(new[]
+            {
+                dashTrails ??= new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Color4.White },
+                hyperDashTrails ??= new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = hyperDashColour },
+                endGlowSprites ??= new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = hyperDashEndGlowColour },
+            });
         }
 
         /// <summary>
