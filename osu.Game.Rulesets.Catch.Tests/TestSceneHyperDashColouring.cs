@@ -106,44 +106,23 @@ namespace osu.Game.Rulesets.Catch.Tests
         private bool checkLegacyFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour) =>
             fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Sprite>().Any(c => c.Colour == expectedColour);
 
-        private class TestSkin : ISkin
+        private class TestSkin : LegacySkin
         {
             public static Color4 CustomHyperDashColour { get; } = Color4.Goldenrod;
             public static Color4 CustomHyperDashFruitColour { get; } = Color4.Cyan;
             public static Color4 CustomHyperDashAfterColour { get; } = Color4.Lime;
 
-            private readonly bool customCatcherColour;
-            private readonly bool customAfterColour;
-            private readonly bool customFruitColour;
-
             public TestSkin(bool customCatcherColour, bool customAfterColour, bool customFruitColour)
+                : base(new SkinInfo(), null, null, string.Empty)
             {
-                this.customCatcherColour = customCatcherColour;
-                this.customAfterColour = customAfterColour;
-                this.customFruitColour = customFruitColour;
-            }
+                if (customCatcherColour)
+                    Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()] = CustomHyperDashColour;
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => null;
+                if (customAfterColour)
+                    Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()] = CustomHyperDashAfterColour;
 
-            public Texture GetTexture(string componentName) => null;
-
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
-
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
-            {
-                if (lookup is CatchSkinColour config)
-                {
-                    if (config == CatchSkinColour.HyperDash && customCatcherColour)
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashColour));
-
-                    if (config == CatchSkinColour.HyperDashFruit && customFruitColour)
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashFruitColour));
-
-                    if (config == CatchSkinColour.HyperDashAfterImage && customAfterColour)
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashAfterColour));
-                }
-
-                return null;
+                if (customFruitColour)
+                    Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()] = CustomHyperDashFruitColour;
             }
         }
     }
