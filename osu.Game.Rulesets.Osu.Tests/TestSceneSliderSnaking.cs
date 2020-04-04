@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -38,6 +40,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly Bindable<bool> snakingIn = new Bindable<bool>();
         private readonly Bindable<bool> snakingOut = new Bindable<bool>();
 
+        private const double duration_of_span = 3605;
+        private const double fade_in_modifier = -1200;
+
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
             var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
@@ -55,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private DrawableSlider slider;
         private DrawableSliderRepeat repeat;
-        private Vector2 vector;
+        private Vector2 savedVector;
 
         [SetUpSteps]
         public override void SetUpSteps() { }
@@ -67,25 +72,18 @@ namespace osu.Game.Rulesets.Osu.Tests
             base.SetUpSteps();
             AddUntilStep("wait for track to start running", () => track.IsRunning);
 
-            AddStep("retrieve 1st slider", () => slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.First());
-            testLinear(true);
-            testLinear(false);
-            AddStep("retrieve 2nd slider", () => slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.Skip(1).First());
-            testRepeating(true);
-            testRepeating(false);
-            AddStep("retrieve 3rd slider", () => slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.Skip(2).First());
-            testDoubleRepeating(true);
-            testDoubleRepeating(false);
+            for (int i = 0; i < 3; i++)
+            {
+                testSlider(i, true);
+                testSlider(i, false);
+            }
         }
 
         [TestCase(true)]
         [TestCase(false)]
         public void TestArrowStays(bool isHit)
         {
-            var isSame = isHit ? "is same" : "decreased";
-            var enable = isHit ? "enable" : "disable";
-
-            AddStep($"{enable} autoplay", () => autoplay = isHit);
+            AddStep($"{(isHit ? "enable" : "disable")} autoplay", () => autoplay = isHit);
             setSnaking(true);
             base.SetUpSteps();
 
@@ -95,154 +93,67 @@ namespace osu.Game.Rulesets.Osu.Tests
                 var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.Skip(1).First();
                 repeat = drawable.ChildrenOfType<Container<DrawableSliderRepeat>>().First().Children.First();
             });
-            AddStep("Save repeat vector", () => vector = repeat.Position);
+            AddStep("Save repeat vector", () => savedVector = repeat.Position);
             addSeekStep(13700);
-            AddAssert($"Repeat vector {isSame}", () => isHit ? Precision.AlmostEquals(vector.X, repeat.X, 1) && Precision.AlmostEquals(vector.Y, repeat.Y, 1) : repeat.X < vector.X && repeat.Y < vector.Y);
+            // Precision.AlmostEquals is used because repeat might have a chance to update its position depending on where in the frame its hit
+            AddAssert($"Repeat vector {(isHit ? "is same" : "decreased")}", () => isHit ? Precision.AlmostEquals(savedVector.X, repeat.X, 1) && Precision.AlmostEquals(savedVector.Y, repeat.Y, 1) : repeat.X < savedVector.X && repeat.Y < savedVector.Y);
         }
 
-        private void testLinear(bool snaking)
+        private void testSlider(int index, bool snaking)
         {
-            var increased = snaking ? "increased" : "is same";
-
+            double startTime = index * 10000 + 3000;
+            int repeats = index;
+            AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
+            {
+                slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.Skip(index).First();
+            });
             setSnaking(snaking);
-            addSeekStep(1800);
-            AddStep("Save end vector", () =>
+            testSnakingIn(startTime + fade_in_modifier, snaking);
+            for (int i = 0; i < repeats + 1; i++)
             {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.Last();
-            });
-            addSeekStep(1900);
-            AddAssert($"End vector {increased}", () =>
+                testSnakingOut(startTime + 100 + duration_of_span * i, snaking && i == repeats, i%2 == 1);
+            }
+        }
+
+        private void testSnakingIn(double startTime, bool isSnakingExpected)
+        {
+            addSeekStep(startTime);
+            AddStep("Save end vector", () => savedVector = getCurrentSliderVector(true));
+            addSeekStep(startTime + 100);
+            AddAssert($"End vector increased", () =>
             {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var last = body.CurrentCurve.Last();
-                return snaking ? last.X > vector.X && last.Y > vector.Y : last == vector;
-            });
-            addSeekStep(3100);
-            AddStep("Save start vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.First();
-            });
-            addSeekStep(3200);
-            AddAssert($"Start vector {increased}", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var first = body.CurrentCurve.First();
-                return snaking ? first.X > vector.X && first.Y > vector.Y : first == vector;
+                var currentVector = getCurrentSliderVector(true);
+                return isSnakingExpected ? currentVector.X > savedVector.X && currentVector.Y > savedVector.Y : currentVector == savedVector;
             });
         }
 
-        private void testRepeating(bool snaking)
+        private void testSnakingOut(double startTime, bool isSnakingExpected, bool testSliderEnd)
         {
-            var increased = snaking ? "increased" : "is same";
-            var decreased = snaking ? "decreased" : "is same";
-
-            setSnaking(snaking);
-            addSeekStep(8800);
-            AddStep("Save end vector", () =>
+            addSeekStep(startTime);
+            AddStep($"Save {(testSliderEnd ? "end" : "start")} vector", () => savedVector = getCurrentSliderVector(testSliderEnd));
+            addSeekStep(startTime + 100);
+            AddAssert($"{(testSliderEnd ? "End" : "Start")} vector {(isSnakingExpected ? (testSliderEnd ? "decreased" : "increased") : "is same")}", () =>
             {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.Last();
-            });
-            addSeekStep(8900);
-            AddAssert($"End vector {increased}", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var last = body.CurrentCurve.Last();
-                return snaking ? last.X > vector.X && last.Y > vector.Y : last == vector;
-            });
-            addSeekStep(10100);
-            AddStep("Save start vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.First();
-            });
-            addSeekStep(10200);
-            AddAssert("Start vector is same", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var first = body.CurrentCurve.First();
-                return first == vector;
-            });
-            addSeekStep(13700);
-            AddStep("Save end vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.Last();
-            });
-            addSeekStep(13800);
-            AddAssert($"End vector {decreased}", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var last = body.CurrentCurve.Last();
-                return snaking ? last.X < vector.X && last.Y < vector.Y : last == vector;
+                var currentVector = getCurrentSliderVector(testSliderEnd);
+                bool check(Vector2 a, Vector2 b)
+                {
+                    if (testSliderEnd)
+                        return a.X < b.X && a.Y < b.Y;
+                    return a.X > b.X && a.Y > b.Y;
+                }
+                return isSnakingExpected ? check(currentVector, savedVector) : currentVector == savedVector;
             });
         }
 
-        private void testDoubleRepeating(bool snaking)
+        private Vector2 getCurrentSliderVector(bool getEndOne)
         {
-            var increased = snaking ? "increased" : "is same";
-
-            setSnaking(snaking);
-            addSeekStep(18800);
-            AddStep("Save end vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.Last();
-            });
-            addSeekStep(18900);
-            AddAssert($"End vector {increased}", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var last = body.CurrentCurve.Last();
-                return snaking ? last.X > vector.X && last.Y > vector.Y : last == vector;
-            });
-            addSeekStep(20100);
-            AddStep("Save start vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.First();
-            });
-            addSeekStep(20200);
-            AddAssert("Start vector is same", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var first = body.CurrentCurve.First();
-                return first == vector;
-            });
-            addSeekStep(23700);
-            AddStep("Save end vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.Last();
-            });
-            addSeekStep(23800);
-            AddAssert("End vector is same", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var last = body.CurrentCurve.Last();
-                return last == vector;
-            });
-            addSeekStep(27300);
-            AddStep("Save start vector", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                vector = body.CurrentCurve.First();
-            });
-            addSeekStep(27400);
-            AddAssert($"Start vector {increased}", () =>
-            {
-                var body = (PlaySliderBody)slider.Body.Drawable;
-                var first = body.CurrentCurve.First();
-                return snaking ? first.X > vector.X && first.Y > vector.Y : first == vector;
-            });
+            var body = (PlaySliderBody)slider.Body.Drawable;
+            return getEndOne ? body.CurrentCurve.Last() : body.CurrentCurve.First();
         }
 
         private void setSnaking(bool value)
         {
-            var text = value ? "Enable" : "Disable";
-            AddStep($"{text} snaking", () =>
+            AddStep($"{(value ? "Enable" : "Disable")} snaking", () =>
             {
                 snakingIn.Value = value;
                 snakingOut.Value = value;
@@ -272,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 new Slider
                 {
-                    StartTime = 10000,
+                    StartTime = 13000,
                     Position = new Vector2(100, 100),
                     Path = new SliderPath(PathType.PerfectCurve, new[]
                     {
@@ -284,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 new Slider
                 {
-                    StartTime = 20000,
+                    StartTime = 23000,
                     Position = new Vector2(100, 100),
                     Path = new SliderPath(PathType.PerfectCurve, new[]
                     {
@@ -296,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 new HitCircle
                 {
-                    StartTime = 99999,
+                    StartTime = 199999,
                 }
             }
         };
