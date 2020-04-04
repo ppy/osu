@@ -389,9 +389,9 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.SkinChanged(skin, allowFallback);
 
-            hyperDashColour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ?? DefaultHyperDashColour;
-            hyperDashEndGlowColour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashColour;
             updateCatcherColour();
+            hyperDashColour = skin.GetHyperDashCatcherColour()?.Value ?? DefaultHyperDashColour;
+            hyperDashEndGlowColour = skin.GetHyperDashEndGlowColour()?.Value ?? DefaultHyperDashColour;
         }
 
         protected override void Update()
