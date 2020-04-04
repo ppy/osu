@@ -254,7 +254,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashDirection = 0;
 
                 if (wasHyperDashing)
+                {
+                    updateCatcherColour(false);
                     Trail &= Dashing;
+                }
             }
             else
             {
@@ -264,6 +267,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!wasHyperDashing)
                 {
+                    updateCatcherColour(true);
                     Trail = true;
 
                     var hyperDashEndGlow = createAdditiveSprite(endGlowSprites);
@@ -273,15 +277,13 @@ namespace osu.Game.Rulesets.Catch.UI
                     hyperDashEndGlow.Expire(true);
                 }
             }
-
-            updateCatcherColour();
         }
 
-        private void updateCatcherColour()
+        private void updateCatcherColour(bool hyperDashing)
         {
             const float hyper_dash_transition_length = 180;
 
-            if (HyperDashing)
+            if (hyperDashing)
             {
                 this.FadeColour(hyperDashColour == DefaultHyperDashColour ? Color4.OrangeRed : hyperDashColour, hyper_dash_transition_length, Easing.OutQuint);
                 this.FadeTo(0.2f, hyper_dash_transition_length, Easing.OutQuint);
@@ -389,9 +391,9 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.SkinChanged(skin, allowFallback);
 
-            updateCatcherColour();
             hyperDashColour = skin.GetHyperDashCatcherColour()?.Value ?? DefaultHyperDashColour;
             hyperDashEndGlowColour = skin.GetHyperDashEndGlowColour()?.Value ?? DefaultHyperDashColour;
+            updateCatcherColour(HyperDashing);
         }
 
         protected override void Update()
