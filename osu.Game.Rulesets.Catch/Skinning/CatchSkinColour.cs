@@ -6,12 +6,12 @@ namespace osu.Game.Rulesets.Catch.Skinning
     public enum CatchSkinColour
     {
         /// <summary>
-        /// The colour to be used for the catcher while on hyper-dashing state.
+        /// The colour to be used for the catcher while in hyper-dashing state.
         /// </summary>
         HyperDash,
 
         /// <summary>
-        /// The colour to be used for hyper-dash fruits.
+        /// The colour to be used for fruits that grant the catcher the ability to hyper-dash.
         /// </summary>
         HyperDashFruit,
 
