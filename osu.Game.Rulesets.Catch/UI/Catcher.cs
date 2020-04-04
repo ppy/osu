@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private Container<CatcherTrailSprite> hyperDashTrails;
         private Container<CatcherTrailSprite> endGlowSprites;
 
-
         public CatcherAnimationState CurrentState { get; private set; }
 
         /// <summary>
