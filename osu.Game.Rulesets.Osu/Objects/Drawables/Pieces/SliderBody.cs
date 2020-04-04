@@ -1,28 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Primitives;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public abstract class SliderBody : CompositeDrawable
     {
-        private readonly SliderPath path;
+        private DrawableSliderPath path;
+
         protected Path Path => path;
 
-        private readonly BufferedContainer container;
-
-        public float PathWidth
+        public virtual float PathRadius
         {
-            get => path.PathWidth;
-            set => path.PathWidth = value;
+            get => path.PathRadius;
+            set => path.PathRadius = value;
         }
 
         /// <summary>
@@ -40,9 +38,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (path.AccentColour == value)
                     return;
-                path.AccentColour = value;
 
-                container.ForceRedraw();
+                path.AccentColour = value;
             }
         }
 
@@ -56,24 +53,45 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (path.BorderColour == value)
                     return;
-                path.BorderColour = value;
 
-                container.ForceRedraw();
+                path.BorderColour = value;
             }
         }
 
-        public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
+        /// <summary>
+        /// Used to size the path border.
+        /// </summary>
+        public float BorderSize
+        {
+            get => path.BorderSize;
+            set
+            {
+                if (path.BorderSize == value)
+                    return;
+
+                path.BorderSize = value;
+            }
+        }
 
         protected SliderBody()
         {
-            InternalChild = container = new BufferedContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                CacheDrawnFrameBuffer = true,
-                Child = path = new SliderPath { Blending = BlendingMode.None }
-            };
+            RecyclePath();
+        }
 
-            container.Attach(RenderbufferInternalFormat.DepthComponent16);
+        /// <summary>
+        /// Initialises a new <see cref="DrawableSliderPath"/>, releasing all resources retained by the old one.
+        /// </summary>
+        public virtual void RecyclePath()
+        {
+            InternalChild = path = CreateSliderPath().With(p =>
+            {
+                p.Position = path?.Position ?? Vector2.Zero;
+                p.PathRadius = path?.PathRadius ?? 10;
+                p.AccentColour = path?.AccentColour ?? Color4.White;
+                p.BorderColour = path?.BorderColour ?? Color4.White;
+                p.BorderSize = path?.BorderSize ?? 1;
+                p.Vertices = path?.Vertices ?? Array.Empty<Vector2>();
+            });
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => path.ReceivePositionalInputAt(screenSpacePos);
@@ -82,57 +100,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// Sets the vertices of the path which should be drawn by this <see cref="SliderBody"/>.
         /// </summary>
         /// <param name="vertices">The vertices</param>
-        protected void SetVertices(IReadOnlyList<Vector2> vertices)
-        {
-            path.Vertices = vertices;
-            container.ForceRedraw();
-        }
+        protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
 
-        private class SliderPath : SmoothPath
-        {
-            private const float border_portion = 0.128f;
-            private const float gradient_portion = 1 - border_portion;
+        protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
 
+        private class DefaultDrawableSliderPath : DrawableSliderPath
+        {
             private const float opacity_at_centre = 0.3f;
             private const float opacity_at_edge = 0.8f;
 
-            private Color4 borderColour = Color4.White;
-
-            public Color4 BorderColour
-            {
-                get => borderColour;
-                set
-                {
-                    if (borderColour == value)
-                        return;
-                    borderColour = value;
-
-                    InvalidateTexture();
-                }
-            }
-
-            private Color4 accentColour = Color4.White;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    if (accentColour == value)
-                        return;
-                    accentColour = value;
-
-                    InvalidateTexture();
-                }
-            }
-
             protected override Color4 ColourAt(float position)
             {
-                if (position <= border_portion)
+                if (CalculatedBorderPortion != 0f && position <= CalculatedBorderPortion)
                     return BorderColour;
 
-                position -= border_portion;
-                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
+                position -= CalculatedBorderPortion;
+                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / GRADIENT_PORTION) * AccentColour.A);
             }
         }
     }

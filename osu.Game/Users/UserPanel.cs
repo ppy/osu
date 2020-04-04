@@ -3,10 +3,8 @@
 
 using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,188 +14,85 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Profile.Header;
+using osu.Game.Users.Drawables;
+using JetBrains.Annotations;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Users
 {
-    public class UserPanel : OsuClickableContainer, IHasContextMenu
+    public abstract class UserPanel : OsuClickableContainer, IHasContextMenu
     {
-        private readonly User user;
-        private const float height = 100;
-        private const float content_padding = 10;
-        private const float status_height = 30;
-
-        private Container statusBar;
-        private Box statusBg;
-        private OsuSpriteText statusMessage;
-
-        private Container content;
-        protected override Container<Drawable> Content => content;
+        public readonly User User;
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
+        public readonly IBindable<UserActivity> Activity = new Bindable<UserActivity>();
+
         public new Action Action;
 
-        protected Action ViewProfile;
+        protected Action ViewProfile { get; private set; }
 
-        public UserPanel(User user)
+        protected DelayedLoadUnloadWrapper Background { get; private set; }
+
+        protected TextFlowContainer LastVisitMessage { get; private set; }
+
+        private SpriteIcon statusIcon;
+        private OsuSpriteText statusMessage;
+
+        protected UserPanel(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            this.user = user;
-
-            Height = height - status_height;
+            User = user;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, UserProfileOverlay profile)
+        [Resolved(canBeNull: true)]
+        private UserProfileOverlay profileOverlay { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private OverlayColourProvider colourProvider { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            if (colours == null)
-                throw new ArgumentNullException(nameof(colours));
+            Masking = true;
+            BorderColour = colourProvider?.Light1 ?? colours.GreyVioletLighter;
 
-            FillFlowContainer infoContainer;
-
-            AddInternal(content = new Container
+            AddRange(new[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = 5,
-                EdgeEffect = new EdgeEffectParameters
+                new Box
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.25f),
-                    Radius = 4,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider?.Background5 ?? colours.Gray1
                 },
-
-                Children = new Drawable[]
+                Background = new DelayedLoadUnloadWrapper(() => new UserCoverBackground
                 {
-                    new DelayedLoadWrapper(new UserCoverBackground(user)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out)
-                    }, 300) { RelativeSizeAxes = Axes.Both },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.7f),
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Top = content_padding, Horizontal = content_padding },
-                        Children = new Drawable[]
-                        {
-                            new UpdateableAvatar
-                            {
-                                Size = new Vector2(height - status_height - content_padding * 2),
-                                User = user,
-                                Masking = true,
-                                CornerRadius = 5,
-                                OpenOnClick = { Value = false },
-                                EdgeEffect = new EdgeEffectParameters
-                                {
-                                    Type = EdgeEffectType.Shadow,
-                                    Colour = Color4.Black.Opacity(0.25f),
-                                    Radius = 4,
-                                },
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Left = height - status_height - content_padding },
-                                Children = new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Text = user.Username,
-                                        TextSize = 18,
-                                        Font = @"Exo2.0-SemiBoldItalic",
-                                    },
-                                    infoContainer = new FillFlowContainer
-                                    {
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        AutoSizeAxes = Axes.X,
-                                        Height = 20f,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(5f, 0f),
-                                        Children = new Drawable[]
-                                        {
-                                            new DrawableFlag(user.Country)
-                                            {
-                                                Width = 30f,
-                                                RelativeSizeAxes = Axes.Y,
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                    statusBar = new Container
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Alpha = 0f,
-                        Children = new Drawable[]
-                        {
-                            statusBg = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.5f,
-                            },
-                            new FillFlowContainer
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Spacing = new Vector2(5f, 0f),
-                                Children = new Drawable[]
-                                {
-                                    new SpriteIcon
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Icon = FontAwesome.fa_circle_o,
-                                        Shadow = true,
-                                        Size = new Vector2(14),
-                                    },
-                                    statusMessage = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Font = @"Exo2.0-Semibold",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    User = User,
+                }, 300, 5000)
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                CreateLayout()
             });
 
-            if (user.IsSupporter)
-            {
-                infoContainer.Add(new SupporterIcon
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 20f,
-                });
-            }
-
-            Status.ValueChanged += displayStatus;
-            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            Status.ValueChanged += status => displayStatus(status.NewValue, Activity.Value);
+            Activity.ValueChanged += activity => displayStatus(Status.Value, activity.NewValue);
 
             base.Action = ViewProfile = () =>
             {
                 Action?.Invoke();
-                profile?.ShowUser(user);
+                profileOverlay?.ShowUser(User);
             };
         }
 
@@ -205,26 +100,116 @@ namespace osu.Game.Users
         {
             base.LoadComplete();
             Status.TriggerChange();
+
+            // Colour should be applied immediately on first load.
+            statusIcon.FinishTransforms();
         }
 
-        private void displayStatus(UserStatus status)
+        protected override bool OnHover(HoverEvent e)
         {
-            const float transition_duration = 500;
+            BorderThickness = 2;
+            return base.OnHover(e);
+        }
 
-            if (status == null)
-            {
-                statusBar.ResizeHeightTo(0f, transition_duration, Easing.OutQuint);
-                statusBar.FadeOut(transition_duration, Easing.OutQuint);
-                this.ResizeHeightTo(height - status_height, transition_duration, Easing.OutQuint);
-            }
-            else
-            {
-                statusBar.ResizeHeightTo(status_height, transition_duration, Easing.OutQuint);
-                statusBar.FadeIn(transition_duration, Easing.OutQuint);
-                this.ResizeHeightTo(height, transition_duration, Easing.OutQuint);
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            BorderThickness = 0;
+            base.OnHoverLost(e);
+        }
 
+        [NotNull]
+        protected abstract Drawable CreateLayout();
+
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar
+        {
+            User = User,
+            OpenOnClick = { Value = false }
+        };
+
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
+        {
+            Size = new Vector2(39, 26)
+        };
+
+        protected OsuSpriteText CreateUsername() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+            Shadow = false,
+            Text = User.Username,
+        };
+
+        protected SpriteIcon CreateStatusIcon() => statusIcon = new SpriteIcon
+        {
+            Icon = FontAwesome.Regular.Circle,
+            Size = new Vector2(25)
+        };
+
+        protected FillFlowContainer CreateStatusMessage(bool rightAlignedChildren)
+        {
+            var statusContainer = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical
+            };
+
+            var alignment = rightAlignedChildren ? Anchor.CentreRight : Anchor.CentreLeft;
+
+            statusContainer.Add(LastVisitMessage = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)).With(text =>
+            {
+                text.Anchor = alignment;
+                text.Origin = alignment;
+                text.AutoSizeAxes = Axes.Both;
+                text.Alpha = 0;
+
+                if (User.LastVisit.HasValue)
+                {
+                    text.AddText(@"Last seen ");
+                    text.AddText(new DrawableDate(User.LastVisit.Value, italic: false)
+                    {
+                        Shadow = false
+                    });
+                }
+            }));
+
+            statusContainer.Add(statusMessage = new OsuSpriteText
+            {
+                Anchor = alignment,
+                Origin = alignment,
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold)
+            });
+
+            return statusContainer;
+        }
+
+        private void displayStatus(UserStatus status, UserActivity activity = null)
+        {
+            if (status != null)
+            {
+                LastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
+
+                // Set status message based on activity (if we have one) and status is not offline
+                if (activity != null && !(status is UserStatusOffline))
+                {
+                    statusMessage.Text = activity.Status;
+                    statusIcon.FadeColour(activity.GetAppropriateColour(colours), 500, Easing.OutQuint);
+                    return;
+                }
+
+                // Otherwise use only status
                 statusMessage.Text = status.Message;
+                statusIcon.FadeColour(status.GetAppropriateColour(colours), 500, Easing.OutQuint);
+
+                return;
             }
+
+            // Fallback to web status if local one is null
+            if (User.IsOnline)
+            {
+                Status.Value = new UserStatusOnline();
+                return;
+            }
+
+            Status.Value = new UserStatusOffline();
         }
 
         public MenuItem[] ContextMenuItems => new MenuItem[]

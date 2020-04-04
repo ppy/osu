@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -12,7 +12,7 @@ namespace osu.Game.Input
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.
     /// </summary>
-    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalInput
+    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalKeyboardInput
     {
         private readonly double timeToIdle;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Input
 
         public bool OnPressed(PlatformAction action) => updateLastInteractionTime();
 
-        public bool OnReleased(PlatformAction action) => updateLastInteractionTime();
+        public void OnReleased(PlatformAction action) => updateLastInteractionTime();
 
         protected override bool Handle(UIEvent e)
         {
@@ -62,6 +62,7 @@ namespace osu.Game.Input
                 case MouseUpEvent _:
                 case MouseMoveEvent _:
                     return updateLastInteractionTime();
+
                 default:
                     return base.Handle(e);
             }

@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -10,11 +10,11 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarMusicButton()
         {
-            Icon = FontAwesome.fa_music;
+            Icon = FontAwesome.Solid.Music;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MusicController music)
+        private void load(NowPlayingOverlay music)
         {
             StateContainer = music;
         }

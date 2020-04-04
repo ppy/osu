@@ -31,6 +31,7 @@ namespace osu.Game.Database
         protected void Dispose(bool disposing)
         {
             if (isDisposed) return;
+
             isDisposed = true;
 
             try

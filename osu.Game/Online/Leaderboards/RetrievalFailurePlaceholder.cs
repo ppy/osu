@@ -3,9 +3,10 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.Placeholders;
 using osuTK;
 
 namespace osu.Game.Online.Leaderboards
@@ -41,7 +42,7 @@ namespace osu.Game.Online.Leaderboards
                     Action = () => Action?.Invoke(),
                     Child = icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.fa_refresh,
+                        Icon = FontAwesome.Solid.Sync,
                         Size = new Vector2(TEXT_SIZE),
                         Shadow = true,
                     },
@@ -54,10 +55,10 @@ namespace osu.Game.Online.Leaderboards
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 icon.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
         }
     }

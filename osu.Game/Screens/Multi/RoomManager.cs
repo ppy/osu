@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
@@ -17,25 +20,52 @@ using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi
 {
-    public class RoomManager : PollingComponent, IRoomManager
+    public class RoomManager : CompositeDrawable, IRoomManager
     {
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
         public IBindableList<Room> Rooms => rooms;
 
-        private Room currentRoom;
+        public double TimeBetweenListingPolls
+        {
+            get => listingPollingComponent.TimeBetweenPolls;
+            set => listingPollingComponent.TimeBetweenPolls = value;
+        }
 
-        private FilterCriteria currentFilter = new FilterCriteria();
-
-        [Resolved]
-        private APIAccess api { get; set; }
+        public double TimeBetweenSelectionPolls
+        {
+            get => selectionPollingComponent.TimeBetweenPolls;
+            set => selectionPollingComponent.TimeBetweenPolls = value;
+        }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private Bindable<Room> selectedRoom { get; set; }
+
+        private readonly ListingPollingComponent listingPollingComponent;
+        private readonly SelectionPollingComponent selectionPollingComponent;
+
+        private Room joinedRoom;
+
+        public RoomManager()
+        {
+            RelativeSizeAxes = Axes.Both;
+
+            InternalChildren = new Drawable[]
+            {
+                listingPollingComponent = new ListingPollingComponent { RoomsReceived = onListingReceived },
+                selectionPollingComponent = new SelectionPollingComponent { RoomReceived = onSelectedRoomReceived }
+            };
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -45,17 +75,18 @@ namespace osu.Game.Screens.Multi
 
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
-            room.Host.Value = api.LocalUser;
+            room.Host.Value = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 
             req.Success += result =>
             {
+                joinedRoom = room;
+
                 update(room, result);
                 addRoom(room);
 
                 RoomsUpdated?.Invoke();
-
                 onSuccess?.Invoke(room);
             };
 
@@ -75,18 +106,18 @@ namespace osu.Game.Screens.Multi
         public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             currentJoinRoomRequest?.Cancel();
-            currentJoinRoomRequest = null;
-
             currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
+
             currentJoinRoomRequest.Success += () =>
             {
-                currentRoom = room;
+                joinedRoom = room;
                 onSuccess?.Invoke(room);
             };
 
             currentJoinRoomRequest.Failure += exception =>
             {
-                Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
+                if (!(exception is OperationCanceledException))
+                    Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
                 onError?.Invoke(exception.ToString());
             };
 
@@ -95,59 +126,61 @@ namespace osu.Game.Screens.Multi
 
         public void PartRoom()
         {
-            if (currentRoom == null)
+            currentJoinRoomRequest?.Cancel();
+
+            if (joinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(currentRoom, api.LocalUser.Value));
-            currentRoom = null;
+            api.Queue(new PartRoomRequest(joinedRoom, api.LocalUser.Value));
+            joinedRoom = null;
         }
 
-        public void Filter(FilterCriteria criteria)
+        /// <summary>
+        /// Invoked when the listing of all <see cref="Room"/>s is received from the server.
+        /// </summary>
+        /// <param name="listing">The listing.</param>
+        private void onListingReceived(List<Room> listing)
         {
-            currentFilter = criteria;
-            PollImmediately();
-        }
-
-        private GetRoomsRequest pollReq;
-
-        protected override Task Poll()
-        {
-            if (!api.IsLoggedIn)
-                return base.Poll();
-
-            var tcs = new TaskCompletionSource<bool>();
-
-            pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(currentFilter.PrimaryFilter);
-
-            pollReq.Success += result =>
+            // Remove past matches
+            foreach (var r in rooms.ToList())
             {
-                // Remove past matches
-                foreach (var r in rooms.ToList())
+                if (listing.All(e => e.RoomID.Value != r.RoomID.Value))
+                    rooms.Remove(r);
+            }
+
+            for (int i = 0; i < listing.Count; i++)
+            {
+                if (selectedRoom.Value?.RoomID?.Value == listing[i].RoomID.Value)
                 {
-                    if (result.All(e => e.RoomID.Value != r.RoomID.Value))
-                        rooms.Remove(r);
+                    // The listing request contains less data than the selection request, so data from the selection request is always preferred while the room is selected.
+                    continue;
                 }
 
-                for (int i = 0; i < result.Count; i++)
+                var r = listing[i];
+                r.Position.Value = i;
+
+                update(r, r);
+                addRoom(r);
+            }
+
+            RoomsUpdated?.Invoke();
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="Room"/> is received from the server.
+        /// </summary>
+        /// <param name="toUpdate">The received <see cref="Room"/>.</param>
+        private void onSelectedRoomReceived(Room toUpdate)
+        {
+            foreach (var room in rooms)
+            {
+                if (room.RoomID.Value == toUpdate.RoomID.Value)
                 {
-                    var r = result[i];
-                    r.Position = i;
-
-                    update(r, r);
-                    addRoom(r);
+                    toUpdate.Position.Value = room.Position.Value;
+                    update(room, toUpdate);
+                    break;
                 }
-
-                RoomsUpdated?.Invoke();
-
-                tcs.SetResult(true);
-            };
-
-            pollReq.Failure += _ => tcs.SetResult(false);
-
-            api.Queue(pollReq);
-
-            return tcs.Task;
+            }
         }
 
         /// <summary>
@@ -166,7 +199,7 @@ namespace osu.Game.Screens.Multi
         /// <summary>
         /// Adds a <see cref="Room"/> to the list of available rooms.
         /// </summary>
-        /// <param name="room">The <see cref="Room"/> to add.<</param>
+        /// <param name="room">The <see cref="Room"/> to add.</param>
         private void addRoom(Room room)
         {
             var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
@@ -174,6 +207,101 @@ namespace osu.Game.Screens.Multi
                 rooms.Add(room);
             else
                 existing.CopyFrom(room);
+        }
+
+        private class SelectionPollingComponent : PollingComponent
+        {
+            public Action<Room> RoomReceived;
+
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            [Resolved]
+            private Bindable<Room> selectedRoom { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                selectedRoom.BindValueChanged(_ =>
+                {
+                    if (IsLoaded)
+                        PollImmediately();
+                });
+            }
+
+            private GetRoomRequest pollReq;
+
+            protected override Task Poll()
+            {
+                if (!api.IsLoggedIn)
+                    return base.Poll();
+
+                if (selectedRoom.Value?.RoomID.Value == null)
+                    return base.Poll();
+
+                var tcs = new TaskCompletionSource<bool>();
+
+                pollReq?.Cancel();
+                pollReq = new GetRoomRequest(selectedRoom.Value.RoomID.Value.Value);
+
+                pollReq.Success += result =>
+                {
+                    RoomReceived?.Invoke(result);
+                    tcs.SetResult(true);
+                };
+
+                pollReq.Failure += _ => tcs.SetResult(false);
+
+                api.Queue(pollReq);
+
+                return tcs.Task;
+            }
+        }
+
+        private class ListingPollingComponent : PollingComponent
+        {
+            public Action<List<Room>> RoomsReceived;
+
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            [Resolved]
+            private Bindable<FilterCriteria> currentFilter { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                currentFilter.BindValueChanged(_ =>
+                {
+                    if (IsLoaded)
+                        PollImmediately();
+                });
+            }
+
+            private GetRoomsRequest pollReq;
+
+            protected override Task Poll()
+            {
+                if (!api.IsLoggedIn)
+                    return base.Poll();
+
+                var tcs = new TaskCompletionSource<bool>();
+
+                pollReq?.Cancel();
+                pollReq = new GetRoomsRequest(currentFilter.Value.PrimaryFilter);
+
+                pollReq.Success += result =>
+                {
+                    RoomsReceived?.Invoke(result);
+                    tcs.SetResult(true);
+                };
+
+                pollReq.Failure += _ => tcs.SetResult(false);
+
+                api.Queue(pollReq);
+
+                return tcs.Task;
+            }
         }
     }
 }

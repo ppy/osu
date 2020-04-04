@@ -6,15 +6,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class OsuLogo : BeatSyncedContainer
     {
-        public readonly Color4 OsuPink = OsuColour.FromHex(@"e967a1");
+        public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
 
         private const double transition_length = 300;
 
@@ -54,7 +54,13 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public Func<bool> Action;
 
-        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.74f;
+        /// <summary>
+        /// The size of the logo Sprite with respect to the scale of its hover and bounce containers.
+        /// </summary>
+        /// <remarks>Does not account for the scale of this <see cref="OsuLogo"/></remarks>
+        public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X;
+
+        public bool IsTracking { get; set; }
 
         private readonly Sprite ripple;
 
@@ -62,7 +68,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Triangles
         {
-            set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
+            set => colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
         public bool BeatMatching = true;
@@ -71,8 +77,8 @@ namespace osu.Game.Screens.Menu
 
         public bool Ripple
         {
-            get { return rippleContainer.Alpha > 0; }
-            set { rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
+            get => rippleContainer.Alpha > 0;
+            set => rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
         private readonly Box flashLayer;
@@ -118,7 +124,7 @@ namespace osu.Game.Screens.Menu
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Blending = BlendingMode.Additive,
+                                            Blending = BlendingParameters.Additive,
                                             Alpha = 0
                                         }
                                     }
@@ -170,8 +176,8 @@ namespace osu.Game.Screens.Menu
                                                                         triangles = new Triangles
                                                                         {
                                                                             TriangleScale = 4,
-                                                                            ColourLight = OsuColour.FromHex(@"ff7db7"),
-                                                                            ColourDark = OsuColour.FromHex(@"de5b95"),
+                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
+                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }
@@ -179,7 +185,7 @@ namespace osu.Game.Screens.Menu
                                                                 flashLayer = new Box
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    Blending = BlendingMode.Additive,
+                                                                    Blending = BlendingParameters.Additive,
                                                                     Colour = Color4.White,
                                                                     Alpha = 0,
                                                                 },
@@ -223,7 +229,7 @@ namespace osu.Game.Screens.Menu
         }
 
         /// <summary>
-        /// Schedule a new extenral animation. Handled queueing and finishing previous animations in a sane way.
+        /// Schedule a new external animation. Handled queueing and finishing previous animations in a sane way.
         /// </summary>
         /// <param name="action">The animation to be performed</param>
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
@@ -249,8 +255,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"Menu/osu-logo-select");
-            sampleBeat = audio.Sample.Get(@"Menu/osu-logo-heartbeat");
+            sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
+            sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
@@ -347,12 +353,11 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return;
 
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
-            return true;
         }
 
         protected override bool OnClick(ClickEvent e)

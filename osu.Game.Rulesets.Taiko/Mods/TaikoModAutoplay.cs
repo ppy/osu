@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModAutoplay : ModAutoplay<TaikoHitObject>
     {
-        protected override Score CreateReplayScore(Beatmap<TaikoHitObject> beatmap) => new Score
+        public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "mekkadosu!" } },
             Replay = new TaikoAutoGenerator(beatmap).Generate(),

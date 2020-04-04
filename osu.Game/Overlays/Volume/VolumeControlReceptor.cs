@@ -9,13 +9,19 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeControlReceptor : Container, IScrollBindingHandler<GlobalAction>, IHandleGlobalInput
+    public class VolumeControlReceptor : Container, IScrollBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         public Func<GlobalAction, bool> ActionRequested;
         public Func<GlobalAction, float, bool, bool> ScrollActionRequested;
 
-        public bool OnPressed(GlobalAction action) => ActionRequested?.Invoke(action) ?? false;
-        public bool OnScroll(GlobalAction action, float amount, bool isPrecise) => ScrollActionRequested?.Invoke(action, amount, isPrecise) ?? false;
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnPressed(GlobalAction action) =>
+            ActionRequested?.Invoke(action) ?? false;
+
+        public bool OnScroll(GlobalAction action, float amount, bool isPrecise) =>
+            ScrollActionRequested?.Invoke(action, amount, isPrecise) ?? false;
+
+        public void OnReleased(GlobalAction action)
+        {
+        }
     }
 }

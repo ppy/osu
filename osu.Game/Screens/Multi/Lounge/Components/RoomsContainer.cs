@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,13 +19,16 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         public Action<Room> JoinRequested;
 
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-        public IBindable<Room> SelectedRoom => selectedRoom;
-
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
+
+        [Resolved(CanBeNull = true)]
+        private Bindable<FilterCriteria> filter { get; set; }
+
+        [Resolved]
+        private Bindable<Room> selectedRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -44,20 +47,16 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            rooms.BindTo(roomManager.Rooms);
-
             rooms.ItemsAdded += addRooms;
             rooms.ItemsRemoved += removeRooms;
-
             roomManager.RoomsUpdated += updateSorting;
 
-            addRooms(rooms);
-        }
+            rooms.BindTo(roomManager.Rooms);
 
-        private FilterCriteria currentFilter;
+            filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
+        }
 
         public void Filter(FilterCriteria criteria)
         {
@@ -68,21 +67,23 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 else
                 {
                     bool matchingFilter = true;
-                    matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+                    matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
+
+                    if (!string.IsNullOrEmpty(criteria.SearchString))
+                        matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                     switch (criteria.SecondaryFilter)
                     {
                         default:
                         case SecondaryFilter.Public:
-                            r.MatchingFilter = r.Room.Availability.Value == RoomAvailability.Public;
+                            matchingFilter &= r.Room.Availability.Value == RoomAvailability.Public;
                             break;
                     }
 
                     r.MatchingFilter = matchingFilter;
                 }
             });
-
-            currentFilter = criteria;
         }
 
         private void addRooms(IEnumerable<Room> rooms)
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
                 roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
 
-            Filter(currentFilter);
+            Filter(filter?.Value);
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
@@ -109,7 +110,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, room.Room.Position);
+                roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
         private void selectRoom(Room room)

@@ -3,17 +3,18 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Play
 {
@@ -21,16 +22,20 @@ namespace osu.Game.Screens.Multi.Play
     {
         public Action Exited;
 
-        private readonly Room room;
-        private readonly int playlistItemId;
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
+
+        private readonly PlaylistItem playlistItem;
 
         [Resolved]
-        private APIAccess api { get; set; }
+        private IAPIProvider api { get; set; }
 
-        public TimeshiftPlayer(Room room, int playlistItemId)
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        public TimeshiftPlayer(PlaylistItem playlistItem)
         {
-            this.room = room;
-            this.playlistItemId = playlistItemId;
+            this.playlistItem = playlistItem;
         }
 
         private int? token;
@@ -42,7 +47,17 @@ namespace osu.Game.Screens.Multi.Play
 
             bool failed = false;
 
-            var req = new CreateRoomScoreRequest(room.RoomID.Value ?? 0, playlistItemId);
+            // Sanity checks to ensure that TimeshiftPlayer matches the settings for the current PlaylistItem
+            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != playlistItem.Beatmap.Value.OnlineBeatmapID)
+                throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
+
+            if (ruleset.Value.ID != playlistItem.Ruleset.Value.ID)
+                throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
+
+            if (!playlistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
+                throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
+
+            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -87,7 +102,7 @@ namespace osu.Game.Screens.Multi.Play
 
             Debug.Assert(token != null);
 
-            var request = new SubmitRoomScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
+            var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
         }
@@ -98,7 +113,5 @@ namespace osu.Game.Screens.Multi.Play
 
             Exited = null;
         }
-
-        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score, room);
     }
 }

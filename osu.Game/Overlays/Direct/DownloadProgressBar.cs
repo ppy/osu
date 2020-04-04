@@ -7,18 +7,19 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadProgressBar : DownloadTrackingComposite
+    public class DownloadProgressBar : BeatmapDownloadTrackingComposite
     {
         private readonly ProgressBar progressBar;
 
         public DownloadProgressBar(BeatmapSetInfo beatmapSet)
             : base(beatmapSet)
         {
-            AddInternal(progressBar = new ProgressBar
+            AddInternal(progressBar = new InteractionDisabledProgressBar
             {
                 Height = 0,
                 Alpha = 0,
@@ -37,16 +38,18 @@ namespace osu.Game.Overlays.Direct
 
             State.BindValueChanged(state =>
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case DownloadState.NotDownloaded:
                         progressBar.Current.Value = 0;
                         progressBar.FadeOut(500);
                         break;
+
                     case DownloadState.Downloading:
                         progressBar.FadeIn(400, Easing.OutQuint);
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
                         break;
+
                     case DownloadState.Downloaded:
                         progressBar.FadeIn(400, Easing.OutQuint);
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
@@ -54,11 +57,18 @@ namespace osu.Game.Overlays.Direct
                         progressBar.Current.Value = 1;
                         progressBar.FillColour = colours.Yellow;
                         break;
+
                     case DownloadState.LocallyAvailable:
                         progressBar.FadeOut(500);
                         break;
                 }
             }, true);
+        }
+
+        private class InteractionDisabledProgressBar : ProgressBar
+        {
+            public override bool HandlePositionalInput => false;
+            public override bool HandleNonPositionalInput => false;
         }
     }
 }

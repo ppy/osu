@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class SwellTick : TaikoHitObject
     {
-        public override Judgement CreateJudgement() => new TaikoSwellTickJudgement();
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

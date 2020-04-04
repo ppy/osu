@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Cursor
         {
             AddRangeInternal(new Drawable[]
             {
-                Cursor = new MenuCursor { State = Visibility.Hidden },
+                Cursor = new MenuCursor { State = { Value = Visibility.Hidden } },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }
@@ -43,6 +43,7 @@ namespace osu.Game.Graphics.Cursor
         }
 
         private IProvideCursor currentTarget;
+
         protected override void Update()
         {
             base.Update();

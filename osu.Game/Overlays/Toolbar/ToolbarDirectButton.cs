@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarDirectButton()
         {
-            SetIcon(FontAwesome.fa_osu_chevron_down_o);
+            SetIcon(OsuIcon.ChevronDownCircle);
         }
 
         [BackgroundDependencyLoader(true)]

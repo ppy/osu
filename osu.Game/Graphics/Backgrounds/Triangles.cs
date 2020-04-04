@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osuTK;
 using osuTK.Graphics;
 using System;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
@@ -30,8 +29,33 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         private const float edge_smoothness = 1;
 
-        public Color4 ColourLight = Color4.White;
-        public Color4 ColourDark = Color4.Black;
+        private Color4 colourLight = Color4.White;
+
+        public Color4 ColourLight
+        {
+            get => colourLight;
+            set
+            {
+                if (colourLight == value) return;
+
+                colourLight = value;
+                updateColours();
+            }
+        }
+
+        private Color4 colourDark = Color4.Black;
+
+        public Color4 ColourDark
+        {
+            get => colourDark;
+            set
+            {
+                if (colourDark == value) return;
+
+                colourDark = value;
+                updateColours();
+            }
+        }
 
         /// <summary>
         /// Whether we want to expire triangles as they exit our draw area completely.
@@ -64,7 +88,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
-        private Shader shader;
+        private IShader shader;
         private readonly Texture texture;
 
         public Triangles()
@@ -75,7 +99,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         protected override void LoadComplete()
@@ -86,7 +110,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         public float TriangleScale
         {
-            get { return triangleScale; }
+            get => triangleScale;
             set
             {
                 float change = value / triangleScale;
@@ -105,15 +129,15 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            Invalidate(Invalidation.DrawNode, shallPropagate: false);
+            Invalidate(Invalidation.DrawNode);
 
             if (CreateNewTriangles)
                 addTriangles(false);
 
-            float adjustedAlpha = HideAlphaDiscrepancies ?
+            float adjustedAlpha = HideAlphaDiscrepancies
                 // Cubically scale alpha to make it drop off more sharply.
-                (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3) :
-                1;
+                ? MathF.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
+                : 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
@@ -137,11 +161,13 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
+        protected int AimCount;
+
         private void addTriangles(bool randomY)
         {
-            int aimTriangleCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            AimCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
-            for (int i = 0; i < aimTriangleCount - parts.Count; i++)
+            for (int i = 0; i < AimCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -150,7 +176,8 @@ namespace osu.Game.Graphics.Backgrounds
             TriangleParticle particle = CreateTriangle();
 
             particle.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() : 1);
-            particle.Colour = CreateTriangleShade();
+            particle.ColourShade = RNG.NextSingle();
+            particle.Colour = CreateTriangleShade(particle.ColourShade);
 
             return particle;
         }
@@ -176,73 +203,93 @@ namespace osu.Game.Graphics.Backgrounds
         /// Creates a shade of colour for the triangles.
         /// </summary>
         /// <returns>The colour.</returns>
-        protected virtual Color4 CreateTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
+        protected virtual Color4 CreateTriangleShade(float shade) => Interpolation.ValueAt(shade, colourDark, colourLight, 0, 1);
 
-        protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
-
-        private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
-        protected override void ApplyDrawNode(DrawNode node)
+        private void updateColours()
         {
-            base.ApplyDrawNode(node);
-
-            var trianglesNode = (TrianglesDrawNode)node;
-
-            trianglesNode.Shader = shader;
-            trianglesNode.Texture = texture;
-            trianglesNode.Size = DrawSize;
-            trianglesNode.Shared = sharedData;
-
-            trianglesNode.Parts.Clear();
-            trianglesNode.Parts.AddRange(parts);
+            for (int i = 0; i < parts.Count; i++)
+            {
+                TriangleParticle newParticle = parts[i];
+                newParticle.Colour = CreateTriangleShade(newParticle.ColourShade);
+                parts[i] = newParticle;
+            }
         }
 
-        private class TrianglesDrawNodeSharedData
-        {
-            public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
-        }
+        protected override DrawNode CreateDrawNode() => new TrianglesDrawNode(this);
 
         private class TrianglesDrawNode : DrawNode
         {
-            public Shader Shader;
-            public Texture Texture;
+            protected new Triangles Source => (Triangles)base.Source;
 
-            public TrianglesDrawNodeSharedData Shared;
+            private IShader shader;
+            private Texture texture;
 
-            public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
-            public Vector2 Size;
+            private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
+            private Vector2 size;
+
+            private QuadBatch<TexturedVertex2D> vertexBatch;
+
+            public TrianglesDrawNode(Triangles source)
+                : base(source)
+            {
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.DrawSize;
+
+                parts.Clear();
+                parts.AddRange(Source.parts);
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 base.Draw(vertexAction);
 
-                Shader.Bind();
-                Texture.TextureGL.Bind();
+                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
+                {
+                    vertexBatch?.Dispose();
+                    vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount, 1);
+                }
+
+                shader.Bind();
 
                 Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                foreach (TriangleParticle particle in Parts)
+                foreach (TriangleParticle particle in parts)
                 {
                     var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
-                    var size = new Vector2(2 * offset.X, offset.Y);
 
                     var triangle = new Triangle(
-                        Vector2Extensions.Transform(particle.Position * Size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * Size + offset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * Size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
+                        Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
                     );
 
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    Texture.DrawTriangle(
+                    DrawTriangle(
+                        texture,
                         triangle,
                         colourInfo,
                         null,
-                        Shared.VertexBatch.AddAction,
-                        Vector2.Divide(localInflationAmount, size));
+                        vertexBatch.AddAction,
+                        Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
                 }
 
-                Shader.Unbind();
+                shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch?.Dispose();
             }
         }
 
@@ -252,6 +299,12 @@ namespace osu.Game.Graphics.Backgrounds
             /// The position of the top vertex of the triangle.
             /// </summary>
             public Vector2 Position;
+
+            /// <summary>
+            /// The colour shade of the triangle.
+            /// This is needed for colour recalculation of visible triangles when <see cref="ColourDark"/> or <see cref="ColourLight"/> is changed.
+            /// </summary>
+            public float ColourShade;
 
             /// <summary>
             /// The colour of the triangle.

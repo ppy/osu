@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Skinning;
@@ -13,36 +15,50 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BlurrableBackgroundScreen
+    public class BackgroundScreenDefault : BackgroundScreen
     {
+        private Background background;
+
         private int currentDisplay;
-        private const int background_count = 5;
+        private const int background_count = 7;
 
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
+        private Bindable<BackgroundSource> mode;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        public BackgroundScreenDefault(bool animateOnEnter = true)
+            : base(animateOnEnter)
+        {
+        }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager)
+        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
         {
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
+            mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
 
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
+            mode.ValueChanged += _ => Next();
+            beatmap.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
-            Next();
+            display(createBackground());
         }
 
         private void display(Background newBackground)
         {
-            Background?.FadeOut(800, Easing.InOutSine);
-            Background?.Expire();
+            background?.FadeOut(800, Easing.InOutSine);
+            background?.Expire();
 
-            AddInternal(Background = newBackground);
+            AddInternal(background = newBackground);
             currentDisplay++;
         }
 
@@ -51,26 +67,40 @@ namespace osu.Game.Screens.Backgrounds
         public void Next()
         {
             nextTask?.Cancel();
-            nextTask = Scheduler.AddDelayed(() =>
+            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
+        }
+
+        private Background createBackground()
+        {
+            Background newBackground;
+
+            if (user.Value?.IsSupporter ?? false)
             {
-                Background background;
+                switch (mode.Value)
+                {
+                    case BackgroundSource.Beatmap:
+                        newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
+                        break;
 
-                if (user.Value?.IsSupporter ?? false)
-                    background = new SkinnedBackground(skin.Value, backgroundName);
-                else
-                    background = new Background(backgroundName);
+                    default:
+                        newBackground = new SkinnedBackground(skin.Value, backgroundName);
+                        break;
+                }
+            }
+            else
+                newBackground = new Background(backgroundName);
 
-                background.Depth = currentDisplay;
+            newBackground.Depth = currentDisplay;
 
-                LoadComponentAsync(background, display);
-            }, 100);
+            return newBackground;
         }
 
         private class SkinnedBackground : Background
         {
             private readonly Skin skin;
 
-            public SkinnedBackground(Skin skin, string fallbackTextureName) : base(fallbackTextureName)
+            public SkinnedBackground(Skin skin, string fallbackTextureName)
+                : base(fallbackTextureName)
             {
                 this.skin = skin;
             }

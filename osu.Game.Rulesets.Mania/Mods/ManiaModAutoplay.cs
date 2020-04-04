@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
     {
-        protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap) => new Score
+        public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "osu!topus!" } },
             Replay = new ManiaAutoGenerator((ManiaBeatmap)beatmap).Generate(),

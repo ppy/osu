@@ -4,84 +4,130 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework;
-using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Allocation;
+using osu.Framework.Layout;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
-    public class SquareGraph : BufferedContainer
+    public class SquareGraph : Container
     {
-        private Column[] columns = { };
+        private BufferedContainer<Column> columns;
 
-        public int ColumnCount => columns.Length;
+        public SquareGraph()
+        {
+            AddLayout(layout);
+        }
+
+        public int ColumnCount => columns?.Children.Count ?? 0;
 
         private int progress;
+
         public int Progress
         {
-            get { return progress; }
+            get => progress;
             set
             {
                 if (value == progress) return;
+
                 progress = value;
                 redrawProgress();
             }
         }
 
-        private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private float[] calculatedValues = Array.Empty<float>(); // values but adjusted to fit the amount of columns
 
         private int[] values;
+
         public int[] Values
         {
-            get { return values; }
+            get => values;
             set
             {
                 if (value == values) return;
+
                 values = value;
                 layout.Invalidate();
             }
         }
 
         private Color4 fillColour;
+
         public Color4 FillColour
         {
-            get { return fillColour; }
+            get => fillColour;
             set
             {
                 if (value == fillColour) return;
+
                 fillColour = value;
                 redrawFilled();
             }
         }
 
-        public SquareGraph()
-        {
-            CacheDrawnFrameBuffer = true;
-        }
-
-        private Cached layout = new Cached();
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                layout.Invalidate();
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
+        private ScheduledDelegate scheduledCreate;
 
         protected override void Update()
         {
             base.Update();
 
-            if (!layout.IsValid)
+            if (values != null && !layout.IsValid)
             {
-                recreateGraph();
+                columns?.FadeOut(500, Easing.OutQuint).Expire();
+
+                scheduledCreate?.Cancel();
+                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
+
                 layout.Validate();
             }
+        }
+
+        private CancellationTokenSource cts;
+
+        /// <summary>
+        /// Recreates the entire graph.
+        /// </summary>
+        protected virtual void RecreateGraph()
+        {
+            var newColumns = new BufferedContainer<Column>
+            {
+                CacheDrawnFrameBuffer = true,
+                RedrawOnScale = false,
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            for (float x = 0; x < DrawWidth; x += Column.WIDTH)
+            {
+                newColumns.Add(new Column(DrawHeight)
+                {
+                    LitColour = fillColour,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Position = new Vector2(x, 0),
+                    State = ColumnState.Dimmed,
+                });
+            }
+
+            cts?.Cancel();
+
+            LoadComponentAsync(newColumns, c =>
+            {
+                Child = columns = c;
+                columns.FadeInFromZero(500, Easing.OutQuint);
+
+                recalculateValues();
+                redrawFilled();
+                redrawProgress();
+            }, (cts = new CancellationTokenSource()).Token);
         }
 
         /// <summary>
@@ -89,9 +135,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void redrawProgress()
         {
-            for (int i = 0; i < columns.Length; i++)
+            for (int i = 0; i < ColumnCount; i++)
                 columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
-            ForceRedraw();
+            columns?.ForceRedraw();
         }
 
         /// <summary>
@@ -101,7 +147,7 @@ namespace osu.Game.Screens.Play
         {
             for (int i = 0; i < ColumnCount; i++)
                 columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
-            ForceRedraw();
+            columns?.ForceRedraw();
         }
 
         /// <summary>
@@ -122,40 +168,13 @@ namespace osu.Game.Screens.Play
             var max = values.Max();
 
             float step = values.Length / (float)ColumnCount;
+
             for (float i = 0; i < values.Length; i += step)
             {
                 newValues.Add((float)values[(int)i] / max);
             }
 
             calculatedValues = newValues.ToArray();
-        }
-
-        /// <summary>
-        /// Recreates the entire graph.
-        /// </summary>
-        private void recreateGraph()
-        {
-            var newColumns = new List<Column>();
-
-            for (float x = 0; x < DrawWidth; x += Column.WIDTH)
-            {
-                newColumns.Add(new Column
-                {
-                    LitColour = fillColour,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Height = DrawHeight,
-                    Position = new Vector2(x, 0),
-                    State = ColumnState.Dimmed,
-                });
-            }
-
-            columns = newColumns.ToArray();
-            Children = columns;
-
-            recalculateValues();
-            redrawFilled();
-            redrawProgress();
         }
 
         public class Column : Container, IStateful<ColumnState>
@@ -174,14 +193,15 @@ namespace osu.Game.Screens.Play
             private readonly List<Box> drawableRows = new List<Box>();
 
             private float filled;
+
             public float Filled
             {
-                get { return filled; }
+                get => filled;
                 set
                 {
                     if (value == filled) return;
-                    filled = value;
 
+                    filled = value;
                     fillActive();
                 }
             }
@@ -190,12 +210,12 @@ namespace osu.Game.Screens.Play
 
             public ColumnState State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;
-                    state = value;
 
+                    state = value;
                     if (IsLoaded)
                         fillActive();
 
@@ -203,27 +223,30 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public Column()
+            public Column(float height)
             {
                 Width = WIDTH;
+                Height = height;
             }
 
-            protected override void LoadComplete()
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                for (int r = 0; r < cubeCount; r++)
+                drawableRows.AddRange(Enumerable.Range(0, (int)cubeCount).Select(r => new Box
                 {
-                    drawableRows.Add(new Box
-                    {
-                        Size = new Vector2(cube_size),
-                        Position = new Vector2(0, r * WIDTH + padding),
-                    });
-                }
+                    Size = new Vector2(cube_size),
+                    Position = new Vector2(0, r * WIDTH + padding),
+                }));
 
                 Children = drawableRows;
 
                 // Reverse drawableRows so when iterating through them they start at the bottom
                 drawableRows.Reverse();
+            }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
                 fillActive();
             }
 
@@ -231,7 +254,7 @@ namespace osu.Game.Screens.Play
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)Math.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;

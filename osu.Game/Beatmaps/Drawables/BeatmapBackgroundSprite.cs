@@ -13,8 +13,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapBackgroundSprite(WorkingBeatmap working)
         {
-             if (working == null)
-                 throw new ArgumentNullException(nameof(working));
+            if (working == null)
+                throw new ArgumentNullException(nameof(working));
 
             this.working = working;
         }

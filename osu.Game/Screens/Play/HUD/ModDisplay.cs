@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -14,18 +14,21 @@ using osu.Game.Rulesets.UI;
 using osuTK;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>
+    public class ModDisplay : Container, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 
         public bool DisplayUnrankedText = true;
 
-        private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
+        public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
-        public Bindable<IEnumerable<Mod>> Current
+        private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
+
+        public Bindable<IReadOnlyList<Mod>> Current
         {
             get => current;
             set
@@ -38,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private readonly FillFlowContainer<ModIcon> iconsContainer;
+        protected readonly FillFlowContainer<ModIcon> IconsContainer;
         private readonly OsuSpriteText unrankedText;
 
         public ModDisplay()
@@ -47,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Children = new Drawable[]
             {
-                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                IconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -60,17 +63,17 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
-                    Font = @"Venera",
-                    TextSize = 12,
+                    Font = OsuFont.Numeric.With(size: 12)
                 }
             };
 
             Current.ValueChanged += mods =>
             {
-                iconsContainer.Clear();
-                foreach (Mod mod in mods)
+                IconsContainer.Clear();
+
+                foreach (Mod mod in mods.NewValue)
                 {
-                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+                    IconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }
 
                 if (IsLoaded)
@@ -87,7 +90,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             appearTransform();
+            IconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         private void appearTransform()
@@ -97,16 +102,23 @@ namespace osu.Game.Screens.Play.HUD
             else
                 unrankedText.Hide();
 
-            iconsContainer.FinishTransforms();
-            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
             expand();
-            using (iconsContainer.BeginDelayedSequence(1200))
+
+            using (IconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
-        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+        private void expand()
+        {
+            if (ExpansionMode != ExpansionMode.AlwaysContracted)
+                IconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+        }
 
-        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+        private void contract()
+        {
+            if (ExpansionMode != ExpansionMode.AlwaysExpanded)
+                IconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+        }
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -119,5 +131,23 @@ namespace osu.Game.Screens.Play.HUD
             contract();
             base.OnHoverLost(e);
         }
+    }
+
+    public enum ExpansionMode
+    {
+        /// <summary>
+        /// The <see cref="ModDisplay"/> will expand only when hovered.
+        /// </summary>
+        ExpandOnHover,
+
+        /// <summary>
+        /// The <see cref="ModDisplay"/> will always be expanded.
+        /// </summary>
+        AlwaysExpanded,
+
+        /// <summary>
+        /// The <see cref="ModDisplay"/> will always be contracted.
+        /// </summary>
+        AlwaysContracted
     }
 }

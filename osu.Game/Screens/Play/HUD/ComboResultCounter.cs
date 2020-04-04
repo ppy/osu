@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public override void Increment(long amount)
         {
-            Current.Value = Current + amount;
+            Current.Value += amount;
         }
     }
 }

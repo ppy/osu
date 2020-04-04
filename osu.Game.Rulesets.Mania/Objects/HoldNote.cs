@@ -4,8 +4,8 @@
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
@@ -14,12 +14,17 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class HoldNote : ManiaHitObject, IHasEndTime
     {
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         private double duration;
+
         public double Duration
         {
-            get { return duration; }
+            get => duration;
             set
             {
                 duration = value;
@@ -29,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override double StartTime
         {
-            get { return base.StartTime; }
+            get => base.StartTime;
             set
             {
                 base.StartTime = value;
@@ -40,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public override int Column
         {
-            get { return base.Column; }
+            get => base.Column;
             set
             {
                 base.Column = value;
@@ -97,6 +102,8 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        public override Judgement CreateJudgement() => new HoldNoteJudgement();
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

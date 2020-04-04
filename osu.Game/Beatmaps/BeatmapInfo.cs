@@ -51,6 +51,19 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
+        [NotMapped]
+        public int? MaxCombo { get; set; }
+
+        /// <summary>
+        /// The playable length in milliseconds of this beatmap.
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// The most common BPM of this beatmap.
+        /// </summary>
+        public double BPM { get; set; }
+
         public string Path { get; set; }
 
         [JsonProperty("file_sha2")]
@@ -66,7 +79,7 @@ namespace osu.Game.Beatmaps
         public string MD5Hash { get; set; }
 
         // General
-        public int AudioLeadIn { get; set; }
+        public double AudioLeadIn { get; set; }
         public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
@@ -88,7 +101,7 @@ namespace osu.Game.Beatmaps
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    Bookmarks = new int[0];
+                    Bookmarks = Array.Empty<int>();
                     return;
                 }
 
@@ -101,7 +114,7 @@ namespace osu.Game.Beatmaps
         }
 
         [NotMapped]
-        public int[] Bookmarks { get; set; } = new int[0];
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }
@@ -119,7 +132,24 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public List<ScoreInfo> Scores { get; set; }
 
-        public override string ToString() => $"{Metadata} [{Version}]";
+        [JsonIgnore]
+        public DifficultyRating DifficultyRating
+        {
+            get
+            {
+                var rating = StarDifficulty;
+
+                if (rating < 2.0) return DifficultyRating.Easy;
+                if (rating < 2.7) return DifficultyRating.Normal;
+                if (rating < 4.0) return DifficultyRating.Hard;
+                if (rating < 5.3) return DifficultyRating.Insane;
+                if (rating < 6.5) return DifficultyRating.Expert;
+
+                return DifficultyRating.ExpertPlus;
+            }
+        }
+
+        public override string ToString() => $"{Metadata} [{Version}]".Trim();
 
         public bool Equals(BeatmapInfo other)
         {

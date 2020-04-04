@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -13,21 +13,23 @@ namespace osu.Game.Online.Chat
 {
     public class ExternalLinkOpener : Component
     {
-        private GameHost host;
-        private DialogOverlay dialogOverlay;
+        [Resolved]
+        private GameHost host { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
         private Bindable<bool> externalLinkWarning;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameHost host, DialogOverlay dialogOverlay, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            this.host = host;
-            this.dialogOverlay = dialogOverlay;
             externalLinkWarning = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning);
         }
 
         public void OpenUrlExternally(string url)
         {
-            if (externalLinkWarning)
+            if (externalLinkWarning.Value)
                 dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
                 host.OpenUrlExternally(url);

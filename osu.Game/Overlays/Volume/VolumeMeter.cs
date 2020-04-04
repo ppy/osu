@@ -4,23 +4,25 @@
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -140,8 +142,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Venera",
-                            TextSize = 0.16f * circleSize
+                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -169,16 +170,16 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = name
                         }
                     }
                 }
             };
-            Bindable.ValueChanged += newVolume =>
+            Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
-                    newVolume,
+                    volume.NewValue,
                     400,
                     Easing.OutQuint);
             };
@@ -218,7 +219,7 @@ namespace osu.Game.Overlays.Volume
 
         public double Volume
         {
-            get => Bindable;
+            get => Bindable.Value;
             private set => Bindable.Value = value;
         }
 
@@ -260,6 +261,29 @@ namespace osu.Game.Overlays.Volume
         protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!IsHovered)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.SelectPrevious:
+                    adjust(1, false);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    adjust(-1, false);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }

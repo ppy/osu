@@ -6,11 +6,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
@@ -44,18 +46,20 @@ namespace osu.Game.Screens.Play.HUD
 
         public Color4 AccentColour
         {
-            get { return fill.Colour; }
-            set { fill.Colour = value; }
+            get => fill.Colour;
+            set => fill.Colour = value;
         }
 
         private Color4 glowColour;
+
         public Color4 GlowColour
         {
-            get { return glowColour; }
+            get => glowColour;
             set
             {
                 if (glowColour == value)
                     return;
+
                 glowColour = value;
 
                 fill.EdgeEffect = new EdgeEffectParameters
@@ -105,11 +109,23 @@ namespace osu.Game.Screens.Play.HUD
             if (result.Type == HitResult.Miss)
                 return;
 
+            Scheduler.AddOnce(flash);
+        }
+
+        private void flash()
+        {
             fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
                 .Delay(glow_fade_delay)
                 .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
         }
 
-        protected override void SetHealth(float value) => fill.ResizeTo(new Vector2(value, 1), 200, Easing.OutQuint);
+        protected override void Update()
+        {
+            base.Update();
+
+            fill.Width = Interpolation.ValueAt(
+                Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
+                fill.Width, (float)Current.Value, 0, 200, Easing.OutQuint);
+        }
     }
 }

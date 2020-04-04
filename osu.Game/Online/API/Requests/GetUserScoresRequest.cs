@@ -2,25 +2,37 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.IO.Network;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<APIScoreInfo>>
+    public class GetUserScoresRequest : PaginatedAPIRequest<List<APILegacyScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
-        private readonly int offset;
+        private readonly RulesetInfo ruleset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0)
+        public GetUserScoresRequest(long userId, ScoreType type, int page = 0, int itemsPerPage = 5, RulesetInfo ruleset = null)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
             this.type = type;
-            this.offset = offset;
+            this.ruleset = ruleset;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
+        protected override WebRequest CreateWebRequest()
+        {
+            var req = base.CreateWebRequest();
+
+            if (ruleset != null)
+                req.AddParameter("mode", ruleset.ShortName);
+
+            return req;
+        }
+
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}";
     }
 
     public enum ScoreType

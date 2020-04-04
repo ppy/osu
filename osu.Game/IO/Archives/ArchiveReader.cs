@@ -15,6 +15,8 @@ namespace osu.Game.IO.Archives
         /// </summary>
         public abstract Stream GetStream(string name);
 
+        public IEnumerable<string> GetAvailableResources() => Filenames;
+
         public abstract void Dispose();
 
         /// <summary>
@@ -43,7 +45,5 @@ namespace osu.Game.IO.Archives
                 return buffer;
             }
         }
-
-        public abstract Stream GetUnderlyingStream();
     }
 }

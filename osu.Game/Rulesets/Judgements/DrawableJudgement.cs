@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -21,9 +20,10 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public class DrawableJudgement : CompositeDrawable
     {
-        private const float judgement_size = 80;
+        private const float judgement_size = 128;
 
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         protected readonly JudgementResult Result;
 
@@ -31,6 +31,16 @@ namespace osu.Game.Rulesets.Judgements
 
         protected Container JudgementBody;
         protected SpriteText JudgementText;
+
+        /// <summary>
+        /// Duration of initial fade in.
+        /// </summary>
+        protected virtual double FadeInDuration => 100;
+
+        /// <summary>
+        /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
+        /// </summary>
+        protected virtual double FadeOutDelay => FadeInDuration;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -46,36 +56,42 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             InternalChild = JudgementBody = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
+                Child = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = @"Venera",
-                    Colour = judgementColour(Result.Type),
+                    Font = OsuFont.Numeric.With(size: 20),
+                    Colour = colours.ForHitResult(Result.Type),
                     Scale = new Vector2(0.85f, 1),
-                    TextSize = 12
-                }, restrictSize: false)
+                }, confineMode: ConfineMode.NoScaling)
             };
+        }
+
+        protected virtual void ApplyHitAnimations()
+        {
+            JudgementBody.ScaleTo(0.9f);
+            JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
+
+            this.Delay(FadeOutDelay).FadeOut(400);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.FadeInFromZero(100, Easing.OutQuint);
+            this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
 
             switch (Result.Type)
             {
                 case HitResult.None:
                     break;
+
                 case HitResult.Miss:
                     JudgementBody.ScaleTo(1.6f);
                     JudgementBody.ScaleTo(1, 100, Easing.In);
@@ -85,34 +101,13 @@ namespace osu.Game.Rulesets.Judgements
 
                     this.Delay(600).FadeOut(200);
                     break;
-                default:
-                    JudgementBody.ScaleTo(0.9f);
-                    JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
 
-                    this.Delay(100).FadeOut(400);
+                default:
+                    ApplyHitAnimations();
                     break;
             }
 
             Expire(true);
-        }
-
-        private Color4 judgementColour(HitResult judgement)
-        {
-            switch (judgement)
-            {
-                case HitResult.Perfect:
-                case HitResult.Great:
-                    return colours.Blue;
-                case HitResult.Ok:
-                case HitResult.Good:
-                    return colours.Green;
-                case HitResult.Meh:
-                    return colours.Yellow;
-                case HitResult.Miss:
-                    return colours.Red;
-                default:
-                    return Color4.White;
-            }
         }
     }
 }

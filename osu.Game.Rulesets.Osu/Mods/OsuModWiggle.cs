@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Wiggle";
         public override string Acronym => "WG";
-        public override FontAwesome Icon => FontAwesome.fa_certificate;
+        public override IconUsage? Icon => FontAwesome.Solid.Certificate;
         public override ModType Type => ModType.Fun;
         public override string Description => "They just won't stay still...";
         public override double ScoreMultiplier => 1;
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Wiggle the repeat points with the slider instead of independently.
             // Also fixes an issue with repeat points being positioned incorrectly.
-            if (osuObject is RepeatPoint)
+            if (osuObject is SliderRepeat)
                 return;
 
             Random objRand = new Random((int)osuObject.StartTime);
@@ -55,8 +55,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             for (int i = 0; i < amountWiggles; i++)
+            {
                 using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * wiggle_duration, true))
                     wiggle();
+            }
 
             // Keep wiggling sliders and spinners for their duration
             if (!(osuObject is IHasEndTime endTime))
@@ -65,8 +67,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             amountWiggles = (int)(endTime.Duration / wiggle_duration);
 
             for (int i = 0; i < amountWiggles; i++)
+            {
                 using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * wiggle_duration, true))
                     wiggle();
+            }
         }
     }
 }

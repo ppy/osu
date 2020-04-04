@@ -13,7 +13,9 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class SearchableListFilterControl<T, U> : Container
+    public abstract class SearchableListFilterControl<TTab, TCategory> : Container
+        where TTab : struct, Enum
+        where TCategory : struct, Enum
     {
         private const float padding = 10;
 
@@ -21,11 +23,12 @@ namespace osu.Game.Overlays.SearchableList
         private readonly Box tabStrip;
 
         public readonly SearchTextBox Search;
-        public readonly PageTabControl<T> Tabs;
-        public readonly DisplayStyleControl<U> DisplayStyleControl;
+        public readonly PageTabControl<TTab> Tabs;
+        public readonly DisplayStyleControl<TCategory> DisplayStyleControl;
 
         protected abstract Color4 BackgroundColour { get; }
-        protected abstract T DefaultTab { get; }
+        protected abstract TTab DefaultTab { get; }
+        protected abstract TCategory DefaultCategory { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
         /// <summary>
@@ -35,9 +38,6 @@ namespace osu.Game.Overlays.SearchableList
 
         protected SearchableListFilterControl()
         {
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("SearchableListFilterControl's sort tabs only support enums as the generic type argument");
-
             RelativeSizeAxes = Axes.X;
 
             var controls = CreateSupplementaryControls();
@@ -84,9 +84,15 @@ namespace osu.Game.Overlays.SearchableList
                                     AutoSizeAxes = Axes.Y,
                                     Margin = new MarginPadding { Top = controls != null ? padding : 0 },
                                 },
-                                Tabs = new PageTabControl<T>
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Right = 225 },
+                                    Child = Tabs = new PageTabControl<TTab>
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                    },
                                 },
                                 new Box //keep the tab strip part of autosize, but don't put it in the flow container
                                 {
@@ -98,7 +104,7 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
-                DisplayStyleControl = new DisplayStyleControl<U>
+                DisplayStyleControl = new DisplayStyleControl<TCategory>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -109,6 +115,9 @@ namespace osu.Game.Overlays.SearchableList
 
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
+
+            DisplayStyleControl.Dropdown.Current.Value = DefaultCategory;
+            DisplayStyleControl.Dropdown.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
@@ -127,10 +136,14 @@ namespace osu.Game.Overlays.SearchableList
 
         private class FilterSearchTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundUnfocused => OsuColour.Gray(0.06f);
-            protected override Color4 BackgroundFocused => OsuColour.Gray(0.12f);
-
             protected override bool AllowCommit => true;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
+            }
         }
     }
 }

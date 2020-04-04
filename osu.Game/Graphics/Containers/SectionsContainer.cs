@@ -3,9 +3,10 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
         private readonly FlowContainer<T> scrollContentContainer;
 
@@ -24,7 +25,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable ExpandableHeader
         {
-            get { return expandableHeader; }
+            get => expandableHeader;
             set
             {
                 if (value == expandableHeader) return;
@@ -40,7 +41,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable FixedHeader
         {
-            get { return fixedHeader; }
+            get => fixedHeader;
             set
             {
                 if (value == fixedHeader) return;
@@ -56,7 +57,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable Footer
         {
-            get { return footer; }
+            get => footer;
             set
             {
                 if (value == footer) return;
@@ -75,7 +76,7 @@ namespace osu.Game.Graphics.Containers
 
         public Drawable HeaderBackground
         {
-            get { return headerBackground; }
+            get => headerBackground;
             set
             {
                 if (value == headerBackground) return;
@@ -110,6 +111,7 @@ namespace osu.Game.Graphics.Containers
 
         private float headerHeight, footerHeight;
         private readonly MarginPadding originalSectionsMargin;
+
         private void updateSectionsMargin()
         {
             if (!Children.Any()) return;
@@ -123,7 +125,7 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(scrollContainer = new ScrollContainer
+            AddInternal(scrollContainer = new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -141,13 +143,28 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            var result = base.OnInvalidate(invalidation, source);
+
+            if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
+            {
+                lastKnownScroll = -1;
+                result = true;
+            }
+
+            return result;
+        }
+
         private float lastKnownScroll;
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
             float headerH = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
             float footerH = Footer?.LayoutSize.Y ?? 0;
+
             if (headerH != headerHeight || footerH != footerHeight)
             {
                 headerHeight = headerH;
@@ -179,6 +196,7 @@ namespace osu.Game.Graphics.Containers
                 foreach (var section in Children)
                 {
                     float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
+
                     if (diff < minDiff)
                     {
                         minDiff = diff;

@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Select
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
 
-            Icon = FontAwesome.fa_trash_o;
+            Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {

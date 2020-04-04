@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,23 +17,25 @@ namespace osu.Game.Screens.Select.Details
         private readonly BarGraph retryGraph, failGraph;
 
         private BeatmapMetrics metrics;
+
         public BeatmapMetrics Metrics
         {
-            get { return metrics; }
+            get => metrics;
             set
             {
                 if (value == metrics) return;
+
                 metrics = value;
 
-                var retries = Metrics?.Retries ?? new int[0];
-                var fails = Metrics?.Fails ?? new int[0];
+                var retries = Metrics?.Retries ?? Array.Empty<int>();
+                var fails = Metrics?.Fails ?? Array.Empty<int>();
 
                 float maxValue = fails.Any() ? fails.Zip(retries, (fail, retry) => fail + retry).Max() : 0;
                 failGraph.MaxValue = maxValue;
                 retryGraph.MaxValue = maxValue;
 
                 failGraph.Values = fails.Select(f => (float)f);
-                retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + MathHelper.Clamp(fail, 0, maxValue));
+                retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + Math.Clamp(fail, 0, maxValue));
             }
         }
 

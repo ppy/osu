@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 
@@ -11,11 +12,11 @@ namespace osu.Game.Online.API
     /// An API request with a well-defined response type.
     /// </summary>
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    public abstract class APIRequest<T> : APIRequest
+    public abstract class APIRequest<T> : APIRequest where T : class
     {
-        protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
+        protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
+        public T Result => ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
 
         protected APIRequest()
         {
@@ -38,7 +39,7 @@ namespace osu.Game.Online.API
     {
         protected abstract string Target { get; }
 
-        protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
+        protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
@@ -61,9 +62,15 @@ namespace osu.Game.Online.API
 
         private Action pendingFailure;
 
-        public void Perform(APIAccess api)
+        public void Perform(IAPIProvider api)
         {
-            API = api;
+            if (!(api is APIAccess apiAccess))
+            {
+                Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
+                return;
+            }
+
+            API = apiAccess;
 
             if (checkAndScheduleFailure())
                 return;
@@ -71,7 +78,7 @@ namespace osu.Game.Online.API
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
-            WebRequest.AddHeader("Authorization", $"Bearer {api.AccessToken}");
+            WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
             if (checkAndScheduleFailure())
                 return;
@@ -85,7 +92,12 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
-            api.Schedule(delegate { Success?.Invoke(); });
+            API.Schedule(delegate
+            {
+                if (cancelled) return;
+
+                Success?.Invoke();
+            });
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -100,6 +112,22 @@ namespace osu.Game.Online.API
 
             cancelled = true;
             WebRequest?.Abort();
+
+            string responseString = WebRequest?.GetResponseString();
+
+            if (!string.IsNullOrEmpty(responseString))
+            {
+                try
+                {
+                    // attempt to decode a displayable error string.
+                    var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
+                    if (error != null)
+                        e = new APIException(error.ErrorMessage, e);
+                }
+                catch
+                {
+                }
+            }
 
             Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
             pendingFailure = () => Failure?.Invoke(e);
@@ -118,10 +146,27 @@ namespace osu.Game.Online.API
             pendingFailure = null;
             return true;
         }
+
+        private class DisplayableError
+        {
+            [JsonProperty("error")]
+            public string ErrorMessage { get; set; }
+        }
+    }
+
+    public class APIException : InvalidOperationException
+    {
+        public APIException(string messsage, Exception innerException)
+            : base(messsage, innerException)
+        {
+        }
     }
 
     public delegate void APIFailureHandler(Exception e);
+
     public delegate void APISuccessHandler();
+
     public delegate void APIProgressHandler(long current, long total);
+
     public delegate void APISuccessHandler<in T>(T content);
 }

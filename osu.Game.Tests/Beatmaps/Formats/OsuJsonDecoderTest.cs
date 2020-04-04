@@ -8,9 +8,10 @@ using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -101,18 +102,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsNotNull(curveData);
             Assert.AreEqual(new Vector2(192, 168), positionData.Position);
             Assert.AreEqual(956, beatmap.HitObjects[0].StartTime);
-            Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
+            Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
             positionData = beatmap.HitObjects[1] as IHasPosition;
 
             Assert.IsNotNull(positionData);
             Assert.AreEqual(new Vector2(304, 56), positionData.Position);
             Assert.AreEqual(1285, beatmap.HitObjects[1].StartTime);
-            Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
+            Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
         }
 
         [TestCase(normal)]
         [TestCase(marathon)]
+        [Ignore("temporarily disabled pending DeepEqual fix (https://github.com/jamesfoster/DeepEqual/pull/35)")]
         // Currently fails:
         // [TestCase(with_sb)]
         public void TestParity(string beatmap)
@@ -123,6 +125,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                                      // Todo: CustomSampleBank shouldn't exist going forward, we need a conversion mechanism
                                      || r.Name == nameof(LegacyDecoder<Beatmap>.LegacySampleControlPoint.CustomSampleBank))
                 .Assert();
+        }
+
+        [Test]
+        public void TestGetJsonDecoder()
+        {
+            Decoder<Beatmap> decoder;
+
+            using (var stream = TestResources.OpenResource(normal))
+            using (var sr = new LineBufferedReader(stream))
+            {
+                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+
+                using (var memStream = new MemoryStream())
+                using (var memWriter = new StreamWriter(memStream))
+                using (var memReader = new LineBufferedReader(memStream))
+                {
+                    memWriter.Write(legacyDecoded.Serialize());
+                    memWriter.Flush();
+
+                    memStream.Position = 0;
+                    decoder = Decoder.GetDecoder<Beatmap>(memReader);
+                }
+            }
+
+            Assert.IsInstanceOf(typeof(JsonBeatmapDecoder), decoder);
         }
 
         /// <summary>
@@ -147,12 +174,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
             using (var stream = TestResources.OpenResource(filename))
-            using (var sr = new StreamReader(stream))
+            using (var sr = new LineBufferedReader(stream))
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
-                using (var sr2 = new StreamReader(ms))
+                using (var sr2 = new LineBufferedReader(ms))
                 {
                     sw.Write(legacyDecoded.Serialize());
                     sw.Flush();

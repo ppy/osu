@@ -3,8 +3,7 @@
 
 using System.Diagnostics;
 using System.Net.Http;
-using osu.Framework.Configuration;
-using osu.Framework.IO.Network;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Online.API
 {
@@ -166,7 +165,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        private class AccessTokenRequest : JsonWebRequest<OAuthToken>
+        private class AccessTokenRequest : OsuJsonWebRequest<OAuthToken>
         {
             protected string GrantType;
 

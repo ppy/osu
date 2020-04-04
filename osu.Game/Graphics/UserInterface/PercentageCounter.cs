@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -22,17 +23,14 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
-            DisplayedCountSpriteText.FixedWidth = true;
+            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             Current.Value = DisplayedCount = 1.0f;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
-        protected override string FormatCount(double count)
-        {
-            return $@"{count:P2}";
-        }
+        protected override string FormatCount(double count) => count.FormatAccuracy();
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
@@ -41,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Increment(double amount)
         {
-            Current.Value = Current + amount;
+            Current.Value += amount;
         }
     }
 }

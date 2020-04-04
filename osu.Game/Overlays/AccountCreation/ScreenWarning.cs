@@ -22,7 +22,9 @@ namespace osu.Game.Overlays.AccountCreation
     {
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
-        private APIAccess api;
+
+        [Resolved(CanBeNull = true)]
+        private IAPIProvider api { get; set; }
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
@@ -39,10 +41,8 @@ namespace osu.Game.Overlays.AccountCreation
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, APIAccess api, OsuGame game, TextureStore textures)
+        private void load(OsuColour colours, OsuGame game, TextureStore textures)
         {
-            this.api = api;
-
             if (string.IsNullOrEmpty(api.ProvidedUsername))
                 return;
 
@@ -83,14 +83,13 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         new OsuSpriteText
                         {
-                            TextSize = 28,
-                            Font = "Exo2.0-Light",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Colour = Color4.Red,
+                            Font = OsuFont.GetFont(size: 28, weight: FontWeight.Light),
                             Text = "Warning! 注意！",
                         },
-                        multiAccountExplanationText = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
+                        multiAccountExplanationText = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
@@ -106,7 +105,7 @@ namespace osu.Game.Overlays.AccountCreation
                             Text = "I understand. This account isn't for me.",
                             Action = () => this.Push(new ScreenEntry())
                         },
-                        furtherAssistance = new LinkFlowContainer(cp => { cp.TextSize = 12; })
+                        furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
                             Margin = new MarginPadding { Top = 20 },
                             Anchor = Anchor.TopCentre,
@@ -122,7 +121,7 @@ namespace osu.Game.Overlays.AccountCreation
             multiAccountExplanationText.AddText("? osu! has a policy of ");
             multiAccountExplanationText.AddText("one account per person!", cp => cp.Colour = colours.Yellow);
             multiAccountExplanationText.AddText(" Please be aware that creating more than one account per person may result in ");
-            multiAccountExplanationText.AddText("permanent deactivation of accounts", cp => cp.Colour = colours.Yellow);
+            multiAccountExplanationText.AddText("permanent deactivation of accounts", cp => cp.Colour = colours.Yellow);
             multiAccountExplanationText.AddText(".");
 
             furtherAssistance.AddText("Need further assistance? Contact us via our ");

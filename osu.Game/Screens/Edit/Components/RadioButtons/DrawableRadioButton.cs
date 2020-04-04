@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         {
             this.button = button;
 
-            Text = button.Text;
-            Action = button.Action;
+            Text = button.Item.ToString();
+            Action = button.Select;
 
             RelativeSizeAxes = Axes.X;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 Scale = new Vector2(0.5f),
                 X = 10,
                 Masking = true,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Child = new Box { RelativeSizeAxes = Axes.Both }
             };
         }
@@ -80,10 +80,10 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         {
             base.LoadComplete();
 
-            button.Selected.ValueChanged += v =>
+            button.Selected.ValueChanged += selected =>
             {
                 updateSelectionState();
-                if (v)
+                if (selected.NewValue)
                     Selected?.Invoke(button);
             };
 
@@ -95,21 +95,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             if (!IsLoaded)
                 return;
 
-            BackgroundColour = button.Selected ? selectedBackgroundColour : defaultBackgroundColour;
-            bubble.Colour = button.Selected ? selectedBubbleColour : defaultBubbleColour;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (button.Selected)
-                return true;
-
-            if (!Enabled)
-                return true;
-
-            button.Selected.Value = true;
-
-            return base.OnClick(e);
+            BackgroundColour = button.Selected.Value ? selectedBackgroundColour : defaultBackgroundColour;
+            bubble.Colour = button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
         }
 
         protected override SpriteText CreateText() => new OsuSpriteText

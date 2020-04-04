@@ -9,8 +9,10 @@ namespace osu.Game.Rulesets.Osu.Judgements
     {
         [Description(@"")]
         None,
+
         [Description(@"Good")]
         Good,
+
         [Description(@"Amazing")]
         Perfect
     }

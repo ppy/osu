@@ -18,6 +18,6 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         protected override bool IsImportant(TaikoReplayFrame frame) => frame.Actions.Any();
 
-        public override List<IInput> GetPendingInputs() => new List<IInput> { new ReplayState<TaikoAction> { PressedActions = CurrentFrame.Actions } };
+        public override List<IInput> GetPendingInputs() => new List<IInput> { new ReplayState<TaikoAction> { PressedActions = CurrentFrame?.Actions ?? new List<TaikoAction>() } };
     }
 }

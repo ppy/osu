@@ -3,53 +3,80 @@
 
 using System.IO;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
 {
     /// <summary>
-    /// A <see cref="WorkingBeatmap"/> that is used for testcases that include waveforms.
+    /// A <see cref="WorkingBeatmap"/> that is used for test scenes that include waveforms.
     /// </summary>
     public class WaveformTestBeatmap : WorkingBeatmap
     {
-        private readonly ZipArchiveReader reader;
-        private readonly Stream stream;
+        private readonly Beatmap beatmap;
+        private readonly ITrackStore trackStore;
 
-        public WaveformTestBeatmap()
-            : base(new BeatmapInfo())
+        public WaveformTestBeatmap(AudioManager audioManager)
+            : this(audioManager, new WaveformBeatmap())
         {
-            stream = TestResources.GetTestBeatmapStream();
-            reader = new ZipArchiveReader(stream);
         }
 
-        public override void Dispose()
+        public WaveformTestBeatmap(AudioManager audioManager, Beatmap beatmap)
+            : base(beatmap.BeatmapInfo, audioManager)
         {
-            base.Dispose();
-            stream?.Dispose();
-            reader?.Dispose();
+            this.beatmap = beatmap;
+            trackStore = audioManager.GetTrackStore(getZipReader());
         }
 
-        protected override IBeatmap GetBeatmap() => createTestBeatmap();
+        ~WaveformTestBeatmap()
+        {
+            // Remove the track store from the audio manager
+            trackStore?.Dispose();
+        }
+
+        private static Stream getStream() => TestResources.GetTestBeatmapStream();
+
+        private static ZipArchiveReader getZipReader() => new ZipArchiveReader(getStream());
+
+        protected override IBeatmap GetBeatmap() => beatmap;
 
         protected override Texture GetBackground() => null;
 
-        protected override Waveform GetWaveform() => new Waveform(getAudioStream());
+        protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
 
-        protected override Track GetTrack() => new TrackBass(getAudioStream());
+        protected override Track GetTrack() => trackStore.Get(firstAudioFile);
 
-        private Stream getAudioStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".mp3")));
-        private Stream getBeatmapStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")));
-
-        private Beatmap createTestBeatmap()
+        private string firstAudioFile
         {
-            using (var beatmapStream = getBeatmapStream())
-            using (var beatmapReader = new StreamReader(beatmapStream))
-                return Decoder.GetDecoder<Beatmap>(beatmapReader).Decode(beatmapReader);
+            get
+            {
+                using (var reader = getZipReader())
+                    return reader.Filenames.First(f => f.EndsWith(".mp3"));
+            }
+        }
+
+        private class WaveformBeatmap : TestBeatmap
+        {
+            public WaveformBeatmap()
+                : base(new CatchRuleset().RulesetInfo)
+            {
+            }
+
+            protected override Beatmap CreateBeatmap()
+            {
+                using (var reader = getZipReader())
+                using (var beatmapStream = reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu"))))
+                using (var beatmapReader = new LineBufferedReader(beatmapStream))
+                    return Decoder.GetDecoder<Beatmap>(beatmapReader).Decode(beatmapReader);
+            }
         }
     }
 }

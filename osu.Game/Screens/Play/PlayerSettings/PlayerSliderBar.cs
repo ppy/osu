@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class PlayerSliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
 

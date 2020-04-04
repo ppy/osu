@@ -4,59 +4,76 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class ReadyButton : HeaderButton
+    public class ReadyButton : TriangleButton
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        private readonly Room room;
+        [Resolved(typeof(Room), nameof(Room.EndDate))]
+        private Bindable<DateTimeOffset> endDate { get; set; }
 
         [Resolved]
-        private IBindableBeatmap gameBeatmap { get; set; }
+        private IBindable<WorkingBeatmap> gameBeatmap { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
         private bool hasBeatmap;
 
-        public ReadyButton(Room room)
+        public ReadyButton()
         {
-            this.room = room;
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(200, 1);
-
             Text = "Start";
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             beatmaps.ItemAdded += beatmapAdded;
+            beatmaps.ItemRemoved += beatmapRemoved;
 
-            Beatmap.BindValueChanged(updateBeatmap, true);
+            SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
+
+            BackgroundColour = colours.Green;
+            Triangles.ColourDark = colours.Green;
+            Triangles.ColourLight = colours.GreenLight;
         }
 
-        private void updateBeatmap(BeatmapInfo beatmap)
+        private void updateSelectedItem(PlaylistItem item)
         {
             hasBeatmap = false;
 
-            if (beatmap?.OnlineBeatmapID == null)
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
                 return;
 
-            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID) != null;
+            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId) != null;
         }
 
-        private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent)
+        private void beatmapAdded(BeatmapSetInfo model)
         {
-            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == Beatmap.Value.OnlineBeatmapID))
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
+                return;
+
+            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
                 Schedule(() => hasBeatmap = true);
+        }
+
+        private void beatmapRemoved(BeatmapSetInfo model)
+        {
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
+                return;
+
+            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
+                Schedule(() => hasBeatmap = false);
         }
 
         protected override void Update()
@@ -68,13 +85,13 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void updateEnabledState()
         {
-            if (gameBeatmap.Value == null)
+            if (gameBeatmap.Value == null || SelectedItem.Value == null)
             {
                 Enabled.Value = false;
                 return;
             }
 
-            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < room.EndDate;
+            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate.Value;
 
             Enabled.Value = hasBeatmap && hasEnoughTime;
         }
@@ -84,7 +101,10 @@ namespace osu.Game.Screens.Multi.Match.Components
             base.Dispose(isDisposing);
 
             if (beatmaps != null)
+            {
                 beatmaps.ItemAdded -= beatmapAdded;
+                beatmaps.ItemRemoved -= beatmapRemoved;
+            }
         }
     }
 }

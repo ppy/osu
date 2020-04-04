@@ -6,8 +6,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Music
 {
@@ -30,7 +31,6 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
-                            Exit = () => ExitRequested?.Invoke(),
                         },
                         new CollectionsDropdown<PlaylistCollection>
                         {
@@ -44,23 +44,22 @@ namespace osu.Game.Overlays.Music
             Search.Current.ValueChanged += current_ValueChanged;
         }
 
-        private void current_ValueChanged(string newValue) => FilterChanged?.Invoke(newValue);
-
-        public Action ExitRequested;
+        private void current_ValueChanged(ValueChangedEvent<string> e) => FilterChanged?.Invoke(e.NewValue);
 
         public Action<string> FilterChanged;
 
         public class FilterTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundUnfocused => OsuColour.Gray(0.06f);
-            protected override Color4 BackgroundFocused => OsuColour.Gray(0.12f);
-
             protected override bool AllowCommit => true;
 
-            public FilterTextBox()
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 Masking = true;
                 CornerRadius = 5;
+
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
             }
         }
     }

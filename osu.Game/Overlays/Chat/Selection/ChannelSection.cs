@@ -7,6 +7,7 @@ using System.Linq;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 
@@ -20,23 +21,23 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
         public IEnumerable<string> FilterTerms => Array.Empty<string>();
+
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1f : 0f, 100);
-            }
+            set => this.FadeTo(value ? 1f : 0f, 100);
         }
+
+        public bool FilteringActive { get; set; }
 
         public string Header
         {
-            get { return header.Text; }
-            set { header.Text = value.ToUpperInvariant(); }
+            get => header.Text;
+            set => header.Text = value.ToUpperInvariant();
         }
 
         public IEnumerable<Channel> Channels
         {
-            set { ChannelFlow.ChildrenEnumerable = value.Select(c => new ChannelListItem(c)); }
+            set => ChannelFlow.ChildrenEnumerable = value.Select(c => new ChannelListItem(c));
         }
 
         public ChannelSection()
@@ -48,8 +49,7 @@ namespace osu.Game.Overlays.Chat.Selection
             {
                 header = new OsuSpriteText
                 {
-                    TextSize = 15,
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                 },
                 ChannelFlow = new FillFlowContainer<ChannelListItem>
                 {

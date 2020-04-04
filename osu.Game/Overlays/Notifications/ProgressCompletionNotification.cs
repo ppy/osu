@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Overlays.Notifications
     {
         public ProgressCompletionNotification()
         {
-            Icon = FontAwesome.fa_check;
+            Icon = FontAwesome.Solid.Check;
         }
 
         [BackgroundDependencyLoader]

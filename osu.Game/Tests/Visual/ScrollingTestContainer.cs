@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Game.Configuration;
@@ -20,9 +20,15 @@ namespace osu.Game.Tests.Visual
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
-        public ScrollVisualisationMethod ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
+        public ScrollVisualisationMethod ScrollAlgorithm
+        {
+            set => scrollingInfo.Algorithm.Algorithm = value;
+        }
 
-        public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
+        public double TimeRange
+        {
+            set => scrollingInfo.TimeRange.Value = value;
+        }
 
         public IScrollingInfo ScrollingInfo => scrollingInfo;
 
@@ -41,7 +47,7 @@ namespace osu.Game.Tests.Visual
             public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
 
-            public readonly Bindable<double> TimeRange = new Bindable<double>(1000) { Value = 1000 };
+            public readonly Bindable<double> TimeRange = new BindableDouble(1000) { Value = 1000 };
             IBindable<double> IScrollingInfo.TimeRange => TimeRange;
 
             public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
@@ -68,9 +74,11 @@ namespace osu.Game.Tests.Visual
                         case ScrollVisualisationMethod.Constant:
                             implementation = new ConstantScrollAlgorithm();
                             break;
+
                         case ScrollVisualisationMethod.Overlapping:
                             implementation = new OverlappingScrollAlgorithm(ControlPoints);
                             break;
+
                         case ScrollVisualisationMethod.Sequential:
                             implementation = new SequentialScrollAlgorithm(ControlPoints);
                             break;
@@ -78,8 +86,8 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            public double GetDisplayStartTime(double time, double timeRange)
-                => implementation.GetDisplayStartTime(time, timeRange);
+            public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
+                => implementation.GetDisplayStartTime(originTime, offset, timeRange, scrollLength);
 
             public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
                 => implementation.GetLength(startTime, endTime, timeRange, scrollLength);

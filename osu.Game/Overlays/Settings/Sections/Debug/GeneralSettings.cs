@@ -23,14 +23,9 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Performance logging",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.PerformanceLogging)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Bypass caching (slow)",
-                    Bindable = config.GetBindable<bool>(DebugSetting.BypassCaching)
-                },
+                    LabelText = "Bypass front-to-back render pass",
+                    Bindable = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                }
             };
         }
     }

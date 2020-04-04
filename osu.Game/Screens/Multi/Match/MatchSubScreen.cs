@@ -4,52 +4,60 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
-using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchSubScreen : MultiplayerSubScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class MatchSubScreen : MultiplayerSubScreen, IPreviewTrackOwner
     {
-        public override bool AllowBeatmapRulesetChange => false;
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
+        public override string Title { get; }
+
         public override string ShortTitle => "room";
 
-        private readonly RoomBindings bindings = new RoomBindings();
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
 
-        private readonly MatchLeaderboard leaderboard;
+        [Resolved(typeof(Room), nameof(Room.Type))]
+        private Bindable<GameType> type { get; set; }
 
-        private readonly Action<Screen> pushGameplayScreen;
-
-        [Cached]
-        private readonly Room room;
+        [Resolved(typeof(Room), nameof(Room.Playlist))]
+        private BindableList<PlaylistItem> playlist { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        public MatchSubScreen(Room room, Action<Screen> pushGameplayScreen)
+        [Resolved(canBeNull: true)]
+        private Multiplayer multiplayer { get; set; }
+
+        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
+        private LeaderboardChatDisplay leaderboardChatDisplay;
+        private MatchSettingsOverlay settingsOverlay;
+
+        public MatchSubScreen(Room room)
         {
-            this.room = room;
-            this.pushGameplayScreen = pushGameplayScreen;
+            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
+        }
 
-            bindings.Room = room;
-
-            MatchChatDisplay chat;
-            Components.Header header;
-            Info info;
-            GridContainer bottomRow;
-            MatchSettingsOverlay settings;
-
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             InternalChildren = new Drawable[]
             {
                 new GridContainer
@@ -57,160 +65,173 @@ namespace osu.Game.Screens.Multi.Match
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
                     {
-                        new Drawable[] { header = new Components.Header(room) { Depth = -1 } },
-                        new Drawable[] { info = new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
-                            bottomRow = new GridContainer
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Content = new[]
+                                Padding = new MarginPadding
                                 {
-                                    new Drawable[]
-                                    {
-                                        leaderboard = new MatchLeaderboard
-                                        {
-                                            Padding = new MarginPadding
-                                            {
-                                                Left = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                                Right = 10,
-                                                Vertical = 10,
-                                            },
-                                            RelativeSizeAxes = Axes.Both,
-                                            Room = room
-                                        },
-                                        new Container
-                                        {
-                                            Padding = new MarginPadding
-                                            {
-                                                Left = 10,
-                                                Right = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                                Vertical = 10,
-                                            },
-                                            RelativeSizeAxes = Axes.Both,
-                                            Child = chat = new MatchChatDisplay(room)
-                                            {
-                                                RelativeSizeAxes = Axes.Both
-                                            }
-                                        },
-                                    },
+                                    Horizontal = 105,
+                                    Vertical = 20
                                 },
+                                Child = new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Content = new[]
+                                    {
+                                        new Drawable[] { new Components.Header() },
+                                        new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Top = 65 },
+                                                Child = new GridContainer
+                                                {
+                                                    ColumnDimensions = new[]
+                                                    {
+                                                        new Dimension(minSize: 160),
+                                                        new Dimension(minSize: 360),
+                                                        new Dimension(minSize: 400),
+                                                    },
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Content = new[]
+                                                    {
+                                                        new Drawable[]
+                                                        {
+                                                            new Container
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Padding = new MarginPadding { Right = 5 },
+                                                                Child = new OverlinedParticipants(Direction.Vertical) { RelativeSizeAxes = Axes.Both }
+                                                            },
+                                                            new Container
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Padding = new MarginPadding { Horizontal = 5 },
+                                                                Child = new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    SelectedItem = { BindTarget = SelectedItem }
+                                                                }
+                                                            },
+                                                            new Container
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Padding = new MarginPadding { Left = 5 },
+                                                                Child = leaderboardChatDisplay = new LeaderboardChatDisplay()
+                                                            }
+                                                        },
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(),
+                                    }
+                                }
                             }
                         },
+                        new Drawable[]
+                        {
+                            new Footer
+                            {
+                                OnStart = onStart,
+                                SelectedItem = { BindTarget = SelectedItem }
+                            }
+                        }
                     },
                     RowDimensions = new[]
                     {
+                        new Dimension(),
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed),
                     }
                 },
-                new Container
+                settingsOverlay = new MatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Components.Header.HEIGHT },
-                    Child = settings = new MatchSettingsOverlay(room) { RelativeSizeAxes = Axes.Both },
-                },
-            };
-
-            header.OnRequestSelectBeatmap = () => this.Push(new MatchSongSelect
-            {
-                Selected = addPlaylistItem,
-            });
-
-            header.Tabs.Current.ValueChanged += t =>
-            {
-                const float fade_duration = 500;
-                if (t is SettingsMatchPage)
-                {
-                    settings.Show();
-                    info.FadeOut(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
-                }
-                else
-                {
-                    settings.Hide();
-                    info.FadeIn(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
+                    EditPlaylist = () => this.Push(new MatchSongSelect()),
+                    State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
             };
-
-            chat.Exit += () =>
-            {
-                if (this.IsCurrentScreen())
-                    this.Exit();
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            beatmapManager.ItemAdded += beatmapAdded;
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            Manager?.PartRoom();
-            return base.OnExiting(next);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            bindings.CurrentBeatmap.BindValueChanged(setBeatmap, true);
-            bindings.CurrentRuleset.BindValueChanged(setRuleset, true);
+            roomId.BindValueChanged(id =>
+            {
+                if (id.NewValue == null)
+                    settingsOverlay.Show();
+                else
+                {
+                    settingsOverlay.Hide();
+
+                    // Set the first playlist item.
+                    // This is scheduled since updating the room and playlist may happen in an arbitrary order (via Room.CopyFrom()).
+                    Schedule(() => SelectedItem.Value = playlist.FirstOrDefault());
+                }
+            }, true);
+
+            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
+            SelectedItem.Value = playlist.FirstOrDefault();
+
+            beatmapManager.ItemAdded += beatmapAdded;
         }
 
-        private void setBeatmap(BeatmapInfo beatmap)
+        public override bool OnExiting(IScreen next)
         {
+            RoomManager?.PartRoom();
+            Mods.Value = Array.Empty<Mod>();
+
+            return base.OnExiting(next);
+        }
+
+        private void selectedItemChanged()
+        {
+            updateWorkingBeatmap();
+
+            var item = SelectedItem.Value;
+
+            Mods.Value = item?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+
+            if (item?.Ruleset != null)
+                Ruleset.Value = item.Ruleset.Value;
+        }
+
+        private void updateWorkingBeatmap()
+        {
+            var beatmap = SelectedItem.Value?.Beatmap.Value;
+
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
-            Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
-        private void setRuleset(RulesetInfo ruleset)
-        {
-            if (ruleset == null)
-                return;
-
-            Game?.ForcefullySetRuleset(ruleset);
-        }
-
-        private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
+        private void beatmapAdded(BeatmapSetInfo model) => Schedule(() =>
         {
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
-            if (bindings.CurrentBeatmap.Value == null)
-                return;
-
-            // Try to retrieve the corresponding local beatmap
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == bindings.CurrentBeatmap.Value.OnlineBeatmapID);
-
-            if (localBeatmap != null)
-                Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+            updateWorkingBeatmap();
         });
-
-        private void addPlaylistItem(PlaylistItem item)
-        {
-            bindings.Playlist.Clear();
-            bindings.Playlist.Add(item);
-        }
 
         private void onStart()
         {
-            Beatmap.Value.Mods.Value = bindings.CurrentMods.Value.ToArray();
-
-            switch (bindings.Type.Value)
+            switch (type.Value)
             {
                 default:
                 case GameTypeTimeshift _:
-                    pushGameplayScreen?.Invoke(new PlayerLoader(() => new TimeshiftPlayer(room, room.Playlist.First().ID)
+                    multiplayer?.Start(() => new TimeshiftPlayer(SelectedItem.Value)
                     {
-                        Exited = () => leaderboard.RefreshScores()
-                    }));
+                        Exited = () => leaderboardChatDisplay.RefreshScores()
+                    });
                     break;
             }
         }

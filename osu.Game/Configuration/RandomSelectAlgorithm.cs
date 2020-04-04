@@ -5,10 +5,11 @@ using System.ComponentModel;
 
 namespace osu.Game.Configuration
 {
-   public enum RandomSelectAlgorithm
+    public enum RandomSelectAlgorithm
     {
         [Description("Never repeat")]
         RandomPermutation,
+
         [Description("Random")]
         Random
     }

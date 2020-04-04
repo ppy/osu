@@ -10,6 +10,8 @@ namespace osu.Game.Storyboards
         string Path { get; }
         bool IsDrawable { get; }
 
+        double StartTime { get; }
+
         Drawable CreateDrawable();
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -57,6 +58,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"version")]
         private string version { get; set; }
 
+        [JsonProperty(@"failtimes")]
+        private BeatmapMetrics metrics { get; set; }
+
+        [JsonProperty(@"max_combo")]
+        private int? maxCombo { get; set; }
+
         public BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
             var set = BeatmapSet?.ToBeatmapSet(rulesets);
@@ -68,8 +75,11 @@ namespace osu.Game.Online.API.Requests.Responses
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
+                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
                 Status = Status,
                 BeatmapSet = set,
+                Metrics = metrics,
+                MaxCombo = maxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,
@@ -81,7 +91,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 {
                     PlayCount = playCount,
                     PassCount = passCount,
-                    Length = length,
                     CircleCount = circleCount,
                     SliderCount = sliderCount,
                 },

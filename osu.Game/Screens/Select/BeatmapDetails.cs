@@ -7,16 +7,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
@@ -29,23 +31,29 @@ namespace osu.Game.Screens.Select
         private readonly AdvancedStats advanced;
         private readonly DetailBox ratingsContainer;
         private readonly UserRatings ratings;
-        private readonly ScrollContainer metadataScroll;
+        private readonly OsuScrollContainer metadataScroll;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
-        private readonly DimmedLoadingAnimation loading;
+        private readonly LoadingLayer loading;
 
-        private APIAccess api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 pendingBeatmapSwitch?.Cancel();
@@ -55,6 +63,8 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
+            Container content;
+
             Children = new Drawable[]
             {
                 new Box
@@ -62,7 +72,7 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                new Container
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = spacing },
@@ -104,7 +114,7 @@ namespace osu.Game.Screens.Select
                                         },
                                     },
                                 },
-                                metadataScroll = new ScrollContainer
+                                metadataScroll = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,
@@ -115,6 +125,7 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         LayoutDuration = transition_duration,
+                                        LayoutEasing = Easing.OutQuad,
                                         Spacing = new Vector2(spacing * 2),
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
@@ -137,8 +148,7 @@ namespace osu.Game.Screens.Select
                                 new OsuSpriteText
                                 {
                                     Text = "Points of Failure",
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 14,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                 },
                                 failRetryGraph = new FailRetryGraph
                                 {
@@ -149,17 +159,8 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-                loading = new DimmedLoadingAnimation
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                loading = new LoadingLayer(content),
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
         }
 
         protected override void UpdateAfterChildren()
@@ -172,104 +173,98 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            if (Beatmap == null)
+            advanced.Beatmap = Beatmap;
+            description.Text = Beatmap?.Version;
+            source.Text = Beatmap?.Metadata?.Source;
+            tags.Text = Beatmap?.Metadata?.Tags;
+
+            // metrics may have been previously fetched
+            if (Beatmap?.BeatmapSet?.Metrics != null && Beatmap?.Metrics != null)
             {
-                clearStats();
+                updateMetrics();
                 return;
             }
 
-            ratingsContainer.FadeIn(transition_duration);
-            advanced.Beatmap = Beatmap;
-            description.Text = Beatmap.Version;
-            source.Text = Beatmap.Metadata.Source;
-            tags.Text = Beatmap.Metadata.Tags;
+            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
+            if (Beatmap?.OnlineBeatmapID == null)
+            {
+                updateMetrics();
+                return;
+            }
 
             var requestedBeatmap = Beatmap;
-            if (requestedBeatmap.Metrics == null)
+
+            var lookup = new GetBeatmapRequest(requestedBeatmap);
+
+            lookup.Success += res =>
             {
-                var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
-                lookup.Success += res =>
+                Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
                         //the beatmap has been changed since we started the lookup.
                         return;
 
-                    requestedBeatmap.Metrics = res;
-                    Schedule(() => displayMetrics(res));
-                };
-                lookup.Failure += e => Schedule(() => displayMetrics(null));
+                    var b = res.ToBeatmap(rulesets);
 
-                api.Queue(lookup);
-                loading.Show();
-            }
+                    if (requestedBeatmap.BeatmapSet == null)
+                        requestedBeatmap.BeatmapSet = b.BeatmapSet;
+                    else
+                        requestedBeatmap.BeatmapSet.Metrics = b.BeatmapSet.Metrics;
 
-            displayMetrics(requestedBeatmap.Metrics, false);
+                    requestedBeatmap.Metrics = b.Metrics;
+
+                    updateMetrics();
+                });
+            };
+
+            lookup.Failure += e =>
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != requestedBeatmap)
+                        //the beatmap has been changed since we started the lookup.
+                        return;
+
+                    updateMetrics();
+                });
+            };
+
+            api.Queue(lookup);
+            loading.Show();
         }
 
-        private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
+        private void updateMetrics()
         {
-            var hasRatings = metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
-
-            if (failOnMissing) loading.Hide();
+            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = metrics;
-                ratings.FadeIn(transition_duration);
-            }
-            else if (failOnMissing)
-            {
-                ratings.Metrics = new BeatmapMetrics
-                {
-                    Ratings = new int[10],
-                };
+                ratings.Metrics = beatmap.BeatmapSet.Metrics;
+                ratingsContainer.FadeIn(transition_duration);
             }
             else
             {
-                ratings.FadeTo(0.25f, transition_duration);
+                ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
+                ratingsContainer.FadeTo(0.25f, transition_duration);
             }
 
             if (hasRetriesFails)
             {
-                failRetryGraph.Metrics = metrics;
+                failRetryGraph.Metrics = beatmap.Metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
-            else if (failOnMissing)
+            else
             {
                 failRetryGraph.Metrics = new BeatmapMetrics
                 {
                     Fails = new int[100],
                     Retries = new int[100],
                 };
+                failRetryContainer.FadeOut(transition_duration);
             }
-            else
-            {
-                failRetryContainer.FadeTo(0.25f, transition_duration);
-            }
-        }
-
-        private void clearStats()
-        {
-            description.Text = null;
-            source.Text = null;
-            tags.Text = null;
-
-            advanced.Beatmap = new BeatmapInfo
-            {
-                StarDifficulty = 0,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 0,
-                    DrainRate = 0,
-                    OverallDifficulty = 0,
-                    ApproachRate = 0,
-                },
-            };
 
             loading.Hide();
-            ratingsContainer.FadeOut(transition_duration);
-            failRetryContainer.FadeOut(transition_duration);
         }
 
         private class DetailBox : Container
@@ -323,8 +318,7 @@ namespace osu.Game.Screens.Select
                             Child = new OsuSpriteText
                             {
                                 Text = title,
-                                Font = @"Exo2.0-Bold",
-                                TextSize = 14,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                             },
                         },
                     },
@@ -337,9 +331,11 @@ namespace osu.Game.Screens.Select
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        textContainer.FadeOut(transition_duration);
+                        this.FadeOut(transition_duration);
                         return;
                     }
+
+                    this.FadeIn(transition_duration);
 
                     setTextAsync(value);
                 }
@@ -347,7 +343,7 @@ namespace osu.Game.Screens.Select
 
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.TextSize = 14)
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -361,36 +357,6 @@ namespace osu.Game.Screens.Select
                     // fade in if we haven't yet.
                     textContainer.FadeIn(transition_duration);
                 });
-            }
-        }
-
-        private class DimmedLoadingAnimation : VisibilityContainer
-        {
-            private readonly LoadingAnimation loading;
-
-            public DimmedLoadingAnimation()
-            {
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
-                    },
-                    loading = new LoadingAnimation(),
-                };
-            }
-
-            protected override void PopIn()
-            {
-                this.FadeIn(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Visible;
-            }
-
-            protected override void PopOut()
-            {
-                this.FadeOut(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Hidden;
             }
         }
     }

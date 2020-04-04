@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -12,24 +13,19 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIRoomScoreInfo>
+    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {
-        public Action<IEnumerable<APIRoomScoreInfo>> ScoresLoaded;
+        public Action<IEnumerable<APIUserScoreAggregate>> ScoresLoaded;
 
-        public Room Room
-        {
-            get => bindings.Room;
-            set => bindings.Room = value;
-        }
-
-        private readonly RoomBindings bindings = new RoomBindings();
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            bindings.RoomID.BindValueChanged(id =>
+            roomId.BindValueChanged(id =>
             {
-                if (id == null)
+                if (id.NewValue == null)
                     return;
 
                 Scores = null;
@@ -37,12 +33,14 @@ namespace osu.Game.Screens.Multi.Match.Components
             }, true);
         }
 
-        protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
+        protected override bool IsOnlineScope => true;
+
+        protected override APIRequest FetchScores(Action<IEnumerable<APIUserScoreAggregate>> scoresCallback)
         {
-            if (bindings.RoomID.Value == null)
+            if (roomId.Value == null)
                 return null;
 
-            var req = new GetRoomScoresRequest(bindings.RoomID.Value ?? 0);
+            var req = new GetRoomScoresRequest(roomId.Value ?? 0);
 
             req.Success += r =>
             {
@@ -53,7 +51,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index) => new MatchLeaderboardScore(model, index);
+        protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index) => new MatchLeaderboardScore(model, index);
     }
 
     public enum MatchLeaderboardScope

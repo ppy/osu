@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -10,28 +10,26 @@ using osu.Game.Beatmaps;
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
-    /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.
+    /// TODO: eventually make this inherit Screen and add a local screen stack inside the Editor.
     /// </summary>
-    public class EditorScreen : Container
+    public abstract class EditorScreen : Container
     {
-        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        [Resolved]
+        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+
+        [Resolved]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        public EditorScreen()
+        protected EditorScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
-        {
-            Beatmap.BindTo(beatmap);
         }
 
         protected override void LoadComplete()
