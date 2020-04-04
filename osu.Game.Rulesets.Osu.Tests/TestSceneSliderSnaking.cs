@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -37,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override bool Autoplay => autoplay;
         private bool autoplay;
 
-        private readonly Bindable<bool> snakingIn = new Bindable<bool>();
-        private readonly Bindable<bool> snakingOut = new Bindable<bool>();
+        private readonly BindableBool snakingIn = new BindableBool();
+        private readonly BindableBool snakingOut = new BindableBool();
 
         private const double duration_of_span = 3605;
         private const double fade_in_modifier = -1200;
@@ -95,8 +94,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             AddStep("Save repeat vector", () => savedVector = repeat.Position);
             addSeekStep(13700);
-            // Precision.AlmostEquals is used because repeat might have a chance to update its position depending on where in the frame its hit
-            AddAssert($"Repeat vector {(isHit ? "is same" : "decreased")}", () => isHit ? Precision.AlmostEquals(savedVector.X, repeat.X, 1) && Precision.AlmostEquals(savedVector.Y, repeat.Y, 1) : repeat.X < savedVector.X && repeat.Y < savedVector.Y);
+
+            AddAssert($"Repeat vector {(isHit ? "is same" : "decreased")}", () =>
+            {
+                if (isHit)
+                    // Precision.AlmostEquals is used because repeat might have a chance to update its position depending on where in the frame its hit
+                    return Precision.AlmostEquals(savedVector, repeat.Position, 1);
+
+                return repeat.X < savedVector.X && repeat.Y < savedVector.Y;
+            });
         }
 
         private void testSlider(int index, bool snaking)
@@ -109,9 +115,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
             setSnaking(snaking);
             testSnakingIn(startTime + fade_in_modifier, snaking);
+
             for (int i = 0; i < repeats + 1; i++)
             {
-                testSnakingOut(startTime + 100 + duration_of_span * i, snaking && i == repeats, i%2 == 1);
+                testSnakingOut(startTime + 100 + duration_of_span * i, snaking && i == repeats, i % 2 == 1);
             }
         }
 
@@ -120,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSeekStep(startTime);
             AddStep("Save end vector", () => savedVector = getCurrentSliderVector(true));
             addSeekStep(startTime + 100);
-            AddAssert($"End vector increased", () =>
+            AddAssert($"End vector {(isSnakingExpected ? "increased" : "is same")}", () =>
             {
                 var currentVector = getCurrentSliderVector(true);
                 return isSnakingExpected ? currentVector.X > savedVector.X && currentVector.Y > savedVector.Y : currentVector == savedVector;
@@ -135,12 +142,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert($"{(testSliderEnd ? "End" : "Start")} vector {(isSnakingExpected ? (testSliderEnd ? "decreased" : "increased") : "is same")}", () =>
             {
                 var currentVector = getCurrentSliderVector(testSliderEnd);
+
                 bool check(Vector2 a, Vector2 b)
                 {
                     if (testSliderEnd)
                         return a.X < b.X && a.Y < b.Y;
+
                     return a.X > b.X && a.Y > b.Y;
                 }
+
                 return isSnakingExpected ? check(currentVector, savedVector) : currentVector == savedVector;
             });
         }
