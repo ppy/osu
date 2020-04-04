@@ -99,6 +99,7 @@ namespace osu.Game.Screens.Edit
                     Children = new[]
                     {
                         new TimelineTickDisplay(),
+                        new TimelineControlPointDisplay(),
                         CreateTimelineContent(),
                     }
                 }, timelineContainer.Add);
