@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets
             if (asm.Name.Equals(typeof(OsuGame).Assembly.GetName().Name, StringComparison.Ordinal))
                 return Assembly.GetExecutingAssembly();
 
-            return null;
+            return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
         }
 
         private void addMissingRulesets()
