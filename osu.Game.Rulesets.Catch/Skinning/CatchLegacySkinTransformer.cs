@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
     {
         private readonly ISkin source;
 
-        public CatchLegacySkinTransformer(ISkinSource source)
+        public CatchLegacySkinTransformer(ISkin source)
         {
             this.source = source;
         }
