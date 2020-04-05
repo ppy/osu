@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if ( optUIEnabled == true )
+            if (optUIEnabled == true)
                 this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
         }
 

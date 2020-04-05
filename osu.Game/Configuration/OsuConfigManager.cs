@@ -130,7 +130,7 @@ namespace osu.Game.Configuration
         public OsuConfigManager(Storage storage)
             : base(storage)
         {
-                        Migrate();
+            Migrate();
         }
 
         public void Migrate()

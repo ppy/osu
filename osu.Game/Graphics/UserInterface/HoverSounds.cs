@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Length of debounce for hover sound playback, in milliseconds. Default is 50ms.
         /// </summary>
-        public double HoverDebounceTime { get;} = 50;
+        public double HoverDebounceTime { get; } = 50;
 
         protected readonly HoverSampleSet SampleSet;
 

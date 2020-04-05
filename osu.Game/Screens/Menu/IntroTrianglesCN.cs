@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Menu
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    InternalChild = new Video(videoStream,false)
+                    InternalChild = new Video(videoStream, false)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Clock = new FramedOffsetClock(Clock) { Offset = -logo_1 }

@@ -196,6 +196,6 @@ namespace osu.Game.Overlays.Toolbar
                     },
                 };
             }
-    }
+        }
     }
 }

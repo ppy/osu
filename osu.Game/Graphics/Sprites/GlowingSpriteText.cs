@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.Sprites
             get => blurredText.Colour;
             set => blurredText.Colour = value;
         }
-        
+
         public Vector2 Spacing
         {
             get => spriteText.Spacing;

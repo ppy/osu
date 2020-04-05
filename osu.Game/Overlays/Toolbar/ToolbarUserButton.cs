@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = OsuFont.GetFont(italics: true,size: 18);
+            DrawableText.Font = OsuFont.GetFont(italics: true, size: 18);
             TooltipMain = "我";
             TooltipSub = "长得很好看(=・ω・=)";
 
