@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -24,7 +25,6 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    [Cached]
     public class ManiaStage : ScrollingPlayfield
     {
         public const float COLUMN_SPACING = 1;
@@ -72,30 +72,19 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
-                            Name = "Columns mask",
+                            Name = "Background",
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black
+                        },
+                        columnFlow = new FillFlowContainer<Column>
+                        {
+                            Name = "Columns",
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Masking = true,
-                            CornerRadius = 5,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Background",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black
-                                },
-                                columnFlow = new FillFlowContainer<Column>
-                                {
-                                    Name = "Columns",
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-                                    Direction = FillDirection.Horizontal,
-                                    Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
-                                },
-                            }
+                            Direction = FillDirection.Horizontal,
+                            Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
                         },
                         new Container
                         {
@@ -157,15 +146,15 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 if (col.Index > 0)
                 {
-                    float spacing = currentSkin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                                   new LegacyManiaSkinConfigurationLookup(Columns.Count, LegacyManiaSkinConfigurationLookups.ColumnSpacing, col.Index - 1))
+                    float spacing = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, col.Index - 1))
                                                ?.Value ?? COLUMN_SPACING;
 
                     col.Margin = new MarginPadding { Left = spacing };
                 }
 
-                float? width = currentSkin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                              new LegacyManiaSkinConfigurationLookup(Columns.Count, LegacyManiaSkinConfigurationLookups.ColumnWidth, col.Index))
+                float? width = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, col.Index))
                                           ?.Value;
 
                 if (width == null)

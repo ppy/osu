@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets
 
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
-        public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
+        public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {

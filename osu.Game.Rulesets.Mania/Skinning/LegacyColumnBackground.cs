@@ -18,12 +18,14 @@ namespace osu.Game.Rulesets.Mania.Skinning
     public class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private readonly bool isLastColumn;
 
         private Container lightContainer;
         private Sprite light;
 
-        public LegacyColumnBackground()
+        public LegacyColumnBackground(bool isLastColumn)
         {
+            this.isLastColumn = isLastColumn;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -40,11 +42,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             bool hasLeftLine = leftLineWidth > 0;
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
-                                || Stage == null || Column.Index == Stage.Columns.Count - 1;
+                                || isLastColumn;
 
-            float lightPosition = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                      new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LightPosition))?.Value
+            float lightPosition = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LightPosition)?.Value
                                   ?? 0;
+
+            Color4 lineColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
+                                ?? Color4.White;
 
             InternalChildren = new Drawable[]
             {
@@ -57,6 +61,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = leftLineWidth,
+                    Colour = lineColour,
                     Alpha = hasLeftLine ? 1 : 0
                 },
                 new Box
@@ -65,6 +70,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = rightLineWidth,
+                    Colour = lineColour,
                     Alpha = hasRightLine ? 1 : 0
                 },
                 lightContainer = new Container

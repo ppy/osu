@@ -327,3 +327,19 @@
     *   [m] [Fix crash caused by user json order changing #8566]
     *   [m] [Fix weird slider ball sizing #8568]
     *   [m] [Update framework #8570]
+
+### 2020/04/03
+*   合并上游分支
+    *   [m] [Fix hold note animation not being reset #8564]
+    *   [m] [Expand mania to fit vertical screen bounds #8563]
+    *   [m] [Add skinning support for column line colour #8565]
+    *   [m] [Implement mania normal-note hit-explosion skinning #8556]
+    *   [m] [Fix GetDecoder getting fallback decoder too often #8584]
+
+### 2020/04/04
+*   合并上游分支
+    *   [m] [Fix dynamic recompilation in intro test scenes #8590]
+    *   [m] [Update usages of Animation and Video in line with framework changes #8592]
+    *   [m] [Rework mania skin lookups to not require total playfield columns #8586]
+    *   [m] [Fix mania scrolling at incorrect speeds #8589]
+    *   [m] [Implement more familiar scroll speed options in mania #8597]
