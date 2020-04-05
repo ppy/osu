@@ -64,23 +64,33 @@ namespace osu.Game.Rulesets.Osu.Tests
         [SetUpSteps]
         public override void SetUpSteps() { }
 
-        [Test]
-        public void TestSnaking()
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        public void TestSnakingEnabled(int repeatAmount)
         {
             AddStep("have autoplay", () => autoplay = true);
             base.SetUpSteps();
             AddUntilStep("wait for track to start running", () => track.IsRunning);
 
-            for (int i = 0; i < 3; i++)
-            {
-                testSlider(i, true);
-                testSlider(i, false);
-            }
+            testSlider(repeatAmount, true);
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        public void TestSnakingDisabled(int repeatAmount)
+        {
+            AddStep("have autoplay", () => autoplay = true);
+            base.SetUpSteps();
+            AddUntilStep("wait for track to start running", () => track.IsRunning);
+
+            testSlider(repeatAmount, false);
         }
 
         [TestCase(true)]
         [TestCase(false)]
-        public void TestArrowStays(bool isHit)
+        public void TestArrowMovement(bool isHit)
         {
             AddStep($"{(isHit ? "enable" : "disable")} autoplay", () => autoplay = isHit);
             setSnaking(true);
