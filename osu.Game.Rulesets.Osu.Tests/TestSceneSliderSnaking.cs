@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void testSlider(int index, bool snaking)
         {
-            double startTime = index * 10000 + 3000;
+            double startTime = hitObjects[index].StartTime;
             int repeats = index;
             AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
             {
@@ -189,46 +189,48 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
         {
-            HitObjects = new List<HitObject>
+            HitObjects = hitObjects
+        };
+
+        private readonly List<HitObject> hitObjects = new List<HitObject>
+        {
+            new Slider
             {
-                new Slider
+                StartTime = 3000,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
-                    StartTime = 3000,
-                    Position = new Vector2(100, 100),
-                    Path = new SliderPath(PathType.PerfectCurve, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(300, 200)
-                    }),
-                },
-                new Slider
+                    Vector2.Zero,
+                    new Vector2(300, 200)
+                }),
+            },
+            new Slider
+            {
+                StartTime = 13000,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
-                    StartTime = 13000,
-                    Position = new Vector2(100, 100),
-                    Path = new SliderPath(PathType.PerfectCurve, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(300, 200)
-                    }),
-                    RepeatCount = 1,
-                },
+                    Vector2.Zero,
+                    new Vector2(300, 200)
+                }),
+                RepeatCount = 1,
+            },
 
-                new Slider
+            new Slider
+            {
+                StartTime = 23000,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
-                    StartTime = 23000,
-                    Position = new Vector2(100, 100),
-                    Path = new SliderPath(PathType.PerfectCurve, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(300, 200)
-                    }),
-                    RepeatCount = 2,
-                },
+                    Vector2.Zero,
+                    new Vector2(300, 200)
+                }),
+                RepeatCount = 2,
+            },
 
-                new HitCircle
-                {
-                    StartTime = 199999,
-                }
+            new HitCircle
+            {
+                StartTime = 199999,
             }
         };
     }
