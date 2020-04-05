@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -117,6 +117,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             setSnaking(true);
             base.SetUpSteps();
 
+            // repeat might have a chance to update its position depending on where in the frame its hit,
+            // so some leniency is allowed here instead of checking strict equality
             checkPositionChange(16600, sliderRepeat, positionAlmostSame);
         }
 
