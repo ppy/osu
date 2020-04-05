@@ -233,7 +233,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }),
                 RepeatCount = 1,
             },
-
             new Slider
             {
                 StartTime = 23000,
@@ -245,7 +244,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }),
                 RepeatCount = 2,
             },
-
             new HitCircle
             {
                 StartTime = 199999,
