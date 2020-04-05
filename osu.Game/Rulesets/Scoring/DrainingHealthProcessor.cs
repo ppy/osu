@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -47,10 +48,24 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
-        private int hitObjectCounter = 0;
-        private int breakCounter = 0;
+        private double storeTime;
+
+        private readonly List<double> objectTimes = new List<double>();
+
+        private readonly List<string> objectHashes = new List<string>();
+
+        private string objectType;
+
+        private int indexTime;
+
+        private int indexLastTime;
+
+        private int hitObjectCounter;
+        private int breakCounter;
 
         private bool applyDrain;
+        private bool notTestRun;
+        private bool reductionStop;
 
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
@@ -65,9 +80,34 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Update();
 
+            storeTime = Time.Current;
+
+            if (breakCounter - 1 >= 0)
+            {
+                if (beatmap.Breaks[breakCounter - 1].StartTime >= storeTime)
+                {
+                    breakCounter--;
+                }
+            }
+
+            if (notTestRun && objectTimes.Count != 0 && objectHashes.Count != 0 && !objectTimes.All(i => i <= storeTime))
+            {
+                indexTime = objectTimes.FindIndex(x => x >= storeTime);
+                indexLastTime = objectTimes.FindLastIndex(x => x >= storeTime);
+                objectHashes.RemoveRange(indexTime, indexLastTime - indexTime + 1);
+                objectTimes.RemoveRange(indexTime, indexLastTime - indexTime + 1);
+                reductionStop = true;
+            }
+            else
+            {
+                reductionStop = false;
+            }
+
             // can check this first, as drain is re-enabled externally by ApplyResultInternal
             if (!applyDrain)
+            {
                 return;
+            }
 
             // drain is on - check if a break is starting; if yes, disable and early-return
             if (IsBreakTime.Value)
@@ -101,15 +141,53 @@ namespace osu.Game.Rulesets.Scoring
             base.ApplyResultInternal(result);
             healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
 
-            if (beatmap.HitObjects[hitObjectCounter + 1].StartTime >= beatmap.Breaks[breakCounter].EndTime)
+            objectType = result.HitObject.GetType().ToString();
+
+            if (objectType.Equals("osu.Game.Rulesets.Osu.Objects.Slider", StringComparison.Ordinal) || objectType.Equals("osu.Game.Rulesets.Osu.Objects.HitCircle", StringComparison.Ordinal) || objectType.Equals("osu.Game.Rulesets.Osu.Objects.Spinner", StringComparison.Ordinal))
+            {
+                if (!reductionStop)
+                {
+                    objectHashes.Add(objectType);
+                    objectTimes.Add(result.HitObject.StartTime);
+                }
+            }
+
+            hitObjectCounter = objectHashes.Count;
+
+            if (hitObjectCounter <= beatmap.HitObjects.Count && breakCounter + 1 <= beatmap.Breaks.Count && beatmap.HitObjects[hitObjectCounter].StartTime >= beatmap.Breaks[breakCounter].EndTime)
             {
                 applyDrain = false;
                 breakCounter++;
-                hitObjectCounter++;
+
+                if (hitObjectCounter == beatmap.HitObjects.Count)
+                {
+                    breakCounter = 0;
+                    hitObjectCounter = 0;
+                    objectHashes.Clear();
+                    objectHashes.TrimExcess();
+                    objectTimes.Clear();
+                    objectTimes.TrimExcess();
+                    notTestRun = true;
+                    applyDrain = false;
+                    return;
+                }
+
                 return;
             }
 
-            hitObjectCounter++;
+            if (hitObjectCounter == beatmap.HitObjects.Count)
+            {
+                breakCounter = 0;
+                hitObjectCounter = 0;
+                objectHashes.Clear();
+                objectHashes.TrimExcess();
+                objectTimes.Clear();
+                objectTimes.TrimExcess();
+                notTestRun = true;
+                applyDrain = false;
+                return;
+            }
+
             applyDrain = true;
         }
 
