@@ -343,3 +343,5 @@
     *   [m] [Rework mania skin lookups to not require total playfield columns #8586]
     *   [m] [Fix mania scrolling at incorrect speeds #8589]
     *   [m] [Implement more familiar scroll speed options in mania #8597]
+    *   [m] [Support HitCircleOverlayAboveNumer typo for old legacy skins #8602]
+    *   [m] [Fix results star rating display not being centered when no mods are present #8603(没有commit?)]
