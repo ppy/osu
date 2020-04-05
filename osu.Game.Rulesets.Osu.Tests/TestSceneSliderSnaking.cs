@@ -59,8 +59,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private DrawableSlider slider;
-        private DrawableSliderRepeat repeat;
-        private Vector2 savedVector;
 
         [SetUpSteps]
         public override void SetUpSteps() { }
@@ -112,31 +110,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestArrowMovement(bool isHit)
+        [Test]
+        public void TestRepeatArrowDoesNotMoveWhenHit()
         {
-            AddStep($"{(isHit ? "enable" : "disable")} autoplay", () => autoplay = isHit);
+            AddStep("enable autoplay", () => autoplay = true);
             setSnaking(true);
             base.SetUpSteps();
 
-            addSeekStep(16500);
-            AddStep("retrieve 2nd slider repeat", () =>
-            {
-                var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(1);
-                repeat = drawable.ChildrenOfType<Container<DrawableSliderRepeat>>().First().Children.First();
-            });
-            AddStep("Save repeat vector", () => savedVector = repeat.Position);
-            addSeekStep(16700);
+            checkPositionChange(16600, sliderRepeat, positionAlmostSame);
+        }
 
-            AddAssert($"Repeat vector {(isHit ? "is same" : "decreased")}", () =>
-            {
-                if (isHit)
-                    // Precision.AlmostEquals is used because repeat might have a chance to update its position depending on where in the frame its hit
-                    return Precision.AlmostEquals(savedVector, repeat.Position, 1);
+        [Test]
+        public void TestRepeatArrowMovesWhenNotHit()
+        {
+            AddStep("disable autoplay", () => autoplay = false);
+            setSnaking(true);
+            base.SetUpSteps();
 
-                return repeat.X < savedVector.X && repeat.Y < savedVector.Y;
-            });
+            checkPositionChange(16600, sliderRepeat, positionDecreased);
         }
 
         private void retrieveSlider(int index) => AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
@@ -166,10 +157,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         private List<Vector2> sliderCurve => ((PlaySliderBody)slider.Body.Drawable).CurrentCurve;
         private Vector2 sliderStart() => sliderCurve.First();
         private Vector2 sliderEnd() => sliderCurve.Last();
+        private Vector2 sliderRepeat()
+        {
+            var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(1);
+            var repeat = drawable.ChildrenOfType<Container<DrawableSliderRepeat>>().First().Children.First();
+            return repeat.Position;
+        }
 
         private bool positionRemainsSame(Vector2 previous, Vector2 current) => previous == current;
         private bool positionIncreased(Vector2 previous, Vector2 current) => current.X > previous.X && current.Y > previous.Y;
         private bool positionDecreased(Vector2 previous, Vector2 current) => current.X < previous.X && current.Y < previous.Y;
+        private bool positionAlmostSame(Vector2 previous, Vector2 current) => Precision.AlmostEquals(previous, current, 1);
 
         private void checkPositionChange(double startTime, Func<Vector2> positionToCheck, Func<Vector2, Vector2, bool> positionAssertion)
         {
