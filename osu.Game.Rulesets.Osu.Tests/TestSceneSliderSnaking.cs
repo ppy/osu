@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSeekStep(16500);
             AddStep("retrieve 2nd slider repeat", () =>
             {
-                var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.Skip(1).First();
+                var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(1);
                 repeat = drawable.ChildrenOfType<Container<DrawableSliderRepeat>>().First().Children.First();
             });
             AddStep("Save repeat vector", () => savedVector = repeat.Position);
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             int repeats = index;
             AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
             {
-                slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.Skip(index).First();
+                slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index);
             });
             setSnaking(snaking);
             testSnakingIn(startTime + fade_in_modifier, snaking);
