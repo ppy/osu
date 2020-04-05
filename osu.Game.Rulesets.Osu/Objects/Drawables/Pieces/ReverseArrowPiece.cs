@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class ReverseArrowPiece : BeatSyncedContainer
     {
+        public bool ShouldFollowBeats = true;
+
         public ReverseArrowPiece()
         {
             Divisor = 2;
@@ -37,7 +39,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             };
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes) =>
-            Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        {
+            if (ShouldFollowBeats)
+                Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
+        }
     }
 }
