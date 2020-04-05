@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     public class ReverseArrowPiece : BeatSyncedContainer
     {
         [Resolved]
-        private DrawableHitObject drawableSlider { get; set; }
+        private DrawableHitObject drawableRepeat { get; set; }
 
         public ReverseArrowPiece()
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            if (!drawableSlider.IsHit)
+            if (!drawableRepeat.IsHit)
                 Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
         }
     }
