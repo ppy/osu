@@ -157,6 +157,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private List<Vector2> sliderCurve => ((PlaySliderBody)slider.Body.Drawable).CurrentCurve;
         private Vector2 sliderStart() => sliderCurve.First();
         private Vector2 sliderEnd() => sliderCurve.Last();
+
         private Vector2 sliderRepeat()
         {
             var drawable = Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(1);
@@ -188,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void setSnaking(bool value)
         {
-            AddStep($"{(value ? "Enable" : "Disable")} snaking", () =>
+            AddStep($"{(value ? "enable" : "disable")} snaking", () =>
             {
                 snakingIn.Value = value;
                 snakingOut.Value = value;
