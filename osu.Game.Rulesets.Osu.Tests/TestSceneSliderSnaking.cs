@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("wait for track to start running", () => track.IsRunning);
 
             double startTime = hitObjects[sliderIndex].StartTime;
-            retrieveSlider(sliderIndex);
+            retrieveDrawableSlider(sliderIndex);
             setSnaking(true);
 
             ensureSnakingIn(startTime + fade_in_modifier);
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("wait for track to start running", () => track.IsRunning);
 
             double startTime = hitObjects[sliderIndex].StartTime;
-            retrieveSlider(sliderIndex);
+            retrieveDrawableSlider(sliderIndex);
             setSnaking(false);
 
             ensureNoSnakingIn(startTime + fade_in_modifier);
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPositionChange(16600, sliderRepeat, positionDecreased);
         }
 
-        private void retrieveSlider(int index) => AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
+        private void retrieveDrawableSlider(int index) => AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
         {
             slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index);
         });
