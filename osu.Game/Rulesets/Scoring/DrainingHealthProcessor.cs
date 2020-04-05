@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
@@ -47,6 +49,34 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
+        private readonly List<(double startTime, double endTime)> nonDrainSections = new List<(double, double)>();
+        private int currentNonDrainSection;
+
+        private bool isInNonDrainSection
+        {
+            get
+            {
+                if (nonDrainSections.Count == 0)
+                    return false;
+
+                var time = Time.Current;
+
+                if (time > nonDrainSections[currentNonDrainSection].endTime)
+                {
+                    while (time > nonDrainSections[currentNonDrainSection].endTime && currentNonDrainSection < nonDrainSections.Count - 1)
+                        currentNonDrainSection++;
+                }
+                else
+                {
+                    while (time < nonDrainSections[currentNonDrainSection].startTime && currentNonDrainSection > 0)
+                        currentNonDrainSection--;
+                }
+
+                var closestSection = nonDrainSections[currentNonDrainSection];
+                return time >= closestSection.startTime && time <= closestSection.endTime;
+            }
+        }
+
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
         /// </summary>
@@ -60,22 +90,35 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Update();
 
-            if (!IsBreakTime.Value)
-            {
-                // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
-                double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
-                double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
+            if (isInNonDrainSection)
+                return;
 
-                Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
-            }
+            // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
+            double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
+            double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
+
+            Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            nonDrainSections.Clear();
+
             this.beatmap = beatmap;
 
             if (beatmap.HitObjects.Count > 0)
                 gameplayEndTime = beatmap.HitObjects[^1].GetEndTime();
+
+            // Ranges between the end of last hit object before a break
+            // and the start of first hit object after a break should
+            // not allow HP draining. (with break periods in)
+            foreach (BreakPeriod b in beatmap.Breaks)
+            {
+                var startTime = beatmap.HitObjects.LastOrDefault(h => h.GetEndTime() < b.StartTime)?.GetEndTime() ?? double.MinValue;
+                var endTime = beatmap.HitObjects.FirstOrDefault(h => h.StartTime > b.EndTime)?.StartTime ?? double.MaxValue;
+
+                nonDrainSections.Add((startTime, endTime));
+            }
 
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
 
