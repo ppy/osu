@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
-        private readonly ReverseArrowPiece scaleContainer;
+        private readonly Drawable scaleContainer;
 
         public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
             : base(sliderRepeat)
@@ -80,7 +80,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.Out)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
-                    scaleContainer.ShouldFollowBeats = false;
                     scaleContainer.Transforms.ForEach(t => scaleContainer.RemoveTransform(t));
                     break;
             }

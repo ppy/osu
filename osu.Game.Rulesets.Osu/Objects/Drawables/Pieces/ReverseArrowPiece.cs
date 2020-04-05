@@ -8,12 +8,15 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Skinning;
+using osu.Framework.Allocation;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class ReverseArrowPiece : BeatSyncedContainer
     {
-        public bool ShouldFollowBeats = true;
+        [Resolved]
+        private DrawableHitObject drawableSlider { get; set; }
 
         public ReverseArrowPiece()
         {
@@ -41,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            if (ShouldFollowBeats)
+            if (!drawableSlider.IsHit)
                 Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
         }
     }
