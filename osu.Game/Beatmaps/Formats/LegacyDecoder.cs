@@ -73,9 +73,6 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                // osu!catch section only has colour settings
-                // so no harm in handling the entire section
-                case Section.CatchTheBeat:
                     HandleColours(output, line);
                     return;
             }
