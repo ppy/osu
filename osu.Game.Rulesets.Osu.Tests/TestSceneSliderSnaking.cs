@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -67,25 +68,48 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
-        public void TestSnakingEnabled(int repeatAmount)
+        public void TestSnakingEnabled(int sliderIndex)
         {
-            AddStep("have autoplay", () => autoplay = true);
+            AddStep("enable autoplay", () => autoplay = true);
             base.SetUpSteps();
             AddUntilStep("wait for track to start running", () => track.IsRunning);
 
-            testSlider(repeatAmount, true);
+            double startTime = hitObjects[sliderIndex].StartTime;
+            retrieveSlider(sliderIndex);
+            setSnaking(true);
+
+            ensureSnakingIn(startTime + fade_in_modifier);
+
+            for (int i = 0; i < sliderIndex; i++)
+            {
+                // non-final repeats should not snake out
+                ensureNoSnakingOut(startTime, i);
+            }
+
+            // final repeat should snake out
+            ensureSnakingOut(startTime, sliderIndex);
         }
 
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
-        public void TestSnakingDisabled(int repeatAmount)
+        public void TestSnakingDisabled(int sliderIndex)
         {
             AddStep("have autoplay", () => autoplay = true);
             base.SetUpSteps();
             AddUntilStep("wait for track to start running", () => track.IsRunning);
 
-            testSlider(repeatAmount, false);
+            double startTime = hitObjects[sliderIndex].StartTime;
+            retrieveSlider(sliderIndex);
+            setSnaking(false);
+
+            ensureNoSnakingIn(startTime + fade_in_modifier);
+
+            for (int i = 0; i <= sliderIndex; i++)
+            {
+                // no snaking out ever, including final repeat
+                ensureNoSnakingOut(startTime, i);
+            }
         }
 
         [TestCase(true)]
@@ -115,60 +139,53 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private void testSlider(int index, bool snaking)
+        private void retrieveSlider(int index) => AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
         {
-            double startTime = hitObjects[index].StartTime;
-            int repeats = index;
-            AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
-            {
-                slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index);
-            });
-            setSnaking(snaking);
-            testSnakingIn(startTime + fade_in_modifier, snaking);
+            slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index);
+        });
 
-            for (int i = 0; i < repeats + 1; i++)
-            {
-                testSnakingOut(startTime + 100 + duration_of_span * i, snaking && i == repeats, i % 2 == 1);
-            }
+        private void ensureSnakingIn(double startTime) => checkPositionChange(startTime, sliderEnd, positionIncreased);
+        private void ensureNoSnakingIn(double startTime) => checkPositionChange(startTime, sliderEnd, positionRemainsSame);
+
+        private void ensureSnakingOut(double startTime, int repeatIndex)
+        {
+            var repeatTime = timeAtRepeat(startTime, repeatIndex);
+
+            if (repeatIndex % 2 == 0)
+                checkPositionChange(repeatTime, sliderStart, positionIncreased);
+            else
+                checkPositionChange(repeatTime, sliderEnd, positionDecreased);
         }
 
-        private void testSnakingIn(double startTime, bool isSnakingExpected)
+        private void ensureNoSnakingOut(double startTime, int repeatIndex) =>
+            checkPositionChange(timeAtRepeat(startTime, repeatIndex), positionAtRepeat(repeatIndex), positionRemainsSame);
+
+        private double timeAtRepeat(double startTime, int repeatIndex) => startTime + 100 + duration_of_span * repeatIndex;
+        private Func<Vector2> positionAtRepeat(int repeatIndex) => repeatIndex % 2 == 0 ? (Func<Vector2>)sliderStart : sliderEnd;
+
+        private List<Vector2> sliderCurve => ((PlaySliderBody)slider.Body.Drawable).CurrentCurve;
+        private Vector2 sliderStart() => sliderCurve.First();
+        private Vector2 sliderEnd() => sliderCurve.Last();
+
+        private bool positionRemainsSame(Vector2 previous, Vector2 current) => previous == current;
+        private bool positionIncreased(Vector2 previous, Vector2 current) => current.X > previous.X && current.Y > previous.Y;
+        private bool positionDecreased(Vector2 previous, Vector2 current) => current.X < previous.X && current.Y < previous.Y;
+
+        private void checkPositionChange(double startTime, Func<Vector2> positionToCheck, Func<Vector2, Vector2, bool> positionAssertion)
         {
+            Vector2 previousPosition = Vector2.Zero;
+
+            string positionDescription = positionToCheck.Method.Name.Humanize(LetterCasing.LowerCase);
+            string assertionDescription = positionAssertion.Method.Name.Humanize(LetterCasing.LowerCase);
+
             addSeekStep(startTime);
-            AddStep("Save end vector", () => savedVector = getCurrentSliderVector(true));
+            AddStep($"save {positionDescription} position", () => previousPosition = positionToCheck.Invoke());
             addSeekStep(startTime + 100);
-            AddAssert($"End vector {(isSnakingExpected ? "increased" : "is same")}", () =>
+            AddAssert($"{positionDescription} {assertionDescription}", () =>
             {
-                var currentVector = getCurrentSliderVector(true);
-                return isSnakingExpected ? currentVector.X > savedVector.X && currentVector.Y > savedVector.Y : currentVector == savedVector;
+                var currentPosition = positionToCheck.Invoke();
+                return positionAssertion.Invoke(previousPosition, currentPosition);
             });
-        }
-
-        private void testSnakingOut(double startTime, bool isSnakingExpected, bool testSliderEnd)
-        {
-            addSeekStep(startTime);
-            AddStep($"Save {(testSliderEnd ? "end" : "start")} vector", () => savedVector = getCurrentSliderVector(testSliderEnd));
-            addSeekStep(startTime + 100);
-            AddAssert($"{(testSliderEnd ? "End" : "Start")} vector {(isSnakingExpected ? (testSliderEnd ? "decreased" : "increased") : "is same")}", () =>
-            {
-                var currentVector = getCurrentSliderVector(testSliderEnd);
-
-                bool check(Vector2 a, Vector2 b)
-                {
-                    if (testSliderEnd)
-                        return a.X < b.X && a.Y < b.Y;
-
-                    return a.X > b.X && a.Y > b.Y;
-                }
-
-                return isSnakingExpected ? check(currentVector, savedVector) : currentVector == savedVector;
-            });
-        }
-
-        private Vector2 getCurrentSliderVector(bool getEndOne)
-        {
-            var body = (PlaySliderBody)slider.Body.Drawable;
-            return getEndOne ? body.CurrentCurve.Last() : body.CurrentCurve.First();
         }
 
         private void setSnaking(bool value)
