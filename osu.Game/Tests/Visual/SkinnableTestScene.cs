@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
@@ -47,16 +48,18 @@ namespace osu.Game.Tests.Visual
         {
             createdDrawables.Clear();
 
-            Cell(0).Child = createProvider(null, creationFunction);
-            Cell(1).Child = createProvider(metricsSkin, creationFunction);
-            Cell(2).Child = createProvider(defaultSkin, creationFunction);
-            Cell(3).Child = createProvider(specialSkin, creationFunction);
-            Cell(4).Child = createProvider(oldSkin, creationFunction);
+            var beatmap = CreateBeatmapForSkinProvider();
+
+            Cell(0).Child = createProvider(null, creationFunction, beatmap);
+            Cell(1).Child = createProvider(metricsSkin, creationFunction, beatmap);
+            Cell(2).Child = createProvider(defaultSkin, creationFunction, beatmap);
+            Cell(3).Child = createProvider(specialSkin, creationFunction, beatmap);
+            Cell(4).Child = createProvider(oldSkin, creationFunction, beatmap);
         }
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
 
-        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
+        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction, IBeatmap beatmap)
         {
             var created = creationFunction();
             createdDrawables.Add(created);
@@ -100,7 +103,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider))
+                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
@@ -112,6 +115,8 @@ namespace osu.Game.Tests.Visual
                 }
             };
         }
+
+        protected virtual IBeatmap CreateBeatmapForSkinProvider() => CreateWorkingBeatmap(Ruleset.Value).GetPlayableBeatmap(Ruleset.Value);
 
         private class OutlineBox : CompositeDrawable
         {
