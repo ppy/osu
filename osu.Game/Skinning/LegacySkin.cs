@@ -243,21 +243,24 @@ namespace osu.Game.Skinning
 
         public override Texture GetTexture(string componentName)
         {
-            componentName = getFallbackName(componentName);
-
-            float ratio = 2;
-            var texture = Textures?.Get($"{componentName}@2x");
-
-            if (texture == null)
+            foreach (var name in getFallbackNames(componentName))
             {
-                ratio = 1;
-                texture = Textures?.Get(componentName);
+                float ratio = 2;
+                var texture = Textures?.Get($"{name}@2x");
+
+                if (texture == null)
+                {
+                    ratio = 1;
+                    texture = Textures?.Get(name);
+                }
+
+                if (texture != null)
+                    texture.ScaleAdjust = ratio;
+
+                return texture;
             }
 
-            if (texture != null)
-                texture.ScaleAdjust = ratio;
-
-            return texture;
+            return null;
         }
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
@@ -277,10 +280,14 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private string getFallbackName(string componentName)
+        private IEnumerable<string> getFallbackNames(string componentName)
         {
+            // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
+            yield return componentName;
+
+            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
-            return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+            yield return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
         }
     }
 }
