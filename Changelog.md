@@ -345,3 +345,7 @@
     *   [m] [Implement more familiar scroll speed options in mania #8597]
     *   [m] [Support HitCircleOverlayAboveNumer typo for old legacy skins #8602]
     *   [m] [Fix results star rating display not being centered when no mods are present #8603(没有commit?)]
+
+### 2020/04/06
+*   合并上游分支
+    *   [o] [Load user rulesets from the game data directory #8607]
