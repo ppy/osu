@@ -71,12 +71,6 @@ namespace osu.Game.Skinning
             {
                 var pair = SplitKeyVal(line);
 
-                if (pair.Key.StartsWith("Colour"))
-                {
-                    HandleColours(currentConfig, line);
-                    continue;
-                }
-
                 switch (pair.Key)
                 {
                     case "ColumnLineWidth":
@@ -105,6 +99,18 @@ namespace osu.Game.Skinning
 
                     case "LightingNWidth":
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
+                        break;
+
+                    case string _ when pair.Key.StartsWith("Colour"):
+                        HandleColours(currentConfig, line);
+                        break;
+
+                    case string _ when pair.Key.StartsWith("NoteImage"):
+                        currentConfig.ImageLookups[pair.Key] = pair.Value;
+                        break;
+
+                    case string _ when pair.Key.StartsWith("KeyImage"):
+                        currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }
             }

@@ -207,6 +207,30 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
+
+                case LegacyManiaSkinConfigurationLookups.NoteImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}H"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteTailImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}T"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}L"));
+
+                case LegacyManiaSkinConfigurationLookups.KeyImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}"));
+
+                case LegacyManiaSkinConfigurationLookups.KeyImageDown:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}D"));
             }
 
             return null;
@@ -214,6 +238,9 @@ namespace osu.Game.Skinning
 
         private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
+
+        private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
+            => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
