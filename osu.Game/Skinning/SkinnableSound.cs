@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     public class SkinnableSound : SkinReloadableDrawable
     {
         // The second element is false if osu!'s default sound should be used for this sample
-        private readonly (ISampleInfo, bool)[] hitSamples; 
+        private readonly (ISampleInfo, bool)[] hitSamples;
 
         private List<(AdjustableProperty property, BindableDouble bindable)> adjustments;
 
@@ -32,12 +32,12 @@ namespace osu.Game.Skinning
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
-            this.hitSamples = hitSamples.Select(s => (s, true)).ToArray();;
+            this.hitSamples = hitSamples.Select(s => (s, true)).ToArray(); ;
         }
 
         public SkinnableSound(ISampleInfo hitSamples)
         {
-            this.hitSamples = new[] { (hitSamples, true) };;
+            this.hitSamples = new[] { (hitSamples, true) }; ;
         }
 
         private bool looping;
@@ -82,7 +82,7 @@ namespace osu.Game.Skinning
                 var s = sample.Item1;
                 var isCustom = sample.Item2;
 
-                var ch = isCustom? skin.GetSample(s) : null;
+                var ch = isCustom ? skin.GetSample(s) : null;
 
                 if (ch == null && allowFallback)
                 {
