@@ -170,6 +170,9 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
                     baseInfo.Suffix = CustomSampleBank.ToString();
+                
+                // 0 means osu!'s default hitsounds
+                baseInfo.IsCustom = CustomSampleBank != 0;
 
                 return baseInfo;
             }
