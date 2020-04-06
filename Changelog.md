@@ -349,3 +349,10 @@
 ### 2020/04/06
 *   合并上游分支
     *   [o] [Load user rulesets from the game data directory #8607]
+    *   [m] [Fix performance when parsing mania skins #8641]
+    *   [m] [Update framework #8644]
+    *   [m] [Bump SharpCompress from 0.24.0 to 0.25.0 #8639]
+    *   [m] [Bump Microsoft.Build.Traversal from 2.0.32 to 2.0.34 #8638]
+
+*   暂不合并
+    *   [o] [Write a test for slider snaking #8489]
