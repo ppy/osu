@@ -32,12 +32,12 @@ namespace osu.Game.Skinning
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
-            this.hitSamples = hitSamples.Select(s => (s, true)).ToArray(); ;
+            this.hitSamples = hitSamples.Select(s => (s, true)).ToArray();
         }
 
         public SkinnableSound(ISampleInfo hitSamples)
         {
-            this.hitSamples = new[] { (hitSamples, true) }; ;
+            this.hitSamples = new[] { (hitSamples, true) };
         }
 
         private bool looping;
