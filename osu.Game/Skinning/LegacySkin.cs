@@ -122,10 +122,7 @@ namespace osu.Game.Skinning
                     switch (legacy)
                     {
                         case LegacySkinConfiguration.LegacySetting.Version:
-                            if (Configuration.LegacyVersion is decimal version)
-                                return SkinUtils.As<TValue>(new Bindable<decimal>(version));
-
-                            break;
+                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion));
                     }
 
                     break;

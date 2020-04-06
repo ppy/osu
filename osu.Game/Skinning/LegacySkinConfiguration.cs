@@ -10,7 +10,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Legacy version of this skin.
         /// </summary>
-        public decimal? LegacyVersion { get; internal set; }
+        public decimal LegacyVersion { get; internal set; } = 1;
 
         public enum LegacySetting
         {

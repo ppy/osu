@@ -143,7 +143,6 @@ namespace osu.Game.Tests.Skins
         public void TestLegacyVersionLookup()
         {
             AddStep("Set source1 version 2.3", () => source1.Configuration.LegacyVersion = 2.3m);
-            AddStep("Set source2 version null", () => source2.Configuration.LegacyVersion = null);
             AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
         }
 
