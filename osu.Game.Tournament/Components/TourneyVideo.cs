@@ -36,7 +36,6 @@ namespace osu.Game.Tournament.Components
                 InternalChild = video = new Video(stream, false)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
                     Clock = new FramedClock(manualClock = new ManualClock()),
                     Loop = loop,
                 };
