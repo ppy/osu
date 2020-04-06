@@ -82,15 +82,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 {
                     rimHit = new Sprite
                     {
-                        Anchor = flipped ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreLeft, // opposite due to scale inversion.
                         Scale = new Vector2(-1, 1),
                         Alpha = 0,
                     },
                     centreHit = new Sprite
                     {
-                        Anchor = flipped ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = flipped ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
                         Alpha = 0,
                     }
                 };
