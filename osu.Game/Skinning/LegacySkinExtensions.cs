@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
                 if (timeReference != null)
                 {
                     Clock = timeReference.Clock;
-                    PlaybackPosition = timeReference.AnimationStartTime - timeReference.Clock.CurrentTime;
+                    PlaybackPosition = timeReference.Clock.CurrentTime - timeReference.AnimationStartTime;
                 }
             }
         }
