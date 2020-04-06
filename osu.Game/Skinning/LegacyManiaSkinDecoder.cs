@@ -108,6 +108,8 @@ namespace osu.Game.Skinning
                         break;
                 }
             }
+
+            pendingLines.Clear();
         }
 
         private void parseArrayValue(string value, float[] output)
