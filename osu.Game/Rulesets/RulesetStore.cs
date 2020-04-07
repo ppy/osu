@@ -24,12 +24,12 @@ namespace osu.Game.Rulesets
             : base(factory)
         {
             rulesetStorage = storage?.GetStorageForDirectory("rulesets");
-            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
 
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
             loadFromDisk();
+            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
             loadUserRulesets();
             addMissingRulesets();
         }
@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets
         {
             var asm = new AssemblyName(args.Name);
 
+            // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
             // this assumes the only explicit dependency of the ruleset is the game core assembly.
             // the ruleset dependency on the game core assembly requires manual resolving, transient dependencies should be resolved automatically
             if (asm.Name.Equals(typeof(OsuGame).Assembly.GetName().Name, StringComparison.Ordinal))
@@ -137,17 +138,10 @@ namespace osu.Game.Rulesets
 
         private void loadUserRulesets()
         {
-            try
-            {
-                var rulesets = rulesetStorage?.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
+            var rulesets = rulesetStorage?.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
 
-                foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
-                    loadRulesetFromFile(rulesetStorage?.GetFullPath(ruleset));
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Couldn't load user rulesets");
-            }
+            foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
+                loadRulesetFromFile(rulesetStorage?.GetFullPath(ruleset));
         }
 
         private void loadFromDisk()
