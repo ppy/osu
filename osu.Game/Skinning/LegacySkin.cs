@@ -214,11 +214,11 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
                     Debug.Assert(maniaLookup.TargetColumn != null);
-                    return SkinUtils.As<TValue>(getCustomColour(existing, $"Colour{maniaLookup.TargetColumn}"));
+                    return SkinUtils.As<TValue>(getCustomColour(existing, $"Colour{maniaLookup.TargetColumn + 1}"));
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLightColour:
                     Debug.Assert(maniaLookup.TargetColumn != null);
-                    return SkinUtils.As<TValue>(getCustomColour(existing, $"ColourLight{maniaLookup.TargetColumn}"));
+                    return SkinUtils.As<TValue>(getCustomColour(existing, $"ColourLight{maniaLookup.TargetColumn + 1}"));
             }
 
             return null;
