@@ -50,14 +50,7 @@ namespace osu.Game.Online.Leaderboards
 
         private void fetchAndLoadTopScore()
         {
-            var score = fetchTopScore();
-
-            loadTopScore(score);
-        }
-
-        private void loadTopScore(ScoreInfo score)
-        {
-            var rank = score?.Rank;
+            var rank = fetchTopScore()?.Rank;
 
             // toggle the display of this drawable
             // we do not want empty space if there is no rank to be displayed
