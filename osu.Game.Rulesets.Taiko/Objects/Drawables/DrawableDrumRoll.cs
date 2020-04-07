@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// A handler action for when the drumroll has been hit,
         /// regardless of any judgement.
         /// </summary>
-        public Action<TaikoAction> OnHit;
+        public Action<TaikoAction, bool> OnHit;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public override bool OnPressed(TaikoAction action)
         {
             if (judgingStarted)
-                OnHit.Invoke(action);
+                OnHit.Invoke(action, HitObject.IsStrong);
 
             return false;
         }
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (result.Type > HitResult.Miss)
             {
-                OnHit.Invoke(drumRollTick.JudgedAction);
+                OnHit.Invoke(drumRollTick.JudgedAction, HitObject.IsStrong);
                 judgingStarted = true;
                 rollingHits++;
             }
