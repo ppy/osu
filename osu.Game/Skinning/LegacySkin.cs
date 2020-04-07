@@ -207,6 +207,30 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.NoteImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}H"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteTailImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}T"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}L"));
+
+                case LegacyManiaSkinConfigurationLookups.KeyImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}"));
+
+                case LegacyManiaSkinConfigurationLookups.KeyImageDown:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}D"));
             }
 
             return null;
@@ -214,6 +238,9 @@ namespace osu.Game.Skinning
 
         private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
+
+        private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
+            => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
@@ -243,21 +270,24 @@ namespace osu.Game.Skinning
 
         public override Texture GetTexture(string componentName)
         {
-            componentName = getFallbackName(componentName);
-
-            float ratio = 2;
-            var texture = Textures?.Get($"{componentName}@2x");
-
-            if (texture == null)
+            foreach (var name in getFallbackNames(componentName))
             {
-                ratio = 1;
-                texture = Textures?.Get(componentName);
+                float ratio = 2;
+                var texture = Textures?.Get($"{name}@2x");
+
+                if (texture == null)
+                {
+                    ratio = 1;
+                    texture = Textures?.Get(name);
+                }
+
+                if (texture != null)
+                    texture.ScaleAdjust = ratio;
+
+                return texture;
             }
 
-            if (texture != null)
-                texture.ScaleAdjust = ratio;
-
-            return texture;
+            return null;
         }
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
@@ -277,10 +307,14 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private string getFallbackName(string componentName)
+        private IEnumerable<string> getFallbackNames(string componentName)
         {
+            // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
+            yield return componentName;
+
+            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
-            return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+            yield return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
         }
     }
 }

@@ -71,12 +71,6 @@ namespace osu.Game.Skinning
             {
                 var pair = SplitKeyVal(line);
 
-                if (pair.Key.StartsWith("Colour"))
-                {
-                    HandleColours(currentConfig, line);
-                    continue;
-                }
-
                 switch (pair.Key)
                 {
                     case "ColumnLineWidth":
@@ -109,6 +103,18 @@ namespace osu.Game.Skinning
 
                     case "WidthForNoteHeightScale":
                         currentConfig.MinimumColumnWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case string _ when pair.Key.StartsWith("Colour"):
+                        HandleColours(currentConfig, line);
+                        break;
+
+                    case string _ when pair.Key.StartsWith("NoteImage"):
+                        currentConfig.ImageLookups[pair.Key] = pair.Value;
+                        break;
+
+                    case string _ when pair.Key.StartsWith("KeyImage"):
+                        currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }
             }
