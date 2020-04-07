@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
+        private readonly ScrollingHitObjectContainer drumRollHitContainer;
         internal readonly HitTarget HitTarget;
 
         private readonly ProxyContainer topLevelHitContainer;
@@ -135,6 +136,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Blending = BlendingParameters.Additive
                         },
+                        drumRollHitContainer = new ScrollingHitObjectContainer
+                        {
+                            Name = "Drumroll hit",
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Stretch,
+                            Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Width = 1.0f
+                        }
                     }
                 },
                 overlayBackgroundContainer = new Container
@@ -212,10 +221,26 @@ namespace osu.Game.Rulesets.Taiko.UI
                     barlineContainer.Add(barline.CreateProxy());
                     break;
 
+                case DrawableDrumRoll drumRoll:
+                    drumRoll.OnHit += onDrumrollArbitraryHit;
+                    break;
+
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
             }
+        }
+
+        private void onDrumrollArbitraryHit(TaikoAction action)
+        {
+            DrawableHit drawableHit;
+
+            if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
+                drawableHit = new DrawableFlyingRimHit(Time.Current);
+            else
+                drawableHit = new DrawableFlyingCentreHit(Time.Current);
+
+            drumRollHitContainer.Add(drawableHit);
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
