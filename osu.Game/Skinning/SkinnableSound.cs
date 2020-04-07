@@ -27,7 +27,7 @@ namespace osu.Game.Skinning
 
         public SkinnableSound(IEnumerable<HitSampleInfo> hitSamples)
         {
-            this.hitSamples = Enumerable.Select<HitSampleInfo, (ISampleInfo, bool)>(hitSamples, s => (s, s.IsCustom)).ToArray();
+            this.hitSamples = hitSamples.Select<HitSampleInfo, (ISampleInfo, bool)>(s => (s, s.IsCustom)).ToArray();
         }
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
