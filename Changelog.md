@@ -366,3 +366,11 @@
     *   [m] [Fix storyboard videos being offset incorrectly #8648]
     *   [m] [Fix SkinnableTestScene losing test resources on dynamic recompilation #8650]
     *   [o] [Add top rank to the beatmap carousel #7639]
+
+*   更新上游pr
+    *   [o] [Load user rulesets from the game data directory #8607]
+
+*   更新了一个test文件
+*   翻译改进
+    *   RankArchived: "达成的排名" -> "取得的成绩"
+*   更新framework至2020.407.0以修复storyboard尺寸问题

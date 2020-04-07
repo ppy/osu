@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select.Filter
         [Description("长度")]
         Length,
 
-        [Description("达成的排名")]
+        [Description("取得的成绩")]
         RankAchieved,
 
         [Description("标题")]
