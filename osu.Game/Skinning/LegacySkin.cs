@@ -207,6 +207,9 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
+
+                case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
             }
 
             return null;
