@@ -262,17 +262,24 @@ namespace osu.Game.Skinning
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            foreach (var lookup in sampleInfo.LookupNames)
-            {
-                var sample = Samples?.Get(lookup);
+            var hsi = sampleInfo as HitSampleInfo;
 
-                if (sample != null)
-                    return sample;
+            if (hsi == null || hsi.IsCustom)
+            {
+                foreach (var lookup in sampleInfo.LookupNames)
+                {
+                    var sample = Samples?.Get(lookup);
+
+                    if (sample != null)
+                        return sample;
+                }
             }
 
-            if (sampleInfo is HitSampleInfo hsi)
+            if (hsi != null)
+            {
                 // Try fallback to non-bank samples.
                 return Samples?.Get(hsi.Name);
+            }
 
             return null;
         }
