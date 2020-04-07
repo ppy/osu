@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -80,7 +79,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.Out)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
-                    scaleContainer.Transforms.ForEach(t => scaleContainer.RemoveTransform(t));
                     break;
             }
         }
