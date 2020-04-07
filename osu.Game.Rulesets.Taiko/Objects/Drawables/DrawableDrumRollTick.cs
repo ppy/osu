@@ -11,6 +11,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
+        /// <summary>
+        /// The action type that the user took which caused this tick to
+        /// have been judged as "hit"
+        /// </summary>
+        public TaikoAction JudgedAction;
+
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
@@ -49,7 +55,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        public override bool OnPressed(TaikoAction action) => UpdateResult(true);
+        public override bool OnPressed(TaikoAction action)
+        {
+            JudgedAction = action;
+            return UpdateResult(true);
+        }
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
