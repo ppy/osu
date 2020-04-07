@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             if (tmp is IFramedAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
                 frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
 
-            explosion = skin.GetAnimation(imageName, true, false, startAtCurrentTime: true, frameLength: frameLength).With(d =>
+            explosion = skin.GetAnimation(imageName, true, false, frameLength: frameLength).With(d =>
             {
                 if (d == null)
                     return;

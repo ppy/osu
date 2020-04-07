@@ -309,7 +309,7 @@
     *   [m] [Fix catcher test resources being at wrong dpi definition #8520]
 
 ### 2020/04/01
-*   合并上游分支
+*   合并上游pr
     *   [m] [Add mania hold note skinning #8524]
     *   [m] [Implement column width/spacing #8536]
     *   [m] [Fix barlines scrolling at different speeds in legacy skins #8538]
@@ -318,10 +318,10 @@
     *   [m] [Fix incorrect explosion position on default skin #8541]
 
 ### 2020/04/02
-*   合并上游分支
+*   合并上游pr
     *   [m] [Add check to detect whether mania is skinned #8535]
 
-*   合并上游分支
+*   合并上游pr
     *   [m] [Add startAtCurrentTime parameter to GetAnimation() #8555]
     *   [m] [Allow hold note tail to fallback to normal note image #8562]
     *   [m] [Fix crash caused by user json order changing #8566]
@@ -329,7 +329,7 @@
     *   [m] [Update framework #8570]
 
 ### 2020/04/03
-*   合并上游分支
+*   合并上游pr
     *   [m] [Fix hold note animation not being reset #8564]
     *   [m] [Expand mania to fit vertical screen bounds #8563]
     *   [m] [Add skinning support for column line colour #8565]
@@ -337,7 +337,7 @@
     *   [m] [Fix GetDecoder getting fallback decoder too often #8584]
 
 ### 2020/04/04
-*   合并上游分支
+*   合并上游pr
     *   [m] [Fix dynamic recompilation in intro test scenes #8590]
     *   [m] [Update usages of Animation and Video in line with framework changes #8592]
     *   [m] [Rework mania skin lookups to not require total playfield columns #8586]
@@ -347,7 +347,7 @@
     *   [m] [Fix results star rating display not being centered when no mods are present #8603(没有commit?)]
 
 ### 2020/04/06
-*   合并上游分支
+*   合并上游pr
     *   [o] [Load user rulesets from the game data directory #8607]
     *   [m] [Fix performance when parsing mania skins #8641]
     *   [m] [Update framework #8644]
@@ -356,3 +356,13 @@
 
 *   暂不合并
     *   [o] [Write a test for slider snaking #8489]
+
+### 2020/04/07
+*   合并上游pr
+    *   [m] [Make legacy skins use startAtCurrentTime by default #8613]
+    *   [m] [Add a simple constructor for BreakPeriod #8630]
+    *   [m] [Fix results star rating display not being centered when no mods are present #8624]
+    *   [m] [Fix sliderball accent colour not being set correctly #8619]
+    *   [m] [Fix storyboard videos being offset incorrectly #8648]
+    *   [m] [Fix SkinnableTestScene losing test resources on dynamic recompilation #8650]
+    *   [o] [Add top rank to the beatmap carousel #7639]
