@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-empty.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.IsNull(decoder.Decode(stream).LegacyVersion);
+                Assert.That(decoder.Decode(stream).LegacyVersion, Is.EqualTo(1.0m));
         }
     }
 }

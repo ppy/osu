@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private Container directionContainer;
         private Sprite noteSprite;
 
+        private float? minimumColumnWidth;
+
         public LegacyNotePiece()
         {
             RelativeSizeAxes = Axes.X;
@@ -29,6 +31,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
+            minimumColumnWidth = skin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.MinimumColumnWidth))?.Value;
+
             InternalChild = directionContainer = new Container
             {
                 Origin = Anchor.BottomCentre,
@@ -47,8 +51,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             if (noteSprite.Texture != null)
             {
-                var scale = DrawWidth / noteSprite.Texture.DisplayWidth;
-                noteSprite.Scale = new Vector2(scale);
+                // The height is scaled to the minimum column width, if provided.
+                float minimumWidth = minimumColumnWidth ?? DrawWidth;
+
+                noteSprite.Scale = Vector2.Divide(new Vector2(DrawWidth, minimumWidth), noteSprite.Texture.DisplayWidth);
             }
         }
 
