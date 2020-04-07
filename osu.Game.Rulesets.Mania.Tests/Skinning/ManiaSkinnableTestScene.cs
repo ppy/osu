@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             typeof(ManiaLegacySkinTransformer),
         };
 
+        protected override Ruleset CreateRulesetForSkinProvider() => new ManiaRuleset();
+
         protected ManiaSkinnableTestScene()
         {
             scrollingInfo.Direction.Value = ScrollingDirection.Down;

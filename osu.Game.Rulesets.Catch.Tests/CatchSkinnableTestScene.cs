@@ -15,5 +15,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(CatchRuleset),
             typeof(CatchLegacySkinTransformer),
         };
+
+        protected override Ruleset CreateRulesetForSkinProvider() => new CatchRuleset();
     }
 }
