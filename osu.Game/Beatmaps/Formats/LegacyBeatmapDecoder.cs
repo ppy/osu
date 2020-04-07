@@ -305,12 +305,9 @@ namespace osu.Game.Beatmaps.Formats
 
                 case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
+                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                    var breakEvent = new BreakPeriod
-                    {
-                        StartTime = start,
-                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])))
-                    };
+                    var breakEvent = new BreakPeriod(start, end);
 
                     if (!breakEvent.HasEffect)
                         return;
