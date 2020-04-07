@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ApplyResult(r => r.Type = HitResult.Good);
         }
 
-        public DrawableFlyingCentreHit(double time)
-            : base(new Hit { StartTime = time })
+        public DrawableFlyingCentreHit(double time, bool isStrong = false)
+            : base(new Hit { StartTime = time, IsStrong = isStrong })
         {
             HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
         }
