@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
@@ -33,6 +34,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
             bool showJudgementLine = GetManiaSkinConfig<bool>(skin, LegacyManiaSkinConfigurationLookups.ShowJudgementLine)?.Value
                                      ?? true;
 
+            Color4 lineColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.JudgementLineColour)?.Value
+                                ?? Color4.White;
+
             InternalChild = directionContainer = new Container
             {
                 Origin = Anchor.CentreLeft,
@@ -52,6 +56,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                         Anchor = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
+                        Colour = lineColour,
                         Alpha = showJudgementLine ? 0.9f : 0
                     }
                 }
