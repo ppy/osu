@@ -43,11 +43,11 @@ namespace osu.Game.Tests.Skins
         {
             AddStep("Add config values", () =>
             {
-                userSource.Configuration.ConfigDictionary["Lookup"] = "source1";
-                beatmapSource.Configuration.ConfigDictionary["Lookup"] = "source2";
+                userSource.Configuration.ConfigDictionary["Lookup"] = "user skin";
+                beatmapSource.Configuration.ConfigDictionary["Lookup"] = "beatmap skin";
             });
 
-            AddAssert("Check lookup finds source2", () => requester.GetConfig<string, string>("Lookup")?.Value == "source2");
+            AddAssert("Check lookup finds beatmap skin", () => requester.GetConfig<string, string>("Lookup")?.Value == "beatmap skin");
         }
 
         [Test]
@@ -131,39 +131,39 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestEmptyComboColoursNoFallback()
         {
-            AddStep("Add custom combo colours to source1", () => userSource.Configuration.AddComboColours(
+            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.AddComboColours(
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255)
             ));
 
-            AddStep("Disallow default colours fallback in source2", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
+            AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 
-            AddAssert("Check retrieved combo colours from source1", () =>
+            AddAssert("Check retrieved combo colours from user skin", () =>
                 requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false);
         }
 
         [Test]
         public void TestNullBeatmapVersionFallsBackToUserSkin()
         {
-            AddStep("Set source1 version 2.3", () => userSource.Configuration.LegacyVersion = 2.3m);
-            AddStep("Set source2 version null", () => beatmapSource.Configuration.LegacyVersion = null);
+            AddStep("Set user skin version 2.3", () => userSource.Configuration.LegacyVersion = 2.3m);
+            AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = null);
             AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
         }
 
         [Test]
         public void TestSetBeatmapVersionNoFallback()
         {
-            AddStep("Set source1 version 2.3", () => userSource.Configuration.LegacyVersion = 2.3m);
-            AddStep("Set source2 version null", () => beatmapSource.Configuration.LegacyVersion = 1.7m);
+            AddStep("Set user skin version 2.3", () => userSource.Configuration.LegacyVersion = 2.3m);
+            AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = 1.7m);
             AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 1.7m);
         }
 
         [Test]
         public void TestNullBeatmapAndUserVersionFallsBackToLatest()
         {
-            AddStep("Set source1 version 2.3", () => userSource.Configuration.LegacyVersion = null);
-            AddStep("Set source2 version null", () => beatmapSource.Configuration.LegacyVersion = null);
+            AddStep("Set user skin version 2.3", () => userSource.Configuration.LegacyVersion = null);
+            AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = null);
             AddAssert("Check legacy version lookup",
                 () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == LegacySkinConfiguration.LATEST_VERSION);
         }
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Skins
         public void TestIniWithNoVersionFallsBackTo1()
         {
             AddStep("Parse skin with no version", () => userSource.Configuration = new LegacySkinDecoder().Decode(new LineBufferedReader(new MemoryStream())));
-            AddStep("Set source2 version null", () => beatmapSource.Configuration.LegacyVersion = null);
+            AddStep("Set beatmap skin version null", () => beatmapSource.Configuration.LegacyVersion = null);
             AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 1.0m);
         }
 
