@@ -101,6 +101,10 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
                         break;
 
+                    case "WidthForNoteHeightScale":
+                        currentConfig.MinimumColumnWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
                     case string _ when pair.Key.StartsWith("Colour"):
                         HandleColours(currentConfig, line);
                         break;
@@ -114,6 +118,8 @@ namespace osu.Game.Skinning
                         break;
                 }
             }
+
+            pendingLines.Clear();
         }
 
         private void parseArrayValue(string value, float[] output)
