@@ -88,7 +88,8 @@ namespace osu.Game.Skinning
 
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
-                lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true, true) != null);
+                lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
+                true) != null);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -204,6 +205,17 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
+
+                case LegacyManiaSkinConfigurationLookups.JudgementLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourJudgementLine"));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getCustomColour(existing, $"Colour{maniaLookup.TargetColumn + 1}"));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnLightColour:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getCustomColour(existing, $"ColourLight{maniaLookup.TargetColumn + 1}"));
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
