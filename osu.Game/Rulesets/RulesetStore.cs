@@ -138,10 +138,12 @@ namespace osu.Game.Rulesets
 
         private void loadUserRulesets()
         {
-            var rulesets = rulesetStorage?.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
+            if (rulesetStorage == null) return;
+
+            var rulesets = rulesetStorage.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
 
             foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
-                loadRulesetFromFile(rulesetStorage?.GetFullPath(ruleset));
+                loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
         }
 
         private void loadFromDisk()
