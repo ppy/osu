@@ -106,6 +106,10 @@ namespace osu.Game.Skinning
                     case "LightingNWidth":
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
                         break;
+
+                    case "WidthForNoteHeightScale":
+                        currentConfig.MinimumColumnWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
                 }
             }
 
