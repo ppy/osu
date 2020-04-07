@@ -40,5 +40,6 @@ namespace osu.Game.Skinning
         JudgementLineColour,
         ColumnBackgroundColour,
         ColumnLightColour
+        MinimumColumnWidth
     }
 }
