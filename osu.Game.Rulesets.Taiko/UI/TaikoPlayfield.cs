@@ -231,14 +231,14 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private void onDrumrollArbitraryHit(TaikoAction action)
+        private void onDrumrollArbitraryHit(TaikoAction action, bool isStrong)
         {
             DrawableHit drawableHit;
 
             if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
-                drawableHit = new DrawableFlyingRimHit(Time.Current);
+                drawableHit = new DrawableFlyingRimHit(Time.Current, isStrong);
             else
-                drawableHit = new DrawableFlyingCentreHit(Time.Current);
+                drawableHit = new DrawableFlyingCentreHit(Time.Current, isStrong);
 
             drumRollHitContainer.Add(drawableHit);
         }
