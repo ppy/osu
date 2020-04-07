@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 
@@ -16,6 +17,20 @@ namespace osu.Game.Skinning
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
+        }
+
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case LegacySkinConfiguration.LegacySetting s when s == LegacySkinConfiguration.LegacySetting.Version:
+                    if (Configuration.LegacyVersion is decimal version)
+                        return SkinUtils.As<TValue>(new Bindable<decimal>(version));
+
+                    return null;
+            }
+
+            return base.GetConfig<TLookup, TValue>(lookup);
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>

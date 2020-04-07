@@ -36,6 +36,7 @@ namespace osu.Game.Skinning
         HoldNoteBodyImage,
         ExplosionImage,
         ExplosionScale,
-        ColumnLineColour
+        ColumnLineColour,
+        MinimumColumnWidth
     }
 }
