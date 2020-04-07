@@ -207,6 +207,9 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
+
+                case LegacyManiaSkinConfigurationLookups.JudgementLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourJudgementLine"));
             }
 
             return null;
