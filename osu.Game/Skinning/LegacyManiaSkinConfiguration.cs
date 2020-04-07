@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
 
@@ -44,6 +45,14 @@ namespace osu.Game.Skinning
 
             ColumnLineWidth.AsSpan().Fill(2);
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
+        }
+
+        private float? minimumColumnWidth;
+
+        public float MinimumColumnWidth
+        {
+            get => minimumColumnWidth ?? ColumnWidth.Min();
+            set => minimumColumnWidth = value;
         }
     }
 }

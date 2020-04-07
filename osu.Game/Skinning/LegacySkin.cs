@@ -71,7 +71,7 @@ namespace osu.Game.Skinning
                     }
                 }
                 else
-                    Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
+                    Configuration = new LegacySkinConfiguration();
             }
 
             if (storage != null)
@@ -122,10 +122,7 @@ namespace osu.Game.Skinning
                     switch (legacy)
                     {
                         case LegacySkinConfiguration.LegacySetting.Version:
-                            if (Configuration.LegacyVersion is decimal version)
-                                return SkinUtils.As<TValue>(new Bindable<decimal>(version));
-
-                            break;
+                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
                     }
 
                     break;
@@ -207,6 +204,9 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
                     return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
+
+                case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
             }
 
             return null;
