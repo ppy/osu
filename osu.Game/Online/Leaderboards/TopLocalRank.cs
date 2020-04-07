@@ -4,6 +4,8 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
@@ -23,8 +25,6 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        protected override double LoadDelay => 250;
 
         public TopLocalRank(BeatmapInfo beatmap)
             : base(null)
@@ -48,19 +48,22 @@ namespace osu.Game.Online.Leaderboards
                 fetchAndLoadTopScore();
         }
 
+        private ScheduledDelegate scheduledRankUpdate;
+
         private void fetchAndLoadTopScore()
         {
             var rank = fetchTopScore()?.Rank;
+            scheduledRankUpdate = Schedule(() =>
+            {
+                Rank = rank;
 
-            // toggle the display of this drawable
-            // we do not want empty space if there is no rank to be displayed
-            if (rank.HasValue)
-                Show();
-            else
-                Hide();
-
-            Schedule(() => Rank = rank);
+                // Required since presence is changed via IsPresent override
+                Invalidate(Invalidation.Presence);
+            });
         }
+
+        // We're present if a rank is set, or if there is a pending rank update (IsPresent = true is required for the scheduler to run).
+        public override bool IsPresent => base.IsPresent && (Rank != null || scheduledRankUpdate?.Completed == false);
 
         private ScoreInfo fetchTopScore()
         {
