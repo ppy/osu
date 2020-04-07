@@ -15,9 +15,14 @@ namespace osu.Game.Online.Leaderboards
     {
         private readonly BeatmapInfo beatmap;
 
-        private ScoreManager scores;
-        private IBindable<RulesetInfo> ruleset;
-        private IAPIProvider api;
+        [Resolved]
+        private ScoreManager scores { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         protected override double LoadDelay => 250;
 
@@ -28,15 +33,11 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScoreManager scores, IBindable<RulesetInfo> ruleset, IAPIProvider api)
+        private void load()
         {
             scores.ItemAdded += scoreChanged;
             scores.ItemRemoved += scoreChanged;
             ruleset.ValueChanged += _ => fetchAndLoadTopScore();
-
-            this.ruleset = ruleset.GetBoundCopy();
-            this.scores = scores;
-            this.api = api;
 
             fetchAndLoadTopScore();
         }
@@ -44,9 +45,7 @@ namespace osu.Game.Online.Leaderboards
         private void scoreChanged(ScoreInfo score)
         {
             if (score.BeatmapInfoID == beatmap.ID)
-            {
                 fetchAndLoadTopScore();
-            }
         }
 
         private void fetchAndLoadTopScore()
@@ -78,6 +77,17 @@ namespace osu.Game.Online.Leaderboards
             return scores.QueryScores(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmap.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
                          .OrderByDescending(s => s.TotalScore)
                          .FirstOrDefault();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (scores != null)
+            {
+                scores.ItemAdded -= scoreChanged;
+                scores.ItemRemoved -= scoreChanged;
+            }
         }
     }
 }
