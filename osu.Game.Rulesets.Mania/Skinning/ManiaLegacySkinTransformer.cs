@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         {
             isLegacySkin = new Lazy<bool>(() => source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() => source.GetAnimation(
-                source.GetConfig<ManiaSkinConfigurationLookup, string>(
+                GetConfig<ManiaSkinConfigurationLookup, string>(
                     new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
                 ?? "mania-key1", true, true) != null);
         }

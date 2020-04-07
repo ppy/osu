@@ -365,6 +365,11 @@
     *   [m] [Fix sliderball accent colour not being set correctly #8619]
     *   [m] [Fix storyboard videos being offset incorrectly #8648]
     *   [m] [Fix SkinnableTestScene losing test resources on dynamic recompilation #8650]
+    *   [m] [Make version-less skins fallback to version 1.0 #8643]
+    *   [m] [!不完全合并] [Retrieve dll resources using a more reliable method #8660]
+    *   [m] [Make note height scale by minimum column width #8652]
+    *   [m] [Fix inconsistent scroll speeds in mania #8653]
+    *   [m] [Implement mania note + key image configs #8642]
     *   [o] [Add top rank to the beatmap carousel #7639]
 
 *   更新上游pr
