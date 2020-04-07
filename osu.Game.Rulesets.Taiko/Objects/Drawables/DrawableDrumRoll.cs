@@ -34,6 +34,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private Color4 colourIdle;
         private Color4 colourEngaged;
 
+        private bool judgingStarted;
+
+        /// <summary>
+        /// A handler action for when the drumroll has been hit,
+        /// regardless of any judgement.
+        /// </summary>
+        public Action<TaikoAction> OnHit;
+
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
@@ -86,15 +94,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 
-        public override bool OnPressed(TaikoAction action) => false;
+        public override bool OnPressed(TaikoAction action)
+        {
+            if (judgingStarted)
+                OnHit.Invoke(action);
+
+            return false;
+        }
 
         private void onNewResult(DrawableHitObject obj, JudgementResult result)
         {
             if (!(obj is DrawableDrumRollTick))
                 return;
 
+            DrawableDrumRollTick drumRollTick = (DrawableDrumRollTick)obj;
+
             if (result.Type > HitResult.Miss)
+            {
+                OnHit.Invoke(drumRollTick.JudgedAction);
+                judgingStarted = true;
                 rollingHits++;
+            }
             else
                 rollingHits--;
 
@@ -113,8 +133,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
+
             if (countHit >= HitObject.RequiredGoodHits)
+            {
                 ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+            }
             else
                 ApplyResult(r => r.Type = HitResult.Miss);
         }
