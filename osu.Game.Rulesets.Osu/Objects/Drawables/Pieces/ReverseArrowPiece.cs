@@ -21,13 +21,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Blending = BlendingParameters.Additive;
-
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
+                Blending = BlendingParameters.Additive,
                 Icon = FontAwesome.Solid.ChevronRight,
                 Size = new Vector2(0.35f)
             })
