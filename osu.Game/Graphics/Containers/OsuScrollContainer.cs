@@ -14,6 +14,9 @@ namespace osu.Game.Graphics.Containers
 {
     public class OsuScrollContainer : ScrollContainer<Drawable>
     {
+        public const float SCROLL_BAR_HEIGHT = 10;
+        public const float SCROLL_BAR_PADDING = 3;
+
         /// <summary>
         /// Allows controlling the scroll bar from any position in the container using the right mouse button.
         /// Uses the value of <see cref="DistanceDecayOnRightMouseScrollbar"/> to smoothly scroll to the dragged location.
@@ -96,8 +99,6 @@ namespace osu.Game.Graphics.Containers
 
         protected class OsuScrollbar : ScrollbarContainer
         {
-            private const float dim_size = 10;
-
             private Color4 hoverColour;
             private Color4 defaultColour;
             private Color4 highlightColour;
@@ -135,7 +136,7 @@ namespace osu.Game.Graphics.Containers
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
             {
-                Vector2 size = new Vector2(dim_size)
+                Vector2 size = new Vector2(SCROLL_BAR_HEIGHT)
                 {
                     [(int)ScrollDirection] = val
                 };

@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private Bindable<FilterCriteria> filter { get; set; }
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
+        private Bindable<Room> selectedRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 {
                     bool matchingFilter = true;
 
-                    matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Equals(criteria.Ruleset));
+                    matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
 
                     if (!string.IsNullOrEmpty(criteria.SearchString))
                         matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
-            currentRoom.Value = room;
+            selectedRoom.Value = room;
         }
 
         protected override void Dispose(bool isDisposing)

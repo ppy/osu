@@ -47,6 +47,8 @@ namespace osu.Game
     {
         public const string CLIENT_STREAM_NAME = "lazer";
 
+        public const int SAMPLE_CONCURRENCY = 6;
+
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
@@ -97,7 +99,7 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
-        public string Version
+        public virtual string Version
         {
             get
             {
@@ -138,28 +140,22 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
-            AddFont(Resources, @"Fonts/Exo2.0-Medium");
-            AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
+
+            AddFont(Resources, @"Fonts/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Bold");
 
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
 
-            AddFont(Resources, @"Fonts/Exo2.0-Regular");
-            AddFont(Resources, @"Fonts/Exo2.0-RegularItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-SemiBold");
-            AddFont(Resources, @"Fonts/Exo2.0-SemiBoldItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Bold");
-            AddFont(Resources, @"Fonts/Exo2.0-BoldItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Light");
-            AddFont(Resources, @"Fonts/Exo2.0-LightItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Black");
-            AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
-
-            AddFont(Resources, @"Fonts/Venera");
             AddFont(Resources, @"Fonts/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera-Medium");
+            AddFont(Resources, @"Fonts/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera-Black");
+
+            Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             runMigrations();
 
@@ -206,6 +202,10 @@ namespace osu.Game
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+
+            // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
+            // and potentially causing a reload of it after just unloading.
+            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
             Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)

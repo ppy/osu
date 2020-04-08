@@ -4,8 +4,6 @@
 using Newtonsoft.Json;
 using osu.Game.Users;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -16,8 +14,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"parent_id")]
         public long? ParentId { get; set; }
-
-        public readonly List<Comment> ChildComments = new List<Comment>();
 
         public Comment ParentComment { get; set; }
 
@@ -71,7 +67,5 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool HasMessage => !string.IsNullOrEmpty(Message);
 
         public bool IsVoted { get; set; }
-
-        public int DeletedChildrenCount => ChildComments.Count(c => c.IsDeleted);
     }
 }

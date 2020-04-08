@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
-                HitObjects = new List<HitObject> { new CentreHit() },
+                HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty(),

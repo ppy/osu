@@ -13,6 +13,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osuTK;
+using JetBrains.Annotations;
+using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -29,6 +31,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private readonly BindableBool showDeleted = new BindableBool();
         private readonly Container content;
+
+        private TestCommentsPage commentsPage;
 
         public TestSceneCommentsPage()
         {
@@ -57,27 +61,40 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 }
             });
+        }
 
-            AddStep("load comments", () => createPage(comment_bundle));
-            AddStep("load empty comments", () => createPage(empty_comment_bundle));
+        [Test]
+        public void TestAppendDuplicatedComment()
+        {
+            AddStep("Create page", () => createPage(getCommentBundle()));
+            AddAssert("Dictionary length is 10", () => commentsPage?.DictionaryLength == 10);
+            AddStep("Append existing comment", () => commentsPage?.AppendComments(getCommentSubBundle()));
+            AddAssert("Dictionary length is 10", () => commentsPage?.DictionaryLength == 10);
+        }
+
+        [Test]
+        public void TestEmptyBundle()
+        {
+            AddStep("Create page", () => createPage(getEmptyCommentBundle()));
+            AddAssert("Dictionary length is 0", () => commentsPage?.DictionaryLength == 0);
         }
 
         private void createPage(CommentBundle commentBundle)
         {
+            commentsPage = null;
             content.Clear();
-            content.Add(new CommentsPage(commentBundle)
+            content.Add(commentsPage = new TestCommentsPage(commentBundle)
             {
                 ShowDeleted = { BindTarget = showDeleted }
             });
         }
 
-        private static readonly CommentBundle empty_comment_bundle = new CommentBundle
+        private CommentBundle getEmptyCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>(),
-            Total = 0,
         };
 
-        private static readonly CommentBundle comment_bundle = new CommentBundle
+        private CommentBundle getCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>
             {
@@ -88,6 +105,33 @@ namespace osu.Game.Tests.Visual.Online
                     LegacyName = "TestUser1",
                     CreatedAt = DateTimeOffset.Now,
                     VotesCount = 5
+                },
+                new Comment
+                {
+                    Id = 100,
+                    Message = "This comment has \"load replies\" button because it has unloaded replies",
+                    LegacyName = "TestUser1100",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 5,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 111,
+                    Message = "This comment has \"Show More\" button because it has unloaded replies, but some of them are loaded",
+                    LegacyName = "TestUser1111",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 100,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 112,
+                    ParentId = 111,
+                    Message = "I'm here to make my parent work",
+                    LegacyName = "someone",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 2,
                 },
                 new Comment
                 {
@@ -155,8 +199,34 @@ namespace osu.Game.Tests.Visual.Online
                     Username = "Good_Admin"
                 }
             },
-            TopLevelCount = 4,
-            Total = 7
         };
+
+        private CommentBundle getCommentSubBundle() => new CommentBundle
+        {
+            Comments = new List<Comment>
+            {
+                new Comment
+                {
+                    Id = 1,
+                    Message = "Simple test comment",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 5
+                },
+            },
+            IncludedComments = new List<Comment>(),
+        };
+
+        private class TestCommentsPage : CommentsPage
+        {
+            public TestCommentsPage(CommentBundle commentBundle)
+                : base(commentBundle)
+            {
+            }
+
+            public new void AppendComments([NotNull] CommentBundle bundle) => base.AppendComments(bundle);
+
+            public int DictionaryLength => CommentDictionary.Count;
+        }
     }
 }

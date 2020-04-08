@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly FavouriteButton favouriteButton;
         private readonly FillFlowContainer fadeContent;
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
         private readonly BeatmapSetHeader beatmapSetHeader;
 
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -144,12 +144,15 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     },
                                                 }
                                             },
-                                            artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true) },
+                                            artist = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true),
+                                                Margin = new MarginPadding { Bottom = 20 }
+                                            },
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Margin = new MarginPadding { Top = 20 },
                                                 Child = author = new AuthorInfo(),
                                             },
                                             beatmapAvailability = new BeatmapAvailability(),
@@ -176,7 +179,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     },
                                 }
                             },
-                            loading = new LoadingAnimation
+                            loading = new LoadingSpinner
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,

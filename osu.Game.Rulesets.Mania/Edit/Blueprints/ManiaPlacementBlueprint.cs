@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
-            if (!PlacementBegun)
+            if (!PlacementActive)
                 Column = ColumnAt(screenSpacePosition);
 
             if (Column == null) return;
@@ -122,11 +122,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             switch (scrollingInfo.Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    mousePosition.Y -= NotePiece.NOTE_HEIGHT / 2;
+                    mousePosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
 
                 case ScrollingDirection.Down:
-                    mousePosition.Y += NotePiece.NOTE_HEIGHT / 2;
+                    mousePosition.Y += DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
             }
 
@@ -143,11 +143,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             switch (scrollingInfo.Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObjectPosition.Y += NotePiece.NOTE_HEIGHT / 2;
+                    hitObjectPosition.Y += DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
 
                 case ScrollingDirection.Down:
-                    hitObjectPosition.Y -= NotePiece.NOTE_HEIGHT / 2;
+                    hitObjectPosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
             }
 

@@ -29,8 +29,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(RankingsOverlayHeader)
         };
 
-        [Cached]
-        private RankingsOverlay rankingsOverlay;
+        [Cached(typeof(RankingsOverlay))]
+        private readonly RankingsOverlay rankingsOverlay;
 
         private readonly Bindable<Country> countryBindable = new Bindable<Country>();
         private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();

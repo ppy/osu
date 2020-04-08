@@ -8,7 +8,6 @@ using osu.Game.Overlays.Rankings.Tables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Graphics.UserInterface;
 using System.Threading;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
@@ -16,6 +15,7 @@ using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         private readonly BasicScrollContainer scrollFlow;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
         private CancellationTokenSource cancellationToken;
         private APIRequest request;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Online
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.8f,
                 },
-                loading = new DimmedLoadingLayer(),
+                loading = new LoadingLayer(),
             };
         }
 

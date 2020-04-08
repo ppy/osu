@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
 
         public Timeline()
         {
@@ -36,10 +37,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock adjustableClock, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
-            this.adjustableClock = adjustableClock;
-
             Add(waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,

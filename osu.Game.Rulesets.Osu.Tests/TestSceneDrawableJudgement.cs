@@ -13,13 +13,13 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneDrawableJudgement : SkinnableTestScene
+    public class TestSceneDrawableJudgement : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(DrawableJudgement),
             typeof(DrawableOsuJudgement)
-        };
+        }).ToList();
 
         public TestSceneDrawableJudgement()
         {

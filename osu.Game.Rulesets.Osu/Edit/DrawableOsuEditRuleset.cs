@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                     if (existing == null)
                         return;
 
+                    hitObject.RemoveTransform(existing);
+
                     using (hitObject.BeginAbsoluteSequence(existing.StartTime))
                         hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
                     break;

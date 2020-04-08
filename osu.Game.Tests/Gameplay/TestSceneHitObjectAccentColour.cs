@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Gameplay
             }
         }
 
-        private class TestHitObjectWithCombo : HitObject, IHasComboInformation
+        private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
             public bool NewCombo { get; } = false;
             public int ComboOffset { get; } = 0;

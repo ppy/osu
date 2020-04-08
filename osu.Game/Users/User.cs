@@ -9,7 +9,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
-    public class User
+    public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
         public long Id = 1;
@@ -68,6 +68,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"support_level")]
         public int SupportLevel;
+
+        [JsonProperty(@"current_mode_rank")]
+        public int? CurrentModeRank;
 
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
@@ -170,8 +173,27 @@ namespace osu.Game.Users
             public int Available;
         }
 
+        private UserStatistics statistics;
+
         [JsonProperty(@"statistics")]
-        public UserStatistics Statistics;
+        public UserStatistics Statistics
+        {
+            get => statistics ??= new UserStatistics();
+            set
+            {
+                if (statistics != null)
+                    // we may already have rank history populated
+                    value.RankHistory = statistics.RankHistory;
+
+                statistics = value;
+            }
+        }
+
+        [JsonProperty(@"rankHistory")]
+        private RankHistoryData rankHistory
+        {
+            set => statistics.RankHistory = value;
+        }
 
         public class RankHistoryData
         {
@@ -180,12 +202,6 @@ namespace osu.Game.Users
 
             [JsonProperty(@"data")]
             public int[] Data;
-        }
-
-        [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]
@@ -243,6 +259,14 @@ namespace osu.Game.Users
 
             [Description("Touch Screen")]
             Touch,
+        }
+
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
         }
     }
 }

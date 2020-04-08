@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override int SectionLength => 750;
 
+        private float halfCatcherWidth;
+
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -70,16 +72,22 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatchWidth);
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth);
 
                 lastObject = hitObject;
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
-            new Movement(),
-        };
+            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+                halfCatcherWidth = catcher.CatchWidth * 0.5f;
+
+            return new Skill[]
+            {
+                new Movement(halfCatcherWidth),
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {

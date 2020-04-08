@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class HeaderDownloadButton : BeatmapDownloadTrackingComposite, IHasTooltip
     {
+        private const int text_size = 12;
+
         private readonly bool noVideo;
 
         public string TooltipText => button.Enabled.Value ? "download this beatmap" : "login to download";
@@ -80,8 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Icon = FontAwesome.Solid.Download,
-                                    Size = new Vector2(16),
-                                    Margin = new MarginPadding { Right = 5 },
+                                    Size = new Vector2(18),
                                 },
                             }
                         },
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Downloading...",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -131,7 +132,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Importing...",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -146,12 +147,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Download",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
                                 Text = getVideoSuffixText(),
-                                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
                             },
                         };
                         this.FadeIn(200);

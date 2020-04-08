@@ -14,9 +14,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Taiko.Objects;
 using osuTK;
 using osuTK.Graphics;
 
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (!result.IsHit)
                         break;
 
-                    bool isRim = judgedObject.HitObject is RimHit;
+                    bool isRim = (judgedObject.HitObject as Hit)?.Type == HitType.Rim;
 
                     hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 

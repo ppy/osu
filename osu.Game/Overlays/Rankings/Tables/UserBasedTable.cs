@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {
-            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE)) { AutoSizeAxes = Axes.Both };
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true)) { AutoSizeAxes = Axes.Both };
             username.AddUserLink(item.User);
             return username;
         }

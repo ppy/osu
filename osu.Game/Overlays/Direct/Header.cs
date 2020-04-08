@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using osu.Framework.Extensions.Color4Extensions;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.Direct
 {
     public class Header : SearchableListHeader<DirectTab>
     {
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"252f3a");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"252f3a");
 
         protected override DirectTab DefaultTab => DirectTab.Search;
         protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", Font = OsuFont.GetFont(size: 25) };

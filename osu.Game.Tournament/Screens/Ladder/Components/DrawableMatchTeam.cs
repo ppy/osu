@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -11,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -26,23 +26,25 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         private readonly TournamentMatch match;
         private readonly bool losers;
-        private OsuSpriteText scoreText;
+        private TournamentSpriteText scoreText;
         private Box background;
+        private Box backgroundRight;
 
         private readonly Bindable<int?> score = new Bindable<int?>();
         private readonly BindableBool completed = new BindableBool();
 
         private Color4 colourWinner;
-        private Color4 colourNormal;
 
         private readonly Func<bool> isWinner;
         private LadderEditorScreen ladderEditor;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private LadderInfo ladderInfo { get; set; }
 
         private void setCurrent()
         {
+            if (ladderInfo == null) return;
+
             //todo: tournamentgamebase?
             if (ladderInfo.CurrentMatch.Value != null)
                 ladderInfo.CurrentMatch.Value.Current.Value = false;
@@ -61,15 +63,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             this.losers = losers;
             Size = new Vector2(150, 40);
 
-            Masking = true;
-            CornerRadius = 5;
-
             Flag.Scale = new Vector2(0.9f);
             Flag.Anchor = Flag.Origin = Anchor.CentreLeft;
 
             AcronymText.Anchor = AcronymText.Origin = Anchor.CentreLeft;
             AcronymText.Padding = new MarginPadding { Left = 50 };
-            AcronymText.Font = OsuFont.GetFont(size: 24);
+            AcronymText.Font = OsuFont.Torus.With(size: 22, weight: FontWeight.Bold);
 
             if (match != null)
             {
@@ -86,8 +85,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             this.ladderEditor = ladderEditor;
 
-            colourWinner = losers ? colours.YellowDarker : colours.BlueDarker;
-            colourNormal = OsuColour.Gray(0.2f);
+            colourWinner = losers
+                ? Color4Extensions.FromHex("#8E7F48")
+                : Color4Extensions.FromHex("#1462AA");
 
             InternalChildren = new Drawable[]
             {
@@ -103,29 +103,28 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     {
                         AcronymText,
                         Flag,
-                        new Container
+                    }
+                },
+                new Container
+                {
+                    Masking = true,
+                    Width = 0.3f,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        backgroundRight = new Box
                         {
-                            Masking = true,
-                            CornerRadius = 5,
-                            Width = 0.3f,
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
+                            Colour = OsuColour.Gray(0.1f),
+                            Alpha = 0.8f,
                             RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = OsuColour.Gray(0.1f),
-                                    Alpha = 0.8f,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                scoreText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 20),
-                                }
-                            }
+                        },
+                        scoreText = new TournamentSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.Torus.With(size: 22),
                         }
                     }
                 }
@@ -182,9 +181,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             bool winner = completed.Value && isWinner?.Invoke() == true;
 
-            background.FadeColour(winner ? colourWinner : colourNormal, winner ? 500 : 0, Easing.OutQuint);
+            background.FadeColour(winner ? Color4.White : Color4Extensions.FromHex("#444"), winner ? 500 : 0, Easing.OutQuint);
+            backgroundRight.FadeColour(winner ? colourWinner : Color4Extensions.FromHex("#333"), winner ? 500 : 0, Easing.OutQuint);
 
-            scoreText.Font = AcronymText.Font = OsuFont.GetFont(weight: winner ? FontWeight.Bold : FontWeight.Regular);
+            AcronymText.Colour = winner ? Color4.Black : Color4.White;
+
+            scoreText.Font = scoreText.Font.With(weight: winner ? FontWeight.Bold : FontWeight.Regular);
         }
 
         public MenuItem[] ContextMenuItems

@@ -41,7 +41,7 @@ namespace osu.Game.Online.Leaderboards
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
-        private readonly int rank;
+        private readonly int? rank;
         private readonly bool allowHighlight;
 
         private Box background;
@@ -55,10 +55,10 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
-        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
             this.rank = rank;
@@ -90,7 +90,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },
@@ -200,7 +200,7 @@ namespace osu.Game.Online.Leaderboards
                                         scoreLabel = new GlowingSpriteText
                                         {
                                             TextColour = Color4.White,
-                                            GlowColour = OsuColour.FromHex(@"83ccfa"),
+                                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                                             Text = score.TotalScore.ToString(@"N0"),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
@@ -325,7 +325,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
-                                    Colour = OsuColour.FromHex(@"3087ac"),
+                                    Colour = Color4Extensions.FromHex(@"3087ac"),
                                     Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
@@ -334,7 +334,7 @@ namespace osu.Game.Online.Leaderboards
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size - 6),
-                                    Colour = OsuColour.FromHex(@"a4edff"),
+                                    Colour = Color4Extensions.FromHex(@"a4edff"),
                                     Icon = statistic.Icon,
                                 },
                             },
@@ -344,7 +344,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TextColour = Color4.White,
-                            GlowColour = OsuColour.FromHex(@"83ccfa"),
+                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
                             Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
                         },
