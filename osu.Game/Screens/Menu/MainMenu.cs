@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"Good bye",
+                        Text = @"Goodbye",
                         Action = confirm
                     },
                     new PopupDialogCancelButton
