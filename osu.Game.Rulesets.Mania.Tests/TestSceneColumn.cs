@@ -96,7 +96,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Width = 50,
                 Height = 0.85f,
                 AccentColour = Color4.OrangeRed,
                 Action = { Value = action },
