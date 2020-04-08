@@ -380,3 +380,10 @@
 *   翻译改进
     *   RankArchived: "达成的排名" -> "取得的成绩"
 *   更新framework至2020.407.0以修复storyboard尺寸问题
+
+### 2020/04/08
+    *   合并上游pr
+        *   [m] [Fix legacy skin texture fallback logic #8669]
+        *   [m] [Increase size of default osu!mania skin's keys to allow clearance with HUD #8674]
+        *   [m] [Fix dragging tournament ladder too far causing it to disappear #8673]
+        *   [m] [Add osu!taiko drum skinning support #8598]

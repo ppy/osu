@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Menu
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    InternalChild = new Video(videoStream, false)
+                    InternalChild = new Video(videoStream)
                     {
                         RelativeSizeAxes = Axes.Both
                     };

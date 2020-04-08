@@ -293,9 +293,10 @@ namespace osu.Game.Skinning
                     texture = Textures?.Get(name);
                 }
 
-                if (texture != null)
-                    texture.ScaleAdjust = ratio;
+                if (texture == null)
+                    continue;
 
+                texture.ScaleAdjust = ratio;
                 return texture;
             }
 
