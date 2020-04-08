@@ -39,6 +39,10 @@ namespace osu.Game.Skinning
                                     skin.LegacyVersion = LegacySkinConfiguration.LATEST_VERSION;
                                 else if (decimal.TryParse(pair.Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var version))
                                     skin.LegacyVersion = version;
+                                return;
+
+                            case @"LayeredHitSounds":
+                                skin.SkinInfo.LayeredHitSounds = pair.Value == "1";
 
                                 return;
                         }

@@ -36,6 +36,11 @@ namespace osu.Game.Audio
         /// The sample volume.
         /// </summary>
         public int Volume { get; set; }
+        
+        /// <summary>
+        /// Whether the hitsample was artificially added or if it was a beatmap specification.
+        /// </summary>
+        public bool IsLayered { get; set; } = false;
 
         /// <summary>
         /// Retrieve all possible filenames that can be used as a source, returned in order of preference (highest first).

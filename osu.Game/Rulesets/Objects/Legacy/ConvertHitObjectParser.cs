@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         protected bool FirstObject { get; private set; } = true;
 
+        protected bool AllowsLayeredHitSounds { get; set; } = true;
+
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
             Offset = offset;
@@ -349,16 +351,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 };
             }
 
-            var soundTypes = new List<HitSampleInfo>
+            var soundTypes = new List<HitSampleInfo>();
+
+            if (type.HasFlag(LegacyHitSoundType.Normal) || AllowsLayeredHitSounds)
             {
-                new LegacyHitSampleInfo
+                soundTypes.Add(new LegacyHitSampleInfo
                 {
                     Bank = bankInfo.Normal,
                     Name = HitSampleInfo.HIT_NORMAL,
                     Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
-                }
-            };
+                    CustomSampleBank = bankInfo.CustomSampleBank,
+                    IsLayered = !type.HasFlag(LegacyHitSoundType.Normal)
+                });
+            }
 
             if (type.HasFlag(LegacyHitSoundType.Finish))
             {
