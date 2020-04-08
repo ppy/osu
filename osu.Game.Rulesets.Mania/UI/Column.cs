@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Index = index;
 
             RelativeSizeAxes = Axes.Y;
+            Width = COLUMN_WIDTH;
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
             {
@@ -138,6 +139,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
-            => DrawRectangle.Inflate(new Vector2(ManiaStage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+            => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
     }
 }
