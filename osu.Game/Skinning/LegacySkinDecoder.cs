@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
                                 return;
 
                             case @"LayeredHitSounds":
-                                skin.SkinInfo.LayeredHitSounds = pair.Value == "1";
+                                skin.LayeredHitSounds = pair.Value == "1";
 
                                 return;
                         }

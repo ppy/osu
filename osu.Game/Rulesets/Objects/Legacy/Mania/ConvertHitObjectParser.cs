@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             : base(offset, formatVersion)
         {
             // LayeredHitSounds is disabled in mania
-            this.AllowsLayeredHitSounds = false;
+            AllowsLayeredHitSounds = false;
         }
 
         protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)

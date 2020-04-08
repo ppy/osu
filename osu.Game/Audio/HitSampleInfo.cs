@@ -36,11 +36,11 @@ namespace osu.Game.Audio
         /// The sample volume.
         /// </summary>
         public int Volume { get; set; }
-        
+
         /// <summary>
         /// Whether the hitsample was artificially added or if it was a beatmap specification.
         /// </summary>
-        public bool IsLayered { get; set; } = false;
+        public bool IsLayered { get; set; }
 
         /// <summary>
         /// Whether the sample is custom or if it uses osu!'s default hitsounds.

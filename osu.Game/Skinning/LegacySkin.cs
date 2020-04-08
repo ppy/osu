@@ -306,6 +306,10 @@ namespace osu.Game.Skinning
         {
             var hsi = sampleInfo as HitSampleInfo;
 
+            if (hsi != null && hsi.IsLayered && !Configuration.LayeredHitSounds)
+                // The layered hitsample is ignored if the skin disabled LayeredHitSounds
+                return null;
+
             if (hsi == null || hsi.IsCustom)
             {
                 foreach (var lookup in sampleInfo.LookupNames)

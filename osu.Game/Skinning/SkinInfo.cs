@@ -18,11 +18,6 @@ namespace osu.Game.Skinning
 
         public string Creator { get; set; }
 
-        /// <summary>
-        /// Whether the hitnormal sounds should always be played or not.
-        /// </summary>
-        public bool LayeredHitSounds { get; set; } = true;
-
         public List<SkinFileInfo> Files { get; set; }
 
         public List<DatabasedSetting> Settings { get; set; }
