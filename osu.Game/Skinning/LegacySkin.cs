@@ -119,14 +119,8 @@ namespace osu.Game.Skinning
 
                     break;
 
-                case LegacySkinConfiguration.LegacySetting legacy:
-                    switch (legacy)
-                    {
-                        case LegacySkinConfiguration.LegacySetting.Version:
-                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
-                    }
-
-                    break;
+                case LegacySkinConfiguration.LegacySetting legacySetting when legacySetting == LegacySkinConfiguration.LegacySetting.Version:
+                    return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
 
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
@@ -306,7 +300,7 @@ namespace osu.Game.Skinning
         {
             var hsi = sampleInfo as HitSampleInfo;
 
-            if (hsi?.IsLayered == true && GetConfig<string, bool>("LayeredHitSounds")?.Value == false)
+            if (hsi?.IsLayered == true && GetConfig<LegacySkinConfiguration.LegacySetting, bool>(LegacySkinConfiguration.LegacySetting.LayeredHitSounds)?.Value == false)
                 // The layered hitsample is ignored if the skin disabled LayeredHitSounds
                 return null;
 
