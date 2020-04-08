@@ -28,7 +28,9 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             typeof(Column),
             typeof(ColumnBackground),
-            typeof(ColumnHitObjectArea)
+            typeof(ColumnHitObjectArea),
+            typeof(DefaultKeyArea),
+            typeof(DefaultHitTarget)
         };
 
         [Cached(typeof(IReadOnlyList<Mod>))]
@@ -94,6 +96,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Width = 50,
                 Height = 0.85f,
                 AccentColour = Color4.OrangeRed,
                 Action = { Value = action },
