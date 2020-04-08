@@ -30,7 +30,7 @@ namespace osu.Game.Online.Leaderboards
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
 
         private ScheduledDelegate showScoresDelegate;
         private CancellationTokenSource showScoresCancellationSource;
@@ -152,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new LoginPlaceholder());
+                        replacePlaceholder(new LoginPlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
@@ -202,7 +202,7 @@ namespace osu.Game.Online.Leaderboards
                         }
                     },
                 },
-                loading = new LoadingAnimation(),
+                loading = new LoadingSpinner(),
                 placeholderContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
@@ -217,14 +217,14 @@ namespace osu.Game.Online.Leaderboards
             Scores = null;
         }
 
-        private IAPIProvider api;
+        [Resolved(CanBeNull = true)]
+        private IAPIProvider api { get; set; }
 
         private ScheduledDelegate pendingUpdateScores;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.api = api;
             api?.Register(this);
         }
 

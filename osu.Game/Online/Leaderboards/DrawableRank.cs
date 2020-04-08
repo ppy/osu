@@ -28,7 +28,7 @@ namespace osu.Game.Online.Leaderboards
             FillMode = FillMode.Fit;
             FillAspectRatio = 2;
 
-            var rankColour = getRankColour();
+            var rankColour = OsuColour.ForRank(rank);
             InternalChild = new DrawSizePreservingFillContainer
             {
                 TargetDrawSize = new Vector2(64, 32),
@@ -58,8 +58,8 @@ namespace osu.Game.Online.Leaderboards
                             Spacing = new Vector2(-3, 0),
                             Padding = new MarginPadding { Top = 5 },
                             Colour = getRankNameColour(),
-                            Font = OsuFont.GetFont(Typeface.Venera, 25),
-                            Text = getRankName(),
+                            Font = OsuFont.Numeric.With(size: 25),
+                            Text = GetRankName(rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
@@ -69,36 +69,7 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        private string getRankName() => rank.GetDescription().TrimEnd('+');
-
-        /// <summary>
-        ///  Retrieves the grade background colour.
-        /// </summary>
-        private Color4 getRankColour()
-        {
-            switch (rank)
-            {
-                case ScoreRank.XH:
-                case ScoreRank.X:
-                    return OsuColour.FromHex(@"ce1c9d");
-
-                case ScoreRank.SH:
-                case ScoreRank.S:
-                    return OsuColour.FromHex(@"00a8b5");
-
-                case ScoreRank.A:
-                    return OsuColour.FromHex(@"7cce14");
-
-                case ScoreRank.B:
-                    return OsuColour.FromHex(@"e3b130");
-
-                case ScoreRank.C:
-                    return OsuColour.FromHex(@"f18252");
-
-                default:
-                    return OsuColour.FromHex(@"e95353");
-            }
-        }
+        public static string GetRankName(ScoreRank rank) => rank.GetDescription().TrimEnd('+');
 
         /// <summary>
         ///  Retrieves the grade text colour.
@@ -109,23 +80,23 @@ namespace osu.Game.Online.Leaderboards
             {
                 case ScoreRank.XH:
                 case ScoreRank.SH:
-                    return ColourInfo.GradientVertical(Color4.White, OsuColour.FromHex("afdff0"));
+                    return ColourInfo.GradientVertical(Color4.White, Color4Extensions.FromHex("afdff0"));
 
                 case ScoreRank.X:
                 case ScoreRank.S:
-                    return ColourInfo.GradientVertical(OsuColour.FromHex(@"ffe7a8"), OsuColour.FromHex(@"ffb800"));
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ffe7a8"), Color4Extensions.FromHex(@"ffb800"));
 
                 case ScoreRank.A:
-                    return OsuColour.FromHex(@"275227");
+                    return Color4Extensions.FromHex(@"275227");
 
                 case ScoreRank.B:
-                    return OsuColour.FromHex(@"553a2b");
+                    return Color4Extensions.FromHex(@"553a2b");
 
                 case ScoreRank.C:
-                    return OsuColour.FromHex(@"473625");
+                    return Color4Extensions.FromHex(@"473625");
 
                 default:
-                    return OsuColour.FromHex(@"512525");
+                    return Color4Extensions.FromHex(@"512525");
             }
         }
     }

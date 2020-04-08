@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual.Menus
         {
             typeof(StartupScreen),
             typeof(IntroScreen),
-            typeof(OsuScreen),
             typeof(IntroTestScene),
         };
 
@@ -64,6 +63,8 @@ namespace osu.Game.Tests.Visual.Menus
 
                 introStack.Push(CreateScreen());
             });
+
+            AddUntilStep("wait for menu", () => introStack.CurrentScreen is MainMenu);
         }
 
         protected abstract IScreen CreateScreen();

@@ -23,6 +23,7 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -86,22 +87,33 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            try
+            {
+                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Could not load beatmap successfully!");
+                // couldn't load, hard abort!
+                this.Exit();
+                return;
+            }
+
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
 
             dependencies.CacheAs(editorBeatmap);
 
             EditorMenuBar menuBar;
 
-            var fileMenuItems = new List<MenuItem>();
+            var fileMenuItems = new List<MenuItem>
+            {
+                new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap)
+            };
 
             if (RuntimeInfo.IsDesktop)
-            {
-                fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap));
                 fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
-                fileMenuItems.Add(new EditorMenuItemSpacer());
-            }
 
+            fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
             AddInternal(new OsuContextMenuContainer

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoreTable : TableContainer
     {
         private const float horizontal_inset = 20;
-        private const float row_height = 25;
+        private const float row_height = 22;
         private const int text_size = 12;
 
         private readonly FillFlowContainer backgroundFlow;
@@ -52,22 +52,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             highAccuracyColour = colours.GreenLight;
         }
 
-        public IReadOnlyList<ScoreInfo> Scores
+        private bool showPerformancePoints;
+
+        public void DisplayScores(IReadOnlyList<ScoreInfo> scores, bool showPerformanceColumn)
         {
-            set
-            {
-                Content = null;
-                backgroundFlow.Clear();
+            ClearScores();
 
-                if (value?.Any() != true)
-                    return;
+            if (!scores.Any())
+                return;
 
-                for (int i = 0; i < value.Count; i++)
-                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i]));
+            showPerformancePoints = showPerformanceColumn;
 
-                Columns = createHeaders(value[0]);
-                Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
-            }
+            for (int i = 0; i < scores.Count; i++)
+                backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
+
+            Columns = createHeaders(scores.FirstOrDefault());
+            Content = scores.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
+        }
+
+        public void ClearScores()
+        {
+            Content = null;
+            backgroundFlow.Clear();
         }
 
         private TableColumn[] createHeaders(ScoreInfo score)
@@ -77,25 +83,30 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("rank", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
                 new TableColumn("score", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 60, maxSize: 70)),
-                new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
-                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 110))
+                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
+                new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 25)), // flag
+                new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
+                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
             };
 
-            foreach (var statistic in score.SortedStatistics)
-                columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70)));
+            foreach (var statistic in score.SortedStatistics.Take(score.SortedStatistics.Count() - 1))
+                columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
 
-            columns.AddRange(new[]
-            {
-                new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 40, maxSize: 70)),
-                new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-            });
+            columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
+
+            if (showPerformancePoints)
+                columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
+
+            columns.Add(new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
 
             return columns.ToArray();
         }
 
         private Drawable[] createContent(int index, ScoreInfo score)
         {
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
+            username.AddUserLink(score.User);
+
             var content = new List<Drawable>
             {
                 new OsuSpriteText
@@ -105,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new UpdateableRank(score.Rank)
                 {
-                    Size = new Vector2(30, 20)
+                    Size = new Vector2(28, 14)
                 },
                 new OsuSpriteText
                 {
@@ -120,35 +131,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
-            };
-
-            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
-            username.AddUserLink(score.User);
-
-            content.AddRange(new Drawable[]
-            {
-                new FillFlowContainer
+                new UpdateableFlag(score.User.Country)
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Right = horizontal_inset },
-                    Spacing = new Vector2(5, 0),
-                    Children = new Drawable[]
-                    {
-                        new UpdateableFlag(score.User.Country)
-                        {
-                            Size = new Vector2(20, 13),
-                            ShowPlaceholderOnNull = false,
-                        },
-                        username
-                    }
+                    Size = new Vector2(19, 13),
+                    ShowPlaceholderOnNull = false,
                 },
+                username,
                 new OsuSpriteText
                 {
                     Text = $@"{score.MaxCombo:N0}x",
-                    Font = OsuFont.GetFont(size: text_size)
+                    Font = OsuFont.GetFont(size: text_size),
+                    Colour = score.MaxCombo == score.Beatmap?.MaxCombo ? highAccuracyColour : Color4.White
                 }
-            });
+            };
 
             foreach (var kvp in score.SortedStatistics)
             {
@@ -160,24 +155,25 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            content.AddRange(new Drawable[]
+            if (showPerformancePoints)
             {
-                new OsuSpriteText
+                content.Add(new OsuSpriteText
                 {
                     Text = $@"{score.PP:N0}",
                     Font = OsuFont.GetFont(size: text_size)
-                },
-                new FillFlowContainer
+                });
+            }
+
+            content.Add(new FillFlowContainer
+            {
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(1),
+                ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
                 {
-                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(1),
-                    ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.3f)
-                    })
-                },
+                    Scale = new Vector2(0.3f)
+                })
             });
 
             return content.ToArray();

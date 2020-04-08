@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,16 +16,24 @@ using osu.Game.Rulesets.Osu.Skinning;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
+    public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition, IHasAccentColour
     {
         public Func<OsuAction?> GetInitialHitAction;
+
+        public Color4 AccentColour
+        {
+            get => ball.Colour;
+            set => ball.Colour = value;
+        }
 
         private readonly Slider slider;
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
+        private readonly CircularContainer ball;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
@@ -46,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Alpha = 0,
                     Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
                 },
-                new CircularContainer
+                ball = new CircularContainer
                 {
                     Masking = true,
                     RelativeSizeAxes = Axes.Both,
@@ -214,9 +223,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public class DefaultSliderBall : CompositeDrawable
         {
+            private Box box;
+
             [BackgroundDependencyLoader]
             private void load(DrawableHitObject drawableObject, ISkinSource skin)
             {
+                var slider = (DrawableSlider)drawableObject;
+
                 RelativeSizeAxes = Axes.Both;
 
                 float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
@@ -231,14 +244,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     BorderThickness = 10,
                     BorderColour = Color4.White,
                     Alpha = 1,
-                    Child = new Box
+                    Child = box = new Box
                     {
+                        Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
-                        Alpha = 0.4f,
+                        AlwaysPresent = true,
+                        Alpha = 0
                     }
                 };
+
+                slider.Tracking.BindValueChanged(trackingChanged, true);
             }
+
+            private void trackingChanged(ValueChangedEvent<bool> tracking) =>
+                box.FadeTo(tracking.NewValue ? 0.6f : 0.05f, 200, Easing.OutQuint);
         }
     }
 }

@@ -20,9 +20,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected override double DecayWeight => 0.94;
 
+        protected readonly float HalfCatcherWidth;
+
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
         private double lastStrainTime;
+
+        public Movement(float halfCatcherWidth)
+        {
+            HalfCatcherWidth = halfCatcherWidth;
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

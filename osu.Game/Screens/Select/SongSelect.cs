@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osuTK;
@@ -151,6 +150,7 @@ namespace osu.Game.Screens.Select
                                         },
                                         Child = Carousel = new BeatmapCarousel
                                         {
+                                            AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             RelativeSizeAxes = Axes.Both,
@@ -207,11 +207,11 @@ namespace osu.Game.Screens.Select
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
                                                 },
-                                                Child = BeatmapDetails = new BeatmapDetailArea
+                                                Child = BeatmapDetails = CreateBeatmapDetailArea().With(d =>
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding { Top = 10, Right = 5 },
-                                                },
+                                                    d.RelativeSizeAxes = Axes.Both;
+                                                    d.Padding = new MarginPadding { Top = 10, Right = 5 };
+                                                })
                                             },
                                         }
                                     },
@@ -261,8 +261,6 @@ namespace osu.Game.Screens.Select
                     Footer = new Footer()
                 });
             }
-
-            BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
 
             if (Footer != null)
             {
@@ -318,6 +316,11 @@ namespace osu.Game.Screens.Select
 
             return dependencies;
         }
+
+        /// <summary>
+        /// Creates the beatmap details to be displayed underneath the wedge.
+        /// </summary>
+        protected abstract BeatmapDetailArea CreateBeatmapDetailArea();
 
         public void Edit(BeatmapInfo beatmap = null)
         {
@@ -378,6 +381,8 @@ namespace osu.Game.Screens.Select
         {
             if (e.NewValue is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
+            Logger.Log($"working beatmap updated to {e.NewValue}");
+
             if (!Carousel.SelectBeatmap(e.NewValue.BeatmapInfo, false))
             {
                 // A selection may not have been possible with filters applied.
@@ -390,7 +395,12 @@ namespace osu.Game.Screens.Select
                 }
 
                 // Even if a ruleset mismatch was not the cause (ie. a text filter is applied),
-                // we still want to forcefully show the new beatmap, bypassing filters.
+                // we still want to temporarily show the new beatmap, bypassing filters.
+                // This will be undone the next time the user changes the filter.
+                var criteria = FilterControl.CreateCriteria();
+                criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
+                Carousel.Filter(criteria);
+
                 Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
             }
         }
@@ -439,8 +449,10 @@ namespace osu.Game.Screens.Select
 
                 if (transferRulesetValue())
                 {
-                    // if the ruleset changed, the rest of the selection update will happen via updateSelectedRuleset.
                     Mods.Value = Array.Empty<Mod>();
+
+                    // required to return once in order to have the carousel in a good state.
+                    // if the ruleset changed, the rest of the selection update will happen via updateSelectedRuleset.
                     return;
                 }
 
@@ -465,7 +477,7 @@ namespace osu.Game.Screens.Select
                 if (this.IsCurrentScreen())
                     ensurePlayingSelected();
 
-                UpdateBeatmap(Beatmap.Value);
+                updateComponentFromBeatmap(Beatmap.Value);
             }
         }
 
@@ -533,14 +545,14 @@ namespace osu.Game.Screens.Select
 
             Carousel.AllowSelection = true;
 
-            BeatmapDetails.Leaderboard.RefreshScores();
+            BeatmapDetails.Refresh();
 
             Beatmap.Value.Track.Looping = true;
             music?.ResetTrackAdjustments();
 
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
-                UpdateBeatmap(Beatmap.Value);
+                updateComponentFromBeatmap(Beatmap.Value);
 
                 // restart playback on returning to song select, regardless.
                 music?.Play();
@@ -559,6 +571,9 @@ namespace osu.Game.Screens.Select
             ModSelect.Hide();
 
             BeatmapOptions.Hide();
+
+            if (Beatmap.Value.Track != null)
+                Beatmap.Value.Track.Looping = false;
 
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
@@ -603,10 +618,8 @@ namespace osu.Game.Screens.Select
         /// This is a debounced call (unlike directly binding to WorkingBeatmap.ValueChanged).
         /// </summary>
         /// <param name="beatmap">The working beatmap.</param>
-        protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
+        private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            Logger.Log($"working beatmap updated to {beatmap}");
-
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
@@ -646,14 +659,24 @@ namespace osu.Game.Screens.Select
         {
             bindBindables();
 
+            Carousel.AllowSelection = true;
+
             // If a selection was already obtained, do not attempt to update the selected beatmap.
             if (Carousel.SelectedBeatmapSet != null)
                 return;
 
             // Attempt to select the current beatmap on the carousel, if it is valid to be selected.
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
-                && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
-                return;
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false)
+            {
+                if (Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
+                    return;
+
+                // prefer not changing ruleset at this point, so look for another difficulty in the currently playing beatmap
+                var found = Beatmap.Value.BeatmapSetInfo.Beatmaps.FirstOrDefault(b => b.Ruleset.Equals(decoupledRuleset.Value));
+
+                if (found != null && Carousel.SelectBeatmap(found, false))
+                    return;
+            }
 
             // If the current active beatmap could not be selected, select a new random beatmap.
             if (!Carousel.SelectNextRandom())
@@ -716,7 +739,7 @@ namespace osu.Game.Screens.Select
 
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
-                Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
+                Schedule(() => BeatmapDetails.Refresh())));
         }
 
         public virtual bool OnPressed(GlobalAction action)

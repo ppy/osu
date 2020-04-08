@@ -33,6 +33,9 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         private readonly Comment comment;
         private Box background;
         private Box hoverLayer;
@@ -68,7 +71,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
             isVoted.Value = comment.IsVoted;
             votesCount.Value = comment.VotesCount;
-            isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
+            isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : colourProvider.Background6, true);
             votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
         }
 

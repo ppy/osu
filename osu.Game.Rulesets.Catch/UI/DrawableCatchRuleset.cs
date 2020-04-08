@@ -8,7 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
+
+        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new CatchReplayRecorder(replay, (CatchPlayfield)Playfield);
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
 

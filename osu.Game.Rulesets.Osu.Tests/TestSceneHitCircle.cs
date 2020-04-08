@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircle : SkinnableTestScene
+    public class TestSceneHitCircle : OsuSkinnableTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

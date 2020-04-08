@@ -116,8 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.ItemsAdded += _ => updateNestedSamples();
-            SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
@@ -178,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new RepeatPoint
+                        AddNested(new SliderRepeat
                         {
                             RepeatIndex = e.SpanIndex,
                             SpanDuration = SpanDuration,
@@ -224,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;
 
-            foreach (var repeat in NestedHitObjects.OfType<RepeatPoint>())
+            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
                 repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
@@ -234,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
-        public override Judgement CreateJudgement() => new OsuJudgement();
+        public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
