@@ -50,6 +50,6 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public override bool EquivalentTo(ControlPoint other) =>
             other is TimingControlPoint otherTyped
-            && TimeSignature == otherTyped.TimeSignature && BeatLength.Equals(otherTyped.BeatLength);
+            && Time == otherTyped.Time && TimeSignature == otherTyped.TimeSignature && BeatLength.Equals(otherTyped.BeatLength);
     }
 }
