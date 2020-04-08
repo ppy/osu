@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
             SpriteText.AlwaysPresent = secondaryText.AlwaysPresent = true;
         }
 
-        
+
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

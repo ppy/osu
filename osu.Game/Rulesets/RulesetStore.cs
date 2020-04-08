@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -17,16 +18,20 @@ namespace osu.Game.Rulesets
 
         private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
 
-        public RulesetStore(IDatabaseContextFactory factory)
+        private readonly Storage rulesetStorage;
+
+        public RulesetStore(IDatabaseContextFactory factory, Storage storage = null)
             : base(factory)
         {
+            rulesetStorage = storage?.GetStorageForDirectory("rulesets");
+
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
             loadFromDisk();
+            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
+            loadUserRulesets();
             addMissingRulesets();
-
-            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetAssembly;
         }
 
         /// <summary>
@@ -48,7 +53,18 @@ namespace osu.Game.Rulesets
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
-        private Assembly resolveRulesetAssembly(object sender, ResolveEventArgs args) => loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
+        private Assembly resolveRulesetDependencyAssembly(object sender, ResolveEventArgs args)
+        {
+            var asm = new AssemblyName(args.Name);
+
+            // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
+            // this assumes the only explicit dependency of the ruleset is the game core assembly.
+            // the ruleset dependency on the game core assembly requires manual resolving, transient dependencies should be resolved automatically
+            if (asm.Name.Equals(typeof(OsuGame).Assembly.GetName().Name, StringComparison.Ordinal))
+                return Assembly.GetExecutingAssembly();
+
+            return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
+        }
 
         private void addMissingRulesets()
         {
@@ -120,6 +136,16 @@ namespace osu.Game.Rulesets
             }
         }
 
+        private void loadUserRulesets()
+        {
+            if (rulesetStorage == null) return;
+
+            var rulesets = rulesetStorage.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
+
+            foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
+                loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
+        }
+
         private void loadFromDisk()
         {
             try
@@ -175,7 +201,7 @@ namespace osu.Game.Rulesets
 
         protected virtual void Dispose(bool disposing)
         {
-            AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetAssembly;
+            AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
     }
 }

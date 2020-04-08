@@ -18,12 +18,14 @@ namespace osu.Game.Rulesets.Mania.Skinning
     public class LegacyColumnBackground : LegacyManiaColumnElement, IKeyBindingHandler<ManiaAction>
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private readonly bool isLastColumn;
 
         private Container lightContainer;
         private Sprite light;
 
-        public LegacyColumnBackground()
+        public LegacyColumnBackground(bool isLastColumn)
         {
+            this.isLastColumn = isLastColumn;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -40,21 +42,26 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
             bool hasLeftLine = leftLineWidth > 0;
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
-                                || Stage == null || Column.Index == Stage.Columns.Count - 1;
+                                || isLastColumn;
 
-            float lightPosition = skin.GetConfig<LegacyManiaSkinConfigurationLookup, float>(
-                                      new LegacyManiaSkinConfigurationLookup(Stage?.Columns.Count ?? 4, LegacyManiaSkinConfigurationLookups.LightPosition))?.Value
+            float lightPosition = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LightPosition)?.Value
                                   ?? 0;
 
             Color4 lineColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
                                 ?? Color4.White;
+
+            Color4 backgroundColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour)?.Value
+                                      ?? Color4.Black;
+
+            Color4 lightColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
+                                 ?? Color4.White;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black
+                    Colour = backgroundColour
                 },
                 new Box
                 {
@@ -81,6 +88,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
+                        Colour = lightColour,
                         Texture = skin.GetTexture(lightImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,

@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -32,6 +30,9 @@ namespace osu.Game.Screens.Ranking.Expanded
         private readonly ScoreInfo score;
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
+
+        private FillFlowContainer starAndModDisplay;
+
         private RollingCounter<long> scoreCounter;
 
         /// <summary>
@@ -121,11 +122,12 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Alpha = 0,
                                 AlwaysPresent = true
                             },
-                            new FillFlowContainer
+                            starAndModDisplay = new FillFlowContainer
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     new StarRatingDisplay(beatmap)
@@ -133,15 +135,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft
                                     },
-                                    new ModDisplay
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        DisplayUnrankedText = false,
-                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                        Scale = new Vector2(0.5f),
-                                        Current = { Value = score.Mods }
-                                    }
                                 }
                             },
                             new FillFlowContainer
@@ -159,7 +152,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Text = beatmap.Version,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
-                                    new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 16))
+                                    new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
@@ -167,8 +160,11 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Direction = FillDirection.Horizontal,
                                     }.With(t =>
                                     {
-                                        t.AddText("作图者：");
-                                        t.AddText(beatmap.Metadata.Author?.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                                        if (!string.IsNullOrEmpty(creator))
+                                        {
+                                            t.AddText("作图者：");
+                                            t.AddText(creator, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                                        }
                                     }),
                                     new OsuSpriteText
                                     {
@@ -181,38 +177,51 @@ namespace osu.Game.Screens.Ranking.Expanded
                             },
                         }
                     },
-                            new FillFlowContainer
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 5),
+                        Children = new Drawable[]
+                        {
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, 5),
-                                Children = new Drawable[]
+                                Content = new[] { topStatistics.Cast<Drawable>().ToArray() },
+                                RowDimensions = new[]
                                 {
-                                    new GridContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Content = new[] { topStatistics.Cast<Drawable>().ToArray() },
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                        }
-                                    },
-                                    new GridContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Content = new[] { bottomStatistics.Cast<Drawable>().ToArray() },
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                        }
-                                    }
+                                    new Dimension(GridSizeMode.AutoSize),
+                                }
+                            },
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Content = new[] { bottomStatistics.Cast<Drawable>().ToArray() },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
                                 }
                             }
                         }
+                    }
+                }
             };
+
+            if (score.Mods.Any())
+            {
+                starAndModDisplay.Add(new ModDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    DisplayUnrankedText = false,
+                    ExpansionMode = ExpansionMode.AlwaysExpanded,
+                    Scale = new Vector2(0.5f),
+                    Current = { Value = score.Mods }
+                });
+            }
         }
 
         protected override void LoadComplete()

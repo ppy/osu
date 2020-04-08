@@ -36,7 +36,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
-/// <summary>
+        /// <summary>
         /// Contains all the messages that weren't read by the user.
         /// </summary>
         public IEnumerable<Message> UnreadMessages => Messages.Where(m => LastReadId < m.Id);

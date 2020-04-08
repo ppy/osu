@@ -124,6 +124,8 @@ namespace osu.Game.Overlays.CustomMenu
             textFlow.AddLink("谱面在线列表 → pr7912[Merged]","https://github.com/ppy/osu/pull/7912");
             textFlow.NewParagraph();
             textFlow.AddLink("看板 → pr8051[Open]","https://github.com/ppy/osu/pull/8051");
+            textFlow.NewParagraph();
+            textFlow.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Open]","https://github.com/ppy/osu/pull/8607");
             textFlow.AddParagraph("暂时不知道tau模式是否可以使用在线功能");
         }
     }

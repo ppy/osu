@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
 
@@ -24,6 +25,8 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
+        public Dictionary<string, string> ImageLookups = new Dictionary<string, string>();
+
         public readonly float[] ColumnLineWidth;
         public readonly float[] ColumnSpacing;
         public readonly float[] ColumnWidth;
@@ -40,9 +43,18 @@ namespace osu.Game.Skinning
             ColumnLineWidth = new float[keys + 1];
             ColumnSpacing = new float[keys - 1];
             ColumnWidth = new float[keys];
+            ExplosionWidth = new float[keys];
 
             ColumnLineWidth.AsSpan().Fill(2);
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
+        }
+
+        private float? minimumColumnWidth;
+
+        public float MinimumColumnWidth
+        {
+            get => minimumColumnWidth ?? ColumnWidth.Min();
+            set => minimumColumnWidth = value;
         }
     }
 }

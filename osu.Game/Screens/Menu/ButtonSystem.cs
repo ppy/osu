@@ -135,8 +135,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, OsuConfigManager config)
         {
-            buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnCustomMenuButton?.Invoke(), WEDGE_WIDTH  ));
-            buttonsCustom.Add(new Button(@"谱面在线列表", @"button-generic-select", FontAwesome.Solid.FileDownload, new Color4(0, 86, 73, 255), () =>  OnBeatmapListing?.Invoke() ));
+            buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnCustomMenuButton?.Invoke(), WEDGE_WIDTH));
+            buttonsCustom.Add(new Button(@"谱面在线列表", @"button-generic-select", FontAwesome.Solid.FileDownload, new Color4(0, 86, 73, 255), () => OnBeatmapListing?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
             buttonsPlay.Add(new Button(@"单人游戏", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new Button(@"排名", @"button-generic-select", FontAwesome.Regular.ChartBar, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsP2C.Add(new Button(@"一个神秘的按钮", @"button-generic-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom ));
+            buttonsP2C.Add(new Button(@"一个神秘的按钮", @"button-generic-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
             buttonsP2C.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"游玩", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
@@ -183,16 +183,16 @@ namespace osu.Game.Screens.Menu
 
         private void UpdateButtons()
         {
-            switch ( Optui.Value )
+            switch (Optui.Value)
             {
                 case true:
-                    if ( state == ButtonSystemState.Play )
-                        buttonsP2C.ForEach( b => b.FadeIn(250) );
+                    if (state == ButtonSystemState.Play)
+                        buttonsP2C.ForEach(b => b.FadeIn(250));
                     break;
 
                 case false:
-                    buttonsP2C.ForEach( b => b.FadeOut(250) );
-                    if ( state == ButtonSystemState.Custom )
+                    buttonsP2C.ForEach(b => b.FadeOut(250));
+                    if (state == ButtonSystemState.Custom)
                         backButton1.Click();
                     break;
             }
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public void OnReleased(GlobalAction action){}
+        public void OnReleased(GlobalAction action) { }
 
         private bool goBack()
         {

@@ -201,7 +201,7 @@ namespace osu.Game.Overlays.Chat
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
 
-            if ( message.IsAction )
+            if (message.IsAction)
             {
                 username.Text = @"* " + $"{message.Sender.Username}" + ":";
             }
