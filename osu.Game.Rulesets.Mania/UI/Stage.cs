@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float COLUMN_SPACING = 1;
 
-        public const float HIT_TARGET_POSITION = 50;
+        public const float HIT_TARGET_POSITION = 110;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
