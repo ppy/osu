@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModHidden : ModHidden
     {
-        public override string Description => @"方块渐隐！";
+        public override string Description => @"Play with no beats and fading sliders.";
         public override double ScoreMultiplier => 1.06;
 
         public override Type[] IncompatibleMods => new[] { typeof(TauModAutoHold) };

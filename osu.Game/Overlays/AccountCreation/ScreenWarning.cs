@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.AccountCreation
     {
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
-        
+
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 

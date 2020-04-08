@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select.Filter
         [Description("不分组")]
         NoGrouping,
 
-        [Description("达成的排名")]
+        [Description("取得的成绩")]
         RankAchieved,
 
         [Description("Rank状态")]

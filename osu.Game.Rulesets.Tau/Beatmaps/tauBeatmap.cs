@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Tau.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = "方块数量",
+                    Name = "Beat count",
                     Content = beats.ToString(),
                     Icon = FontAwesome.Solid.Square
                 }

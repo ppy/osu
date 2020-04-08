@@ -3,32 +3,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Taiko.Audio;
+using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Rulesets.Taiko.UI;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneInputDrum : OsuTestScene
+    public class TestSceneInputDrum : TaikoSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(InputDrum),
-            typeof(DrumSampleMapping),
-            typeof(HitSampleInfo),
-            typeof(SampleControlPoint)
-        };
+            typeof(LegacyInputDrum),
+        }).ToList();
 
-        public TestSceneInputDrum()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Add(new TaikoInputManager(new RulesetInfo { ID = 1 })
+            SetContents(() => new TaikoInputManager(new RulesetInfo { ID = 1 })
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new Container

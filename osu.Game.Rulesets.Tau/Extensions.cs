@@ -3,6 +3,7 @@
 
 using System;
 using osuTK;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Rulesets.Tau
 {
@@ -11,11 +12,13 @@ namespace osu.Game.Rulesets.Tau
         public static float GetDegreesFromPosition(this Vector2 target, Vector2 self)
         {
             Vector2 offset = self - target;
-            float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
-
-            return degrees;
+            return (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y));
         }
 
-        public static float GetHitObjectAngle(this Vector2 target, Vector2 self) => target.GetDegreesFromPosition(self) * 4;
+        public static float GetHitObjectAngle(this Vector2 target)
+        {
+            Vector2 offset = new Vector2(256, 192) - target; // Using centre of playfield.
+            return (float)MathHelper.RadiansToDegrees(Math.Atan2(offset.X, -offset.Y)) - 90;
+        }
     }
 }

@@ -10,11 +10,11 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModAutoHold : Mod
     {
-        public override string Name => "自动滑条";
+        public override string Name => "Auto Hold";
         public override string Acronym => "AH";
         public override IconUsage? Icon => OsuIcon.ModSpunout;
         public override ModType Type => ModType.DifficultyReduction;
-        public override string Description => @"滑条会自动完成";
+        public override string Description => @"Hold beat will automatically be completed.";
         public override double ScoreMultiplier => 0.9;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };

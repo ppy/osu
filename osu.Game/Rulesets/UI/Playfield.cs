@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.UI
         /// A function that converts screen space coordinates to gamefield.
         /// </summary>
         public Func<Vector2, Vector2> ScreenSpaceToGamefield => HitObjectContainer.ToLocalSpace;
-        
+
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>

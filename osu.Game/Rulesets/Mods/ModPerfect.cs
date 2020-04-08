@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override string Description => "不SS,便重试";
 
-                protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
-            => !(result.Judgement is IgnoreJudgement)
-               && result.Type != result.Judgement.MaxResult;
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+    => !(result.Judgement is IgnoreJudgement)
+       && result.Type != result.Judgement.MaxResult;
     }
 }

@@ -20,7 +20,7 @@ namespace osu.Game.Updater
     public class SimpleUpdateManager : UpdateManager
     {
         private string version;
-        
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -47,10 +47,10 @@ namespace osu.Game.Updater
                 {
                     Notifications.Post(new SimpleNotification
                     {
-                        Text =  "osu!lazer已有新版本可用!\n"
-                                +$"你的版本{version}\n"
-                                +$"最新版本{latest.TagName}.\n\n"
-                                +"点击这里前往github下载",
+                        Text = "osu!lazer已有新版本可用!\n"
+                                + $"你的版本{version}\n"
+                                + $"最新版本{latest.TagName}.\n\n"
+                                + "点击这里前往github下载",
                         Icon = FontAwesome.Solid.Upload,
                         Activated = () =>
                         {
@@ -79,7 +79,7 @@ namespace osu.Game.Updater
                 case RuntimeInfo.Platform.MacOsx:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
                     break;
-                
+
                 case RuntimeInfo.Platform.Linux:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".tar.xz"));
                     break;
