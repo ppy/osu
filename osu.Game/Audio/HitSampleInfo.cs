@@ -43,6 +43,11 @@ namespace osu.Game.Audio
         public bool IsLayered { get; set; } = false;
 
         /// <summary>
+        /// Whether the sample is custom or if it uses osu!'s default hitsounds.
+        /// </summary>
+        public bool IsCustom;
+
+        /// <summary>
         /// Retrieve all possible filenames that can be used as a source, returned in order of preference (highest first).
         /// </summary>
         public virtual IEnumerable<string> LookupNames
