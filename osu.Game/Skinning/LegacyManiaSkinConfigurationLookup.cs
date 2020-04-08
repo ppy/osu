@@ -37,6 +37,9 @@ namespace osu.Game.Skinning
         ExplosionImage,
         ExplosionScale,
         ColumnLineColour,
+        JudgementLineColour,
+        ColumnBackgroundColour,
+        ColumnLightColour,
         MinimumColumnWidth
     }
 }

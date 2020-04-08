@@ -50,12 +50,18 @@ namespace osu.Game.Rulesets.Mania.Skinning
             Color4 lineColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
                                 ?? Color4.White;
 
+            Color4 backgroundColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour)?.Value
+                                      ?? Color4.Black;
+
+            Color4 lightColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
+                                 ?? Color4.White;
+
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black
+                    Colour = backgroundColour
                 },
                 new Box
                 {
@@ -82,6 +88,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
+                        Colour = lightColour,
                         Texture = skin.GetTexture(lightImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,

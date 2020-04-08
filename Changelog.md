@@ -370,6 +370,7 @@
     *   [m] [Make note height scale by minimum column width #8652]
     *   [m] [Fix inconsistent scroll speeds in mania #8653]
     *   [m] [Implement mania note + key image configs #8642]
+    *   [m] [Implement mania judgement line/column background/column light colours #8657]
     *   [o] [Add top rank to the beatmap carousel #7639]
 
 *   更新上游pr
