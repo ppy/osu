@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }, false, false, false);
             });
 
-            AddAssert("hyper-dash fruit has default colour", () => checkLegacyFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour));
+            AddAssert("hyper-dash fruit has default colour", () => checkLegacyFruitHyperDashColour(drawableFruit, Catcher.DEFAULT_HYPER_DASH_COLOUR));
         }
 
         [TestCase(true)]
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }, customCatcherHyperDashColour, false, true);
             });
 
-            AddAssert("hyper-dash fruit use fruit colour from skin", () => checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour));
+            AddAssert("hyper-dash fruit use fruit colour from skin", () => checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CUSTOM_HYPER_DASH_FRUIT_COLOUR));
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     }, true, false, false);
             });
 
-            AddAssert("hyper-dash fruit colour falls back to catcher colour from skin", () => checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour));
+            AddAssert("hyper-dash fruit colour falls back to catcher colour from skin", () => checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CUSTOM_HYPER_DASH_COLOUR));
         }
 
         private Drawable setupSkinHierarchy(Drawable child, bool customCatcherColour, bool customAfterColour, bool customFruitColour)
@@ -108,21 +108,21 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestSkin : LegacySkin
         {
-            public static Color4 CustomHyperDashColour { get; } = Color4.Goldenrod;
-            public static Color4 CustomHyperDashFruitColour { get; } = Color4.Cyan;
-            public static Color4 CustomHyperDashAfterColour { get; } = Color4.Lime;
+            public static readonly Color4 CUSTOM_HYPER_DASH_COLOUR = Color4.Goldenrod;
+            public static readonly Color4 CUSTOM_HYPER_DASH_AFTER_COLOUR = Color4.Lime;
+            public static readonly Color4 CUSTOM_HYPER_DASH_FRUIT_COLOUR = Color4.Cyan;
 
             public TestSkin(bool customCatcherColour, bool customAfterColour, bool customFruitColour)
                 : base(new SkinInfo(), null, null, string.Empty)
             {
                 if (customCatcherColour)
-                    Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()] = CustomHyperDashColour;
+                    Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()] = CUSTOM_HYPER_DASH_COLOUR;
 
                 if (customAfterColour)
-                    Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()] = CustomHyperDashAfterColour;
+                    Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()] = CUSTOM_HYPER_DASH_AFTER_COLOUR;
 
                 if (customFruitColour)
-                    Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()] = CustomHyperDashFruitColour;
+                    Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()] = CUSTOM_HYPER_DASH_FRUIT_COLOUR;
             }
         }
     }
