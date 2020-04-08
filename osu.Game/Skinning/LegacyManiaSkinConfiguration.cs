@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
         public float MinimumColumnWidth
         {
             get => minimumColumnWidth ?? ColumnWidth.Min();
-            set => minimumColumnWidth = value > 0 ? (float?)value : null;
+            set => minimumColumnWidth = value;
         }
     }
 }
