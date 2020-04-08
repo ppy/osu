@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    BorderColour = Catcher.DefaultHyperDashColour,
+                    BorderColour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
                     BorderThickness = 12f * RADIUS_ADJUST,
                     Children = new Drawable[]
                     {
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                             Alpha = 0.3f,
                             Blending = BlendingParameters.Additive,
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Catcher.DefaultHyperDashColour,
+                            Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR,
                         }
                     }
                 });

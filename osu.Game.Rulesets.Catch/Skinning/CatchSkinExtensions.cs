@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
         public static IBindable<Color4> GetHyperDashFruitColour(this ISkin skin)
             => skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit) ??
                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash) ??
-               new Bindable<Color4>(Catcher.DefaultHyperDashColour);
+               new Bindable<Color4>(Catcher.DEFAULT_HYPER_DASH_COLOUR);
     }
 }
