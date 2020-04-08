@@ -12,15 +12,9 @@ namespace osu.Game.Skinning
         /// </summary>
         public decimal? LegacyVersion { get; internal set; }
 
-        /// <summary>
-        /// Whether the hitnormal sample should always be played or not.
-        /// </summary>
-        public bool? LayeredHitSounds { get; internal set; }
-
         public enum LegacySetting
         {
-            Version,
-            LayeredHitSounds
+            Version
         }
     }
 }
