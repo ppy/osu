@@ -38,7 +38,7 @@ namespace osu.Game.Audio
         public int Volume { get; set; }
 
         /// <summary>
-        /// Whether the hitsample was artificially added or if it was a beatmap specification.
+        /// Whether the sample was artificially added or if it was a beatmap specification.
         /// </summary>
         public bool IsLayered { get; set; }
 
