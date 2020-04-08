@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModBlinds : Mod, IApplicableToDrawableRuleset<TauHitObject>, IApplicableToHealthProcessor
     {
-        public override string Name => "致盲";
-        public override string Description => "蒙上你的眼睛";
+        public override string Name => "Blinds";
+        public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
         public override IconUsage? Icon => FontAwesome.Solid.Adjust;

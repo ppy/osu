@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Tau.UI
         {
         }
 
-        protected override Playfield CreatePlayfield() => new TauPlayfield();
+        protected override Playfield CreatePlayfield() => new TauPlayfield(Beatmap.BeatmapInfo.BaseDifficulty);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TauFramedReplayInputHandler(replay);
 

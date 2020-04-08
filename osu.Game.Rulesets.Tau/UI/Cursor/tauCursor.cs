@@ -19,11 +19,14 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
     public class TauCursor : CompositeDrawable
     {
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly BeatmapDifficulty difficulty;
 
         private DefaultCursor defaultCursor;
 
-        public TauCursor()
+        public TauCursor(BeatmapDifficulty difficulty)
         {
+            this.difficulty = difficulty;
+
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
 
@@ -33,7 +36,7 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap)
         {
-            InternalChild = defaultCursor = new DefaultCursor(beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize);
+            InternalChild = defaultCursor = new DefaultCursor(difficulty.CircleSize);
 
             this.beatmap.BindTo(beatmap);
         }
@@ -158,7 +161,7 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
                     const double a = 2;
                     const double b = 7;
                     const double c = 0.15;
-                    const double d = 0.05;
+                    const double d = 0.0605;
 
                     // Thank you AlFas for this code.
                     double convertValue(double value) => c + (((d - c) * (value - a)) / (b - a));
@@ -167,7 +170,7 @@ namespace osu.Game.Rulesets.Tau.UI.Cursor
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                var angle = e.MousePosition.GetDegreesFromPosition(AnchorPosition) - 25;
+                var angle = e.MousePosition.GetDegreesFromPosition(AnchorPosition);
 
                 Rotation = angle;
 

@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Tau.Judgements
 {
     public class TauJudgement : Judgement
     {
-        public override HitResult MaxResult => HitResult.Perfect;
+        public override HitResult MaxResult => HitResult.Great;
 
         protected override int NumericResultFor(HitResult result)
         {
@@ -18,28 +18,10 @@ namespace osu.Game.Rulesets.Tau.Judgements
                     return 0;
 
                 case HitResult.Great:
-                    return 100;
-
-                case HitResult.Perfect:
                     return 300;
-            }
-        }
 
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.Miss:
-                    return -0.2;
-
-                case HitResult.Great:
-                    return 0.1;
-
-                case HitResult.Perfect:
-                    return 0.2;
+                case HitResult.Good:
+                    return 100;
             }
         }
     }
