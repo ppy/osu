@@ -50,15 +50,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            float halfCatchWidth;
-
-            using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
-            {
-                halfCatchWidth = catcher.CatchWidth * 0.5f;
-                // We're only using 80% of the catcher's width to simulate imperfect gameplay, reduced further at circle sizes above 5.5
-                halfCatchWidth *= Math.Min(1.075f - (0.05f * beatmap.BeatmapInfo.BaseDifficulty.CircleSize), 0.8f);
-            }
-
             CatchHitObject lastObject = null;
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
@@ -81,7 +72,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
             using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+            {
                 halfCatcherWidth = catcher.CatchWidth * 0.5f;
+
+                // For circle sizes above 5.5, reduce the catcher width further to simulate imperfect gameplay.
+                halfCatcherWidth *= 1 - (Math.Max(0, beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5.5f) * 0.0625f);
+            }
 
             return new Skill[]
             {
