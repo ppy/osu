@@ -84,6 +84,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                         case ManiaSkinComponents.StageBackground:
                             return new LegacyStageBackground();
+
+                        case ManiaSkinComponents.StageForeground:
+                            return new LegacyStageForeground();
                     }
 
                     break;

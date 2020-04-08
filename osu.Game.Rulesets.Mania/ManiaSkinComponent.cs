@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Mania
         HoldNoteTail,
         HoldNoteBody,
         HitExplosion,
-        StageBackground
+        StageBackground,
+        StageForeground,
     }
 }
