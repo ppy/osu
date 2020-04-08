@@ -618,11 +618,14 @@ namespace osu.Game.Screens.Select
             {
                 if (d.IsPresent)
                 {
+                    d.DesiredY = currentY;
+
                     switch (d)
                     {
                         case DrawableCarouselBeatmapSet set:
                         {
                             lastSet = set;
+                            set.ClearAssurance();
 
                             set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
                             set.MoveToY(currentY, 750, Easing.OutExpo);
@@ -644,7 +647,7 @@ namespace osu.Game.Screens.Select
                             Debug.Assert(lastSet != null);
 
                             float? setY = null;
-                            if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
+                            if (!d.DrawableIsPresent)
                                 setY = lastSet.Y + lastSet.DrawHeight + 5;
 
                             if (d.IsLoaded)
@@ -654,6 +657,8 @@ namespace osu.Game.Screens.Select
                                 float y = currentY;
                                 d.OnLoadComplete += _ => performMove(y, setY);
                             }
+
+                            lastSet.AssureBeatmapPositionValid(beatmap);
 
                             break;
                         }

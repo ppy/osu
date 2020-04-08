@@ -111,6 +111,30 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        private readonly List<DrawableCarouselBeatmap> beatmapsToCheck = new List<DrawableCarouselBeatmap>();
+
+        public void AssureBeatmapPositionValid(DrawableCarouselBeatmap beatmap) => beatmapsToCheck.Add(beatmap);
+
+        public void ClearAssurance() => beatmapsToCheck.Clear();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var i = 0;
+
+            beatmapsToCheck.ForEach(beatmap =>
+            {
+                if (beatmap.Y > Y + DrawHeight + 6 + i * (beatmap.DrawHeight + 5))
+                    beatmap.MoveToY(Y + DrawHeight + 5 + i * (beatmap.DrawHeight + 5)).MoveToY(beatmap.DesiredY, 750, Easing.OutExpo);
+
+                if (beatmap.Y < Y + DrawHeight + 4)
+                    beatmap.MoveToY(Y + DrawHeight + 5).MoveToY(beatmap.DesiredY, 750, Easing.OutExpo);
+
+                i++;
+            });
+        }
+
         private const int maximum_difficulty_icons = 18;
 
         private IEnumerable<DifficultyIcon> getDifficultyIcons()

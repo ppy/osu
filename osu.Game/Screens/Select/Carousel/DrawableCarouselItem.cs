@@ -25,6 +25,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         public override bool IsPresent => base.IsPresent || Item.Visible;
 
+        public bool DrawableIsPresent => base.IsPresent;
+
+        public float DesiredY;
+
         public readonly CarouselItem Item;
 
         private Container nestedContainer;
