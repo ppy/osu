@@ -43,5 +43,6 @@ namespace osu.Game.Skinning
         MinimumColumnWidth,
         LeftStageImage,
         RightStageImage,
+        BottomStageImage
     }
 }

@@ -100,6 +100,10 @@ namespace osu.Game.Rulesets.Mania.UI
                                 RelativeSizeAxes = Axes.Y,
                             }
                         },
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground), _ => null)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,
