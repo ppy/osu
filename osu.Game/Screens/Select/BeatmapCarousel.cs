@@ -602,7 +602,6 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
-        /// <returns>The Y position of the currently selected item.</returns>
         private void updateItems()
         {
             Items = root.Drawables.ToList();
