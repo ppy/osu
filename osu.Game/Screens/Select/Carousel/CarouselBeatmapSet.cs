@@ -37,7 +37,8 @@ namespace osu.Game.Screens.Select.Carousel
             if (LastSelected == null)
             {
                 var recommendedBeatmapInfo = getRecommendedBeatmap(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap));
-                return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommendedBeatmapInfo);
+                if (recommendedBeatmapInfo != null)
+                    return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommendedBeatmapInfo);
             }
 
             return base.GetNextToSelect();
