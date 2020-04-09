@@ -12,11 +12,13 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
+using osu.Framework.Audio;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Configuration;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -30,6 +32,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
+
+        /// <summary>
+        /// The stereo balance of the samples if the <i>Positional hitsounds</i> setting is set.
+        /// </summary>
+        private readonly BindableDouble positionalSoundAdjustment = new BindableDouble();
 
         protected SkinnableSound Samples { get; private set; }
 
@@ -84,8 +91,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
+        /// <summary>
+        /// The stereo balance of the samples played if <i>Positional hitsounds</i> is set.
+        /// </summary>
+        protected virtual float PositionalSound => (HitObject is IHasXPosition position) ? (position.X / 512f - 0.5f) * 0.8f : 0;
+
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
+        private Bindable<bool> userPositionalHitSounds;
         private Bindable<int> comboIndexBindable;
 
         public override bool RemoveWhenNotAlive => false;
@@ -101,10 +114,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject([NotNull] HitObject hitObject)
         {
             HitObject = hitObject ?? throw new ArgumentNullException(nameof(hitObject));
+            positionalSoundAdjustment.Value = PositionalSound;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             var judgement = HitObject.CreateJudgement();
 
@@ -113,6 +127,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
             loadSamples();
+
+            userPositionalHitSounds = config.GetBindable<bool>(OsuSetting.PositionalHitSounds);
+            userPositionalHitSounds.BindValueChanged(positional =>
+            {
+                if (positional.NewValue)
+                    Samples?.AddAdjustment(AdjustableProperty.Balance, positionalSoundAdjustment);
+                else
+                    Samples?.RemoveAdjustment(AdjustableProperty.Balance, positionalSoundAdjustment);
+            });
+            userPositionalHitSounds.TriggerChange();
         }
 
         protected override void LoadComplete()
