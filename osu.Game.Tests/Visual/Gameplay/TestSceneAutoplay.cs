@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep($"seek to break {breakIndex}", () => Player.GameplayClockContainer.Seek(destBreak().StartTime));
             AddUntilStep("wait for seek to complete", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= destBreak().StartTime);
 
-            BreakPeriod destBreak() => Player.ChildrenOfType<BreakTracker>().First().Breaks.ElementAt(breakIndex);
+            BreakPeriod destBreak() => Beatmap.Value.Beatmap.Breaks.ElementAt(breakIndex);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Lists;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -20,22 +21,24 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> IsBreakTime => isBreakTime;
 
-        protected int CurrentBreakIndex;
-
         private readonly BindableBool isBreakTime = new BindableBool();
 
-        private IReadOnlyList<BreakPeriod> breaks;
+        private readonly IntervalList<double> breakIntervals = new IntervalList<double>();
 
         public IReadOnlyList<BreakPeriod> Breaks
         {
-            get => breaks;
             set
             {
-                breaks = value;
-
-                // reset index in case the new breaks list is smaller than last one
                 isBreakTime.Value = false;
-                CurrentBreakIndex = 0;
+                breakIntervals.Clear();
+
+                foreach (var b in value)
+                {
+                    if (!b.HasEffect)
+                        continue;
+
+                    breakIntervals.Add(b.StartTime, b.EndTime - BreakOverlay.BREAK_FADE_DURATION);
+                }
             }
         }
 
@@ -49,34 +52,11 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            isBreakTime.Value = getCurrentBreak()?.HasEffect == true
-                                || Clock.CurrentTime < gameplayStartTime
+            var time = Clock.CurrentTime;
+
+            isBreakTime.Value = breakIntervals.IsInAnyInterval(time)
+                                || time < gameplayStartTime
                                 || scoreProcessor?.HasCompleted == true;
-        }
-
-        private BreakPeriod getCurrentBreak()
-        {
-            if (breaks?.Count > 0)
-            {
-                var time = Clock.CurrentTime;
-
-                if (time > breaks[CurrentBreakIndex].EndTime)
-                {
-                    while (time > breaks[CurrentBreakIndex].EndTime && CurrentBreakIndex < breaks.Count - 1)
-                        CurrentBreakIndex++;
-                }
-                else
-                {
-                    while (time < breaks[CurrentBreakIndex].StartTime && CurrentBreakIndex > 0)
-                        CurrentBreakIndex--;
-                }
-
-                var closest = breaks[CurrentBreakIndex];
-
-                return closest.Contains(time) ? closest : null;
-            }
-
-            return null;
         }
     }
 }
