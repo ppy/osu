@@ -66,15 +66,16 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
         public void HandleHit(HitObject hitObject)
         {
-            // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks, spinners)
+            // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks, spinners).
             if (!hitObjectCanBlockFutureHits(hitObject))
                 return;
 
-            double minimumTime = hitObject.StartTime;
+            double maximumTime = hitObject.StartTime;
 
+            // Iterate through and apply miss results to all top-level and nested hitobjects which block future hits.
             foreach (var obj in hitObjectContainer.AliveObjects)
             {
-                if (obj.Judged || obj.HitObject.StartTime >= minimumTime)
+                if (obj.Judged || obj.HitObject.StartTime >= maximumTime)
                     continue;
 
                 if (hitObjectCanBlockFutureHits(obj.HitObject))
@@ -82,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 foreach (var nested in obj.NestedHitObjects)
                 {
-                    if (nested.Judged || nested.HitObject.StartTime >= minimumTime)
+                    if (nested.Judged || nested.HitObject.StartTime >= maximumTime)
                         continue;
 
                     if (hitObjectCanBlockFutureHits(nested.HitObject))
