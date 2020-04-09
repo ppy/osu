@@ -579,7 +579,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
 
             loadBeatmaps(sets);
-            advanceSelection(true);
+            advanceSelection(false);
 
             for (int i = 1; i < makeThisManyGroups; i++)
             {
