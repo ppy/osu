@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Skins
             AddAssert("sample is null", () => channel == null, "LayeredHitSounds OFF and IsLayered ON");
 
             AddStep("retrieve sample", () => channel = skinUnlayered.GetSample(hsiUnlayered));
-            AddAssert("sample is non-null", () => channel != null, "LayeredHitSounds OFF and IsLayered FF");
+            AddAssert("sample is non-null", () => channel != null, "LayeredHitSounds OFF and IsLayered OFF");
         }
 
         private class TestSkin : LegacySkin
@@ -55,7 +55,8 @@ namespace osu.Game.Tests.Skins
             }
         }
 
-        private class TestHitSampleInfo : HitSampleInfo{
+        private class TestHitSampleInfo : HitSampleInfo
+        {
             public TestHitSampleInfo(bool isLayered)
             {
                 Name = "test-sample";
