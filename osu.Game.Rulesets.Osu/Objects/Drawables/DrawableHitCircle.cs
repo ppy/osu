@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
 
-            if (result == HitResult.None || CheckHittable?.Invoke(this) == false)
+            if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;

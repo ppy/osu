@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Whether this <see cref="DrawableOsuHitObject"/> can be hit.
         /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
         /// </summary>
-        public Func<DrawableOsuHitObject, bool> CheckHittable;
+        public Func<DrawableHitObject, double, bool> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
