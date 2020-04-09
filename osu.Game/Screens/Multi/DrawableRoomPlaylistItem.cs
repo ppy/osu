@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Multi
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
+                                    Spacing = new Vector2(15, 0),
                                     Children = new Drawable[]
                                     {
                                         authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },

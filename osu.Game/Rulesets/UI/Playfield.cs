@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -62,10 +61,7 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
@@ -137,7 +133,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (beatmap != null)
+            if (mods != null)
             {
                 foreach (var mod in mods)
                 {
