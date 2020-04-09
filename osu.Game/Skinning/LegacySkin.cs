@@ -301,7 +301,6 @@ namespace osu.Game.Skinning
             var hsi = sampleInfo as HitSampleInfo;
 
             if (hsi?.IsLayered == true && GetConfig<LegacySkinConfiguration.LegacySetting, bool>(LegacySkinConfiguration.LegacySetting.LayeredHitSounds)?.Value == false)
-                // The layered hitsample is ignored if the skin disabled LayeredHitSounds
                 return null;
 
             if (hsi?.IsCustom != false)

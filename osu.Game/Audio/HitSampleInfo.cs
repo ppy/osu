@@ -38,14 +38,15 @@ namespace osu.Game.Audio
         public int Volume { get; set; }
 
         /// <summary>
-        /// Whether the sample was artificially added or if it was a beatmap specification.
+        /// True if the sample is a <c>hitnormal</c> sample added artificially due to the skin having
+        /// the <see cref="osu.Game.Skinning.LegacySkinConfiguration.LegacySetting.LayeredHitSounds"/> option set.
         /// </summary>
         public bool IsLayered { get; set; }
 
         /// <summary>
         /// Whether the sample is custom or if it uses osu!'s default hitsounds.
         /// </summary>
-        public bool IsCustom;
+        public bool IsCustom { get; set; }
 
         /// <summary>
         /// Retrieve all possible filenames that can be used as a source, returned in order of preference (highest first).

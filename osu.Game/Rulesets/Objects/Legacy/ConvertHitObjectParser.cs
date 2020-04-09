@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         protected bool FirstObject { get; private set; } = true;
 
-        protected bool AllowsLayeredHitSounds { get; set; } = true;
+        protected bool AllowLayeredHitSounds { get; set; } = true;
 
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
@@ -353,7 +353,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             var soundTypes = new List<HitSampleInfo>();
 
-            if (type.HasFlag(LegacyHitSoundType.Normal) || AllowsLayeredHitSounds)
+            if (type.HasFlag(LegacyHitSoundType.Normal) || AllowLayeredHitSounds)
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
