@@ -34,8 +34,6 @@ namespace osu.Game.Screens.Select
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
 
-        protected readonly Bindable<double> RecommendedStarDifficulty = new Bindable<double>();
-
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
         /// </summary>
@@ -122,6 +120,7 @@ namespace osu.Game.Screens.Select
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselRoot root;
+        public SongSelect.DifficultyRecommender DifficultyRecommender;
 
         public BeatmapCarousel()
         {
@@ -145,10 +144,10 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private Bindable<RulesetInfo> decoupledRuleset { get; set; }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config, Bindable<RulesetInfo> decoupledRuleset)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
@@ -162,27 +161,6 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapRestored += beatmapRestored;
 
             loadBeatmapSets(GetLoadableBeatmaps());
-
-            decoupledRuleset.BindValueChanged(UpdateRecommendedStarDifficulty, true);
-        }
-
-        protected void UpdateRecommendedStarDifficulty(ValueChangedEvent<RulesetInfo> ruleset)
-        {
-            if (api.LocalUser.Value is GuestUser)
-            {
-                RecommendedStarDifficulty.Value = 0;
-                return;
-            }
-
-            var req = new GetUserRequest(api.LocalUser.Value.Id, ruleset.NewValue);
-
-            req.Success += result =>
-            {
-                // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                RecommendedStarDifficulty.Value = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
-            };
-
-            api.PerformAsync(req);
         }
 
         protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
@@ -608,7 +586,12 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet, RecommendedStarDifficulty);
+            BeatmapInfo recommender(IEnumerable<BeatmapInfo> beatmaps)
+            {
+                return DifficultyRecommender?.GetRecommendedBeatmap(beatmaps, decoupledRuleset.Value);
+            }
+
+            var set = new CarouselBeatmapSet(beatmapSet, recommender);
 
             foreach (var c in set.Beatmaps)
             {
