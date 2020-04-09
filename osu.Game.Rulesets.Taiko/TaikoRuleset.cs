@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new TaikoLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new TaikoLegacySkinTransformer(source);
 
         public const string SHORT_NAME = "taiko";
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new TaikoModNightcore();
@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Conversion:
                     return new Mod[]
                     {
+                        new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
                     };
 

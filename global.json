@@ -5,6 +5,6 @@
     "version": "3.1.100"
   },
   "msbuild-sdks": {
-    "Microsoft.Build.Traversal": "2.0.24"
+    "Microsoft.Build.Traversal": "2.0.34"
   }
 }

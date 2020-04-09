@@ -20,7 +20,22 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             this.source = source;
         }
 
-        public Drawable GetDrawableComponent(ISkinComponent component) => source.GetDrawableComponent(component);
+        public Drawable GetDrawableComponent(ISkinComponent component)
+        {
+            if (!(component is TaikoSkinComponent taikoComponent))
+                return null;
+
+            switch (taikoComponent.Component)
+            {
+                case TaikoSkinComponents.InputDrum:
+                    if (GetTexture("taiko-bar-left") != null)
+                        return new LegacyInputDrum();
+
+                    return null;
+            }
+
+            return source.GetDrawableComponent(component);
+        }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);
 
