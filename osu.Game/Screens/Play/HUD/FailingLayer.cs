@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -46,6 +47,17 @@ namespace osu.Game.Screens.Play.HUD
             box.Colour = color.Red;
             enabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
             enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0, fade_time, Easing.OutQuint), true);
+        }
+
+        public override void BindHealthProcessor(HealthProcessor processor)
+        {
+            base.BindHealthProcessor(processor);
+
+            if (!(processor is DrainingHealthProcessor))
+            {
+                enabled.UnbindBindings();
+                enabled.Value = false;
+            }
         }
 
         protected override void Update()

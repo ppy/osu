@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Bind the tracked fields of <see cref="HealthProcessor"/> to this health display.
         /// </summary>
-        public void BindHealthProcessor(HealthProcessor processor)
+        public virtual void BindHealthProcessor(HealthProcessor processor)
         {
             Current.BindTo(processor.Health);
         }
