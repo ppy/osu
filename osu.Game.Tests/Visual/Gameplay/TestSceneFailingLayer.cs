@@ -3,48 +3,63 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneFailingLayer : OsuTestScene
     {
-        private readonly FailingLayer layer;
+        private FailingLayer layer;
 
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        public TestSceneFailingLayer()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Child = layer = new FailingLayer();
+            AddStep("create layer", () => Child = layer = new FailingLayer());
+            AddStep("enable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
+            AddUntilStep("layer is visible", () => layer.IsPresent);
         }
 
         [Test]
-        public void TestLayerConfig()
+        public void TestLayerDisabledViaConfig()
         {
-            AddStep("enable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
-            AddWaitStep("wait for transition to finish", 5);
-            AddAssert("layer is enabled", () => layer.IsPresent);
-
             AddStep("disable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, false));
-            AddWaitStep("wait for transition to finish", 5);
-            AddAssert("layer is disabled", () => !layer.IsPresent);
-            AddStep("restore layer enabling", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
+            AddUntilStep("layer is not visible", () => !layer.IsPresent);
+        }
+
+        [Test]
+        public void TestLayerVisibilityWithAccumulatingProcessor()
+        {
+            AddStep("bind accumulating processor", () => layer.BindHealthProcessor(new AccumulatingHealthProcessor(1)));
+            AddUntilStep("layer is not visible", () => !layer.IsPresent);
+        }
+
+        [Test]
+        public void TestLayerVisibilityWithDrainingProcessor()
+        {
+            AddStep("bind accumulating processor", () => layer.BindHealthProcessor(new DrainingHealthProcessor(1)));
+            AddWaitStep("wait for potential fade", 10);
+            AddAssert("layer is still visible", () => layer.IsPresent);
         }
 
         [Test]
         public void TestLayerFading()
         {
-            AddSliderStep("current health", 0.0, 1.0, 1.0, val => layer.Current.Value = val);
-            var box = layer.Child;
+            AddSliderStep("current health", 0.0, 1.0, 1.0, val =>
+            {
+                if (layer != null)
+                    layer.Current.Value = val;
+            });
 
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.10);
-            AddWaitStep("wait for fade to finish", 5);
-            AddAssert("layer fade is visible", () => box.IsPresent);
+            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddUntilStep("layer fade is visible", () => layer.Child.Alpha > 0.1f);
             AddStep("set health to 1", () => layer.Current.Value = 1f);
-            AddWaitStep("wait for fade to finish", 10);
-            AddAssert("layer fade is invisible", () => !box.IsPresent);
+            AddUntilStep("layer fade is invisible", () => !layer.Child.IsPresent);
         }
     }
 }
