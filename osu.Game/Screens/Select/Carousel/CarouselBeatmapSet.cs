@@ -13,13 +13,13 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
-        private readonly Bindable<double> recommendedStarDifficulty = new Bindable<double>();
+        private Func<IEnumerable<BeatmapInfo>, BeatmapInfo> getRecommendedBeatmap;
 
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, Bindable<double> recommendedStarDifficulty)
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, Func<IEnumerable<BeatmapInfo>, BeatmapInfo> getRecommendedBeatmap)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
 
-            this.recommendedStarDifficulty.BindTo(recommendedStarDifficulty);
+            this.getRecommendedBeatmap = getRecommendedBeatmap;
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
@@ -37,14 +37,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (LastSelected == null)
             {
-                return Children.OfType<CarouselBeatmap>()
-                               .Where(b => !b.Filtered.Value)
-                               .OrderBy(b =>
-                               {
-                                   var difference = b.Beatmap.StarDifficulty - recommendedStarDifficulty.Value;
-                                   return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
-                               })
-                               .FirstOrDefault();
+                var recommendedBeatmapInfo = getRecommendedBeatmap(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap));
+                return Children.OfType<CarouselBeatmap>().Where(b => b.Beatmap == recommendedBeatmapInfo).First();
             }
 
             return base.GetNextToSelect();

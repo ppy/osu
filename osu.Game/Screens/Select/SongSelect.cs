@@ -36,6 +36,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
+using osu.Game.Online.API;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Screens.Select
 {
@@ -80,6 +83,7 @@ namespace osu.Game.Screens.Select
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
+        private DifficultyRecommender difficultyRecommender;
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -106,6 +110,8 @@ namespace osu.Game.Screens.Select
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
+
+            AddInternal(difficultyRecommender = new DifficultyRecommender());
 
             AddRangeInternal(new Drawable[]
             {
@@ -156,6 +162,7 @@ namespace osu.Game.Screens.Select
                                             RelativeSizeAxes = Axes.Both,
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                            DifficultyRecommender = difficultyRecommender,
                                         },
                                     }
                                 },
@@ -778,6 +785,64 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public class DifficultyRecommender : Component
+        {
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            [Resolved]
+            private RulesetStore rulesets { get; set; }
+
+            private Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
+
+            private int pendingAPIRequests = 0;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                updateRecommended();
+            }
+
+            private void updateRecommended()
+            {
+                if (pendingAPIRequests > 0)
+                    return;
+                if (api.LocalUser.Value is GuestUser)
+                    return;
+                rulesets.AvailableRulesets.ForEach(rulesetInfo =>
+                {
+                    var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
+
+                    req.Success += result =>
+                    {
+                        // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
+                        recommendedStarDifficulty[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
+                        pendingAPIRequests--;
+                    };
+
+                    req.Failure += _ => pendingAPIRequests--;
+
+                    pendingAPIRequests++;
+                    api.Queue(req);
+                });
+            }
+
+            public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps, RulesetInfo currentRuleset)
+            {
+                if (!recommendedStarDifficulty.ContainsKey(currentRuleset))
+                {
+                    updateRecommended();
+                    return null;
+                }
+
+                return beatmaps.OrderBy(b =>
+                {
+                    var difference = b.StarDifficulty - recommendedStarDifficulty[currentRuleset];
+                    return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
+                }).FirstOrDefault();
+            }
         }
 
         private class VerticalMaskingContainer : Container
