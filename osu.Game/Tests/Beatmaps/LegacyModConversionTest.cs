@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Beatmaps
         protected void Test(LegacyMods legacyMods, Type[] expectedMods)
         {
             var ruleset = CreateRuleset();
-            var mods = ruleset.ConvertLegacyMods(legacyMods).ToList();
+            var mods = ruleset.ConvertFromLegacyMods(legacyMods).ToList();
             Assert.AreEqual(expectedMods.Length, mods.Count);
 
             foreach (var modType in expectedMods)

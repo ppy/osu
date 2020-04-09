@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly SkinnableDrawable CirclePiece;
         private readonly Container scaleContainer;
 
+        protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece()),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
