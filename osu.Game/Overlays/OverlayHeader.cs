@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
                                         AutoSizeAxes = Axes.Y,
                                         Padding = new MarginPadding
                                         {
-                                            Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
+                                            Horizontal = CONTENT_X_MARGIN,
                                         },
                                         Children = new[]
                                         {
