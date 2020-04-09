@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osuTK;
 using osu.Framework.Graphics;
@@ -87,10 +86,10 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             DrawableHitObject lastObject = osuHitObject;
 
-            // Get the last hitobject that contributes to note lock
+            // Get the last hitobject that can block future hits
             while ((lastObject = HitObjectContainer.AliveObjects.GetPrevious(lastObject)) != null)
             {
-                if (contributesToNoteLock(lastObject.HitObject))
+                if (canBlockFutureHits(lastObject.HitObject))
                     break;
             }
 
@@ -108,7 +107,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            missAllEarlier(result.HitObject);
+            // Hitobjects that block future hits should miss previous hitobjects if they're hit out-of-order.
+            if (canBlockFutureHits(result.HitObject))
+                missAllEarlierObjects(result.HitObject);
 
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
@@ -127,12 +128,8 @@ namespace osu.Game.Rulesets.Osu.UI
         /// Misses all <see cref="OsuHitObject"/>s occurring earlier than the start time of a judged <see cref="OsuHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The marker <see cref="HitObject"/>, which all <see cref="HitObject"/>s earlier than will get missed.</param>
-        private void missAllEarlier(HitObject hitObject)
+        private void missAllEarlierObjects(HitObject hitObject)
         {
-            if (!causesNoteLockMisses(hitObject))
-                return;
-
-            // The minimum start time required for hitobjects so that they aren't missed.
             double minimumTime = hitObject.StartTime;
 
             foreach (var obj in HitObjectContainer.AliveObjects)
@@ -140,49 +137,35 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (obj.HitObject.StartTime >= minimumTime)
                     break;
 
-                performMiss(obj);
-
-                foreach (var n in obj.NestedHitObjects)
+                switch (obj)
                 {
-                    if (n.HitObject.StartTime >= minimumTime)
+                    case DrawableHitCircle circle:
+                        miss(circle);
                         break;
 
-                    performMiss(n);
+                    case DrawableSlider slider:
+                        miss(slider.HeadCircle);
+                        break;
                 }
+            }
+
+            static void miss(DrawableOsuHitObject obj)
+            {
+                // Hitobjects that have already been judged cannot be missed.
+                if (obj.Judged)
+                    return;
+
+                obj.MissForcefully();
             }
         }
 
-        private void performMiss(DrawableHitObject obj)
-        {
-            if (!(obj is DrawableOsuHitObject osuObject))
-                throw new InvalidOperationException($"{obj.GetType()} is not a {nameof(DrawableOsuHitObject)}.");
-
-            // Hitobjects that have already been judged cannot be missed.
-            if (osuObject.Judged)
-                return;
-
-            if (!causesNoteLockMisses(obj.HitObject))
-                return;
-
-            osuObject.MissForcefully();
-        }
-
         /// <summary>
-        /// Whether a <see cref="HitObject"/> is contributes to note lock.
-        /// Future contributing <see cref="HitObject"/>s will not be hittable until the start time of the last contributing <see cref="HitObject"/> is reached.
+        /// Whether a <see cref="HitObject"/> can block hits on future <see cref="HitObject"/>s until its start time is reached.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
-        /// <returns>Whether <paramref name="hitObject"/> causes note lock.</returns>
-        private bool contributesToNoteLock(HitObject hitObject)
+        /// <returns>Whether <paramref name="hitObject"/> can block hits on future <see cref="HitObject"/>s.</returns>
+        private bool canBlockFutureHits(HitObject hitObject)
             => hitObject is HitCircle || hitObject is Slider;
-
-        /// <summary>
-        /// Whether a <see cref="HitObject"/> can be missed and causes other <see cref="HitObject"/>s to be missed when hit out-of-order during note lock.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
-        /// <returns>Whether <paramref name="hitObject"/> contributes to note lock misses.</returns>
-        private bool causesNoteLockMisses(HitObject hitObject)
-            => hitObject is HitCircle && !(hitObject is SliderTailCircle);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 
