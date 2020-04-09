@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,9 +11,12 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Skinning;
+using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,31 +25,33 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    [Cached]
-    public class ManiaStage : ScrollingPlayfield
+    public class Stage : ScrollingPlayfield
     {
         public const float COLUMN_SPACING = 1;
 
-        public const float HIT_TARGET_POSITION = 50;
+        public const float HIT_TARGET_POSITION = 110;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        private readonly Container barLineContainer;
-
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
 
+        private readonly Drawable barLineContainer;
         private readonly Container topLevelContainer;
 
-        private List<Color4> normalColumnColours = new List<Color4>();
-        private Color4 specialColumnColour;
+        private readonly Dictionary<ColumnType, Color4> columnColours = new Dictionary<ColumnType, Color4>
+        {
+            { ColumnType.Even, new Color4(6, 84, 0, 255) },
+            { ColumnType.Odd, new Color4(94, 0, 57, 255) },
+            { ColumnType.Special, new Color4(0, 48, 63, 255) }
+        };
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
 
         private readonly int firstColumnIndex;
 
-        public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+        public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
         {
             this.firstColumnIndex = firstColumnIndex;
 
@@ -68,31 +72,19 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
-                            Name = "Columns mask",
+                            Name = "Background",
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black
+                        },
+                        columnFlow = new FillFlowContainer<Column>
+                        {
+                            Name = "Columns",
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Masking = true,
-                            CornerRadius = 5,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Background",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black
-                                },
-                                columnFlow = new FillFlowContainer<Column>
-                                {
-                                    Name = "Columns",
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-                                    Direction = FillDirection.Horizontal,
-                                    Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
-                                    Spacing = new Vector2(COLUMN_SPACING, 0)
-                                },
-                            }
+                            Direction = FillDirection.Horizontal,
+                            Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
                         },
                         new Container
                         {
@@ -103,13 +95,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = barLineContainer = new Container
+                            Child = barLineContainer = new HitObjectArea(HitObjectContainer)
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
-                                Child = HitObjectContainer
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
@@ -126,24 +117,52 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                var isSpecial = definition.IsSpecialColumn(i);
+                var columnType = definition.GetTypeOfColumn(i);
                 var column = new Column(firstColumnIndex + i)
                 {
-                    IsSpecial = isSpecial,
-                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
+                    ColumnType = columnType,
+                    AccentColour = columnColours[columnType],
+                    Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
                 AddColumn(column);
             }
+        }
 
-            Direction.BindValueChanged(dir =>
+        private ISkin currentSkin;
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
+        {
+            currentSkin = skin;
+            skin.SourceChanged += onSkinChanged;
+
+            onSkinChanged();
+        }
+
+        private void onSkinChanged()
+        {
+            foreach (var col in columnFlow)
             {
-                barLineContainer.Padding = new MarginPadding
+                if (col.Index > 0)
                 {
-                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
-                };
-            }, true);
+                    float spacing = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                                   new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnSpacing, col.Index - 1))
+                                               ?.Value ?? COLUMN_SPACING;
+
+                    col.Margin = new MarginPadding { Left = spacing };
+                }
+
+                float? width = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, col.Index))
+                                          ?.Value;
+
+                if (width == null)
+                    // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
+                    col.Width = col.IsSpecial ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
+                else
+                    col.Width = width.Value;
+            }
         }
 
         public void AddColumn(Column c)
@@ -194,38 +213,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            normalColumnColours = new List<Color4>
-            {
-                new Color4(94, 0, 57, 255),
-                new Color4(6, 84, 0, 255)
-            };
-
-            specialColumnColour = new Color4(0, 48, 63, 255);
-
-            // Set the special column + colour + key
-            foreach (var column in Columns)
-            {
-                if (!column.IsSpecial)
-                    continue;
-
-                column.AccentColour = specialColumnColour;
-            }
-
-            var nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
-
-            // We'll set the colours of the non-special columns in a separate loop, because the non-special
-            // column colours are mirrored across their centre and special styles mess with this
-            for (int i = 0; i < Math.Ceiling(nonSpecialColumns.Count / 2f); i++)
-            {
-                Color4 colour = normalColumnColours[i % normalColumnColours.Count];
-                nonSpecialColumns[i].AccentColour = colour;
-                nonSpecialColumns[nonSpecialColumns.Count - 1 - i].AccentColour = colour;
-            }
         }
 
         protected override void Update()

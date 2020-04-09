@@ -8,6 +8,8 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning
@@ -15,12 +17,20 @@ namespace osu.Game.Rulesets.Mania.Skinning
     public class ManiaLegacySkinTransformer : ISkin
     {
         private readonly ISkin source;
+        private readonly ManiaBeatmap beatmap;
 
         private Lazy<bool> isLegacySkin;
 
-        public ManiaLegacySkinTransformer(ISkinSource source)
+        /// <summary>
+        /// Whether texture for the keys exists.
+        /// Used to determine if the mania ruleset is skinned.
+        /// </summary>
+        private Lazy<bool> hasKeyTexture;
+
+        public ManiaLegacySkinTransformer(ISkinSource source, IBeatmap beatmap)
         {
             this.source = source;
+            this.beatmap = (ManiaBeatmap)beatmap;
 
             source.SourceChanged += sourceChanged;
             sourceChanged();
@@ -29,6 +39,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private void sourceChanged()
         {
             isLegacySkin = new Lazy<bool>(() => source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
+            hasKeyTexture = new Lazy<bool>(() => source.GetAnimation(
+                GetConfig<ManiaSkinConfigurationLookup, string>(
+                    new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
+                ?? "mania-key1", true, true) != null);
         }
 
         public Drawable GetDrawableComponent(ISkinComponent component)
@@ -38,9 +52,36 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 case GameplaySkinComponent<HitResult> resultComponent:
                     return getResult(resultComponent);
 
-                case ManiaSkinComponent _:
-                    if (!isLegacySkin.Value)
+                case ManiaSkinComponent maniaComponent:
+                    if (!isLegacySkin.Value || !hasKeyTexture.Value)
                         return null;
+
+                    switch (maniaComponent.Component)
+                    {
+                        case ManiaSkinComponents.ColumnBackground:
+                            return new LegacyColumnBackground(maniaComponent.TargetColumn == beatmap.TotalColumns - 1);
+
+                        case ManiaSkinComponents.HitTarget:
+                            return new LegacyHitTarget();
+
+                        case ManiaSkinComponents.KeyArea:
+                            return new LegacyKeyArea();
+
+                        case ManiaSkinComponents.Note:
+                            return new LegacyNotePiece();
+
+                        case ManiaSkinComponents.HoldNoteHead:
+                            return new LegacyHoldNoteHeadPiece();
+
+                        case ManiaSkinComponents.HoldNoteTail:
+                            return new LegacyHoldNoteTailPiece();
+
+                        case ManiaSkinComponents.HoldNoteBody:
+                            return new LegacyBodyPiece();
+
+                        case ManiaSkinComponents.HitExplosion:
+                            return new LegacyHitExplosion();
+                    }
 
                     break;
             }
@@ -78,7 +119,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) =>
-            source.GetConfig<TLookup, TValue>(lookup);
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            if (lookup is ManiaSkinConfigurationLookup maniaLookup)
+                return source.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
+
+            return source.GetConfig<TLookup, TValue>(lookup);
+        }
     }
 }

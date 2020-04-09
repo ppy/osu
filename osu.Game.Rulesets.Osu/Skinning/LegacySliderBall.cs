@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public LegacySliderBall(Drawable animationContent)
         {
             this.animationContent = animationContent;
+
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
