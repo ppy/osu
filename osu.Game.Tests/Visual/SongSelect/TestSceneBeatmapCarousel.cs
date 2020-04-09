@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -82,6 +81,82 @@ namespace osu.Game.Tests.Visual.SongSelect
             advanceSelection(direction: -1, diff: true);
             advanceSelection(direction: -1, diff: true);
             waitForSelection(set_count, 3);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestTraversalBeyondVisible(bool forwards)
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            const int total_set_count = 200;
+
+            for (int i = 0; i < total_set_count; i++)
+                sets.Add(createTestBeatmapSet(i + 1));
+
+            loadBeatmaps(sets);
+
+            for (int i = 1; i < total_set_count; i += i)
+                selectNextAndAssert(i);
+
+            void selectNextAndAssert(int amount)
+            {
+                setSelected(forwards ? 1 : total_set_count, 1);
+
+                AddStep($"{(forwards ? "Next" : "Previous")} beatmap {amount} times", () =>
+                {
+                    for (int i = 0; i < amount; i++)
+                    {
+                        carousel.SelectNext(forwards ? 1 : -1);
+                    }
+                });
+
+                waitForSelection(forwards ? amount + 1 : total_set_count - amount);
+            }
+        }
+
+        [Test]
+        public void TestTraversalBeyondVisibleDifficulties()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            const int total_set_count = 20;
+
+            for (int i = 0; i < total_set_count; i++)
+                sets.Add(createTestBeatmapSet(i + 1));
+
+            loadBeatmaps(sets);
+
+            // Selects next set once, difficulty index doesn't change
+            selectNextAndAssert(3, true, 2, 1);
+
+            // Selects next set 16 times (50 \ 3 == 16), difficulty index changes twice (50 % 3 == 2)
+            selectNextAndAssert(50, true, 17, 3);
+
+            // Travels around the carousel thrice (200 \ 60 == 3)
+            // continues to select 20 times (200 \ 60 == 20)
+            // selects next set 6 times (20 \ 3 == 6)
+            // difficulty index changes twice (20 % 3 == 2)
+            selectNextAndAssert(200, true, 7, 3);
+
+            // All same but in reverse
+            selectNextAndAssert(3, false, 19, 3);
+            selectNextAndAssert(50, false, 4, 1);
+            selectNextAndAssert(200, false, 14, 1);
+
+            void selectNextAndAssert(int amount, bool forwards, int expectedSet, int expectedDiff)
+            {
+                // Select very first or very last difficulty
+                setSelected(forwards ? 1 : 20, forwards ? 1 : 3);
+
+                AddStep($"{(forwards ? "Next" : "Previous")} difficulty {amount} times", () =>
+                {
+                    for (int i = 0; i < amount; i++)
+                        carousel.SelectNext(forwards ? 1 : -1, false);
+                });
+
+                waitForSelection(expectedSet, expectedDiff);
+            }
         }
 
         /// <summary>
@@ -580,34 +655,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        [Test]
-        public void TestSelectRecommendedDifficulty()
-        {
-            void setRecommendedAndExpect(double recommended, int expectedSet, int expectedDiff)
-            {
-                AddStep($"Recommend SR {recommended}", () => carousel.RecommendedStarDifficulty.Value = recommended);
-                advanceSelection(direction: 1, diff: false);
-                waitForSelection(expectedSet, expectedDiff);
-            }
-
-            createCarousel();
-            AddStep("Add beatmaps", () =>
-            {
-                for (int i = 1; i <= 7; i++)
-                {
-                    var set = createTestBeatmapSet(i);
-                    carousel.UpdateBeatmapSet(set);
-                }
-            });
-            waitForSelection(1, 1);
-            setRecommendedAndExpect(1, 2, 1);
-            setRecommendedAndExpect(3.9, 3, 1);
-            setRecommendedAndExpect(4.1, 4, 2);
-            setRecommendedAndExpect(5.6, 5, 2);
-            setRecommendedAndExpect(5.7, 6, 3);
-            setRecommendedAndExpect(10, 7, 3);
-        }
-
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null)
         {
             createCarousel();
@@ -809,8 +856,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private class TestBeatmapCarousel : BeatmapCarousel
         {
             public new List<DrawableCarouselItem> Items => base.Items;
-
-            public new Bindable<double> RecommendedStarDifficulty => base.RecommendedStarDifficulty;
 
             public bool PendingFilterTask => PendingFilter != null;
 

@@ -23,9 +23,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
-using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Screens.Select
 {
@@ -33,8 +31,6 @@ namespace osu.Game.Screens.Select
     {
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
-
-        protected readonly Bindable<double> RecommendedStarDifficulty = new Bindable<double>();
 
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
@@ -122,6 +118,7 @@ namespace osu.Game.Screens.Select
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselRoot root;
+        public SongSelect.DifficultyRecommender DifficultyRecommender;
 
         public BeatmapCarousel()
         {
@@ -145,10 +142,10 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private Bindable<RulesetInfo> decoupledRuleset { get; set; }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config, Bindable<RulesetInfo> decoupledRuleset)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
@@ -162,37 +159,6 @@ namespace osu.Game.Screens.Select
             beatmaps.BeatmapRestored += beatmapRestored;
 
             loadBeatmapSets(GetLoadableBeatmaps());
-
-            decoupledRuleset.BindValueChanged(UpdateRecommendedStarDifficulty, true);
-        }
-
-        protected void UpdateRecommendedStarDifficulty(ValueChangedEvent<RulesetInfo> ruleset)
-        {
-            if (api.LocalUser.Value is GuestUser)
-            {
-                RecommendedStarDifficulty.Value = 0;
-                return;
-            }
-
-            var req = new GetUserRequest(api.LocalUser.Value.Id, ruleset.NewValue);
-
-            req.Success += result =>
-            {
-                // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
-                RecommendedStarDifficulty.Value = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
-            };
-
-            api.PerformAsync(req);
-        }
-
-        internal bool IsRecommended(BeatmapInfo beatmap)
-        {
-            if (RecommendedStarDifficulty.Value == 0)
-                return false;
-
-            BeatmapSetInfo set = beatmap.BeatmapSet;
-            BeatmapInfo recommended = set.Beatmaps.OrderBy(b => SongSelect.DifferenceToRecommended(b, RecommendedStarDifficulty.Value)).FirstOrDefault();
-            return beatmap == recommended && Math.Abs(beatmap.StarDifficulty - RecommendedStarDifficulty.Value) < 0.5;
         }
 
         protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
@@ -292,46 +258,37 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            var visibleItems = Items.Where(s => !s.Item.Filtered.Value).ToList();
-
-            if (!visibleItems.Any())
+            if (beatmapSets.All(s => s.Filtered.Value))
                 return;
 
-            DrawableCarouselItem drawable = null;
+            if (skipDifficulties)
+                selectNextSet(direction, true);
+            else
+                selectNextDifficulty(direction);
+        }
 
-            if (selectedBeatmap != null && (drawable = selectedBeatmap.Drawables.FirstOrDefault()) == null)
-                // if the selected beatmap isn't present yet, we can't correctly change selection.
-                // we can fix this by changing this method to not reference drawables / Items in the first place.
-                return;
+        private void selectNextSet(int direction, bool skipDifficulties)
+        {
+            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
 
-            int originalIndex = visibleItems.IndexOf(drawable);
-            int currentIndex = originalIndex;
+            var nextSet = unfilteredSets[(unfilteredSets.IndexOf(selectedBeatmapSet) + direction + unfilteredSets.Count) % unfilteredSets.Count];
 
-            // local function to increment the index in the required direction, wrapping over extremities.
-            int incrementIndex() => currentIndex = (currentIndex + direction + visibleItems.Count) % visibleItems.Count;
+            if (skipDifficulties)
+                select(nextSet);
+            else
+                select(direction > 0 ? nextSet.Beatmaps.First(b => !b.Filtered.Value) : nextSet.Beatmaps.Last(b => !b.Filtered.Value));
+        }
 
-            while (incrementIndex() != originalIndex)
-            {
-                var item = visibleItems[currentIndex].Item;
+        private void selectNextDifficulty(int direction)
+        {
+            var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
 
-                if (item.Filtered.Value || item.State.Value == CarouselItemState.Selected) continue;
+            int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
 
-                switch (item)
-                {
-                    case CarouselBeatmap beatmap:
-                        if (skipDifficulties) continue;
-
-                        select(beatmap);
-                        return;
-
-                    case CarouselBeatmapSet set:
-                        if (skipDifficulties)
-                            select(set);
-                        else
-                            select(direction > 0 ? set.Beatmaps.First(b => !b.Filtered.Value) : set.Beatmaps.Last(b => !b.Filtered.Value));
-                        return;
-                }
-            }
+            if (index + direction < 0 || index + direction >= unfilteredDifficulties.Count)
+                selectNextSet(direction, false);
+            else
+                select(unfilteredDifficulties[index + direction]);
         }
 
         /// <summary>
@@ -627,7 +584,12 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet, RecommendedStarDifficulty);
+            BeatmapInfo recommender(IEnumerable<BeatmapInfo> beatmaps)
+            {
+                return DifficultyRecommender?.GetRecommendedBeatmap(beatmaps, decoupledRuleset.Value);
+            }
+
+            var set = new CarouselBeatmapSet(beatmapSet, recommender);
 
             foreach (var c in set.Beatmaps)
             {

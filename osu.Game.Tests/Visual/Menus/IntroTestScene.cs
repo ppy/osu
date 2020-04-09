@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual.Menus
         {
             typeof(StartupScreen),
             typeof(IntroScreen),
-            typeof(OsuScreen),
             typeof(IntroTestScene),
         };
 
