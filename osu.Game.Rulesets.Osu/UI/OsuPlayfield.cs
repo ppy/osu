@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            missAllEarlier(result);
+            missAllEarlier(result.HitObject);
 
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
@@ -131,14 +131,14 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <summary>
         /// Misses all <see cref="OsuHitObject"/>s occurring earlier than the start time of a judged <see cref="OsuHitObject"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> of the judged <see cref="OsuHitObject"/>.</param>
-        private void missAllEarlier(JudgementResult result)
+        /// <param name="hitObject">The marker <see cref="HitObject"/>, which all <see cref="HitObject"/>s earlier than will get missed.</param>
+        private void missAllEarlier(HitObject hitObject)
         {
-            if (!causesNoteLockMisses(result.HitObject))
+            if (!causesNoteLockMisses(hitObject))
                 return;
 
             // The minimum start time required for hitobjects so that they aren't missed.
-            double minimumTime = result.HitObject.StartTime;
+            double minimumTime = hitObject.StartTime;
 
             foreach (var obj in HitObjectContainer.AliveObjects)
             {
