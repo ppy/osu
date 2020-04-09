@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The stereo balance of the samples played if <i>Positional hitsounds</i> is set.
         /// </summary>
-        protected virtual float PositionalSound => (HitObject is IHasXPosition position) ? (position.X / 512f - 0.5f) * 0.8f : 0;
+        protected virtual float PositionalSound => (Position.X / 512f - 0.5f) * 0.8f;
 
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
@@ -114,7 +114,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject([NotNull] HitObject hitObject)
         {
             HitObject = hitObject ?? throw new ArgumentNullException(nameof(hitObject));
-            positionalSoundAdjustment.Value = PositionalSound;
         }
 
         [BackgroundDependencyLoader]
@@ -377,7 +376,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
-        public virtual void PlaySamples() => Samples?.Play();
+        public virtual void PlaySamples()
+        {
+            positionalSoundAdjustment.Value = PositionalSound;
+            Samples?.Play();
+        }
 
         protected override void Update()
         {
