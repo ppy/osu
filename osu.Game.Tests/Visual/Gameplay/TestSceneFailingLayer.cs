@@ -26,6 +26,21 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestLayerFading()
+        {
+            AddSliderStep("current health", 0.0, 1.0, 1.0, val =>
+            {
+                if (layer != null)
+                    layer.Current.Value = val;
+            });
+
+            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddUntilStep("layer fade is visible", () => layer.Child.Alpha > 0.1f);
+            AddStep("set health to 1", () => layer.Current.Value = 1f);
+            AddUntilStep("layer fade is invisible", () => !layer.Child.IsPresent);
+        }
+
+        [Test]
         public void TestLayerDisabledViaConfig()
         {
             AddStep("disable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, false));
@@ -45,21 +60,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("bind accumulating processor", () => layer.BindHealthProcessor(new DrainingHealthProcessor(1)));
             AddWaitStep("wait for potential fade", 10);
             AddAssert("layer is still visible", () => layer.IsPresent);
-        }
-
-        [Test]
-        public void TestLayerFading()
-        {
-            AddSliderStep("current health", 0.0, 1.0, 1.0, val =>
-            {
-                if (layer != null)
-                    layer.Current.Value = val;
-            });
-
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
-            AddUntilStep("layer fade is visible", () => layer.Child.Alpha > 0.1f);
-            AddStep("set health to 1", () => layer.Current.Value = 1f);
-            AddUntilStep("layer fade is invisible", () => !layer.Child.IsPresent);
         }
     }
 }
