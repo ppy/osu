@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (obj == hitObject)
                     break;
 
-                if (canBlockFutureHits(obj))
+                if (drawableCanBlockFutureHits(obj))
                     blockingObject = obj;
             }
 
@@ -66,29 +66,26 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
         public void HandleHit(HitObject hitObject)
         {
-            // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks)
-            if (!canBlockFutureHits(hitObject))
+            // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks, spinners)
+            if (!hitObjectCanBlockFutureHits(hitObject))
                 return;
 
             double minimumTime = hitObject.StartTime;
 
             foreach (var obj in hitObjectContainer.AliveObjects)
             {
-                if (obj.HitObject.StartTime >= minimumTime)
-                    break;
-
-                // If the parent hitobject cannot cause a miss, neither can any nested hitobject.
-                if (!canBlockFutureHits(obj))
+                if (obj.Judged || obj.HitObject.StartTime >= minimumTime)
                     continue;
 
-                applyMiss(obj);
+                if (hitObjectCanBlockFutureHits(obj.HitObject))
+                    applyMiss(obj);
 
                 foreach (var nested in obj.NestedHitObjects)
                 {
-                    if (nested.HitObject.StartTime >= minimumTime)
-                        break;
+                    if (nested.Judged || nested.HitObject.StartTime >= minimumTime)
+                        continue;
 
-                    if (canBlockFutureHits(nested))
+                    if (hitObjectCanBlockFutureHits(nested.HitObject))
                         applyMiss(nested);
                 }
             }
@@ -100,15 +97,11 @@ namespace osu.Game.Rulesets.Osu.UI
         /// Whether a <see cref="DrawableHitObject"/> blocks hits on future <see cref="DrawableHitObject"/>s until its start time is reached.
         /// </summary>
         /// <remarks>
-        /// Must only be used when iterating through top-most drawable hitobjects.
+        /// This will ONLY match on top-most <see cref="DrawableHitObject"/>s.
         /// </remarks>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to test.</param>
-        private static bool canBlockFutureHits(DrawableHitObject hitObject)
+        private static bool drawableCanBlockFutureHits(DrawableHitObject hitObject)
         {
-            // Judged hitobjects can never block hits.
-            if (hitObject.Judged)
-                return false;
-
             // Special considerations for slider tails aren't required since only top-most drawable hitobjects are being iterated over.
             return hitObject is DrawableHitCircle || hitObject is DrawableSlider;
         }
@@ -117,10 +110,10 @@ namespace osu.Game.Rulesets.Osu.UI
         /// Whether a <see cref="HitObject"/> blocks hits on future <see cref="HitObject"/>s until its start time is reached.
         /// </summary>
         /// <remarks>
-        /// Must only be used when iterating through nested hitobjects.
+        /// This is more rigorous and may not match on top-most <see cref="HitObject"/>s as <see cref="drawableCanBlockFutureHits"/> does.
         /// </remarks>
         /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
-        private static bool canBlockFutureHits(HitObject hitObject)
+        private static bool hitObjectCanBlockFutureHits(HitObject hitObject)
         {
             // Unlike the above we will receive slider tails, but they do not block future hits.
             if (hitObject is SliderTailCircle)
