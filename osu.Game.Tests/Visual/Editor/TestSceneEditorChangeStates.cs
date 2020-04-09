@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -29,7 +30,8 @@ namespace osu.Game.Tests.Visual.Editor
                 LoadScreen(editor = new Screens.Edit.Editor());
             });
 
-            AddUntilStep("wait for editor to load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for editor to load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
+                                                          && editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
             AddStep("get beatmap", () => editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single());
         }
 
