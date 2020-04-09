@@ -108,6 +108,16 @@ namespace osu.Game.Screens.Edit
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
 
         /// <summary>
+        /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="hitObjects">The <see cref="HitObject"/>s to add.</param>
+        public void AddRange(IEnumerable<HitObject> hitObjects)
+        {
+            foreach (var h in hitObjects)
+                Add(h);
+        }
+
+        /// <summary>
         /// Adds a <see cref="HitObject"/> to this <see cref="EditorBeatmap"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
@@ -128,12 +138,34 @@ namespace osu.Game.Screens.Edit
         /// Removes a <see cref="HitObject"/> from this <see cref="EditorBeatmap"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Remove(HitObject hitObject)
+        /// <returns>True if the <see cref="HitObject"/> has been removed, false otherwise.</returns>
+        public bool Remove(HitObject hitObject)
         {
-            if (!mutableHitObjects.Contains(hitObject))
-                return;
+            int index = FindIndex(hitObject);
 
-            mutableHitObjects.Remove(hitObject);
+            if (index == -1)
+                return false;
+
+            RemoveAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// Finds the index of a <see cref="HitObject"/> in this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to search for.</param>
+        /// <returns>The index of <paramref name="hitObject"/>.</returns>
+        public int FindIndex(HitObject hitObject) => mutableHitObjects.IndexOf(hitObject);
+
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> at an index in this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="index">The index of the <see cref="HitObject"/> to remove.</param>
+        public void RemoveAt(int index)
+        {
+            var hitObject = (HitObject)mutableHitObjects[index];
+
+            mutableHitObjects.RemoveAt(index);
 
             var bindable = startTimeBindables[hitObject];
             bindable.UnbindAll();
