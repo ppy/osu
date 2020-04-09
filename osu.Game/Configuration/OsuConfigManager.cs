@@ -88,6 +88,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
+            Set(OsuSetting.PositionalHitSounds, true);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
@@ -176,6 +177,7 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
+        PositionalHitSounds,
         ScoreMeter,
         FloatingComments,
         ShowInterface,
