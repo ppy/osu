@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.UI
 {
     /// <summary>
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
-    /// Will ensure a minimum of 40 frames per clock second is maintained, regardless of any system lag or seeks.
+    /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
     public class FrameStabilityContainer : Container, IHasReplayHandler
     {
