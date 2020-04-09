@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 boxes = new Container
                 {
+                    Alpha = 0,
                     Blending = BlendingParameters.Additive,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]

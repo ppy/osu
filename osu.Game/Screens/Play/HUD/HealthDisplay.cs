@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public abstract class HealthDisplay : Container
     {
-        public readonly BindableDouble Current = new BindableDouble
+        public readonly BindableDouble Current = new BindableDouble(1)
         {
             MinValue = 0,
             MaxValue = 1
