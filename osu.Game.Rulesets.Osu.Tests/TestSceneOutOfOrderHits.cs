@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneNoteLock : RateAdjustedBeatmapTestScene
+    public class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
     {
         private const double early_miss_window = 1000; // time after -1000 to -500 is considered a miss
         private const double late_miss_window = 500; // time after +500 is considered a miss
