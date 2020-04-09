@@ -60,8 +60,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
 
-                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
                 MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
                 Zoom = getZoomLevelForVisibleMilliseconds(2000);
             }, true);
         }
