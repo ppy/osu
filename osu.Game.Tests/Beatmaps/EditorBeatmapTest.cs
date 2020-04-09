@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
 
             HitObject changedObject = null;
-            editorBeatmap.StartTimeChanged += h => changedObject = h;
+            editorBeatmap.HitObjectUpdated += h => changedObject = h;
 
             hitCircle.StartTime = 1000;
             Assert.That(changedObject, Is.EqualTo(hitCircle));
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Beatmaps
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap());
 
             HitObject changedObject = null;
-            editorBeatmap.StartTimeChanged += h => changedObject = h;
+            editorBeatmap.HitObjectUpdated += h => changedObject = h;
 
             var hitCircle = new HitCircle();
 
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Beatmaps
             var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
 
             HitObject changedObject = null;
-            editorBeatmap.StartTimeChanged += h => changedObject = h;
+            editorBeatmap.HitObjectUpdated += h => changedObject = h;
 
             editorBeatmap.Remove(hitCircle);
             Assert.That(changedObject, Is.Null);
