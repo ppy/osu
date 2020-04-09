@@ -89,8 +89,9 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
-            boxes.Alpha = (float)Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, fade_time), boxes.Alpha,
-                Math.Clamp(max_alpha * (1 - Current.Value / LowHealthThreshold), 0, max_alpha), 0, fade_time, Easing.Out);
+            double target = Math.Clamp(max_alpha * (1 - Current.Value / LowHealthThreshold), 0, max_alpha);
+
+            boxes.Alpha = (float)Interpolation.Lerp(boxes.Alpha, target, Clock.ElapsedFrameTime * 0.01f);
 
             base.Update();
         }
