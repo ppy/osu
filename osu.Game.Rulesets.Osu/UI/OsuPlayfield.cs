@@ -78,12 +78,7 @@ namespace osu.Game.Rulesets.Osu.UI
             bool result = base.Remove(h);
 
             if (result)
-            {
-                DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
-                osuHitObject.CheckHittable = null;
-
-                followPoints.RemoveFollowPoints(osuHitObject);
-            }
+                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
 
             return result;
         }
