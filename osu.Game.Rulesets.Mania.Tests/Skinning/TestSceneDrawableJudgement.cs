@@ -6,15 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Tests.Visual;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneDrawableJudgement : SkinnableTestScene
+    public class TestSceneDrawableJudgement : ManiaSkinnableTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

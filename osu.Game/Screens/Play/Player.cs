@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(gameplayBeatmap);
 
             addUnderlayComponents(GameplayClockContainer);
-            addGameplayComponents(GameplayClockContainer, Beatmap.Value);
+            addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -218,13 +218,13 @@ namespace osu.Game.Screens.Play
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
-        private void addGameplayComponents(Container target, WorkingBeatmap working)
+        private void addGameplayComponents(Container target, WorkingBeatmap working, IBeatmap playableBeatmap)
         {
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(working.Skin);
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.

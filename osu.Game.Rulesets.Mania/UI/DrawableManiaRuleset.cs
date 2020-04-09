@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -26,6 +28,16 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
+        /// <summary>
+        /// The minimum time range. This occurs at a <see cref="relativeTimeRange"/> of 40.
+        /// </summary>
+        public const double MIN_TIME_RANGE = 150;
+
+        /// <summary>
+        /// The maximum time range. This occurs at a <see cref="relativeTimeRange"/> of 1.
+        /// </summary>
+        public const double MAX_TIME_RANGE = 6000;
+
         protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
@@ -47,6 +59,19 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            bool isForCurrentRuleset = Beatmap.BeatmapInfo.Ruleset.Equals(Ruleset.RulesetInfo);
+
+            foreach (var p in ControlPoints)
+            {
+                // Mania doesn't care about global velocity
+                p.Velocity = 1;
+                p.BaseBeatLength *= Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
+
+                // For non-mania beatmap, speed changes should only happen through timing points
+                if (!isForCurrentRuleset)
+                    p.DifficultyPoint = new DifficultyControlPoint();
+            }
+
             BarLines.ForEach(Playfield.Add);
 
             Config.BindWith(ManiaRulesetSetting.ScrollDirection, configDirection);
@@ -55,6 +80,17 @@ namespace osu.Game.Rulesets.Mania.UI
             Config.BindWith(ManiaRulesetSetting.ScrollTime, TimeRange);
 
             Overlays.Add(new FailingLayer());
+        }
+
+        protected override void AdjustScrollSpeed(int amount)
+        {
+            this.TransformTo(nameof(relativeTimeRange), relativeTimeRange + amount, 200, Easing.OutQuint);
+        }
+
+        private double relativeTimeRange
+        {
+            get => MAX_TIME_RANGE / TimeRange.Value;
+            set => TimeRange.Value = MAX_TIME_RANGE / value;
         }
 
         /// <summary>
