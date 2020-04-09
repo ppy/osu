@@ -28,9 +28,10 @@ namespace osu.Game.Scoring.Legacy
         {
             var score = new Score
             {
-                ScoreInfo = new ScoreInfo(),
                 Replay = new Replay()
             };
+
+            WorkingBeatmap workingBeatmap;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -41,12 +42,9 @@ namespace osu.Game.Scoring.Legacy
 
                 var version = sr.ReadInt32();
 
-                var workingBeatmap = GetBeatmap(sr.ReadString());
+                workingBeatmap = GetBeatmap(sr.ReadString());
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
-
-                currentBeatmap = workingBeatmap.Beatmap;
-                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
 
                 scoreInfo.User = new User { Username = sr.ReadString() };
 
@@ -67,6 +65,9 @@ namespace osu.Game.Scoring.Legacy
                 sr.ReadBoolean();
 
                 scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+
+                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
+                scoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -112,6 +113,10 @@ namespace osu.Game.Scoring.Legacy
             }
 
             CalculateAccuracy(score.ScoreInfo);
+
+            // before returning for database import, we must restore the database-sourced BeatmapInfo.
+            // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
+            score.ScoreInfo.Beatmap = workingBeatmap.BeatmapInfo;
 
             return score;
         }

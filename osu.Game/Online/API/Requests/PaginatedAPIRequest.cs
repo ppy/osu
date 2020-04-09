@@ -6,7 +6,7 @@ using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API.Requests
 {
-    public abstract class PaginatedAPIRequest<T> : APIRequest<T>
+    public abstract class PaginatedAPIRequest<T> : APIRequest<T> where T : class
     {
         private readonly int page;
         private readonly int itemsPerPage;
