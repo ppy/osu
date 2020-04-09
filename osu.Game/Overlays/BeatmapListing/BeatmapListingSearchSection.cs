@@ -47,8 +47,8 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchTextBox textBox;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<BeatmapSearchCategory> categoryFilter;
-        private readonly BeatmapSearchSmallFilterRow<BeatmapSearchGenre> genreFilter;
-        private readonly BeatmapSearchSmallFilterRow<BeatmapSearchLanguage> languageFilter;
+        private readonly BeatmapSearchFilterRow<BeatmapSearchGenre> genreFilter;
+        private readonly BeatmapSearchFilterRow<BeatmapSearchLanguage> languageFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -104,8 +104,8 @@ namespace osu.Game.Overlays.BeatmapListing
                                 {
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<BeatmapSearchCategory>(@"Categories"),
-                                    genreFilter = new BeatmapSearchSmallFilterRow<BeatmapSearchGenre>(@"Genre"),
-                                    languageFilter = new BeatmapSearchSmallFilterRow<BeatmapSearchLanguage>(@"Language"),
+                                    genreFilter = new BeatmapSearchFilterRow<BeatmapSearchGenre>(@"Genre"),
+                                    languageFilter = new BeatmapSearchFilterRow<BeatmapSearchLanguage>(@"Language"),
                                 }
                             }
                         }

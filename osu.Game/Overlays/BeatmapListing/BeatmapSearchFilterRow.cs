@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osuTK;
 using osuTK.Graphics;
+using Humanizer;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -55,8 +56,8 @@ namespace osu.Game.Overlays.BeatmapListing
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 10),
-                            Text = headerName.ToUpper()
+                            Font = OsuFont.GetFont(size: 13),
+                            Text = headerName.Titleize()
                         },
                         CreateFilter().With(f =>
                         {
