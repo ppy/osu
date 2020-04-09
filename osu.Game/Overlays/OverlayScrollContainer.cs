@@ -3,14 +3,12 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -43,7 +41,7 @@ namespace osu.Game.Overlays
                 {
                     ScrollToStart();
                     currentTarget = Target;
-                    Button.Current.Value = Visibility.Hidden;
+                    Button.State = Visibility.Hidden;
                 }
             });
         }
@@ -54,7 +52,7 @@ namespace osu.Game.Overlays
 
             if (ScrollContent.DrawHeight + button_scroll_position < DrawHeight)
             {
-                Button.Current.Value = Visibility.Hidden;
+                Button.State = Visibility.Hidden;
                 return;
             }
 
@@ -62,19 +60,27 @@ namespace osu.Game.Overlays
                 return;
 
             currentTarget = Target;
-            Button.Current.Value = Current > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
+            Button.State = Current > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
         }
 
-        public class ScrollToTopButton : OsuHoverContainer, IHasCurrentValue<Visibility>
+        public class ScrollToTopButton : OsuHoverContainer
         {
             private const int fade_duration = 500;
 
-            private readonly BindableWithCurrent<Visibility> current = new BindableWithCurrent<Visibility>();
+            private Visibility state;
 
-            public Bindable<Visibility> Current
+            public Visibility State
             {
-                get => current.Current;
-                set => current.Current = value;
+                get => state;
+                set
+                {
+                    if (value == state)
+                        return;
+
+                    state = value;
+                    Enabled.Value = state == Visibility.Visible;
+                    this.FadeTo(state == Visibility.Visible ? 1 : 0, fade_duration, Easing.OutQuint);
+                }
             }
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
@@ -126,16 +132,6 @@ namespace osu.Game.Overlays
                 IdleColour = colourProvider.Background6;
                 HoverColour = colourProvider.Background5;
                 flashColour = colourProvider.Light1;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                Current.BindValueChanged(visibility =>
-                {
-                    Enabled.Value = visibility.NewValue == Visibility.Visible;
-                    this.FadeTo(visibility.NewValue == Visibility.Visible ? 1 : 0, fade_duration, Easing.OutQuint);
-                }, true);
             }
 
             protected override bool OnClick(ClickEvent e)
