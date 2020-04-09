@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -35,22 +34,27 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <returns>Whether <paramref name="hitObject"/> can be hit at the given <paramref name="time"/>.</returns>
         public bool IsHittable(DrawableHitObject hitObject, double time)
         {
-            DrawableHitObject lastObject = hitObject;
+            DrawableHitObject blockingObject = null;
 
-            // Get the last hitobject that can block future hits
-            while ((lastObject = hitObjectContainer.AliveObjects.GetPrevious(lastObject)) != null)
+            // Find the last hitobject which blocks future hits.
+            foreach (var obj in hitObjectContainer.AliveObjects)
             {
-                if (canBlockFutureHits(lastObject.HitObject))
+                if (obj == hitObject)
                     break;
+
+                if (canBlockFutureHits(obj))
+                    blockingObject = obj;
             }
 
-            // If there is no previous object alive, allow the hit.
-            if (lastObject == null)
+            // If there is no previous hitobject, allow the hit.
+            if (blockingObject == null)
                 return true;
 
-            // Ensure that either the last object has received a judgement or the hit time occurs at or after the last object's start time.
-            // Simultaneous hitobjects are allowed to be hit at the same time value to account for edge-cases such as Centipede.
-            if (lastObject.Judged || time >= lastObject.HitObject.StartTime)
+            // A hit is allowed if:
+            // 1. The last blocking hitobject has been judged.
+            // 2. The current time is after the last hitobject's start time.
+            // Hits at exactly the same time as the blocking hitobject are allowed for maps that contain simultaneous hitobjects (e.g. /b/372245).
+            if (blockingObject.Judged || time >= blockingObject.HitObject.StartTime)
                 return true;
 
             return false;
@@ -62,6 +66,7 @@ namespace osu.Game.Rulesets.Osu.UI
         /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
         public void HandleHit(HitObject hitObject)
         {
+            // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks)
             if (!canBlockFutureHits(hitObject))
                 return;
 
@@ -72,33 +77,57 @@ namespace osu.Game.Rulesets.Osu.UI
                 if (obj.HitObject.StartTime >= minimumTime)
                     break;
 
-                switch (obj)
+                // If the parent hitobject cannot cause a miss, neither can any nested hitobject.
+                if (!canBlockFutureHits(obj))
+                    continue;
+
+                applyMiss(obj);
+
+                foreach (var nested in obj.NestedHitObjects)
                 {
-                    case DrawableHitCircle circle:
-                        miss(circle);
+                    if (nested.HitObject.StartTime >= minimumTime)
                         break;
 
-                    case DrawableSlider slider:
-                        miss(slider.HeadCircle);
-                        break;
+                    if (canBlockFutureHits(nested))
+                        applyMiss(nested);
                 }
             }
 
-            static void miss(DrawableOsuHitObject obj)
-            {
-                // Hitobjects that have already been judged cannot be missed.
-                if (obj.Judged)
-                    return;
+            static void applyMiss(DrawableHitObject obj) => ((DrawableOsuHitObject)obj).MissForcefully();
+        }
 
-                obj.MissForcefully();
-            }
+        /// <summary>
+        /// Whether a <see cref="DrawableHitObject"/> blocks hits on future <see cref="DrawableHitObject"/>s until its start time is reached.
+        /// </summary>
+        /// <remarks>
+        /// Must only be used when iterating through top-most drawable hitobjects.
+        /// </remarks>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to test.</param>
+        private static bool canBlockFutureHits(DrawableHitObject hitObject)
+        {
+            // Judged hitobjects can never block hits.
+            if (hitObject.Judged)
+                return false;
+
+            // Special considerations for slider tails aren't required since only top-most drawable hitobjects are being iterated over.
+            return hitObject is DrawableHitCircle || hitObject is DrawableSlider;
         }
 
         /// <summary>
         /// Whether a <see cref="HitObject"/> blocks hits on future <see cref="HitObject"/>s until its start time is reached.
         /// </summary>
+        /// <remarks>
+        /// Must only be used when iterating through nested hitobjects.
+        /// </remarks>
         /// <param name="hitObject">The <see cref="HitObject"/> to test.</param>
-        private bool canBlockFutureHits(HitObject hitObject)
-            => hitObject is HitCircle || hitObject is Slider;
+        private static bool canBlockFutureHits(HitObject hitObject)
+        {
+            // Unlike the above we will receive slider tails, but they do not block future hits.
+            if (hitObject is SliderTailCircle)
+                return false;
+
+            // All other hitcircles continue to block future hits.
+            return hitObject is HitCircle;
+        }
     }
 }
