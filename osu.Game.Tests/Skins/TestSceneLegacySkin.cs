@@ -22,16 +22,15 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestLayeredHitSoundsHandledCorrectly()
         {
+            var hsiLayered = new TestHitSampleInfo(true);
+            var hsiUnlayered = new TestHitSampleInfo(false);
+
             LegacySkin skinLayered = null;
             LegacySkin skinUnlayered = null;
-            HitSampleInfo hsiLayered = null;
-            HitSampleInfo hsiUnlayered = null;
             SampleChannel channel = null;
 
-            AddStep("create skin with LayeredHitSounds on", () => skinLayered = new TestSkin(true, Audio));
-            AddStep("create skin with LayeredHitSounds off", () => skinUnlayered = new TestSkin(false, Audio));
-            AddStep("create sample info with IsLayered on", () => hsiLayered = new TestHitSampleInfo(true));
-            AddStep("create sample info with IsLayered off", () => hsiUnlayered = new TestHitSampleInfo(false));
+            AddStep("create skin with LayeredHitSounds on", () => skinLayered = new TestSkin(Audio, true));
+            AddStep("create skin with LayeredHitSounds off", () => skinUnlayered = new TestSkin(Audio, false));
 
             AddStep("retrieve sample", () => channel = skinLayered.GetSample(hsiLayered));
             AddAssert("sample is non-null", () => channel != null, "LayeredHitSounds ON and IsLayered ON");
@@ -43,24 +42,41 @@ namespace osu.Game.Tests.Skins
             AddAssert("sample is null", () => channel == null, "LayeredHitSounds OFF and IsLayered ON");
 
             AddStep("retrieve sample", () => channel = skinUnlayered.GetSample(hsiUnlayered));
-            AddAssert("sample is non-null", () => channel != null, "LayeredHitSounds OFF and IsLayered FF");
+            AddAssert("sample is non-null", () => channel != null, "LayeredHitSounds OFF and IsLayered OFF");
+        }
+
+        [Test]
+        public void TestFallbackForNonCustomSample()
+        {
+            LegacySkin skin = null;
+            SampleChannel channel = null;
+
+            AddStep("create skin", () => skin = new TestSkin(Audio));
+
+            AddStep("retrieve custom sample", () => channel = skin.GetSample(new TestHitSampleInfo(false, true)));
+            AddAssert("sample is non-null", () => channel != null);
+
+            AddStep("retrieve non-custom sample", () => channel = skin.GetSample(new TestHitSampleInfo(false, false)));
+            AddAssert("sample is null", () => channel == null);
         }
 
         private class TestSkin : LegacySkin
         {
-            public TestSkin(bool layeredHitSounds, AudioManager audioManager)
-                : base(new SkinInfo(), new TestResourceStore("test-sample"), audioManager, string.Empty)
+            public TestSkin(AudioManager audioManager, bool layeredHitSounds = true, string resourceName = "normal-hitnormal")
+                : base(new SkinInfo(), new TestResourceStore(resourceName), audioManager, string.Empty)
             {
                 Configuration.ConfigDictionary["LayeredHitSounds"] = layeredHitSounds ? "1" : "0";
             }
         }
 
-        private class TestHitSampleInfo : HitSampleInfo{
-            public TestHitSampleInfo(bool isLayered)
+        private class TestHitSampleInfo : HitSampleInfo
+        {
+            public TestHitSampleInfo(bool isLayered, bool isCustom = true)
             {
-                Name = "test-sample";
+                Bank = "normal";
+                Name = "hitnormal";
                 IsLayered = isLayered;
-                IsCustom = false;
+                IsCustom = isCustom;
             }
         }
 
