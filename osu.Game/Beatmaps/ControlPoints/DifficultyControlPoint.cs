@@ -29,6 +29,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public override bool EquivalentTo(ControlPoint other) =>
             other is DifficultyControlPoint otherTyped && otherTyped.SpeedMultiplier.Equals(SpeedMultiplier);
-        public override bool IsRedundant(ControlPoint other, double time) => EquivalentTo(other);
+
+        public override bool IsRedundant(ControlPoint existing, double time) => EquivalentTo(existing);
     }
 }

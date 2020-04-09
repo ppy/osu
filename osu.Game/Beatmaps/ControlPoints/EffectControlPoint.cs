@@ -38,6 +38,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override bool EquivalentTo(ControlPoint other) =>
             other is EffectControlPoint otherTyped &&
             KiaiMode == otherTyped.KiaiMode && OmitFirstBarLine == otherTyped.OmitFirstBarLine;
-        public override bool IsRedundant(ControlPoint other, double time) => !OmitFirstBarLine && EquivalentTo(other);
+
+        public override bool IsRedundant(ControlPoint existing, double time) => !OmitFirstBarLine && EquivalentTo(existing);
     }
 }
