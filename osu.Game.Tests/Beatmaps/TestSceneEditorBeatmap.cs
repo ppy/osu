@@ -4,15 +4,17 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Internal;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Beatmaps
 {
-    [TestFixture]
-    public class EditorBeatmapTest
+    [HeadlessTest]
+    public class TestSceneEditorBeatmap : EditorClockTestScene
     {
         /// <summary>
         /// Tests that the addition event is correctly invoked after a hitobject is added.
@@ -55,13 +57,19 @@ namespace osu.Game.Tests.Beatmaps
         public void TestInitialHitObjectStartTimeChangeEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
 
             HitObject changedObject = null;
-            editorBeatmap.HitObjectUpdated += h => changedObject = h;
 
-            hitCircle.StartTime = 1000;
-            Assert.That(changedObject, Is.EqualTo(hitCircle));
+            AddStep("add beatmap", () =>
+            {
+                EditorBeatmap editorBeatmap;
+
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
+                editorBeatmap.HitObjectUpdated += h => changedObject = h;
+            });
+
+            AddStep("change start time", () => hitCircle.StartTime = 1000);
+            AddAssert("received change event", () => changedObject == hitCircle);
         }
 
         /// <summary>
@@ -71,18 +79,22 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestAddedHitObjectStartTimeChangeEvent()
         {
-            var editorBeatmap = new EditorBeatmap(new OsuBeatmap());
-
+            EditorBeatmap editorBeatmap = null;
             HitObject changedObject = null;
-            editorBeatmap.HitObjectUpdated += h => changedObject = h;
+
+            AddStep("add beatmap", () =>
+            {
+                Child = editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+                editorBeatmap.HitObjectUpdated += h => changedObject = h;
+            });
 
             var hitCircle = new HitCircle();
 
-            editorBeatmap.Add(hitCircle);
-            Assert.That(changedObject, Is.Null);
+            AddStep("add object", () => editorBeatmap.Add(hitCircle));
+            AddAssert("event not received", () => changedObject == null);
 
-            hitCircle.StartTime = 1000;
-            Assert.That(changedObject, Is.EqualTo(hitCircle));
+            AddStep("change start time", () => hitCircle.StartTime = 1000);
+            AddAssert("event received", () => changedObject == hitCircle);
         }
 
         /// <summary>
