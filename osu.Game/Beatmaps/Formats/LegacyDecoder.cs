@@ -41,6 +41,7 @@ namespace osu.Game.Beatmaps.Formats
                         section = Section.None;
                     }
 
+                    OnBeginNewSection(section);
                     continue;
                 }
 
@@ -57,6 +58,14 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
+        /// <summary>
+        /// Invoked when a new <see cref="Section"/> has been entered.
+        /// </summary>
+        /// <param name="section">The entered <see cref="Section"/>.</param>
+        protected virtual void OnBeginNewSection(Section section)
+        {
+        }
+
         protected virtual void ParseLine(T output, Section section, string line)
         {
             line = StripComments(line);
@@ -64,7 +73,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (section)
             {
                 case Section.Colours:
-                    handleColours(output, line);
+                    HandleColours(output, line);
                     return;
             }
         }
@@ -78,7 +87,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        private void handleColours(T output, string line)
+        protected void HandleColours<TModel>(TModel output, string line)
         {
             var pair = SplitKeyVal(line);
 
@@ -139,7 +148,8 @@ namespace osu.Game.Beatmaps.Formats
             Colours,
             HitObjects,
             Variables,
-            Fonts
+            Fonts,
+            Mania
         }
 
         internal class LegacyDifficultyControlPoint : DifficultyControlPoint

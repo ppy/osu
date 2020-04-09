@@ -3,20 +3,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneFruitObjects : SkinnableTestScene
+    public class TestSceneFruitObjects : CatchSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(CatchHitObject),
             typeof(Fruit),
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(DrawableBanana),
             typeof(DrawableBananaShower),
             typeof(Pulp),
-        };
+        }).ToList();
 
         protected override void LoadComplete()
         {

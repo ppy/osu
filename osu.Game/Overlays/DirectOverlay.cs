@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
@@ -34,9 +35,9 @@ namespace osu.Game.Overlays
         private readonly OsuSpriteText resultCountsText;
         private FillFlowContainer<DirectPanel> panels;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
-        protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
-        protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"485e74");
+        protected override Color4 TrianglesColourLight => Color4Extensions.FromHex(@"465b71");
+        protected override Color4 TrianglesColourDark => Color4Extensions.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();

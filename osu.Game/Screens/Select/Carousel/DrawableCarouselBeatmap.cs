@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -69,8 +70,8 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     TriangleScale = 2,
                     RelativeSizeAxes = Axes.Both,
-                    ColourLight = OsuColour.FromHex(@"3a7285"),
-                    ColourDark = OsuColour.FromHex(@"123744")
+                    ColourLight = Color4Extensions.FromHex(@"3a7285"),
+                    ColourDark = Color4Extensions.FromHex(@"123744")
                 },
                 new FillFlowContainer
                 {
@@ -121,10 +122,24 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                     }
                                 },
-                                starCounter = new StarCounter
+                                new FillFlowContainer
                                 {
-                                    CountStars = (float)beatmap.StarDifficulty,
-                                    Scale = new Vector2(0.8f),
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4, 0),
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new TopLocalRank(beatmap)
+                                        {
+                                            Scale = new Vector2(0.8f),
+                                            Size = new Vector2(40, 20)
+                                        },
+                                        starCounter = new StarCounter
+                                        {
+                                            Current = (float)beatmap.StarDifficulty,
+                                            Scale = new Vector2(0.8f),
+                                        }
+                                    }
                                 }
                             }
                         }

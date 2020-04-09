@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
         }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         private void confirmAndExit()
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Menu
             if (exitConfirmed) return;
 
             exitConfirmed = true;
-            game.PerformFromScreen(menu => menu.Exit());
+            game?.PerformFromScreen(menu => menu.Exit());
         }
 
         private void preloadSongSelect()
@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"Good bye",
+                        Text = @"Goodbye",
                         Action = confirm
                     },
                     new PopupDialogCancelButton

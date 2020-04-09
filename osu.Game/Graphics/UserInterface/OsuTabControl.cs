@@ -113,13 +113,13 @@ namespace osu.Game.Graphics.UserInterface
 
             private const float transition_length = 500;
 
-            private void fadeActive()
+            protected void FadeHovered()
             {
                 Bar.FadeIn(transition_length, Easing.OutQuint);
                 Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
             }
 
-            private void fadeInactive()
+            protected void FadeUnhovered()
             {
                 Bar.FadeOut(transition_length, Easing.OutQuint);
                 Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
@@ -128,14 +128,14 @@ namespace osu.Game.Graphics.UserInterface
             protected override bool OnHover(HoverEvent e)
             {
                 if (!Active.Value)
-                    fadeActive();
+                    FadeHovered();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (!Active.Value)
-                    fadeInactive();
+                    FadeUnhovered();
             }
 
             [BackgroundDependencyLoader]
@@ -172,13 +172,19 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     new HoverClickSounds()
                 };
-
-                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
-            protected override void OnActivated() => fadeActive();
+            protected override void OnActivated()
+            {
+                Text.Font = Text.Font.With(weight: FontWeight.Bold);
+                FadeHovered();
+            }
 
-            protected override void OnDeactivated() => fadeInactive();
+            protected override void OnDeactivated()
+            {
+                Text.Font = Text.Font.With(weight: FontWeight.Medium);
+                FadeUnhovered();
+            }
         }
     }
 }
