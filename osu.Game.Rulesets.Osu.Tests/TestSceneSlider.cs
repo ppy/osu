@@ -22,12 +22,11 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSlider : SkinnableTestScene
+    public class TestSceneSlider : OsuSkinnableTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
