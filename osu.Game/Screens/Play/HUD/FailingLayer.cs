@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public double LowHealthThreshold = 0.20f;
 
+        private const float gradient_size = 0.3f;
+
         private readonly Container boxes;
 
         public FailingLayer()
@@ -51,12 +53,12 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0)),
-                            Height = 0.2f,
+                            Height = gradient_size,
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Height = 0.2f,
+                            Height = gradient_size,
                             Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0), Color4.White),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
