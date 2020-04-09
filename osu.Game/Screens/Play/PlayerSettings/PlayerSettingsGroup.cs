@@ -31,7 +31,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly FillFlowContainer content;
         private readonly IconButton button;
 
-        private bool optUIEnabled = false;
         private bool expanded = true;
 
         public bool Expanded
@@ -54,17 +53,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 updateExpanded();
-            }
-        }
-
-        public bool OptUIEnabled
-        {
-            get => optUIEnabled;
-            set
-            {
-                if (optUIEnabled == value) return;
-
-                optUIEnabled = value;
             }
         }
 
@@ -146,8 +134,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (optUIEnabled == true)
-                this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)

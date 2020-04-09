@@ -6,14 +6,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.CustomMenu
+namespace osu.Game.Overlays.MfMenu
 {
-    public class CustomMenuContent : FillFlowContainer
+    public class MfMenuContent : FillFlowContainer
     {
         public const float HORIZONTAL_PADDING = 30;
         private const float transition_time = 400;
 
-        public CustomMenuContent()
+        public MfMenuContent()
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
             RelativeSizeAxes = Axes.X;

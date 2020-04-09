@@ -47,18 +47,28 @@ namespace osu.Game.Graphics.Mf.Resources
             OptUIEnabled = config.GetBindable<bool>(OsuSetting.OptUI);
             parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
 
-            OptUIEnabled.ValueChanged += _ => UpdateVisualEffect();
-            parallaxEnabled.ValueChanged += _ => UpdateVisualEffect();
+            OptUIEnabled.ValueChanged += delegate
+            {
+                if (!OptUIEnabled.Value)
+                {
+                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
+                    content.Scale = new Vector2(1 + Math.Abs(ParallaxAmount));
+                }
+                UpdateVisualEffect();
+            };
+            parallaxEnabled.ValueChanged += delegate
+            {
+                if (!parallaxEnabled.Value)
+                {
+                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
+                    content.Scale = new Vector2(1 + Math.Abs(ParallaxAmount));
+                }
+                UpdateVisualEffect();
+            };
         }
 
         private void UpdateVisualEffect()
         {
-            if (!parallaxEnabled.Value || !OptUIEnabled.Value)
-            {
-                content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
-                content.Scale = new Vector2(1 + Math.Abs(ParallaxAmount));
-            };
-
             if (parallaxEnabled.Value && OptUIEnabled.Value)
             {
                 Vector2 offset = (input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.Position) - DrawSize / 2) * ParallaxAmount;

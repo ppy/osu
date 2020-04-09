@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             InternalChild = scaleContainer = new ReverseArrowPiece();

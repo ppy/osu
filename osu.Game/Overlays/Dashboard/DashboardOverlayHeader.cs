@@ -2,23 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
-using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    public class DashboardOverlayHeader : TabControlOverlayHeader<HomeOverlayTabs>
+    public class DashboardOverlayHeader : TabControlOverlayHeaderCN<HomeOverlayTabs>
     {
-        protected override ScreenTitle CreateTitle() => new DashboardTitle();
+        protected override OverlayTitle CreateTitle() => new DashboardTitle();
 
-        private class DashboardTitle : ScreenTitle
+        private class DashboardTitle : OverlayTitle
         {
             public DashboardTitle()
             {
                 Title = "看板";
+                IconTexture = "Icons/changelog";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 

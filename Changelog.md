@@ -382,8 +382,22 @@
 *   更新framework至2020.407.0以修复storyboard尺寸问题
 
 ### 2020/04/08
-    *   合并上游pr
-        *   [m] [Fix legacy skin texture fallback logic #8669]
-        *   [m] [Increase size of default osu!mania skin's keys to allow clearance with HUD #8674]
-        *   [m] [Fix dragging tournament ladder too far causing it to disappear #8673]
-        *   [m] [Add osu!taiko drum skinning support #8598]
+*   合并上游pr
+    *   [m] [Fix legacy skin texture fallback logic #8669]
+    *   [m] [Increase size of default osu!mania skin's keys to allow clearance with HUD #8674]
+    *   [m] [Fix dragging tournament ladder too far causing it to disappear #8673]
+    *   [m] [Add osu!taiko drum skinning support #8598]
+
+### 2020/04/09
+*   合并上游pr
+    *   [m] [!未合并tests] [Fix TestSceneColumn columns not getting a width #8679]
+    *   [m] [Fix slider ball and follow circle blending for legacy skins #8680]
+    *   [m] [!未合并tests] [Fix osu!taiko input drum alignment for old skin versions #8681]
+    *   [m] [!未合并tests] [Fix hidden notes due to 0 minimum width #8677]
+    *   [m] [Add top rank to the beatmap carousel #7639]
+    *   [m] [Don't allow new transformations for reverse arrow after it's hit #8626]
+    *   [m] [Implement mania stage bottom/left/right images #8676]
+    *   [m] [Update overlay header elements to match osu-web #8454]
+
+*   翻译调整
+*   界面bug修复

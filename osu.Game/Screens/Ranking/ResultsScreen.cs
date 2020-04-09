@@ -147,8 +147,62 @@ namespace osu.Game.Screens.Ranking
         protected override void LoadComplete()
         {
             bottomPanel.panel_IsHovered.ValueChanged += _ => UpdateVisualEffects();
+            UpdateRankTexts();
             base.LoadComplete();
         }
+
+        private void UpdateRankTexts()
+        {
+                switch ( Score.Rank )
+                {
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        texts.Text = RandomTextXH();
+                        break;
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                        texts.Text = RandomTextS();
+                        break;
+
+                    case ScoreRank.A:
+                        texts.Text = "快要到了, 继续努力!";
+                        break;
+
+                    case ScoreRank.B:
+                    case ScoreRank.C:
+                    case ScoreRank.D:
+                        texts.Text = "加油, 你一定能行!";
+                        break;
+
+                    default:
+                        texts.Text = "???";
+                        break;
+                }
+        }
+        private string RandomTextXH() //基于Disclaimer
+        {
+            string[] texts =
+            {
+                "恭喜达成SS!",
+                "去挑战top榜吧!",
+                "OHHHHHHHHHHHHH",
+            };
+
+            return texts[RNG.Next(0, texts.Length)];
+        }
+
+        private string RandomTextS()
+        {
+            string[] texts =
+            {
+                "虽然有点难, 但你克服了几乎所有的挑战!",
+                "离SS只有咫尺之遥!",
+            };
+
+            return texts[RNG.Next(0, texts.Length)];
+        }
+
 
         private void UpdateVisualEffects()
         {
@@ -159,32 +213,6 @@ namespace osu.Game.Screens.Ranking
                     bottomPanel.ResizeHeightTo(BOTTOMPANEL_SIZE.Y + 30, DURATION, Easing.OutQuint);
                     buttons.MoveToY(20, DURATION, Easing.OutQuint);
                     colorBox.FadeColour( Color4Extensions.FromHex("#2d2d2d"), DURATION);
-                    switch ( Score.Rank )
-                    {
-                        case ScoreRank.X:
-                        case ScoreRank.XH:
-                            texts.Text = "加入俱乐部吧, 我们需要你这样的人!";
-                            break;
-
-                        case ScoreRank.S:
-                        case ScoreRank.SH:
-                            texts.Text = "虽然有点难, 但你克服了几乎所有的挑战!";
-                            break;
-
-                        case ScoreRank.A:
-                            texts.Text = "快要到了, 继续努力!";
-                            break;
-
-                        case ScoreRank.B:
-                        case ScoreRank.C:
-                        case ScoreRank.D:
-                            texts.Text = "加油, 你一定能行!";
-                            break;
-
-                        default:
-                            texts.Text = "???";
-                            break;
-                    }
                     texts.FadeIn(DURATION).MoveToY(-23, DURATION, Easing.OutQuint);
                     break;
 
@@ -197,16 +225,6 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private string getRandomText() //之后会用上, 取自Disclaimer
-        {
-            string[] texts =
-            {
-                "句子1",
-                "句子2",
-            };
-
-            return texts[RNG.Next(0, texts.Length)];
-        }
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);

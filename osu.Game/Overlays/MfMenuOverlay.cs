@@ -2,23 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.CustomMenu;
-using osuTK;
-using osuTK.Graphics;
+using osu.Game.Overlays.MfMenu;
 
 namespace osu.Game.Overlays
 {
-    public class CustomMenuOverlay : FullscreenOverlay
+    public class MfMenuOverlay : FullscreenOverlay
     {
-        protected CustomMenuHeader Header;
+        protected MfMenuHeader Header;
 
-        public CustomMenuOverlay()
+        public MfMenuOverlay()
             : base(OverlayColourScheme.Orange)
         {
 
@@ -40,14 +35,14 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new CustomMenuHeader(),
+                            new MfMenuHeader(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    new CustomMenuTexts(),
+                                    new MfMenuTexts(),
                                 }
                             }
                         }

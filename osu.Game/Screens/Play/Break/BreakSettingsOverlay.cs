@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
                 Margin = new MarginPadding { Top = 100, Right = 10 },
                 Children = new PlayerSettingsGroup[]
                 {
-                    VisualSettings = new VisualSettings { Expanded = false , OptUIEnabled = Optui.Value }
+                    VisualSettings = new VisualSettings { Expanded = false}
                 }
             };
         }

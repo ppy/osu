@@ -81,6 +81,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                         case ManiaSkinComponents.HitExplosion:
                             return new LegacyHitExplosion();
+
+                        case ManiaSkinComponents.StageBackground:
+                            return new LegacyStageBackground();
+
+                        case ManiaSkinComponents.StageForeground:
+                            return new LegacyStageForeground();
                     }
 
                     break;

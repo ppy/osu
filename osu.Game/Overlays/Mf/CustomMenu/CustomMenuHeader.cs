@@ -2,24 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.CustomMenu
+namespace osu.Game.Overlays.MfMenu
 {
-    public class CustomMenuHeader : OverlayHeader
+    public class MfMenuHeader : OverlayHeader
     {
         protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/search");
-        protected override ScreenTitle CreateTitle() => new CustomMenuTitle();
+        protected override OverlayTitle CreateTitle() => new MfMenuTitle();
 
-        private class CustomMenuTitle : ScreenTitle
+        private class MfMenuTitle : OverlayTitle
         {
-            public CustomMenuTitle()
+            public MfMenuTitle()
             {
-                Title = @"关于Mf-osu";
-                Section = @"页面";
+                Title = "关于Mf-osu 页面";
+                IconTexture = "Icons/news";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
 
         }
     }
