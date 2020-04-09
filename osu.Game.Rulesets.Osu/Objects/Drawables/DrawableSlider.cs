@@ -6,7 +6,6 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -26,12 +25,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly SliderBall Ball;
         public readonly SkinnableDrawable Body;
 
+        public override bool DisplayResult => false;
+
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
         private readonly Container<DrawableSliderHead> headContainer;
         private readonly Container<DrawableSliderTail> tailContainer;
         private readonly Container<DrawableSliderTick> tickContainer;
-        private readonly Container<DrawableRepeatPoint> repeatContainer;
+        private readonly Container<DrawableSliderRepeat> repeatContainer;
 
         private readonly Slider slider;
 
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
-                repeatContainer = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
+                repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
@@ -100,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     tickContainer.Add(tick);
                     break;
 
-                case DrawableRepeatPoint repeat:
+                case DrawableSliderRepeat repeat:
                     repeatContainer.Add(repeat);
                     break;
             }
@@ -129,8 +130,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case SliderTick tick:
                     return new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
 
-                case RepeatPoint repeat:
-                    return new DrawableRepeatPoint(repeat, this) { Position = repeat.Position - slider.Position };
+                case SliderRepeat repeat:
+                    return new DrawableSliderRepeat(repeat, this) { Position = repeat.Position - slider.Position };
             }
 
             return base.CreateNestedHitObject(hitObject);
@@ -185,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplySkin(skin, allowFallback);
 
             bool allowBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
-            Ball.Colour = allowBallTint ? AccentColour.Value : Color4.White;
+            Ball.AccentColour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -193,22 +194,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < slider.EndTime)
                 return;
 
-            ApplyResult(r =>
-            {
-                var judgementsCount = NestedHitObjects.Count;
-                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
+            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+        }
 
-                var hitFraction = (double)judgementsHit / judgementsCount;
-
-                if (hitFraction == 1 && HeadCircle.Result.Type == HitResult.Great)
-                    r.Type = HitResult.Great;
-                else if (hitFraction >= 0.5 && HeadCircle.Result.Type >= HitResult.Good)
-                    r.Type = HitResult.Good;
-                else if (hitFraction > 0)
-                    r.Type = HitResult.Meh;
-                else
-                    r.Type = HitResult.Miss;
-            });
+        public override void PlaySamples()
+        {
+            // rather than doing it this way, we should probably attach the sample to the tail circle.
+            // this can only be done after we stop using LegacyLastTick.
+            if (TailCircle.Result.Type != HitResult.Miss)
+                base.PlaySamples();
         }
 
         protected override void UpdateStateTransforms(ArmedState state)

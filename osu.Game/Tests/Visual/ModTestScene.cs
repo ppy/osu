@@ -57,8 +57,10 @@ namespace osu.Game.Tests.Visual
 
             SelectedMods.Value = mods;
 
-            return new ModTestPlayer(AllowFail);
+            return CreateModPlayer(ruleset);
         }
+
+        protected virtual TestPlayer CreateModPlayer(Ruleset ruleset) => new ModTestPlayer(AllowFail);
 
         protected class ModTestPlayer : TestPlayer
         {

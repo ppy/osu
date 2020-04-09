@@ -27,6 +27,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -36,7 +37,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : ManualInputManagerTestScene
+    public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -203,7 +204,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if the visual settings container removes user dim when suspending <see cref="Player"/> for <see cref="SoloResults"/>
+        /// Check if the visual settings container removes user dim when suspending <see cref="Player"/> for <see cref="ResultsScreen"/>
         /// </summary>
         [Test]
         public void TransitionTest()
@@ -277,6 +278,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private void setupUserSettings()
         {
+            AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
             AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
@@ -335,7 +337,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBackgroundCurrent() => ((FadeAccessibleBackground)Background).IsCurrentScreen();
         }
 
-        private class FadeAccessibleResults : SoloResults
+        private class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score)

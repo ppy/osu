@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Sprites;
@@ -12,7 +13,8 @@ namespace osu.Game.Skinning
 {
     public static class LegacySkinExtensions
     {
-        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-")
+        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
+                                            bool startAtCurrentTime = true, double? frameLength = null)
         {
             Texture texture;
 
@@ -22,10 +24,10 @@ namespace osu.Game.Skinning
 
                 if (textures.Length > 0)
                 {
-                    var animation = new TextureAnimation
+                    var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
-                        DefaultFrameLength = getFrameLength(source, applyConfigFrameRate, textures),
-                        Repeat = looping,
+                        DefaultFrameLength = frameLength ?? getFrameLength(source, applyConfigFrameRate, textures),
+                        Loop = looping,
                     };
 
                     foreach (var t in textures)
@@ -53,6 +55,28 @@ namespace osu.Game.Skinning
             }
         }
 
+        public class SkinnableTextureAnimation : TextureAnimation
+        {
+            [Resolved(canBeNull: true)]
+            private IAnimationTimeReference timeReference { get; set; }
+
+            public SkinnableTextureAnimation(bool startAtCurrentTime = true)
+                : base(startAtCurrentTime)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (timeReference != null)
+                {
+                    Clock = timeReference.Clock;
+                    PlaybackPosition = timeReference.Clock.CurrentTime - timeReference.AnimationStartTime;
+                }
+            }
+        }
+
         private const double default_frame_time = 1000 / 60d;
 
         private static double getFrameLength(ISkin source, bool applyConfigFrameRate, Texture[] textures)
@@ -61,7 +85,7 @@ namespace osu.Game.Skinning
             {
                 var iniRate = source.GetConfig<GlobalSkinConfiguration, int>(GlobalSkinConfiguration.AnimationFramerate);
 
-                if (iniRate != null)
+                if (iniRate?.Value > 0)
                     return 1000f / iniRate.Value;
 
                 return 1000f / textures.Length;

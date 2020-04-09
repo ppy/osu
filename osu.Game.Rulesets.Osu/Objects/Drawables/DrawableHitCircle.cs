@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly SkinnableDrawable CirclePiece;
         private readonly Container scaleContainer;
 
+        protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece()),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -170,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => ApproachCircle;
 
-        public class HitReceptor : Drawable, IKeyBindingHandler<OsuAction>
+        public class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
         {
             // IsHovered is used
             public override bool HandlePositionalInput => true;
@@ -185,6 +187,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
+
+                CornerRadius = OsuHitObject.OBJECT_RADIUS;
+                CornerExponent = 2;
             }
 
             public bool OnPressed(OsuAction action)
