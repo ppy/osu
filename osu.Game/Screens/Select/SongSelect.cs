@@ -795,9 +795,9 @@ namespace osu.Game.Screens.Select
             [Resolved]
             private RulesetStore rulesets { get; set; }
 
-            private Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
+            private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
 
-            private int pendingAPIRequests = 0;
+            private int pendingAPIRequests;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -811,6 +811,7 @@ namespace osu.Game.Screens.Select
                     return;
                 if (api.LocalUser.Value is GuestUser)
                     return;
+
                 rulesets.AvailableRulesets.ForEach(rulesetInfo =>
                 {
                     var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);

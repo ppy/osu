@@ -23,9 +23,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
-using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Screens.Select
 {
