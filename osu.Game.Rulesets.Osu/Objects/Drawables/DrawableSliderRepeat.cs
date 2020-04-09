@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             InternalChild = scaleContainer = new ReverseArrowPiece();
@@ -87,6 +86,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
+            // When the repeat is hit, the arrow should fade out on spot rather than following the slider
+            if (IsHit) return;
+
             bool isRepeatAtEnd = sliderRepeat.RepeatIndex % 2 == 0;
             List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
 
