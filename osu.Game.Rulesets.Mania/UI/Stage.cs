@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
@@ -72,11 +71,9 @@ namespace osu.Game.Rulesets.Mania.UI
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new Box
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground), _ => new DefaultStageBackground())
                         {
-                            Name = "Background",
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black
+                            RelativeSizeAxes = Axes.Both
                         },
                         columnFlow = new FillFlowContainer<Column>
                         {
@@ -102,6 +99,10 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
                             }
+                        },
+                        new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground), _ => null)
+                        {
+                            RelativeSizeAxes = Axes.Both
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
