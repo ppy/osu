@@ -21,7 +21,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -78,8 +77,6 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, TimeRange);
-
-            Overlays.Add(new FailingLayer());
         }
 
         protected override void AdjustScrollSpeed(int amount)
