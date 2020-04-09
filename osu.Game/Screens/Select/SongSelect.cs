@@ -498,11 +498,12 @@ namespace osu.Game.Screens.Select
 
         internal bool IsRecommended(BeatmapInfo beatmap)
         {
-            IEnumerable<BeatmapInfo> beatmaps = beatmap.BeatmapSet.Beatmaps;
-            BeatmapInfo recommended = difficultyRecommender.GetRecommendedBeatmap(beatmaps, decoupledRuleset.Value);
+            BeatmapInfo recommended = difficultyRecommender.GetRecommendedBeatmap(beatmap.BeatmapSet.Beatmaps, decoupledRuleset.Value);
             double? recommendedStarDifficulty = difficultyRecommender.GetRecommendedStarDifficulty(decoupledRuleset.Value);
+
             if (recommendedStarDifficulty == null)
                 return false;
+
             return beatmap == recommended && Math.Abs(beatmap.StarDifficulty - recommendedStarDifficulty.Value) < 0.5;
         }
 
@@ -859,6 +860,7 @@ namespace osu.Game.Screens.Select
             {
                 if (!recommendedStarDifficulty.ContainsKey(currentRuleset))
                     return null;
+
                 return recommendedStarDifficulty[currentRuleset];
             }
         }
