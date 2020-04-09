@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -29,9 +30,9 @@ namespace osu.Game.Screens.Edit
         public event Action<HitObject> HitObjectRemoved;
 
         /// <summary>
-        /// Invoked when the start time of a <see cref="HitObject"/> in this <see cref="EditorBeatmap"/> was changed.
+        /// Invoked when a <see cref="HitObject"/> is updated.
         /// </summary>
-        public event Action<HitObject> StartTimeChanged;
+        public event Action<HitObject> HitObjectUpdated;
 
         /// <summary>
         /// All currently selected <see cref="HitObject"/>s.
@@ -68,7 +69,9 @@ namespace osu.Game.Screens.Edit
         /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void UpdateHitObject(HitObject hitObject)
+        public void UpdateHitObject([NotNull] HitObject hitObject) => updateHitObject(hitObject, false);
+
+        private void updateHitObject([CanBeNull] HitObject hitObject, bool silent)
         {
             scheduledUpdate?.Cancel();
             scheduledUpdate = Scheduler.AddDelayed(() =>
@@ -76,6 +79,9 @@ namespace osu.Game.Screens.Edit
                 beatmapProcessor?.PreProcess();
                 hitObject?.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
                 beatmapProcessor?.PostProcess();
+
+                if (!silent)
+                    HitObjectUpdated?.Invoke(hitObject);
             }, 0);
         }
 
@@ -114,6 +120,8 @@ namespace osu.Game.Screens.Edit
             mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
             HitObjectAdded?.Invoke(hitObject);
+
+            updateHitObject(hitObject, true);
         }
 
         /// <summary>
@@ -132,6 +140,8 @@ namespace osu.Game.Screens.Edit
 
             startTimeBindables.Remove(hitObject);
             HitObjectRemoved?.Invoke(hitObject);
+
+            updateHitObject(null, true);
         }
 
         private void trackStartTime(HitObject hitObject)
@@ -145,7 +155,7 @@ namespace osu.Game.Screens.Edit
                 var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
                 mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
-                StartTimeChanged?.Invoke(hitObject);
+                UpdateHitObject(hitObject);
             };
         }
 
