@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
@@ -13,7 +12,7 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
-        private Func<IEnumerable<BeatmapInfo>, BeatmapInfo> getRecommendedBeatmap;
+        private readonly Func<IEnumerable<BeatmapInfo>, BeatmapInfo> getRecommendedBeatmap;
 
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (LastSelected == null)
             {
                 var recommendedBeatmapInfo = getRecommendedBeatmap(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap));
-                return Children.OfType<CarouselBeatmap>().Where(b => b.Beatmap == recommendedBeatmapInfo).First();
+                return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommendedBeatmapInfo);
             }
 
             return base.GetNextToSelect();
