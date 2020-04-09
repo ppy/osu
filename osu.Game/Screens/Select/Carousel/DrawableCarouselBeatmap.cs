@@ -122,10 +122,24 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                     }
                                 },
-                                starCounter = new StarCounter
+                                new FillFlowContainer
                                 {
-                                    Current = (float)beatmap.StarDifficulty,
-                                    Scale = new Vector2(0.8f),
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4, 0),
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new TopLocalRank(beatmap)
+                                        {
+                                            Scale = new Vector2(0.8f),
+                                            Size = new Vector2(40, 20)
+                                        },
+                                        starCounter = new StarCounter
+                                        {
+                                            Current = (float)beatmap.StarDifficulty,
+                                            Scale = new Vector2(0.8f),
+                                        }
+                                    }
                                 }
                             }
                         }
