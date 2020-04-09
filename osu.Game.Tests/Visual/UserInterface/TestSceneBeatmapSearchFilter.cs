@@ -20,8 +20,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(BeatmapSearchFilterRow<>),
-            typeof(BeatmapSearchRulesetFilterRow),
-            typeof(BeatmapSearchSmallFilterRow<>),
+            typeof(BeatmapSearchRulesetFilterRow)
         };
 
         [Cached]
@@ -43,7 +42,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new BeatmapSearchRulesetFilterRow(),
                     new BeatmapSearchFilterRow<BeatmapSearchCategory>("Categories"),
-                    new BeatmapSearchSmallFilterRow<BeatmapSearchCategory>("Header Name")
+                    new BeatmapSearchFilterRow<BeatmapSearchCategory>("Header Name")
                 }
             });
         }
