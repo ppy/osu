@@ -212,6 +212,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
             {
                 // Make sure there isn't already an existing sample
@@ -220,6 +222,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 h.Samples.Add(new HitSampleInfo { Name = sampleName });
             }
+
+            changeHandler?.EndChange();
         }
 
         /// <summary>
@@ -228,8 +232,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
