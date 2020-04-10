@@ -63,6 +63,7 @@ namespace osu.Game.Screens.Edit
                 trackStartTime(obj);
         }
 
+        private readonly HashSet<HitObject> pendingUpdates = new HashSet<HitObject>();
         private ScheduledDelegate scheduledUpdate;
 
         /// <summary>
@@ -74,15 +75,27 @@ namespace osu.Game.Screens.Edit
         private void updateHitObject([CanBeNull] HitObject hitObject, bool silent)
         {
             scheduledUpdate?.Cancel();
-            scheduledUpdate = Scheduler.AddDelayed(() =>
+
+            if (hitObject != null)
+                pendingUpdates.Add(hitObject);
+
+            scheduledUpdate = Schedule(() =>
             {
                 beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+
+                foreach (var obj in pendingUpdates)
+                    obj.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+
                 beatmapProcessor?.PostProcess();
 
                 if (!silent)
-                    HitObjectUpdated?.Invoke(hitObject);
-            }, 0);
+                {
+                    foreach (var obj in pendingUpdates)
+                        HitObjectUpdated?.Invoke(obj);
+                }
+
+                pendingUpdates.Clear();
+            });
         }
 
         public BeatmapInfo BeatmapInfo
