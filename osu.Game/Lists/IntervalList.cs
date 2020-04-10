@@ -13,6 +13,7 @@ namespace osu.Game.Lists
     /// </summary>
     /// <typeparam name="T">The type of interval values.</typeparam>
     public class IntervalList<T> : ICollection<Interval<T>>, IReadOnlyList<Interval<T>>
+        where T : struct, IConvertible
     {
         private static readonly IComparer<T> type_comparer = Comparer<T>.Default;
 
@@ -103,6 +104,7 @@ namespace osu.Game.Lists
     }
 
     public readonly struct Interval<T>
+        where T : struct, IConvertible
     {
         /// <summary>
         /// The start value of this interval.
