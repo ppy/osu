@@ -116,10 +116,11 @@ namespace osu.Game.Lists
 
         public Interval(T start, T end)
         {
-            bool startLessThanEnd = Comparer<T>.Default.Compare(start, end) < 0;
+            if (Comparer<T>.Default.Compare(start, end) >= 0)
+                throw new ArgumentException($"Invalid interval, {nameof(start)} must be less than {nameof(end)}", nameof(start));
 
-            Start = startLessThanEnd ? start : end;
-            End = startLessThanEnd ? end : start;
+            Start = start;
+            End = end;
         }
     }
 }

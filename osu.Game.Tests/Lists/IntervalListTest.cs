@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Lists;
 
@@ -14,7 +15,7 @@ namespace osu.Game.Tests.Lists
         {
             (-9.1d, -8.3d),
             (-3.4d, 2.1d),
-            (50.0d, 9.0d), // intentionally reversing interval.
+            (9.0d, 50.0d),
             (5.25d, 10.50d),
         };
 
@@ -103,39 +104,12 @@ namespace osu.Game.Tests.Lists
         }
 
         [Test]
-        public void TestCheckIntervalIndexOnChecks()
+        public void TestReversedIntervalThrows()
         {
-            var list = new TestIntervalList { { 1.0d, 2.0d }, { 3.0d, 4.0d }, { 5.0d, 6.0d }, { 7.0d, 8.0d } };
+            var list = new IntervalList<int>();
 
-            Assert.IsTrue(list.IsInAnyInterval(1.5d));
-            Assert.IsTrue(list.NearestIntervalIndex == 0);
-
-            Assert.IsTrue(list.IsInAnyInterval(5.5d));
-            Assert.IsTrue(list.NearestIntervalIndex == 2);
-
-            Assert.IsTrue(list.IsInAnyInterval(7.5d));
-            Assert.IsTrue(list.NearestIntervalIndex == 3);
-        }
-
-        [Test]
-        public void TestCheckIntervalIndexOnOutOfIntervalsChecks()
-        {
-            var list = new TestIntervalList { { 1.0d, 2.0d }, { 3.0d, 4.0d }, { 5.0d, 6.0d }, { 7.0d, 8.0d } };
-
-            Assert.IsFalse(list.IsInAnyInterval(4.5d));
-            Assert.IsTrue(list.NearestIntervalIndex == 1 ||
-                          list.NearestIntervalIndex == 2); // 4.5 in between 3.0-4.0 and 5.0-6.0
-
-            Assert.IsFalse(list.IsInAnyInterval(9.0d));
-            Assert.IsTrue(list.NearestIntervalIndex == 3); // 9.0 goes above 7.0-8.0
-
-            Assert.IsFalse(list.IsInAnyInterval(0.0d));
-            Assert.IsTrue(list.NearestIntervalIndex == 0); // 0.0 goes below 1.0-2.0
-        }
-
-        private class TestIntervalList : IntervalList<double>
-        {
-            public new int NearestIntervalIndex => base.NearestIntervalIndex;
+            Assert.Throws<ArgumentException>(() => list.Add(50, 25));
+            Assert.Throws<ArgumentException>(() => list.Add(new Interval<int>(50, 25)));
         }
     }
 }
