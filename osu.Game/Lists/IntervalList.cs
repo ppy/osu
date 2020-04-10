@@ -12,7 +12,7 @@ namespace osu.Game.Lists
     /// Represents a list of intervals that can be used for whether a specific value falls into one of them.
     /// </summary>
     /// <typeparam name="T">The type of interval values.</typeparam>
-    public class IntervalList<T> : ICollection<Interval<T>>, IReadOnlyList<Interval<T>>
+    public class IntervalList<T> : IEnumerable<Interval<T>>
         where T : struct, IConvertible
     {
         private static readonly IComparer<T> type_comparer = Comparer<T>.Default;
@@ -20,6 +20,11 @@ namespace osu.Game.Lists
         private readonly SortedList<Interval<T>> intervals = new SortedList<Interval<T>>((x, y) => type_comparer.Compare(x.Start, y.Start));
         private int nearestIndex;
 
+        public Interval<T> this[int i]
+        {
+            get => intervals[i];
+            set => intervals[i] = value;
+        }
 
         /// <summary>
         /// Whether the provided value is in any interval added to this list.
@@ -58,12 +63,6 @@ namespace osu.Game.Lists
         /// <param name="end">The end value of the interval.</param>
         public void Add(T start, T end) => Add(new Interval<T>(start, end));
 
-        #region ICollection<Interval<T>>
-
-        public int Count => intervals.Count;
-
-        bool ICollection<Interval<T>>.IsReadOnly => false;
-
         /// <summary>
         /// Adds a new interval to the list
         /// </summary>
@@ -82,25 +81,9 @@ namespace osu.Game.Lists
         /// </summary>
         public void Clear() => intervals.Clear();
 
-        public void CopyTo(Interval<T>[] array, int arrayIndex) => intervals.CopyTo(array, arrayIndex);
-
-        public bool Contains(Interval<T> item) => intervals.Contains(item);
-
         public IEnumerator<Interval<T>> GetEnumerator() => intervals.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        #endregion
-
-        #region IReadOnlyList<Interval<T>>
-
-        public Interval<T> this[int index]
-        {
-            get => intervals[index];
-            set => intervals[index] = value;
-        }
-
-        #endregion
     }
 
     public readonly struct Interval<T>
