@@ -17,11 +17,8 @@ namespace osu.Game.Lists
         private static readonly IComparer<T> type_comparer = Comparer<T>.Default;
 
         private readonly SortedList<Interval<T>> intervals = new SortedList<Interval<T>>((x, y) => type_comparer.Compare(x.Start, y.Start));
+        private int nearestIndex;
 
-        /// <summary>
-        /// The index of the nearest interval from last <see cref="IsInAnyInterval"/> call.
-        /// </summary>
-        protected int NearestIntervalIndex;
 
         /// <summary>
         /// Whether the provided value is in any interval added to this list.
@@ -34,20 +31,20 @@ namespace osu.Game.Lists
 
             // Clamp the nearest index in case there were intervals
             // removed from the list causing the index to go out of range.
-            NearestIntervalIndex = Math.Clamp(NearestIntervalIndex, 0, Count - 1);
+            nearestIndex = Math.Clamp(nearestIndex, 0, intervals.Count - 1);
 
-            if (type_comparer.Compare(value, this[NearestIntervalIndex].End) > 0)
+            if (type_comparer.Compare(value, this[nearestIndex].End) > 0)
             {
-                while (type_comparer.Compare(value, this[NearestIntervalIndex].End) > 0 && NearestIntervalIndex < Count - 1)
-                    NearestIntervalIndex++;
+                while (type_comparer.Compare(value, this[nearestIndex].End) > 0 && nearestIndex < intervals.Count - 1)
+                    nearestIndex++;
             }
             else
             {
-                while (type_comparer.Compare(value, this[NearestIntervalIndex].Start) < 0 && NearestIntervalIndex > 0)
-                    NearestIntervalIndex--;
+                while (type_comparer.Compare(value, this[nearestIndex].Start) < 0 && nearestIndex > 0)
+                    nearestIndex--;
             }
 
-            var nearestInterval = this[NearestIntervalIndex];
+            var nearestInterval = this[nearestIndex];
 
             return type_comparer.Compare(value, nearestInterval.Start) >= 0 &&
                    type_comparer.Compare(value, nearestInterval.End) <= 0;
