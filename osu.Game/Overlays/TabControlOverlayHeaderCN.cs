@@ -90,8 +90,8 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.GetDescription().ToString().ToLower();
-                    Text.Font = OsuFont.GetFont(size: 18);
-                    Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
+                    Text.Font = OsuFont.GetFont(size: 20);
+                    Text.Margin = new MarginPadding { Vertical = 15.5f }; // 15px padding + 1.5px line-height difference compensation
                     Bar.Margin = new MarginPadding { Bottom = bar_height };
                 }
             }

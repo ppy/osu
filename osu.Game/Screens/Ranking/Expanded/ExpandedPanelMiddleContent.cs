@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Text = beatmap.Version,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
-                                    new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
+                                    new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 16))
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
+                        Spacing = new Vector2(0, 2.5f),
                         Children = new Drawable[]
                         {
                             new GridContainer
