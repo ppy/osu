@@ -20,6 +20,8 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Testing;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
@@ -35,6 +37,8 @@ namespace osu.Game.Tests.Visual
         protected Bindable<IReadOnlyList<Mod>> SelectedMods;
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
+
+        private DrawableRulesetDependencies rulesetDependencies;
 
         private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
@@ -64,7 +68,12 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new OsuScreenDependencies(false, base.CreateChildDependencies(parent));
+            var baseDependencies = base.CreateChildDependencies(parent);
+
+            if (this is IRulesetTestScene rts)
+                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(rts.CreateRuleset(), baseDependencies);
+
+            Dependencies = new OsuScreenDependencies(false, baseDependencies);
 
             Beatmap = Dependencies.Beatmap;
             Beatmap.SetDefault();
@@ -141,6 +150,8 @@ namespace osu.Game.Tests.Visual
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            rulesetDependencies?.Dispose();
 
             if (Beatmap?.Value.TrackLoaded == true)
                 Beatmap.Value.Track.Stop();
