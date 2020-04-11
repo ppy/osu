@@ -49,6 +49,7 @@ namespace osu.Game.Configuration
             };
 
             Set(OsuSetting.ExternalLinkWarning, true);
+            Set(OsuSetting.PreferNoVideo, false);
 
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -212,6 +213,7 @@ namespace osu.Game.Configuration
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,
+        PreferNoVideo,
         Scaling,
         ScalingPositionX,
         ScalingPositionY,

@@ -21,6 +21,11 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     LabelText = "Warn about opening external links",
                     Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Prefer no-video downloads",
+                    Bindable = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
+                },
             };
         }
     }
