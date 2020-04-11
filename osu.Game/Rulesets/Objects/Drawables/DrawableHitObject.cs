@@ -33,11 +33,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        /// <summary>
-        /// The stereo balance of the samples if the <i>Positional hitsounds</i> setting is set.
-        /// </summary>
-        private readonly BindableDouble positionalSoundAdjustment = new BindableDouble();
-
         protected SkinnableSound Samples { get; private set; }
 
         protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
@@ -94,7 +89,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The stereo balance of the samples played if <i>Positional hitsounds</i> is set.
         /// </summary>
-        protected virtual float PositionalSound => (Position.X / 512f - 0.5f) * 0.8f;
+        protected virtual float SamplePlaybackBalance => 0;
+
+        private readonly BindableDouble samplePlaybackBalanceAdjustment = new BindableDouble();
 
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
@@ -119,6 +116,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            userPositionalHitSounds = config.GetBindable<bool>(OsuSetting.PositionalHitSounds);
             var judgement = HitObject.CreateJudgement();
 
             Result = CreateResult(judgement);
@@ -126,16 +124,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
             loadSamples();
-
-            userPositionalHitSounds = config.GetBindable<bool>(OsuSetting.PositionalHitSounds);
-            userPositionalHitSounds.BindValueChanged(positional =>
-            {
-                if (positional.NewValue)
-                    Samples?.AddAdjustment(AdjustableProperty.Balance, positionalSoundAdjustment);
-                else
-                    Samples?.RemoveAdjustment(AdjustableProperty.Balance, positionalSoundAdjustment);
-            });
-            userPositionalHitSounds.TriggerChange();
         }
 
         protected override void LoadComplete()
@@ -179,7 +167,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            AddInternal(Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
+            Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
+            Samples.AddAdjustment(AdjustableProperty.Balance, samplePlaybackBalanceAdjustment);
+            AddInternal(Samples);
         }
 
         private void onDefaultsApplied() => apply(HitObject);
@@ -378,7 +368,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual void PlaySamples()
         {
-            positionalSoundAdjustment.Value = PositionalSound;
+            samplePlaybackBalanceAdjustment.Value = userPositionalHitSounds.Value ? SamplePlaybackBalance : 0;
             Samples?.Play();
         }
 
