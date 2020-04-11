@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The texture store to be used for the ruleset.
         /// </summary>
-        public TextureStore TextureStore { get; private set; }
+        public TextureStore TextureStore { get; }
 
         /// <summary>
         /// The sample store to be used for the ruleset.
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.UI
         /// the cached sample store (<see cref="FallbackSampleStore"/>) retrieves from
         /// this store and falls back to the parent store if this store doesn't have the requested sample.
         /// </remarks>
-        public ISampleStore SampleStore { get; private set; }
+        public ISampleStore SampleStore { get; }
 
         /// <summary>
         /// The ruleset config manager.
