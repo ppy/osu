@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
@@ -98,8 +99,13 @@ namespace osu.Game.Online.API
             {
                 if (cancelled) return;
 
-                Success?.Invoke();
+                TriggerSuccess();
             });
+        }
+
+        internal void TriggerSuccess()
+        {
+            Success?.Invoke();
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
