@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         public DrawableFlyingRimHit(double time, bool isStrong = false)
-            : base(new Hit { StartTime = time, IsStrong = isStrong })
+            : base(new IgnoreHit { StartTime = time, IsStrong = isStrong })
         {
             HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
         }
