@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -26,13 +28,24 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, DrawableHitObject drawableHitObject)
         {
-            InternalChildren = new[]
+            Drawable getDrawableFor(string lookup)
             {
-                backgroundLayer = skin.GetAnimation("taikohitcircle", true, false),
-                skin.GetAnimation("taikohitcircleoverlay", true, false),
-            };
+                const string normal_hit = "taikohit";
+                const string big_hit = "taikobig";
+
+                string prefix = ((drawableHitObject as DrawableTaikoHitObject)?.HitObject.IsStrong ?? false) ? big_hit : normal_hit;
+
+                return skin.GetAnimation($"{prefix}{lookup}", true, false) ?? skin.GetAnimation($"{normal_hit}{lookup}", true, false);
+            }
+
+            // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer
+            AddInternal(backgroundLayer = getDrawableFor("circle"));
+
+            var foregroundLayer = getDrawableFor("circleoverlay");
+            if (foregroundLayer != null)
+                AddInternal(foregroundLayer);
 
             // animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
             // for now just stop at first frame for sanity.
