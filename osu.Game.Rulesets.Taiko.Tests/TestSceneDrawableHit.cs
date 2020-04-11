@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             typeof(DrawableHit),
             typeof(DrawableCentreHit),
             typeof(DrawableRimHit),
+            typeof(LegacyHit),
         }).ToList();
 
         [BackgroundDependencyLoader]
