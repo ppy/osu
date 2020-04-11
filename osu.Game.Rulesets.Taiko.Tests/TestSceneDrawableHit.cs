@@ -34,17 +34,31 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
+
+            AddStep("Centre hit (strong)", () => SetContents(() => new DrawableCentreHit(createHitAtCurrentTime(true))
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            }));
+
             AddStep("Rim hit", () => SetContents(() => new DrawableRimHit(createHitAtCurrentTime())
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            }));
+
+            AddStep("Rim hit (strong)", () => SetContents(() => new DrawableRimHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
         }
 
-        private Hit createHitAtCurrentTime()
+        private Hit createHitAtCurrentTime(bool strong = false)
         {
             var hit = new Hit
             {
+                IsStrong = strong,
                 StartTime = Time.Current + 3000,
             };
 
