@@ -10,7 +10,8 @@ namespace osu.Game.Tests.Online
 {
     public class TestDummyAPIRequestHandling : OsuTestScene
     {
-        public TestDummyAPIRequestHandling()
+        [Test]
+        public void TestGenericRequestHandling()
         {
             AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
             {
@@ -33,7 +34,10 @@ namespace osu.Game.Tests.Online
                 API.Queue(request);
             });
 
-            AddAssert("got response", () => response != null);
+            AddAssert("response event fired", () => response != null);
+
+            AddAssert("request has response", () => request.Result == response);
+        }
         }
     }
 }
