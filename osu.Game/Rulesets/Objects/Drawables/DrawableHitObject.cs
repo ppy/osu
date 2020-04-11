@@ -392,7 +392,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => AllJudged && base.ComputeIsMaskedAway(maskingBounds);
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => AllJudged && base.UpdateSubTreeMasking(source, maskingBounds);
 
         protected override void UpdateAfterChildren()
         {
