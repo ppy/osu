@@ -14,10 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -57,10 +55,6 @@ namespace osu.Game.Rulesets.UI
         public override double GameplayStartTime => Objects.First().StartTime - 2000;
 
         private readonly Lazy<Playfield> playfield;
-
-        private TextureStore textureStore;
-
-        private ISampleStore localSampleStore;
 
         /// <summary>
         /// The playfield.
@@ -146,8 +140,6 @@ namespace osu.Game.Rulesets.UI
         {
             dependencies = new DrawableRulesetDependencies(Ruleset, base.CreateChildDependencies(parent));
 
-            textureStore = dependencies.TextureStore;
-            localSampleStore = dependencies.SampleStore;
             Config = dependencies.RulesetConfigManager;
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
