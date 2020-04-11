@@ -44,16 +44,16 @@ namespace osu.Game.Screens.Select
         /// <returns>The recommended difficulty, or null if a recommendation could not be provided.</returns>
         public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
-            if (!recommendedStarDifficulty.ContainsKey(ruleset.Value))
+            if (recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars))
             {
-                return null;
+                return beatmaps.OrderBy(b =>
+                {
+                    var difference = b.StarDifficulty - stars;
+                    return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
+                }).FirstOrDefault();
             }
 
-            return beatmaps.OrderBy(b =>
-            {
-                var difference = b.StarDifficulty - recommendedStarDifficulty[ruleset.Value];
-                return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
-            }).FirstOrDefault();
+            return null;
         }
 
         private void calculateRecommendedDifficulties()
