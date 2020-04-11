@@ -401,3 +401,10 @@
 
 *   翻译调整
 *   界面bug修复
+
+### 2020/04/11
+*   合并上游pr
+    *   [m] [Fix possible legacy beatmap encoder nullref #8694]
+    *   [m] [Fix crash when trying to edit long beatmaps #8695]
+    *   [m] [!未合并tests] [Cleanup handling of hitobject updates #8693]
+    *   [m] [!未合并tests] [Fix EditorBeatmap potentially not updating hitobjects #8703]

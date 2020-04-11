@@ -69,10 +69,6 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IFrameBasedClock framedClock)
         {
-            EditorBeatmap.HitObjectAdded += addHitObject;
-            EditorBeatmap.HitObjectRemoved += removeHitObject;
-            EditorBeatmap.StartTimeChanged += UpdateHitObject;
-
             Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
@@ -236,10 +232,6 @@ namespace osu.Game.Rulesets.Edit
             lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
-        private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
-
-        private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
-
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
         public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
@@ -302,19 +294,6 @@ namespace osu.Game.Rulesets.Edit
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
-
-        public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (EditorBeatmap != null)
-            {
-                EditorBeatmap.HitObjectAdded -= addHitObject;
-                EditorBeatmap.HitObjectRemoved -= removeHitObject;
-            }
-        }
     }
 
     [Cached(typeof(HitObjectComposer))]
@@ -343,12 +322,6 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
-
-        /// <summary>
-        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public abstract void UpdateHitObject([CanBeNull] HitObject hitObject);
 
         public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
 
