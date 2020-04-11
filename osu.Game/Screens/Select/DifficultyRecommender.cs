@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -21,6 +22,9 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
 
         private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
 
@@ -57,9 +61,9 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps, RulesetInfo currentRuleset)
+        public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
-            if (!recommendedStarDifficulty.ContainsKey(currentRuleset))
+            if (!recommendedStarDifficulty.ContainsKey(ruleset.Value))
             {
                 updateRecommended();
                 return null;
@@ -67,7 +71,7 @@ namespace osu.Game.Screens.Select
 
             return beatmaps.OrderBy(b =>
             {
-                var difference = b.StarDifficulty - recommendedStarDifficulty[currentRuleset];
+                var difference = b.StarDifficulty - recommendedStarDifficulty[ruleset.Value];
                 return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
             }).FirstOrDefault();
         }

@@ -588,7 +588,7 @@ namespace osu.Game.Screens.Select
 
             BeatmapInfo recommender(IEnumerable<BeatmapInfo> beatmaps)
             {
-                return DifficultyRecommender?.GetRecommendedBeatmap(beatmaps, decoupledRuleset.Value);
+                return DifficultyRecommender?.GetRecommendedBeatmap(beatmaps);
             }
 
             var set = new CarouselBeatmapSet(beatmapSet, recommender);
