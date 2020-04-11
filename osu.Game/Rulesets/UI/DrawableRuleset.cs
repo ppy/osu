@@ -343,7 +343,7 @@ namespace osu.Game.Rulesets.UI
             }
 
             // Dispose the components created by this dependency container.
-            dependencies.Dispose();
+            dependencies?.Dispose();
         }
     }
 
