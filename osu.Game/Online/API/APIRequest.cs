@@ -30,6 +30,8 @@ namespace osu.Game.Online.API
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        internal void TriggerSuccess(T result) => Success?.Invoke(result);
     }
 
     /// <summary>
