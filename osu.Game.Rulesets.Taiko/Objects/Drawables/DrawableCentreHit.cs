@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        protected override CompositeDrawable CreateMainPiece() => new CentreHitCirclePiece();
+        protected override CompositeDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.CentreHit),
+            _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
     }
 }
