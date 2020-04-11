@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         {
             typeof(ManiaRuleset),
             typeof(ManiaLegacySkinTransformer),
+            typeof(ManiaSettingsSubsection)
         };
 
         protected override Ruleset CreateRulesetForSkinProvider() => new ManiaRuleset();

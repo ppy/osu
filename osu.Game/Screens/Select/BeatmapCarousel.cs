@@ -23,7 +23,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Select.Carousel;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
@@ -48,6 +47,11 @@ namespace osu.Game.Screens.Select
         /// The currently selected beatmap set.
         /// </summary>
         public BeatmapSetInfo SelectedBeatmapSet => selectedBeatmapSet?.BeatmapSet;
+
+        /// <summary>
+        /// A function to optionally decide on a recommended difficulty from a beatmap set.
+        /// </summary>
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
 
         private CarouselBeatmapSet selectedBeatmapSet;
 
@@ -117,8 +121,8 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
+
         private CarouselRoot root;
-        public SongSelect.DifficultyRecommender DifficultyRecommender;
 
         public BeatmapCarousel()
         {
@@ -140,9 +144,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
-        [Resolved]
-        private Bindable<RulesetInfo> decoupledRuleset { get; set; }
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config)
@@ -584,12 +585,10 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            BeatmapInfo recommender(IEnumerable<BeatmapInfo> beatmaps)
+            var set = new CarouselBeatmapSet(beatmapSet)
             {
-                return DifficultyRecommender?.GetRecommendedBeatmap(beatmaps, decoupledRuleset.Value);
-            }
-
-            var set = new CarouselBeatmapSet(beatmapSet, recommender);
+                GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
+            };
 
             foreach (var c in set.Beatmaps)
             {
