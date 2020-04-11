@@ -15,7 +15,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
-    public class DifficultyRecommender : Component
+    public class DifficultyRecommender : Component, IOnlineComponent
     {
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -28,12 +28,10 @@ namespace osu.Game.Screens.Select
 
         private readonly Dictionary<RulesetInfo, double> recommendedStarDifficulty = new Dictionary<RulesetInfo, double>();
 
-        private int pendingAPIRequests;
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            calculateRecommendedDifficulties();
+            api.Register(this);
         }
 
         /// <summary>
@@ -48,7 +46,6 @@ namespace osu.Game.Screens.Select
         {
             if (!recommendedStarDifficulty.ContainsKey(ruleset.Value))
             {
-                calculateRecommendedDifficulties();
                 return null;
             }
 
@@ -61,11 +58,6 @@ namespace osu.Game.Screens.Select
 
         private void calculateRecommendedDifficulties()
         {
-            if (pendingAPIRequests > 0)
-                return;
-            if (api.LocalUser.Value is GuestUser)
-                return;
-
             rulesets.AvailableRulesets.ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
@@ -74,14 +66,27 @@ namespace osu.Game.Screens.Select
                 {
                     // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
                     recommendedStarDifficulty[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
-                    pendingAPIRequests--;
                 };
 
-                req.Failure += _ => pendingAPIRequests--;
-
-                pendingAPIRequests++;
                 api.Queue(req);
             });
+        }
+
+        public void APIStateChanged(IAPIProvider api, APIState state)
+        {
+            switch (state)
+            {
+                case APIState.Online:
+                    calculateRecommendedDifficulties();
+                    break;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            api.Unregister(this);
         }
     }
 }
