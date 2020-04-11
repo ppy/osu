@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Multi
 
         private class PlaylistDownloadButton : PanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool? noVideo = null)
                 : base(beatmapSet, noVideo)
             {
                 Alpha = 0;
