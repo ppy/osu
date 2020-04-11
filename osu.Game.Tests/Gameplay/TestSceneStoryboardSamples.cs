@@ -60,11 +60,11 @@ namespace osu.Game.Tests.Gameplay
                 this.resourceName = resourceName;
             }
 
-            public byte[] Get(string name) => name == resourceName ? TestResources.GetStore().Get("Resources/test-sample.mp3") : null;
+            public byte[] Get(string name) => name == resourceName ? TestResources.GetStore().Get("Resources/Samples/test-sample.mp3") : null;
 
-            public Task<byte[]> GetAsync(string name) => name == resourceName ? TestResources.GetStore().GetAsync("Resources/test-sample.mp3") : null;
+            public Task<byte[]> GetAsync(string name) => name == resourceName ? TestResources.GetStore().GetAsync("Resources/Samples/test-sample.mp3") : null;
 
-            public Stream GetStream(string name) => name == resourceName ? TestResources.GetStore().GetStream("Resources/test-sample.mp3") : null;
+            public Stream GetStream(string name) => name == resourceName ? TestResources.GetStore().GetStream("Resources/Samples/test-sample.mp3") : null;
 
             public IEnumerable<string> GetAvailableResources() => new[] { resourceName };
 
