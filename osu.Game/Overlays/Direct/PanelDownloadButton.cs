@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -14,12 +15,12 @@ namespace osu.Game.Overlays.Direct
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
-        private readonly bool noVideo;
+        private readonly bool? noVideo;
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
 
-        public PanelDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+        public PanelDownloadButton(BeatmapSetInfo beatmapSet, bool? noVideo = null)
             : base(beatmapSet)
         {
             this.noVideo = noVideo;
@@ -43,7 +44,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapManager beatmaps)
+        private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig)
         {
             if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
             {
@@ -66,7 +67,8 @@ namespace osu.Game.Overlays.Direct
                         break;
 
                     default:
-                        beatmaps.Download(BeatmapSet.Value, noVideo);
+                        var minimiseDownloadSize = noVideo ?? osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo).Value;
+                        beatmaps.Download(BeatmapSet.Value, minimiseDownloadSize);
                         break;
                 }
             };
