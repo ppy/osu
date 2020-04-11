@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         // Must be set to update IsHovered as it's used in relax mdo to detect osu hit objects.
         public override bool HandlePositionalInput => true;
 
+        protected override float SamplePlaybackBalance => (HitObject.X / 512f - 0.5f) * 0.8f;
+
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {

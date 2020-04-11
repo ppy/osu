@@ -5,8 +5,10 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -23,6 +25,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+
+        protected override float SamplePlaybackBalance
+        {
+            get
+            {
+                CompositeDrawable stage = this;
+                while (!(stage is Stage))
+                    stage = stage.Parent;
+
+                var columnCount = ((Stage)stage).Columns.Count;
+                var columnIndex = HitObject.Column;
+                return 0.8f * columnIndex / (columnCount - 1) - 0.4f;
+            }
+        }
 
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
