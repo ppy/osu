@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         public DrawableFlyingCentreHit(double time, bool isStrong = false)
-            : base(new Hit { StartTime = time, IsStrong = isStrong })
+            : base(new IgnoreHit { StartTime = time, IsStrong = isStrong })
         {
             HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
         }
