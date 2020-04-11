@@ -80,7 +80,8 @@ namespace osu.Game.Screens.Select
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
-        private DifficultyRecommender difficultyRecommender;
+
+        private DifficultyRecommender recommender;
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -108,10 +109,9 @@ namespace osu.Game.Screens.Select
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
-            AddInternal(difficultyRecommender = new DifficultyRecommender());
-
             AddRangeInternal(new Drawable[]
             {
+                recommender = new DifficultyRecommender(),
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Select
                                             RelativeSizeAxes = Axes.Both,
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
-                                            DifficultyRecommender = difficultyRecommender,
+                                            GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
                                         },
                                     }
                                 },

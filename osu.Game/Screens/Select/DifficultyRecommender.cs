@@ -33,10 +33,33 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateRecommended();
+            calculateRecommendedDifficulties();
         }
 
-        private void updateRecommended()
+        /// <summary>
+        /// Find the recommended difficulty from a selection of available difficulties for the current local user.
+        /// </summary>
+        /// <remarks>
+        /// This requires the user to be online for now.
+        /// </remarks>
+        /// <param name="beatmaps">A collection of beatmaps to select a difficulty from.</param>
+        /// <returns>The recommended difficulty, or null if a recommendation could not be provided.</returns>
+        public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
+        {
+            if (!recommendedStarDifficulty.ContainsKey(ruleset.Value))
+            {
+                calculateRecommendedDifficulties();
+                return null;
+            }
+
+            return beatmaps.OrderBy(b =>
+            {
+                var difference = b.StarDifficulty - recommendedStarDifficulty[ruleset.Value];
+                return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
+            }).FirstOrDefault();
+        }
+
+        private void calculateRecommendedDifficulties()
         {
             if (pendingAPIRequests > 0)
                 return;
@@ -59,21 +82,6 @@ namespace osu.Game.Screens.Select
                 pendingAPIRequests++;
                 api.Queue(req);
             });
-        }
-
-        public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
-        {
-            if (!recommendedStarDifficulty.ContainsKey(ruleset.Value))
-            {
-                updateRecommended();
-                return null;
-            }
-
-            return beatmaps.OrderBy(b =>
-            {
-                var difference = b.StarDifficulty - recommendedStarDifficulty[ruleset.Value];
-                return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
-            }).FirstOrDefault();
         }
     }
 }

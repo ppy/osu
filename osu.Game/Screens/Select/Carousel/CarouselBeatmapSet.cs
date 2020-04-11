@@ -12,13 +12,13 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
-        private readonly Func<IEnumerable<BeatmapInfo>, BeatmapInfo> getRecommendedBeatmap;
-
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, Func<IEnumerable<BeatmapInfo>, BeatmapInfo> getRecommendedBeatmap)
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
+
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
@@ -26,8 +26,6 @@ namespace osu.Game.Screens.Select.Carousel
                       .Where(b => !b.Hidden)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
-
-            this.getRecommendedBeatmap = getRecommendedBeatmap;
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
@@ -36,9 +34,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (LastSelected == null)
             {
-                var recommendedBeatmapInfo = getRecommendedBeatmap(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap));
-                if (recommendedBeatmapInfo != null)
-                    return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommendedBeatmapInfo);
+                if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap)) is BeatmapInfo recommended)
+                    return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommended);
             }
 
             return base.GetNextToSelect();
