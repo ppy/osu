@@ -382,8 +382,15 @@
 *   更新framework至2020.407.0以修复storyboard尺寸问题
 
 ### 2020/04/08
-    *   合并上游pr
-        *   [m] [Fix legacy skin texture fallback logic #8669]
-        *   [m] [Increase size of default osu!mania skin's keys to allow clearance with HUD #8674]
-        *   [m] [Fix dragging tournament ladder too far causing it to disappear #8673]
-        *   [m] [Add osu!taiko drum skinning support #8598]
+*   合并上游pr
+    *   [m] [Fix legacy skin texture fallback logic #8669]
+    *   [m] [Increase size of default osu!mania skin's keys to allow clearance with HUD #8674]
+    *   [m] [Fix dragging tournament ladder too far causing it to disappear #8673]
+    *   [m] [Add osu!taiko drum skinning support #8598]
+
+### 2020/04/11
+*   合并上游pr
+    *   [m] [Fix possible legacy beatmap encoder nullref #8694]
+    *   [m] [Fix crash when trying to edit long beatmaps #8695]
+    *   [m] [!未合并tests] [Cleanup handling of hitobject updates #8693]
+    *   [m] [!未合并tests] [Fix EditorBeatmap potentially not updating hitobjects #8703]
