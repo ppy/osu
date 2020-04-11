@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
@@ -20,12 +21,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         public LegacyHit(TaikoSkinComponents component)
         {
             this.component = component;
+
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 backgroundLayer = skin.GetAnimation("taikohitcircle", true, false),
                 skin.GetAnimation("taikohitcircleoverlay", true, false),
@@ -36,6 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             foreach (var c in InternalChildren)
             {
                 (c as IFramedAnimation)?.Stop();
+
                 c.Anchor = Anchor.Centre;
                 c.Origin = Anchor.Centre;
             }
@@ -43,6 +47,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             AccentColour = component == TaikoSkinComponents.CentreHit
                 ? new Color4(235, 69, 44, 255)
                 : new Color4(67, 142, 172, 255);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // not all skins (including the default osu-stable) have similar sizes for hitcircle and hitcircleoverlay.
+            // this ensures they are scaled relative to each other but also match the expected DrawableHit size.
+            foreach (var c in InternalChildren)
+                c.Scale = new Vector2(DrawWidth / 128);
         }
 
         private Color4 accentColour;
