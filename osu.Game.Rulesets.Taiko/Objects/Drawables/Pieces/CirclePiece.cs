@@ -71,6 +71,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public CirclePiece()
         {
+            RelativeSizeAxes = Axes.Both;
+
             EarlyActivationMilliseconds = pre_beat_transition_time;
 
             AddRangeInternal(new Drawable[]
