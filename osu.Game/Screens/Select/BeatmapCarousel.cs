@@ -117,8 +117,10 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
+
         private CarouselRoot root;
-        public SongSelect.DifficultyRecommender DifficultyRecommender;
+
+        public DifficultyRecommender DifficultyRecommender;
 
         public BeatmapCarousel()
         {
