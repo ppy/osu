@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -17,6 +19,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override bool HandlePositionalInput => true;
 
         protected override float SamplePlaybackBalance => (HitObject.X / 512f - 0.5f) * 0.8f;
+
+        /// <summary>
+        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit.
+        /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
+        /// </summary>
+        public Func<DrawableHitObject, double, bool> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
@@ -55,6 +63,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
         }
+
+        /// <summary>
+        /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void MissForcefully() => ApplyResult(r => r.Type = HitResult.Miss);
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
