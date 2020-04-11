@@ -37,18 +37,20 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 string prefix = ((drawableHitObject as DrawableTaikoHitObject)?.HitObject.IsStrong ?? false) ? big_hit : normal_hit;
 
-                return skin.GetAnimation($"{prefix}{lookup}", true, false) ?? skin.GetAnimation($"{normal_hit}{lookup}", true, false);
+                return skin.GetAnimation($"{prefix}{lookup}", true, false) ??
+                       // fallback to regular size if "big" version doesn't exist.
+                       skin.GetAnimation($"{normal_hit}{lookup}", true, false);
             }
 
-            // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer
+            // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer.
             AddInternal(backgroundLayer = getDrawableFor("circle"));
 
             var foregroundLayer = getDrawableFor("circleoverlay");
             if (foregroundLayer != null)
                 AddInternal(foregroundLayer);
 
-            // animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
-            // for now just stop at first frame for sanity.
+            // Animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
+            // For now just stop at first frame for sanity.
             foreach (var c in InternalChildren)
             {
                 (c as IFramedAnimation)?.Stop();
@@ -66,8 +68,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         {
             base.Update();
 
-            // not all skins (including the default osu-stable) have similar sizes for hitcircle and hitcircleoverlay.
-            // this ensures they are scaled relative to each other but also match the expected DrawableHit size.
+            // Not all skins (including the default osu-stable) have similar sizes for "hitcircle" and "hitcircleoverlay".
+            // This ensures they are scaled relative to each other but also match the expected DrawableHit size.
             foreach (var c in InternalChildren)
                 c.Scale = new Vector2(DrawWidth / 128);
         }
