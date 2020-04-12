@@ -274,12 +274,13 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new PanelDownloadButton(BeatmapSet.Value)
+                    PanelDownloadButton panelButton;
+                    downloadButtonsContainer.Child = panelButton = new PanelDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
-                        RelativeSizeAxes = Axes.Y,
-                        CurrentBeatmap = Picker.Beatmap.GetBoundCopy()
+                        RelativeSizeAxes = Axes.Y
                     };
+                    panelButton.CurrentBeatmap.BindTo(Picker.Beatmap);
                     break;
 
                 case DownloadState.Downloading:
