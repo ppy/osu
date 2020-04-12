@@ -277,7 +277,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     downloadButtonsContainer.Child = new PanelDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
-                        RelativeSizeAxes = Axes.Y
+                        RelativeSizeAxes = Axes.Y,
+                        CurrentBeatmap = Picker.Beatmap.GetBoundCopy()
                     };
                     break;
 
