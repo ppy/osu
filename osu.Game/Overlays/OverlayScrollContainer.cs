@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
                 return;
 
             currentTarget = Target;
-            Button.State = Current > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
+            Button.State = Target > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
         }
 
         public class ScrollToTopButton : OsuHoverContainer
