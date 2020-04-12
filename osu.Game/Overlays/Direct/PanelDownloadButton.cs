@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Direct
 
         private readonly bool noVideo;
 
-        public Bindable<BeatmapInfo> CurrentBeatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<BeatmapInfo> CurrentBeatmap = new Bindable<BeatmapInfo>();
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
