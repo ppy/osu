@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : ScrollingPlayfield
     {
-        private readonly List<ManiaStage> stages = new List<ManiaStage>();
+        private readonly List<Stage> stages = new List<Stage>();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new Stage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public int TotalColumns => stages.Sum(s => s.Columns.Count);
 
-        private ManiaStage getStageByColumn(int column)
+        private Stage getStageByColumn(int column)
         {
             int sum = 0;
 
