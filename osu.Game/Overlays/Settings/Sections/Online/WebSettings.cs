@@ -23,7 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Prefer no-video downloads",
+                    LabelText = "Prefer downloads without video",
+                    Keywords = new[] { "no-video" },
                     Bindable = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
                 },
             };

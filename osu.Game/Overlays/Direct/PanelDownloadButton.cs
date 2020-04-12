@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -15,16 +16,13 @@ namespace osu.Game.Overlays.Direct
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
-        private readonly bool? noVideo;
-
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
+        private readonly BindableBool noVideoSetting = new BindableBool();
 
-        public PanelDownloadButton(BeatmapSetInfo beatmapSet, bool? noVideo = null)
+        public PanelDownloadButton(BeatmapSetInfo beatmapSet)
             : base(beatmapSet)
         {
-            this.noVideo = noVideo;
-
             InternalChild = shakeContainer = new ShakeContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -53,6 +51,8 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
+            noVideoSetting.BindTo(osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo));
+
             button.Action = () =>
             {
                 switch (State.Value)
@@ -67,8 +67,7 @@ namespace osu.Game.Overlays.Direct
                         break;
 
                     default:
-                        var minimiseDownloadSize = noVideo ?? osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo).Value;
-                        beatmaps.Download(BeatmapSet.Value, minimiseDownloadSize);
+                        beatmaps.Download(BeatmapSet.Value, noVideoSetting.Value);
                         break;
                 }
             };
