@@ -410,6 +410,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
                 Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
 
+                Assert.IsTrue(getTestableSampleInfo(hitObjects[1]).IsCustom);
+                Assert.IsTrue(getTestableSampleInfo(hitObjects[2]).IsCustom);
+                Assert.IsFalse(getTestableSampleInfo(hitObjects[3]).IsCustom);
+
                 // The control point at the end time of the slider should be applied
                 Assert.AreEqual("soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
