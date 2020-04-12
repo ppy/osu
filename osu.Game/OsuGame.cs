@@ -315,11 +315,14 @@ namespace osu.Game
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
-        /// <param name="findPredicate">Predicate used to find a difficulty to select</param>
-        public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> findPredicate = null)
+        /// <param name="difficultyCriteria">
+        /// Optional predicate used to try and find a difficulty to select.
+        /// If omitted, this will try to present the first beatmap from the current ruleset.
+        /// In case of failure the first difficulty of the set will be presented, ignoring the predicate.
+        /// </param>
+        public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            // Use this predicate if non was provided. This will try to find some difficulty from current ruleset so we wouldn't have to change rulesets
-            findPredicate ??= b => b.Ruleset.Equals(Ruleset.Value);
+            difficultyCriteria ??= b => b.Ruleset.Equals(Ruleset.Value);
 
             var databasedSet = beatmap.OnlineBeatmapSetID != null
                 ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
@@ -338,13 +341,13 @@ namespace osu.Game
                     menuScreen.LoadToSolo();
 
                 // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && findPredicate(Beatmap.Value.BeatmapInfo))
+                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && difficultyCriteria(Beatmap.Value.BeatmapInfo))
                 {
                     return;
                 }
 
                 // Find first beatmap that matches our predicate.
-                var first = databasedSet.Beatmaps.Find(findPredicate) ?? databasedSet.Beatmaps.First();
+                var first = databasedSet.Beatmaps.Find(difficultyCriteria) ?? databasedSet.Beatmaps.First();
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
