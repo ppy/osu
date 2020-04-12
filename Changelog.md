@@ -413,3 +413,7 @@
 *   合并上游pr
     *   [m] [Update framework #8712]
     *   [m] [!未合并tests] [Block out-of-order judgements from occurring (aka "note lock") #8337]
+
+*   使[OsuButton](osu.Game/Graphics/UserInterface/OsuButton.cs)可以使用自定义字体大小
+*   多人联机按钮细节修改
+*   缓解了多人联机房间列表的对齐问题

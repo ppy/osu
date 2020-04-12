@@ -438,6 +438,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             public CreateRoomButton()
             {
                 Text = "创建";
+                FontSize = 23;
             }
 
             [BackgroundDependencyLoader]

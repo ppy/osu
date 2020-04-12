@@ -180,7 +180,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
+                                        Margin = new MarginPadding { Top = 0, Bottom = -1.25f },
+                                        Spacing = new Vector2(0, 0.625f),
                                         Children = new Drawable[]
                                         {
                                             new RoomStatusInfo(),
