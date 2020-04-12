@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// for a usage example.
     /// </para>
     /// </summary>
-    public class CirclePiece : BeatSyncedContainer
+    public abstract class CirclePiece : BeatSyncedContainer
     {
         public const float SYMBOL_SIZE = 0.45f;
         public const float SYMBOL_BORDER = 8;
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public Box FlashBox;
 
-        public CirclePiece()
+        protected CirclePiece()
         {
             RelativeSizeAxes = Axes.Both;
 
