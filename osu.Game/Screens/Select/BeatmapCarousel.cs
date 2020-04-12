@@ -276,6 +276,13 @@ namespace osu.Game.Screens.Select
 
         private void selectNextDifficulty(int direction)
         {
+            if (selectedBeatmapSet == null || selectedBeatmap == null)
+            {
+                // defer selection to selecting a set, which doesn't care if selectedBeatmapSet is null
+                selectNextSet(direction, false);
+                return;
+            }
+
             var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
 
             int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
