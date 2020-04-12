@@ -408,3 +408,8 @@
     *   [m] [Fix crash when trying to edit long beatmaps #8695]
     *   [m] [!未合并tests] [Cleanup handling of hitobject updates #8693]
     *   [m] [!未合并tests] [Fix EditorBeatmap potentially not updating hitobjects #8703]
+
+### 2020/04/12
+*   合并上游pr
+    *   [m] [Update framework #8712]
+    *   [m] [!未合并tests] [Block out-of-order judgements from occurring (aka "note lock") #8337]
