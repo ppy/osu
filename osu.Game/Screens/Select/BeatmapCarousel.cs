@@ -632,7 +632,11 @@ namespace osu.Game.Screens.Select
                         case DrawableCarouselBeatmap beatmap:
                         {
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
-                                scrollTarget = currentY + beatmap.DrawHeight / 2 - (Parent.DrawHeight / 2 - Parent.Padding.Top);
+                                // scroll position at currentY makes the set panel appear at the very top of the carousel in screen space
+                                // move down by half of parent height (which is the height of the carousel's visible extent, including semi-transparent areas)
+                                // then reapply parent's padding from the top by adding it
+                                // and finally add half of the panel's own height to achieve vertical centering of the panel itself
+                                scrollTarget = currentY - Parent.DrawHeight / 2 + Parent.Padding.Top + beatmap.DrawHeight / 2;
 
                             void performMove(float y, float? startY = null)
                             {
