@@ -632,7 +632,7 @@ namespace osu.Game.Screens.Select
                         case DrawableCarouselBeatmap beatmap:
                         {
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
-                                scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
+                                scrollTarget = currentY + beatmap.DrawHeight / 2 - (Parent.DrawHeight / 2 - Parent.Padding.Top);
 
                             void performMove(float y, float? startY = null)
                             {
