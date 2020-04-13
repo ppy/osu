@@ -278,7 +278,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y,
-                        CurrentBeatmap = { BindTarget = Picker.Beatmap }
+                        SelectedBeatmap = { BindTarget = Picker.Beatmap }
                     };
                     break;
 

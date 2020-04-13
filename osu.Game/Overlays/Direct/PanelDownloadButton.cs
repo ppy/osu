@@ -18,7 +18,10 @@ namespace osu.Game.Overlays.Direct
 
         private readonly bool noVideo;
 
-        public readonly IBindable<BeatmapInfo> CurrentBeatmap = new Bindable<BeatmapInfo>();
+        /// <summary>
+        /// Currently selected beatmap. Used to present the correct difficulty after completing a download.
+        /// </summary>
+        public readonly IBindable<BeatmapInfo> SelectedBeatmap = new Bindable<BeatmapInfo>();
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
@@ -67,8 +70,8 @@ namespace osu.Game.Overlays.Direct
 
                     case DownloadState.LocallyAvailable:
                         Predicate<BeatmapInfo> findPredicate = null;
-                        if (CurrentBeatmap.Value != null)
-                            findPredicate = b => b.OnlineBeatmapID == CurrentBeatmap.Value.OnlineBeatmapID;
+                        if (SelectedBeatmap.Value != null)
+                            findPredicate = b => b.OnlineBeatmapID == SelectedBeatmap.Value.OnlineBeatmapID;
 
                         game?.PresentBeatmap(BeatmapSet.Value, findPredicate);
                         break;
