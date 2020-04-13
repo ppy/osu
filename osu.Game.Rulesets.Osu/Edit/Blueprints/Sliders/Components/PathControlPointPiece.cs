@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -50,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
+
+            controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
@@ -183,8 +186,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
             Color4 colour = ControlPoint.Type.Value != null ? colours.Red : colours.Yellow;
+
             if (IsHovered || IsSelected.Value)
-                colour = Color4.White;
+                colour = colour.Lighten(1);
+
             marker.Colour = colour;
         }
     }
