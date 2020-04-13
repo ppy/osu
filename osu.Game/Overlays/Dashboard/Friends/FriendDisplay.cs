@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             };
 
             onlineStreamControl.Populate(users);
-            addTableToPlaceholder(createTable());
+            replacePreviousContent(createUserPanels());
         }
 
         protected override void LoadComplete()
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             cancellationToken?.Cancel();
             loading.Show();
-            LoadComponentAsync(createTable(), addTableToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+            LoadComponentAsync(createUserPanels(), replacePreviousContent, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private List<User> getUsersInCurrentGroup()
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             }
         }
 
-        private void addTableToPlaceholder(FillFlowContainer<UserPanel> table)
+        private void replacePreviousContent(FillFlowContainer<UserPanel> table)
         {
             loading.Hide();
 
@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             currentTable.FadeIn(200, Easing.OutQuint);
         }
 
-        private FillFlowContainer<UserPanel> createTable()
+        private FillFlowContainer<UserPanel> createUserPanels()
         {
             var sortedUsers = sortUsers(getUsersInCurrentGroup());
             var style = userListToolbar.DisplayStyle.Value;
