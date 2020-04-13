@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("button is hidden", () => scroll.Button.State == Visibility.Hidden);
 
             AddStep("scroll to 500", () => scroll.ScrollTo(500));
-            AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 500, 0.1f));
+            AddUntilStep("scrolled to 500", () => Precision.AlmostEquals(scroll.Current, 500, 0.1f));
             AddAssert("button is visible", () => scroll.Button.State == Visibility.Visible);
         }
 
