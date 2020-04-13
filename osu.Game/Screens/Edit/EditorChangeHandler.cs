@@ -15,8 +15,10 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorChangeHandler : IEditorChangeHandler
     {
-        private readonly LegacyEditorBeatmapDiffer differ;
-        private readonly List<Stream> savedStates = new List<Stream>();
+        private readonly LegacyEditorBeatmapPatcher patcher;
+
+        private readonly List<byte[]> savedStates = new List<byte[]>();
+
         private int currentState = -1;
 
         private readonly EditorBeatmap editorBeatmap;
@@ -35,7 +37,7 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.HitObjectRemoved += hitObjectRemoved;
             editorBeatmap.HitObjectUpdated += hitObjectUpdated;
 
-            differ = new LegacyEditorBeatmapDiffer(editorBeatmap);
+            patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
 
             // Initial state.
             SaveState();
@@ -69,15 +71,17 @@ namespace osu.Game.Screens.Edit
             if (isRestoring)
                 return;
 
-            var stream = new MemoryStream();
-
-            using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(editorBeatmap).Encode(sw);
-
             if (currentState < savedStates.Count - 1)
                 savedStates.RemoveRange(currentState + 1, savedStates.Count - currentState - 1);
 
-            savedStates.Add(stream);
+            using (var stream = new MemoryStream())
+            {
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new LegacyBeatmapEncoder(editorBeatmap).Encode(sw);
+
+                savedStates.Add(stream.ToArray());
+            }
+
             currentState = savedStates.Count - 1;
         }
 
@@ -99,7 +103,7 @@ namespace osu.Game.Screens.Edit
 
             isRestoring = true;
 
-            differ.Patch(savedStates[currentState], savedStates[newState]);
+            patcher.Patch(savedStates[currentState], savedStates[newState]);
             currentState = newState;
 
             isRestoring = false;

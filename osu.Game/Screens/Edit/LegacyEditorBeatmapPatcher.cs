@@ -4,25 +4,29 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using DiffPlex;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Screens.Edit
 {
-    public class LegacyEditorBeatmapDiffer
+    /// <summary>
+    /// Patches an <see cref="EditorBeatmap"/> based on the difference between two legacy (.osu) states.
+    /// </summary>
+    public class LegacyEditorBeatmapPatcher
     {
         private readonly EditorBeatmap editorBeatmap;
 
-        public LegacyEditorBeatmapDiffer(EditorBeatmap editorBeatmap)
+        public LegacyEditorBeatmapPatcher(EditorBeatmap editorBeatmap)
         {
             this.editorBeatmap = editorBeatmap;
         }
 
-        public void Patch(Stream currentState, Stream newState)
+        public void Patch(byte[] currentState, byte[] newState)
         {
             // Diff the beatmaps
             var result = new Differ().CreateLineDiffs(readString(currentState), readString(newState), true, false);
@@ -36,7 +40,7 @@ namespace osu.Game.Screens.Edit
 
             foreach (var block in result.DiffBlocks)
             {
-                // Removed hitobject
+                // Removed hitobjects
                 for (int i = 0; i < block.DeleteCountA; i++)
                 {
                     int hoIndex = block.DeleteStartA + i - oldHitObjectsIndex - 1;
@@ -47,7 +51,7 @@ namespace osu.Game.Screens.Edit
                     toRemove.Add(hoIndex);
                 }
 
-                // Added hitobject
+                // Added hitobjects
                 for (int i = 0; i < block.InsertCountB; i++)
                 {
                     int hoIndex = block.InsertStartB + i - newHitObjectsIndex - 1;
@@ -74,18 +78,11 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        private string readString(Stream stream)
+        private string readString(byte[] state) => Encoding.UTF8.GetString(state);
+
+        private IBeatmap readBeatmap(byte[] state)
         {
-            stream.Seek(0, SeekOrigin.Begin);
-
-            using (var sr = new StreamReader(stream, System.Text.Encoding.UTF8, true, 1024, true))
-                return sr.ReadToEnd();
-        }
-
-        private IBeatmap readBeatmap(Stream stream)
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-
+            using (var stream = new MemoryStream(state))
             using (var reader = new LineBufferedReader(stream, true))
                 return new PassThroughWorkingBeatmap(Decoder.GetDecoder<Beatmap>(reader).Decode(reader)).GetPlayableBeatmap(editorBeatmap.BeatmapInfo.Ruleset);
         }
