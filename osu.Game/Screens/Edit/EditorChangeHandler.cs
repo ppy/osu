@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Edit
         private int bulkChangesStarted;
         private bool isRestoring;
 
+        public const int MAX_SAVED_STATES = 50;
+
         /// <summary>
         /// Creates a new <see cref="EditorChangeHandler"/>.
         /// </summary>
@@ -42,6 +44,8 @@ namespace osu.Game.Screens.Edit
             // Initial state.
             SaveState();
         }
+
+        public bool HasUndoState => currentState > 0;
 
         private void hitObjectAdded(HitObject obj) => SaveState();
 
@@ -73,6 +77,9 @@ namespace osu.Game.Screens.Edit
 
             if (currentState < savedStates.Count - 1)
                 savedStates.RemoveRange(currentState + 1, savedStates.Count - currentState - 1);
+
+            if (savedStates.Count > MAX_SAVED_STATES)
+                savedStates.RemoveAt(0);
 
             using (var stream = new MemoryStream())
             {
