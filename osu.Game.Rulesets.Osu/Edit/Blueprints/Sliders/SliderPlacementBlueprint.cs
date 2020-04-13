@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -23,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private SliderBodyPiece bodyPiece;
         private HitCirclePiece headCirclePiece;
         private HitCirclePiece tailCirclePiece;
+        private PathControlPointVisualiser controlPointVisualiser;
 
         private InputManager inputManager;
 
@@ -51,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                new PathControlPointVisualiser(HitObject, false)
+                controlPointVisualiser = new PathControlPointVisualiser(HitObject, false)
             };
 
             setState(PlacementState.Initial);
@@ -91,17 +95,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
-                    switch (e.Button)
-                    {
-                        case MouseButton.Left:
-                            ensureCursor();
+                    if (e.Button != MouseButton.Left)
+                        break;
 
-                            // Detatch the cursor
-                            cursor = null;
-                            break;
+                    // Find the last non-cursor control point and the respective drawable piece
+                    var lastPoint = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
+                    var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == lastPoint);
+
+                    if (lastPiece?.IsHovered == true)
+                    {
+                        Debug.Assert(lastPoint != null);
+
+                        segmentStart = lastPoint;
+                        segmentStart.Type.Value = PathType.Linear;
+
+                        currentSegmentLength = 1;
+                    }
+                    else
+                    {
+                        ensureCursor();
+                        cursor = null; // Detatch the cursor
                     }
 
-                    break;
+                    return true;
             }
 
             return true;
@@ -112,16 +128,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (state == PlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
-        }
-
-        protected override bool OnDoubleClick(DoubleClickEvent e)
-        {
-            // Todo: This should all not occur on double click, but rather if the previous control point is hovered.
-            segmentStart = HitObject.Path.ControlPoints[^1];
-            segmentStart.Type.Value = PathType.Linear;
-
-            currentSegmentLength = 1;
-            return true;
         }
 
         private void beginCurve()
@@ -169,6 +175,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 currentSegmentLength++;
 
                 updatePathType();
+
+                Logger.Log("Set cursor");
             }
         }
 
