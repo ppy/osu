@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -27,18 +26,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         [Resolved(canBeNull: true)]
-        private Playfield playfield { get; set; }
+        private ManiaPlayfield playfield { get; set; }
 
         protected override float SamplePlaybackPosition
         {
             get
             {
-                var columns = (playfield as ManiaPlayfield)?.TotalColumns;
-
-                if (columns == null)
+                if (playfield == null)
                     return base.SamplePlaybackPosition;
 
-                return (float)HitObject.Column / columns.Value;
+                return (float)HitObject.Column / playfield.TotalColumns;
             }
         }
 
