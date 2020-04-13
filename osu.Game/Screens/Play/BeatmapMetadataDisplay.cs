@@ -80,7 +80,9 @@ namespace osu.Game.Screens.Play
             this.mods.BindTo(mods);
         }
 
+        private Container basePanel;
         private Container bg;
+        private FillFlowContainer contentFillFlow;
         private readonly Bindable<bool> Optui = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
@@ -89,9 +91,15 @@ namespace osu.Game.Screens.Play
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
             AutoSizeAxes = Axes.Both;
-            AddRangeInternal(new Drawable[]
+            Children = new Drawable[]
             {
                 new Container
+                {
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    Size = new Vector2(320, 353),
+                },
+                basePanel = new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.TopCentre,
@@ -119,89 +127,89 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                    new FillFlowContainer
-                    {
-                    AutoSizeAxes = Axes.Both,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Direction = FillDirection.Vertical,
-                    Children = new[]
-                    {
-                        facade.With(d =>
+                        contentFillFlow = new FillFlowContainer
                         {
-                            d.Anchor = Anchor.TopCentre;
-                            d.Origin = Anchor.TopCentre;
-                        }),
-                        new OsuSpriteText
-                        {
-                            Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
-                            Font = OsuFont.GetFont(size: 36, italics: true),
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Margin = new MarginPadding { Top = 15 },
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                            Font = OsuFont.GetFont(size: 26, italics: true),
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                        },
-                        new Container
-                        {
-                            Size = new Vector2(300, 60),
-                            Margin = new MarginPadding(10),
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            CornerRadius = 10,
-                            Masking = true,
-                            Children = new Drawable[]
+                            AutoSizeAxes = Axes.Both,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Direction = FillDirection.Vertical,
+                            Children = new[]
                             {
-                                backgroundSprite = new Sprite
+                                facade.With(d =>
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Texture = beatmap?.Background,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre,
-                                    FillMode = FillMode.Fill,
+                                    d.Anchor = Anchor.TopCentre;
+                                    d.Origin = Anchor.TopCentre;
+                                }),
+                                new OsuSpriteText
+                                {
+                                    Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
+                                    Font = OsuFont.GetFont(size: 36, italics: true),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Top = 15 },
                                 },
-                                loading = new LoadingLayer(backgroundSprite)
-                            }
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = beatmap?.BeatmapInfo?.Version,
-                            Font = OsuFont.GetFont(size: 26, italics: true),
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Margin = new MarginPadding
-                            {
-                                Bottom = 40
+                                new OsuSpriteText
+                                {
+                                    Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
+                                    Font = OsuFont.GetFont(size: 26, italics: true),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                },
+                                new Container
+                                {
+                                    Size = new Vector2(300, 60),
+                                    Margin = new MarginPadding(10),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    CornerRadius = 10,
+                                    Masking = true,
+                                    Children = new Drawable[]
+                                    {
+                                        backgroundSprite = new Sprite
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Texture = beatmap?.Background,
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.Centre,
+                                            FillMode = FillMode.Fill,
+                                        },
+                                        loading = new LoadingLayer(backgroundSprite)
+                                    }
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = beatmap?.BeatmapInfo?.Version,
+                                    Font = OsuFont.GetFont(size: 26, italics: true),
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Margin = new MarginPadding
+                                    {
+                                        Bottom = 40
+                                    },
+                                },
+                                new MetadataLine("来源", metadata.Source)
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                },
+                                new MetadataLine("作图者", metadata.AuthorString)
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                },
+                                new ModDisplay
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    AutoSizeAxes = Axes.Both,
+                                    Margin = new MarginPadding { Top = 20 },
+                                    Current = mods
+                                }
                             },
                         },
-                        new MetadataLine("来源", metadata.Source)
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                        },
-                        new MetadataLine("作图者", metadata.AuthorString)
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                        },
-                        new ModDisplay
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Top = 20 },
-                            Current = mods
                         }
-                    },
                 },
-                    }
-                },
-            });
+            };
 
             Loading = true;
 
@@ -230,8 +238,10 @@ namespace osu.Game.Screens.Play
             switch (Optui.Value)
             {
                 case true:
+                    //contentFillFlow.LayoutEasing = Easing.OutQuint;
+                    //contentFillFlow.LayoutDuration = 500;
                     bg.ScaleTo(1.2f);
-                    this.FadeOut().ScaleTo(1.5f).Then().Delay(750).FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
+                    basePanel.FadeOut().ScaleTo(1.5f).Then().Delay(750).FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
                     return;
                 
                 case false:
