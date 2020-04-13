@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         private readonly OsuScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
-        private readonly FlowContainer<T> scrollContentContainer;
+        private FlowContainer<T> scrollContentContainer;
 
         protected override Container<T> Content => scrollContentContainer;
 
@@ -125,19 +126,25 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(scrollContainer = new OsuScrollContainer
+            AddRangeInternal(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                ScrollbarVisible = false,
-                Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() }
-            });
-            AddInternal(headerBackgroundContainer = new Container
-            {
-                RelativeSizeAxes = Axes.X
+                scrollContainer = CreateScrollContainer().With(s =>
+                {
+                    s.RelativeSizeAxes = Axes.Both;
+                    s.Masking = true;
+                    s.ScrollbarVisible = false;
+                    s.Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() };
+                }),
+                headerBackgroundContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X
+                }
             });
             originalSectionsMargin = scrollContentContainer.Margin;
         }
+
+        [NotNull]
+        protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
 
         public void ScrollTo(Drawable section) => scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
 
