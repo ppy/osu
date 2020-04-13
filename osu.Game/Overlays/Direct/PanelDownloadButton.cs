@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Direct
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
-        private readonly BindableBool noVideoSetting = new BindableBool();
+        private Bindable<bool> noVideoSetting;
 
         public PanelDownloadButton(BeatmapSetInfo beatmapSet)
             : base(beatmapSet)
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
-            noVideoSetting.BindTo(osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo));
+            noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             button.Action = () =>
             {
