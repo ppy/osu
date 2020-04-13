@@ -3,11 +3,11 @@
 
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -77,11 +77,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
-                    ensureCursor();
-
-                    // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
-                    // is used instead since snapping control points doesn't make much sense
-                    cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                    updateCursor();
                     break;
             }
         }
@@ -98,23 +94,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     if (e.Button != MouseButton.Left)
                         break;
 
-                    // Find the last non-cursor control point and the respective drawable piece
-                    var lastPoint = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
-                    var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == lastPoint);
-
-                    if (lastPiece?.IsHovered == true)
+                    if (canPlaceNewControlPoint(out var lastPoint))
                     {
+                        // Place a new point by detatching the current cursor.
+                        updateCursor();
+                        cursor = null;
+                    }
+                    else
+                    {
+                        // Transform the last point into a new segment.
                         Debug.Assert(lastPoint != null);
 
                         segmentStart = lastPoint;
                         segmentStart.Type.Value = PathType.Linear;
 
                         currentSegmentLength = 1;
-                    }
-                    else
-                    {
-                        ensureCursor();
-                        cursor = null; // Detatch the cursor
                     }
 
                     return true;
@@ -167,17 +161,48 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        private void ensureCursor()
+        private void updateCursor()
         {
-            if (cursor == null)
+            if (canPlaceNewControlPoint(out _))
             {
-                HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
-                currentSegmentLength++;
+                // The cursor does not overlap a previous control point, so it can be added if not already existing.
+                if (cursor == null)
+                {
+                    HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
 
-                updatePathType();
+                    // The path type should be adjusted in the progression of updatePathType() (Linear -> PC -> Bezier).
+                    currentSegmentLength++;
+                    updatePathType();
+                }
 
-                Logger.Log("Set cursor");
+                // Update the cursor position.
+                cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
+            else if (cursor != null)
+            {
+                // The cursor overlaps a previous control point, so it's removed.
+                HitObject.Path.ControlPoints.Remove(cursor);
+                cursor = null;
+
+                // The path type should be adjusted in the reverse progression of updatePathType() (Bezier -> PC -> Linear).
+                currentSegmentLength--;
+                updatePathType();
+            }
+        }
+
+        /// <summary>
+        /// Whether a new control point can be placed at the current mouse position.
+        /// </summary>
+        /// <param name="lastPoint">The last-placed control point. May be null, but is not null if <c>false</c> is returned.</param>
+        /// <returns>Whether a new control point can be placed at the current position.</returns>
+        private bool canPlaceNewControlPoint([CanBeNull] out PathControlPoint lastPoint)
+        {
+            // We cannot rely on the ordering of drawable pieces, so find the respective drawable piece by searching for the last non-cursor control point.
+            var last = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
+            var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == last);
+
+            lastPoint = last;
+            return lastPiece?.IsHovered != true;
         }
 
         private void updateSlider()
