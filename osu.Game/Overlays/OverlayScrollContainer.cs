@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         /// </summary>
         private const int button_scroll_position = 200;
 
-        public ScrollToTopButton Button { get; }
+        protected readonly ScrollToTopButton Button;
 
         private float currentTarget;
 
