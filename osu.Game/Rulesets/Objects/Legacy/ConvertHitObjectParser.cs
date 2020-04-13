@@ -425,6 +425,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             public string Filename;
 
+            public FileHitSampleInfo()
+            {
+                // Has no effect since LookupNames is overridden, however prompts LegacyBeatmapSkin to not fallback.
+                Suffix = "0";
+            }
+
             public override IEnumerable<string> LookupNames => new[]
             {
                 Filename,
