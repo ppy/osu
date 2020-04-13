@@ -25,14 +25,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private OverlayScrollContainer scroll;
+        private TestScrollContainer scroll;
 
         private int invocationCount;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = scroll = new OverlayScrollContainer
+            Child = scroll = new TestScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new Container
@@ -103,6 +103,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddRepeatStep("click button", () => InputManager.Click(MouseButton.Left), 3);
 
             AddAssert("invocation count is 1", () => invocationCount == 1);
+        }
+
+        private class TestScrollContainer : OverlayScrollContainer
+        {
+            public new ScrollToTopButton Button => base.Button;
         }
     }
 }
