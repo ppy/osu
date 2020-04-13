@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             path.ClearVertices();
 
             int nextIndex = controlPointIndex + 1;
-            if (nextIndex == 0 || nextIndex == slider.Path.ControlPoints.Count)
+            if (nextIndex == 0 || nextIndex >= slider.Path.ControlPoints.Count)
                 return;
 
             path.AddVertex(Vector2.Zero);
