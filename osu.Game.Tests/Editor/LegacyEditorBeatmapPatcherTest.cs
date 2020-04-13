@@ -20,15 +20,15 @@ using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 namespace osu.Game.Tests.Editor
 {
     [TestFixture]
-    public class LegacyEditorBeatmapDifferTest
+    public class LegacyEditorBeatmapPatcherTest
     {
-        private LegacyEditorBeatmapDiffer differ;
+        private LegacyEditorBeatmapPatcher patcher;
         private EditorBeatmap current;
 
         [SetUp]
         public void Setup()
         {
-            differ = new LegacyEditorBeatmapDiffer(current = new EditorBeatmap(new OsuBeatmap
+            patcher = new LegacyEditorBeatmapPatcher(current = new EditorBeatmap(new OsuBeatmap
             {
                 BeatmapInfo =
                 {
@@ -312,7 +312,7 @@ namespace osu.Game.Tests.Editor
             patch = decode(encode(patch));
 
             // Apply the patch.
-            differ.Patch(encode(current), encode(patch));
+            patcher.Patch(encode(current), encode(patch));
 
             // Convert beatmaps to strings for assertion purposes.
             string currentStr = Encoding.ASCII.GetString(encode(current));
