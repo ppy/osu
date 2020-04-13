@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,6 +16,11 @@ namespace osu.Game.Overlays.Direct
     public class PanelDownloadButton : BeatmapDownloadTrackingComposite
     {
         protected bool DownloadEnabled => button.Enabled.Value;
+
+        /// <summary>
+        /// Currently selected beatmap. Used to present the correct difficulty after completing a download.
+        /// </summary>
+        public readonly IBindable<BeatmapInfo> SelectedBeatmap = new Bindable<BeatmapInfo>();
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
@@ -63,7 +69,11 @@ namespace osu.Game.Overlays.Direct
                         break;
 
                     case DownloadState.LocallyAvailable:
-                        game?.PresentBeatmap(BeatmapSet.Value);
+                        Predicate<BeatmapInfo> findPredicate = null;
+                        if (SelectedBeatmap.Value != null)
+                            findPredicate = b => b.OnlineBeatmapID == SelectedBeatmap.Value.OnlineBeatmapID;
+
+                        game?.PresentBeatmap(BeatmapSet.Value, findPredicate);
                         break;
 
                     default:
