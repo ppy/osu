@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
@@ -32,8 +31,8 @@ namespace osu.Game.Online.API
 
         internal void TriggerSuccess(T result)
         {
-            // disallow calling twice
-            Debug.Assert(Result == null);
+            if (Result != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
 
             Result = result;
             Success?.Invoke(result);
