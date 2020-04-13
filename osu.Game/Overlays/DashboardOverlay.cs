@@ -14,6 +14,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Users;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -153,9 +154,10 @@ namespace osu.Game.Overlays
             {
                 case GetFriendsRequest friendsRequest:
                     return new FriendDisplay(friendsRequest.Result);
-            }
 
-            return null;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         private APIRequest createScopedRequest()
