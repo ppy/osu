@@ -168,7 +168,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
+                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 0)
                     baseInfo.Suffix = CustomSampleBank.ToString();
 
                 return baseInfo;
