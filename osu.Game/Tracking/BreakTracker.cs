@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Tracking
 {
     public class BreakTracker : Component
     {

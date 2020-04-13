@@ -7,7 +7,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
-namespace osu.Game.Input
+namespace osu.Game.Tracking
 {
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.

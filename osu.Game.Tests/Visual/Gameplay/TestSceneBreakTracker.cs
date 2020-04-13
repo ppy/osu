@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
+using osu.Game.Tracking;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {

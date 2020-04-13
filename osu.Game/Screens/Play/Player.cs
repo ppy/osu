@@ -30,6 +30,7 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
+using osu.Game.Tracking;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play

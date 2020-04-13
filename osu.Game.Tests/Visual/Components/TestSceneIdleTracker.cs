@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Input;
+using osu.Game.Tracking;
 using osuTK;
 using osuTK.Graphics;
 

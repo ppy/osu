@@ -15,7 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input;
+using osu.Game.Tracking;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Menu;
