@@ -43,17 +43,9 @@ namespace osu.Game.Tests.Online
         }
 
         [Test]
-        public void TestRequestHandling()
+        public void TestQueueRequestHandling()
         {
-            AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
-            {
-                switch (req)
-                {
-                    case LeaveChannelRequest cRequest:
-                        cRequest.TriggerSuccess();
-                        break;
-                }
-            });
+            registerHandler();
 
             LeaveChannelRequest request;
             bool gotResponse = false;
@@ -67,6 +59,57 @@ namespace osu.Game.Tests.Online
             });
 
             AddAssert("response event fired", () => gotResponse);
+        }
+
+        [Test]
+        public void TestPerformRequestHandling()
+        {
+            registerHandler();
+
+            LeaveChannelRequest request;
+            bool gotResponse = false;
+
+            AddStep("fire request", () =>
+            {
+                gotResponse = false;
+                request = new LeaveChannelRequest(new Channel(), new User());
+                request.Success += () => gotResponse = true;
+                API.Perform(request);
+            });
+
+            AddAssert("response event fired", () => gotResponse);
+        }
+
+        [Test]
+        public void TestPerformAsyncRequestHandling()
+        {
+            registerHandler();
+
+            LeaveChannelRequest request;
+            bool gotResponse = false;
+
+            AddStep("fire request", () =>
+            {
+                gotResponse = false;
+                request = new LeaveChannelRequest(new Channel(), new User());
+                request.Success += () => gotResponse = true;
+                API.PerformAsync(request);
+            });
+
+            AddAssert("response event fired", () => gotResponse);
+        }
+
+        private void registerHandler()
+        {
+            AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case LeaveChannelRequest cRequest:
+                        cRequest.TriggerSuccess();
+                        break;
+                }
+            });
         }
     }
 }

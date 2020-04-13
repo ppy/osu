@@ -64,9 +64,13 @@ namespace osu.Game.Online.API
             HandleRequest?.Invoke(request);
         }
 
-        public void Perform(APIRequest request) { }
+        public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
 
-        public Task PerformAsync(APIRequest request) => Task.CompletedTask;
+        public Task PerformAsync(APIRequest request)
+        {
+            HandleRequest?.Invoke(request);
+            return Task.CompletedTask;
+        }
 
         public void Register(IOnlineComponent component)
         {
