@@ -36,7 +36,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.PurpleDarkAlternative
                 },
-                new OsuScrollContainer
+                new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new FillFlowContainer

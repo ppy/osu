@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.SearchableList
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Child = new OsuScrollContainer
+                        Child = new OverlayScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
