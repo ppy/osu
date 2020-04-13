@@ -415,7 +415,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 set
                 {
-                    if (value > 1)
+                    if (value > 0)
                         Suffix = value.ToString();
                 }
             }
