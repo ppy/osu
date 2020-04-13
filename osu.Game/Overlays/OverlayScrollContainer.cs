@@ -28,8 +28,6 @@ namespace osu.Game.Overlays
 
         protected readonly ScrollToTopButton Button;
 
-        private float currentTarget;
-
         public OverlayScrollContainer()
         {
             AddInternal(Button = new ScrollToTopButton
@@ -40,7 +38,6 @@ namespace osu.Game.Overlays
                 Action = () =>
                 {
                     ScrollToStart();
-                    currentTarget = Target;
                     Button.State = Visibility.Hidden;
                 }
             });
@@ -56,11 +53,6 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            // Clicking on button should immediately cause it's disappearance, so we don't want to override it's state until we have a new target.
-            if (Target == currentTarget)
-                return;
-
-            currentTarget = Target;
             Button.State = Target > button_scroll_position ? Visibility.Visible : Visibility.Hidden;
         }
 
