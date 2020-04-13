@@ -324,9 +324,10 @@ namespace osu.Game.Tests.Editor
         private byte[] encode(IBeatmap beatmap)
         {
             using (var encoded = new MemoryStream())
-            using (var sw = new StreamWriter(encoded, leaveOpen: true))
             {
-                new LegacyBeatmapEncoder(beatmap).Encode(sw);
+                using (var sw = new StreamWriter(encoded))
+                    new LegacyBeatmapEncoder(beatmap).Encode(sw);
+
                 return encoded.ToArray();
             }
         }
@@ -334,7 +335,7 @@ namespace osu.Game.Tests.Editor
         private IBeatmap decode(byte[] state)
         {
             using (var stream = new MemoryStream(state))
-            using (var reader = new LineBufferedReader(stream, true))
+            using (var reader = new LineBufferedReader(stream))
                 return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
         }
     }
