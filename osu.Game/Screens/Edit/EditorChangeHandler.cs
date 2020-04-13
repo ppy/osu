@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorChangeHandler : IEditorChangeHandler
     {
-        private readonly LegacyEditorBeatmapDiffer differ;
+        private readonly LegacyEditorBeatmapPatcher patcher;
 
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.HitObjectRemoved += hitObjectRemoved;
             editorBeatmap.HitObjectUpdated += hitObjectUpdated;
 
-            differ = new LegacyEditorBeatmapDiffer(editorBeatmap);
+            patcher = new LegacyEditorBeatmapPatcher(editorBeatmap);
 
             // Initial state.
             SaveState();
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit
 
             isRestoring = true;
 
-            differ.Patch(savedStates[currentState], savedStates[newState]);
+            patcher.Patch(savedStates[currentState], savedStates[newState]);
             currentState = newState;
 
             isRestoring = false;

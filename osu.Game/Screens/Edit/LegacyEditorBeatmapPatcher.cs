@@ -14,11 +14,14 @@ using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Screens.Edit
 {
-    public class LegacyEditorBeatmapDiffer
+    /// <summary>
+    /// Patches an <see cref="EditorBeatmap"/> based on the difference between two legacy (.osu) states.
+    /// </summary>
+    public class LegacyEditorBeatmapPatcher
     {
         private readonly EditorBeatmap editorBeatmap;
 
-        public LegacyEditorBeatmapDiffer(EditorBeatmap editorBeatmap)
+        public LegacyEditorBeatmapPatcher(EditorBeatmap editorBeatmap)
         {
             this.editorBeatmap = editorBeatmap;
         }
