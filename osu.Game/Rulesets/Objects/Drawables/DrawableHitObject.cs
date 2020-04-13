@@ -87,11 +87,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public JudgementResult Result { get; private set; }
 
         /// <summary>
-        /// The stereo balance of the samples played if <i>Positional hitsounds</i> is set.
+        /// The relative X position of this hit object for sample playback balance adjustment.
         /// </summary>
-        protected virtual float SamplePlaybackBalance => 0;
+        /// <remarks>
+        /// This is a range of 0..1 (0 for far-left, 0.5 for centre, 1 for far-right).
+        /// Dampening is post-applied to ensure the effect is not too intense.
+        /// </remarks>
+        protected virtual float SamplePlaybackPosition => 0.5f;
 
-        private readonly BindableDouble samplePlaybackBalanceAdjustment = new BindableDouble();
+        private readonly BindableDouble balanceAdjust = new BindableDouble();
 
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
@@ -168,7 +172,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
-            Samples.AddAdjustment(AdjustableProperty.Balance, samplePlaybackBalanceAdjustment);
+            Samples.AddAdjustment(AdjustableProperty.Balance, balanceAdjust);
             AddInternal(Samples);
         }
 
@@ -368,7 +372,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual void PlaySamples()
         {
-            samplePlaybackBalanceAdjustment.Value = userPositionalHitSounds.Value ? SamplePlaybackBalance : 0;
+            const float balance_adjust_amount = 0.4f;
+
+            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0);
             Samples?.Play();
         }
 
