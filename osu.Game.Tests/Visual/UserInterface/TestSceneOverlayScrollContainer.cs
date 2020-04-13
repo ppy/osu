@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Add(scroll = new OverlayScrollContainer
+            Child = scroll = new OverlayScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new Container
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Colour = Color4.Gray
                     }
                 }
-            });
+            };
 
             invocationCount = 0;
 
@@ -62,6 +62,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("scroll to start", () => scroll.ScrollToStart(false));
             AddAssert("button is hidden", () => scroll.Button.State == Visibility.Hidden);
+
+            AddStep("scroll to 250", () => scroll.ScrollTo(500));
+            AddUntilStep("scrolled back to start", () => Precision.AlmostEquals(scroll.Current, 500, 0.1f));
+            AddAssert("button is visible", () => scroll.Button.State == Visibility.Visible);
         }
 
         [Test]
