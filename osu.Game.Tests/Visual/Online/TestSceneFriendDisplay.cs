@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override bool UseOnlineAPI => true;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
         [Cached]
