@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -14,7 +15,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Configuration;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -77,19 +80,50 @@ namespace osu.Game.Screens.Play
             this.mods.BindTo(mods);
         }
 
+        private Container bg;
+        private readonly Bindable<bool> Optui = new Bindable<bool>();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
             AutoSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
-                new FillFlowContainer
+                new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
+                    Masking = false,
+                    Children = new Drawable[]
+                    {
+                        bg = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            CornerRadius = 20,
+                            CornerExponent = 2.5f,
+                            Masking = true,
+                            BorderColour = Color4.Black,
+                            BorderThickness = 3f,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0.5f,
+                                    Colour = Color4.Black,
+                                }
+                            }
+                        },
+                    new FillFlowContainer
+                    {
+                    AutoSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
                     Direction = FillDirection.Vertical,
                     Children = new[]
                     {
@@ -164,10 +198,46 @@ namespace osu.Game.Screens.Play
                             Current = mods
                         }
                     },
-                }
-            };
+                },
+                    }
+                },
+            });
 
             Loading = true;
+
+            config.BindWith(OsuSetting.OptUI, Optui);
+            Optui.ValueChanged += _ => UpdateVisualEffects();
+
+            EntryAnimation();
+        }
+
+        private void UpdateVisualEffects()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                    return;
+
+                case false:
+                    bg.ScaleTo(1.5f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                    return;
+            }
+        }
+
+        private void EntryAnimation()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    bg.ScaleTo(1.2f);
+                    this.FadeOut().ScaleTo(1.5f).Then().Delay(750).FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
+                    return;
+                
+                case false:
+                    bg.ScaleTo(1.5f).Then().FadeOut();
+                    return;
+            }
         }
     }
 }

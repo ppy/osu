@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Select;
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Multi.Components
                             new TriangleButton
                             {
                                 Text = "添加该谱面至游玩列表",
-                                FontSize = 22,
+                                Font = OsuFont.GetFont(size: 22),
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 Action = () => CreateNewItem?.Invoke()

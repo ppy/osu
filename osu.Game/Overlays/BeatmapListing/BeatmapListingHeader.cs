@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public BeatmapListingTitle()
             {
-                Title = "谱面 列表";
+                Title = "谱面列表";
                 IconTexture = "Icons/changelog";
             }
         }

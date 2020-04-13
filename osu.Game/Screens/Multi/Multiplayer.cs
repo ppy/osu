@@ -421,7 +421,7 @@ namespace osu.Game.Screens.Multi
                 Triangles.TriangleScale = 1.5f;
 
                 Text = "创建房间";
-                FontSize = 23.5f;
+                Font = OsuFont.GetFont(size: 23.5f);
             }
         }
     }

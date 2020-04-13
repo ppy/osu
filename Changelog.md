@@ -417,3 +417,11 @@
 *   使[OsuButton](osu.Game/Graphics/UserInterface/OsuButton.cs)可以使用自定义字体大小
 *   多人联机按钮细节修改
 *   缓解了多人联机房间列表的对齐问题
+
+### 2020/04/13
+*   合并上游pr
+    *   [m] [Remove unused changelog comments class #8733]
+    *   [m] [Make beatmap info overlay present selected difficulty #8731]
+
+*   Mf自定义UI
+    *   新增 : 优化歌曲加载界面效果

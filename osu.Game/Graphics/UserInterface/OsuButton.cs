@@ -31,10 +31,10 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public float? FontSize
+        public FontUsage Font
         {
-            get => SpriteText.Font.Size;
-            set => SpriteText.Font = SpriteText.Font.With(size: value, weight: FontWeight.Bold);
+            get => SpriteText.Font;
+            set => SpriteText.Font = value;
         }
 
         private Color4? backgroundColour;

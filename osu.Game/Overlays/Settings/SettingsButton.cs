@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
@@ -13,6 +14,7 @@ namespace osu.Game.Overlays.Settings
     {
         public SettingsButton()
         {
+            Font = OsuFont.GetFont(weight: FontWeight.Bold);
             RelativeSizeAxes = Axes.X;
             Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
         }
