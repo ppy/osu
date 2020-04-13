@@ -56,6 +56,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            // Clicking on button should immediately cause it's disappearance, so we don't want to override it's state until we have a new target.
             if (Target == currentTarget)
                 return;
 
