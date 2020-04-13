@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Play
             {
                 MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
                 {
-                    Alpha = 0,
+                    Alpha = 0.001f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },

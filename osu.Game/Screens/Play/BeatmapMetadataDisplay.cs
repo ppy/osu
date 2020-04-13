@@ -93,12 +93,6 @@ namespace osu.Game.Screens.Play
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                new Container
-                {
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Size = new Vector2(320, 353),
-                },
                 basePanel = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -238,12 +232,12 @@ namespace osu.Game.Screens.Play
             switch (Optui.Value)
             {
                 case true:
-                    //contentFillFlow.LayoutEasing = Easing.OutQuint;
-                    //contentFillFlow.LayoutDuration = 500;
                     bg.ScaleTo(1.2f);
-                    basePanel.FadeOut().ScaleTo(1.5f).Then().Delay(750).FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
+                    basePanel.ScaleTo(1.5f).Then()
+                             .Delay(750).FadeIn(500, Easing.OutQuint)
+                             .ScaleTo(1f, 500, Easing.OutQuint);
                     return;
-                
+
                 case false:
                     bg.ScaleTo(1.5f).Then().FadeOut();
                     return;

@@ -425,3 +425,7 @@
 
 *   Mf自定义UI
     *   新增 : 优化歌曲加载界面效果
+        *   **!!! 动画逻辑等仍需改进 → 需要想办法让`LogoTrackingContainer`在bg不可见时追踪他 !!!**
+        *   更新 : 使`LogoTrackContainer`不再瞬移
+
+*   翻译文本优化
