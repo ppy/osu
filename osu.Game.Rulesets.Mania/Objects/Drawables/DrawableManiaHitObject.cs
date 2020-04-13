@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        protected override float SamplePlaybackBalance
+        protected override float SamplePlaybackPosition
         {
             get
             {
