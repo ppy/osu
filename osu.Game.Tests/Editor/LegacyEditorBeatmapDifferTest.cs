@@ -315,26 +315,25 @@ namespace osu.Game.Tests.Editor
             differ.Patch(encode(current), encode(patch));
 
             // Convert beatmaps to strings for assertion purposes.
-            string currentStr = Encoding.ASCII.GetString(encode(current).ToArray());
-            string patchStr = Encoding.ASCII.GetString(encode(patch).ToArray());
+            string currentStr = Encoding.ASCII.GetString(encode(current));
+            string patchStr = Encoding.ASCII.GetString(encode(patch));
 
             Assert.That(currentStr, Is.EqualTo(patchStr));
         }
 
-        private MemoryStream encode(IBeatmap beatmap)
+        private byte[] encode(IBeatmap beatmap)
         {
-            var encoded = new MemoryStream();
-
+            using (var encoded = new MemoryStream())
             using (var sw = new StreamWriter(encoded, leaveOpen: true))
+            {
                 new LegacyBeatmapEncoder(beatmap).Encode(sw);
-
-            return encoded;
+                return encoded.ToArray();
+            }
         }
 
-        private IBeatmap decode(Stream stream)
+        private IBeatmap decode(byte[] state)
         {
-            stream.Seek(0, SeekOrigin.Begin);
-
+            using (var stream = new MemoryStream(state))
             using (var reader = new LineBufferedReader(stream, true))
                 return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
         }
