@@ -2,33 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osuTK;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
-    public class SwellCirclePiece : CirclePiece
+    public class CentreHitCirclePiece : CirclePiece
     {
-        public SwellCirclePiece()
+        public CentreHitCirclePiece()
         {
-            Add(new SwellSymbolPiece());
+            Add(new CentreHitSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour = colours.YellowDark;
+            AccentColour = colours.PinkDarker;
         }
 
         /// <summary>
-        /// The symbol used for swell pieces.
+        /// The symbol used for centre hit pieces.
         /// </summary>
-        public class SwellSymbolPiece : Container
+        public class CentreHitSymbolPiece : Container
         {
-            public SwellSymbolPiece()
+            public CentreHitSymbolPiece()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -39,11 +39,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
                 Children = new[]
                 {
-                    new SpriteIcon
+                    new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Icon = FontAwesome.Solid.Asterisk,
-                        Shadow = false
+                        Masking = true,
+                        Children = new[] { new Box { RelativeSizeAxes = Axes.Both } }
                     }
                 };
             }
