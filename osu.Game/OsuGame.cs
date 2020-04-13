@@ -315,8 +315,15 @@ namespace osu.Game
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
-        public void PresentBeatmap(BeatmapSetInfo beatmap)
+        /// <param name="difficultyCriteria">
+        /// Optional predicate used to try and find a difficulty to select.
+        /// If omitted, this will try to present the first beatmap from the current ruleset.
+        /// In case of failure the first difficulty of the set will be presented, ignoring the predicate.
+        /// </param>
+        public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
+            difficultyCriteria ??= b => b.Ruleset.Equals(Ruleset.Value);
+
             var databasedSet = beatmap.OnlineBeatmapSetID != null
                 ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
                 : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
@@ -334,13 +341,13 @@ namespace osu.Game
                     menuScreen.LoadToSolo();
 
                 // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash)
+                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && difficultyCriteria(Beatmap.Value.BeatmapInfo))
                 {
                     return;
                 }
 
-                // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First();
+                // Find first beatmap that matches our predicate.
+                var first = databasedSet.Beatmaps.Find(difficultyCriteria) ?? databasedSet.Beatmaps.First();
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
