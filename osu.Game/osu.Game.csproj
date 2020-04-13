@@ -18,6 +18,7 @@
     </None>
   </ItemGroup>
   <ItemGroup Label="Package References">
+    <PackageReference Include="DiffPlex" Version="1.6.1" />
     <PackageReference Include="Humanizer" Version="2.7.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
