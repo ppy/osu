@@ -15,7 +15,6 @@ using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    [Cached]
     public abstract class Playfield : CompositeDrawable
     {
         /// <summary>
