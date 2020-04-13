@@ -39,7 +39,7 @@ namespace osu.Game.Overlays
         public BeatmapSetOverlay()
             : base(OverlayColourScheme.Blue)
         {
-            OsuScrollContainer scroll;
+            OverlayScrollContainer scroll;
             Info info;
             CommentsSection comments;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                scroll = new OsuScrollContainer
+                scroll = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,

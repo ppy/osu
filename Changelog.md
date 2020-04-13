@@ -422,10 +422,20 @@
 *   合并上游pr
     *   [m] [Remove unused changelog comments class #8733]
     *   [m] [Make beatmap info overlay present selected difficulty #8731]
+    *   [m] [Implement OverlayScrollContainer component #8471]
+    *   [m] [Add stereo shifted hitsound playback support #8699]
+    *   [m] [Bump BenchmarkDotNet from 0.12.0 to 0.12.1 #8739]
+    *   [m] [Add undo/redo support to the Editor #8696]
+    *   [m] [Add basic taiko "hit" skinning support #8711]
+    *   [m] [Fix connections hidden due to overlapping controlpoints #8737]
+    *   [m] [Add change state support to more Editor components #8697]
+    *   [m] [Use OverlayScrollContainer for overlays #8740]
+    *   [m] [Limit upper number of editor beatmap states saved to 50 #8741]
+    *   [m] [Rework slider control point placement to improve path progression #8736]
 
 *   Mf自定义UI
     *   新增 : 优化歌曲加载界面效果
-        *   **!!! 动画逻辑等仍需改进 → 需要想办法让`LogoTrackingContainer`在bg不可见时追踪他 !!!**
+        *   **!!! 需要想办法让`LogoTrackingContainer`在`bg`不可见时追踪他 !!!**
         *   更新 : 使`LogoTrackContainer`不再瞬移
 
 *   翻译文本优化

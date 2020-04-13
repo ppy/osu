@@ -196,6 +196,8 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both;
             }
 
+            protected override OsuScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
+
             protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new FillFlowContainer<ProfileSection>
             {
                 Direction = FillDirection.Vertical,

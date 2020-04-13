@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (action == HitAction)
                 HitAction = null;
-                
+
             base.OnReleased(action);
         }
 

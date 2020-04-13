@@ -40,6 +40,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         private EditorBeatmap editorBeatmap { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         public SelectionHandler()
         {
             selectedBlueprints = new List<SelectionBlueprint>();
@@ -152,8 +155,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void deleteSelected()
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in selectedBlueprints.ToList())
-                editorBeatmap.Remove(h.HitObject);
+                editorBeatmap?.Remove(h.HitObject);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
@@ -205,6 +212,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
             {
                 // Make sure there isn't already an existing sample
@@ -213,6 +222,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 h.Samples.Add(new HitSampleInfo { Name = sampleName });
             }
+
+            changeHandler?.EndChange();
         }
 
         /// <summary>
@@ -221,8 +232,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
@@ -238,16 +253,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 var items = new List<MenuItem>
                 {
-                    new OsuMenuItem("音效")
+                    new OsuMenuItem("Sound")
                     {
                         Items = new[]
                         {
-                            createHitSampleMenuItem("口哨", HitSampleInfo.HIT_WHISTLE),
-                            createHitSampleMenuItem("拍掌", HitSampleInfo.HIT_CLAP),
-                            createHitSampleMenuItem("重音", HitSampleInfo.HIT_FINISH)
+                            createHitSampleMenuItem("Whistle", HitSampleInfo.HIT_WHISTLE),
+                            createHitSampleMenuItem("Clap", HitSampleInfo.HIT_CLAP),
+                            createHitSampleMenuItem("Finish", HitSampleInfo.HIT_FINISH)
                         }
                     },
-                    new OsuMenuItem("删除", MenuItemType.Destructive, deleteSelected),
+                    new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
                 };
 
                 if (selectedBlueprints.Count == 1)

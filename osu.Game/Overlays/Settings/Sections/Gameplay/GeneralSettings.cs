@@ -57,6 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "总是显示按键框",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "立体音效",
+                    Bindable = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
+                },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {
                     LabelText = "分数计类型",

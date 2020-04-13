@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
+        private EditorChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
 
@@ -100,8 +101,10 @@ namespace osu.Game.Screens.Edit
             }
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
-
             dependencies.CacheAs(editorBeatmap);
+
+            changeHandler = new EditorChangeHandler(editorBeatmap);
+            dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
             EditorMenuBar menuBar;
 
@@ -111,10 +114,7 @@ namespace osu.Game.Screens.Edit
             };
 
             if (RuntimeInfo.IsDesktop)
-            {
-                
-                fileMenuItems.Add(new EditorMenuItem("导出地图", MenuItemType.Standard, exportBeatmap));
-            }
+                fileMenuItems.Add(new EditorMenuItem("导出图包", MenuItemType.Standard, exportBeatmap));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("退出", MenuItemType.Standard, this.Exit));
@@ -150,6 +150,14 @@ namespace osu.Game.Screens.Edit
                                 new MenuItem("文件")
                                 {
                                     Items = fileMenuItems
+                                },
+                                new MenuItem("编辑")
+                                {
+                                    Items = new[]
+                                    {
+                                        new EditorMenuItem("撤销", MenuItemType.Standard, undo),
+                                        new EditorMenuItem("重做", MenuItemType.Standard, redo)
+                                    }
                                 }
                             }
                         }
@@ -237,6 +245,19 @@ namespace osu.Game.Screens.Edit
                     }
 
                     break;
+
+                case Key.Z:
+                    if (e.ControlPressed)
+                    {
+                        if (e.ShiftPressed)
+                            redo();
+                        else
+                            undo();
+
+                        return true;
+                    }
+
+                    break;
             }
 
             return base.OnKeyDown(e);
@@ -299,6 +320,10 @@ namespace osu.Game.Screens.Edit
 
             return base.OnExiting(next);
         }
+
+        private void undo() => changeHandler.RestoreState(-1);
+
+        private void redo() => changeHandler.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {

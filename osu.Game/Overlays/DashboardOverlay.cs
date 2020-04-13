@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
         private readonly DashboardOverlayHeader header;
         private readonly Container content;
         private readonly LoadingLayer loading;
-        private readonly BasicScrollContainer scrollFlow;
+        private readonly OverlayScrollContainer scrollFlow;
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple)
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                scrollFlow = new BasicScrollContainer
+                scrollFlow = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
