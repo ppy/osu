@@ -44,16 +44,27 @@ namespace osu.Game.Screens.Select
         /// <returns>The recommended difficulty, or null if a recommendation could not be provided.</returns>
         public BeatmapInfo GetRecommendedBeatmap(IEnumerable<BeatmapInfo> beatmaps)
         {
-            if (recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars))
+            if (!recommendedStarDifficulty.Any())
+                return null;
+
+            BeatmapInfo beatmap = null;
+
+            foreach (var r in getBestRulesetOrder())
             {
-                return beatmaps.OrderBy(b =>
+                if (!recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars))
+                    break;
+
+                beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
                     var difference = b.StarDifficulty - stars;
                     return difference >= 0 ? difference * 2 : difference * -1; // prefer easier over harder
                 }).FirstOrDefault();
+
+                if (beatmap != null)
+                    break;
             }
 
-            return null;
+            return beatmap;
         }
 
         private void calculateRecommendedDifficulties()
@@ -70,6 +81,26 @@ namespace osu.Game.Screens.Select
 
                 api.Queue(req);
             });
+        }
+
+        private IEnumerable<RulesetInfo> bestRulesetOrder;
+
+        private IEnumerable<RulesetInfo> getBestRulesetOrder()
+        {
+            if (bestRulesetOrder != null)
+                return bestRulesetOrder;
+
+            var otherRulesets = recommendedStarDifficulty.ToList()
+                                                         .Where(pair => !pair.Key.Equals(ruleset.Value))
+                                                         .OrderBy(pair => pair.Value)
+                                                         .Select(pair => pair.Key)
+                                                         .Reverse();
+
+            var rulesetList = new List<RulesetInfo>(new[] { ruleset.Value });
+            rulesetList.AddRange(otherRulesets);
+
+            bestRulesetOrder = rulesetList;
+            return rulesetList;
         }
 
         public void APIStateChanged(IAPIProvider api, APIState state)
