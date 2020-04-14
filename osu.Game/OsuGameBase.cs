@@ -100,6 +100,9 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
+        [Cached]
+        protected readonly DifficultyRecommender DifficultyRecommender = new DifficultyRecommender();
+
         public virtual string Version
         {
             get
@@ -241,9 +244,7 @@ namespace osu.Game
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
 
-            DifficultyRecommender difficultyRecommender;
-            dependencies.Cache(difficultyRecommender = new DifficultyRecommender());
-            Add(difficultyRecommender);
+            Add(DifficultyRecommender);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }

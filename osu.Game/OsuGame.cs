@@ -322,7 +322,7 @@ namespace osu.Game
         /// </param>
         public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            difficultyCriteria ??= b => b.Ruleset.Equals(Ruleset.Value);
+            difficultyCriteria ??= _ => true;
 
             var databasedSet = beatmap.OnlineBeatmapSetID != null
                 ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
@@ -346,11 +346,15 @@ namespace osu.Game
                     return;
                 }
 
-                // Find first beatmap that matches our predicate.
-                var first = databasedSet.Beatmaps.Find(difficultyCriteria) ?? databasedSet.Beatmaps.First();
+                // Find beatmaps that match our predicate.
+                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria(b));
+                if (!beatmaps.Any())
+                    beatmaps = databasedSet.Beatmaps;
 
-                Ruleset.Value = first.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps);
+
+                Ruleset.Value = selection.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
             }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
