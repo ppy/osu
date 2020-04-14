@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -87,18 +86,25 @@ namespace osu.Game.Overlays
             header.Current.BindValueChanged(_ => onTabChanged());
         }
 
+        private bool fetchRequired = true;
+
         protected override void PopIn()
         {
             base.PopIn();
 
-            if (!content.Any())
+            // We don't want to create new request on every call, only when exiting from fully closed state.
+            if (fetchRequired)
+            {
                 header.Current.TriggerChange();
+                fetchRequired = false;
+            }
         }
 
         protected override void PopOutComplete()
         {
             base.PopOutComplete();
-            loadDisplay(null);
+            loadDisplay(Empty());
+            fetchRequired = true;
         }
 
         private void onTabChanged()
@@ -111,7 +117,7 @@ namespace osu.Game.Overlays
             // We may want to use OnlineViewContainer after https://github.com/ppy/osu/pull/8044 merge
             if (!api.IsLoggedIn)
             {
-                loadDisplay(null);
+                loadDisplay(Empty());
                 return;
             }
 
@@ -120,12 +126,12 @@ namespace osu.Game.Overlays
 
             if (request == null)
             {
-                loadDisplay(null);
+                loadDisplay(Empty());
                 return;
             }
 
             request.Success += () => Schedule(() => loadDisplay(createDisplayFromResponse(request)));
-            request.Failure += _ => Schedule(() => loadDisplay(null));
+            request.Failure += _ => Schedule(() => loadDisplay(Empty()));
 
             api.Queue(request);
         }
@@ -133,13 +139,6 @@ namespace osu.Game.Overlays
         private void loadDisplay(Drawable display)
         {
             scrollFlow.ScrollToStart();
-
-            if (display == null)
-            {
-                content.Clear();
-                loading.Hide();
-                return;
-            }
 
             LoadComponentAsync(display, loaded =>
             {
