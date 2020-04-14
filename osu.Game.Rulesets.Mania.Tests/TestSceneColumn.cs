@@ -28,7 +28,9 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             typeof(Column),
             typeof(ColumnBackground),
-            typeof(ColumnHitObjectArea)
+            typeof(ColumnHitObjectArea),
+            typeof(DefaultKeyArea),
+            typeof(DefaultHitTarget)
         };
 
         [Cached(typeof(IReadOnlyList<Mod>))]
