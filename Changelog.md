@@ -442,7 +442,10 @@
 
 ## 2020/4/14
 *   `Triangles`兼容性修复
+*   修复`Triangles`在未给定`IgnoreSettings`时透明度不正确的问题
 *   修复`三角形粒子动画`设置无效的问题
+
+
 *   合并上游pr
     *   [m] [Fix scoring in classic mode not awarding exact numerical value for judgement #8750]
     *   [m] [Implement "prefer no-video" option #8716]

@@ -24,6 +24,7 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
         public bool IgnoreSettings = false;
+        public float alpha_orig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
 
@@ -105,6 +106,7 @@ namespace osu.Game.Graphics.Backgrounds
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
 
+            alpha_orig = Alpha;
             config.BindWith(OsuSetting.TrianglesEnabled, TrianglesEnabled);
 
             TrianglesEnabled.ValueChanged += _ => UpdateIcons();
@@ -116,7 +118,7 @@ namespace osu.Game.Graphics.Backgrounds
                 switch (TrianglesEnabled.Value)
                 {
                     case true:
-                        this.FadeIn(250);
+                        this.FadeTo(alpha_orig, 250);
                         break;
 
                     case false:
