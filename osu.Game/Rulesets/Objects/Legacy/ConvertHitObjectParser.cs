@@ -420,22 +420,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     customSampleBank = value;
 
-                    // A 0 custom sample bank should cause LegacyBeatmapSkin to always fall back to the user skin. This is done by giving a null suffix.
-                    if (value > 0)
+                    if (value >= 2)
                         Suffix = value.ToString();
-                }
-            }
-
-            public override IEnumerable<string> LookupNames
-            {
-                get
-                {
-                    // The lookup should only contain the suffix for custom sample bank 2 and beyond.
-                    // For custom sample bank 1 and 0, the lookup should not contain the suffix as only the lookup source (beatmap or user skin) is changed.
-                    if (CustomSampleBank >= 2)
-                        yield return $"{Bank}-{Name}{Suffix}";
-
-                    yield return $"{Bank}-{Name}";
                 }
             }
         }
