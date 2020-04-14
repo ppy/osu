@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             api.Register(this);
+
+            ruleset.ValueChanged += _ => bestRulesetOrder = null;
         }
 
         /// <summary>
