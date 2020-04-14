@@ -439,3 +439,10 @@
         *   更新 : 使`LogoTrackContainer`不再瞬移
 
 *   翻译文本优化
+
+## 2020/4/14
+*   `Triangles`兼容性修复
+*   修复`三角形粒子动画`设置无效的问题
+*   合并上游pr
+    *   [m] [Fix scoring in classic mode not awarding exact numerical value for judgement #8750]
+    *   [m] [Implement "prefer no-video" option #8716]
