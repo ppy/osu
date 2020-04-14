@@ -81,8 +81,6 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
-        private DifficultyRecommender recommender;
-
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
 
@@ -104,14 +102,13 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, DifficultyRecommender recommender)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
             AddRangeInternal(new Drawable[]
             {
-                recommender = new DifficultyRecommender(),
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
