@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osuTK;
 using System.Linq;
 using osu.Game.Audio;
@@ -108,19 +107,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
     }
 
-    public abstract class DrawableTaikoHitObject<TTaikoHit> : DrawableTaikoHitObject
-        where TTaikoHit : TaikoHitObject
+    public abstract class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
+        where TObject : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        public new TTaikoHit HitObject;
+        public new TObject HitObject;
 
         protected readonly Vector2 BaseSize;
-        protected readonly TaikoPiece MainPiece;
+        protected readonly CompositeDrawable MainPiece;
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
-        protected DrawableTaikoHitObject(TTaikoHit hitObject)
+        protected DrawableTaikoHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
@@ -132,7 +131,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
             Content.Add(MainPiece = CreateMainPiece());
-            MainPiece.KiaiMode = HitObject.Kiai;
 
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
@@ -169,7 +167,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         // Normal and clap samples are handled by the drum
         protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
 
-        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
+        protected abstract CompositeDrawable CreateMainPiece();
 
         /// <summary>
         /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.
