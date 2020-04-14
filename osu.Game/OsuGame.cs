@@ -316,8 +316,8 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         /// <param name="difficultyCriteria">
-        /// Optional predicate used to try and find a difficulty to select.
-        /// If omitted, this will try to present the first beatmap from the current ruleset.
+        /// Optional predicate used to filter which difficulties to select.
+        /// If omitted, this will try to present a recommended beatmap from the current ruleset.
         /// In case of failure the first difficulty of the set will be presented, ignoring the predicate.
         /// </param>
         public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
@@ -351,7 +351,10 @@ namespace osu.Game
                 if (!beatmaps.Any())
                     beatmaps = databasedSet.Beatmaps;
 
-                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps);
+                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps) ?? (
+                    // fallback if a difficulty can't be recommended, maybe we are offline
+                    databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First()
+                );
 
                 Ruleset.Value = selection.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
