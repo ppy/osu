@@ -111,7 +111,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"Source: {beatmap.Metadata.Source}"));
             writer.WriteLine(FormattableString.Invariant($"Tags: {beatmap.Metadata.Tags}"));
             writer.WriteLine(FormattableString.Invariant($"BeatmapID: {beatmap.BeatmapInfo.OnlineBeatmapID ?? 0}"));
-            writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID ?? -1}"));
+            writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID ?? -1}"));
         }
 
         private void handleDifficulty(TextWriter writer)

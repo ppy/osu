@@ -49,6 +49,7 @@ namespace osu.Game.Configuration
             };
 
             Set(OsuSetting.ExternalLinkWarning, true);
+            Set(OsuSetting.PreferNoVideo, false);
 
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -89,6 +90,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
             Set(OsuSetting.KeyOverlay, false);
+            Set(OsuSetting.PositionalHitSounds, true);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
@@ -177,6 +179,7 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
+        PositionalHitSounds,
         ScoreMeter,
         FloatingComments,
         ShowInterface,
@@ -214,6 +217,7 @@ namespace osu.Game.Configuration
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,
+        PreferNoVideo,
         Scaling,
         ScalingPositionX,
         ScalingPositionY,

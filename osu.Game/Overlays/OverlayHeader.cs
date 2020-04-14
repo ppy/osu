@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -14,7 +13,6 @@ namespace osu.Game.Overlays
     public abstract class OverlayHeader : Container
     {
         private readonly Box titleBackground;
-        private readonly ScreenTitle title;
 
         protected readonly FillFlowContainer HeaderInfo;
 
@@ -57,11 +55,10 @@ namespace osu.Game.Overlays
                                         Padding = new MarginPadding
                                         {
                                             Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                                            Vertical = 10,
                                         },
                                         Children = new[]
                                         {
-                                            title = CreateTitle().With(title =>
+                                            CreateTitle().With(title =>
                                             {
                                                 title.Anchor = Anchor.CentreLeft;
                                                 title.Origin = Anchor.CentreLeft;
@@ -86,7 +83,6 @@ namespace osu.Game.Overlays
         private void load(OverlayColourProvider colourProvider)
         {
             titleBackground.Colour = colourProvider.Dark5;
-            title.AccentColour = colourProvider.Highlight1;
         }
 
         [NotNull]
@@ -96,11 +92,11 @@ namespace osu.Game.Overlays
         protected virtual Drawable CreateBackground() => Empty();
 
         /// <summary>
-        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="ScreenTitle"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
+        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="OverlayTitle"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
         /// </summary>
         [NotNull]
         protected virtual Drawable CreateTitleContent() => Empty();
 
-        protected abstract ScreenTitle CreateTitle();
+        protected abstract OverlayTitle CreateTitle();
     }
 }

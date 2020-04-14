@@ -62,6 +62,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Positional hitsounds",
+                    Bindable = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
+                },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {
                     LabelText = "Score meter type",

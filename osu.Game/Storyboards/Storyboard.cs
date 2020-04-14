@@ -47,9 +47,6 @@ namespace osu.Game.Storyboards
                 if (backgroundPath == null)
                     return false;
 
-                if (GetLayer("Video").Elements.Any())
-                    return true;
-
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }
         }
