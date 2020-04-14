@@ -409,26 +409,46 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        private class LegacyHitSampleInfo : HitSampleInfo
+        internal class LegacyHitSampleInfo : HitSampleInfo
         {
+            private int customSampleBank;
+
             public int CustomSampleBank
             {
+                get => customSampleBank;
                 set
                 {
+                    customSampleBank = value;
+
+                    // A 0 custom sample bank should cause LegacyBeatmapSkin to always fall back to the user skin. This is done by giving a null suffix.
                     if (value > 0)
                         Suffix = value.ToString();
                 }
             }
+
+            public override IEnumerable<string> LookupNames
+            {
+                get
+                {
+                    // The lookup should only contain the suffix for custom sample bank 2 and beyond.
+                    // For custom sample bank 1 and 0, the lookup should not contain the suffix as only the lookup source (beatmap or user skin) is changed.
+                    if (CustomSampleBank >= 2)
+                        yield return $"{Bank}-{Name}{Suffix}";
+
+                    yield return $"{Bank}-{Name}";
+                }
+            }
         }
 
-        private class FileHitSampleInfo : HitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo
         {
             public string Filename;
 
             public FileHitSampleInfo()
             {
-                // Has no effect since LookupNames is overridden, however prompts LegacyBeatmapSkin to not fallback.
-                Suffix = "0";
+                // Make sure that the LegacyBeatmapSkin does not fall back to the user skin.
+                // Note that this does not change the lookup names, as they are overridden locally.
+                CustomSampleBank = 1;
             }
 
             public override IEnumerable<string> LookupNames => new[]
