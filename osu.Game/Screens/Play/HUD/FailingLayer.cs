@@ -26,7 +26,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private const int fade_time = 400;
 
-        private Bindable<bool> enabled;
+        private readonly Bindable<bool> enabled = new Bindable<bool>();
+        private Bindable<bool> configEnabled;
 
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
@@ -36,6 +37,7 @@ namespace osu.Game.Screens.Play.HUD
         private const float gradient_size = 0.3f;
 
         private readonly Container boxes;
+        private HealthProcessor healthProcessor;
 
         public FailingLayer()
         {
@@ -73,16 +75,29 @@ namespace osu.Game.Screens.Play.HUD
         {
             boxes.Colour = color.Red;
 
-            enabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
+            configEnabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
             enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0, fade_time, Easing.OutQuint), true);
+
+            updateBindings();
         }
 
         public override void BindHealthProcessor(HealthProcessor processor)
         {
             base.BindHealthProcessor(processor);
 
-            // don't display ever if the ruleset is not using a draining health display.
-            if (!(processor is DrainingHealthProcessor))
+            healthProcessor = processor;
+            updateBindings();
+        }
+
+        private void updateBindings()
+        {
+            if (configEnabled == null || healthProcessor == null)
+                return;
+
+            // Don't display ever if the ruleset is not using a draining health display.
+            if (healthProcessor is DrainingHealthProcessor)
+                enabled.BindTo(configEnabled);
+            else
             {
                 enabled.UnbindBindings();
                 enabled.Value = false;
