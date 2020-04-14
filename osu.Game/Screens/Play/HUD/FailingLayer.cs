@@ -23,20 +23,18 @@ namespace osu.Game.Screens.Play.HUD
     public class FailingLayer : HealthDisplay
     {
         private const float max_alpha = 0.4f;
-
         private const int fade_time = 400;
-
-        private readonly Bindable<bool> enabled = new Bindable<bool>();
-        private Bindable<bool> configEnabled;
+        private const float gradient_size = 0.3f;
 
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
         /// </summary>
         public double LowHealthThreshold = 0.20f;
 
-        private const float gradient_size = 0.3f;
-
+        private readonly Bindable<bool> enabled = new Bindable<bool>();
         private readonly Container boxes;
+
+        private Bindable<bool> configEnabled;
         private HealthProcessor healthProcessor;
 
         public FailingLayer()
