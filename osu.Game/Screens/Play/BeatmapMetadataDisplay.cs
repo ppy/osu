@@ -18,6 +18,8 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Rulesets;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
@@ -56,6 +58,7 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
         private LoadingSpinner loading;
+        private SelectedRulesetIcon ruleseticon;
         private Sprite backgroundSprite;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
@@ -65,9 +68,20 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (value)
+                {
                     loading.Show();
+                    ruleseticon.Hide();
+                }
                 else
+                {
                     loading.Hide();
+                    if ( Optui.Value )
+                        ruleseticon.Delay(200).Then()
+                                   .ScaleTo(1.5f).FadeOut().Then()
+                                   .FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
+                    else
+                        ruleseticon.Hide();
+                }
             }
         }
 
@@ -167,7 +181,8 @@ namespace osu.Game.Screens.Play
                                             Anchor = Anchor.Centre,
                                             FillMode = FillMode.Fill,
                                         },
-                                        loading = new LoadingLayer(backgroundSprite)
+                                        loading = new LoadingLayer(backgroundSprite),
+                                        ruleseticon = new SelectedRulesetIcon(),
                                     }
                                 },
                                 new OsuSpriteText
@@ -212,6 +227,49 @@ namespace osu.Game.Screens.Play
 
             EntryAnimation();
         }
+
+        private class SelectedRulesetIcon : Container
+        {
+
+            [Resolved]
+            private IBindable<RulesetInfo> rulesetInfo { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Origin = Anchor.Centre;
+                Anchor = Anchor.Centre;
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        Size = new Vector2(40),
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        CornerRadius = 10,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0.8f,
+                                Colour = Color4.Black,
+                            }
+                        }
+                    },
+                    new ConstrainedIconContainer
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
+                        Colour = Color4.White,
+                        Size = new Vector2(25),
+                    },
+                };
+            }
+        };
 
         private void UpdateVisualEffects()
         {

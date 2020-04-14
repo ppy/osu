@@ -8,7 +8,7 @@
 ```
 
 ### 2020/03/28
-* 描述 : 切换自定义ui选项时的相关逻辑仍需改进
+* 描述 : ~~切换自定义ui选项时的相关逻辑仍需改进~~(已解决)
 * 相关文件:
     *   [Toolbar.cs](osu.Game/Overlays/Toolbar/Toolbar.cs)
 
