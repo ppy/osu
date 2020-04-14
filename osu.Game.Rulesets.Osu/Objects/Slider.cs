@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Head:
-                        AddNested(HeadCircle = new SliderCircle
+                        AddNested(HeadCircle = new SliderHeadCircle
                         {
                             StartTime = e.Time,
                             Position = Position,
