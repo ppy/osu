@@ -253,7 +253,7 @@ namespace osu.Game.Tests.Gameplay
                 };
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
-                dependencies.SkinSource = new SkinProvidingContainer(new LegacySkin(userSkinInfo, userSkinResourceStore, dependencies.Get<AudioManager>()));
+                dependencies.SkinSource = new SkinProvidingContainer(new LegacySkin(userSkinInfo, userSkinResourceStore, Audio));
             });
         }
 
@@ -287,7 +287,7 @@ namespace osu.Game.Tests.Gameplay
                 if (type == typeof(ISkinSource))
                     return SkinSource;
 
-                return fallback.Get(type);
+                return fallback.Get(type, info);
             }
 
             public void Inject<T>(T instance) where T : class
