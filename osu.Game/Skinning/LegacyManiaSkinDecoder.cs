@@ -102,7 +102,9 @@ namespace osu.Game.Skinning
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.MinimumColumnWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        float minWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        if (minWidth > 0)
+                            currentConfig.MinimumColumnWidth = minWidth;
                         break;
 
                     case string _ when pair.Key.StartsWith("Colour"):

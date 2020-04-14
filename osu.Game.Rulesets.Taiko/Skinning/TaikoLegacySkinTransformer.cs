@@ -32,6 +32,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                         return new LegacyInputDrum();
 
                     return null;
+
+                case TaikoSkinComponents.CentreHit:
+                case TaikoSkinComponents.RimHit:
+
+                    if (GetTexture("taikohitcircle") != null)
+                        return new LegacyHit(taikoComponent.Component);
+
+                    return null;
             }
 
             return source.GetDrawableComponent(component);
