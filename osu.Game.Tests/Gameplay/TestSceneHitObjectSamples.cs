@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -24,6 +25,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Gameplay
 {
+    [HeadlessTest]
     public class TestSceneHitObjectSamples : PlayerTestScene
     {
         private readonly SkinInfo userSkinInfo = new SkinInfo();
