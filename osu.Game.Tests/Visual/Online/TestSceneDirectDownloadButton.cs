@@ -149,8 +149,8 @@ namespace osu.Game.Tests.Visual.Online
 
             public DownloadState DownloadState => State.Value;
 
-            public TestDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            public TestDownloadButton(BeatmapSetInfo beatmapSet)
+                : base(beatmapSet)
             {
             }
         }
