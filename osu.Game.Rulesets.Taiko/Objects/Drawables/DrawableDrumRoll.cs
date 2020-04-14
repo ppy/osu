@@ -34,17 +34,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private Color4 colourIdle;
         private Color4 colourEngaged;
 
+        private ElongatedCirclePiece elongatedPiece;
+
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
             RelativeSizeAxes = Axes.Y;
-            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
+            elongatedPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            MainPiece.AccentColour = colourIdle = colours.YellowDark;
+            elongatedPiece.AccentColour = colourIdle = colours.YellowDark;
             colourEngaged = colours.YellowDarker;
         }
 
@@ -84,7 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
+        protected override CompositeDrawable CreateMainPiece() => elongatedPiece = new ElongatedCirclePiece();
 
         public override bool OnPressed(TaikoAction action) => false;
 
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             rollingHits = Math.Clamp(rollingHits, 0, rolling_hits_for_engaged_colour);
 
             Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
-            MainPiece.FadeAccent(newColour, 100);
+            (MainPiece as IHasAccentColour)?.FadeAccent(newColour, 100);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

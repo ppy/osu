@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourProvider.Background6
                 },
-                new BasicScrollContainer
+                new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
