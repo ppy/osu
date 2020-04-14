@@ -449,3 +449,7 @@
 *   合并上游pr
     *   [m] [Fix scoring in classic mode not awarding exact numerical value for judgement #8750]
     *   [m] [Implement "prefer no-video" option #8716]
+    *   [m] [Fix beatmap background not displaying when video is present #8751]
+    *   [m] [Add support for testing arbitrary API requests/responses via Dummy API #8714]
+    *   [m] [Make beatmap carousel select recommended difficulties #8444]
+    *   [m] [Mark dummy api test scene as headless #8752]

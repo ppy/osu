@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
         public bool IgnoreSettings = false;
-        public float alpha_orig = 1;
+        private float alpha_orig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
 
