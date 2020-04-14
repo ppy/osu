@@ -444,7 +444,7 @@
 *   `Triangles`兼容性修复
 *   修复`Triangles`在未给定`IgnoreSettings`时透明度不正确的问题
 *   修复`三角形粒子动画`设置无效的问题
-*   优化歌曲界面加载效果
+*   继续调整歌曲加载界面动画
 
 
 *   合并上游pr
@@ -453,4 +453,7 @@
     *   [m] [Fix beatmap background not displaying when video is present #8751]
     *   [m] [Add support for testing arbitrary API requests/responses via Dummy API #8714]
     *   [m] [Make beatmap carousel select recommended difficulties #8444]
+    *   [m] [Fade playfield to red when player health is low #8312]
+
+*   暂不合并
     *   [m] [Mark dummy api test scene as headless #8752]

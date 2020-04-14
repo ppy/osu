@@ -54,6 +54,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "生命值低时游戏区域泛红",
+                    Bindable = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "总是显示按键框",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },

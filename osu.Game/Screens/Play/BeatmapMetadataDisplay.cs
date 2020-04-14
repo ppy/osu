@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play
                 {
                     loading.Hide();
                     if ( Optui.Value )
-                        ruleseticon.Delay(200).Then()
+                        ruleseticon.Delay(250).Then()
                                    .ScaleTo(1.5f).FadeOut().Then()
                                    .FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
                     else
@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Play
                 {
                     new Container
                     {
-                        Size = new Vector2(40),
+                        Size = new Vector2(200, 40),
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         CornerRadius = 10,
@@ -259,13 +259,28 @@ namespace osu.Game.Screens.Play
                             }
                         }
                     },
-                    new ConstrainedIconContainer
+                    new FillFlowContainer
                     {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
-                        Colour = Color4.White,
-                        Size = new Vector2(25),
+                        RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(10),
+                        Children = new Drawable[]
+                        {
+                            new ConstrainedIconContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
+                                Colour = Color4.White,
+                                Size = new Vector2(20),
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = $"{rulesetInfo.Value.CreateInstance().Description}",
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                            }
+                        }
                     },
                 };
             }
@@ -276,10 +291,12 @@ namespace osu.Game.Screens.Play
             switch (Optui.Value)
             {
                 case true:
+                    ruleseticon.FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
                     bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     return;
 
                 case false:
+                    ruleseticon.FadeOut(500, Easing.OutQuint).ScaleTo(1.5f, 500, Easing.OutQuint);
                     bg.ScaleTo(1.5f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
                     return;
             }

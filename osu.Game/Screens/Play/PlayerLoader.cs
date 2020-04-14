@@ -29,6 +29,9 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
+        private float extra_delay = 750;
+        private readonly Bindable<bool> Optui = new Bindable<bool>();
+
         protected const float BACKGROUND_BLUR = 15;
 
         public override bool HideOverlaysOnEnter => hideOverlays;
@@ -105,9 +108,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics)
+        private void load(SessionStatics sessionStatics, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+            config.BindWith(OsuSetting.OptUI, Optui);
 
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -138,6 +142,22 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
+
+            Optui.ValueChanged += _ => UpdateExtraDelay();
+        }
+
+        private void UpdateExtraDelay()
+        {
+            switch ( Optui.Value )
+            {
+                case true:
+                    extra_delay = 750;
+                    break;
+                
+                case false:
+                    extra_delay = 0;
+                    break;
+            }
         }
 
         protected override void LoadComplete()
@@ -306,9 +326,9 @@ namespace osu.Game.Screens.Play
 
                 scheduledPushPlayer = Scheduler.AddDelayed(() =>
                 {
-                    contentOut();
+                    this.Delay(extra_delay).Schedule( () => contentOut() );
 
-                    this.Delay(250).Schedule(() =>
+                    this.Delay(250 + extra_delay).Schedule(() =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
