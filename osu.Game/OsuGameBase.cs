@@ -33,6 +33,7 @@ using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osuTK.Input;
 
@@ -239,6 +240,10 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            DifficultyRecommender difficultyRecommender;
+            dependencies.Cache(difficultyRecommender = new DifficultyRecommender());
+            Add(difficultyRecommender);
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }
