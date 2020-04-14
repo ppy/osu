@@ -81,6 +81,8 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
+        private DifficultyRecommender recommender;
+
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
 
@@ -109,6 +111,7 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
+                recommender = new DifficultyRecommender(),
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -156,6 +159,7 @@ namespace osu.Game.Screens.Select
                                             RelativeSizeAxes = Axes.Both,
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                            GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
                                         },
                                     }
                                 },
