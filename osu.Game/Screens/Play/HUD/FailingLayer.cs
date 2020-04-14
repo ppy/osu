@@ -92,14 +92,13 @@ namespace osu.Game.Screens.Play.HUD
             if (configEnabled == null || healthProcessor == null)
                 return;
 
+            enabled.UnbindBindings();
+
             // Don't display ever if the ruleset is not using a draining health display.
             if (healthProcessor is DrainingHealthProcessor)
                 enabled.BindTo(configEnabled);
             else
-            {
-                enabled.UnbindBindings();
                 enabled.Value = false;
-            }
         }
 
         protected override void Update()
