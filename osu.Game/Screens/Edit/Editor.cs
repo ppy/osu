@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
+        private EditorChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
 
@@ -100,8 +101,10 @@ namespace osu.Game.Screens.Edit
             }
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
-
             dependencies.CacheAs(editorBeatmap);
+
+            changeHandler = new EditorChangeHandler(editorBeatmap);
+            dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
             EditorMenuBar menuBar;
 
@@ -147,6 +150,14 @@ namespace osu.Game.Screens.Edit
                                 new MenuItem("File")
                                 {
                                     Items = fileMenuItems
+                                },
+                                new MenuItem("Edit")
+                                {
+                                    Items = new[]
+                                    {
+                                        new EditorMenuItem("Undo", MenuItemType.Standard, undo),
+                                        new EditorMenuItem("Redo", MenuItemType.Standard, redo)
+                                    }
                                 }
                             }
                         }
@@ -234,6 +245,19 @@ namespace osu.Game.Screens.Edit
                     }
 
                     break;
+
+                case Key.Z:
+                    if (e.ControlPressed)
+                    {
+                        if (e.ShiftPressed)
+                            redo();
+                        else
+                            undo();
+
+                        return true;
+                    }
+
+                    break;
             }
 
             return base.OnKeyDown(e);
@@ -296,6 +320,10 @@ namespace osu.Game.Screens.Edit
 
             return base.OnExiting(next);
         }
+
+        private void undo() => changeHandler.RestoreState(-1);
+
+        private void redo() => changeHandler.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {
