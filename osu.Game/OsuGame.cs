@@ -322,8 +322,6 @@ namespace osu.Game
         /// </param>
         public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            difficultyCriteria ??= _ => true;
-
             var databasedSet = beatmap.OnlineBeatmapSetID != null
                 ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
                 : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
@@ -347,14 +345,20 @@ namespace osu.Game
                 }
 
                 // Find beatmaps that match our predicate.
-                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria(b));
+                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true);
                 if (!beatmaps.Any())
                     beatmaps = databasedSet.Beatmaps;
 
-                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps) ?? (
-                    // fallback if a difficulty can't be recommended, maybe we are offline
-                    databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First()
-                );
+                var selection = DifficultyRecommender.GetRecommendedBeatmap(beatmaps);
+
+                // fallback if a difficulty can't be recommended, maybe we are offline
+                if (selection == null)
+                {
+                    if (difficultyCriteria != null)
+                        selection = beatmaps.First();
+                    else
+                        selection = databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First();
+                }
 
                 Ruleset.Value = selection.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
