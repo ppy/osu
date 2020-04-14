@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
 
+        protected override float SamplePlaybackPosition => HitObject.X;
+
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {

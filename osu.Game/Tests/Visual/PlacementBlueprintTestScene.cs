@@ -4,8 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -15,12 +13,10 @@ using osu.Game.Screens.Edit.Compose;
 namespace osu.Game.Tests.Visual
 {
     [Cached(Type = typeof(IPlacementHandler))]
-    public abstract class PlacementBlueprintTestScene : OsuTestScene, IPlacementHandler
+    public abstract class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
-        protected Container HitObjectContainer;
+        protected readonly Container HitObjectContainer;
         private PlacementBlueprint currentBlueprint;
-
-        private InputManager inputManager;
 
         protected PlacementBlueprintTestScene()
         {
@@ -45,8 +41,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
-            Add(currentBlueprint = CreateBlueprint());
+            ResetPlacement();
         }
 
         public void BeginPlacement(HitObject hitObject)
@@ -58,7 +53,13 @@ namespace osu.Game.Tests.Visual
             if (commit)
                 AddHitObject(CreateHitObject(hitObject));
 
-            Remove(currentBlueprint);
+            ResetPlacement();
+        }
+
+        protected void ResetPlacement()
+        {
+            if (currentBlueprint != null)
+                Remove(currentBlueprint);
             Add(currentBlueprint = CreateBlueprint());
         }
 
@@ -66,10 +67,11 @@ namespace osu.Game.Tests.Visual
         {
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        protected override void Update()
         {
-            currentBlueprint.UpdatePosition(e.ScreenSpaceMousePosition);
-            return true;
+            base.Update();
+
+            currentBlueprint.UpdatePosition(InputManager.CurrentState.Mouse.Position);
         }
 
         public override void Add(Drawable drawable)
@@ -79,7 +81,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is PlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdatePosition(inputManager.CurrentState.Mouse.Position);
+                blueprint.UpdatePosition(InputManager.CurrentState.Mouse.Position);
             }
         }
 
