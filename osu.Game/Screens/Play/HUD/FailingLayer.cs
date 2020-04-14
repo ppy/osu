@@ -75,7 +75,11 @@ namespace osu.Game.Screens.Play.HUD
 
             configEnabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
             enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0, fade_time, Easing.OutQuint), true);
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             updateBindings();
         }
 
@@ -89,7 +93,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateBindings()
         {
-            if (configEnabled == null || healthProcessor == null)
+            if (LoadState < LoadState.Ready)
                 return;
 
             enabled.UnbindBindings();
