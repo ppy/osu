@@ -239,6 +239,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         StartTime = HitObject.StartTime,
                         Duration = endTimeData.Duration,
                         Column = column,
+                        Samples = HitObject.Samples,
                         Head = { Samples = sampleInfoListAt(HitObject.StartTime) },
                         Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
                     });
