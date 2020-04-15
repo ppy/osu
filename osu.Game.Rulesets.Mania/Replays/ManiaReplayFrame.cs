@@ -74,22 +74,20 @@ namespace osu.Game.Rulesets.Mania.Replays
                         // the index in lazer, which doesn't include special keys.
                         int nonSpecialKeyIndex = action - ManiaAction.Key1;
 
+                        // the index inclusive of special keys.
                         int overallIndex = 0;
 
                         // iterate to find the index including special keys.
-                        while (true)
+                        for (; overallIndex < maniaBeatmap.TotalColumns; overallIndex++)
                         {
-                            if (!isColumnAtIndexSpecial(maniaBeatmap, overallIndex))
-                            {
-                                // found a non-special column we could use.
-                                if (nonSpecialKeyIndex == 0)
-                                    break;
-
-                                // found a non-special column but not ours.
-                                nonSpecialKeyIndex--;
-                            }
-
-                            overallIndex++;
+                            // skip over special columns.
+                            if (isColumnAtIndexSpecial(maniaBeatmap, overallIndex))
+                                continue;
+                            // found a non-special column to use.
+                            if (nonSpecialKeyIndex == 0)
+                                break;
+                            // found a non-special column but not ours.
+                            nonSpecialKeyIndex--;
                         }
 
                         keys |= 1 << overallIndex;
@@ -127,21 +125,20 @@ namespace osu.Game.Rulesets.Mania.Replays
         /// </summary>
         /// <param name="beatmap">The beatmap.</param>
         /// <param name="index">The overall index to check.</param>
-        /// <returns></returns>
         private bool isColumnAtIndexSpecial(ManiaBeatmap beatmap, int index)
         {
             foreach (var stage in beatmap.Stages)
             {
-                for (int stageIndex = 0; stageIndex < stage.Columns; stageIndex++)
+                if (index >= stage.Columns)
                 {
-                    if (index == 0)
-                        return stage.IsSpecialColumn(stageIndex);
-
-                    index--;
+                    index -= stage.Columns;
+                    continue;
                 }
+
+                return stage.IsSpecialColumn(index);
             }
 
-            return false;
+            throw new ArgumentException("Column index is too high.", nameof(index));
         }
     }
 }
