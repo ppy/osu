@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -16,7 +18,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
@@ -27,13 +28,18 @@ namespace osu.Game.Overlays
 {
     public class BeatmapListingOverlay : FullscreenOverlay
     {
+        /// <summary>
+        /// Scroll distance from bottom at which new beatmaps will be loaded, if possible.
+        /// </summary>
+        protected const int pagination_scroll_distance = 500;
+
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private SearchBeatmapSetsRequest getSetsRequest;
+        private OverlayScrollContainer scroll;
 
         private Drawable currentContent;
         private BeatmapListingSearchSection searchSection;
@@ -54,7 +60,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourProvider.Background6
                 },
-                new OverlayScrollContainer
+                scroll = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -168,16 +174,33 @@ namespace osu.Game.Overlays
         }
 
         private ScheduledDelegate queryChangedDebounce;
+        private ScheduledDelegate addPageDebounce;
 
         private LoadingLayer loadingLayer;
         private Container panelTarget;
 
+        [CanBeNull]
+        private BeatmapSetPager beatmapSetPager;
+
+        private bool shouldLoadNextPage => scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(pagination_scroll_distance);
+
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
-            getSetsRequest?.Cancel();
+            beatmapSetPager?.Reset();
 
             queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+        }
+
+        private void queueAddPage()
+        {
+            if (beatmapSetPager == null || !beatmapSetPager.CanFetchNextPage)
+                return;
+
+            if (addPageDebounce != null)
+                return;
+
+            beatmapSetPager.FetchNextPage();
         }
 
         private void updateSearch()
@@ -195,28 +218,58 @@ namespace osu.Game.Overlays
 
             loadingLayer.Show();
 
-            getSetsRequest = new SearchBeatmapSetsRequest(
+            beatmapSetPager?.Reset();
+            beatmapSetPager = new BeatmapSetPager(
+                API,
+                rulesets,
                 searchSection.Query.Value,
                 searchSection.Ruleset.Value,
                 searchSection.Category.Value,
                 sortControl.Current.Value,
                 sortControl.SortDirection.Value);
 
-            getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
+            beatmapSetPager.PageFetch += onPageFetch;
 
-            API.Queue(getSetsRequest);
+            addPageDebounce?.Cancel();
+            addPageDebounce = null;
+
+            queueAddPage();
         }
 
-        private void recreatePanels(SearchBeatmapSetsResponse response)
+        private void onPageFetch(List<BeatmapSetInfo> beatmaps)
         {
-            if (response.Total == 0)
+            Schedule(() =>
+            {
+                if (beatmapSetPager.IsPastFirstPage)
+                {
+                    addPanels(beatmaps);
+                }
+                else
+                {
+                    recreatePanels(beatmaps);
+                }
+
+                addPageDebounce = Scheduler.AddDelayed(() => addPageDebounce = null, 1000);
+            });
+        }
+
+        private IEnumerable<DirectPanel> createPanels(IEnumerable<BeatmapSetInfo> beatmaps)
+        {
+            return beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
+        }
+
+        private void recreatePanels(IEnumerable<BeatmapSetInfo> beatmaps)
+        {
+            if (beatmapSetPager.TotalSets == 0)
             {
                 searchSection.BeatmapSet = null;
                 LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder);
                 return;
             }
-
-            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
             var newPanels = new FillFlowContainer<DirectPanel>
             {
@@ -225,11 +278,7 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(10),
                 Alpha = 0,
                 Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                })
+                ChildrenEnumerable = createPanels(beatmaps)
             };
 
             LoadComponentAsync(newPanels, loaded =>
@@ -237,6 +286,11 @@ namespace osu.Game.Overlays
                 addContentToPlaceholder(loaded);
                 searchSection.BeatmapSet = beatmaps.First();
             });
+        }
+
+        private void addPanels(IEnumerable<BeatmapSetInfo> beatmaps)
+        {
+            LoadComponentsAsync(createPanels(beatmaps), loaded => addPanelsToContent(loaded));
         }
 
         private void addContentToPlaceholder(Drawable content)
@@ -260,10 +314,29 @@ namespace osu.Game.Overlays
             currentContent.FadeIn(200, Easing.OutQuint);
         }
 
+        private void addPanelsToContent(IEnumerable<DirectPanel> panels)
+        {
+            // TODO: Fade in?
+
+            if (currentContent == null)
+                return;
+
+            ((FillFlowContainer<DirectPanel>)currentContent).AddRange(panels);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (shouldLoadNextPage)
+                queueAddPage();
+        }
+
         protected override void Dispose(bool isDisposing)
         {
-            getSetsRequest?.Cancel();
+            beatmapSetPager?.Reset();
             queryChangedDebounce?.Cancel();
+            addPageDebounce?.Cancel();
 
             base.Dispose(isDisposing);
         }

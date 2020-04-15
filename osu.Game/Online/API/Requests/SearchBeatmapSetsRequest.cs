@@ -13,15 +13,17 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly string query;
         private readonly RulesetInfo ruleset;
+        private readonly object cursor;
         private readonly BeatmapSearchCategory searchCategory;
         private readonly DirectSortCriteria sortCriteria;
         private readonly SortDirection direction;
         private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, object cursor = null, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
+            this.cursor = cursor;
             this.searchCategory = searchCategory;
             this.sortCriteria = sortCriteria;
             this.direction = direction;
@@ -34,6 +36,9 @@ namespace osu.Game.Online.API.Requests
 
             if (ruleset.ID.HasValue)
                 req.AddParameter("m", ruleset.ID.Value.ToString());
+
+            if (cursor != null)
+                req.AddParameter("cursor", cursor.ToString());
 
             req.AddParameter("s", searchCategory.ToString().ToLowerInvariant());
             req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");

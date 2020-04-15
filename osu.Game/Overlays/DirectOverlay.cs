@@ -258,6 +258,7 @@ namespace osu.Game.Overlays
             getSetsRequest = new SearchBeatmapSetsRequest(
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
+                null,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)
 
