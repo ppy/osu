@@ -155,8 +155,8 @@ namespace osu.Game.Screens.Edit
                                 {
                                     Items = new[]
                                     {
-                                        new EditorMenuItem("Undo", MenuItemType.Standard, undo),
-                                        new EditorMenuItem("Redo", MenuItemType.Standard, redo)
+                                        new EditorMenuItem("Undo", MenuItemType.Standard, undo) { Enabled = { BindTarget = changeHandler.CanUndo } },
+                                        new EditorMenuItem("Redo", MenuItemType.Standard, redo) { Enabled = { BindTarget = changeHandler.CanRedo } }
                                     }
                                 }
                             }
