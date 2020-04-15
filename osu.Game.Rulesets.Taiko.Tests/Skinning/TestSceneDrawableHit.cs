@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             typeof(DrawableCentreHit),
             typeof(DrawableRimHit),
             typeof(LegacyHit),
+            typeof(LegacyCirclePiece),
         }).ToList();
 
         [BackgroundDependencyLoader]
