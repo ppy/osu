@@ -44,13 +44,13 @@ namespace osu.Game.IO.Serialization.Converters
             var list = new List<T>();
 
             var obj = JObject.Load(reader);
-            var lookupTable = serializer.Deserialize<List<string>>(obj["lookup_table"].CreateReader());
+            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"].CreateReader());
 
-            foreach (var tok in obj["items"])
+            foreach (var tok in obj["$items"])
             {
                 var itemReader = tok.CreateReader();
 
-                var typeName = lookupTable[(int)tok["type"]];
+                var typeName = lookupTable[(int)tok["$type"]];
                 var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
                 serializer.Populate(itemReader, instance);
 
@@ -85,16 +85,16 @@ namespace osu.Game.IO.Serialization.Converters
                 }
 
                 var itemObject = JObject.FromObject(item, serializer);
-                itemObject.AddFirst(new JProperty("type", typeId));
+                itemObject.AddFirst(new JProperty("$type", typeId));
                 objects.Add(itemObject);
             }
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("lookup_table");
+            writer.WritePropertyName("$lookup_table");
             serializer.Serialize(writer, lookupTable);
 
-            writer.WritePropertyName("items");
+            writer.WritePropertyName("$items");
             serializer.Serialize(writer, objects);
 
             writer.WriteEndObject();
