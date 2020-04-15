@@ -10,6 +10,7 @@ using osuTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Effects;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// for a usage example.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : BeatSyncedContainer
+    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = 0.45f;
         public const float SYMBOL_BORDER = 8;
