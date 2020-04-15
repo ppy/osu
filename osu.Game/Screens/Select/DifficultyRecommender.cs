@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             api.Register(this);
-
-            ruleset.ValueChanged += _ => bestRulesetOrder = null;
         }
 
         /// <summary>
@@ -90,19 +88,22 @@ namespace osu.Game.Screens.Select
         private IEnumerable<RulesetInfo> getBestRulesetOrder()
         {
             if (bestRulesetOrder != null)
-                return bestRulesetOrder;
+                return moveCurrentRulesetToFirst();
 
-            var otherRulesets = recommendedStarDifficulty.ToList()
-                                                         .Where(pair => !pair.Key.Equals(ruleset.Value))
-                                                         .OrderBy(pair => pair.Value)
-                                                         .Select(pair => pair.Key)
-                                                         .Reverse();
+            bestRulesetOrder = recommendedStarDifficulty.ToList()
+                                                        .OrderBy(pair => pair.Value)
+                                                        .Select(pair => pair.Key)
+                                                        .Reverse();
 
-            var rulesetList = new List<RulesetInfo>(new[] { ruleset.Value });
-            rulesetList.AddRange(otherRulesets);
+            return moveCurrentRulesetToFirst();
+        }
 
-            bestRulesetOrder = rulesetList;
-            return rulesetList;
+        private IEnumerable<RulesetInfo> moveCurrentRulesetToFirst()
+        {
+            var orderedRulesets = bestRulesetOrder.ToList();
+            orderedRulesets.Remove(ruleset.Value);
+            orderedRulesets.Insert(0, ruleset.Value);
+            return orderedRulesets;
         }
 
         public void APIStateChanged(IAPIProvider api, APIState state)
