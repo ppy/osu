@@ -134,17 +134,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             // Get player's throughput according to miss count
-            double missTP;
-            if (effectiveMissCount == 0)
-                missTP = Attributes.MissTPs[0];
-            else
-            {
-                missTP = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
+            double missTP = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
                                  .Interpolate(effectiveMissCount);
-
-                // give it a small penalty so that higher combo almost always gives higher pp
-                missTP = Math.Max(missTP, 0) * 0.997;
-            }
+            missTP = Math.Max(missTP, 0);
 
             // Combine combo based throughput and miss count based throughput
             double tp = Math.Pow(comboTP, comboWeight) * Math.Pow(missTP, 1 - comboWeight);
