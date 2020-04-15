@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition || h is ManiaHitObject);
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
