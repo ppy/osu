@@ -40,6 +40,8 @@ namespace osu.Game.Screens.Menu
 
         private Screen songSelect;
 
+        private Screen mvisScreen;
+
         private MenuSideFlashes sideFlashes;
 
         private ButtonSystem buttons;
@@ -102,6 +104,7 @@ namespace osu.Game.Screens.Menu
                         {
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
+                            OnMvisButton = onMvis,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
                         }
@@ -139,6 +142,7 @@ namespace osu.Game.Screens.Menu
             buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
+            LoadComponentAsync(mvisScreen = new MvisScreen());
             preloadSongSelect();
         }
         [Resolved(canBeNull: true)]
@@ -161,6 +165,8 @@ namespace osu.Game.Screens.Menu
         public void LoadToSolo() => Schedule(onSolo);
 
         private void onSolo() => this.Push(consumeSongSelect());
+
+        private void onMvis() => this.Push( new MvisScreen() );
 
         private Screen consumeSongSelect()
         {

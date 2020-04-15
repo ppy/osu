@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Compose
             composer = ruleset?.CreateHitObjectComposer();
 
             if (ruleset == null || composer == null)
-                return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}编辑器");
+                return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "该谱面" : $"{ruleset.Description}编辑器");
 
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 

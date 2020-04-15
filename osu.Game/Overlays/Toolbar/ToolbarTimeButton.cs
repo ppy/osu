@@ -9,6 +9,8 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarTimeButton : ToolbarButton
     {
 
+        public string DateTimeString;
+
         public ToolbarTimeButton()
         {
             SetIcon(FontAwesome.Solid.Clock);
@@ -25,7 +27,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.Update();
 
-            TooltipSub = GetTimeInfo().ToString() ?? "未知";
+            DateTimeString = TooltipSub = GetTimeInfo().ToString() ?? "未知";
 
         }
     }
