@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -28,5 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         public override bool OnPressed(TaikoAction action) => false;
+
+        protected override CompositeDrawable CreateMainPiece() => new TickPiece();
     }
 }
