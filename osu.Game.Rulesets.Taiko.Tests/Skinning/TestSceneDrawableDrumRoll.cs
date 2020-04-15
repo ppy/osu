@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 
@@ -23,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             typeof(DrawableDrumRoll),
             typeof(DrawableDrumRollTick),
+            typeof(LegacyDrumRoll),
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
