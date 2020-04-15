@@ -461,3 +461,7 @@
 ### 2020/4/25
 *   继续调整动画
 *   翻译补全
+
+*   合并上游pr
+    *   [m] [Fix typo in DrawableTaikoHitObject #8761]
+    *   [m] [Fix osu!mania replays actuating incorrect keys when multiple stages are involved #8755]

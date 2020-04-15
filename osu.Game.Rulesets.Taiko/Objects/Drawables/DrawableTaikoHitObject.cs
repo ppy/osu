@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         /// <summary>
         /// Moves <see cref="Content"/> to a layer proxied above the playfield.
-        /// Does nothing is content is already proxied.
+        /// Does nothing if content is already proxied.
         /// </summary>
         protected void ProxyContent()
         {
