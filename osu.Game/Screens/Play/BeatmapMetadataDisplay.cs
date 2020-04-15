@@ -75,10 +75,14 @@ namespace osu.Game.Screens.Play
                 else
                 {
                     loading.Hide();
+
                     if ( Optui.Value )
+                    {
+                        ruleseticon.Loaded = true;
                         ruleseticon.Delay(250).Then()
                                    .ScaleTo(1.5f).FadeOut().Then()
                                    .FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
+                    }
                     else
                         ruleseticon.Hide();
                 }
@@ -96,7 +100,6 @@ namespace osu.Game.Screens.Play
 
         private Container basePanel;
         private Container bg;
-        private FillFlowContainer contentFillFlow;
         private readonly Bindable<bool> Optui = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
@@ -135,7 +138,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        contentFillFlow = new FillFlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -228,8 +231,47 @@ namespace osu.Game.Screens.Play
             EntryAnimation();
         }
 
+        private void UpdateVisualEffects()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    ruleseticon.Delay(500).Schedule( () => ruleseticon.AddRulesetSprite() );
+                    ruleseticon.ScaleTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                    bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                    return;
+
+                case false:
+                    ruleseticon.ScaleTo(0.9f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                    bg.FadeOut(500, Easing.OutQuint).ScaleTo(1.1f, 500, Easing.OutQuint);
+                    return;
+            }
+        }
+
+        private void EntryAnimation()
+        {
+            switch (Optui.Value)
+            {
+                case true:
+                    bg.ScaleTo(1.2f);
+                    basePanel.ScaleTo(1.5f).Then()
+                             .Delay(750).FadeIn(500, Easing.OutQuint)
+                             .ScaleTo(1f, 500, Easing.OutQuint);
+                    return;
+
+                case false:
+                    ruleseticon.ScaleTo(0.9f).FadeOut();
+                    bg.ScaleTo(1.1f).FadeOut();
+                    return;
+            }
+        }
+
+        
+
         private class SelectedRulesetIcon : Container
         {
+            public FillFlowContainer contentFillFlow;
+            private OsuSpriteText rulesetSpriteText;
 
             [Resolved]
             private IBindable<RulesetInfo> rulesetInfo { get; set; }
@@ -259,64 +301,65 @@ namespace osu.Game.Screens.Play
                             }
                         }
                     },
-                    new FillFlowContainer
+                    contentFillFlow = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.Both,
                         Spacing = new Vector2(10),
+                        LayoutDuration = 500,
+                        LayoutEasing = Easing.OutQuint,
                         Children = new Drawable[]
                         {
                             new ConstrainedIconContainer
                             {
-                                Origin = Anchor.Centre,
                                 Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
                                 Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
                                 Colour = Color4.White,
                                 Size = new Vector2(20),
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = $"{rulesetInfo.Value.CreateInstance().Description}",
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
                             }
+
                         }
                     },
                 };
+
+                Loaded = false;
+            }
+
+            private bool LoadAnimationDone = false;
+            public bool Loaded
+            {
+                set
+                {
+                    if ( value )
+                    {
+                        this.Delay(750).Schedule( () => AddRulesetSprite() );
+                    }
+                }
+            }
+
+            public void AddRulesetSprite()
+            {
+                if ( !LoadAnimationDone )
+                {
+                    contentFillFlow.Add(
+                                new Container
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Child = rulesetSpriteText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = $"{rulesetInfo.Value.CreateInstance().Description}",
+                                    }
+                                });
+                    rulesetSpriteText.FadeOut().Then().FadeIn(500, Easing.OutQuint);
+
+                    LoadAnimationDone = true;
+                }
             }
         };
-
-        private void UpdateVisualEffects()
-        {
-            switch (Optui.Value)
-            {
-                case true:
-                    ruleseticon.FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
-                    bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
-                    return;
-
-                case false:
-                    ruleseticon.FadeOut(500, Easing.OutQuint).ScaleTo(1.5f, 500, Easing.OutQuint);
-                    bg.ScaleTo(1.5f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
-                    return;
-            }
-        }
-
-        private void EntryAnimation()
-        {
-            switch (Optui.Value)
-            {
-                case true:
-                    bg.ScaleTo(1.2f);
-                    basePanel.ScaleTo(1.5f).Then()
-                             .Delay(750).FadeIn(500, Easing.OutQuint)
-                             .ScaleTo(1f, 500, Easing.OutQuint);
-                    return;
-
-                case false:
-                    bg.ScaleTo(1.5f).Then().FadeOut();
-                    return;
-            }
-        }
     }
 }
