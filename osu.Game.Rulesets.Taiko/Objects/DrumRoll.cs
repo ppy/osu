@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasEndTime
+    public class DrumRoll : TaikoHitObject, IHasDistance
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
@@ -25,6 +25,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
         }
 
         public double Duration { get; set; }
+
+        public double Distance => Duration * Velocity;
+
+        /// <summary>
+        /// Velocity of this <see cref="DrumRoll"/>.
+        /// </summary>
+        public double Velocity { get; private set; }
 
         /// <summary>
         /// Numer of ticks per beat length.
@@ -54,6 +61,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
+
+            double scoringDistance = base_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
             overallDifficulty = difficulty.OverallDifficulty;

@@ -313,7 +313,7 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (hitObject)
             {
-                case IHasCurve _:
+                case IHasDistance _:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
