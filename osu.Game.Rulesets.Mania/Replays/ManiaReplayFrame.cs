@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                 }
             }
 
-            throw new InvalidOperationException("Special key index too high");
+            throw new ArgumentException("Special key index is too high.", nameof(specialOffset));
         }
 
         /// <summary>
