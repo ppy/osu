@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private int rollingHits;
 
-        private Container<DrawableDrumRollTick> tickContainer;
+        private Container tickContainer;
 
         private Color4 colourIdle;
         private Color4 colourEngaged;
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             updateColour();
 
-            ((Container)MainPiece.Drawable).Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
+            Content.Add(tickContainer = new Container { RelativeSizeAxes = Axes.Both });
 
             if (MainPiece.Drawable is IHasAccentColour accentMain)
                 accentMain.AccentColour = colourIdle;
@@ -139,6 +139,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
+        private void updateColour()
+        {
+            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
+            (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, 100);
+        }
+
         private class StrongNestedHit : DrawableStrongNestedHit
         {
             public StrongNestedHit(StrongHitObject strong, DrawableDrumRoll drumRoll)
@@ -155,12 +161,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
 
             public override bool OnPressed(TaikoAction action) => false;
-        }
-
-        private void updateColour()
-        {
-            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
-            (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, 100);
         }
     }
 }
