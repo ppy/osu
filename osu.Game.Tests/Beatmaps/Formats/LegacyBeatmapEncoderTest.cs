@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -32,57 +31,58 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var decoded = decode(name, out var encoded);
 
-            Assert.That(decoded.HitObjects.Count, Is.EqualTo(encoded.HitObjects.Count));
-
             string encodedSerialised = encoded.Serialize();
             string decodedSerialised = decoded.Serialize();
 
+            Assert.That(encoded.HitObjects.Count, Is.EqualTo(decoded.HitObjects.Count));
             Assert.That(encodedSerialised, Is.EqualTo(decodedSerialised));
         }
 
-        private Beatmap decode(string filename, out Beatmap encoded)
+        private IBeatmap decode(string filename, out IBeatmap encoded)
         {
             using (var stream = TestResources.GetStore().GetStream(filename))
             using (var sr = new LineBufferedReader(stream))
             {
-                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+                var legacyDecoded = convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr));
 
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
-                using (var sr2 = new LineBufferedReader(ms))
+                using (var sr2 = new LineBufferedReader(ms, true))
                 {
-                    RulesetInfo ruleset = null;
-
-                    switch (legacyDecoded.BeatmapInfo.RulesetID)
-                    {
-                        case 0:
-                            ruleset = new OsuRuleset().RulesetInfo;
-                            break;
-
-                        case 1:
-                            ruleset = new TaikoRuleset().RulesetInfo;
-                            break;
-
-                        case 2:
-                            ruleset = new CatchRuleset().RulesetInfo;
-                            break;
-
-                        case 3:
-                            ruleset = new ManiaRuleset().RulesetInfo;
-                            break;
-                    }
-
-                    var converted = new TestWorkingBeatmap(legacyDecoded).GetPlayableBeatmap(ruleset);
-
-                    new LegacyBeatmapEncoder(converted).Encode(sw);
+                    new LegacyBeatmapEncoder(legacyDecoded).Encode(sw);
 
                     sw.Flush();
                     ms.Position = 0;
 
-                    encoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr2);
+                    encoded = convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr2));
+
                     return legacyDecoded;
                 }
             }
+        }
+
+        private IBeatmap convert(IBeatmap beatmap)
+        {
+            switch (beatmap.BeatmapInfo.RulesetID)
+            {
+                case 0:
+                    beatmap.BeatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;
+                    break;
+
+                case 1:
+                    beatmap.BeatmapInfo.Ruleset = new TaikoRuleset().RulesetInfo;
+                    break;
+
+                case 2:
+                    beatmap.BeatmapInfo.Ruleset = new CatchRuleset().RulesetInfo;
+                    break;
+
+                case 3:
+                    beatmap.BeatmapInfo.Ruleset = new ManiaRuleset().RulesetInfo;
+                    break;
+            }
+
+            return new TestWorkingBeatmap(beatmap).GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
         }
 
         private class TestWorkingBeatmap : WorkingBeatmap
