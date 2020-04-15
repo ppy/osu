@@ -11,12 +11,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {
-    public class LegacyDrumRoll : Container, IHasAccentColour
+    public class LegacyDrumRoll : CompositeDrawable, IHasAccentColour
     {
-        protected override Container<Drawable> Content => content;
-
-        private Container content;
-
         private LegacyCirclePiece headCircle;
 
         private Sprite body;
@@ -25,63 +21,40 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
         public LegacyDrumRoll()
         {
-            RelativeSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load(ISkinSource skin, OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
-                content = new Container
+                end = new Sprite
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = skin.GetTexture("taiko-roll-end"),
+                    FillMode = FillMode.Fit,
+                },
+                body = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        headCircle = new LegacyCirclePiece
-                        {
-                            Depth = float.MinValue,
-                            RelativeSizeAxes = Axes.Y,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                        },
-                        body = new Sprite
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Texture = skin.GetTexture("taiko-roll-middle"),
-                        },
-                        end = new Sprite
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Texture = skin.GetTexture("taiko-roll-end"),
-                            FillMode = FillMode.Fit,
-                        },
-                    },
+                    Texture = skin.GetTexture("taiko-roll-middle"),
+                },
+                headCircle = new LegacyCirclePiece
+                {
+                    RelativeSizeAxes = Axes.Y,
                 },
             };
+
+            AccentColour = colours.YellowDark;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             updateAccentColour();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            var padding = Content.DrawHeight * Content.Width / 2;
-
-            Content.Padding = new MarginPadding
-            {
-                Left = padding,
-                Right = padding,
-            };
-
-            Width = Parent.DrawSize.X + DrawHeight;
         }
 
         private Color4 accentColour;
