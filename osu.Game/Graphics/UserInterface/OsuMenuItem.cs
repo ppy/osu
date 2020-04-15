@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuMenuItem : MenuItem
     {
+        public readonly Bindable<bool> Enabled = new Bindable<bool>(true);
+
         public readonly MenuItemType Type;
 
         public OsuMenuItem(string text, MenuItemType type = MenuItemType.Standard)
@@ -19,6 +22,9 @@ namespace osu.Game.Graphics.UserInterface
             : base(text, action)
         {
             Type = type;
+
+            Enabled.BindValueChanged(enabled => Action.Disabled = !enabled.NewValue);
+            Action.BindDisabledChanged(disabled => Enabled.Value = !disabled);
         }
     }
 }
