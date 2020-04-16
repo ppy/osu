@@ -43,5 +43,10 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"Perfect")]
         Perfect,
+
+        SmallTickHit,
+        SmallTickMiss,
+        LargeTickHit,
+        LargeTickMiss,
     }
 }
