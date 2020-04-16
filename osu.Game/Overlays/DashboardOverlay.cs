@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            // We don't want to create new display on every call, only when exiting from fully closed state.
+            // We don't want to create a new display on every call, only when exiting from fully closed state.
             if (displayUpdateRequired)
             {
                 header.Current.TriggerChange();
@@ -102,7 +102,9 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(display, loaded =>
             {
-                loading.Hide();
+                if (API.IsLoggedIn)
+                    loading.Hide();
+
                 content.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
@@ -110,8 +112,13 @@ namespace osu.Game.Overlays
         private void onTabChanged(ValueChangedEvent<DashboardOverlayTabs> tab)
         {
             cancellationToken?.Cancel();
-
             loading.Show();
+
+            if (!API.IsLoggedIn)
+            {
+                loadDisplay(Empty());
+                return;
+            }
 
             switch (tab.NewValue)
             {
@@ -126,19 +133,10 @@ namespace osu.Game.Overlays
 
         public override void APIStateChanged(IAPIProvider api, APIState state)
         {
-            switch (state)
-            {
-                case APIState.Online:
-                    // Will force to create a display based on visibility state
-                    displayUpdateRequired = true;
-                    State.TriggerChange();
-                    return;
+            if (State.Value == Visibility.Hidden)
+                return;
 
-                default:
-                    content.Clear();
-                    loading.Show();
-                    return;
-            }
+            header.Current.TriggerChange();
         }
 
         protected override void Dispose(bool isDisposing)
