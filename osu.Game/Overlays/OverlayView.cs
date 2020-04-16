@@ -55,9 +55,6 @@ namespace osu.Game.Overlays
                     request.Success += response => Schedule(() => OnSuccess(response));
                     api.Queue(request);
                     break;
-
-                default:
-                    break;
             }
         }
 
