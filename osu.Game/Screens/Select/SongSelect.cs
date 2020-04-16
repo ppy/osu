@@ -34,7 +34,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
@@ -70,9 +69,6 @@ namespace osu.Game.Screens.Select
         /// Whether entering editor mode should be allowed.
         /// </summary>
         public virtual bool AllowEditing => true;
-
-        [Resolved(canBeNull: true)]
-        private NotificationOverlay notificationOverlay { get; set; }
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
@@ -329,10 +325,7 @@ namespace osu.Game.Screens.Select
         public void Edit(BeatmapInfo beatmap = null)
         {
             if (!AllowEditing)
-            {
-                notificationOverlay?.Post(new SimpleNotification { Text = "Editing is not available from the current mode." });
-                return;
-            }
+                throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             this.Push(new Editor());
