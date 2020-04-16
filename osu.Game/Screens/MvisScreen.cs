@@ -41,6 +41,7 @@ namespace osu.Game.Screens
 
         Container buttons;
         HoverCheckContainer hoverCheckContainer;
+        ParallaxContainer beatmapParallax;
         private Box bgBox;
 
         private bool AllowCursor = false;
@@ -78,7 +79,7 @@ namespace osu.Game.Screens
                     Alpha = 0.3f
                 },
                 new SpaceParticlesContainer(),
-                new ParallaxContainer
+                beatmapParallax = new ParallaxContainer
                 {
                     ParallaxAmount = -0.0025f,
                     Child = new BeatmapLogo
@@ -212,6 +213,8 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
+            beatmapParallax.Hide();
+            beatmapParallax.Expire();
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
         }
@@ -262,10 +265,7 @@ namespace osu.Game.Screens
 
         private void HideHostOverlay()
         {
-            // for some reason
-            // `if(!bottomBar.panel_IsHovered.Value) TryHideHostOverlay();`
-            //  doesn't work in `UpdateBarEffects`, so I put it here :\
-            if ( !idleTracker.IsIdle.Value || bottomBar.panel_IsHovered.Value )
+            if ( !idleTracker.IsIdle.Value  )
                 return;
 
             game?.Toolbar.Hide();
@@ -296,7 +296,7 @@ namespace osu.Game.Screens
         {
             try
             {
-                if ( !canReallyHide || ScheduleDone )
+                if ( !canReallyHide || ScheduleDone || bottomBar.panel_IsHovered.Value)
                     return;
 
                 scheduledHideBars = Scheduler.AddDelayed(() =>
