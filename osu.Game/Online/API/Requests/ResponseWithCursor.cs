@@ -11,6 +11,15 @@ namespace osu.Game.Online.API.Requests
         /// A collection of parameters which should be passed to the search endpoint to fetch the next page.
         /// </summary>
         [JsonProperty("cursor")]
-        public object CursorJson;
+        public dynamic Cursor;
+    }
+
+    public abstract class ResponseWithCursor<T> : ResponseWithCursor where T : class
+    {
+        /// <summary>
+        /// A collection of parameters which should be passed to the search endpoint to fetch the next page.
+        /// </summary>
+        [JsonProperty("cursor")]
+        public new T Cursor;
     }
 }

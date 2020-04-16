@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapListing
             getSetsRequest = new SearchBeatmapSetsRequest(
                 query,
                 ruleset,
-                lastResponse?.CursorJson,
+                lastResponse?.Cursor,
                 searchCategory,
                 sortCriteria,
                 sortDirection);

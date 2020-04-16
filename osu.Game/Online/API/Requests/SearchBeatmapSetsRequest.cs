@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
@@ -11,15 +12,24 @@ namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
+        public class Cursor
+        {
+            [JsonProperty("_id")]
+            public string Id;
+
+            [JsonProperty("approved_date")]
+            public string ApprovedDate;
+        }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
-        private readonly object cursor;
+        private readonly Cursor cursor;
         private readonly BeatmapSearchCategory searchCategory;
         private readonly DirectSortCriteria sortCriteria;
         private readonly SortDirection direction;
         private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, object cursor = null, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, Cursor cursor = null, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
@@ -38,7 +48,10 @@ namespace osu.Game.Online.API.Requests
                 req.AddParameter("m", ruleset.ID.Value.ToString());
 
             if (cursor != null)
-                req.AddParameter("cursor", cursor.ToString());
+            {
+                req.AddParameter("cursor[_id]", cursor.Id);
+                req.AddParameter("cursor[approved_date]", cursor.ApprovedDate);
+            }
 
             req.AddParameter("s", searchCategory.ToString().ToLowerInvariant());
             req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");

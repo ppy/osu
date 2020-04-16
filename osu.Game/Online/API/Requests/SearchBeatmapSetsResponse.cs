@@ -7,7 +7,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class SearchBeatmapSetsResponse : ResponseWithCursor
+    public class SearchBeatmapSetsResponse : ResponseWithCursor<SearchBeatmapSetsRequest.Cursor>
     {
         [JsonProperty("beatmapsets")]
         public IEnumerable<APIBeatmapSet> BeatmapSets;
