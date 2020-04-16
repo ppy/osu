@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 using osu.Framework.IO.Network;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -138,21 +138,5 @@ namespace osu.Game.Online.API.Requests
 
         [Order(5)]
         Italian
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class OrderAttribute : Attribute
-    {
-        public readonly int Order;
-
-        public OrderAttribute(int order)
-        {
-            Order = order;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Enum)]
-    public class HasOrderedElementsAttribute : Attribute
-    {
     }
 }
