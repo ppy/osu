@@ -213,7 +213,7 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            beatmapParallax.Hide();
+            beatmapParallax.FadeOut(100);
             beatmapParallax.Expire();
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
@@ -265,7 +265,7 @@ namespace osu.Game.Screens
 
         private void HideHostOverlay()
         {
-            if ( !idleTracker.IsIdle.Value  )
+            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value )
                 return;
 
             game?.Toolbar.Hide();
