@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(Attributes.MaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+                value *= Math.Min(Math.Pow(Score.MaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
             float approachRate = (float)Attributes.ApproachRate;
             float approachRateFactor = 1.0f;
