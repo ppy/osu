@@ -21,12 +21,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         };
 
         private OsuMenu menu;
-        private bool actionPeformed;
+        private bool actionPerformed;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            actionPeformed = false;
+            actionPerformed = false;
 
             Child = menu = new OsuMenu(Direction.Vertical, true)
             {
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("move to first menu item", () => InputManager.MoveMouseTo(menu.ChildrenOfType<DrawableOsuMenuItem>().First()));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("action performed", () => actionPeformed);
+            AddAssert("action performed", () => actionPerformed);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("move to first menu item", () => InputManager.MoveMouseTo(menu.ChildrenOfType<DrawableOsuMenuItem>().First()));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("action not performed", () => !actionPeformed);
+            AddAssert("action not performed", () => !actionPerformed);
         }
 
         [Test]
@@ -83,9 +83,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("move to first menu item", () => InputManager.MoveMouseTo(menu.ChildrenOfType<DrawableOsuMenuItem>().First()));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("action performed", () => actionPeformed);
+            AddAssert("action performed", () => actionPerformed);
         }
 
-        private void performAction() => actionPeformed = true;
+        private void performAction() => actionPerformed = true;
     }
 }
