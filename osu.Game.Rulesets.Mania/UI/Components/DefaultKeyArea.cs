@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             InternalChild = directionContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
-                Height = ManiaStage.HIT_TARGET_POSITION,
+                Height = Stage.HIT_TARGET_POSITION,
                 Children = new[]
                 {
                     gradient = new Box
@@ -53,9 +53,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     keyIcon = new Container
                     {
                         Name = "Key icon",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         Size = new Vector2(key_icon_size),
+                        Origin = Anchor.Centre,
                         Masking = true,
                         CornerRadius = key_icon_corner_radius,
                         BorderThickness = 2,
@@ -88,11 +87,15 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         {
             if (direction.NewValue == ScrollingDirection.Up)
             {
+                keyIcon.Anchor = Anchor.BottomCentre;
+                keyIcon.Y = -20;
                 directionContainer.Anchor = directionContainer.Origin = Anchor.TopLeft;
                 gradient.Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0));
             }
             else
             {
+                keyIcon.Anchor = Anchor.TopCentre;
+                keyIcon.Y = 20;
                 directionContainer.Anchor = directionContainer.Origin = Anchor.BottomLeft;
                 gradient.Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black);
             }
