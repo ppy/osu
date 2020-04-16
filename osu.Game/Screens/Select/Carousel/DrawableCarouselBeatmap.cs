@@ -41,6 +41,9 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private SongSelect songSelect { get; set; }
+
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
             : base(panel)
         {
@@ -49,7 +52,7 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SongSelect songSelect, BeatmapManager manager)
+        private void load(BeatmapManager manager)
         {
             if (songSelect != null)
             {
@@ -190,9 +193,12 @@ namespace osu.Game.Screens.Select.Carousel
                 List<MenuItem> items = new List<MenuItem>
                 {
                     new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
-                    new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
-                    new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
                 };
+
+                if (songSelect.AllowEditing)
+                    items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)));
+
+                items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)));
 
                 if (beatmap.OnlineBeatmapID.HasValue)
                     items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
