@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("disable menu items", () =>
             {
                 foreach (var item in menu.Items)
-                    ((OsuMenuItem)item).Enabled.Value = false;
+                    ((OsuMenuItem)item).Action.Disabled = true;
             });
 
             AddStep("move to first menu item", () => InputManager.MoveMouseTo(menu.ChildrenOfType<DrawableOsuMenuItem>().First()));
@@ -71,13 +71,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("disable menu items", () =>
             {
                 foreach (var item in menu.Items)
-                    ((OsuMenuItem)item).Enabled.Value = false;
+                    ((OsuMenuItem)item).Action.Disabled = true;
             });
 
             AddStep("enable menu items", () =>
             {
                 foreach (var item in menu.Items)
-                    ((OsuMenuItem)item).Enabled.Value = true;
+                    ((OsuMenuItem)item).Action.Disabled = false;
             });
 
             AddStep("move to first menu item", () => InputManager.MoveMouseTo(menu.ChildrenOfType<DrawableOsuMenuItem>().First()));
