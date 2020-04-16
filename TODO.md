@@ -17,3 +17,24 @@
 * 相关文件:
     *   [PlayerLoader.cs](osu.Game/Screens/Play/PlayerLoader.cs)
     *   [BeatmapMetadataDisplay.cs](osu.Game/Screens/Play/BeatmapMetadataDisplay.cs)
+
+### 2020/04/16
+* 描述 : 需要让`UpdateBarEffects()`仅在`barHovered`为`false`,`mouseIdle`为`true`时隐藏HostOverlay
+``````C#
+        var mouseIdle = idleTracker.IsIdle.Value;
+        var barHovered = bottomBar.panel_IsHovered.Value;
+
+        switch (mouseIdle)
+        {
+            case true:
+                if ( !barHovered ) TryHideHostOverlay();
+                break;
+
+            case false:
+                scheduledHideBars?.Cancel();
+                ShowHostOverlay();
+                break;
+        }
+``````
+* 相关文件:
+    *   [MvisScreen.cs:219](osu.Game/Screens/MvisScreen.cs)

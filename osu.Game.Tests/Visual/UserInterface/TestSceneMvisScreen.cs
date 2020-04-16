@@ -3,47 +3,55 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.Menu;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Screens;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Mvis.UI.Objects;
-using osu.Game.Screens.Mvis.Buttons;
 using osu.Game.Overlays;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens;
+using osu.Game.Input;
+using osu.Framework.Audio;
+using osu.Game.Overlays.Toolbar;
+using osu.Framework.Graphics.Containers;
+using System.Linq;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneMvisScreen : ScreenTestScene
+    public class TestSceneMvisScreen : TestSceneBeatSyncedContainer
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MvisScreen),
             typeof(BottomBar)
         };
+
+
+        private IReadOnlyList<Type> requiredGameDependencies => new[]
+        {
+            typeof(OsuGame),
+            typeof(IdleTracker),
+            typeof(OnScreenDisplay),
+            typeof(NotificationOverlay),
+            typeof(MusicController),
+        };
+
         [Cached]
-        private MusicController musicController = new MusicController();
+        private Toolbar toolbar = new Toolbar();
+
+        [Cached]
+        private IdleTracker idleTracker = new IdleTracker(1000);
+
+
+        [Resolved]
+        private AudioManager audioManager { get; set; }
 
         [Test]
         public void Mvis()
         {
             OsuScreenStack stack;
+            idleTracker = new IdleTracker(3000);
 
             AddStep("Run test", () =>
             {
@@ -60,8 +68,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void load()
         {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+        }
 
-            Add(musicController);
+        
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+            Beatmap.Value.Track.Start();
+            Beatmap.Value.Track.Seek(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
         }
     }
 }

@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Mvis.UI.Objects
             Height = BOTTOMPANEL_SIZE.Y;
             Alpha = 0;
         }
-        
         protected override bool OnHover(Framework.Input.Events.HoverEvent e)
         {
             this.panel_IsHovered.Value = true;

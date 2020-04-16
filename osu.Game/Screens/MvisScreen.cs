@@ -13,19 +13,19 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Mvis.UI.Objects;
 using osu.Game.Screens.Mvis.Buttons;
+using osu.Game.Screens.Mvis.Objects.Helpers;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Framework.Input.Events;
 using osu.Game.Input;
 using osu.Framework.Input;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens
 {
     /// <summary>
-    /// 缝 合 怪
+    /// 缝合怪 + 奥利给山警告
     /// </summary>
     public class MvisScreen : OsuScreen
     {
@@ -35,35 +35,33 @@ namespace osu.Game.Screens
         private const float DURATION = 750;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
         private BottomBar bottomBar;
+        private bool ScheduleDone = false;
 
         Container buttons;
         private Box bgBox;
 
-        protected OsuScreenStack ScreenStack;
-        //private bool AllowCursor = false;
+        private bool AllowCursor = false;
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
-        //public override bool CursorVisible => AllowCursor;
+        public override bool CursorVisible => AllowCursor;
 
-        private InputManager inputManager;
-        private IdleTracker idleTracker;
+        private ScheduledDelegate scheduledHideBars;
+        private InputManager inputManager { get; set; }
         private bool canReallyHide =>
-            // don't push if the user is hovering one of the panes, unless they are idle.
+            // don't hide if the user is hovering one of the panes, unless they are idle.
             (IsHovered || idleTracker.IsIdle.Value)
-            // don't push if the user is dragging a slider or otherwise.
-            && inputManager?.DraggedDrawable == null
-            // don't push if a focused overlay is visible, like settings.
-            && inputManager?.FocusedDrawable == null;
-
+            // don't hide if a focused overlay is visible, like settings.
+            && inputManager?.FocusedDrawable == null
+            // don't hide if the user is hovering toolbar.
+            && !game.Toolbar.toolbarIsHovered.Value;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
-
         [Resolved]
         private MusicController musicController { get; set; }
-        [Resolved]
-        private OsuColour colours { get; set; }
+
+        private MouseIdleTracker idleTracker;
 
         public MvisScreen()
         {
@@ -138,7 +136,7 @@ namespace osu.Game.Screens
                                                 new MusicOverlayButton(FontAwesome.Solid.StepBackward)
                                                 {
                                                     Action = () => musicController.PreviousTrack(),
-                                                    TooltipText = "上一首",
+                                                    TooltipText = "上一首/从头开始",
                                                 },
                                                 new MusicOverlayButton(FontAwesome.Solid.Music)
                                                 {
@@ -150,7 +148,6 @@ namespace osu.Game.Screens
                                                     Action = () => musicController.NextTrack(),
                                                     TooltipText = "下一首",
                                                 },
-
                                             }
                                         },
                                         new FillFlowContainer
@@ -161,13 +158,6 @@ namespace osu.Game.Screens
                                             AutoSizeAxes = Axes.Both,
                                             Spacing = new Vector2(5),
                                             Margin = new MarginPadding { Right = 5 },
-                                            Children = new Drawable[]
-                                            {
-                                                new MusicOverlayButton(FontAwesome.Solid.TheaterMasks)
-                                                {
-                                                    TooltipText = "工具栏、底栏常驻(未实现)",
-                                                },
-                                            }
                                         },
                                     }
                                 },
@@ -175,24 +165,25 @@ namespace osu.Game.Screens
                         },
                     }
                 },
-                idleTracker = new IdleTracker(1000),
+                idleTracker = new MouseIdleTracker(2000),
             };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            game?.Toolbar.Hide();
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
         }
+
         protected override void LoadComplete()
         {
-            base.LoadComplete();
-
+            idleTracker.IsIdle.ValueChanged += _ => UpdateBarEffects();
             inputManager = GetContainingInputManager();
-            bottomBar.panel_IsHovered.ValueChanged += _ => UpdateBarEffects();
+            bgBox.ScaleTo(1.1f);
 
-            HideBottomBar(true);
+            ShowHostOverlay();
+
+            base.LoadComplete();
         }
 
         public override void OnEntering(IScreen last)
@@ -202,70 +193,85 @@ namespace osu.Game.Screens
             ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
         }
 
+        public override bool OnExiting(IScreen next)
+        {
+            game?.Toolbar.Show();
+            this.FadeOut(500, Easing.OutQuint);
+            return base.OnExiting(next);
+        }
+
         private void UpdateBarEffects()
         {
-            switch (bottomBar.panel_IsHovered.Value)
+            var mouseIdle = idleTracker.IsIdle.Value;
+
+            switch (mouseIdle)
             {
                 case true:
-                    ShowBottomBar();
+                    TryHideHostOverlay();
                     break;
 
                 case false:
-                    this.Delay(1000).Schedule( () => HideBottomBar(false) );
+                    scheduledHideBars?.Cancel();
+                    ShowHostOverlay();
                     break;
             }
         }
 
-        private void HideBottomBar(bool IgnoreCanReallyHide = false)
+        private void HideHostOverlay()
+        {
+            // for some reason
+            // `if(!bottomBar.panel_IsHovered.Value) TryHideHostOverlay();`
+            //  doesn't work in `UpdateBarEffects`, so I put it here :\
+            if ( !idleTracker.IsIdle.Value || bottomBar.panel_IsHovered.Value )
+                return;
+
+            game?.Toolbar.Hide();
+            bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
+            buttons.MoveToY(20, DURATION, Easing.OutQuint);
+            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y - 45, DURATION, Easing.OutQuint)
+                     .FadeTo(0.01f, DURATION, Easing.OutQuint);
+            AllowBack = false;
+            AllowCursor = false;
+            ScheduleDone = true;
+        }
+
+        private void ShowHostOverlay()
+        {
+            game?.Toolbar.Show();
+            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
+            buttons.MoveToY(0, DURATION, Easing.OutQuint);
+            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
+                     .FadeIn(DURATION, Easing.OutQuint);
+            AllowCursor = true;
+            AllowBack = true;
+            ScheduleDone = false;
+        }
+
+        private void TryHideHostOverlay()
         {
             try
             {
-                if ( IgnoreCanReallyHide == false && (bottomBar.panel_IsHovered.Value || !canReallyHide) )
+                if ( !canReallyHide || ScheduleDone )
                     return;
+
+                scheduledHideBars = Scheduler.AddDelayed(() =>
+                {
+                    HideHostOverlay();
+                }, 1000);
+
             }
             finally
             {
-                game?.Toolbar.Hide();
-                AllowBack = false;
-                bgBox.FadeTo(0.3f, 500, Easing.OutQuint);
-                //AllowCursor = false;
-                bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y - 45, DURATION, Easing.OutQuint)
-                         .FadeTo(0.01f, DURATION, Easing.OutQuint);
+                    Schedule(TryHideHostOverlay);
             }
-        }
-
-        private void ShowBottomBar()
-        {
-            game?.Toolbar.Show();
-            //AllowCursor = true;
-            bgBox.FadeTo(0.6f, 500, Easing.OutQuint);
-            AllowBack = true;
-            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
-                     .FadeIn(DURATION, Easing.OutQuint);
         }
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            if (Background is BackgroundScreenBeatmap backgroundBeatmap)
             {
-                backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
-                backgroundModeBeatmap.FadeColour(Color4.White, 250);
-            }
-        }
-
-        private class HoverableProgressBar : ProgressBar
-        {
-            protected override bool OnHover(HoverEvent e)
-            {
-                this.ResizeHeightTo(10, 500, Easing.OutQuint);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                this.ResizeHeightTo(10 / 2, 500, Easing.OutQuint);
-                base.OnHoverLost(e);
+                backgroundBeatmap.Beatmap = beatmap;
+                backgroundBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
             }
         }
     }
