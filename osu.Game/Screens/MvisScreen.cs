@@ -18,9 +18,11 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Input;
 using osu.Framework.Input;
 using osu.Framework.Threading;
+using osu.Framework.Bindables;
+using osu.Framework.Input.Events;
+using osuTK.Input;
 
 namespace osu.Game.Screens
 {
@@ -38,12 +40,14 @@ namespace osu.Game.Screens
         private bool ScheduleDone = false;
 
         Container buttons;
+        HoverCheckContainer hoverCheckContainer;
         private Box bgBox;
 
         private bool AllowCursor = false;
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
+        public override bool AllowExternalScreenChange => true;
 
         private ScheduledDelegate scheduledHideBars;
         private InputManager inputManager { get; set; }
@@ -165,6 +169,18 @@ namespace osu.Game.Screens
                         },
                     }
                 },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Child = hoverCheckContainer = new HoverCheckContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                },
                 idleTracker = new MouseIdleTracker(2000),
             };
         }
@@ -178,6 +194,7 @@ namespace osu.Game.Screens
         protected override void LoadComplete()
         {
             idleTracker.IsIdle.ValueChanged += _ => UpdateBarEffects();
+            hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateBarEffects();
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
 
@@ -195,14 +212,41 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            game?.Toolbar.Show();
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat) return false;
+
+            switch (e.Key)
+            {
+                case Key.Right:
+                    musicController.NextTrack();
+                    return true;
+
+                case Key.Left:
+                    musicController.PreviousTrack();
+                    return true;
+
+                case Key.Space:
+                    musicController.TogglePause();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         private void UpdateBarEffects()
         {
             var mouseIdle = idleTracker.IsIdle.Value;
+
+            if ( !hoverCheckContainer.ScreenHovered.Value )
+            {
+                ShowHostOverlay();
+                return;
+            }
 
             switch (mouseIdle)
             {
@@ -211,7 +255,6 @@ namespace osu.Game.Screens
                     break;
 
                 case false:
-                    scheduledHideBars?.Cancel();
                     ShowHostOverlay();
                     break;
             }
@@ -237,6 +280,8 @@ namespace osu.Game.Screens
 
         private void ShowHostOverlay()
         {
+            scheduledHideBars?.Cancel();
+
             game?.Toolbar.Show();
             bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             buttons.MoveToY(0, DURATION, Easing.OutQuint);
@@ -272,6 +317,23 @@ namespace osu.Game.Screens
             {
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
+            }
+        }
+
+        private class HoverCheckContainer : Container
+        {
+            public readonly Bindable<bool> ScreenHovered = new Bindable<bool>();
+
+            protected override bool OnHover(Framework.Input.Events.HoverEvent e)
+            {
+                this.ScreenHovered.Value = true;
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(Framework.Input.Events.HoverLostEvent e)
+            {
+                this.ScreenHovered.Value = false;
+                base.OnHoverLost(e);
             }
         }
     }

@@ -1,6 +1,11 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Mvis.UI.Objects.Helpers;
 using osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers;
 using osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers.Bars;
@@ -13,8 +18,11 @@ namespace osu.Game.Screens.Mvis.UI.Objects
     {
         private const int radius = 350;
 
+        private LogoVisualisation visualisation;
+        private Container circularContainer;
         private readonly CircularProgress progressGlow;
 
+        private Bindable<bool> UseLogoVisuals = new Bindable<bool>();
         public BeatmapLogo(int barsCount = 120, float barWidth = 3f)
         {
             Origin = Anchor.Centre;
@@ -22,34 +30,52 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
             AddRangeInternal(new Drawable[]
             {
-                new CircularVisualizer
+                visualisation = new LogoVisualisation
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    DegreeValue = 120,
-                    BarWidth = barWidth,
-                    BarsCount = barsCount,
-                    CircleSize = radius,
+                    Colour = Color4.White,
+                    Alpha = 0,
                 },
-                new CircularVisualizer
+                circularContainer = new Container
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    DegreeValue = 120,
-                    Rotation = 120,
-                    BarWidth = barWidth,
-                    BarsCount = barsCount,
-                    CircleSize = radius,
-                },
-                new CircularVisualizer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    DegreeValue = 120,
-                    Rotation = 240,
-                    BarWidth = barWidth,
-                    BarsCount = barsCount,
-                    CircleSize = radius,
+                    Alpha = 0,
+                    Children = new Drawable[]
+                    {
+                        new CircularVisualizer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            DegreeValue = 120,
+                            BarWidth = barWidth,
+                            BarsCount = barsCount,
+                            CircleSize = radius,
+                        },
+                        new CircularVisualizer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            DegreeValue = 120,
+                            Rotation = 120,
+                            BarWidth = barWidth,
+                            BarsCount = barsCount,
+                            CircleSize = radius,
+                        },
+                        new CircularVisualizer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            DegreeValue = 120,
+                            Rotation = 240,
+                            BarWidth = barWidth,
+                            BarsCount = barsCount,
+                            CircleSize = radius,
+                        },
+                    }
                 },
                 new UpdateableBeatmapBackground
                 {
@@ -70,6 +96,32 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                     PadExtent = true
                 }),
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.MvisUseOsuLogoVisualisation, UseLogoVisuals);
+
+            UseLogoVisuals.ValueChanged += _ => UpdateVisuals();
+
+            UpdateVisuals();
+        }
+
+        private void UpdateVisuals()
+        {
+            switch ( UseLogoVisuals.Value )
+            {
+                case true:
+                    circularContainer.FadeOut(500, Easing.OutQuint);
+                    visualisation.FadeIn(500, Easing.OutQuint);
+                    break;
+
+                case false:
+                    circularContainer.FadeIn(500, Easing.OutQuint);
+                    visualisation.FadeOut(500, Easing.OutQuint);
+                    break;
+            }
         }
 
         protected override void Update()

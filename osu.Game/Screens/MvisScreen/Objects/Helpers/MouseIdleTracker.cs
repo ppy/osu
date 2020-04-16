@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Mvis.Objects.Helpers
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.
     /// </summary>
-    public class MouseIdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalKeyboardInput
+    public class MouseIdleTracker : Component, IHandleGlobalKeyboardInput
     {
         private readonly double timeToIdle;
 
@@ -47,10 +47,6 @@ namespace osu.Game.Screens.Mvis.Objects.Helpers
             base.Update();
             isIdle.Value = TimeSpentIdle > timeToIdle && AllowIdle;
         }
-
-        public bool OnPressed(PlatformAction action) => updateLastInteractionTime();
-
-        public void OnReleased(PlatformAction action) => updateLastInteractionTime();
 
         protected override bool Handle(UIEvent e)
         {
