@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : CompositeDrawable
+    public class FriendDisplay : OverlayView<List<User>>
     {
         private List<User> users = new List<User>();
 
@@ -26,15 +26,10 @@ namespace osu.Game.Overlays.Dashboard.Friends
             set
             {
                 users = value;
-
                 onlineStreamControl.Populate(value);
             }
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
 
         private Drawable currentContent;
@@ -48,92 +43,85 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         public FriendDisplay()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new Drawable[]
+                new Container
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
+                        controlBackground = new Box
                         {
-                            controlBackground = new Box
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding
                             {
-                                RelativeSizeAxes = Axes.Both
+                                Top = 20,
+                                Horizontal = 45
                             },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding
-                                {
-                                    Top = 20,
-                                    Horizontal = 45
-                                },
-                                Child = onlineStreamControl = new FriendOnlineStreamControl(),
-                            }
+                            Child = onlineStreamControl = new FriendOnlineStreamControl(),
                         }
-                    },
-                    new Container
+                    }
+                },
+                new Container
+                {
+                    Name = "User List",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Name = "User List",
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
+                        background = new Box
                         {
-                            background = new Box
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Margin = new MarginPadding { Bottom = 20 },
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Margin = new MarginPadding { Bottom = 20 },
-                                Children = new Drawable[]
+                                new Container
                                 {
-                                    new Container
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding
-                                        {
-                                            Horizontal = 40,
-                                            Vertical = 20
-                                        },
-                                        Child = userListToolbar = new UserListToolbar
-                                        {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                        }
+                                        Horizontal = 40,
+                                        Vertical = 20
                                     },
-                                    new Container
+                                    Child = userListToolbar = new UserListToolbar
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                    }
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        itemsPlaceholder = new Container
                                         {
-                                            itemsPlaceholder = new Container
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = 50 }
-                                            },
-                                            loading = new LoadingLayer(itemsPlaceholder)
-                                        }
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Padding = new MarginPadding { Horizontal = 50 }
+                                        },
+                                        loading = new LoadingLayer(itemsPlaceholder)
                                     }
                                 }
                             }
                         }
                     }
                 }
-            };
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -152,14 +140,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
 
-        public void Fetch()
-        {
-            if (!api.IsLoggedIn)
-                return;
+        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
 
-            request = new GetFriendsRequest();
-            request.Success += response => Schedule(() => Users = response);
-            api.Queue(request);
+        protected override void OnSuccess(List<User> response)
+        {
+            Users = response;
         }
 
         private void recreatePanels()
@@ -258,9 +243,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }
