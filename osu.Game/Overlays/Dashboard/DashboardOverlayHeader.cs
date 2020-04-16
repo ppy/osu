@@ -3,7 +3,7 @@
 
 namespace osu.Game.Overlays.Dashboard
 {
-    public class DashboardOverlayHeader : TabControlOverlayHeader<HomeOverlayTabs>
+    public class DashboardOverlayHeader : TabControlOverlayHeader<DashboardOverlayTabs>
     {
         protected override OverlayTitle CreateTitle() => new DashboardTitle();
 
@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Dashboard
         }
     }
 
-    public enum HomeOverlayTabs
+    public enum DashboardOverlayTabs
     {
         Friends
     }
