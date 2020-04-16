@@ -106,6 +106,9 @@ namespace osu.Game.Rulesets.Edit
                 case ScrollEvent _:
                     return false;
 
+                case DoubleClickEvent _:
+                    return false;
+
                 case MouseButtonEvent _:
                     return true;
 
