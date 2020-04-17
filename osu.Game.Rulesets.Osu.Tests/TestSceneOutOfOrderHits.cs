@@ -371,6 +371,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     HeadCircle.HitWindows = new TestHitWindows();
                     TailCircle.HitWindows = new TestHitWindows();
+
+                    HeadCircle.HitWindows.SetDifficulty(0);
+                    TailCircle.HitWindows.SetDifficulty(0);
                 };
             }
         }
