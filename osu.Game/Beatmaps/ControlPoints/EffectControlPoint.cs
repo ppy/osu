@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => KiaiModeBindable.Value = value;
         }
 
-        public override bool IsRedundant(ControlPoint existing, double time)
+        public override bool IsRedundant(ControlPoint existing)
             => !OmitFirstBarLine
                && existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode

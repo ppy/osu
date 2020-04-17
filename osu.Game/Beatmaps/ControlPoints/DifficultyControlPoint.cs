@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => SpeedMultiplierBindable.Value = value;
         }
 
-        public override bool IsRedundant(ControlPoint existing, double time)
+        public override bool IsRedundant(ControlPoint existing)
             => existing is DifficultyControlPoint existingDifficulty
                && SpeedMultiplier == existingDifficulty.SpeedMultiplier;
     }

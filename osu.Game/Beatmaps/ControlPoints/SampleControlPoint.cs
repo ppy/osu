@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             return newSampleInfo;
         }
 
-        public override bool IsRedundant(ControlPoint existing, double time)
+        public override bool IsRedundant(ControlPoint existing)
             => existing is SampleControlPoint existingSample
                && SampleBank == existingSample.SampleBank
                && SampleVolume == existingSample.SampleVolume;
