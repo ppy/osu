@@ -70,7 +70,18 @@ namespace osu.Game.Tests.Visual
             Beatmap.SetDefault();
 
             Ruleset = Dependencies.Ruleset;
-            Ruleset.SetDefault();
+
+            var definedRuleset = CreateRuleset()?.RulesetInfo;
+
+            if (definedRuleset != null)
+            {
+                // Set global ruleset bindable to the ruleset defined
+                // for this test scene and disallow changing it.
+                Ruleset.Value = definedRuleset;
+                Ruleset.Disabled = true;
+            }
+            else
+                Ruleset.SetDefault();
 
             SelectedMods = Dependencies.Mods;
             SelectedMods.SetDefault();
@@ -124,6 +135,14 @@ namespace osu.Game.Tests.Visual
         [Resolved]
         protected AudioManager Audio { get; private set; }
 
+        /// <summary>
+        /// Creates the ruleset to be used for this test scene.
+        /// </summary>
+        /// <remarks>
+        /// When testing against ruleset-specific components, this method must be overriden to their ruleset.
+        /// </remarks>
+        protected virtual Ruleset CreateRuleset() => null;
+
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
@@ -135,7 +154,8 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Ruleset.Value = rulesets.AvailableRulesets.First();
+            if (!Ruleset.Disabled)
+                Ruleset.Value = rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)
