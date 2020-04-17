@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps.Formats
             handleEvents(writer);
 
             writer.WriteLine();
-            handleTimingPoints(writer);
+            handleControlPoints(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
@@ -149,7 +149,7 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
         }
 
-        private void handleTimingPoints(TextWriter writer)
+        private void handleControlPoints(TextWriter writer)
         {
             if (beatmap.ControlPointInfo.Groups.Count == 0)
                 return;
@@ -158,38 +158,67 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var group in beatmap.ControlPointInfo.Groups)
             {
-                var timingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
-                var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
-                var samplePoint = beatmap.ControlPointInfo.SamplePointAt(group.Time);
-                var effectPoint = beatmap.ControlPointInfo.EffectPointAt(group.Time);
+                var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
-                // Convert beat length the legacy format
-                double beatLength;
-                if (timingPoint != null)
-                    beatLength = timingPoint.BeatLength;
+                if (groupTimingPoint != null)
+                {
+                    // The timing point always needs to be output.
+                    handleTimingControlPoint(writer, groupTimingPoint);
+
+                    // A difficulty point may be added alongside all timing points, provided the speed adjustment isn't redundant.
+                    // The two control points can be output together in all cases without issue, however for the resultant
+                    // output to remain as close to the original beatmap as possible, the difficulty point is only output if it's non-default.
+                    var groupDifficultyPoint = group.ControlPoints.OfType<DifficultyControlPoint>().FirstOrDefault();
+                    if (groupDifficultyPoint != null && groupDifficultyPoint.SpeedMultiplier != 1)
+                        handleNonTimingControlPointAt(writer, groupDifficultyPoint.Time);
+                }
                 else
-                    beatLength = -100 / difficultyPoint.SpeedMultiplier;
-
-                // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
-                HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo());
-
-                // Convert effect flags to the legacy format
-                LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
-                if (effectPoint.KiaiMode)
-                    effectFlags |= LegacyEffectFlags.Kiai;
-                if (effectPoint.OmitFirstBarLine)
-                    effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
-
-                writer.Write(FormattableString.Invariant($"{group.Time},"));
-                writer.Write(FormattableString.Invariant($"{beatLength},"));
-                writer.Write(FormattableString.Invariant($"{(int)beatmap.ControlPointInfo.TimingPointAt(group.Time).TimeSignature},"));
-                writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
-                writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
-                writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
-                writer.Write(FormattableString.Invariant($"{(timingPoint != null ? '1' : '0')},"));
-                writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
-                writer.WriteLine();
+                {
+                    // If there is no timing point, we still need to output a difficulty point along with all other control points.
+                    // We cannot rely on the group containing a difficulty point as it may have been determined to be redundant, so a separate search is done to find the last difficulty point.
+                    handleNonTimingControlPointAt(writer, group.Time);
+                }
             }
+        }
+
+        private void handleTimingControlPoint(TextWriter writer, TimingControlPoint timingPoint)
+        {
+            writer.Write(FormattableString.Invariant($"{timingPoint.Time},"));
+            writer.Write(FormattableString.Invariant($"{timingPoint.BeatLength},"));
+            outputControlPointEffectsAt(writer, timingPoint.Time, true);
+        }
+
+        private void handleNonTimingControlPointAt(TextWriter writer, double time)
+        {
+            var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
+
+            writer.Write(FormattableString.Invariant($"{time},"));
+            writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
+            outputControlPointEffectsAt(writer, time, false);
+        }
+
+        private void outputControlPointEffectsAt(TextWriter writer, double time, bool isTimingPoint)
+        {
+            var samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
+            var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
+
+            // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
+            HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo());
+
+            // Convert effect flags to the legacy format
+            LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
+            if (effectPoint.KiaiMode)
+                effectFlags |= LegacyEffectFlags.Kiai;
+            if (effectPoint.OmitFirstBarLine)
+                effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
+
+            writer.Write(FormattableString.Invariant($"{(int)beatmap.ControlPointInfo.TimingPointAt(time).TimeSignature},"));
+            writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
+            writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
+            writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
+            writer.Write(FormattableString.Invariant($"{(isTimingPoint ? '1' : '0')},"));
+            writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
+            writer.WriteLine();
         }
 
         private void handleHitObjects(TextWriter writer)
