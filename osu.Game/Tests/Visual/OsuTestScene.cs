@@ -75,6 +75,10 @@ namespace osu.Game.Tests.Visual
 
             if (definedRuleset != null)
             {
+                // re-enable the bindable in case it was disabled.
+                // happens when restarting current test scene.
+                Ruleset.Disabled = false;
+
                 // Set global ruleset bindable to the ruleset defined
                 // for this test scene and disallow changing it.
                 Ruleset.Value = definedRuleset;
