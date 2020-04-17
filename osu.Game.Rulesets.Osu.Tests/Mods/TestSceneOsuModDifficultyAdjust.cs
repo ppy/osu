@@ -15,11 +15,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public class TestSceneOsuModDifficultyAdjust : ModTestScene
     {
-        public TestSceneOsuModDifficultyAdjust()
-            : base(new OsuRuleset())
-        {
-        }
-
         [Test]
         public void TestNoAdjustment() => CreateModTest(new ModTestData
         {
@@ -82,5 +77,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             return Player.ScoreProcessor.JudgedHits >= 2;
         }
+
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 }

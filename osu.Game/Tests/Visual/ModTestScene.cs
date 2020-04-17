@@ -19,11 +19,6 @@ namespace osu.Game.Tests.Visual
             typeof(ModTestScene)
         };
 
-        protected ModTestScene(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
-
         private ModTestData currentTestData;
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>

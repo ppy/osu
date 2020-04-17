@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
     public class TestSceneOsuModPerfect : ModPerfectTestScene
     {
         public TestSceneOsuModPerfect()
-            : base(new OsuRuleset(), new OsuModPerfect())
+            : base(new OsuModPerfect())
         {
         }
 
@@ -48,5 +48,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
             CreateHitObjectTest(new HitObjectTestData(spinner), shouldMiss);
         }
+
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 }

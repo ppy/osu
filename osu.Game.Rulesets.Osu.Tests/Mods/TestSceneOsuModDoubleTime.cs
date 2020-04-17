@@ -10,11 +10,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public class TestSceneOsuModDoubleTime : ModTestScene
     {
-        public TestSceneOsuModDoubleTime()
-            : base(new OsuRuleset())
-        {
-        }
-
         [TestCase(0.5)]
         [TestCase(1.01)]
         [TestCase(1.5)]
@@ -31,5 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                                       Precision.AlmostEquals(Player.GameplayClockContainer.GameplayClock.Rate, mod.SpeedChange.Value)
             });
         }
+
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 }

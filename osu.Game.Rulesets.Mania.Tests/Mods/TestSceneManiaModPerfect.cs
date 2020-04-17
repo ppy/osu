@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
     public class TestSceneManiaModPerfect : ModPerfectTestScene
     {
         public TestSceneManiaModPerfect()
-            : base(new ManiaRuleset(), new ManiaModPerfect())
+            : base(new ManiaModPerfect())
         {
         }
 
@@ -22,5 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [TestCase(false)]
         [TestCase(true)]
         public void TestHoldNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HoldNote { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
 }
