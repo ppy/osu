@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double totalValueExponent = 1.5;
         private const double comboWeight = 0.5;
         private const double skillToPPExponent = 2.7;
+        private const double missCountLeniency = 0.5;
 
         private readonly int countHitCircles;
         private readonly int countSliders;
@@ -174,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = tpToPP(tp * cheeseFactor);
 
             // penalize misses
-            aimValue *= Math.Pow(0.96, effectiveMissCount);
+            aimValue *= Math.Pow(0.96, Math.Max(effectiveMissCount - missCountLeniency, 0));
 
             // Buff long maps
             aimValue *= 1 + (SpecialFunctions.Logistic((totalHits - 2500) / 500.0) - SpecialFunctions.Logistic(-2500 / 500.0)) * 0.128;
@@ -240,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             tapValue *= accFactor;
 
             // Penalize misses and 50s exponentially
-            tapValue *= Math.Pow(0.93, effectiveMissCount);
+            tapValue *= Math.Pow(0.93, Math.Max(effectiveMissCount - missCountLeniency, 0));
             tapValue *= Math.Pow(0.98, countMeh);
 
             // Buff very high AR
@@ -273,7 +274,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 46000;
 
             // scale acc pp with misses
-            accuracyValue *= Math.Pow(0.96, effectiveMissCount);
+            accuracyValue *= Math.Pow(0.96, Math.Max(effectiveMissCount - missCountLeniency, 0));
 
             // nerf short maps
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0);
