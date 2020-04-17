@@ -49,12 +49,13 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SongSelect songSelect, BeatmapManager manager)
+        private void load(BeatmapManager manager, SongSelect songSelect)
         {
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
-                editRequested = songSelect.Edit;
+                if (songSelect.AllowEditing)
+                    editRequested = songSelect.Edit;
             }
 
             if (manager != null)
@@ -187,15 +188,19 @@ namespace osu.Game.Screens.Select.Carousel
         {
             get
             {
-                List<MenuItem> items = new List<MenuItem>
-                {
-                    new OsuMenuItem("游玩", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
-                    new OsuMenuItem("编辑", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
-                    new OsuMenuItem("隐藏", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
-                };
+                List<MenuItem> items = new List<MenuItem>();
 
-                if (beatmap.OnlineBeatmapID.HasValue)
-                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
+                if (startRequested != null)
+                    items.Add(new OsuMenuItem("游玩", MenuItemType.Highlighted, () => startRequested(beatmap)));
+
+                if (editRequested != null)
+                    items.Add(new OsuMenuItem("编辑", MenuItemType.Standard, () => editRequested(beatmap)));
+
+                if (hideRequested != null)
+                    items.Add(new OsuMenuItem("隐藏", MenuItemType.Destructive, () => hideRequested(beatmap)));
+
+                if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("细节", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
 
                 return items.ToArray();
             }

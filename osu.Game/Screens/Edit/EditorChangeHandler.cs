@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects;
 
@@ -15,8 +16,10 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorChangeHandler : IEditorChangeHandler
     {
-        private readonly LegacyEditorBeatmapPatcher patcher;
+        public readonly Bindable<bool> CanUndo = new Bindable<bool>();
+        public readonly Bindable<bool> CanRedo = new Bindable<bool>();
 
+        private readonly LegacyEditorBeatmapPatcher patcher;
         private readonly List<byte[]> savedStates = new List<byte[]>();
 
         private int currentState = -1;
@@ -44,8 +47,6 @@ namespace osu.Game.Screens.Edit
             // Initial state.
             SaveState();
         }
-
-        public bool HasUndoState => currentState > 0;
 
         private void hitObjectAdded(HitObject obj) => SaveState();
 
@@ -90,6 +91,8 @@ namespace osu.Game.Screens.Edit
             }
 
             currentState = savedStates.Count - 1;
+
+            updateBindables();
         }
 
         /// <summary>
@@ -114,6 +117,14 @@ namespace osu.Game.Screens.Edit
             currentState = newState;
 
             isRestoring = false;
+
+            updateBindables();
+        }
+
+        private void updateBindables()
+        {
+            CanUndo.Value = savedStates.Count > 0 && currentState > 0;
+            CanRedo.Value = currentState < savedStates.Count - 1;
         }
     }
 }

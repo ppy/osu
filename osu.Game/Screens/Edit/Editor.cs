@@ -107,6 +107,8 @@ namespace osu.Game.Screens.Edit
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
             EditorMenuBar menuBar;
+            OsuMenuItem undoMenuItem;
+            OsuMenuItem redoMenuItem;
 
             var fileMenuItems = new List<MenuItem>
             {
@@ -155,8 +157,8 @@ namespace osu.Game.Screens.Edit
                                 {
                                     Items = new[]
                                     {
-                                        new EditorMenuItem("撤销", MenuItemType.Standard, undo),
-                                        new EditorMenuItem("重做", MenuItemType.Standard, redo)
+                                        undoMenuItem = new EditorMenuItem("撤销", MenuItemType.Standard, undo),
+                                        redoMenuItem = new EditorMenuItem("重做", MenuItemType.Standard, redo)
                                     }
                                 }
                             }
@@ -213,6 +215,9 @@ namespace osu.Game.Screens.Edit
                     },
                 }
             });
+
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             menuBar.Mode.ValueChanged += onModeChanged;
 

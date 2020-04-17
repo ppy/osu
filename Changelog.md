@@ -458,10 +458,16 @@
 *   暂不合并
     *   [m] [Mark dummy api test scene as headless #8752]
 
-### 2020/4/25
+### 2020/4/15
 *   继续调整动画
 *   翻译补全
 
 *   合并上游pr
     *   [m] [Fix typo in DrawableTaikoHitObject #8761]
     *   [m] [Fix osu!mania replays actuating incorrect keys when multiple stages are involved #8755]
+
+### 2020/4/17
+*   合并上游pr
+    *   [m] [Fix 0 custom sample bank not falling back to user skin #8756]
+    *   [m] [Hide edit context menu item in multiplayer song select #8768]
+    *   [m] [Disable undo/redo menu items when they can't be performed #8764]
