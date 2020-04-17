@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -39,15 +37,10 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             DrawableHitObject blockingObject = null;
 
-            using (var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime))
+            foreach (var obj in enumerateHitObjectsUpTo(hitObject.HitObject.StartTime))
             {
-                while (enumerator.MoveNext())
-                {
-                    Debug.Assert(enumerator.Current != null);
-
-                    if (hitObjectCanBlockFutureHits(enumerator.Current))
-                        blockingObject = enumerator.Current;
-                }
+                if (hitObjectCanBlockFutureHits(obj))
+                    blockingObject = obj;
             }
 
             // If there is no previous hitobject, allow the hit.
@@ -77,18 +70,13 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
                 throw new InvalidOperationException($"A {hitObject} was hit before it become hittable!");
 
-            using (var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime))
+            foreach (var obj in enumerateHitObjectsUpTo(hitObject.HitObject.StartTime))
             {
-                while (enumerator.MoveNext())
-                {
-                    Debug.Assert(enumerator.Current != null);
+                if (obj.Judged)
+                    continue;
 
-                    if (enumerator.Current.Judged)
-                        continue;
-
-                    if (hitObjectCanBlockFutureHits(enumerator.Current))
-                        ((DrawableOsuHitObject)enumerator.Current).MissForcefully();
-                }
+                if (hitObjectCanBlockFutureHits(obj))
+                    ((DrawableOsuHitObject)obj).MissForcefully();
             }
         }
 
@@ -99,90 +87,22 @@ namespace osu.Game.Rulesets.Osu.UI
         private static bool hitObjectCanBlockFutureHits(DrawableHitObject hitObject)
             => hitObject is DrawableHitCircle;
 
-        private struct HitObjectEnumerator : IEnumerator<DrawableHitObject>
+        private IEnumerable<DrawableHitObject> enumerateHitObjectsUpTo(double targetTime)
         {
-            private readonly IEnumerator<DrawableHitObject> hitObjectEnumerator;
-            private readonly double targetTime;
-
-            private DrawableHitObject currentTopLevel;
-            private int currentNestedIndex;
-
-            public HitObjectEnumerator(HitObjectContainer hitObjectContainer, double targetTime)
+            foreach (var obj in hitObjectContainer.AliveObjects)
             {
-                hitObjectEnumerator = hitObjectContainer.AliveObjects.GetEnumerator();
-                this.targetTime = targetTime;
+                if (obj.HitObject.StartTime >= targetTime)
+                    yield break;
 
-                currentTopLevel = null;
-                currentNestedIndex = -1;
-                Current = null;
-            }
+                yield return obj;
 
-            /// <summary>
-            /// Attempts to move to the next top-level or nested hitobject.
-            /// Stops when no such hitobject is found or until the hitobject start time reaches <see cref="targetTime"/>.
-            /// </summary>
-            /// <returns>Whether a new hitobject was moved to.</returns>
-            public bool MoveNext()
-            {
-                // If we don't already have a top-level hitobject, try to get one.
-                if (currentTopLevel == null)
-                    return moveNextTopLevel();
+                for (int i = 0; i < obj.NestedHitObjects.Count; i++)
+                {
+                    if (obj.NestedHitObjects[i].HitObject.StartTime >= targetTime)
+                        break;
 
-                // If we have a top-level hitobject, try to move to the next nested hitobject or otherwise move to the next top-level hitobject.
-                if (!moveNextNested())
-                    return moveNextTopLevel();
-
-                // Guaranteed by moveNextNested() to have a hitobject.
-                return true;
-            }
-
-            /// <summary>
-            /// Attempts to move to the next top-level hitobject.
-            /// </summary>
-            /// <returns>Whether a new top-level hitobject was found.</returns>
-            private bool moveNextTopLevel()
-            {
-                currentNestedIndex = -1;
-
-                hitObjectEnumerator.MoveNext();
-                currentTopLevel = hitObjectEnumerator.Current;
-
-                Current = currentTopLevel;
-
-                return Current?.HitObject.StartTime < targetTime;
-            }
-
-            /// <summary>
-            /// Attempts to move to the next nested hitobject in the current top-level hitobject.
-            /// </summary>
-            /// <returns>Whether a new nested hitobject was moved to.</returns>
-            private bool moveNextNested()
-            {
-                currentNestedIndex++;
-                if (currentNestedIndex >= currentTopLevel.NestedHitObjects.Count)
-                    return false;
-
-                Current = currentTopLevel.NestedHitObjects[currentNestedIndex];
-                Debug.Assert(Current != null);
-
-                return Current?.HitObject.StartTime < targetTime;
-            }
-
-            public void Reset()
-            {
-                hitObjectEnumerator.Reset();
-                currentTopLevel = null;
-                currentNestedIndex = -1;
-                Current = null;
-            }
-
-            public DrawableHitObject Current { get; set; }
-
-            object IEnumerator.Current => Current;
-
-            public void Dispose()
-            {
-                hitObjectEnumerator?.Dispose();
+                    yield return obj.NestedHitObjects[i];
+                }
             }
         }
     }
