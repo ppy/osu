@@ -39,14 +39,15 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             DrawableHitObject blockingObject = null;
 
-            var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime);
-
-            while (enumerator.MoveNext())
+            using (var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime))
             {
-                Debug.Assert(enumerator.Current != null);
+                while (enumerator.MoveNext())
+                {
+                    Debug.Assert(enumerator.Current != null);
 
-                if (hitObjectCanBlockFutureHits(enumerator.Current))
-                    blockingObject = enumerator.Current;
+                    if (hitObjectCanBlockFutureHits(enumerator.Current))
+                        blockingObject = enumerator.Current;
+                }
             }
 
             // If there is no previous hitobject, allow the hit.
@@ -76,17 +77,18 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
                 throw new InvalidOperationException($"A {hitObject} was hit before it become hittable!");
 
-            var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime);
-
-            while (enumerator.MoveNext())
+            using (var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime))
             {
-                Debug.Assert(enumerator.Current != null);
+                while (enumerator.MoveNext())
+                {
+                    Debug.Assert(enumerator.Current != null);
 
-                if (enumerator.Current.Judged)
-                    continue;
+                    if (enumerator.Current.Judged)
+                        continue;
 
-                if (hitObjectCanBlockFutureHits(enumerator.Current))
-                    ((DrawableOsuHitObject)enumerator.Current).MissForcefully();
+                    if (hitObjectCanBlockFutureHits(enumerator.Current))
+                        ((DrawableOsuHitObject)enumerator.Current).MissForcefully();
+                }
             }
         }
 
@@ -180,6 +182,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public void Dispose()
             {
+                hitObjectEnumerator?.Dispose();
             }
         }
     }
