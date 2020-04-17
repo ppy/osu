@@ -8,6 +8,7 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -168,8 +169,11 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
-                    baseInfo.Suffix = CustomSampleBank.ToString();
+                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy
+                    && legacy.CustomSampleBank == 0)
+                {
+                    legacy.CustomSampleBank = CustomSampleBank;
+                }
 
                 return baseInfo;
             }
