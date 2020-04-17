@@ -448,8 +448,10 @@ namespace osu.Game.Screens.Select
                 {
                     Mods.Value = Array.Empty<Mod>();
 
-                    // required to return once in order to have the carousel in a good state.
-                    // if the ruleset changed, the rest of the selection update will happen via updateSelectedRuleset.
+                    // the ruleset transfer may cause a deselection of the current beatmap (due to incompatibility).
+                    // this can happen via Carousel.FlushPendingFilterOperations().
+                    // to ensure a good state, re-transfer no-debounce values.
+                    performUpdateSelected();
                     return;
                 }
 
