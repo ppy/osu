@@ -16,20 +16,27 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+        public T Result { get; private set; }
 
         protected APIRequest()
         {
-            base.Success += onSuccess;
+            base.Success += () => TriggerSuccess(((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject);
         }
-
-        private void onSuccess() => Success?.Invoke(Result);
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        internal void TriggerSuccess(T result)
+        {
+            if (Result != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            Result = result;
+            Success?.Invoke(result);
+        }
     }
 
     /// <summary>
@@ -96,8 +103,13 @@ namespace osu.Game.Online.API
             {
                 if (cancelled) return;
 
-                Success?.Invoke();
+                TriggerSuccess();
             });
+        }
+
+        internal void TriggerSuccess()
+        {
+            Success?.Invoke();
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
