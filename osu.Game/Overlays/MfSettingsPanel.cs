@@ -15,7 +15,7 @@ namespace osu.Game.Overlays
         protected override Drawable CreateHeader() => new SettingsHeader("Mf-osu自定义选项", "在这里调整Mf-osu的额外设置!");
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(RulesetStore rulesets, GlobalActionContainer global)
+        private void load()
         {
             AddSection(new MfMainSection());
         }

@@ -128,6 +128,8 @@ namespace osu.Game.Configuration
             //Optimize Settings
             Set(OsuSetting.OptUI, true);
             Set(OsuSetting.TrianglesEnabled, true);
+            Set(OsuSetting.MvisParticleAmount, 350, 0, 350);
+            Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
         }
 
         public OsuConfigManager(Storage storage)
@@ -234,5 +236,7 @@ namespace osu.Game.Configuration
         MenuBackgroundSource,
         OptUI,
         TrianglesEnabled,
+        MvisParticleAmount,
+        MvisUseOsuLogoVisualisation
     }
 }

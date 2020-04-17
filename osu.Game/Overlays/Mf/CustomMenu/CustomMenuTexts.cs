@@ -5,10 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osuTK;
-using osu.Game.Overlays.Profile.Header.Components;
-using System;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Users;
@@ -126,6 +123,8 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.AddLink("看板 → pr8051[Open]","https://github.com/ppy/osu/pull/8051");
             textFlow.NewParagraph();
             textFlow.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Open]","https://github.com/ppy/osu/pull/8607");
+            textFlow.NewParagraph();
+            textFlow.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis","https://github.com/EVAST9919/lazer-m-vis");
             textFlow.AddParagraph("暂时不知道tau模式是否可以使用在线功能");
         }
     }

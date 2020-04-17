@@ -24,12 +24,14 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
+        public readonly Bindable<bool> toolbarIsHovered = new Bindable<bool>();
         private Bindable<bool> optUI { get; set; }
         protected ToolbarTimeButton ToolbarTimeButton { get; private set; }
         protected ToolbarMfButton ToolbarMfButton { get; private set; }
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
         private FillFlowContainer LeftSideToolbar;
+        private ToolbarBackground toolbarBg;
 
         private const double transition_time = 500;
         private float anim_time = 0;
@@ -53,7 +55,7 @@ namespace osu.Game.Overlays.Toolbar
 
             Children = new Drawable[]
             {
-                new ToolbarBackground(),
+                toolbarBg = new ToolbarBackground(),
                 LeftSideToolbar = new FillFlowContainer
                 {
                     Direction = FillDirection.Horizontal,
@@ -100,6 +102,7 @@ namespace osu.Game.Overlays.Toolbar
 
             // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
             rulesetSelector.Current.BindTo(parentRuleset);
+            toolbarIsHovered.BindTo( toolbarBg.toolbar_IsHovered );
 
             State.ValueChanged += visibility =>
             {
@@ -139,6 +142,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public class ToolbarBackground : Container
         {
+            public readonly Bindable<bool> toolbar_IsHovered = new Bindable<bool>();
             private readonly Box solidBackground;
             private readonly Box gradientBackground;
 
@@ -167,6 +171,7 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnHover(HoverEvent e)
             {
+                this.toolbar_IsHovered.Value = true;
                 solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
@@ -174,6 +179,7 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
+                this.toolbar_IsHovered.Value = false;
                 solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
