@@ -19,11 +19,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneMissHitWindowJudgements : ModTestScene
     {
-        public TestSceneMissHitWindowJudgements()
-            : base(new OsuRuleset())
-        {
-        }
-
         [Test]
         public void TestMissViaEarlyHit()
         {
@@ -65,6 +60,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && Player.Results[0].Type == HitResult.Miss
             });
         }
+
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
 
         private class TestAutoMod : OsuModAutoplay
         {
