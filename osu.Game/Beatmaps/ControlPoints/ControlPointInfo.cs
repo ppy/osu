@@ -247,7 +247,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                     break;
             }
 
-            return newPoint.IsRedundant(existing, time);
+            return newPoint.IsRedundant(existing);
         }
 
         private void groupItemAdded(ControlPoint controlPoint)

@@ -174,8 +174,8 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool IsRedundant(ControlPoint existing, double time)
-                => base.IsRedundant(existing, time)
+            public override bool IsRedundant(ControlPoint existing)
+                => base.IsRedundant(existing)
                    && existing is LegacySampleControlPoint existingSample
                    && CustomSampleBank == existingSample.CustomSampleBank;
         }

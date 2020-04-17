@@ -19,11 +19,10 @@ namespace osu.Game.Beatmaps.ControlPoints
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 
         /// <summary>
-        /// Whether this control point results in a meaningful change when placed after another.
+        /// Determines whether this <see cref="ControlPoint"/> results in a meaningful change when placed alongside another.
         /// </summary>
         /// <param name="existing">An existing control point to compare with.</param>
-        /// <param name="time">The time this control point will be placed at if it is added.</param>
-        /// <returns>Whether redundant.</returns>
-        public abstract bool IsRedundant(ControlPoint existing, double time);
+        /// <returns>Whether this <see cref="ControlPoint"/> is redundant when placed alongside <paramref name="existing"/>.</returns>
+        public abstract bool IsRedundant(ControlPoint existing);
     }
 }
