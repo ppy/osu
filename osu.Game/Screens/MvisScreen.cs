@@ -31,27 +31,17 @@ namespace osu.Game.Screens
     /// </summary>
     public class MvisScreen : OsuScreen
     {
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
-        protected const float BACKGROUND_BLUR = 20;
-
         private const float DURATION = 750;
+        protected const float BACKGROUND_BLUR = 20;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
-        private BottomBar bottomBar;
-        private bool ScheduleDone = false;
-
-        Container buttons;
-        HoverCheckContainer hoverCheckContainer;
-        ParallaxContainer beatmapParallax;
-        private Box bgBox;
 
         private bool AllowCursor = false;
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
-        public override bool AllowExternalScreenChange => true;
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        private ScheduledDelegate scheduledHideBars;
-        private InputManager inputManager { get; set; }
+
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
             (IsHovered || idleTracker.IsIdle.Value)
@@ -66,7 +56,16 @@ namespace osu.Game.Screens
         [Resolved]
         private MusicController musicController { get; set; }
 
+        private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
+
+        private Box bgBox;
+        private BottomBar bottomBar;
+        private bool ScheduleDone = false;
+        private ScheduledDelegate scheduledHideBars;
+        Container buttons;
+        ParallaxContainer beatmapParallax;
+        HoverCheckContainer hoverCheckContainer;
 
         public MvisScreen()
         {
@@ -265,9 +264,6 @@ namespace osu.Game.Screens
 
         private void HideHostOverlay()
         {
-            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value )
-                return;
-
             game?.Toolbar.Hide();
             bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
             buttons.MoveToY(20, DURATION, Easing.OutQuint);
@@ -276,6 +272,19 @@ namespace osu.Game.Screens
             AllowBack = false;
             AllowCursor = false;
             ScheduleDone = true;
+        }
+
+        
+        /// <summary>
+        /// 因为未知原因, <see cref="TryHideHostOverlay"/>调用的<see cref="HideHostOverlay"/>无法被<see cref="ShowHostOverlay"/>中断
+        /// 因此将相关功能独立出来作为单独的函数用来调用
+        /// </summary>
+        private void RunHideHostOverlay()
+        {
+            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value )
+                return;
+
+            HideHostOverlay();
         }
 
         private void ShowHostOverlay()
@@ -301,13 +310,12 @@ namespace osu.Game.Screens
 
                 scheduledHideBars = Scheduler.AddDelayed(() =>
                 {
-                    HideHostOverlay();
+                    RunHideHostOverlay();
                 }, 1000);
-
             }
             finally
             {
-                    Schedule(TryHideHostOverlay);
+                Schedule(TryHideHostOverlay);
             }
         }
 
