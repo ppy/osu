@@ -35,10 +35,10 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => KiaiModeBindable.Value = value;
         }
 
-        public override bool EquivalentTo(ControlPoint other) =>
-            other is EffectControlPoint otherTyped &&
-            KiaiMode == otherTyped.KiaiMode && OmitFirstBarLine == otherTyped.OmitFirstBarLine;
-
-        public override bool IsRedundant(ControlPoint existing, double time) => !OmitFirstBarLine && EquivalentTo(existing);
+        public override bool IsRedundant(ControlPoint existing, double time)
+            => !OmitFirstBarLine
+               && existing is EffectControlPoint existingEffect
+               && KiaiMode == existingEffect.KiaiMode
+               && OmitFirstBarLine == existingEffect.OmitFirstBarLine;
     }
 }
