@@ -386,14 +386,6 @@ namespace osu.Game.Beatmaps.Formats
                 SampleVolume = sampleVolume,
                 CustomSampleBank = customSampleBank,
             }, timingChange);
-
-            // To handle the scenario where a non-timing line shares the same time value as a subsequent timing line but
-            // appears earlier in the file, we buffer non-timing control points and rewrite them *after* control points from the timing line
-            // with the same time value (allowing them to overwrite as necessary).
-            //
-            // The expected outcome is that we prefer the non-timing line's adjustments over the timing line's adjustments when time is equal.
-            if (timingChange)
-                flushPendingPoints();
         }
 
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
@@ -405,19 +397,27 @@ namespace osu.Game.Beatmaps.Formats
                 flushPendingPoints();
 
             if (timingChange)
-            {
-                beatmap.ControlPointInfo.Add(time, point);
-                return;
-            }
+                pendingControlPoints.Insert(0, point);
+            else
+                pendingControlPoints.Add(point);
 
-            pendingControlPoints.Add(point);
             pendingControlPointsTime = time;
         }
 
         private void flushPendingPoints()
         {
-            foreach (var p in pendingControlPoints)
-                beatmap.ControlPointInfo.Add(pendingControlPointsTime, p);
+            var set = new HashSet<Type>();
+
+            // Changes from non-timing-points appear towards the end of the list and should override any changes from timing-points.
+            for (int i = pendingControlPoints.Count - 1; i >= 0; i--)
+            {
+                var type = pendingControlPoints[i].GetType();
+                if (set.Contains(type))
+                    continue;
+
+                set.Add(type);
+                beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
+            }
 
             pendingControlPoints.Clear();
         }
