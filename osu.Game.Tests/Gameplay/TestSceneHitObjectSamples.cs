@@ -16,17 +16,16 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
-using osu.Game.Tests.Visual;
+using osu.Game.Tests.Visual.Gameplay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneHitObjectSamples : PlayerTestScene
+    public class TestSceneHitObjectSamples : TestPlayerTestScene
     {
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
@@ -43,11 +42,6 @@ namespace osu.Game.Tests.Gameplay
         private readonly TestResourceStore beatmapSkinResourceStore = new TestResourceStore();
 
         protected override bool HasCustomSteps => true;
-
-        public TestSceneHitObjectSamples()
-            : base(new OsuRuleset())
-        {
-        }
 
         private SkinSourceDependencyContainer dependencies;
 

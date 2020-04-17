@@ -4,19 +4,13 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircleLongCombo : PlayerTestScene
+    public class TestSceneHitCircleLongCombo : TestSceneOsuPlayer
     {
-        public TestSceneHitCircleLongCombo()
-            : base(new OsuRuleset())
-        {
-        }
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap

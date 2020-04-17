@@ -8,12 +8,11 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [HeadlessTest] // we alter unsafe properties on the game host to test inactive window state.
-    public class TestScenePauseWhenInactive : PlayerTestScene
+    public class TestScenePauseWhenInactive : TestPlayerTestScene
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
@@ -26,11 +25,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private GameHost host { get; set; }
-
-        public TestScenePauseWhenInactive()
-            : base(new OsuRuleset())
-        {
-        }
 
         [Test]
         public void TestDoesntPauseDuringIntro()

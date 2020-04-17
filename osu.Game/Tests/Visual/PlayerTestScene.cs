@@ -19,14 +19,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool HasCustomSteps { get; } = false;
 
-        private readonly Ruleset ruleset;
-
         protected TestPlayer Player;
-
-        protected PlayerTestScene(Ruleset ruleset)
-        {
-            this.ruleset = ruleset;
-        }
 
         protected OsuConfigManager LocalConfig;
 
@@ -53,7 +46,7 @@ namespace osu.Game.Tests.Visual
 
             action?.Invoke();
 
-            AddStep(ruleset.RulesetInfo.Name, LoadPlayer);
+            AddStep(CreateRuleset().RulesetInfo.Name, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -63,28 +56,28 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer()
         {
-            var beatmap = CreateBeatmap(ruleset.RulesetInfo);
+            var beatmap = CreateBeatmap(Ruleset.Value);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
-            Ruleset.Value = ruleset.RulesetInfo;
-
             SelectedMods.Value = Array.Empty<Mod>();
+
+            var rulesetInstance = Ruleset.Value.CreateInstance();
 
             if (!AllowFail)
             {
-                var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);
+                var noFailMod = rulesetInstance.GetAllMods().FirstOrDefault(m => m is ModNoFail);
                 if (noFailMod != null)
                     SelectedMods.Value = new[] { noFailMod };
             }
 
             if (Autoplay)
             {
-                var mod = ruleset.GetAutoplayMod();
+                var mod = rulesetInstance.GetAutoplayMod();
                 if (mod != null)
                     SelectedMods.Value = SelectedMods.Value.Concat(mod.Yield()).ToArray();
             }
 
-            Player = CreatePlayer(ruleset);
+            Player = CreatePlayer(rulesetInstance);
             LoadScreen(Player);
         }
 

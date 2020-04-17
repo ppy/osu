@@ -3,19 +3,17 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Rulesets.Taiko.Tests
 {
-    [TestFixture]
-    public class TestSceneOsuPlayer : PlayerTestScene
+    public class TestSceneTaikoPlayer : PlayerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(OsuRuleset),
+            typeof(TaikoRuleset)
         };
 
-        protected override Ruleset CreateRuleset() => new OsuRuleset();
+        protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
 }

@@ -10,22 +10,16 @@ using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Storyboards;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneGameplayRewinding : PlayerTestScene
+    public class TestSceneGameplayRewinding : TestPlayerTestScene
     {
         [Resolved]
         private AudioManager audioManager { get; set; }
-
-        public TestSceneGameplayRewinding()
-            : base(new OsuRuleset())
-        {
-        }
 
         private Track track;
 

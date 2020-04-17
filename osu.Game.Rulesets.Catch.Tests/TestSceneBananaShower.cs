@@ -8,12 +8,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneBananaShower : PlayerTestScene
+    public class TestSceneBananaShower : TestSceneCatchPlayer
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -25,11 +24,6 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(CatchRuleset),
             typeof(DrawableCatchRuleset),
         };
-
-        public TestSceneBananaShower()
-            : base(new CatchRuleset())
-        {
-        }
 
         [Test]
         public void TestBananaShower()
