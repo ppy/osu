@@ -51,8 +51,7 @@ namespace osu.Game.Screens.Select
 
             foreach (var r in getBestRulesetOrder())
             {
-                if (!recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars))
-                    break;
+                recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars);
 
                 beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
@@ -75,6 +74,7 @@ namespace osu.Game.Screens.Select
 
                 req.Success += result =>
                 {
+                    bestRulesetOrder = null;
                     // algorithm taken from https://github.com/ppy/osu-web/blob/e6e2825516449e3d0f3f5e1852c6bdd3428c3437/app/Models/User.php#L1505
                     recommendedStarDifficulty[rulesetInfo] = Math.Pow((double)(result.Statistics.PP ?? 0), 0.4) * 0.195;
                 };
@@ -87,22 +87,30 @@ namespace osu.Game.Screens.Select
 
         private IEnumerable<RulesetInfo> getBestRulesetOrder()
         {
-            if (bestRulesetOrder != null)
-                return moveCurrentRulesetToFirst();
-
-            bestRulesetOrder = recommendedStarDifficulty.ToList()
-                                                        .OrderBy(pair => pair.Value)
-                                                        .Select(pair => pair.Key)
-                                                        .Reverse();
+            bestRulesetOrder ??= recommendedStarDifficulty.ToList()
+                                                          .OrderBy(pair => pair.Value)
+                                                          .Select(pair => pair.Key)
+                                                          .Reverse();
 
             return moveCurrentRulesetToFirst();
         }
 
         private IEnumerable<RulesetInfo> moveCurrentRulesetToFirst()
         {
-            var orderedRulesets = bestRulesetOrder.ToList();
-            orderedRulesets.Remove(ruleset.Value);
-            orderedRulesets.Insert(0, ruleset.Value);
+            List<RulesetInfo> orderedRulesets = null;
+
+            if (bestRulesetOrder.Contains(ruleset.Value))
+            {
+                orderedRulesets = bestRulesetOrder.ToList();
+                orderedRulesets.Remove(ruleset.Value);
+                orderedRulesets.Insert(0, ruleset.Value);
+            }
+            else
+            {
+                orderedRulesets = new List<RulesetInfo> { ruleset.Value };
+                orderedRulesets.AddRange(bestRulesetOrder);
+            }
+
             return orderedRulesets;
         }
 
