@@ -471,3 +471,5 @@
     *   [m] [Fix 0 custom sample bank not falling back to user skin #8756]
     *   [m] [Hide edit context menu item in multiplayer song select #8768]
     *   [m] [Disable undo/redo menu items when they can't be performed #8764]
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8771]
+        *   #8051 -> #8771
