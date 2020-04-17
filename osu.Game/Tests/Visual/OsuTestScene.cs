@@ -20,7 +20,6 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Testing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
@@ -70,8 +69,9 @@ namespace osu.Game.Tests.Visual
         {
             var baseDependencies = base.CreateChildDependencies(parent);
 
-            if (this is IRulesetTestScene rts)
-                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(rts.CreateRuleset(), baseDependencies);
+            var providedRuleset = CreateRuleset();
+            if (providedRuleset != null)
+                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
 
             Dependencies = new OsuScreenDependencies(false, baseDependencies);
 
