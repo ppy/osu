@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Visual
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
             /// <param name="length">The length of the returned virtual track.</param>
             public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
-                : base(beatmap, storyboard)
+                : base(beatmap, storyboard, audio)
             {
                 if (referenceClock != null)
                 {
