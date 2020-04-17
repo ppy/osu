@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.MfMenu
 
             textFlow.AddUserLink(new User
                         {
-                            Username = "A M D (比赛端翻译修正)",
+                            Username = "A M D (比赛端、游戏内翻译修正)",
                             Id = 5321112
                         });
             textFlow.NewParagraph();
