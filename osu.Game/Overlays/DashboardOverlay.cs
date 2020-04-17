@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,26 +10,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
     public class DashboardOverlay : FullscreenOverlay
     {
-        private readonly Bindable<User> localUser = new Bindable<User>();
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         private CancellationTokenSource cancellationToken;
-        private APIRequest lastRequest;
 
         private readonly Box background;
-        private readonly DashboardOverlayHeader header;
         private readonly Container content;
+        private readonly DashboardOverlayHeader header;
         private readonly LoadingLayer loading;
         private readonly OverlayScrollContainer scrollFlow;
 
@@ -80,98 +72,75 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            localUser.BindTo(api.LocalUser);
-            localUser.BindValueChanged(_ => onTabChanged());
-            header.Current.BindValueChanged(_ => onTabChanged());
+            header.Current.BindValueChanged(onTabChanged);
         }
+
+        private bool displayUpdateRequired = true;
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            if (!content.Any())
+            // We don't want to create a new display on every call, only when exiting from fully closed state.
+            if (displayUpdateRequired)
+            {
                 header.Current.TriggerChange();
+                displayUpdateRequired = false;
+            }
         }
 
         protected override void PopOutComplete()
         {
             base.PopOutComplete();
-            loadDisplay(null);
-        }
-
-        private void onTabChanged()
-        {
-            lastRequest?.Cancel();
-            cancellationToken?.Cancel();
-
-            loading.Show();
-
-            // We may want to use OnlineViewContainer after https://github.com/ppy/osu/pull/8044 merge
-            if (!api.IsLoggedIn)
-            {
-                loadDisplay(null);
-                return;
-            }
-
-            var request = createScopedRequest();
-            lastRequest = request;
-
-            if (request == null)
-            {
-                loadDisplay(null);
-                return;
-            }
-
-            request.Success += () => Schedule(() => loadDisplay(createDisplayFromResponse(request)));
-            request.Failure += _ => Schedule(() => loadDisplay(null));
-
-            api.Queue(request);
+            loadDisplay(Empty());
+            displayUpdateRequired = true;
         }
 
         private void loadDisplay(Drawable display)
         {
             scrollFlow.ScrollToStart();
 
-            if (display == null)
-            {
-                content.Clear();
-                loading.Hide();
-                return;
-            }
-
             LoadComponentAsync(display, loaded =>
             {
-                loading.Hide();
+                if (API.IsLoggedIn)
+                    loading.Hide();
+
                 content.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
-        private Drawable createDisplayFromResponse(APIRequest request)
+        private void onTabChanged(ValueChangedEvent<DashboardOverlayTabs> tab)
         {
-            switch (request)
+            cancellationToken?.Cancel();
+            loading.Show();
+
+            if (!API.IsLoggedIn)
             {
-                case GetFriendsRequest friendsRequest:
-                    return new FriendDisplay(friendsRequest.Result);
+                loadDisplay(Empty());
+                return;
             }
 
-            return null;
+            switch (tab.NewValue)
+            {
+                case DashboardOverlayTabs.Friends:
+                    loadDisplay(new FriendDisplay());
+                    break;
+
+                default:
+                    throw new NotImplementedException($"Display for {tab.NewValue} tab is not implemented");
+            }
         }
 
-        private APIRequest createScopedRequest()
+        public override void APIStateChanged(IAPIProvider api, APIState state)
         {
-            switch (header.Current.Value)
-            {
-                case HomeOverlayTabs.Friends:
-                    return new GetFriendsRequest();
-            }
+            if (State.Value == Visibility.Hidden)
+                return;
 
-            return null;
+            header.Current.TriggerChange();
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            lastRequest?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
