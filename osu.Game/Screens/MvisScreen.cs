@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Mvis.UI.Objects;
 using osu.Game.Screens.Mvis.Buttons;
@@ -23,6 +24,8 @@ using osu.Framework.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osuTK.Input;
+using osu.Game.Overlays.Music;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens
 {
@@ -46,15 +49,14 @@ namespace osu.Game.Screens
             // don't hide if the user is hovering one of the panes, unless they are idle.
             (IsHovered || idleTracker.IsIdle.Value)
             // don't hide if a focused overlay is visible, like settings.
-            && inputManager?.FocusedDrawable == null
-            // don't hide if the user is hovering toolbar.
-            && !game.Toolbar.toolbarIsHovered.Value;
+            && inputManager?.FocusedDrawable == null;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
         [Resolved]
         private MusicController musicController { get; set; }
+        private PlaylistOverlay playlist;
 
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
@@ -66,6 +68,7 @@ namespace osu.Game.Screens
         Container buttons;
         ParallaxContainer beatmapParallax;
         HoverCheckContainer hoverCheckContainer;
+        HoverableProgressBarContainer progressBarContainer;
 
         public MvisScreen()
         {
@@ -86,6 +89,19 @@ namespace osu.Game.Screens
                         Anchor = Anchor.Centre,
                     }
                 },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 400,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Child =  playlist = new PlaylistOverlay
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                    },
+                },
                 bottomBar = new BottomBar
                 {
                     Children = new Drawable[]
@@ -103,6 +119,10 @@ namespace osu.Game.Screens
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                progressBarContainer = new HoverableProgressBarContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                                 buttons = new Container
                                 {
                                     Name = "Buttons Container",
@@ -162,6 +182,14 @@ namespace osu.Game.Screens
                                             AutoSizeAxes = Axes.Both,
                                             Spacing = new Vector2(5),
                                             Margin = new MarginPadding { Right = 5 },
+                                            Children = new Drawable[]
+                                            {
+                                                new MusicOverlayButton(FontAwesome.Solid.Atom)
+                                                {
+                                                    Action = () => playlist.ToggleVisibility(),
+                                                    TooltipText = "歌曲列表",
+                                                }
+                                            }
                                         },
                                     }
                                 },
@@ -198,9 +226,20 @@ namespace osu.Game.Screens
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
 
-            ShowHostOverlay();
+            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
+
+            ShowOverlays();
 
             base.LoadComplete();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
+
+            progressBarContainer.progressBar.EndTime = track.Length;
+            progressBarContainer.progressBar.CurrentTime = track.CurrentTime;
         }
 
         public override void OnEntering(IScreen last)
@@ -235,6 +274,10 @@ namespace osu.Game.Screens
                 case Key.Space:
                     musicController.TogglePause();
                     return true;
+
+                case Key.Menu:
+                    playlist.ToggleVisibility();
+                    return true;
             }
 
             return base.OnKeyDown(e);
@@ -246,23 +289,23 @@ namespace osu.Game.Screens
 
             if ( !hoverCheckContainer.ScreenHovered.Value )
             {
-                ShowHostOverlay();
+                ShowOverlays();
                 return;
             }
 
             switch (mouseIdle)
             {
                 case true:
-                    TryHideHostOverlay();
+                    TryHideOverlays();
                     break;
 
                 case false:
-                    ShowHostOverlay();
+                    ShowOverlays();
                     break;
             }
         }
 
-        private void HideHostOverlay()
+        private void HideOverlays()
         {
             game?.Toolbar.Hide();
             bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
@@ -276,18 +319,18 @@ namespace osu.Game.Screens
 
         
         /// <summary>
-        /// 因为未知原因, <see cref="TryHideHostOverlay"/>调用的<see cref="HideHostOverlay"/>无法被<see cref="ShowHostOverlay"/>中断
+        /// 因为未知原因, <see cref="TryHideOverlays"/>调用的<see cref="HideOverlays"/>无法被<see cref="ShowOverlays"/>中断
         /// 因此将相关功能独立出来作为单独的函数用来调用
         /// </summary>
-        private void RunHideHostOverlay()
+        private void RunHideOverlays()
         {
             if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value )
                 return;
 
-            HideHostOverlay();
+            HideOverlays();
         }
 
-        private void ShowHostOverlay()
+        private void ShowOverlays()
         {
             scheduledHideBars?.Cancel();
 
@@ -301,7 +344,7 @@ namespace osu.Game.Screens
             ScheduleDone = false;
         }
 
-        private void TryHideHostOverlay()
+        private void TryHideOverlays()
         {
             try
             {
@@ -310,12 +353,12 @@ namespace osu.Game.Screens
 
                 scheduledHideBars = Scheduler.AddDelayed(() =>
                 {
-                    RunHideHostOverlay();
+                    RunHideOverlays();
                 }, 1000);
             }
             finally
             {
-                Schedule(TryHideHostOverlay);
+                Schedule(TryHideOverlays);
             }
         }
 

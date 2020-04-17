@@ -6,15 +6,14 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
-using osu.Game.Screens.Mvis.UI.Objects;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens;
 using osu.Game.Input;
 using osu.Framework.Audio;
 using osu.Game.Overlays.Toolbar;
-using osu.Framework.Graphics.Containers;
 using System.Linq;
+using osu.Game.Screens.Mvis.UI;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -24,7 +23,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MvisScreen),
-            typeof(BottomBar)
+            typeof(BottomBar),
+            typeof(HoverableProgressBarContainer)
         };
 
 

@@ -15,15 +15,18 @@ namespace osu.Game.Tests.Editor
         {
             var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()));
 
-            Assert.That(handler.HasUndoState, Is.False);
+            Assert.That(handler.CanUndo.Value, Is.False);
+            Assert.That(handler.CanRedo.Value, Is.False);
 
             handler.SaveState();
 
-            Assert.That(handler.HasUndoState, Is.True);
+            Assert.That(handler.CanUndo.Value, Is.True);
+            Assert.That(handler.CanRedo.Value, Is.False);
 
             handler.RestoreState(-1);
 
-            Assert.That(handler.HasUndoState, Is.False);
+            Assert.That(handler.CanUndo.Value, Is.False);
+            Assert.That(handler.CanRedo.Value, Is.True);
         }
 
         [Test]
@@ -31,20 +34,20 @@ namespace osu.Game.Tests.Editor
         {
             var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()));
 
-            Assert.That(handler.HasUndoState, Is.False);
+            Assert.That(handler.CanUndo.Value, Is.False);
 
             for (int i = 0; i < EditorChangeHandler.MAX_SAVED_STATES; i++)
                 handler.SaveState();
 
-            Assert.That(handler.HasUndoState, Is.True);
+            Assert.That(handler.CanUndo.Value, Is.True);
 
             for (int i = 0; i < EditorChangeHandler.MAX_SAVED_STATES; i++)
             {
-                Assert.That(handler.HasUndoState, Is.True);
+                Assert.That(handler.CanUndo.Value, Is.True);
                 handler.RestoreState(-1);
             }
 
-            Assert.That(handler.HasUndoState, Is.False);
+            Assert.That(handler.CanUndo.Value, Is.False);
         }
 
         [Test]
@@ -52,20 +55,20 @@ namespace osu.Game.Tests.Editor
         {
             var handler = new EditorChangeHandler(new EditorBeatmap(new Beatmap()));
 
-            Assert.That(handler.HasUndoState, Is.False);
+            Assert.That(handler.CanUndo.Value, Is.False);
 
             for (int i = 0; i < EditorChangeHandler.MAX_SAVED_STATES * 2; i++)
                 handler.SaveState();
 
-            Assert.That(handler.HasUndoState, Is.True);
+            Assert.That(handler.CanUndo.Value, Is.True);
 
             for (int i = 0; i < EditorChangeHandler.MAX_SAVED_STATES; i++)
             {
-                Assert.That(handler.HasUndoState, Is.True);
+                Assert.That(handler.CanUndo.Value, Is.True);
                 handler.RestoreState(-1);
             }
 
-            Assert.That(handler.HasUndoState, Is.False);
+            Assert.That(handler.CanUndo.Value, Is.False);
         }
     }
 }

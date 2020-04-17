@@ -24,7 +24,7 @@
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
 
 ### 2020/04/17
-* 描述 : 修复当`HideHostOverlay()`被`TryHideHostOverlay()`调用时,`ShowHostOverlay()`无效的问题
+* 描述 : ~~修复当`HideHostOverlay()`被`TryHideHostOverlay()`调用时,`ShowHostOverlay()`无效的问题~~(已有临时解决方案)
 * 相关文件
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
 

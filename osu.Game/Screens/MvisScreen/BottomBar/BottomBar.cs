@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.UI.Objects
+namespace osu.Game.Screens.Mvis.UI
 {
     public class BottomBar : Container
     {
