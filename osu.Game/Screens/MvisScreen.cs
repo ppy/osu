@@ -324,7 +324,7 @@ namespace osu.Game.Screens
         /// </summary>
         private void RunHideOverlays()
         {
-            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value )
+            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value || bottomBar.panel_IsHovered.Value )
                 return;
 
             HideOverlays();
