@@ -25,7 +25,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using osu.Game.Overlays.Music;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens
 {
