@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -30,10 +29,14 @@ namespace osu.Game.Tests.Visual
         protected SkinnableTestScene()
             : base(2, 3)
         {
+            // avoid running silently incorrectly.
+            if (CreateRuleset() == null)
+            {
+                throw new InvalidOperationException(
+                    $"No ruleset provided, override {nameof(CreateRuleset)} to the ruleset belonging to the skinnable content."
+                    + "This is required to add the legacy skin transformer for the content to behave as expected.");
+            }
         }
-
-        // Required to be part of the per-ruleset implementation to construct the newer version of the Ruleset.
-        protected abstract Ruleset CreateRulesetForSkinProvider();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SkinManager skinManager)
@@ -107,7 +110,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(CreateRulesetForSkinProvider().CreateLegacySkinProvider(mainProvider, beatmap))
+                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
