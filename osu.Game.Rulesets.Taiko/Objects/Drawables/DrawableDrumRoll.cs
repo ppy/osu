@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -135,6 +136,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     this.Delay(HitObject.Duration).FadeOut(100);
                     break;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            OriginPosition = new Vector2(DrawHeight);
+            Content.X = DrawHeight / 2;
         }
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
