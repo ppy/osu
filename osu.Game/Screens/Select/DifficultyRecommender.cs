@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Select
 
         private IEnumerable<RulesetInfo> moveCurrentRulesetToFirst()
         {
-            List<RulesetInfo> orderedRulesets = null;
+            List<RulesetInfo> orderedRulesets;
 
             if (bestRulesetOrder.Contains(ruleset.Value))
             {
