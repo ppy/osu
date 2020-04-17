@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -71,6 +72,9 @@ namespace osu.Game.Rulesets.Osu.UI
             // Hitobjects which themselves don't block future hitobjects don't cause misses (e.g. slider ticks, spinners).
             if (!hitObjectCanBlockFutureHits(hitObject))
                 return;
+
+            if (!IsHittable(hitObject, hitObject.HitObject.StartTime + hitObject.Result.TimeOffset))
+                throw new InvalidOperationException($"A {hitObject} was hit before it become hittable!");
 
             var enumerator = new HitObjectEnumerator(hitObjectContainer, hitObject.HitObject.StartTime);
 
