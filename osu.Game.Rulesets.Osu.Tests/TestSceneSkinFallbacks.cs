@@ -25,13 +25,12 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSkinFallbacks : PlayerTestScene
+    public class TestSceneSkinFallbacks : TestSceneOsuPlayer
     {
         private readonly TestSource testUserSkin;
         private readonly TestSource testBeatmapSkin;
 
         public TestSceneSkinFallbacks()
-            : base(new OsuRuleset())
         {
             testUserSkin = new TestSource("user");
             testBeatmapSkin = new TestSource("beatmap");

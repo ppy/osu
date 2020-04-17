@@ -10,14 +10,13 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePause : PlayerTestScene
+    public class TestScenePause : TestPlayerTestScene
     {
         protected new PausePlayer Player => (PausePlayer)base.Player;
 
@@ -26,7 +25,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Container<Drawable> Content => content;
 
         public TestScenePause()
-            : base(new OsuRuleset())
         {
             base.Content.Add(content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both });
         }

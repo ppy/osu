@@ -11,13 +11,8 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestSceneTaikoSuddenDeath : PlayerTestScene
+    public class TestSceneTaikoSuddenDeath : TestSceneTaikoPlayer
     {
-        public TestSceneTaikoSuddenDeath()
-            : base(new TaikoRuleset())
-        {
-        }
-
         protected override bool AllowFail => true;
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset)

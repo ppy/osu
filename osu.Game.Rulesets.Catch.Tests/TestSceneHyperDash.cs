@@ -10,23 +10,17 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneHyperDash : PlayerTestScene
+    public class TestSceneHyperDash : TestSceneCatchPlayer
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(CatcherArea),
         };
-
-        public TestSceneHyperDash()
-            : base(new CatchRuleset())
-        {
-        }
 
         protected override bool Autoplay => true;
 
