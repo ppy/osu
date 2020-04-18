@@ -139,6 +139,23 @@ namespace osu.Game.Screens.Select
                                             Padding = new MarginPadding { Right = -150 },
                                         },
                                     },
+                                    new Container(),
+                                },
+                            }
+                        },
+                        new GridContainer // used for max width implementation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 650),
+                                new Dimension(),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new Container(),
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,

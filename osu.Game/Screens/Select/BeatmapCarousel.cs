@@ -136,7 +136,9 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Child = scrollableContent = new Container<DrawableCarouselItem>
                     {
-                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Width = 850,
                     }
                 }
             };
