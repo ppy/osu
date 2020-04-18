@@ -5,7 +5,7 @@ using System;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>, IEquatable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>
     {
         /// <summary>
         /// The time at which the control point takes effect.
@@ -19,12 +19,10 @@ namespace osu.Game.Beatmaps.ControlPoints
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 
         /// <summary>
-        /// Whether this control point is equivalent to another, ignoring time.
+        /// Determines whether this <see cref="ControlPoint"/> results in a meaningful change when placed alongside another.
         /// </summary>
-        /// <param name="other">Another control point to compare with.</param>
-        /// <returns>Whether equivalent.</returns>
-        public abstract bool EquivalentTo(ControlPoint other);
-
-        public bool Equals(ControlPoint other) => Time == other?.Time && EquivalentTo(other);
+        /// <param name="existing">An existing control point to compare with.</param>
+        /// <returns>Whether this <see cref="ControlPoint"/> is redundant when placed alongside <paramref name="existing"/>.</returns>
+        public abstract bool IsRedundant(ControlPoint existing);
     }
 }

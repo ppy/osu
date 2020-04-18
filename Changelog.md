@@ -474,3 +474,8 @@
     *   [o] [Replace SocialOverlay with DashboardOverlay #8771]
         *   #8051 -> #8771
 *   **添加了Mvis播放器界面**
+
+### 2020/4/18
+*   合并上游pr
+    *   [m] [Update framework #8781]
+    *   [m] [Adjust TimingControlPoint equivalency #8672]
