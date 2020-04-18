@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapSetPager
     {
-        private readonly IAPIProvider API;
+        private readonly IAPIProvider api;
 
         public event PageFetchHandler PageFetch;
 
@@ -35,9 +35,9 @@ namespace osu.Game.Overlays.BeatmapListing
         public bool IsFetching => getSetsRequest != null;
         public bool CanFetchNextPage => !IsLastPageFetched && !IsFetching;
 
-        public BeatmapSetPager(IAPIProvider API, RulesetStore rulesets, string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
+        public BeatmapSetPager(IAPIProvider api, RulesetStore rulesets, string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
         {
-            this.API = API;
+            this.api = api;
 
             this.rulesets = rulesets;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 PageFetch?.Invoke(sets);
             };
 
-            API.Queue(getSetsRequest);
+            api.Queue(getSetsRequest);
         }
 
         public void Reset()

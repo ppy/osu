@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -28,7 +27,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Scroll distance from bottom at which new beatmaps will be loaded, if possible.
         /// </summary>
-        protected const int pagination_scroll_distance = 500;
+        private const int pagination_scroll_distance = 500;
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
