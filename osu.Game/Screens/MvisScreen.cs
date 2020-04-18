@@ -257,8 +257,17 @@ namespace osu.Game.Screens
             base.Update();
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
 
-            progressBarContainer.progressBar.EndTime = track.Length;
-            progressBarContainer.progressBar.CurrentTime = track.CurrentTime;
+            if (track?.IsDummyDevice == false)
+            {
+                progressBarContainer.progressBar.EndTime = track.Length;
+                progressBarContainer.progressBar.CurrentTime = track.CurrentTime;
+            }
+            else
+            {
+                progressBarContainer.progressBar.CurrentTime = 0;
+                progressBarContainer.progressBar.EndTime = 1;
+            }
+            
         }
 
         public override void OnEntering(IScreen last)
@@ -270,7 +279,7 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            beatmapParallax.FadeOut(100);
+            beatmapParallax.Hide();
             beatmapParallax.Expire();
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);

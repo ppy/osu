@@ -480,3 +480,9 @@
     *   [m] [Update framework #8781]
     *   [m] [Adjust TimingControlPoint equivalency #8672]
 *   使Mvis播放器可以通过Enter键将当前播放的谱面于歌曲选择中显示
+
+### 2020/4/19
+*   合并上游pr
+    *   [o] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
+
+*   修复了在Mvis播放器界面导入并查看谱面会导致游戏崩溃的问题
