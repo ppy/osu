@@ -11,11 +11,12 @@ namespace osu.Game.Overlays
     public class MfMainSection : SettingsSection
     {
         public override IconUsage Icon => FontAwesome.Solid.Globe;
-        public override string Header => "总体";
+        public override string Header => "界面选项";
 
         public MfMainSection()
         {
             Add(new MfSettings());
+            Add(new MvisSettings());
         }
     }
 }

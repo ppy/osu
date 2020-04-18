@@ -181,7 +181,7 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.Title;
-                    Text.Font = Text.Font.With(size: 16);
+                    Text.Font = Text.Font.With(size: 18);
                     Text.Margin = new MarginPadding { Bottom = 10 + bar_height };
                     Bar.ExpandedSize = 10;
                     Bar.Margin = new MarginPadding { Bottom = bar_height };

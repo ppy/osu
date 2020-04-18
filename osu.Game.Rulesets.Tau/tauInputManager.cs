@@ -59,10 +59,10 @@ namespace osu.Game.Rulesets.Tau
 
     public enum TauAction
     {
-        [Description("Left tick button")]
+        [Description("左键")]
         LeftButton,
 
-        [Description("Right tick button")]
+        [Description("右键")]
         RightButton,
 
         [Description("Hard beat button")]

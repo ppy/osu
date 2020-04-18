@@ -15,11 +15,16 @@ using System.Collections.Generic;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Backgrounds
 {
     public class Triangles : Drawable
     {
+        private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
+        public bool IgnoreSettings = false;
+        private float alpha_orig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
 
@@ -97,15 +102,37 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders)
+        private void load(ShaderManager shaders, OsuConfigManager config)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+
+            alpha_orig = Alpha;
+            config.BindWith(OsuSetting.TrianglesEnabled, TrianglesEnabled);
+
+            TrianglesEnabled.ValueChanged += _ => UpdateIcons();
+        }
+
+        private void UpdateIcons()
+        {
+            if (!IgnoreSettings)
+                switch (TrianglesEnabled.Value)
+                {
+                    case true:
+                        this.FadeTo(alpha_orig, 250);
+                        break;
+
+                    case false:
+                        this.FadeOut(250);
+                        break;
+                }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             addTriangles(true);
+
+            UpdateIcons();
         }
 
         public float TriangleScale

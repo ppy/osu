@@ -439,3 +439,43 @@
         *   更新 : 使`LogoTrackContainer`不再瞬移
 
 *   翻译文本优化
+
+### 2020/4/14
+*   `Triangles`兼容性修复
+*   修复`Triangles`在未给定`IgnoreSettings`时透明度不正确的问题
+*   修复`三角形粒子动画`设置无效的问题
+*   继续调整歌曲加载界面动画
+
+
+*   合并上游pr
+    *   [m] [Fix scoring in classic mode not awarding exact numerical value for judgement #8750]
+    *   [m] [Implement "prefer no-video" option #8716]
+    *   [m] [Fix beatmap background not displaying when video is present #8751]
+    *   [m] [Add support for testing arbitrary API requests/responses via Dummy API #8714]
+    *   [m] [Make beatmap carousel select recommended difficulties #8444]
+    *   [m] [Fade playfield to red when player health is low #8312]
+
+*   暂不合并
+    *   [m] [Mark dummy api test scene as headless #8752]
+
+### 2020/4/15
+*   继续调整动画
+*   翻译补全
+
+*   合并上游pr
+    *   [m] [Fix typo in DrawableTaikoHitObject #8761]
+    *   [m] [Fix osu!mania replays actuating incorrect keys when multiple stages are involved #8755]
+
+### 2020/4/17
+*   合并上游pr
+    *   [m] [Fix 0 custom sample bank not falling back to user skin #8756]
+    *   [m] [Hide edit context menu item in multiplayer song select #8768]
+    *   [m] [Disable undo/redo menu items when they can't be performed #8764]
+    *   [o] [Replace SocialOverlay with DashboardOverlay #8771]
+        *   #8051 -> #8771
+*   **添加了Mvis播放器界面**
+
+### 2020/4/18
+*   合并上游pr
+    *   [m] [Update framework #8781]
+    *   [m] [Adjust TimingControlPoint equivalency #8672]

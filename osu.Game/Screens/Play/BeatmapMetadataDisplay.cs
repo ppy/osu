@@ -18,6 +18,8 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Rulesets;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
@@ -56,6 +58,7 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
         private LoadingSpinner loading;
+        private SelectedRulesetIcon ruleseticon;
         private Sprite backgroundSprite;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
@@ -65,9 +68,24 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (value)
+                {
                     loading.Show();
+                    ruleseticon.Hide();
+                }
                 else
+                {
                     loading.Hide();
+
+                    if ( Optui.Value )
+                    {
+                        ruleseticon.Loaded = true;
+                        ruleseticon.Delay(250).Then()
+                                   .ScaleTo(1.5f).FadeOut().Then()
+                                   .FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
+                    }
+                    else
+                        ruleseticon.Hide();
+                }
             }
         }
 
@@ -82,7 +100,6 @@ namespace osu.Game.Screens.Play
 
         private Container basePanel;
         private Container bg;
-        private FillFlowContainer contentFillFlow;
         private readonly Bindable<bool> Optui = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
@@ -121,7 +138,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        contentFillFlow = new FillFlowContainer
+                        new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
@@ -167,7 +184,8 @@ namespace osu.Game.Screens.Play
                                             Anchor = Anchor.Centre,
                                             FillMode = FillMode.Fill,
                                         },
-                                        loading = new LoadingLayer(backgroundSprite)
+                                        loading = new LoadingLayer(backgroundSprite),
+                                        ruleseticon = new SelectedRulesetIcon(),
                                     }
                                 },
                                 new OsuSpriteText
@@ -218,11 +236,14 @@ namespace osu.Game.Screens.Play
             switch (Optui.Value)
             {
                 case true:
+                    ruleseticon.Delay(500).Schedule( () => ruleseticon.AddRulesetSprite() );
+                    ruleseticon.ScaleTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     return;
 
                 case false:
-                    bg.ScaleTo(1.5f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                    ruleseticon.ScaleTo(0.9f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                    bg.FadeOut(500, Easing.OutQuint).ScaleTo(1.1f, 500, Easing.OutQuint);
                     return;
             }
         }
@@ -239,9 +260,106 @@ namespace osu.Game.Screens.Play
                     return;
 
                 case false:
-                    bg.ScaleTo(1.5f).Then().FadeOut();
+                    ruleseticon.ScaleTo(0.9f).FadeOut();
+                    bg.ScaleTo(1.1f).FadeOut();
                     return;
             }
         }
+
+        
+
+        private class SelectedRulesetIcon : Container
+        {
+            public FillFlowContainer contentFillFlow;
+            private OsuSpriteText rulesetSpriteText;
+
+            [Resolved]
+            private IBindable<RulesetInfo> rulesetInfo { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Origin = Anchor.Centre;
+                Anchor = Anchor.Centre;
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        Size = new Vector2(200, 40),
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        CornerRadius = 10,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0.8f,
+                                Colour = Color4.Black,
+                            }
+                        }
+                    },
+                    contentFillFlow = new FillFlowContainer
+                    {
+                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.Both,
+                        Spacing = new Vector2(10),
+                        LayoutDuration = 500,
+                        LayoutEasing = Easing.OutQuint,
+                        Children = new Drawable[]
+                        {
+                            new ConstrainedIconContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
+                                Colour = Color4.White,
+                                Size = new Vector2(20),
+                            }
+
+                        }
+                    },
+                };
+
+                Loaded = false;
+            }
+
+            private bool LoadAnimationDone = false;
+            public bool Loaded
+            {
+                set
+                {
+                    if ( value )
+                    {
+                        this.Delay(750).Schedule( () => AddRulesetSprite() );
+                    }
+                }
+            }
+
+            public void AddRulesetSprite()
+            {
+                if ( !LoadAnimationDone )
+                {
+                    contentFillFlow.Add(
+                                new Container
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Child = rulesetSpriteText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = $"{rulesetInfo.Value.CreateInstance().Description}",
+                                    }
+                                });
+                    rulesetSpriteText.FadeOut().Then().FadeIn(500, Easing.OutQuint);
+
+                    LoadAnimationDone = true;
+                }
+            }
+        };
     }
 }

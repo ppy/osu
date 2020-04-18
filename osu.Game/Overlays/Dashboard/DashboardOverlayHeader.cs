@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    public class DashboardOverlayHeader : TabControlOverlayHeaderCN<HomeOverlayTabs>
+    public class DashboardOverlayHeader : TabControlOverlayHeaderCN<DashboardOverlayTabs>
     {
         protected override OverlayTitle CreateTitle() => new DashboardTitle();
 
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Dashboard
         }
     }
 
-    public enum HomeOverlayTabs
+    public enum DashboardOverlayTabs
     {
         [Description("好友列表")]
         Friends
