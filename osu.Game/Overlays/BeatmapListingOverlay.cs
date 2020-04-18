@@ -10,13 +10,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Direct;
@@ -41,9 +38,9 @@ namespace osu.Game.Overlays
 
         private OverlayScrollContainer scroll;
 
-        private Drawable currentContent;
         private BeatmapListingSearchSection searchSection;
         private BeatmapListingSortTabControl sortControl;
+        private BeatmapListingResultsDisplay resultsDisplay;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
@@ -138,6 +135,7 @@ namespace osu.Game.Overlays
                                                     {
                                                         AutoSizeAxes = Axes.Y,
                                                         RelativeSizeAxes = Axes.X,
+                                                        Child = resultsDisplay = new BeatmapListingResultsDisplay()
                                                     },
                                                     loadingLayer = new LoadingLayer(panelTarget),
                                                 }
@@ -240,88 +238,19 @@ namespace osu.Game.Overlays
         {
             Schedule(() =>
             {
+                loadingLayer.Hide();
+
                 if (beatmapSetPager.IsPastFirstPage)
                 {
-                    addPanels(beatmaps);
+                    resultsDisplay.AddBeatmaps(beatmaps);
                 }
                 else
                 {
-                    recreatePanels(beatmaps);
+                    resultsDisplay.ReplaceBeatmaps(beatmaps);
                 }
 
                 addPageDebounce = Scheduler.AddDelayed(() => addPageDebounce = null, 1000);
             });
-        }
-
-        private IEnumerable<DirectPanel> createPanels(IEnumerable<BeatmapSetInfo> beatmaps)
-        {
-            return beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
-            {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            });
-        }
-
-        private void recreatePanels(IEnumerable<BeatmapSetInfo> beatmaps)
-        {
-            if (beatmapSetPager.TotalSets == 0)
-            {
-                searchSection.BeatmapSet = null;
-                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder);
-                return;
-            }
-
-            var newPanels = new FillFlowContainer<DirectPanel>
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(10),
-                Alpha = 0,
-                Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = createPanels(beatmaps)
-            };
-
-            LoadComponentAsync(newPanels, loaded =>
-            {
-                addContentToPlaceholder(loaded);
-                searchSection.BeatmapSet = beatmaps.First();
-            });
-        }
-
-        private void addPanels(IEnumerable<BeatmapSetInfo> beatmaps)
-        {
-            LoadComponentsAsync(createPanels(beatmaps), loaded => addPanelsToContent(loaded));
-        }
-
-        private void addContentToPlaceholder(Drawable content)
-        {
-            loadingLayer.Hide();
-
-            Drawable lastContent = currentContent;
-
-            if (lastContent != null)
-            {
-                lastContent.FadeOut(100, Easing.OutQuint).Expire();
-
-                // Consider the case when the new content is smaller than the last content.
-                // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
-                // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
-                // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
-                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
-            }
-
-            panelTarget.Add(currentContent = content);
-            currentContent.FadeIn(200, Easing.OutQuint);
-        }
-
-        private void addPanelsToContent(IEnumerable<DirectPanel> panels)
-        {
-            // TODO: Fade in?
-
-            if (currentContent == null)
-                return;
-
-            ((FillFlowContainer<DirectPanel>)currentContent).AddRange(panels);
         }
 
         protected override void Update()
@@ -339,48 +268,6 @@ namespace osu.Game.Overlays
             addPageDebounce?.Cancel();
 
             base.Dispose(isDisposing);
-        }
-
-        private class NotFoundDrawable : CompositeDrawable
-        {
-            public NotFoundDrawable()
-            {
-                RelativeSizeAxes = Axes.X;
-                Height = 250;
-                Alpha = 0;
-                Margin = new MarginPadding { Top = 15 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                AddInternal(new FillFlowContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(10, 0),
-                    Children = new Drawable[]
-                    {
-                        new Sprite
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit,
-                            Texture = textures.Get(@"Online/not-found")
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Text = @"... nope, nothing found.",
-                        }
-                    }
-                });
-            }
         }
     }
 }
