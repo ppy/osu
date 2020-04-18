@@ -187,14 +187,13 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[HitObjects]");
 
+            // TODO: implement other legacy rulesets
             switch (beatmap.BeatmapInfo.RulesetID)
             {
                 case 0:
                     foreach (var h in beatmap.HitObjects)
                         handleOsuHitObject(writer, h);
                     break;
-
-                // TODO: implement other legacy rulesets
             }
         }
 
