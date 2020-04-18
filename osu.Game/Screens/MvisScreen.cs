@@ -55,6 +55,8 @@ namespace osu.Game.Screens
 
         [Resolved]
         private MusicController musicController { get; set; }
+
+        [Cached]
         private PlaylistOverlay playlist;
 
         private InputManager inputManager { get; set; }
@@ -94,106 +96,124 @@ namespace osu.Game.Screens
                     Width = 400,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Child =  playlist = new PlaylistOverlay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                    },
-                },
-                bottomBar = new BottomBar
-                {
                     Children = new Drawable[]
                     {
-                        new Box
+                        playlist = new PlaylistOverlay
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#333")
-                        },
-                        new Container
-                        {
-                            Name = "Base Container",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                        },
+                    }
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        bottomBar = new BottomBar
+                        {
                             Children = new Drawable[]
                             {
-                                progressBarContainer = new HoverableProgressBarContainer
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#333")
                                 },
-                                buttons = new Container
+                                new Container
                                 {
-                                    Name = "Buttons Container",
+                                    Name = "Base Container",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer
+                                        progressBarContainer = new HoverableProgressBarContainer
                                         {
-                                            Name = "Left Buttons FillFlow",
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            AutoSizeAxes = Axes.Both,
-                                            Spacing = new Vector2(5),
-                                            Margin = new MarginPadding { Left = 5 },
-                                            Children = new Drawable[]
-                                            {
-                                                new MusicOverlayButton(FontAwesome.Solid.ArrowLeft)
-                                                {
-                                                    Action = () => this.Exit(),
-                                                    TooltipText = "退出",
-                                                },
-                                            }
+                                            RelativeSizeAxes = Axes.Both,
                                         },
-                                        new FillFlowContainer
+                                        buttons = new Container
                                         {
-                                            Name = "Centre Button FillFlow",
+                                            Name = "Buttons Container",
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            AutoSizeAxes = Axes.Both,
-                                            Spacing = new Vector2(5),
+                                            RelativeSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                new MusicOverlayButton(FontAwesome.Solid.StepBackward)
+                                                new FillFlowContainer
                                                 {
-                                                    Action = () => musicController.PreviousTrack(),
-                                                    TooltipText = "上一首/从头开始",
+                                                    Name = "Left Buttons FillFlow",
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Spacing = new Vector2(5),
+                                                    Margin = new MarginPadding { Left = 5 },
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new MusicOverlayButton(FontAwesome.Solid.ArrowLeft)
+                                                        {
+                                                            Action = () => this.Exit(),
+                                                            TooltipText = "退出",
+                                                        },
+                                                    }
                                                 },
-                                                new MusicOverlayButton(FontAwesome.Solid.Music)
+                                                new FillFlowContainer
                                                 {
-                                                    Action = () => musicController.TogglePause(),
-                                                    TooltipText = "切换暂停",
+                                                    Name = "Centre Button FillFlow",
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Spacing = new Vector2(5),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new MusicOverlayButton(FontAwesome.Solid.StepBackward)
+                                                        {
+                                                            Action = () => musicController.PreviousTrack(),
+                                                            TooltipText = "上一首/从头开始",
+                                                        },
+                                                        new MusicOverlayButton(FontAwesome.Solid.Music)
+                                                        {
+                                                            Action = () => musicController.TogglePause(),
+                                                            TooltipText = "切换暂停",
+                                                        },
+                                                        new MusicOverlayButton(FontAwesome.Solid.StepForward)
+                                                        {
+                                                            Action = () => musicController.NextTrack(),
+                                                            TooltipText = "下一首",
+                                                        },
+                                                    }
                                                 },
-                                                new MusicOverlayButton(FontAwesome.Solid.StepForward)
+                                                new FillFlowContainer
                                                 {
-                                                    Action = () => musicController.NextTrack(),
-                                                    TooltipText = "下一首",
+                                                    Name = "Right Buttons FillFlow",
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Spacing = new Vector2(5),
+                                                    Margin = new MarginPadding { Right = 5 },
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new MusicOverlayButton(FontAwesome.Solid.User)
+                                                        {
+                                                            Action = () => InvokeSolo(),
+                                                            TooltipText = "在选歌界面中查看",
+                                                        },
+                                                        new MusicOverlayButton(FontAwesome.Solid.Atom)
+                                                        {
+                                                            Action = () => playlist.ToggleVisibility(),
+                                                            TooltipText = "歌曲列表",
+                                                        }
+                                                    }
                                                 },
-                                            }
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            Name = "Right Buttons FillFlow",
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                            AutoSizeAxes = Axes.Both,
-                                            Spacing = new Vector2(5),
-                                            Margin = new MarginPadding { Right = 5 },
-                                            Children = new Drawable[]
-                                            {
-                                                new MusicOverlayButton(FontAwesome.Solid.Atom)
-                                                {
-                                                    Action = () => playlist.ToggleVisibility(),
-                                                    TooltipText = "歌曲列表",
-                                                }
                                             }
                                         },
                                     }
                                 },
                             }
                         },
+
                     }
                 },
                 new Container
@@ -237,8 +257,17 @@ namespace osu.Game.Screens
             base.Update();
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
 
-            progressBarContainer.progressBar.EndTime = track.Length;
-            progressBarContainer.progressBar.CurrentTime = track.CurrentTime;
+            if (track?.IsDummyDevice == false)
+            {
+                progressBarContainer.progressBar.EndTime = track.Length;
+                progressBarContainer.progressBar.CurrentTime = track.CurrentTime;
+            }
+            else
+            {
+                progressBarContainer.progressBar.CurrentTime = 0;
+                progressBarContainer.progressBar.EndTime = 1;
+            }
+            
         }
 
         public override void OnEntering(IScreen last)
@@ -250,7 +279,7 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            beatmapParallax.FadeOut(100);
+            beatmapParallax.Hide();
             beatmapParallax.Expire();
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
@@ -277,9 +306,18 @@ namespace osu.Game.Screens
                 case Key.Menu:
                     playlist.ToggleVisibility();
                     return true;
+
+                case Key.Enter:
+                    InvokeSolo();
+                    return true;
             }
 
             return base.OnKeyDown(e);
+        }
+
+        private void InvokeSolo()
+        {
+            game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
         }
 
         private void UpdateBarEffects()
@@ -309,7 +347,7 @@ namespace osu.Game.Screens
             game?.Toolbar.Hide();
             bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
             buttons.MoveToY(20, DURATION, Easing.OutQuint);
-            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y - 45, DURATION, Easing.OutQuint)
+            bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
                      .FadeTo(0.01f, DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
