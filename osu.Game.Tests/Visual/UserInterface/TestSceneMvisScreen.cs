@@ -22,8 +22,8 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(MvisScreen),
             typeof(BottomBar),
+            typeof(MvisScreen),
             typeof(HoverableProgressBarContainer)
         };
 

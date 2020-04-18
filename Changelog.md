@@ -479,3 +479,4 @@
 *   合并上游pr
     *   [m] [Update framework #8781]
     *   [m] [Adjust TimingControlPoint equivalency #8672]
+*   使Mvis播放器可以通过Enter键将当前播放的谱面于歌曲选择中显示
