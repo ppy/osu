@@ -138,7 +138,6 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Width = 850,
                     }
                 }
             };
@@ -540,6 +539,9 @@ namespace osu.Game.Screens.Select
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p);
+
+            // Update content width
+            scrollableContent.Width = Math.Min(850, scroll.DrawWidth);
         }
 
         protected override void UpdateAfterChildren()
