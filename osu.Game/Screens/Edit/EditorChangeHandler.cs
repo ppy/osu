@@ -82,19 +82,12 @@ namespace osu.Game.Screens.Edit
             if (savedStates.Count > MAX_SAVED_STATES)
                 savedStates.RemoveAt(0);
 
-            try
+            using (var stream = new MemoryStream())
             {
-                using (var stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                        new LegacyBeatmapEncoder(editorBeatmap).Encode(sw);
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new LegacyBeatmapEncoder(editorBeatmap).Encode(sw);
 
-                    savedStates.Add(stream.ToArray());
-                }
-            }
-            catch (NotImplementedException)
-            {
-                // some rulesets don't have encoder implementations yet.
+                savedStates.Add(stream.ToArray());
             }
 
             currentState = savedStates.Count - 1;
