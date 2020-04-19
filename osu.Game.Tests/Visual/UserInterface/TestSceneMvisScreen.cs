@@ -14,6 +14,7 @@ using osu.Framework.Audio;
 using osu.Game.Overlays.Toolbar;
 using System.Linq;
 using osu.Game.Screens.Mvis.UI;
+using osu.Game.Screens.Mvis.Buttons;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(BottomBar),
             typeof(MvisScreen),
+            typeof(OverlayLockButton),
+            typeof(MusicOverlayButton),
             typeof(HoverableProgressBarContainer)
         };
 

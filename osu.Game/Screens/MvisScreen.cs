@@ -64,9 +64,10 @@ namespace osu.Game.Screens
 
         private Box bgBox;
         private BottomBar bottomBar;
-        private bool ScheduleDone = false;
-        private ScheduledDelegate scheduledHideBars;
+        private ScheduledDelegate scheduledHideOverlays;
+        private ScheduledDelegate scheduledShowOverlays;
         Container buttons;
+        OverlayLockButton lockButton;
         ParallaxContainer beatmapParallax;
         HoverCheckContainer hoverCheckContainer;
         HoverableProgressBarContainer progressBarContainer;
@@ -108,6 +109,7 @@ namespace osu.Game.Screens
                 },
                 new FillFlowContainer
                 {
+                    Name = "Bottom FillFlow",
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(5),
@@ -213,7 +215,12 @@ namespace osu.Game.Screens
                                 },
                             }
                         },
-
+                        lockButton = new OverlayLockButton
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            TooltipText = "Lock overlays",
+                        }
                     }
                 },
                 new Container
@@ -310,6 +317,10 @@ namespace osu.Game.Screens
                 case Key.Enter:
                     InvokeSolo();
                     return true;
+
+                case Key.Tab:
+                    lockButton.ToggleLock();
+                    return true;
             }
 
             return base.OnKeyDown(e);
@@ -326,7 +337,7 @@ namespace osu.Game.Screens
 
             if ( !hoverCheckContainer.ScreenHovered.Value )
             {
-                ShowOverlays();
+                TryShowOverlays();
                 return;
             }
 
@@ -337,7 +348,7 @@ namespace osu.Game.Screens
                     break;
 
                 case false:
-                    ShowOverlays();
+                    TryShowOverlays();
                     break;
             }
         }
@@ -351,7 +362,6 @@ namespace osu.Game.Screens
                      .FadeTo(0.01f, DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
-            ScheduleDone = true;
         }
 
         
@@ -361,16 +371,21 @@ namespace osu.Game.Screens
         /// </summary>
         private void RunHideOverlays()
         {
-            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value || bottomBar.panel_IsHovered.Value )
+            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
+                 || bottomBar.panel_IsHovered.Value || lockButton.LockEnabled.Value )
                 return;
 
             HideOverlays();
         }
 
+        private void RunShowOverlays()
+        {
+            if ( !lockButton.LockEnabled.Value )
+                ShowOverlays();
+        }
+
         private void ShowOverlays()
         {
-            scheduledHideBars?.Cancel();
-
             game?.Toolbar.Show();
             bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             buttons.MoveToY(0, DURATION, Easing.OutQuint);
@@ -378,24 +393,36 @@ namespace osu.Game.Screens
                      .FadeIn(DURATION, Easing.OutQuint);
             AllowCursor = true;
             AllowBack = true;
-            ScheduleDone = false;
         }
 
         private void TryHideOverlays()
         {
+            if ( !canReallyHide || bottomBar.panel_IsHovered.Value)
+                return;
+
             try
             {
-                if ( !canReallyHide || ScheduleDone || bottomBar.panel_IsHovered.Value)
-                    return;
-
-                scheduledHideBars = Scheduler.AddDelayed(() =>
+                scheduledHideOverlays = Scheduler.AddDelayed(() =>
                 {
                     RunHideOverlays();
                 }, 1000);
             }
             finally
             {
-                Schedule(TryHideOverlays);
+            }
+        }
+
+        private void TryShowOverlays()
+        {
+            try
+            {
+                scheduledShowOverlays = Scheduler.AddDelayed(() => 
+                {
+                    RunShowOverlays();
+                }, 0);
+            }
+            finally
+            {
             }
         }
 
