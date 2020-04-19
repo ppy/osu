@@ -71,6 +71,7 @@ namespace osu.Game.Screens
         ParallaxContainer beatmapParallax;
         HoverCheckContainer hoverCheckContainer;
         HoverableProgressBarContainer progressBarContainer;
+        private bool OverlaysHidden = false;
 
         public MvisScreen()
         {
@@ -219,7 +220,6 @@ namespace osu.Game.Screens
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            TooltipText = "Lock overlays",
                         }
                     }
                 },
@@ -247,8 +247,10 @@ namespace osu.Game.Screens
 
         protected override void LoadComplete()
         {
-            idleTracker.IsIdle.ValueChanged += _ => UpdateBarEffects();
-            hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateBarEffects();
+            idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
+            hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
+            lockButton.LockEnabled.ValueChanged += _ => UpdateLockButton();
+
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
 
@@ -331,13 +333,16 @@ namespace osu.Game.Screens
             game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
         }
 
-        private void UpdateBarEffects()
+        private void UpdateVisuals()
         {
             var mouseIdle = idleTracker.IsIdle.Value;
 
             if ( !hoverCheckContainer.ScreenHovered.Value )
             {
-                TryShowOverlays();
+                if ( lockButton.LockEnabled.Value && OverlaysHidden )
+                    lockButton.ToggleLock();
+
+                ShowOverlays();
                 return;
             }
 
@@ -346,11 +351,26 @@ namespace osu.Game.Screens
                 case true:
                     TryHideOverlays();
                     break;
-
-                case false:
-                    TryShowOverlays();
-                    break;
             }
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case MouseMoveEvent _:
+                    TryShowOverlays();
+                    return base.Handle(e);
+
+                default:
+                    return base.Handle(e);
+            }
+        }
+
+        private void UpdateLockButton()
+        {
+            lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
+            UpdateVisuals();
         }
 
         private void HideOverlays()
@@ -362,6 +382,19 @@ namespace osu.Game.Screens
                      .FadeTo(0.01f, DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
+            OverlaysHidden = true;
+        }
+
+        private void ShowOverlays(bool Locked = false)
+        {
+            game?.Toolbar.Show();
+            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
+            buttons.MoveToY(0, DURATION, Easing.OutQuint);
+            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
+                     .FadeIn(DURATION, Easing.OutQuint);
+            AllowCursor = true;
+            AllowBack = true;
+            OverlaysHidden = false;
         }
 
         
@@ -372,7 +405,7 @@ namespace osu.Game.Screens
         private void RunHideOverlays()
         {
             if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
-                 || bottomBar.panel_IsHovered.Value || lockButton.LockEnabled.Value )
+                 || bottomBar.bar_IsHovered.Value || lockButton.LockEnabled.Value )
                 return;
 
             HideOverlays();
@@ -380,24 +413,17 @@ namespace osu.Game.Screens
 
         private void RunShowOverlays()
         {
-            if ( !lockButton.LockEnabled.Value )
+            if ( lockButton.LockEnabled.Value && bottomBar.Alpha == 0.01f )
+            {
+                lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
+                return;
+            }
                 ShowOverlays();
-        }
-
-        private void ShowOverlays()
-        {
-            game?.Toolbar.Show();
-            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
-            buttons.MoveToY(0, DURATION, Easing.OutQuint);
-            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
-                     .FadeIn(DURATION, Easing.OutQuint);
-            AllowCursor = true;
-            AllowBack = true;
         }
 
         private void TryHideOverlays()
         {
-            if ( !canReallyHide || bottomBar.panel_IsHovered.Value)
+            if ( !canReallyHide || bottomBar.bar_IsHovered.Value)
                 return;
 
             try

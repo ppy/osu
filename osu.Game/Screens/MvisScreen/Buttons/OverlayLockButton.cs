@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Mvis.Buttons
             {
                 ToggleLock();
             };
+            this.Delay(1000).FadeOut(500, Easing.OutQuint);
         }
 
         public void ToggleLock()
