@@ -418,6 +418,16 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            // cancel push delegate in case judges reverted
+            // after delegate may have already been scheduled.
+            if (!completionState.NewValue)
+            {
+                completionProgressDelegate?.Cancel();
+                completionProgressDelegate = null;
+                ValidForResume = true;
+                return;
+            }
+
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed || completionProgressDelegate != null)
                 return;
