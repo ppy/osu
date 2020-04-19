@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets
 
             // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
             // this assumes the only explicit dependency of the ruleset is the game core assembly.
-            // the ruleset dependency on the game core assembly requires manual resolving, transient dependencies should be resolved automatically
+            // the ruleset dependency on the game core assembly requires manual resolving, transitive dependencies should be resolved automatically
             if (asm.Name.Equals(typeof(OsuGame).Assembly.GetName().Name, StringComparison.Ordinal))
                 return Assembly.GetExecutingAssembly();
 
