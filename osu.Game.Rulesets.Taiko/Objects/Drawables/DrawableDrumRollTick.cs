@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool DisplayResult => false;
 
-        protected override TaikoPiece CreateMainPiece() => new TickPiece
+        protected override CompositeDrawable CreateMainPiece() => new TickPiece
         {
             Filled = HitObject.FirstTick
         };
