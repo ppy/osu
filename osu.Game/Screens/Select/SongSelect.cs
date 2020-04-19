@@ -34,7 +34,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
@@ -71,15 +70,14 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public virtual bool AllowEditing => true;
 
-        [Resolved(canBeNull: true)]
-        private NotificationOverlay notificationOverlay { get; set; }
-
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
+
+        private DifficultyRecommender recommender;
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -109,6 +107,7 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
+                recommender = new DifficultyRecommender(),
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -156,6 +155,7 @@ namespace osu.Game.Screens.Select
                                             RelativeSizeAxes = Axes.Both,
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                            GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
                                         },
                                     }
                                 },
@@ -325,10 +325,7 @@ namespace osu.Game.Screens.Select
         public void Edit(BeatmapInfo beatmap = null)
         {
             if (!AllowEditing)
-            {
-                notificationOverlay?.Post(new SimpleNotification { Text = "Editing is not available from the current mode." });
-                return;
-            }
+                throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             this.Push(new Editor());

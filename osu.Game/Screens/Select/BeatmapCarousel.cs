@@ -48,6 +48,11 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public BeatmapSetInfo SelectedBeatmapSet => selectedBeatmapSet?.BeatmapSet;
 
+        /// <summary>
+        /// A function to optionally decide on a recommended difficulty from a beatmap set.
+        /// </summary>
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
+
         private CarouselBeatmapSet selectedBeatmapSet;
 
         /// <summary>
@@ -116,6 +121,7 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
+
         private CarouselRoot root;
 
         public BeatmapCarousel()
@@ -579,7 +585,10 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet);
+            var set = new CarouselBeatmapSet(beatmapSet)
+            {
+                GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
+            };
 
             foreach (var c in set.Beatmaps)
             {
