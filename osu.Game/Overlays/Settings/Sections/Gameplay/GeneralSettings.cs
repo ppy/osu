@@ -67,6 +67,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Positional hitsounds",
                     Bindable = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Always play first combo break sound",
+                    Keywords = new[] { "regardless", "combobreak.wav" },
+                    Bindable = config.GetBindable<bool>(OsuSetting.AlwaysPlayComboBreak)
+                },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {
                     LabelText = "Score meter type",

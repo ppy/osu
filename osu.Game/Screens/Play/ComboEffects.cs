@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
@@ -16,27 +17,34 @@ namespace osu.Game.Screens.Play
 
         private SkinnableSound comboBreakSample;
 
+        private Bindable<bool> alwaysPlay;
+        private bool firstTime = true;
+
         public ComboEffects(ScoreProcessor processor)
         {
             this.processor = processor;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             InternalChild = comboBreakSample = new SkinnableSound(new SampleInfo("combobreak"));
+            alwaysPlay = config.GetBindable<bool>(OsuSetting.AlwaysPlayComboBreak);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            processor.Combo.BindValueChanged(onComboChange, true);
+            processor.Combo.BindValueChanged(onComboChange);
         }
 
         private void onComboChange(ValueChangedEvent<int> combo)
         {
-            if (combo.NewValue == 0 && combo.OldValue > 20)
+            if (combo.NewValue == 0 && (combo.OldValue > 20 || alwaysPlay.Value && firstTime))
+            {
                 comboBreakSample?.Play();
+                firstTime = false;
+            }
         }
     }
 }
