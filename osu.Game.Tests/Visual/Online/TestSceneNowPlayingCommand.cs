@@ -13,12 +13,12 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [HeadlessTest]
-    public class TestNowPlayingCommand : OsuTestScene
+    public class TestSceneNowPlayingCommand : OsuTestScene
     {
         [Cached(typeof(IChannelPostTarget))]
         private PostTarget postTarget { get; set; }
 
-        public TestNowPlayingCommand()
+        public TestSceneNowPlayingCommand()
         {
             Add(postTarget = new PostTarget());
         }
