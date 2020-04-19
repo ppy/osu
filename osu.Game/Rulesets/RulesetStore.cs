@@ -29,6 +29,10 @@ namespace osu.Game.Rulesets
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
             loadFromDisk();
+   
+            // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
+            // It needs to be attached to the assembly lookup event before the actual call to loadUserRulesets() else rulesets located out of the base game directory will fail
+            // to load as unable to locate the game core assembly.
             AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
             loadUserRulesets();
             addMissingRulesets();
