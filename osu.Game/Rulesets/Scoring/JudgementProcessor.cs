@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -12,11 +13,6 @@ namespace osu.Game.Rulesets.Scoring
 {
     public abstract class JudgementProcessor : Component
     {
-        /// <summary>
-        /// Invoked when all <see cref="HitObject"/>s have been judged by this <see cref="JudgementProcessor"/>.
-        /// </summary>
-        public event Action AllJudged;
-
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by this <see cref="JudgementProcessor"/>.
         /// </summary>
@@ -32,10 +28,12 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public int JudgedHits { get; private set; }
 
+        private readonly BindableBool hasCompleted = new BindableBool();
+
         /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
-        public bool HasCompleted => JudgedHits == MaxHits;
+        public IBindable<bool> HasCompleted => hasCompleted;
 
         /// <summary>
         /// Applies a <see cref="IBeatmap"/> to this <see cref="ScoreProcessor"/>.
@@ -60,8 +58,8 @@ namespace osu.Game.Rulesets.Scoring
 
             NewJudgement?.Invoke(result);
 
-            if (HasCompleted)
-                AllJudged?.Invoke();
+            if (JudgedHits == MaxHits)
+                hasCompleted.Value = true;
         }
 
         /// <summary>
@@ -71,6 +69,9 @@ namespace osu.Game.Rulesets.Scoring
         public void RevertResult(JudgementResult result)
         {
             JudgedHits--;
+
+            if (JudgedHits < MaxHits)
+                hasCompleted.Value = false;
 
             RevertResultInternal(result);
         }
