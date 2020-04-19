@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Play
             };
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.AllJudged += onCompletion;
+            ScoreProcessor.HasCompleted.ValueChanged += updateCompletionState;
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -412,7 +412,7 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate completionProgressDelegate;
 
-        private void onCompletion()
+        private void updateCompletionState(ValueChangedEvent<bool> completionState)
         {
             // screen may be in the exiting transition phase.
             if (!this.IsCurrentScreen())
