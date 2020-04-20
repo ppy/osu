@@ -93,12 +93,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
                 yield return obj;
 
-                for (int i = 0; i < obj.NestedHitObjects.Count; i++)
+                foreach (var nestedObj in obj.NestedHitObjects)
                 {
-                    if (obj.NestedHitObjects[i].HitObject.StartTime >= targetTime)
+                    if (nestedObj.HitObject.StartTime >= targetTime)
                         break;
 
-                    yield return obj.NestedHitObjects[i];
+                    yield return nestedObj;
                 }
             }
         }
