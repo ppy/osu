@@ -48,8 +48,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public double BPM => 60000 / BeatLength;
 
-        public override bool EquivalentTo(ControlPoint other) =>
-            other is TimingControlPoint otherTyped
-            && TimeSignature == otherTyped.TimeSignature && BeatLength.Equals(otherTyped.BeatLength);
+        // Timing points are never redundant as they can change the time signature.
+        public override bool IsRedundant(ControlPoint existing) => false;
     }
 }
