@@ -25,7 +25,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using osu.Game.Overlays.Music;
-using osu.Game.Configuration;
 
 namespace osu.Game.Screens
 {
@@ -63,16 +62,16 @@ namespace osu.Game.Screens
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
 
-        private Box bgBox;
-        private BottomBar bottomBar;
-        private ScheduledDelegate scheduledHideOverlays;
-        private ScheduledDelegate scheduledShowOverlays;
+        ScheduledDelegate scheduledHideOverlays;
+        ScheduledDelegate scheduledShowOverlays;
+        Box bgBox;
+        BottomBar bottomBar;
         Container buttons;
-        ToggleableTrackLoopButton loopToggleButton;
-        ToggleableOverlayLockButton lockButton;
         ParallaxContainer beatmapParallax;
         HoverCheckContainer hoverCheckContainer;
         HoverableProgressBarContainer progressBarContainer;
+        ToggleableTrackLoopButton loopToggleButton;
+        ToggleableOverlayLockButton lockButton;
         private bool OverlaysHidden = false;
 
         public MvisScreen()
@@ -202,7 +201,7 @@ namespace osu.Game.Screens
                                                     {
                                                         loopToggleButton = new ToggleableTrackLoopButton()
                                                         {
-                                                            TooltipText = "切换单曲循环",
+                                                            TooltipText = "单曲循环",
                                                         },
                                                         new MusicOverlayButton(FontAwesome.Solid.User)
                                                         {
@@ -212,7 +211,7 @@ namespace osu.Game.Screens
                                                         new MusicOverlayButton(FontAwesome.Solid.Atom)
                                                         {
                                                             Action = () => playlist.ToggleVisibility(),
-                                                            TooltipText = "歌曲列表",
+                                                            TooltipText = "侧边栏",
                                                         },
                                                     }
                                                 },
@@ -246,7 +245,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics session)
+        private void load()
         {
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
         }

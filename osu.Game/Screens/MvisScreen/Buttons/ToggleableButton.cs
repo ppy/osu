@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Mvis.Buttons
 
         public ToggleableButton()
         {
-            Size = new Vector2(50, 30);
+            Size = new Vector2(30, 30);
 
             Children = new Drawable[]
             {
