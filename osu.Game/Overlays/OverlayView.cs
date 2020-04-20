@@ -9,29 +9,19 @@ using osu.Game.Online.API;
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// Drawable which used to represent online content in <see cref="FullscreenOverlay"/>.
+    /// A subview containing online content, to be displayed inside a <see cref="FullscreenOverlay"/>.
     /// </summary>
     /// <typeparam name="T">Response type</typeparam>
-    public abstract class OverlayView<T> : Container, IOnlineComponent
+    public abstract class OverlayView<T> : CompositeDrawable, IOnlineComponent
         where T : class
     {
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected override Container<Drawable> Content => content;
-
-        private readonly FillFlowContainer content;
-
         protected OverlayView()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            AddInternal(content = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            });
         }
 
         protected override void LoadComplete()

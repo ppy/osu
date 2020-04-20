@@ -34,16 +34,17 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         private Drawable currentContent;
 
-        private readonly FriendOnlineStreamControl onlineStreamControl;
-        private readonly Box background;
-        private readonly Box controlBackground;
-        private readonly UserListToolbar userListToolbar;
-        private readonly Container itemsPlaceholder;
-        private readonly LoadingLayer loading;
+        private FriendOnlineStreamControl onlineStreamControl;
+        private Box background;
+        private Box controlBackground;
+        private UserListToolbar userListToolbar;
+        private Container itemsPlaceholder;
+        private LoadingLayer loading;
 
-        public FriendDisplay()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            AddRange(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {
@@ -121,12 +122,8 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         }
                     }
                 }
-            });
-        }
+            };
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
             background.Colour = colourProvider.Background4;
             controlBackground.Colour = colourProvider.Background5;
         }
