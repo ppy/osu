@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double defaultCheeseLevel = 0.4;
         private const int cheeseLevelCount = 11;
 
-        private const int difficultyCount = 20;
+        private const int missTPCount = 20;
+        private const int comboTPCount = 50;
 
 
         public static (double, double, double[], double[], double[], double, double[], double[], string)
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
                                                                 hidden: true, noteDensities: noteDensities);
 
-            var mapHitProbs = new HitProbabilities(movements, defaultCheeseLevel);
+            var mapHitProbs = new HitProbabilities(movements, defaultCheeseLevel, difficultyCount: comboTPCount);
             double fcProbTP = calculateFCProbTP(movements);
             double fcProbTPHidden = calculateFCProbTP(movementsHidden);
 
@@ -161,11 +162,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         private static (double[], double[]) calculateMissTPsMissCounts(IList<OsuMovement> movements, double fcTimeTP)
         {
-            double[] missTPs = new double[difficultyCount];
-            double[] missCounts = new double[difficultyCount];
+            double[] missTPs = new double[missTPCount];
+            double[] missCounts = new double[missTPCount];
             double fcProb = calculateFCProb(movements, fcTimeTP, defaultCheeseLevel);
 
-            for (int i = 0; i < difficultyCount; i++)
+            for (int i = 0; i < missTPCount; i++)
             {
                 double missTP = fcTimeTP * (1 - Math.Pow(i, 1.5) * 0.005);
                 double[] missProbs = getMissProbs(movements, missTP);
@@ -235,9 +236,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private static double[] calculateComboTps(HitProbabilities hitProbabilities)
         {
-            double[] ComboTPs = new double[difficultyCount];
+            double[] ComboTPs = new double[comboTPCount];
 
-            for (int i = 1; i <= difficultyCount; ++i)
+            for (int i = 1; i <= comboTPCount; ++i)
             {
                 ComboTPs[i - 1] = calculateFCTimeTP(hitProbabilities, i);
             }
