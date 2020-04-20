@@ -25,6 +25,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using osu.Game.Overlays.Music;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.Screens
 {
@@ -294,6 +295,11 @@ namespace osu.Game.Screens
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            Track musicTrack = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
+
+            if (musicTrack?.IsDummyDevice == false)
+                musicTrack.RestartPoint = 0;
 
             ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
         }
