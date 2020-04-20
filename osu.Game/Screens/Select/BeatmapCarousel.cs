@@ -28,7 +28,14 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
+        /// </summary>
         public float BleedTop;
+
+        /// <summary>
+        /// Height of the area below the carousel that should be treated as visible due to transparency of elements in front of it.
+        /// </summary>
         public float BleedBottom;
 
         /// <summary>
