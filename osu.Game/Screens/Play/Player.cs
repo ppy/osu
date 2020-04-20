@@ -37,6 +37,11 @@ namespace osu.Game.Screens.Play
     [Cached]
     public class Player : ScreenWithBeatmapBackground
     {
+        /// <summary>
+        /// The delay upon completion of the beatmap before displaying the results screen.
+        /// </summary>
+        public const double RESULTS_DISPLAY_DELAY = 1000.0;
+
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -436,7 +441,7 @@ namespace osu.Game.Screens.Play
 
             if (!showResults) return;
 
-            using (BeginDelayedSequence(1000))
+            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
                 scheduleGotoRanking();
         }
 

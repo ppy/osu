@@ -24,6 +24,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private AudioManager audio { get; set; }
 
+        private int resultsDisplayWaitCount =>
+            (int)((Screens.Play.Player.RESULTS_DISPLAY_DELAY / TimePerAction) * 2);
+
         protected override bool AllowFail => false;
 
         public TestSceneCompletionCancellation()
@@ -83,7 +86,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("rewind to cancel", () => track.Seek(4000));
             AddUntilStep("completion cleared by processor", () => !Player.ScoreProcessor.HasCompleted.Value);
 
-            AddWaitStep("wait", 5);
+            // wait to ensure there was no attempt of pushing the results screen.
+            AddWaitStep("wait", resultsDisplayWaitCount);
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
