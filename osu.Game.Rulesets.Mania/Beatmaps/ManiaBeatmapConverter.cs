@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
 
-                if (TargetColumns >= 10)
+                if (TargetColumns > 10)
                 {
                     TargetColumns /= 2;
                     Dual = true;

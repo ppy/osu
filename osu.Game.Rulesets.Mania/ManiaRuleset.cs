@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Mania
         {
             get
             {
-                for (int i = 1; i <= 9; i++)
+                for (int i = 1; i <= 10; i++)
                     yield return (int)PlayfieldType.Single + i;
                 for (int i = 2; i <= 18; i += 2)
                     yield return (int)PlayfieldType.Dual + i;
@@ -262,26 +262,53 @@ namespace osu.Game.Rulesets.Mania
             switch (getPlayfieldType(variant))
             {
                 case PlayfieldType.Single:
-                    return new VariantMappingGenerator
+                    switch (variant)
                     {
-                        LeftKeys = new[]
-                        {
-                            InputKey.A,
-                            InputKey.S,
-                            InputKey.D,
-                            InputKey.F
-                        },
-                        RightKeys = new[]
-                        {
-                            InputKey.J,
-                            InputKey.K,
-                            InputKey.L,
-                            InputKey.Semicolon
-                        },
-                        SpecialKey = InputKey.Space,
-                        SpecialAction = ManiaAction.Special1,
-                        NormalActionStart = ManiaAction.Key1,
-                    }.GenerateKeyBindingsFor(variant, out _);
+                        case 10:
+                            // 10K is special because it extents one key towards the centre of the keyboard (V/N), rather than towards the edges of the keyboard.
+                            return new VariantMappingGenerator
+                            {
+                                LeftKeys = new[]
+                                {
+                                    InputKey.A,
+                                    InputKey.S,
+                                    InputKey.D,
+                                    InputKey.F,
+                                    InputKey.V
+                                },
+                                RightKeys = new[]
+                                {
+                                    InputKey.N,
+                                    InputKey.J,
+                                    InputKey.K,
+                                    InputKey.L,
+                                    InputKey.Semicolon,
+                                },
+                                NormalActionStart = ManiaAction.Key1,
+                            }.GenerateKeyBindingsFor(variant, out _);
+
+                        default:
+                            return new VariantMappingGenerator
+                            {
+                                LeftKeys = new[]
+                                {
+                                    InputKey.A,
+                                    InputKey.S,
+                                    InputKey.D,
+                                    InputKey.F
+                                },
+                                RightKeys = new[]
+                                {
+                                    InputKey.J,
+                                    InputKey.K,
+                                    InputKey.L,
+                                    InputKey.Semicolon
+                                },
+                                SpecialKey = InputKey.Space,
+                                SpecialAction = ManiaAction.Special1,
+                                NormalActionStart = ManiaAction.Key1,
+                            }.GenerateKeyBindingsFor(variant, out _);
+                    }
 
                 case PlayfieldType.Dual:
                     int keys = getDualStageKeyCount(variant);
