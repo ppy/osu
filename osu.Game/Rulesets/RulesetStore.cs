@@ -62,10 +62,13 @@ namespace osu.Game.Rulesets
             var asm = new AssemblyName(args.Name);
 
             // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
-            // this assumes the only explicit dependency of the ruleset is the game core assembly.
-            // the ruleset dependency on the game core assembly requires manual resolving, transitive dependencies should be resolved automatically
-            if (asm.Name.Equals(typeof(OsuGame).Assembly.GetName().Name, StringComparison.Ordinal))
-                return Assembly.GetExecutingAssembly();
+            // this attempts resolving the ruleset dependencies on game core and framework assemblies by returning assemblies with the same assembly name
+            // already loaded in the AppDomain.
+            foreach (var curAsm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.Name.Equals(curAsm.GetName().Name, StringComparison.Ordinal))
+                    return curAsm;
+            }
 
             return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
         }
