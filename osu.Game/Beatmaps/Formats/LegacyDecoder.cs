@@ -150,7 +150,8 @@ namespace osu.Game.Beatmaps.Formats
             HitObjects,
             Variables,
             Fonts,
-            Mania
+            CatchTheBeat,
+            Mania,
         }
 
         internal class LegacyDifficultyControlPoint : DifficultyControlPoint
