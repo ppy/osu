@@ -150,7 +150,8 @@ namespace osu.Game.Beatmaps.Formats
             HitObjects,
             Variables,
             Fonts,
-            Mania
+            CatchTheBeat,
+            Mania,
         }
 
         internal class LegacyDifficultyControlPoint : DifficultyControlPoint
@@ -178,9 +179,10 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool EquivalentTo(ControlPoint other) =>
-                base.EquivalentTo(other) && other is LegacySampleControlPoint otherTyped &&
-                CustomSampleBank == otherTyped.CustomSampleBank;
+            public override bool IsRedundant(ControlPoint existing)
+                => base.IsRedundant(existing)
+                   && existing is LegacySampleControlPoint existingSample
+                   && CustomSampleBank == existingSample.CustomSampleBank;
         }
     }
 }
