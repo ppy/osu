@@ -92,7 +92,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public void OnReleased(TestAction action)
             {
-                throw new System.NotImplementedException();
             }
         }
     }
