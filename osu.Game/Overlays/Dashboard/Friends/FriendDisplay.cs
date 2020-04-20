@@ -44,78 +44,84 @@ namespace osu.Game.Overlays.Dashboard.Friends
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new FillFlowContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        controlBackground = new Box
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding
+                            controlBackground = new Box
                             {
-                                Top = 20,
-                                Horizontal = 45
+                                RelativeSizeAxes = Axes.Both
                             },
-                            Child = onlineStreamControl = new FriendOnlineStreamControl(),
-                        }
-                    }
-                },
-                new Container
-                {
-                    Name = "User List",
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Margin = new MarginPadding { Bottom = 20 },
-                            Children = new Drawable[]
+                            new Container
                             {
-                                new Container
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding
-                                    {
-                                        Horizontal = 40,
-                                        Vertical = 20
-                                    },
-                                    Child = userListToolbar = new UserListToolbar
-                                    {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                    }
+                                    Top = 20,
+                                    Horizontal = 45
                                 },
-                                new Container
+                                Child = onlineStreamControl = new FriendOnlineStreamControl(),
+                            }
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "User List",
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            background = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both
+                            },
+                            new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Margin = new MarginPadding { Bottom = 20 },
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Children = new Drawable[]
+                                    new Container
                                     {
-                                        itemsPlaceholder = new Container
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Padding = new MarginPadding { Horizontal = 50 }
+                                            Horizontal = 40,
+                                            Vertical = 20
                                         },
-                                        loading = new LoadingLayer(itemsPlaceholder)
+                                        Child = userListToolbar = new UserListToolbar
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Children = new Drawable[]
+                                        {
+                                            itemsPlaceholder = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Padding = new MarginPadding { Horizontal = 50 }
+                                            },
+                                            loading = new LoadingLayer(itemsPlaceholder)
+                                        }
                                     }
                                 }
                             }
