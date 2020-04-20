@@ -25,6 +25,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using osu.Game.Overlays.Music;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens
 {
@@ -67,7 +68,8 @@ namespace osu.Game.Screens
         private ScheduledDelegate scheduledHideOverlays;
         private ScheduledDelegate scheduledShowOverlays;
         Container buttons;
-        OverlayLockButton lockButton;
+        ToggleableTrackLoopButton loopToggleButton;
+        ToggleableOverlayLockButton lockButton;
         ParallaxContainer beatmapParallax;
         HoverCheckContainer hoverCheckContainer;
         HoverableProgressBarContainer progressBarContainer;
@@ -198,6 +200,10 @@ namespace osu.Game.Screens
                                                     Margin = new MarginPadding { Right = 5 },
                                                     Children = new Drawable[]
                                                     {
+                                                        loopToggleButton = new ToggleableTrackLoopButton()
+                                                        {
+                                                            TooltipText = "切换单曲循环",
+                                                        },
                                                         new MusicOverlayButton(FontAwesome.Solid.User)
                                                         {
                                                             Action = () => InvokeSolo(),
@@ -207,7 +213,7 @@ namespace osu.Game.Screens
                                                         {
                                                             Action = () => playlist.ToggleVisibility(),
                                                             TooltipText = "歌曲列表",
-                                                        }
+                                                        },
                                                     }
                                                 },
                                             }
@@ -216,7 +222,7 @@ namespace osu.Game.Screens
                                 },
                             }
                         },
-                        lockButton = new OverlayLockButton
+                        lockButton = new ToggleableOverlayLockButton
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
@@ -240,7 +246,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SessionStatics session)
         {
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
         }
@@ -249,7 +255,8 @@ namespace osu.Game.Screens
         {
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
-            lockButton.LockEnabled.ValueChanged += _ => UpdateLockButton();
+            lockButton.ToggleableValue.ValueChanged += _ => UpdateLockButton();
+            loopToggleButton.ToggleableValue.ValueChanged += _ => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
@@ -321,7 +328,7 @@ namespace osu.Game.Screens
                     return true;
 
                 case Key.Tab:
-                    lockButton.ToggleLock();
+                    lockButton.Toggle();
                     return true;
             }
 
@@ -339,8 +346,8 @@ namespace osu.Game.Screens
 
             if ( !hoverCheckContainer.ScreenHovered.Value )
             {
-                if ( lockButton.LockEnabled.Value && OverlaysHidden )
-                    lockButton.ToggleLock();
+                if ( lockButton.ToggleableValue.Value && OverlaysHidden )
+                    lockButton.Toggle();
 
                 ShowOverlays();
                 return;
@@ -405,7 +412,7 @@ namespace osu.Game.Screens
         private void RunHideOverlays()
         {
             if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
-                 || bottomBar.bar_IsHovered.Value || lockButton.LockEnabled.Value )
+                 || bottomBar.bar_IsHovered.Value || lockButton.ToggleableValue.Value )
                 return;
 
             HideOverlays();
@@ -413,7 +420,7 @@ namespace osu.Game.Screens
 
         private void RunShowOverlays()
         {
-            if ( lockButton.LockEnabled.Value && bottomBar.Alpha == 0.01f )
+            if ( lockButton.ToggleableValue.Value && bottomBar.Alpha == 0.01f )
             {
                 lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
                 return;
@@ -454,6 +461,7 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
+            Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
             {
                 backgroundBeatmap.Beatmap = beatmap;

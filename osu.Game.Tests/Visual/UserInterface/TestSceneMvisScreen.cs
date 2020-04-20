@@ -25,8 +25,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(BottomBar),
             typeof(MvisScreen),
-            typeof(OverlayLockButton),
+            typeof(ToggleableOverlayLockButton),
+            typeof(ToggleableTrackLoopButton),
             typeof(MusicOverlayButton),
+            typeof(ToggleableButton),
             typeof(HoverableProgressBarContainer)
         };
 

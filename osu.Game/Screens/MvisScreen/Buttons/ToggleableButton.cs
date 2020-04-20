@@ -7,19 +7,23 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Buttons
 {
-    public class OverlayLockButton : OsuAnimatedButton
+    public class ToggleableButton : OsuAnimatedButton
     {
-        private Box bgBox;
+        public Bindable<bool> ToggleableValue = new Bindable<bool>();
+        private readonly Box bgBox;
+        protected readonly SpriteIcon icon;
+        protected readonly bool defaultValue;
 
-        public Bindable<bool> LockEnabled = new Bindable<bool>();
+        [Resolved]
+        private OsuColour colour { get; set; }
 
-        public OverlayLockButton()
+        public ToggleableButton()
         {
             Size = new Vector2(50, 30);
 
@@ -31,12 +35,11 @@ namespace osu.Game.Screens.Mvis.Buttons
                     Depth = float.MaxValue,
                     Colour = Color4Extensions.FromHex("#5a5a5a"),
                 },
-                new SpriteIcon
+                icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(13),
-                    Icon = FontAwesome.Solid.Lock,
                 },
             };
         }
@@ -44,26 +47,25 @@ namespace osu.Game.Screens.Mvis.Buttons
         [BackgroundDependencyLoader]
         private void load()
         {
-            LockEnabled.Value = false;
+            ToggleableValue.Value = defaultValue;
             this.Action = () =>
             {
-                ToggleLock();
+                Toggle();
             };
-            this.Delay(1000).FadeOut(500, Easing.OutQuint);
         }
 
-        public void ToggleLock()
+        public void Toggle()
         {
-            switch ( LockEnabled.Value )
+            switch ( ToggleableValue.Value )
             {
                 case true:
-                    LockEnabled.Value = false;
+                    ToggleableValue.Value = false;
                     bgBox.FadeColour( Color4Extensions.FromHex("#5a5a5a"), 500, Easing.OutQuint );
                     break;
 
                 case false:
-                    LockEnabled.Value = true;
-                    bgBox.FadeColour( Color4.DarkGreen, 500, Easing.OutQuint );
+                    ToggleableValue.Value = true;
+                    bgBox.FadeColour( colour.Green, 500, Easing.OutQuint );
                     break;
             }
         }
