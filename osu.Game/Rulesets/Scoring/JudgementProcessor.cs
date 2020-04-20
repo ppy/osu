@@ -58,8 +58,7 @@ namespace osu.Game.Rulesets.Scoring
 
             NewJudgement?.Invoke(result);
 
-            if (JudgedHits == MaxHits)
-                hasCompleted.Value = true;
+            updateHasCompleted();
         }
 
         /// <summary>
@@ -70,8 +69,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             JudgedHits--;
 
-            if (JudgedHits < MaxHits)
-                hasCompleted.Value = false;
+            updateHasCompleted();
 
             RevertResultInternal(result);
         }
@@ -135,5 +133,7 @@ namespace osu.Game.Rulesets.Scoring
                 ApplyResult(result);
             }
         }
+
+        private void updateHasCompleted() => hasCompleted.Value = JudgedHits == MaxHits;
     }
 }
