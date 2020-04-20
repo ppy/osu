@@ -31,12 +31,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
         /// </summary>
-        public float BleedTop;
+        public float BleedTop { get; set; }
 
         /// <summary>
         /// Height of the area below the carousel that should be treated as visible due to transparency of elements in front of it.
         /// </summary>
-        public float BleedBottom;
+        public float BleedBottom { get; set; }
 
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
