@@ -29,7 +29,7 @@ namespace osu.Game.Utils
                 if (type.GetField(i.ToString()).GetCustomAttributes(typeof(OrderAttribute), false).FirstOrDefault() is OrderAttribute attr)
                     return attr.Order;
 
-                return 0;
+                throw new ArgumentException($"Not all values of {nameof(T)} have {nameof(OrderAttribute)} specified.");
             });
         }
     }
