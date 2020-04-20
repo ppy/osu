@@ -26,18 +26,4 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.AccentColour = colours.BlueDarker;
         }
     }
-
-    public class DrawableFlyingRimHit : DrawableRimHit
-    {
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            ApplyResult(r => r.Type = HitResult.Good);
-        }
-
-        public DrawableFlyingRimHit(double time, bool isStrong = false)
-            : base(new IgnoreHit { StartTime = time, IsStrong = isStrong })
-        {
-            HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-        }
-    }
 }
