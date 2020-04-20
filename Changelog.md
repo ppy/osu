@@ -486,3 +486,13 @@
     *   [o] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
 
 *   修复了在Mvis播放器界面导入并查看谱面会导致游戏崩溃的问题
+
+### 2020/4/20
+*   合并上游pr
+    *   [m] [Add support for custom hyper-dash legacy fruit colouring #8446]
+    *   [m] [Fix slider heads not being blocked when hit out-of-order #8777]
+    *   [m] [Fix typo in exception #8808]
+    *   [m] [Fix DatabasedKeyBindingContainer not using defaults for non-databased ruleset #8806]
+    *   [m] [Add /np (now playing) command support in chat #8801]
+    *   [m] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
+    *   [m] [Fix presenting new ruleset and beatmap at once causing wedge display desync #8779]

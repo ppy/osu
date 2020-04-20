@@ -44,11 +44,11 @@ namespace osu.Game.Rulesets.Catch.Skinning
                         return new LegacyFruitPiece("fruit-drop") { Scale = new Vector2(0.8f) };
 
                     break;
-                
+
                 case CatchSkinComponents.CatcherIdle:
                     return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
                            this.GetAnimation("fruit-ryuuta", true, true, true);
-                
+
                 case CatchSkinComponents.CatcherFail:
                     return this.GetAnimation("fruit-catcher-fail", true, true, true) ??
                            this.GetAnimation("fruit-ryuuta", true, true, true);
@@ -65,6 +65,15 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
         public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source.GetConfig<TLookup, TValue>(lookup);
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case CatchSkinColour colour:
+                    return source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+            }
+
+            return source.GetConfig<TLookup, TValue>(lookup);
+        }
     }
 }
