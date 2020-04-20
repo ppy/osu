@@ -76,7 +76,7 @@
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
     <PackageReference Include="DiffPlex" Version="1.6.1" />
-    <PackageReference Include="Humanizer" Version="2.7.9" />
+    <PackageReference Include="Humanizer" Version="2.8.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
