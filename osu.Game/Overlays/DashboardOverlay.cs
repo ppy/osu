@@ -19,14 +19,19 @@ namespace osu.Game.Overlays
     {
         private CancellationTokenSource cancellationToken;
 
-        private readonly Box background;
-        private readonly Container content;
-        private readonly DashboardOverlayHeader header;
-        private readonly LoadingLayer loading;
-        private readonly OverlayScrollContainer scrollFlow;
+        private Box background;
+        private Container content;
+        private DashboardOverlayHeader header;
+        private LoadingLayer loading;
+        private OverlayScrollContainer scrollFlow;
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple)
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Children = new Drawable[]
             {
@@ -61,17 +66,14 @@ namespace osu.Game.Overlays
                 },
                 loading = new LoadingLayer(content),
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             background.Colour = ColourProvider.Background5;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             header.Current.BindValueChanged(onTabChanged);
         }
 
