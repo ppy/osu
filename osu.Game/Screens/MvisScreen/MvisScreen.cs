@@ -43,7 +43,6 @@ namespace osu.Game.Screens
         public override bool CursorVisible => AllowCursor;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
             (IsHovered || idleTracker.IsIdle.Value)
@@ -70,7 +69,7 @@ namespace osu.Game.Screens
         ParallaxContainer beatmapParallax;
         HoverCheckContainer hoverCheckContainer;
         HoverableProgressBarContainer progressBarContainer;
-        ToggleableTrackLoopButton loopToggleButton;
+        ToggleableButton loopToggleButton;
         ToggleableOverlayLockButton lockButton;
         private bool OverlaysHidden = false;
 
@@ -156,8 +155,9 @@ namespace osu.Game.Screens
                                                     Margin = new MarginPadding { Left = 5 },
                                                     Children = new Drawable[]
                                                     {
-                                                        new MusicOverlayButton(FontAwesome.Solid.ArrowLeft)
+                                                        new BottomBarButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.ArrowLeft,
                                                             Action = () => this.Exit(),
                                                             TooltipText = "退出",
                                                         },
@@ -172,18 +172,21 @@ namespace osu.Game.Screens
                                                     Spacing = new Vector2(5),
                                                     Children = new Drawable[]
                                                     {
-                                                        new MusicOverlayButton(FontAwesome.Solid.StepBackward)
+                                                        new MusicControlButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.StepBackward,
                                                             Action = () => musicController.PreviousTrack(),
                                                             TooltipText = "上一首/从头开始",
                                                         },
-                                                        new MusicOverlayButton(FontAwesome.Solid.Music)
+                                                        new MusicControlButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.Music,
                                                             Action = () => musicController.TogglePause(),
                                                             TooltipText = "切换暂停",
                                                         },
-                                                        new MusicOverlayButton(FontAwesome.Solid.StepForward)
+                                                        new MusicControlButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.StepForward,
                                                             Action = () => musicController.NextTrack(),
                                                             TooltipText = "下一首",
                                                         },
@@ -199,17 +202,20 @@ namespace osu.Game.Screens
                                                     Margin = new MarginPadding { Right = 5 },
                                                     Children = new Drawable[]
                                                     {
-                                                        loopToggleButton = new ToggleableTrackLoopButton()
+                                                        loopToggleButton = new ToggleableButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.Undo,
                                                             TooltipText = "单曲循环",
                                                         },
-                                                        new MusicOverlayButton(FontAwesome.Solid.User)
+                                                        new BottomBarButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.User,
                                                             Action = () => InvokeSolo(),
                                                             TooltipText = "在选歌界面中查看",
                                                         },
-                                                        new MusicOverlayButton(FontAwesome.Solid.Atom)
+                                                        new BottomBarButton()
                                                         {
+                                                            ButtonIcon = FontAwesome.Solid.Atom,
                                                             Action = () => playlist.ToggleVisibility(),
                                                             TooltipText = "侧边栏",
                                                         },
@@ -328,6 +334,10 @@ namespace osu.Game.Screens
 
                 case Key.Tab:
                     lockButton.Toggle();
+                    return true;
+
+                case Key.L:
+                    loopToggleButton.Toggle();
                     return true;
             }
 

@@ -5,44 +5,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Screens.Mvis.Buttons
 {
-    public class ToggleableButton : OsuAnimatedButton
+    public class ToggleableButton : BottomBarButton
     {
         public Bindable<bool> ToggleableValue = new Bindable<bool>();
-        private readonly Box bgBox;
-        protected readonly SpriteIcon icon;
         protected readonly bool defaultValue;
 
         [Resolved]
         private OsuColour colour { get; set; }
-
-        public ToggleableButton()
-        {
-            Size = new Vector2(30, 30);
-
-            Children = new Drawable[]
-            {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
-                    Colour = Color4Extensions.FromHex("#5a5a5a"),
-                },
-                icon = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(13),
-                },
-            };
-        }
 
         [BackgroundDependencyLoader]
         private void load()

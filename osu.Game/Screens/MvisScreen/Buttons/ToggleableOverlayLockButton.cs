@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Mvis.Buttons
     {
         public ToggleableOverlayLockButton()
         {
-            icon.Icon = FontAwesome.Solid.Lock;
+            ButtonIcon = FontAwesome.Solid.Lock;
         }
 
         [BackgroundDependencyLoader]
