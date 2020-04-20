@@ -60,9 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to completion again", () => track.Seek(5000));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
 
-            AddWaitStep("wait", 5);
-
-            AddAssert("attempted to push ranking", () => ((FakeRankingPushPlayer)Player).GotoRankingInvoked);
+            AddUntilStep("attempted to push ranking", () => ((FakeRankingPushPlayer)Player).GotoRankingInvoked);
         }
 
         /// <summary>
