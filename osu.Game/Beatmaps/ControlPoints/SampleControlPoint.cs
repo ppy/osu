@@ -68,8 +68,9 @@ namespace osu.Game.Beatmaps.ControlPoints
             return newSampleInfo;
         }
 
-        public override bool EquivalentTo(ControlPoint other) =>
-            other is SampleControlPoint otherTyped &&
-            SampleBank == otherTyped.SampleBank && SampleVolume == otherTyped.SampleVolume;
+        public override bool IsRedundant(ControlPoint existing)
+            => existing is SampleControlPoint existingSample
+               && SampleBank == existingSample.SampleBank
+               && SampleVolume == existingSample.SampleVolume;
     }
 }
