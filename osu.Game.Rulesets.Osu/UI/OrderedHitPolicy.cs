@@ -11,7 +11,7 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Osu.UI
 {
     /// <summary>
-    /// Ensures that <see cref="HitObject"/>s are hit in-order.
+    /// Ensures that <see cref="HitObject"/>s are hit in-order. Affectionately known as "note lock".
     /// If a <see cref="HitObject"/> is hit out of order:
     /// <list type="number">
     /// <item><description>The hit is blocked if it occurred earlier than the previous <see cref="HitObject"/>'s start time.</description></item>
