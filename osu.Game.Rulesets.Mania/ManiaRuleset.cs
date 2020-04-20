@@ -284,6 +284,8 @@ namespace osu.Game.Rulesets.Mania
                                     InputKey.L,
                                     InputKey.Semicolon,
                                 },
+                                SpecialKey = InputKey.Space,
+                                SpecialAction = ManiaAction.Special1,
                                 NormalActionStart = ManiaAction.Key1,
                             }.GenerateKeyBindingsFor(variant, out _);
 
