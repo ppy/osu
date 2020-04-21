@@ -496,3 +496,15 @@
     *   [m] [Add /np (now playing) command support in chat #8801]
     *   [m] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
     *   [m] [Fix presenting new ruleset and beatmap at once causing wedge display desync #8779]
+
+### 2020/4/21
+*   合并上游pr
+    *   [m] [Bump Humanizer from 2.7.9 to 2.8.2 #8811]
+    *   [m] [Fix spinners being considered the "first object" for increased visibility in hidden #8769]
+    *   [m] [Replace SocialOverlay with DashboardOverlay #8771]
+    *   [m] [Fix inline executions of APIRequest.Perform not getting result populated early enough #8810]
+    *   [m] [Let beatmap carousel scroll to screen middle #8728]
+    *   [m] [Allow 10k to be played on a single stage #8809]
+    *   [m] [Add taiko drumroll skinning support #8766]
+    *   [m] [Fix results screen pushed after rewinding in-between push delay #8800]
+    *   [m] [Don't serialise AllControlPoints #8814]
