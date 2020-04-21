@@ -428,7 +428,7 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// selection has been changed as the result of a user interaction.
+        /// Selection has been changed as the result of a user interaction.
         /// </summary>
         private void performUpdateSelected()
         {
@@ -437,7 +437,7 @@ namespace osu.Game.Screens.Select
 
             selectionChangedDebounce?.Cancel();
 
-            if (beatmap == null)
+            if (beatmapNoDebounce == null)
                 run();
             else
                 selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
@@ -450,9 +450,11 @@ namespace osu.Game.Screens.Select
                 {
                     Mods.Value = Array.Empty<Mod>();
 
-                    // required to return once in order to have the carousel in a good state.
-                    // if the ruleset changed, the rest of the selection update will happen via updateSelectedRuleset.
-                    return;
+                    // transferRulesetValue() may trigger a refilter. If the current selection does not match the new ruleset, we want to switch away from it.
+                    // The default logic on WorkingBeatmap change is to switch to a matching ruleset (see workingBeatmapChanged()), but we don't want that here.
+                    // We perform an early selection attempt and clear out the beatmap selection to avoid a second ruleset change (revert).
+                    if (beatmap != null && !Carousel.SelectBeatmap(beatmap, false))
+                        beatmap = null;
                 }
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
@@ -716,7 +718,7 @@ namespace osu.Game.Screens.Select
             if (decoupledRuleset.Value?.Equals(Ruleset.Value) == true)
                 return false;
 
-            Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\"");
+            Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\")");
             rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
 
             // if we have a pending filter operation, we want to run it now.
