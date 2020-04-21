@@ -360,6 +360,68 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestPresentNewRulesetNewBeatmap()
+        {
+            createSongSelect();
+            changeRuleset(2);
+
+            addRulesetImportStep(2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
+
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            BeatmapInfo target = null;
+
+            AddStep("select beatmap/ruleset externally", () =>
+            {
+                target = manager.GetAllUsableBeatmapSets()
+                                .Last(b => b.Beatmaps.Any(bi => bi.RulesetID == 0)).Beatmaps.Last();
+
+                Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == 0);
+                Beatmap.Value = manager.GetWorkingBeatmap(target);
+            });
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.Equals(target));
+
+            // this is an important check, to make sure updateComponentFromBeatmap() was actually run
+            AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo == target);
+        }
+
+        [Test]
+        public void TestPresentNewBeatmapNewRuleset()
+        {
+            createSongSelect();
+            changeRuleset(2);
+
+            addRulesetImportStep(2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.RulesetID == 2);
+
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            BeatmapInfo target = null;
+
+            AddStep("select beatmap/ruleset externally", () =>
+            {
+                target = manager.GetAllUsableBeatmapSets()
+                                .Last(b => b.Beatmaps.Any(bi => bi.RulesetID == 0)).Beatmaps.Last();
+
+                Beatmap.Value = manager.GetWorkingBeatmap(target);
+                Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == 0);
+            });
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.Equals(target));
+
+            AddUntilStep("has correct ruleset", () => Ruleset.Value.ID == 0);
+
+            // this is an important check, to make sure updateComponentFromBeatmap() was actually run
+            AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo == target);
+        }
+
+        [Test]
         public void TestRulesetChangeResetsMods()
         {
             createSongSelect();
