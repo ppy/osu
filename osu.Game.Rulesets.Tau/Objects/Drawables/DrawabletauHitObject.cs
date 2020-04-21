@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         public Box Box;
 
         public Func<DrawabletauHitObject, bool> CheckValidation;
+
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
@@ -102,9 +103,6 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
                 if (result == HitResult.None)
                     return;
 
-                if (result == HitResult.Miss)
-                    ApplyResult(r => r.Type = HitResult.Miss);
-
                 if (!validActionPressed)
                     ApplyResult(r => r.Type = HitResult.Miss);
                 else
@@ -169,6 +167,8 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
             return result;
         }
 
-        public void OnReleased(TauAction action) { }
+        public void OnReleased(TauAction action)
+        {
+        }
     }
 }
