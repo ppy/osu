@@ -3,27 +3,29 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Overlays;
 using NUnit.Framework;
-using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dashboard;
+using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapListingOverlay : OsuTestScene
+    public class TestSceneDashboardOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(BeatmapListingOverlay),
-            typeof(BeatmapListingFilterControl)
+            typeof(DashboardOverlay),
+            typeof(DashboardOverlayHeader),
+            typeof(FriendDisplay)
         };
 
         protected override bool UseOnlineAPI => true;
 
-        private readonly BeatmapListingOverlay overlay;
+        private readonly DashboardOverlay overlay;
 
-        public TestSceneBeatmapListingOverlay()
+        public TestSceneDashboardOverlay()
         {
-            Add(overlay = new BeatmapListingOverlay());
+            Add(overlay = new DashboardOverlay());
         }
 
         [Test]
