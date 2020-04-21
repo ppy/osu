@@ -17,7 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
 namespace osu.Game.Overlays
@@ -118,14 +118,14 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var newPanels = new FillFlowContainer<DirectPanel>
+            var newPanels = new FillFlowContainer<BeatmapPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
                 Alpha = 0,
                 Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
+                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
