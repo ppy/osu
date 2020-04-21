@@ -47,15 +47,8 @@ namespace osu.Game.Tests.Visual
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
             typeof(NotificationOverlay),
-<<<<<<< HEAD
-            typeof(DirectOverlay),
+            typeof(BeatmapListingOverlay),
             typeof(DashboardOverlay),
-||||||| parent of 96a3a08a9... Remove unused classes and replace overlay in game
-            typeof(DirectOverlay),
-            typeof(SocialOverlay),
-=======
-            typeof(SocialOverlay),
->>>>>>> 96a3a08a9... Remove unused classes and replace overlay in game
             typeof(ChannelManager),
             typeof(ChatOverlay),
             typeof(SettingsOverlay),

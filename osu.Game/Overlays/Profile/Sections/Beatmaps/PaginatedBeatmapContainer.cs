@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Users;
 using osuTK;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override Drawable CreateDrawableItem(APIBeatmapSet model) => !model.OnlineBeatmapSetID.HasValue
             ? null
-            : new DirectGridPanel(model.ToBeatmapSet(Rulesets))
+            : new BeatmapPanelGrid(model.ToBeatmapSet(Rulesets))
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

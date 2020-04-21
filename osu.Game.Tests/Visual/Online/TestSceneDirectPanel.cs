@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
@@ -20,8 +20,8 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(DirectGridPanel),
-            typeof(DirectListPanel),
+            typeof(BeatmapPanelGrid),
+            typeof(BeatmapPanelList),
             typeof(IconPill)
         };
 
@@ -126,12 +126,12 @@ namespace osu.Game.Tests.Visual.Online
                     Spacing = new Vector2(5, 20),
                     Children = new Drawable[]
                     {
-                        new DirectGridPanel(normal),
-                        new DirectGridPanel(undownloadable),
-                        new DirectGridPanel(manyDifficulties),
-                        new DirectListPanel(normal),
-                        new DirectListPanel(undownloadable),
-                        new DirectListPanel(manyDifficulties),
+                        new BeatmapPanelGrid(normal),
+                        new BeatmapPanelGrid(undownloadable),
+                        new BeatmapPanelGrid(manyDifficulties),
+                        new BeatmapPanelList(normal),
+                        new BeatmapPanelList(undownloadable),
+                        new BeatmapPanelList(manyDifficulties),
                     },
                 },
             };

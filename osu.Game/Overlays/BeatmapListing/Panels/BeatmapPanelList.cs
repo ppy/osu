@@ -1,25 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public class DirectListPanel : DirectPanel
+    public class BeatmapPanelList : BeatmapPanel
     {
         private const float transition_duration = 120;
         private const float horizontal_padding = 10;
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Direct
         private const float height = 70;
 
         private FillFlowContainer statusContainer;
-        protected PanelDownloadButton DownloadButton;
+        protected BeatmapPanelDownloadButton DownloadButton;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Direct
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public DirectListPanel(BeatmapSetInfo beatmap)
+        public BeatmapPanelList(BeatmapSetInfo beatmap)
             : base(beatmap)
         {
             RelativeSizeAxes = Axes.X;
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays.Direct
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Child = DownloadButton = new PanelDownloadButton(SetInfo)
+                                    Child = DownloadButton = new BeatmapPanelDownloadButton(SetInfo)
                                     {
                                         Size = new Vector2(height - vertical_padding * 3),
                                         Margin = new MarginPadding { Left = vertical_padding * 2, Right = vertical_padding },

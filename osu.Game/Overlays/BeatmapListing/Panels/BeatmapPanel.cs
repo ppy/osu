@@ -26,9 +26,9 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public abstract class DirectPanel : OsuClickableContainer, IHasContextMenu
+    public abstract class BeatmapPanel : OsuClickableContainer, IHasContextMenu
     {
         public readonly BeatmapSetInfo SetInfo;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Direct
 
         protected Action ViewBeatmap;
 
-        protected DirectPanel(BeatmapSetInfo setInfo)
+        protected BeatmapPanel(BeatmapSetInfo setInfo)
         {
             Debug.Assert(setInfo.OnlineBeatmapSetID != null);
 
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Direct
             if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
             {
                 foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
-                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is DirectListPanel ? Color4.White : colours.Gray5));
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is BeatmapPanelList ? Color4.White : colours.Gray5));
             }
             else
             {
