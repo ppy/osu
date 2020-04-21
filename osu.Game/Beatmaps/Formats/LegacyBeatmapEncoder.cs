@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps.Formats
             handleEvents(writer);
 
             writer.WriteLine();
-            handleTimingPoints(writer);
+            handleControlPoints(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
@@ -139,7 +139,7 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
         }
 
-        private void handleTimingPoints(TextWriter writer)
+        private void handleControlPoints(TextWriter writer)
         {
             if (beatmap.ControlPointInfo.Groups.Count == 0)
                 return;
@@ -148,17 +148,27 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var group in beatmap.ControlPointInfo.Groups)
             {
-                var timingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
-                var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
-                var samplePoint = beatmap.ControlPointInfo.SamplePointAt(group.Time);
-                var effectPoint = beatmap.ControlPointInfo.EffectPointAt(group.Time);
+                var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
-                // Convert beat length the legacy format
-                double beatLength;
-                if (timingPoint != null)
-                    beatLength = timingPoint.BeatLength;
-                else
-                    beatLength = -100 / difficultyPoint.SpeedMultiplier;
+                // If the group contains a timing control point, it needs to be output separately.
+                if (groupTimingPoint != null)
+                {
+                    writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
+                    writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
+                    outputControlPointEffectsAt(groupTimingPoint.Time, true);
+                }
+
+                // Output any remaining effects as secondary non-timing control point.
+                var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
+                writer.Write(FormattableString.Invariant($"{group.Time},"));
+                writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
+                outputControlPointEffectsAt(group.Time, false);
+            }
+
+            void outputControlPointEffectsAt(double time, bool isTimingPoint)
+            {
+                var samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
+                var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
                 HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo());
@@ -170,13 +180,11 @@ namespace osu.Game.Beatmaps.Formats
                 if (effectPoint.OmitFirstBarLine)
                     effectFlags |= LegacyEffectFlags.OmitFirstBarLine;
 
-                writer.Write(FormattableString.Invariant($"{group.Time},"));
-                writer.Write(FormattableString.Invariant($"{beatLength},"));
-                writer.Write(FormattableString.Invariant($"{(int)beatmap.ControlPointInfo.TimingPointAt(group.Time).TimeSignature},"));
+                writer.Write(FormattableString.Invariant($"{(int)beatmap.ControlPointInfo.TimingPointAt(time).TimeSignature},"));
                 writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
                 writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample)},"));
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
-                writer.Write(FormattableString.Invariant($"{(timingPoint != null ? '1' : '0')},"));
+                writer.Write(FormattableString.Invariant($"{(isTimingPoint ? '1' : '0')},"));
                 writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
                 writer.WriteLine();
             }
