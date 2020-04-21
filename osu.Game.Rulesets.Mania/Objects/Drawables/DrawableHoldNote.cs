@@ -127,6 +127,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
+        public override void PlaySamples()
+        {
+            // The hold note does not play samples itself.
+        }
+
         protected override void Update()
         {
             base.Update();
