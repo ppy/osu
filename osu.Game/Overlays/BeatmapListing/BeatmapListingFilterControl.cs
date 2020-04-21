@@ -159,5 +159,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             base.Dispose(isDisposing);
         }
+
+        public void TakeFocus() => searchControl.TakeFocus();
     }
 }
