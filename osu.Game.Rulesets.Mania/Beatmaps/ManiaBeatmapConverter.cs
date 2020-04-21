@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osuTK;
-using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -67,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition || h is ManiaHitObject);
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
