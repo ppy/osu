@@ -272,10 +272,31 @@ namespace osu.Game.Screens.Select
             if (beatmapSets.All(s => s.Filtered.Value))
                 return;
 
+            if (selectedBeatmapSet == null || selectedBeatmap == null)
+            {
+                selectNextWhenNull(direction, false);
+                return;
+            }
+
             if (skipDifficulties)
                 selectNextSet(direction, true);
             else
                 selectNextDifficulty(direction);
+        }
+
+        private void selectNextWhenNull(int direction, bool skipDifficulties)
+        {
+            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
+            CarouselItem toSelect = direction > 0 ? unfilteredSets.First() : unfilteredSets.Last();
+
+            if (!skipDifficulties)
+            {
+                // We are not skipping difficulties so we want to select the very first (or the very last) difficulty
+                var selectedBeatmaps = ((CarouselBeatmapSet)toSelect).Beatmaps.Where(s => !s.Filtered.Value);
+                toSelect = direction > 0 ? selectedBeatmaps.First() : selectedBeatmaps.Last();
+            }
+
+            select(toSelect);
         }
 
         private void selectNextSet(int direction, bool skipDifficulties)
@@ -292,13 +313,6 @@ namespace osu.Game.Screens.Select
 
         private void selectNextDifficulty(int direction)
         {
-            if (selectedBeatmapSet == null || selectedBeatmap == null)
-            {
-                // defer selection to selecting a set, which doesn't care if selectedBeatmapSet is null
-                selectNextSet(direction, false);
-                return;
-            }
-
             var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
 
             int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
