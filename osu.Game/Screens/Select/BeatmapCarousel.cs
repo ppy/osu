@@ -224,6 +224,9 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection was made, False if it wasn't.</returns>
         public bool SelectBeatmap(BeatmapInfo beatmap, bool bypassFilters = true)
         {
+            // ensure that any pending events from BeatmapManager have been run before attempting a selection.
+            Scheduler.Update();
+
             if (beatmap?.Hidden != false)
                 return false;
 
