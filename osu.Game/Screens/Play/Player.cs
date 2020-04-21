@@ -423,8 +423,6 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            // cancel push delegate in case judges reverted
-            // after delegate may have already been scheduled.
             if (!completionState.NewValue)
             {
                 completionProgressDelegate?.Cancel();
@@ -433,8 +431,11 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
+            if (completionProgressDelegate != null)
+                throw new InvalidOperationException($"{nameof(updateCompletionState)} was fired more than once");
+
             // Only show the completion screen if the player hasn't failed
-            if (HealthProcessor.HasFailed || completionProgressDelegate != null)
+            if (HealthProcessor.HasFailed)
                 return;
 
             ValidForResume = false;
@@ -442,7 +443,7 @@ namespace osu.Game.Screens.Play
             if (!showResults) return;
 
             using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
-                scheduleGotoRanking();
+                completionProgressDelegate = Schedule(GotoRanking);
         }
 
         protected virtual ScoreInfo CreateScore()
@@ -692,12 +693,6 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
-        }
-
-        private void scheduleGotoRanking()
-        {
-            completionProgressDelegate?.Cancel();
-            completionProgressDelegate = Schedule(GotoRanking);
         }
 
         #endregion
