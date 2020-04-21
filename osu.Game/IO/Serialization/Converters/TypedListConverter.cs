@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -62,7 +61,7 @@ namespace osu.Game.IO.Serialization.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var list = (IList)value;
+            var list = (IEnumerable<T>)value;
 
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
