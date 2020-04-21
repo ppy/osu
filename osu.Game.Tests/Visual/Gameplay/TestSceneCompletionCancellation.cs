@@ -46,46 +46,54 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCancelCompletionOnRewind()
         {
-            cancelCompletionSteps();
+            complete();
+            cancel();
 
-            AddAssert("no attempt to push ranking", () => !((FakeRankingPushPlayer)Player).GotoRankingInvoked);
+            checkNoRanking();
         }
 
         [Test]
         public void TestReCompleteAfterCancellation()
         {
-            cancelCompletionSteps();
-
-            // Attempt completing again.
-            AddStep("seek to completion again", () => track.Seek(5000));
-            AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+            complete();
+            cancel();
+            complete();
 
             AddUntilStep("attempted to push ranking", () => ((FakeRankingPushPlayer)Player).GotoRankingInvoked);
         }
 
         /// <summary>
-        /// Tests whether can still pause after cancelling completion
-        /// by reverting <see cref="IScreen.ValidForResume"/> back to true.
+        /// Tests whether can still pause after cancelling completion by reverting <see cref="IScreen.ValidForResume"/> back to true.
         /// </summary>
         [Test]
         public void TestCanPauseAfterCancellation()
         {
-            cancelCompletionSteps();
+            complete();
+            cancel();
 
             AddStep("pause", () => Player.Pause());
             AddAssert("paused successfully", () => Player.GameplayClockContainer.IsPaused.Value);
+
+            checkNoRanking();
         }
 
-        private void cancelCompletionSteps()
+        private void complete()
         {
             AddStep("seek to completion", () => track.Seek(5000));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+        }
 
+        private void cancel()
+        {
             AddStep("rewind to cancel", () => track.Seek(4000));
             AddUntilStep("completion cleared by processor", () => !Player.ScoreProcessor.HasCompleted.Value);
+        }
 
+        private void checkNoRanking()
+        {
             // wait to ensure there was no attempt of pushing the results screen.
             AddWaitStep("wait", resultsDisplayWaitCount);
+            AddAssert("no attempt to push ranking", () => !((FakeRankingPushPlayer)Player).GotoRankingInvoked);
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
