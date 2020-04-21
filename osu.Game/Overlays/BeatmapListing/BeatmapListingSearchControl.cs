@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Online.API.Requests;
 using osuTK;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Drawables;
@@ -23,11 +22,11 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<RulesetInfo> Ruleset => modeFilter.Current;
 
-        public Bindable<BeatmapSearchCategory> Category => categoryFilter.Current;
+        public Bindable<SearchCategory> Category => categoryFilter.Current;
 
-        public Bindable<BeatmapSearchGenre> Genre => genreFilter.Current;
+        public Bindable<SearchGenre> Genre => genreFilter.Current;
 
-        public Bindable<BeatmapSearchLanguage> Language => languageFilter.Current;
+        public Bindable<SearchLanguage> Language => languageFilter.Current;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -46,9 +45,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private readonly BeatmapSearchTextBox textBox;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
-        private readonly BeatmapSearchFilterRow<BeatmapSearchCategory> categoryFilter;
-        private readonly BeatmapSearchFilterRow<BeatmapSearchGenre> genreFilter;
-        private readonly BeatmapSearchFilterRow<BeatmapSearchLanguage> languageFilter;
+        private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
+        private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
+        private readonly BeatmapSearchFilterRow<SearchLanguage> languageFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -103,9 +102,9 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Children = new Drawable[]
                                 {
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
-                                    categoryFilter = new BeatmapSearchFilterRow<BeatmapSearchCategory>(@"Categories"),
-                                    genreFilter = new BeatmapSearchFilterRow<BeatmapSearchGenre>(@"Genre"),
-                                    languageFilter = new BeatmapSearchFilterRow<BeatmapSearchLanguage>(@"Language"),
+                                    categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"Categories"),
+                                    genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
+                                    languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
                                 }
                             }
                         }
@@ -113,7 +112,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 }
             });
 
-            categoryFilter.Current.Value = BeatmapSearchCategory.Leaderboard;
+            categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
         [BackgroundDependencyLoader]
