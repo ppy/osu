@@ -27,6 +27,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
             switch (taikoComponent.Component)
             {
+                case TaikoSkinComponents.DrumRollBody:
+                    if (GetTexture("taiko-roll-middle") != null)
+                        return new LegacyDrumRoll();
+
+                    return null;
+
                 case TaikoSkinComponents.InputDrum:
                     if (GetTexture("taiko-bar-left") != null)
                         return new LegacyInputDrum();
@@ -40,6 +46,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                         return new LegacyHit(taikoComponent.Component);
 
                     return null;
+
+                case TaikoSkinComponents.DrumRollTick:
+                    return this.GetAnimation("sliderscorepoint", false, false);
             }
 
             return source.GetDrawableComponent(component);

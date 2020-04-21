@@ -354,7 +354,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private ScoreAccessibleReplayPlayer currentPlayer;
         private List<JudgementResult> judgementResults;
-        private bool allJudgedFired;
 
         private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames)
         {
@@ -380,20 +379,15 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         if (currentPlayer == p) judgementResults.Add(result);
                     };
-                    p.ScoreProcessor.AllJudged += () =>
-                    {
-                        if (currentPlayer == p) allJudgedFired = true;
-                    };
                 };
 
                 LoadScreen(currentPlayer = p);
-                allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddUntilStep("Wait for all judged", () => allJudgedFired);
+            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
         private class TestHitCircle : HitCircle

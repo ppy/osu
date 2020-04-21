@@ -56,6 +56,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// All control points, of all types.
         /// </summary>
+        [JsonIgnore]
         public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints).ToArray();
 
         /// <summary>

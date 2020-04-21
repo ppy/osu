@@ -153,6 +153,8 @@ namespace osu.Game.Screens.Select
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             RelativeSizeAxes = Axes.Both,
+                                            BleedTop = FilterControl.HEIGHT,
+                                            BleedBottom = Footer.HEIGHT,
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
                                             GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
