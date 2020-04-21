@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public class BeatmapPanelList : BeatmapPanel
+    public class ListBeatmapPanel : BeatmapPanel
     {
         private const float transition_duration = 120;
         private const float horizontal_padding = 10;
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public BeatmapPanelList(BeatmapSetInfo beatmap)
+        public ListBeatmapPanel(BeatmapSetInfo beatmap)
             : base(beatmap)
         {
             RelativeSizeAxes = Axes.X;

@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
             {
                 foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
-                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is BeatmapPanelList ? Color4.White : colours.Gray5));
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is ListBeatmapPanel ? Color4.White : colours.Gray5));
             }
             else
             {

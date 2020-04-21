@@ -125,7 +125,7 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(10),
                 Alpha = 0,
                 Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new BeatmapPanelGrid(b)
+                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
