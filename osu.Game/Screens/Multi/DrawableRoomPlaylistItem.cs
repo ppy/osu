@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Multi
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
+                                    Spacing = new Vector2(15, 0),
                                     Children = new Drawable[]
                                     {
                                         authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },
@@ -212,8 +212,8 @@ namespace osu.Game.Screens.Multi
 
         private class PlaylistDownloadButton : PanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet)
+                : base(beatmapSet)
             {
                 Alpha = 0;
             }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
@@ -24,16 +25,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         internal readonly Container<PathControlPointPiece> Pieces;
+        internal readonly Container<PathControlPointConnectionPiece> Connections;
 
-        private readonly Container<PathControlPointConnectionPiece> connections;
-
+        private readonly IBindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly Slider slider;
-
         private readonly bool allowSelection;
 
         private InputManager inputManager;
-
-        private IBindableList<PathControlPoint> controlPoints;
 
         public Action<List<PathControlPoint>> RemoveControlPointsRequested;
 
@@ -46,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             InternalChildren = new Drawable[]
             {
-                connections = new Container<PathControlPointConnectionPiece> { RelativeSizeAxes = Axes.Both },
+                Connections = new Container<PathControlPointConnectionPiece> { RelativeSizeAxes = Axes.Both },
                 Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both }
             };
         }
@@ -57,33 +55,38 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             inputManager = GetContainingInputManager();
 
-            controlPoints = slider.Path.ControlPoints.GetBoundCopy();
-            controlPoints.ItemsAdded += addControlPoints;
-            controlPoints.ItemsRemoved += removeControlPoints;
-
-            addControlPoints(controlPoints);
+            controlPoints.CollectionChanged += onControlPointsChanged;
+            controlPoints.BindTo(slider.Path.ControlPoints);
         }
 
-        private void addControlPoints(IEnumerable<PathControlPoint> controlPoints)
+        private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach (var point in controlPoints)
+            switch (e.Action)
             {
-                Pieces.Add(new PathControlPointPiece(slider, point).With(d =>
-                {
-                    if (allowSelection)
-                        d.RequestSelection = selectPiece;
-                }));
+                case NotifyCollectionChangedAction.Add:
+                    for (int i = 0; i < e.NewItems.Count; i++)
+                    {
+                        var point = (PathControlPoint)e.NewItems[i];
 
-                connections.Add(new PathControlPointConnectionPiece(slider, point));
-            }
-        }
+                        Pieces.Add(new PathControlPointPiece(slider, point).With(d =>
+                        {
+                            if (allowSelection)
+                                d.RequestSelection = selectPiece;
+                        }));
 
-        private void removeControlPoints(IEnumerable<PathControlPoint> controlPoints)
-        {
-            foreach (var point in controlPoints)
-            {
-                Pieces.RemoveAll(p => p.ControlPoint == point);
-                connections.RemoveAll(c => c.ControlPoint == point);
+                        Connections.Add(new PathControlPointConnectionPiece(slider, e.NewStartingIndex + i));
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var point in e.OldItems.Cast<PathControlPoint>())
+                    {
+                        Pieces.RemoveAll(p => p.ControlPoint == point);
+                        Connections.RemoveAll(c => c.ControlPoint == point);
+                    }
+
+                    break;
             }
         }
 
