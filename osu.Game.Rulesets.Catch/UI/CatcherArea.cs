@@ -33,9 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             RelativeSizeAxes = Axes.X;
             Height = CATCHER_SIZE;
-
-            Child = MovableCatcher = new Catcher(difficulty);
-            MovableCatcher.SetAdditiveTarget(this);
+            Child = MovableCatcher = new Catcher(difficulty, this);
         }
 
         public static float GetCatcherSize(BeatmapDifficulty difficulty)
