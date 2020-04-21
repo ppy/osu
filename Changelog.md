@@ -508,3 +508,7 @@
     *   [m] [Add taiko drumroll skinning support #8766]
     *   [m] [Fix results screen pushed after rewinding in-between push delay #8800]
     *   [m] [Don't serialise AllControlPoints #8814]
+    *   [m] [Fix carousel not correctly updating when selection changes to a new beatmap from a child screen #8772]
+    *   [m] [Fix control point overriding working incorrectly #8815]
+    *   [m] [Implement sorting by genre and language in BeatmapListingOverlay #7924]
+    *   [m] [Implement ColumnLineWidth skinning #8822]

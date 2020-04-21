@@ -96,9 +96,9 @@ namespace osu.Game.Overlays.MfMenu
 
             textFlow.AddText("虽然osu!lazer和他的框架osu!framework是基于");
             textFlow.AddLink("MIT协议","https://opensource.org/licenses/MIT");
-            textFlow.AddText("开源的, 但这并不覆盖有关\"osu\"和\"ppy\"的任何用法, 因为这些都是注册商标并受商标法的保护, ");
+            textFlow.AddText("开源的, 但这并不覆盖有关\"osu\"和\"ppy\"在软件、 资源、 广告和促销中的的任何用法, 因为这些都是注册商标并受商标法的保护, ");
 
-            textFlow.AddText("请不要公开分发包含这些内容的项目, 详细信息可以通过");
+            textFlow.AddText("详细信息可以通过");
             textFlow.AddLink("官方README","https://github.com/ppy/osu#licence");
             textFlow.AddText("查询。");
             textFlow.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
