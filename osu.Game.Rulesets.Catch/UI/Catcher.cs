@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
     {
-        public static Color4 DefaultHyperDashColour { get; } = Color4.Red;
+        public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
 
         /// <summary>
         /// Whether we are hyper-dashing or not.
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CatcherSprite currentCatcher;
 
-        private Color4 hyperDashColour = DefaultHyperDashColour;
-        private Color4 hyperDashEndGlowColour = DefaultHyperDashColour;
+        private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
+        private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
 
         private int currentDirection;
 
@@ -390,8 +390,14 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.SkinChanged(skin, allowFallback);
 
-            hyperDashColour = skin.GetHyperDashCatcherColour()?.Value ?? DefaultHyperDashColour;
-            hyperDashEndGlowColour = skin.GetHyperDashCatcherAfterImageColour()?.Value ?? DefaultHyperDashColour;
+            hyperDashColour =
+                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
+                DEFAULT_HYPER_DASH_COLOUR;
+
+            hyperDashEndGlowColour =
+                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
+                hyperDashColour;
+
             updateCatcherColour(HyperDashing);
         }
 

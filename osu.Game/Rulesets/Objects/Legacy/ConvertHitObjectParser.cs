@@ -409,21 +409,33 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        private class LegacyHitSampleInfo : HitSampleInfo
+        internal class LegacyHitSampleInfo : HitSampleInfo
         {
+            private int customSampleBank;
+
             public int CustomSampleBank
             {
+                get => customSampleBank;
                 set
                 {
-                    if (value > 1)
+                    customSampleBank = value;
+
+                    if (value >= 2)
                         Suffix = value.ToString();
                 }
             }
         }
 
-        private class FileHitSampleInfo : HitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo
         {
             public string Filename;
+
+            public FileHitSampleInfo()
+            {
+                // Make sure that the LegacyBeatmapSkin does not fall back to the user skin.
+                // Note that this does not change the lookup names, as they are overridden locally.
+                CustomSampleBank = 1;
+            }
 
             public override IEnumerable<string> LookupNames => new[]
             {

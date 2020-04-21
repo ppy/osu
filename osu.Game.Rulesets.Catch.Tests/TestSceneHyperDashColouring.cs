@@ -4,15 +4,10 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
@@ -32,29 +27,113 @@ namespace osu.Game.Rulesets.Catch.Tests
         private SkinManager skins { get; set; }
 
         [Test]
-        public void TestHyperDashCatcherColour()
+        public void TestDefaultCatcherColour()
+        {
+            var skin = new TestSkin();
+
+            checkHyperDashCatcherColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR);
+        }
+
+        [Test]
+        public void TestCustomCatcherColour()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashColour = Color4.Goldenrod
+            };
+
+            checkHyperDashCatcherColour(skin, skin.HyperDashColour);
+        }
+
+        [Test]
+        public void TestCustomEndGlowColour()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashAfterImageColour = Color4.Lime
+            };
+
+            checkHyperDashCatcherColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR, skin.HyperDashAfterImageColour);
+        }
+
+        [Test]
+        public void TestCustomEndGlowColourPriority()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashColour = Color4.Goldenrod,
+                HyperDashAfterImageColour = Color4.Lime
+            };
+
+            checkHyperDashCatcherColour(skin, skin.HyperDashColour, skin.HyperDashAfterImageColour);
+        }
+
+        [Test]
+        public void TestDefaultFruitColour()
+        {
+            var skin = new TestSkin();
+
+            checkHyperDashFruitColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR);
+        }
+
+        [Test]
+        public void TestCustomFruitColour()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashFruitColour = Color4.Cyan
+            };
+
+            checkHyperDashFruitColour(skin, skin.HyperDashFruitColour);
+        }
+
+        [Test]
+        public void TestCustomFruitColourPriority()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashColour = Color4.Goldenrod,
+                HyperDashFruitColour = Color4.Cyan
+            };
+
+            checkHyperDashFruitColour(skin, skin.HyperDashFruitColour);
+        }
+
+        [Test]
+        public void TestFruitColourFallback()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashColour = Color4.Goldenrod
+            };
+
+            checkHyperDashFruitColour(skin, skin.HyperDashColour);
+        }
+
+        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
         {
             CatcherArea catcherArea = null;
 
-            AddStep("setup catcher", () =>
+            AddStep("create hyper-dashing catcher", () =>
             {
                 Child = setupSkinHierarchy(catcherArea = new CatcherArea
                 {
-                    RelativePositionAxes = Axes.None,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(4f),
-                }, false, false, false);
-            });
+                }, skin);
 
-            AddStep("start hyper-dashing", () =>
-            {
                 catcherArea.MovableCatcher.SetHyperDashState(2);
                 catcherArea.MovableCatcher.FinishTransforms();
             });
 
-            AddAssert("catcher has default hyper-dash colour", () => catcherArea.MovableCatcher.Colour == Color4.OrangeRed);
-            AddAssert("catcher trails have default hyper-dash colour", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == Catcher.DefaultHyperDashColour));
+            AddAssert("catcher colour is correct", () =>
+                expectedCatcherColour == Catcher.DEFAULT_HYPER_DASH_COLOUR
+                    ? catcherArea.MovableCatcher.Colour == Catcher.DEFAULT_CATCHER_HYPER_DASH_COLOUR
+                    : catcherArea.MovableCatcher.Colour == expectedCatcherColour);
+
+            AddAssert("catcher trails colours are correct", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == expectedCatcherColour));
+            AddAssert("catcher end-glow colours are correct", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == (expectedEndGlowColour ?? expectedCatcherColour)));
 
             AddStep("finish hyper-dashing", () =>
             {
@@ -62,111 +141,14 @@ namespace osu.Game.Rulesets.Catch.Tests
                 catcherArea.MovableCatcher.FinishTransforms();
             });
 
-            AddAssert("hyper-dash colour cleared from catcher", () => catcherArea.MovableCatcher.Colour == Color4.White);
+            AddAssert("catcher colour returned to white", () => catcherArea.MovableCatcher.Colour == Color4.White);
         }
 
-        [Test]
-        public void TestCustomHyperDashCatcherColour()
-        {
-            CatcherArea catcherArea = null;
-
-            AddStep("setup catcher", () =>
-            {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea
-                {
-                    RelativePositionAxes = Axes.None,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(4f),
-                }, true, false, false);
-            });
-
-            AddStep("start hyper-dashing", () =>
-            {
-                catcherArea.MovableCatcher.SetHyperDashState(2);
-                catcherArea.MovableCatcher.FinishTransforms();
-            });
-
-            AddAssert("catcher use hyper-dash colour from skin", () => catcherArea.MovableCatcher.Colour == TestSkin.CustomHyperDashColour);
-            AddAssert("catcher trails use hyper-dash colour from skin", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == TestSkin.CustomHyperDashColour));
-
-            AddStep("clear hyper-dash", () =>
-            {
-                catcherArea.MovableCatcher.SetHyperDashState(1);
-                catcherArea.MovableCatcher.FinishTransforms();
-            });
-
-            AddAssert("hyper-dash colour cleared from catcher", () => catcherArea.MovableCatcher.Colour == Color4.White);
-        }
-
-        [Test]
-        public void TestHyperDashCatcherEndGlowColour()
-        {
-            CatcherArea catcherArea = null;
-
-            AddStep("setup catcher", () =>
-            {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea
-                {
-                    RelativePositionAxes = Axes.None,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(4f),
-                }, false, false, false);
-            });
-
-            AddStep("start hyper-dashing", () => catcherArea.MovableCatcher.SetHyperDashState(2));
-            AddAssert("end-glow catcher sprite has default hyper-dash colour", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == Catcher.DefaultHyperDashColour));
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestCustomHyperDashCatcherEndGlowColour(bool customHyperDashCatcherColour)
-        {
-            CatcherArea catcherArea = null;
-
-            AddStep("setup catcher", () =>
-            {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea
-                {
-                    RelativePositionAxes = Axes.None,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(4f),
-                }, customHyperDashCatcherColour, true, false);
-            });
-
-            AddStep("start hyper-dashing", () => catcherArea.MovableCatcher.SetHyperDashState(2));
-            AddAssert("end-glow catcher sprite use its hyper-dash colour from skin", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == TestSkin.CustomHyperDashAfterColour));
-        }
-
-        [Test]
-        public void TestCustomHyperDashCatcherEndGlowColourFallback()
-        {
-            CatcherArea catcherArea = null;
-
-            AddStep("setup catcher", () =>
-            {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea
-                {
-                    RelativePositionAxes = Axes.None,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(4f),
-                }, true, false, false);
-            });
-
-            AddStep("start hyper-dashing", () => catcherArea.MovableCatcher.SetHyperDashState(2));
-            AddAssert("end-glow catcher sprite colour falls back to catcher colour from skin", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == TestSkin.CustomHyperDashColour));
-        }
-
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestHyperDashFruitColour(bool legacyFruit)
+        private void checkHyperDashFruitColour(ISkin skin, Color4 expectedColour)
         {
             DrawableFruit drawableFruit = null;
 
-            AddStep("setup hyper-dash fruit", () =>
+            AddStep("create hyper-dash fruit", () =>
             {
                 var fruit = new Fruit { HyperDashTarget = new Banana() };
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -176,130 +158,50 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(4f),
-                }, false, false, false, legacyFruit);
+                }, skin);
             });
 
-            AddAssert("hyper-dash fruit has default colour", () =>
-                legacyFruit
-                    ? checkLegacyFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour)
-                    : checkFruitHyperDashColour(drawableFruit, Catcher.DefaultHyperDashColour));
+            AddAssert("hyper-dash colour is correct", () => checkLegacyFruitHyperDashColour(drawableFruit, expectedColour));
         }
 
-        [TestCase(false, true)]
-        [TestCase(false, false)]
-        [TestCase(true, true)]
-        [TestCase(true, false)]
-        public void TestCustomHyperDashFruitColour(bool legacyFruit, bool customCatcherHyperDashColour)
+        private Drawable setupSkinHierarchy(Drawable child, ISkin skin)
         {
-            DrawableFruit drawableFruit = null;
+            var legacySkinProvider = new SkinProvidingContainer(skins.GetSkin(DefaultLegacySkin.Info));
+            var testSkinProvider = new SkinProvidingContainer(skin);
+            var legacySkinTransformer = new SkinProvidingContainer(new CatchLegacySkinTransformer(testSkinProvider));
 
-            AddStep("setup hyper-dash fruit", () =>
-            {
-                var fruit = new Fruit { HyperDashTarget = new Banana() };
-                fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
-                Child = setupSkinHierarchy(drawableFruit = new DrawableFruit(fruit)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(4f),
-                }, customCatcherHyperDashColour, false, true, legacyFruit);
-            });
-
-            AddAssert("hyper-dash fruit use fruit colour from skin", () =>
-                legacyFruit
-                    ? checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour)
-                    : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashFruitColour));
+            return legacySkinProvider
+                .WithChild(testSkinProvider
+                    .WithChild(legacySkinTransformer
+                        .WithChild(child)));
         }
-
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestCustomHyperDashFruitColourFallback(bool legacyFruit)
-        {
-            DrawableFruit drawableFruit = null;
-
-            AddStep("setup hyper-dash fruit", () =>
-            {
-                var fruit = new Fruit { HyperDashTarget = new Banana() };
-                fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
-                Child = setupSkinHierarchy(
-                    drawableFruit = new DrawableFruit(fruit)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(4f),
-                    }, true, false, false, legacyFruit);
-            });
-
-            AddAssert("hyper-dash fruit colour falls back to catcher colour from skin", () =>
-                legacyFruit
-                    ? checkLegacyFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour)
-                    : checkFruitHyperDashColour(drawableFruit, TestSkin.CustomHyperDashColour));
-        }
-
-        private Drawable setupSkinHierarchy(Drawable child, bool customCatcherColour, bool customAfterColour, bool customFruitColour, bool legacySkin = true)
-        {
-            var testSkinProvider = new SkinProvidingContainer(new TestSkin(customCatcherColour, customAfterColour, customFruitColour));
-
-            if (legacySkin)
-            {
-                var legacySkinProvider = new SkinProvidingContainer(skins.GetSkin(DefaultLegacySkin.Info));
-                var legacySkinTransformer = new SkinProvidingContainer(new CatchLegacySkinTransformer(testSkinProvider));
-
-                return legacySkinProvider
-                    .WithChild(testSkinProvider
-                        .WithChild(legacySkinTransformer
-                            .WithChild(child)));
-            }
-
-            return testSkinProvider.WithChild(child);
-        }
-
-        private bool checkFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour) =>
-            fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Circle>().Single(c => c.BorderColour == expectedColour).Any(d => d.Colour == expectedColour);
 
         private bool checkLegacyFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour) =>
             fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Sprite>().Any(c => c.Colour == expectedColour);
 
-        private class TestSkin : ISkin
+        private class TestSkin : LegacySkin
         {
-            public static Color4 CustomHyperDashColour { get; } = Color4.Goldenrod;
-            public static Color4 CustomHyperDashFruitColour { get; } = Color4.Cyan;
-            public static Color4 CustomHyperDashAfterColour { get; } = Color4.Lime;
-
-            private readonly bool customCatcherColour;
-            private readonly bool customAfterColour;
-            private readonly bool customFruitColour;
-
-            public TestSkin(bool customCatcherColour, bool customAfterColour, bool customFruitColour)
+            public Color4 HyperDashColour
             {
-                this.customCatcherColour = customCatcherColour;
-                this.customAfterColour = customAfterColour;
-                this.customFruitColour = customFruitColour;
+                get => Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()];
+                set => Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()] = value;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => null;
-
-            public Texture GetTexture(string componentName) => null;
-
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
-
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+            public Color4 HyperDashAfterImageColour
             {
-                if (lookup is CatchSkinColour config)
-                {
-                    if (config == CatchSkinColour.HyperDash && customCatcherColour)
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashColour));
+                get => Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()];
+                set => Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()] = value;
+            }
 
-                    if (config == CatchSkinColour.HyperDashFruit && customFruitColour)
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashFruitColour));
+            public Color4 HyperDashFruitColour
+            {
+                get => Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()];
+                set => Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()] = value;
+            }
 
-                    if (config == CatchSkinColour.HyperDashAfterImage && customAfterColour)
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(CustomHyperDashAfterColour));
-                }
-
-                return null;
+            public TestSkin()
+                : base(new SkinInfo(), null, null, string.Empty)
+            {
             }
         }
     }
