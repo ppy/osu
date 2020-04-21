@@ -119,27 +119,30 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             loadBeatmaps();
             checkNoSelection();
-            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
+            setRecommendationFunction();
             advanceSelection(direction: 1, diff: false);
             waitForSelection(1, 2);
 
             loadBeatmaps();
             checkNoSelection();
-            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
+            setRecommendationFunction();
             advanceSelection(direction: 1, diff: true);
             waitForSelection(1, 1);
 
             loadBeatmaps();
             checkNoSelection();
-            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
+            setRecommendationFunction();
             advanceSelection(direction: -1, diff: false);
             waitForSelection(set_count, 2);
 
             loadBeatmaps();
             checkNoSelection();
-            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
+            setRecommendationFunction();
             advanceSelection(direction: -1, diff: true);
             waitForSelection(set_count, 3);
+
+            void setRecommendationFunction()
+                => AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
         }
 
         [TestCase(true)]
