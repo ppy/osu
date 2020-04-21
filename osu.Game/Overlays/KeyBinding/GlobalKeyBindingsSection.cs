@@ -16,9 +16,19 @@ namespace osu.Game.Overlays.KeyBinding
         {
             Add(new DefaultBindingsSubsection(manager));
             Add(new AudioControlKeyBindingsSubsection(manager));
+            Add(new MvisBindingsSection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
         }
+        private class MvisBindingsSection : KeyBindingsSubsection
+        {
+            protected override string Header => "Mvis播放器";
 
+            public MvisBindingsSection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.MvisControlKeyBindings;
+            }
+        }
         private class DefaultBindingsSubsection : KeyBindingsSubsection
         {
             protected override string Header => string.Empty;

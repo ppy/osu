@@ -486,3 +486,36 @@
     *   [o] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
 
 *   修复了在Mvis播放器界面导入并查看谱面会导致游戏崩溃的问题
+
+### 2020/4/20
+*   合并上游pr
+    *   [m] [Add support for custom hyper-dash legacy fruit colouring #8446]
+    *   [m] [Fix slider heads not being blocked when hit out-of-order #8777]
+    *   [m] [Fix typo in exception #8808]
+    *   [m] [Fix DatabasedKeyBindingContainer not using defaults for non-databased ruleset #8806]
+    *   [m] [Add /np (now playing) command support in chat #8801]
+    *   [m] [Fix hard crash in editor on legacy modes without encoder implementation #8788]
+    *   [m] [Fix presenting new ruleset and beatmap at once causing wedge display desync #8779]
+
+### 2020/4/21
+*   合并上游pr
+    *   [m] [Bump Humanizer from 2.7.9 to 2.8.2 #8811]
+    *   [m] [Fix spinners being considered the "first object" for increased visibility in hidden #8769]
+    *   [m] [Replace SocialOverlay with DashboardOverlay #8771]
+    *   [m] [Fix inline executions of APIRequest.Perform not getting result populated early enough #8810]
+    *   [m] [Let beatmap carousel scroll to screen middle #8728]
+    *   [m] [Allow 10k to be played on a single stage #8809]
+    *   [m] [Add taiko drumroll skinning support #8766]
+    *   [m] [Fix results screen pushed after rewinding in-between push delay #8800]
+    *   [m] [Don't serialise AllControlPoints #8814]
+    *   [m] [Fix carousel not correctly updating when selection changes to a new beatmap from a child screen #8772]
+    *   [m] [Fix control point overriding working incorrectly #8815]
+    *   [m] [Implement sorting by genre and language in BeatmapListingOverlay #7924]
+    *   [m] [Implement ColumnLineWidth skinning #8822]
+    *   [m] [Fix relax replays playing back incorrectly #8819]
+    *   [m] [Fix BeatmapListingOverlay not taking focus #8820]
+    *   [m] [Add support for taiko hit target skinning #8824]
+    *   [m] [Replace direct overlay with new beatmaplisting overlay #8821]
+    *   [m] [Update framework #8825]
+
+*   实现了Mvis播放器的键位绑定、单曲循环、锁定以及在选歌界面中查看歌曲的功能

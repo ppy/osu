@@ -11,9 +11,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public class PanelDownloadButton : BeatmapDownloadTrackingComposite
+    public class BeatmapPanelDownloadButton : BeatmapDownloadTrackingComposite
     {
         protected bool DownloadEnabled => button.Enabled.Value;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Direct
         private readonly DownloadButton button;
         private Bindable<bool> noVideoSetting;
 
-        public PanelDownloadButton(BeatmapSetInfo beatmapSet)
+        public BeatmapPanelDownloadButton(BeatmapSetInfo beatmapSet)
             : base(beatmapSet)
         {
             InternalChild = shakeContainer = new ShakeContainer
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Direct
             if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
             {
                 button.Enabled.Value = false;
-                button.TooltipText = "该谱面暂时无法下载...";
+                button.TooltipText = "this beatmap is currently not available for download.";
                 return;
             }
 

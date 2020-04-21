@@ -28,3 +28,12 @@
 * 相关文件
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
 
+### 2020/04/20
+* 描述 : 修复`MvisScreen`在Tests中的音频播放问题
+* 相关文件
+    *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
+    *   [TestSceneMvisScreen.cs](osu.Game.Tests/Visual/UserInterface/TestSceneMvisScreen.cs)
+
+* 描述 : ~~添加`MvisScreen`的键位绑定支持~~(已解决)
+* 相关文件
+    *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)

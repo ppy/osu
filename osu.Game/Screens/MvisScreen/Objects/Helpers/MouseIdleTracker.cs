@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Mvis.Objects.Helpers
