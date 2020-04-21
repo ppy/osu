@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             additiveTarget?.AddRange(new[]
             {
-                dashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Color4.White },
+                dashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both },
                 hyperDashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = hyperDashColour },
                 endGlowSprites = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = hyperDashEndGlowColour }
             });
