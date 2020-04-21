@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 StartTime = EndTime,
                 Column = Column,
-                Samples = getNodeSamples(1),
+                Samples = getNodeSamples((NodeSamples?.Count - 1) ?? 1),
             });
         }
 
