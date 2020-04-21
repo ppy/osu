@@ -160,41 +160,20 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
+                // If the group contains a timing control point, it needs to be output separately.
                 if (groupTimingPoint != null)
                 {
-                    // The timing point always needs to be output.
-                    handleTimingControlPoint(writer, groupTimingPoint);
+                    writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
+                    writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
+                    outputControlPointEffectsAt(writer, groupTimingPoint.Time, true);
+                }
 
-                    // A difficulty point may be added alongside all timing points, provided the speed adjustment isn't redundant.
-                    // The two control points can be output together in all cases without issue, however for the resultant
-                    // output to remain as close to the original beatmap as possible, the difficulty point is only output if it's non-default.
-                    var groupDifficultyPoint = group.ControlPoints.OfType<DifficultyControlPoint>().FirstOrDefault();
-                    if (groupDifficultyPoint != null && groupDifficultyPoint.SpeedMultiplier != 1)
-                        handleNonTimingControlPointAt(writer, groupDifficultyPoint.Time);
-                }
-                else
-                {
-                    // If there is no timing point, we still need to output a difficulty point along with all other control points.
-                    // We cannot rely on the group containing a difficulty point as it may have been determined to be redundant, so a separate search is done to find the last difficulty point.
-                    handleNonTimingControlPointAt(writer, group.Time);
-                }
+                // Output any remaining effects as secondary non-timing control point.
+                var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(group.Time);
+                writer.Write(FormattableString.Invariant($"{group.Time},"));
+                writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
+                outputControlPointEffectsAt(writer, group.Time, false);
             }
-        }
-
-        private void handleTimingControlPoint(TextWriter writer, TimingControlPoint timingPoint)
-        {
-            writer.Write(FormattableString.Invariant($"{timingPoint.Time},"));
-            writer.Write(FormattableString.Invariant($"{timingPoint.BeatLength},"));
-            outputControlPointEffectsAt(writer, timingPoint.Time, true);
-        }
-
-        private void handleNonTimingControlPointAt(TextWriter writer, double time)
-        {
-            var difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
-
-            writer.Write(FormattableString.Invariant($"{time},"));
-            writer.Write(FormattableString.Invariant($"{-100 / difficultyPoint.SpeedMultiplier},"));
-            outputControlPointEffectsAt(writer, time, false);
         }
 
         private void outputControlPointEffectsAt(TextWriter writer, double time, bool isTimingPoint)
