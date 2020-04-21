@@ -6,17 +6,17 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarDirectButton : ToolbarOverlayToggleButton
+    public class ToolbarBeatmapListingButton : ToolbarOverlayToggleButton
     {
-        public ToolbarDirectButton()
+        public ToolbarBeatmapListingButton()
         {
             SetIcon(OsuIcon.ChevronDownCircle);
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct)
+        private void load(BeatmapListingOverlay beatmapListing)
         {
-            StateContainer = direct;
+            StateContainer = beatmapListing;
         }
     }
 }
