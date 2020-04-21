@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     public abstract class TaikoSkinnableTestScene : SkinnableTestScene
     {

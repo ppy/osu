@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Skinning;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
     public class TestSceneDrawableHit : TaikoSkinnableTestScene
@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             typeof(DrawableCentreHit),
             typeof(DrawableRimHit),
             typeof(LegacyHit),
+            typeof(LegacyCirclePiece),
         }).ToList();
 
         [BackgroundDependencyLoader]
