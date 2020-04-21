@@ -112,27 +112,32 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count, 3);
         }
 
+        [Test]
         public void TestTraversalWhenNull()
         {
             // This is testing behaviour when carousel root doesn't do eager selection. This is only happens in testing.
 
             loadBeatmaps();
             checkNoSelection();
+            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
             advanceSelection(direction: 1, diff: false);
-            waitForSelection(1, 1);
+            waitForSelection(1, 2);
 
             loadBeatmaps();
             checkNoSelection();
+            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
             advanceSelection(direction: 1, diff: true);
             waitForSelection(1, 1);
 
             loadBeatmaps();
             checkNoSelection();
+            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
             advanceSelection(direction: -1, diff: false);
-            waitForSelection(set_count, 3);
+            waitForSelection(set_count, 2);
 
             loadBeatmaps();
             checkNoSelection();
+            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.Skip(1).FirstOrDefault());
             advanceSelection(direction: -1, diff: true);
             waitForSelection(set_count, 3);
         }
