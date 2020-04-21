@@ -398,7 +398,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => AllJudged && base.UpdateSubTreeMasking(source, maskingBounds);
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
         protected override void UpdateAfterChildren()
         {

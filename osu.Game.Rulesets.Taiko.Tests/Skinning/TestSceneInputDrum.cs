@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Rulesets.Taiko.UI;
+using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     [TestFixture]
     public class TestSceneInputDrum : TaikoSkinnableTestScene
