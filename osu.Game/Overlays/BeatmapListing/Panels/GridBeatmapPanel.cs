@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {
-    public class BeatmapPanelGrid : BeatmapPanel
+    public class GridBeatmapPanel : BeatmapPanel
     {
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public BeatmapPanelGrid(BeatmapSetInfo beatmap)
+        public GridBeatmapPanel(BeatmapSetInfo beatmap)
             : base(beatmap)
         {
             Width = 380;
