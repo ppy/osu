@@ -65,7 +65,7 @@ namespace osu.Game
 
         private NowPlayingOverlay nowPlaying;
 
-        private DirectOverlay direct;
+        private BeatmapListingOverlay beatmapListing;
 
         private DashboardOverlay dashboard;
 
@@ -610,7 +610,7 @@ namespace osu.Game
             loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
-            loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
@@ -670,7 +670,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, dashboard, direct, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -865,7 +865,7 @@ namespace osu.Game
                     return true;
 
                 case GlobalAction.ToggleDirect:
-                    direct.ToggleVisibility();
+                    beatmapListing.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:
