@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModEasy : ModEasy
     {
-        public override string Description => @"Larger hit area, more forgiving HP drain, less accuracy required, and three lives!";
+        public override string Description => @"更大的接盘,更少的扣血,更低的准确率要求,并且拥有额外生命!";
     }
 }

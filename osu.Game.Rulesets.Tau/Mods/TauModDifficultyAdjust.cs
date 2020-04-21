@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("Paddle Size", "Override a beatmap's set PS.")]
+        [SettingSource("接盘大小", "Override a beatmap's set PS.")]
         public BindableNumber<float> PaddleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Tau.Mods
             Value = 5,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.")]
+        [SettingSource("移动速度", "Override a beatmap's set AR.")]
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,

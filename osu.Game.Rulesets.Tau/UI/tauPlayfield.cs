@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Tau.UI
         public const float UNIVERSAL_SCALE = 0.6f;
         public static readonly Vector2 BASE_SIZE = new Vector2(768, 768);
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         public TauPlayfield(BeatmapDifficulty difficulty)
         {
             cursor = new TauCursor(difficulty);

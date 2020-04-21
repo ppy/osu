@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TauHitObject>
     {
-        public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
+        public override string Description => @"你不用点击,只需移动,让你用来点击的手指放松一下";
 
         public void Update(Playfield playfield)
         {
