@@ -4,32 +4,29 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Screens.Mvis.UI
 {
     public class BottomBar : Container
     {
-        public readonly Bindable<bool> panel_IsHovered = new Bindable<bool>();
-        private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 60);
+        public readonly Bindable<bool> bar_IsHovered = new Bindable<bool>();
         public BottomBar()
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.X;
-            Height = BOTTOMPANEL_SIZE.Y;
+            Height = 50;
             Alpha = 0;
         }
         protected override bool OnHover(Framework.Input.Events.HoverEvent e)
         {
-            this.panel_IsHovered.Value = true;
+            this.bar_IsHovered.Value = true;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(Framework.Input.Events.HoverLostEvent e)
         {
-            this.panel_IsHovered.Value = false;
+            this.bar_IsHovered.Value = false;
             base.OnHoverLost(e);
         }
     }

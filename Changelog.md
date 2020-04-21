@@ -517,3 +517,5 @@
     *   [m] [Add support for taiko hit target skinning #8824]
     *   [m] [Replace direct overlay with new beatmaplisting overlay #8821]
     *   [m] [Update framework #8825]
+
+*   实现了Mvis播放器的键位绑定、单曲循环、锁定以及在选歌界面中查看歌曲的功能
