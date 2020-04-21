@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSearchHandler : CompositeDrawable
+    public class BeatmapListingFilterControl : CompositeDrawable
     {
         public Action<List<BeatmapSetInfo>> SearchFinished;
         public Action SearchStarted;
@@ -32,13 +32,13 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private readonly BeatmapListingSearchSection searchSection;
+        private readonly BeatmapListingSearchControl searchControl;
         private readonly BeatmapListingSortTabControl sortControl;
         private readonly Box sortControlBackground;
 
         private SearchBeatmapSetsRequest getSetsRequest;
 
-        public BeatmapListingSearchHandler()
+        public BeatmapListingFilterControl()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             Radius = 3,
                             Offset = new Vector2(0f, 1f),
                         },
-                        Child = searchSection = new BeatmapListingSearchSection(),
+                        Child = searchControl = new BeatmapListingSearchControl(),
                     },
                     new Container
                     {
@@ -99,17 +99,17 @@ namespace osu.Game.Overlays.BeatmapListing
             var sortCriteria = sortControl.Current;
             var sortDirection = sortControl.SortDirection;
 
-            searchSection.Query.BindValueChanged(query =>
+            searchControl.Query.BindValueChanged(query =>
             {
                 sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
                 sortDirection.Value = SortDirection.Descending;
                 queueUpdateSearch(true);
             });
 
-            searchSection.Ruleset.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Category.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Genre.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Language.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Ruleset.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Category.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
@@ -129,13 +129,13 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void updateSearch()
         {
-            getSetsRequest = new SearchBeatmapSetsRequest(searchSection.Query.Value, searchSection.Ruleset.Value)
+            getSetsRequest = new SearchBeatmapSetsRequest(searchControl.Query.Value, searchControl.Ruleset.Value)
             {
-                SearchCategory = searchSection.Category.Value,
+                SearchCategory = searchControl.Category.Value,
                 SortCriteria = sortControl.Current.Value,
                 SortDirection = sortControl.SortDirection.Value,
-                Genre = searchSection.Genre.Value,
-                Language = searchSection.Language.Value
+                Genre = searchControl.Genre.Value,
+                Language = searchControl.Language.Value
             };
 
             getSetsRequest.Success += response => Schedule(() => onSearchFinished(response));
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
-            searchSection.BeatmapSet = response.Total == 0 ? null : beatmaps.First();
+            searchControl.BeatmapSet = response.Total == 0 ? null : beatmaps.First();
 
             SearchFinished?.Invoke(beatmaps);
         }

@@ -17,7 +17,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSearchSection : CompositeDrawable
+    public class BeatmapListingSearchControl : CompositeDrawable
     {
         public Bindable<string> Query => textBox.Current;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
 
-        public BeatmapListingSearchSection()
+        public BeatmapListingSearchControl()
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;

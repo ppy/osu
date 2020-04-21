@@ -57,7 +57,7 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             new BeatmapListingHeader(),
-                            new BeatmapListingSearchHandler
+                            new BeatmapListingFilterControl
                             {
                                 SearchStarted = onSearchStarted,
                                 SearchFinished = onSearchFinished,
