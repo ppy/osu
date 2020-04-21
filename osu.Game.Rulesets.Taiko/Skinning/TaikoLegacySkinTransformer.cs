@@ -49,6 +49,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.DrumRollTick:
                     return this.GetAnimation("sliderscorepoint", false, false);
+
+                case TaikoSkinComponents.HitTarget:
+                    if (GetTexture("taikobigcircle") != null)
+                        return new LegacyHitTarget();
+
+                    return null;
             }
 
             return source.GetDrawableComponent(component);
