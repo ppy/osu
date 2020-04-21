@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
@@ -31,11 +34,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var decoded = decode(name, out var encoded);
 
-            string encodedSerialised = encoded.Serialize();
-            string decodedSerialised = decoded.Serialize();
+            sort(decoded);
+            sort(encoded);
 
-            Assert.That(encoded.HitObjects.Count, Is.EqualTo(decoded.HitObjects.Count));
-            Assert.That(encodedSerialised, Is.EqualTo(decodedSerialised));
+            var decodedSerialized = decoded.Serialize();
+            var encodedSerialized = encoded.Serialize();
+
+            Assert.That(encodedSerialized, Is.EqualTo(decodedSerialized));
+        }
+
+        private void sort(IBeatmap beatmap)
+        {
+            // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
+            foreach (var g in beatmap.ControlPointInfo.Groups)
+            {
+                ArrayList.Adapter((IList)g.ControlPoints).Sort(
+                    Comparer<ControlPoint>.Create((c1, c2) => string.Compare(c1.GetType().ToString(), c2.GetType().ToString(), StringComparison.Ordinal)));
+            }
         }
 
         private IBeatmap decode(string filename, out IBeatmap encoded)
@@ -97,9 +112,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override IBeatmap GetBeatmap() => beatmap;
 
-            protected override Texture GetBackground() => throw new System.NotImplementedException();
+            protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new System.NotImplementedException();
+            protected override Track GetTrack() => throw new NotImplementedException();
         }
     }
 }
