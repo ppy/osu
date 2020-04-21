@@ -340,7 +340,7 @@ namespace osu.Game.Beatmaps.Formats
                     if (beatmap.BeatmapInfo.RulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else
-                        type |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
+                        type |= LegacyHitObjectType.Spinner;
                     break;
 
                 default:
