@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasEndTime, IHasCurve
+    public class DrumRoll : TaikoHitObject, IHasCurve
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
