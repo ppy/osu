@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestTraversalWhenNull()
+        public void TestInitialSelection()
         {
             // This is testing behaviour when carousel root doesn't do eager selection. This is only happens in testing.
 
