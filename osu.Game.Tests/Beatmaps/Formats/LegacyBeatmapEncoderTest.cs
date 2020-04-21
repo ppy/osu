@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
@@ -30,8 +32,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var decoded = decode(name, out var encoded);
 
-            Assert.That(decoded.HitObjects.Count, Is.EqualTo(encoded.HitObjects.Count));
+            sort(decoded);
+            sort(encoded);
+
             Assert.That(encoded.Serialize(), Is.EqualTo(decoded.Serialize()));
+        }
+
+        private void sort(IBeatmap beatmap)
+        {
+            // Sort control points to ensure a sane ordering, as they may be parsed in different orders. This works because each group contains only uniquely-typed control points.
+            foreach (var g in beatmap.ControlPointInfo.Groups)
+            {
+                ArrayList.Adapter((IList)g.ControlPoints).Sort(
+                    Comparer<ControlPoint>.Create((c1, c2) => string.Compare(c1.GetType().ToString(), c2.GetType().ToString(), StringComparison.Ordinal)));
+            }
         }
 
         private IBeatmap decode(string filename, out IBeatmap encoded)
