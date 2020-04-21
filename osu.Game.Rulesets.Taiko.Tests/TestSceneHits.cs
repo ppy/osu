@@ -24,7 +24,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneTaikoPlayfield : OsuTestScene
+    public class TestSceneHits : OsuTestScene
     {
         private const double default_duration = 1000;
         private const float scroll_time = 1000;
