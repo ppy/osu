@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
@@ -24,7 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, BeatmapSearchCategory>
+    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, SearchCategory>
     {
         private const float panel_padding = 10f;
 
@@ -40,7 +41,8 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => Color4Extensions.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<DirectSortCriteria, SearchCategory> CreateFilterControl() => new FilterControl();
+
         private IEnumerable<BeatmapSetInfo> beatmapSets;
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
@@ -254,11 +256,11 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            getSetsRequest = new SearchBeatmapSetsRequest(
-                currentQuery.Value,
-                ((FilterControl)Filter).Ruleset.Value,
-                Filter.DisplayStyleControl.Dropdown.Current.Value,
-                Filter.Tabs.Current.Value); //todo: sort direction (?)
+            getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value, ((FilterControl)Filter).Ruleset.Value)
+            {
+                SearchCategory = Filter.DisplayStyleControl.Dropdown.Current.Value,
+                SortCriteria = Filter.Tabs.Current.Value
+            };
 
             getSetsRequest.Success += response =>
             {

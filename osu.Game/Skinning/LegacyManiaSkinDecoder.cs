@@ -74,7 +74,7 @@ namespace osu.Game.Skinning
                 switch (pair.Key)
                 {
                     case "ColumnLineWidth":
-                        parseArrayValue(pair.Value, currentConfig.ColumnLineWidth);
+                        parseArrayValue(pair.Value, currentConfig.ColumnLineWidth, false);
                         break;
 
                     case "ColumnSpacing":
@@ -124,7 +124,7 @@ namespace osu.Game.Skinning
             pendingLines.Clear();
         }
 
-        private void parseArrayValue(string value, float[] output)
+        private void parseArrayValue(string value, float[] output, bool applyScaleFactor = true)
         {
             string[] values = value.Split(',');
 
@@ -133,7 +133,7 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
             }
         }
     }

@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = leftLineWidth,
+                    Scale = new Vector2(0.740f, 1),
                     Colour = lineColour,
                     Alpha = hasLeftLine ? 1 : 0
                 },
@@ -75,6 +76,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
+                    Scale = new Vector2(0.740f, 1),
                     Width = rightLineWidth,
                     Colour = lineColour,
                     Alpha = hasRightLine ? 1 : 0
