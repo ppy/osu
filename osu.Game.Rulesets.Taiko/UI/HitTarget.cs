@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public HitTarget()
         {
+            RelativeSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
                 new Box
