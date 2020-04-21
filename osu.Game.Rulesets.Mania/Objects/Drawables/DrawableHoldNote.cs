@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public override void PlaySamples()
         {
-            // The hold note does not play samples itself.
+            // Samples are played by the head/tail notes.
         }
 
         protected override void Update()
