@@ -21,7 +21,18 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings);
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(MvisControlKeyBindings);
+
+        public IEnumerable<KeyBinding> MvisControlKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.Left, GlobalAction.MvisMusicPrev),
+            new KeyBinding(InputKey.Right, GlobalAction.MvisMusicNext),
+            new KeyBinding(InputKey.Space, GlobalAction.MvisTogglePause),
+            new KeyBinding(InputKey.Tab, GlobalAction.MvisToggleOverlayLock),
+            new KeyBinding(InputKey.Menu, GlobalAction.MvisTogglePlayList),
+            new KeyBinding(InputKey.L, GlobalAction.MvisToggleTrackLoop),
+            new KeyBinding(InputKey.Enter, GlobalAction.MvisOpenInSongSelect),
+        };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -150,5 +161,20 @@ namespace osu.Game.Input.Bindings
 
         [Description("音量减")]
         SelectNext,
+
+        [Description("上一首")]
+        MvisMusicPrev,
+        [Description("下一首")]
+        MvisMusicNext,
+        [Description("暂停/播放")]
+        MvisTogglePause,
+        [Description("切换锁定")]
+        MvisToggleOverlayLock,
+        [Description("切换播放列表")]
+        MvisTogglePlayList,
+        [Description("切换单曲循环")]
+        MvisToggleTrackLoop,
+        [Description("在歌曲选择中打开")]
+        MvisOpenInSongSelect,
     }
 }

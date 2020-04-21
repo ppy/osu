@@ -34,6 +34,6 @@
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
     *   [TestSceneMvisScreen.cs](osu.Game.Tests/Visual/UserInterface/TestSceneMvisScreen.cs)
 
-* 描述 : 添加`MvisScreen`的键位绑定支持
+* 描述 : ~~添加`MvisScreen`的键位绑定支持~~(已解决)
 * 相关文件
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)

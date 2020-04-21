@@ -23,16 +23,17 @@ using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
-using osuTK.Input;
 using osu.Game.Overlays.Music;
 using osu.Framework.Audio.Track;
+using osu.Game.Input.Bindings;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Screens
 {
     /// <summary>
     /// 缝合怪 + 奥利给山警告
     /// </summary>
-    public class MvisScreen : OsuScreen
+    public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         private const float DURATION = 750;
         protected const float BACKGROUND_BLUR = 20;
@@ -312,42 +313,44 @@ namespace osu.Game.Screens
             return base.OnExiting(next);
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(GlobalAction action)
         {
-            if (e.Repeat) return false;
-
-            switch (e.Key)
+            switch (action)
             {
-                case Key.Right:
-                    musicController.NextTrack();
-                    return true;
-
-                case Key.Left:
+                case GlobalAction.MvisMusicPrev:
                     musicController.PreviousTrack();
                     return true;
 
-                case Key.Space:
+                case GlobalAction.MvisMusicNext:
+                    musicController.NextTrack();
+                    return true;
+
+                case GlobalAction.MvisTogglePause:
                     musicController.TogglePause();
                     return true;
 
-                case Key.Menu:
+                case GlobalAction.MvisTogglePlayList:
                     playlist.ToggleVisibility();
                     return true;
 
-                case Key.Enter:
+                case GlobalAction.MvisOpenInSongSelect:
                     InvokeSolo();
                     return true;
 
-                case Key.Tab:
+                case GlobalAction.MvisToggleOverlayLock:
                     lockButton.Toggle();
                     return true;
 
-                case Key.L:
+                case GlobalAction.MvisToggleTrackLoop:
                     loopToggleButton.Toggle();
                     return true;
             }
 
-            return base.OnKeyDown(e);
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         private void InvokeSolo()
