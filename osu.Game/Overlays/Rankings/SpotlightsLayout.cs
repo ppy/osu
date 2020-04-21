@@ -12,10 +12,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
-using osu.Game.Overlays.Direct;
 using System.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.BeatmapListing.Panels;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Rankings
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(10),
-                    Children = response.BeatmapSets.Select(b => new DirectGridPanel(b.ToBeatmapSet(rulesets))
+                    Children = response.BeatmapSets.Select(b => new BeatmapPanelGrid(b.ToBeatmapSet(rulesets))
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
