@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Select
 
             if (selectedBeatmapSet == null || selectedBeatmap == null)
             {
-                selectNextWhenNull(direction, false);
+                selectNextWhenNull(direction, skipDifficulties);
                 return;
             }
 
@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Select
 
         private void selectNextWhenNull(int direction, bool skipDifficulties)
         {
-            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
+            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value);
             CarouselItem toSelect = direction > 0 ? unfilteredSets.First() : unfilteredSets.Last();
 
             if (!skipDifficulties)
