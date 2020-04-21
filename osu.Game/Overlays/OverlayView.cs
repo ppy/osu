@@ -9,29 +9,24 @@ using osu.Game.Online.API;
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// Drawable which used to represent online content in <see cref="FullscreenOverlay"/>.
+    /// A subview containing online content, to be displayed inside a <see cref="FullscreenOverlay"/>.
     /// </summary>
-    /// <typeparam name="T">Response type</typeparam>
-    public abstract class OverlayView<T> : Container, IOnlineComponent
+    /// <remarks>
+    /// Automatically performs a data fetch on load.
+    /// </remarks>
+    /// <typeparam name="T">The type of the API response.</typeparam>
+    public abstract class OverlayView<T> : CompositeDrawable, IOnlineComponent
         where T : class
     {
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected override Container<Drawable> Content => content;
-
-        private readonly FillFlowContainer content;
+        private APIRequest<T> request;
 
         protected OverlayView()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            AddInternal(content = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            });
         }
 
         protected override void LoadComplete()
@@ -40,20 +35,36 @@ namespace osu.Game.Overlays
             API.Register(this);
         }
 
-        private APIRequest<T> request;
-
+        /// <summary>
+        /// Create the API request for fetching data.
+        /// </summary>
         protected abstract APIRequest<T> CreateRequest();
 
+        /// <summary>
+        /// Fired when results arrive from the main API request.
+        /// </summary>
+        /// <param name="response"></param>
         protected abstract void OnSuccess(T response);
+
+        /// <summary>
+        /// Force a re-request for data from the API.
+        /// </summary>
+        protected void PerformFetch()
+        {
+            request?.Cancel();
+
+            request = CreateRequest();
+            request.Success += response => Schedule(() => OnSuccess(response));
+
+            API.Queue(request);
+        }
 
         public virtual void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {
                 case APIState.Online:
-                    request = CreateRequest();
-                    request.Success += response => Schedule(() => OnSuccess(response));
-                    api.Queue(request);
+                    PerformFetch();
                     break;
             }
         }
