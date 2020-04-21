@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset, ILegacyRuleset
     {
+        /// <summary>
+        /// The maximum number of supported keys in a single stage.
+        /// </summary>
+        public const int MAX_STAGE_KEYS = 10;
+
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
@@ -251,9 +256,9 @@ namespace osu.Game.Rulesets.Mania
         {
             get
             {
-                for (int i = 1; i <= 10; i++)
+                for (int i = 1; i <= MAX_STAGE_KEYS; i++)
                     yield return (int)PlayfieldType.Single + i;
-                for (int i = 2; i <= 20; i += 2)
+                for (int i = 2; i <= MAX_STAGE_KEYS * 2; i += 2)
                     yield return (int)PlayfieldType.Dual + i;
             }
         }
