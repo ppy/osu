@@ -236,9 +236,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{hitObject.StartTime},"));
             writer.Write(FormattableString.Invariant($"{(int)getObjectType(hitObject)},"));
 
-            writer.Write(hitObject is IHasCurve
-                ? FormattableString.Invariant($"0,")
-                : FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
+            writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
             if (hitObject is IHasCurve curveData)
             {
@@ -427,7 +425,7 @@ namespace osu.Game.Beatmaps.Formats
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank.ToString(CultureInfo.InvariantCulture);
 
-            throw new ArgumentException("Can only encode legacy hit sample infos.", nameof(hitSampleInfo));
+            return "0";
         }
     }
 }
