@@ -23,14 +23,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class LegacyBeatmapEncoderTest
     {
-        private const string normal = "Soleily - Renatus (Gamu) [Insane].osu";
-
         private static IEnumerable<string> allBeatmaps => TestResources.GetStore().GetAvailableResources().Where(res => res.EndsWith(".osu"));
 
         [TestCaseSource(nameof(allBeatmaps))]
-        public void TestDecodeEncodedBeatmap(string name)
+        public void TestBeatmap(string name)
         {
-            var decoded = decode(normal, out var encoded);
+            var decoded = decode(name, out var encoded);
 
             Assert.That(decoded.HitObjects.Count, Is.EqualTo(encoded.HitObjects.Count));
             Assert.That(encoded.Serialize(), Is.EqualTo(decoded.Serialize()));
