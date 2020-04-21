@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
             public bool CheckFailed(bool failed)
             {
                 if (!failed)
-                    return ScoreProcessor.HasCompleted && !HealthProcessor.HasFailed;
+                    return ScoreProcessor.HasCompleted.Value && !HealthProcessor.HasFailed;
 
                 return HealthProcessor.HasFailed;
             }

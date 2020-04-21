@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(PanelDownloadButton)
+            typeof(BeatmapPanelDownloadButton)
         };
 
         private TestDownloadButton downloadButton;
@@ -143,14 +143,14 @@ namespace osu.Game.Tests.Visual.Online
             return beatmap;
         }
 
-        private class TestDownloadButton : PanelDownloadButton
+        private class TestDownloadButton : BeatmapPanelDownloadButton
         {
             public new bool DownloadEnabled => base.DownloadEnabled;
 
             public DownloadState DownloadState => State.Value;
 
-            public TestDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            public TestDownloadButton(BeatmapSetInfo beatmapSet)
+                : base(beatmapSet)
             {
             }
         }
