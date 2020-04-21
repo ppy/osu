@@ -512,3 +512,6 @@
     *   [m] [Fix control point overriding working incorrectly #8815]
     *   [m] [Implement sorting by genre and language in BeatmapListingOverlay #7924]
     *   [m] [Implement ColumnLineWidth skinning #8822]
+    *   [m] [Fix relax replays playing back incorrectly #8819]
+    *   [m] [Fix BeatmapListingOverlay not taking focus #8820]
+    *   [m] [Add support for taiko hit target skinning #8824]

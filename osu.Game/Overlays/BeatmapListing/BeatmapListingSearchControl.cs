@@ -121,6 +121,8 @@ namespace osu.Game.Overlays.BeatmapListing
             background.Colour = colourProvider.Dark6;
         }
 
+        public void TakeFocus() => textBox.TakeFocus();
+
         private class BeatmapSearchTextBox : SearchTextBox
         {
             protected override Color4 SelectionColour => Color4.Gray;

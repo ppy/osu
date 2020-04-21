@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -35,6 +36,8 @@ namespace osu.Game.Overlays
         {
         }
 
+        private BeatmapListingFilterControl filterControl;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -57,7 +60,7 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             new BeatmapListingHeader(),
-                            new BeatmapListingFilterControl
+                            filterControl = new BeatmapListingFilterControl
                             {
                                 SearchStarted = onSearchStarted,
                                 SearchFinished = onSearchFinished,
@@ -86,6 +89,13 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            filterControl.TakeFocus();
         }
 
         private CancellationTokenSource cancellationToken;
