@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             missTP = Math.Max(missTP, 0);
 
             // Combine combo based throughput and miss count based throughput
-            double tp = Math.Pow(comboTP, comboWeight) * Math.Pow(missTP, 1 - comboWeight);
+            double tp = Mean.PowerMean(comboTP, missTP, 20);
 
             // Hidden mod
             if (mods.Any(h => h is OsuModHidden))
