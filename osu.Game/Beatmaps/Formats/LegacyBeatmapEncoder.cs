@@ -242,7 +242,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case IHasEndTime _:
-                    type |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
+                    type |= LegacyHitObjectType.Spinner;
                     break;
 
                 default:
