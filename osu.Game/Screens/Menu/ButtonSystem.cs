@@ -40,7 +40,6 @@ namespace osu.Game.Screens.Menu
 
         public Action OnEdit;
         public Action OnExit;
-        public Action OnDirect;
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMulti;
@@ -138,7 +137,6 @@ namespace osu.Game.Screens.Menu
         {
             buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
             buttonsCustom.Add(new Button(@"Mvis播放器", @"button-generic-select", FontAwesome.Solid.QuoteLeft, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
-            buttonsCustom.Add(new Button(@"谱面在线列表", @"button-generic-select", FontAwesome.Solid.FileDownload, new Color4(0, 86, 73, 255), () => OnBeatmapListing?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
             buttonsPlay.Add(new Button(@"单人游戏", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
@@ -151,7 +149,7 @@ namespace osu.Game.Screens.Menu
 
             buttonsTopLevel.Add(new Button(@"游玩", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new Button(@"osu!编辑器", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"谱面列表", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new Button(@"退出", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));

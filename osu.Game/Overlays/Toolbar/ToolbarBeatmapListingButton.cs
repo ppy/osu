@@ -6,19 +6,19 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarDirectButton : ToolbarOverlayToggleButtonRightSide
+    public class ToolbarBeatmapListingButton : ToolbarOverlayToggleButtonRightSide
     {
-        public ToolbarDirectButton()
+        public ToolbarBeatmapListingButton()
         {
             SetIcon(OsuIcon.ChevronDownCircle);
-            TooltipMain = "osu!direct";
+            TooltipMain = "谱面列表";
             TooltipSub = "在这里下图";
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct)
+        private void load(BeatmapListingOverlay beatmapListing)
         {
-            StateContainer = direct;
+            StateContainer = beatmapListing;
         }
     }
 }

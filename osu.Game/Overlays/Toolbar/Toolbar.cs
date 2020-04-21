@@ -14,7 +14,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 using osu.Game.Configuration;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -86,7 +85,7 @@ namespace osu.Game.Overlays.Toolbar
                         ToolbarTimeButton = new ToolbarTimeButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
-                        new ToolbarDirectButton(),
+                        new ToolbarBeatmapListingButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),

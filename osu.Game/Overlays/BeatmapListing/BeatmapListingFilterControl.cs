@@ -14,7 +14,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -101,7 +100,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             searchControl.Query.BindValueChanged(query =>
             {
-                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
+                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? SortCriteria.Ranked : SortCriteria.Relevance;
                 sortDirection.Value = SortDirection.Descending;
                 queueUpdateSearch(true);
             });

@@ -515,3 +515,5 @@
     *   [m] [Fix relax replays playing back incorrectly #8819]
     *   [m] [Fix BeatmapListingOverlay not taking focus #8820]
     *   [m] [Add support for taiko hit target skinning #8824]
+    *   [m] [Replace direct overlay with new beatmaplisting overlay #8821]
+    *   [m] [Update framework #8825]

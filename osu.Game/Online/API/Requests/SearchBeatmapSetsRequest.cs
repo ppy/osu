@@ -4,7 +4,6 @@
 using osu.Framework.IO.Network;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
@@ -13,7 +12,7 @@ namespace osu.Game.Online.API.Requests
     {
         public SearchCategory SearchCategory { get; set; }
 
-        public DirectSortCriteria SortCriteria { get; set; }
+        public SortCriteria SortCriteria { get; set; }
 
         public SortDirection SortDirection { get; set; }
 
@@ -32,7 +31,7 @@ namespace osu.Game.Online.API.Requests
             this.ruleset = ruleset;
 
             SearchCategory = SearchCategory.Any;
-            SortCriteria = DirectSortCriteria.Ranked;
+            SortCriteria = SortCriteria.Ranked;
             SortDirection = SortDirection.Descending;
             Genre = SearchGenre.Any;
             Language = SearchLanguage.Any;
