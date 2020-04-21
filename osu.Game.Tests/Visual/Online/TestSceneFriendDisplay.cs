@@ -10,6 +10,7 @@ using osu.Game.Users;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
 using NUnit.Framework;
+using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private FriendDisplay display;
+        private TestFriendDisplay display;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = display = new FriendDisplay()
+                Child = display = new TestFriendDisplay()
             };
         });
 
@@ -83,5 +84,17 @@ namespace osu.Game.Tests.Visual.Online
                 LastVisit = DateTimeOffset.Now
             }
         };
+
+        private class TestFriendDisplay : FriendDisplay
+        {
+            public void Fetch()
+            {
+                base.APIStateChanged(API, APIState.Online);
+            }
+
+            public override void APIStateChanged(IAPIProvider api, APIState state)
+            {
+            }
+        }
     }
 }
