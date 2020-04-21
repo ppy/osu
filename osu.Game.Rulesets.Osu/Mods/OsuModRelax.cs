@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 hasReplay = true;
                 return;
             }
+
+            osuInputManager.AllowUserPresses = false;
         }
 
         public void Update(Playfield playfield)
