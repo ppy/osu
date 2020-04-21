@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
             typeof(NotificationOverlay),
-            typeof(DirectOverlay),
+            typeof(BeatmapListingOverlay),
             typeof(DashboardOverlay),
             typeof(ChannelManager),
             typeof(ChatOverlay),
