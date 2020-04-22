@@ -240,8 +240,9 @@ namespace osu.Game.Beatmaps.Formats
             }
             else
             {
-                if (hitObject is IHasEndTime endTimeData)
-                    writer.Write(FormattableString.Invariant($"{endTimeData.EndTime},"));
+                if (hitObject is IHasEndTime _)
+                    addEndTimeData(writer, hitObject);
+
                 writer.Write(getSampleBank(hitObject.Samples));
             }
 
@@ -342,6 +343,20 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(getSampleBank(curveData.NodeSamples[i], true));
                 writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
             }
+        }
+
+        private void addEndTimeData(TextWriter writer, HitObject hitObject)
+        {
+            var endTimeData = (IHasEndTime)hitObject;
+            var type = getObjectType(hitObject);
+
+            char suffix = ',';
+
+            // Holds write the end time as if it's part of sample data.
+            if (type == LegacyHitObjectType.Hold)
+                suffix = ':';
+
+            writer.Write(FormattableString.Invariant($"{endTimeData.EndTime}{suffix}"));
         }
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
