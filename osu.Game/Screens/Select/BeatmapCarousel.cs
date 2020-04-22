@@ -669,7 +669,7 @@ namespace osu.Game.Screens.Select
                             Debug.Assert(lastSet != null);
 
                             float? setY = null;
-                            if (!d.DrawableIsPresent)
+                            if (!d.IsLoaded || beatmap.Alpha <= 0.0001f) // can't use IsPresent due to DrawableCarouselItem override.
                                 setY = lastSet.Y + lastSet.DrawHeight + 5;
 
                             if (d.IsLoaded)
