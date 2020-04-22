@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
             if (difficulty != null)
-                Scale = CalculateScale(difficulty);
+                Scale = calculateScale(difficulty);
 
             catchWidth = CalculateCatchWidth(Scale);
         }
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
         /// </summary>
-        internal static Vector2 CalculateScale(BeatmapDifficulty difficulty)
+        private static Vector2 calculateScale(BeatmapDifficulty difficulty)
             => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
         internal static float CalculateCatchWidth(BeatmapDifficulty difficulty)
-            => CalculateCatchWidth(CalculateScale(difficulty));
+            => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Add a caught fruit to the catcher's stack.
