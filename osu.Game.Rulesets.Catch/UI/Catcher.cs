@@ -29,7 +29,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
 
         /// <summary>
-        /// The default colour used directly for this <see cref="Catcher"/>'s <see cref="Drawable.Colour"/>.
+        /// The default hyper-dash colour used directly for this
+        /// <see cref="Catcher"/>'s <see cref="Drawable.Colour"/>.
         /// </summary>
         /// <remarks>
         /// This colour is only used when no skin overrides <see cref="CatchSkinColour.HyperDash"/>.
