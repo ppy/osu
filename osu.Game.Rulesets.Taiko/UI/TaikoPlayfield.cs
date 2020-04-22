@@ -119,7 +119,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Masking = true,
-                            Child = HitObjectContainer
+                            Children = new Drawable[]
+                            {
+                                HitObjectContainer,
+                                drumRollHitContainer = new ScrollingHitObjectContainer
+                                {
+                                    Name = "Drumroll hit"
+                                }
+                            }
                         },
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
@@ -135,14 +142,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Blending = BlendingParameters.Additive
-                        },
-                        drumRollHitContainer = new ScrollingHitObjectContainer
-                        {
-                            Name = "Drumroll hit",
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Stretch,
-                            Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            Width = 1.0f
                         }
                     }
                 },
@@ -279,6 +278,20 @@ namespace osu.Game.Rulesets.Taiko.UI
                         kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
 
                     break;
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Time.Elapsed < 0)
+            {
+                foreach (DrawableHit taikoHit in drumRollHitContainer.Objects)
+                {
+                    taikoHit.RemoveProxiedContent();
+                    drumRollHitContainer.Remove(taikoHit);
+                }
             }
         }
 
