@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
         {
             CatcherArea catcherArea = null;
+            CatcherTrailDisplay trails = null;
 
             AddStep("create hyper-dashing catcher", () =>
             {
@@ -123,6 +124,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Scale = new Vector2(4f),
                 }, skin);
 
+                trails = catcherArea.OfType<CatcherTrailDisplay>().Single();
                 catcherArea.MovableCatcher.SetHyperDashState(2);
                 catcherArea.MovableCatcher.FinishTransforms();
             });
@@ -132,8 +134,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                     ? catcherArea.MovableCatcher.Colour == Catcher.DEFAULT_CATCHER_HYPER_DASH_COLOUR
                     : catcherArea.MovableCatcher.Colour == expectedCatcherColour);
 
-            AddAssert("catcher trails colours are correct", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == expectedCatcherColour));
-            AddAssert("catcher end-glow colours are correct", () => catcherArea.OfType<Container<CatcherTrailSprite>>().Any(c => c.Colour == (expectedEndGlowColour ?? expectedCatcherColour)));
+            AddAssert("catcher trails colours are correct", () => trails.HyperDashTrailsColour == expectedCatcherColour);
+            AddAssert("catcher end-glow colours are correct", () => trails.EndGlowSpritesColour == (expectedEndGlowColour ?? expectedCatcherColour));
 
             AddStep("finish hyper-dashing", () =>
             {
