@@ -413,8 +413,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             else
                 d12StackedNerf = d12;
 
+            // Correction #9 - Slow small jump nerf
+            double smallJumpNerfFactor = 1 - 0.085 * Math.Exp(-Math.Pow((d12 - 2.2) / 0.7, 2)) *
+                                             SpecialFunctions.Logistic((275 - effectiveBpm) / 10);
 
-            // Correction #9 - Hidden Mod
+            // Correction #10 - Hidden Mod
             double correctionHidden = 0;
             if (hidden)
             {
@@ -422,7 +425,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
 
-            // Correction #10 - Stacked wiggle fix
+            // Correction #11 - Stacked wiggle fix
             if (obj0 != null && obj3 != null)
             {
                 var d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
@@ -440,7 +443,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
-                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * (1 + correctionHidden);
+                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * (1 + correctionHidden);
 
             movement.D = d12WithCorrection;
             movement.MT = t12;
