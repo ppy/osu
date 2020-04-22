@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class Catcher : Container, IKeyBindingHandler<CatchAction>
     {
+        public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
+
         /// <summary>
         /// Whether we are hyper-dashing or not.
         /// </summary>
@@ -384,7 +386,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             currentCatcher.Show();
-            (currentCatcher.Drawable as IAnimation)?.GotoFrame(0);
+            (currentCatcher.Drawable as IFramedAnimation)?.GotoFrame(0);
         }
 
         private void beginTrail()

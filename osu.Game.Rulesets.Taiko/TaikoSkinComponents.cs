@@ -5,5 +5,12 @@ namespace osu.Game.Rulesets.Taiko
 {
     public enum TaikoSkinComponents
     {
+        InputDrum,
+        CentreHit,
+        RimHit,
+        DrumRollBody,
+        DrumRollTick,
+        Swell,
+        HitTarget
     }
 }

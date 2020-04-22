@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
-    public class TickPiece : TaikoPiece
+    public class TickPiece : CompositeDrawable
     {
         /// <summary>
         /// Any tick that is not the first for a drumroll is not filled, but is instead displayed
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             FillMode = FillMode.Fit;
             Size = new Vector2(tick_size);
 
-            Add(new CircularContainer
+            InternalChild = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                         AlwaysPresent = true
                     }
                 }
-            });
+            };
         }
     }
 }

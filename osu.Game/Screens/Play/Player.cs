@@ -37,6 +37,11 @@ namespace osu.Game.Screens.Play
     [Cached]
     public class Player : ScreenWithBeatmapBackground
     {
+        /// <summary>
+        /// The delay upon completion of the beatmap before displaying the results screen.
+        /// </summary>
+        public const double RESULTS_DISPLAY_DELAY = 1000.0;
+
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -176,7 +181,7 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(gameplayBeatmap);
 
             addUnderlayComponents(GameplayClockContainer);
-            addGameplayComponents(GameplayClockContainer, Beatmap.Value);
+            addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -197,7 +202,7 @@ namespace osu.Game.Screens.Play
             };
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.AllJudged += onCompletion;
+            ScoreProcessor.HasCompleted.ValueChanged += updateCompletionState;
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -214,13 +219,13 @@ namespace osu.Game.Screens.Play
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
-        private void addGameplayComponents(Container target, WorkingBeatmap working)
+        private void addGameplayComponents(Container target, WorkingBeatmap working, IBeatmap playableBeatmap)
         {
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(working.Skin);
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -412,22 +417,33 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate completionProgressDelegate;
 
-        private void onCompletion()
+        private void updateCompletionState(ValueChangedEvent<bool> completionState)
         {
             // screen may be in the exiting transition phase.
             if (!this.IsCurrentScreen())
                 return;
 
+            if (!completionState.NewValue)
+            {
+                completionProgressDelegate?.Cancel();
+                completionProgressDelegate = null;
+                ValidForResume = true;
+                return;
+            }
+
+            if (completionProgressDelegate != null)
+                throw new InvalidOperationException($"{nameof(updateCompletionState)} was fired more than once");
+
             // Only show the completion screen if the player hasn't failed
-            if (HealthProcessor.HasFailed || completionProgressDelegate != null)
+            if (HealthProcessor.HasFailed)
                 return;
 
             ValidForResume = false;
 
             if (!showResults) return;
 
-            using (BeginDelayedSequence(1000))
-                scheduleGotoRanking();
+            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
+                completionProgressDelegate = Schedule(GotoRanking);
         }
 
         protected virtual ScoreInfo CreateScore()
@@ -677,12 +693,6 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
-        }
-
-        private void scheduleGotoRanking()
-        {
-            completionProgressDelegate?.Cancel();
-            completionProgressDelegate = Schedule(GotoRanking);
         }
 
         #endregion
