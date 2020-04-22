@@ -126,10 +126,9 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 trails = catcherArea.OfType<CatcherTrailDisplay>().Single();
                 catcherArea.MovableCatcher.SetHyperDashState(2);
-                catcherArea.MovableCatcher.FinishTransforms();
             });
 
-            AddAssert("catcher colour is correct", () =>
+            AddUntilStep("catcher colour is correct", () =>
             {
                 var expected = expectedCatcherColour;
 
