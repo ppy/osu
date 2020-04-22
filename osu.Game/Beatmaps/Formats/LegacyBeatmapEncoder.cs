@@ -248,7 +248,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine();
         }
 
-        private static LegacyHitObjectType getObjectType(HitObject hitObject)
+        private LegacyHitObjectType getObjectType(HitObject hitObject)
         {
             LegacyHitObjectType type = 0;
 
@@ -267,7 +267,10 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case IHasEndTime _:
-                    type |= LegacyHitObjectType.Spinner;
+                    if (beatmap.BeatmapInfo.RulesetID == 3)
+                        type |= LegacyHitObjectType.Hold;
+                    else
+                        type |= LegacyHitObjectType.Spinner;
                     break;
 
                 default:
