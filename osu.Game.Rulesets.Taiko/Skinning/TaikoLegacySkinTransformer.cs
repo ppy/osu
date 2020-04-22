@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
@@ -32,9 +33,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                         return new LegacyInputDrum();
 
                     return null;
-            }
 
-            return source.GetDrawableComponent(component);
+                case TaikoSkinComponents.TaikoDon:
+                    if (GetTexture("pippidonclear0") != null)
+                        return new DrawableTaikoCharacter();
+
+                    return null;
+
+                default:
+                    return source.GetDrawableComponent(component);
+            }
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);

@@ -19,6 +19,9 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Rulesets.Scoring;
+using osu.Framework.Bindables;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -52,6 +55,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly Box overlayBackground;
         private readonly Box background;
+
+        private readonly SkinnableDrawable characterDrawable;
+
+        private Bindable<double> frameTime = new Bindable<double>(100);
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
@@ -186,6 +193,12 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
+                },
+                characterDrawable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => new Container(), confineMode: ConfineMode.ScaleToFit)
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.TopLeft,
+                    RelativePositionAxes = Axes.None
                 }
             };
         }
@@ -254,16 +267,28 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     break;
             }
-        }
 
-        private class ProxyContainer : LifetimeManagementContainer
-        {
-            public new MarginPadding Padding
+            if (characterDrawable.Drawable is DrawableTaikoCharacter character)
             {
-                set => base.Padding = value;
+                if (result.Type == HitResult.Miss && result.Judgement.AffectsCombo)
+                {
+                    character.State = TaikoDonAnimationState.Fail;
+                }
+                else
+                {
+                    character.State = judgedObject.HitObject.Kiai ? TaikoDonAnimationState.Kiai : TaikoDonAnimationState.Idle;
+                }
             }
-
-            public void Add(Drawable proxy) => AddInternal(proxy);
         }
+    }
+
+    class ProxyContainer : LifetimeManagementContainer
+    {
+        public new MarginPadding Padding
+        {
+            set => base.Padding = value;
+        }
+
+        public void Add(Drawable proxy) => AddInternal(proxy);
     }
 }
