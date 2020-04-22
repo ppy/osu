@@ -15,6 +15,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
+using Humanizer;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -53,8 +55,8 @@ namespace osu.Game.Overlays.BeatmapListing
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 10),
-                            Text = headerName.ToUpper()
+                            Font = OsuFont.GetFont(size: 13),
+                            Text = headerName.Titleize()
                         },
                         CreateFilter().With(f =>
                         {
@@ -81,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 if (typeof(T).IsEnum)
                 {
-                    foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                    foreach (var val in OrderAttributeUtils.GetValuesInOrder<T>())
                         AddItem(val);
                 }
             }

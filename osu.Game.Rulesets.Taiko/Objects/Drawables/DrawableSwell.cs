@@ -9,11 +9,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -33,8 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
-
-        private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
             : base(swell)
@@ -107,17 +106,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
 
             AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
-
-            MainPiece.Add(symbol = new SwellSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
+
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Swell),
+            _ => new SwellCirclePiece
+            {
+                // to allow for rotation transform
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
 
         protected override void LoadComplete()
         {
@@ -182,7 +186,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     .Then()
                     .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
-                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
+                MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 

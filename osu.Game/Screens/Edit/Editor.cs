@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
+        private EditorChangeHandler changeHandler;
 
         private DependencyContainer dependencies;
 
@@ -100,10 +101,14 @@ namespace osu.Game.Screens.Edit
             }
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
-
             dependencies.CacheAs(editorBeatmap);
 
+            changeHandler = new EditorChangeHandler(editorBeatmap);
+            dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+
             EditorMenuBar menuBar;
+            OsuMenuItem undoMenuItem;
+            OsuMenuItem redoMenuItem;
 
             var fileMenuItems = new List<MenuItem>
             {
@@ -147,6 +152,14 @@ namespace osu.Game.Screens.Edit
                                 new MenuItem("File")
                                 {
                                     Items = fileMenuItems
+                                },
+                                new MenuItem("Edit")
+                                {
+                                    Items = new[]
+                                    {
+                                        undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, undo),
+                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, redo)
+                                    }
                                 }
                             }
                         }
@@ -203,6 +216,9 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
+            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
             menuBar.Mode.ValueChanged += onModeChanged;
 
             bottomBackground.Colour = colours.Gray2;
@@ -230,6 +246,19 @@ namespace osu.Game.Screens.Edit
                     if (e.ControlPressed)
                     {
                         saveBeatmap();
+                        return true;
+                    }
+
+                    break;
+
+                case Key.Z:
+                    if (e.ControlPressed)
+                    {
+                        if (e.ShiftPressed)
+                            redo();
+                        else
+                            undo();
+
                         return true;
                     }
 
@@ -296,6 +325,10 @@ namespace osu.Game.Screens.Edit
 
             return base.OnExiting(next);
         }
+
+        private void undo() => changeHandler.RestoreState(-1);
+
+        private void redo() => changeHandler.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {

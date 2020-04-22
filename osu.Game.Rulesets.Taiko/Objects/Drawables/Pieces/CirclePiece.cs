@@ -10,6 +10,8 @@ using osuTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Effects;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -20,21 +22,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// for a usage example.
     /// </para>
     /// </summary>
-    public class CirclePiece : TaikoPiece
+    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = 0.45f;
         public const float SYMBOL_BORDER = 8;
         private const double pre_beat_transition_time = 80;
 
+        private Color4 accentColour;
+
         /// <summary>
         /// The colour of the inner circle and outer glows.
         /// </summary>
-        public override Color4 AccentColour
+        public Color4 AccentColour
         {
-            get => base.AccentColour;
+            get => accentColour;
             set
             {
-                base.AccentColour = value;
+                accentColour = value;
 
                 background.Colour = AccentColour;
 
@@ -42,15 +46,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             }
         }
 
+        private bool kiaiMode;
+
         /// <summary>
         /// Whether Kiai mode effects are enabled for this circle piece.
         /// </summary>
-        public override bool KiaiMode
+        public bool KiaiMode
         {
-            get => base.KiaiMode;
+            get => kiaiMode;
             set
             {
-                base.KiaiMode = value;
+                kiaiMode = value;
 
                 resetEdgeEffects();
             }
@@ -64,8 +70,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public Box FlashBox;
 
-        public CirclePiece()
+        protected CirclePiece()
         {
+            RelativeSizeAxes = Axes.Both;
+
             EarlyActivationMilliseconds = pre_beat_transition_time;
 
             AddRangeInternal(new Drawable[]

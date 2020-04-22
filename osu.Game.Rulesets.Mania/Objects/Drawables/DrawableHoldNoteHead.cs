@@ -8,6 +8,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNoteHead : DrawableNote
     {
+        protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteHead;
+
         public DrawableHoldNoteHead(DrawableHoldNote holdNote)
             : base(holdNote.HitObject.Head)
         {

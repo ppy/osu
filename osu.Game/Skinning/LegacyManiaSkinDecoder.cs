@@ -11,8 +11,6 @@ namespace osu.Game.Skinning
 {
     public class LegacyManiaSkinDecoder : LegacyDecoder<List<LegacyManiaSkinConfiguration>>
     {
-        private const float size_scale_factor = 1.6f;
-
         public LegacyManiaSkinDecoder()
             : base(1)
         {
@@ -76,7 +74,7 @@ namespace osu.Game.Skinning
                 switch (pair.Key)
                 {
                     case "ColumnLineWidth":
-                        parseArrayValue(pair.Value, currentConfig.ColumnLineWidth);
+                        parseArrayValue(pair.Value, currentConfig.ColumnLineWidth, false);
                         break;
 
                     case "ColumnSpacing":
@@ -88,13 +86,45 @@ namespace osu.Game.Skinning
                         break;
 
                     case "HitPosition":
-                        currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * size_scale_factor;
+                        currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case "LightPosition":
+                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case "JudgementLine":
+                        currentConfig.ShowJudgementLine = pair.Value == "1";
+                        break;
+
+                    case "LightingNWidth":
+                        parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
+                        break;
+
+                    case "WidthForNoteHeightScale":
+                        float minWidth = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        if (minWidth > 0)
+                            currentConfig.MinimumColumnWidth = minWidth;
+                        break;
+
+                    case string _ when pair.Key.StartsWith("Colour"):
+                        HandleColours(currentConfig, line);
+                        break;
+
+                    case string _ when pair.Key.StartsWith("NoteImage"):
+                        currentConfig.ImageLookups[pair.Key] = pair.Value;
+                        break;
+
+                    case string _ when pair.Key.StartsWith("KeyImage"):
+                        currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }
             }
+
+            pendingLines.Clear();
         }
 
-        private void parseArrayValue(string value, float[] output)
+        private void parseArrayValue(string value, float[] output, bool applyScaleFactor = true)
         {
             string[] values = value.Split(',');
 
@@ -103,7 +133,7 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * size_scale_factor;
+                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
             }
         }
     }

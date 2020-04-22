@@ -111,7 +111,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"Source: {beatmap.Metadata.Source}"));
             writer.WriteLine(FormattableString.Invariant($"Tags: {beatmap.Metadata.Tags}"));
             writer.WriteLine(FormattableString.Invariant($"BeatmapID: {beatmap.BeatmapInfo.OnlineBeatmapID ?? 0}"));
-            writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID ?? -1}"));
+            writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID ?? -1}"));
         }
 
         private void handleDifficulty(TextWriter writer)
@@ -187,26 +187,12 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[HitObjects]");
 
+            // TODO: implement other legacy rulesets
             switch (beatmap.BeatmapInfo.RulesetID)
             {
                 case 0:
                     foreach (var h in beatmap.HitObjects)
                         handleOsuHitObject(writer, h);
-                    break;
-
-                case 1:
-                    foreach (var h in beatmap.HitObjects)
-                        handleTaikoHitObject(writer, h);
-                    break;
-
-                case 2:
-                    foreach (var h in beatmap.HitObjects)
-                        handleCatchHitObject(writer, h);
-                    break;
-
-                case 3:
-                    foreach (var h in beatmap.HitObjects)
-                        handleManiaHitObject(writer, h);
                     break;
             }
         }
@@ -327,12 +313,6 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
             }
         }
-
-        private void handleTaikoHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
-
-        private void handleCatchHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
-
-        private void handleManiaHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
         {
