@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -126,10 +127,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             beatmapsToCheck.ForEach(beatmap =>
             {
-                if (beatmap.Y > Y + DrawHeight + 6 + i * (beatmap.DrawHeight + 5))
+                // Movement if difficulty panel is too low
+                if (Precision.DefinitelyBigger(beatmap.Y, Y + DrawHeight + 5 + i * (beatmap.DrawHeight + 5), 0.3))
                     beatmap.MoveToY(Y + DrawHeight + 5 + i * (beatmap.DrawHeight + 5)).MoveToY(beatmap.DesiredY, 750, Easing.OutExpo);
 
-                if (beatmap.Y < Y + DrawHeight + 4)
+                // Movement if difficulty panel is too high
+                if (Precision.DefinitelyBigger(Y + DrawHeight + 5, beatmap.Y, 0.3))
                     beatmap.MoveToY(Y + DrawHeight + 5).MoveToY(beatmap.DesiredY, 750, Easing.OutExpo);
 
                 i++;
