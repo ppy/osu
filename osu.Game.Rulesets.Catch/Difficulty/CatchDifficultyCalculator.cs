@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.Difficulty.Skills;
@@ -71,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
-            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
+            using (var catcher = new Catcher(new Container(), beatmap.BeatmapInfo.BaseDifficulty))
                 halfCatcherWidth = catcher.CatchWidth * 0.5f;
 
             return new Skill[]

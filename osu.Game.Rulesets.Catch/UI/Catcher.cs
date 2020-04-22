@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -116,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
 
-        public Catcher(BeatmapDifficulty difficulty = null, Container additiveTarget = null)
+        public Catcher([NotNull] Container additiveTarget, BeatmapDifficulty difficulty = null)
         {
             this.additiveTarget = additiveTarget;
 
