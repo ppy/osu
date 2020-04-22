@@ -9,8 +9,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableFlyingRimHit : DrawableRimHit
     {
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
             ApplyResult(r => r.Type = HitResult.Good);
         }
 
