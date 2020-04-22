@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -31,10 +32,13 @@ namespace osu.Game.Tests.Visual
         {
         }
 
+        // Required to be part of the per-ruleset implementation to construct the newer version of the Ruleset.
+        protected abstract Ruleset CreateRulesetForSkinProvider();
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SkinManager skinManager)
         {
-            var dllStore = new DllResourceStore(GetType().Assembly);
+            var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
             defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
@@ -103,7 +107,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
+                                new SkinProvidingContainer(CreateRulesetForSkinProvider().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,

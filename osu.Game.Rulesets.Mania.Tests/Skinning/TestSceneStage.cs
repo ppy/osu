@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
                 return new ManiaInputManager(new ManiaRuleset().RulesetInfo, 4)
                 {
-                    Child = new ManiaStage(0, new StageDefinition { Columns = 4 }, ref normalAction, ref specialAction)
+                    Child = new Stage(0, new StageDefinition { Columns = 4 }, ref normalAction, ref specialAction)
                 };
             });
         }

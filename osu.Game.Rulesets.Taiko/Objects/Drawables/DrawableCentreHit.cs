@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -14,13 +13,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableCentreHit(Hit hit)
             : base(hit)
         {
-            MainPiece.Add(new CentreHitSymbolPiece());
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            MainPiece.AccentColour = colours.PinkDarker;
-        }
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.CentreHit),
+            _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
     }
 }
