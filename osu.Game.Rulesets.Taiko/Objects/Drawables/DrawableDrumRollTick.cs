@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -19,10 +20,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool DisplayResult => false;
 
-        protected override TaikoPiece CreateMainPiece() => new TickPiece
-        {
-            Filled = HitObject.FirstTick
-        };
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
+            _ => new TickPiece
+            {
+                Filled = HitObject.FirstTick
+            });
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

@@ -8,6 +8,7 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -149,7 +150,8 @@ namespace osu.Game.Beatmaps.Formats
             HitObjects,
             Variables,
             Fonts,
-            Mania
+            CatchTheBeat,
+            Mania,
         }
 
         internal class LegacyDifficultyControlPoint : DifficultyControlPoint
@@ -168,15 +170,19 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
-                    baseInfo.Suffix = CustomSampleBank.ToString();
+                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy
+                    && legacy.CustomSampleBank == 0)
+                {
+                    legacy.CustomSampleBank = CustomSampleBank;
+                }
 
                 return baseInfo;
             }
 
-            public override bool EquivalentTo(ControlPoint other) =>
-                base.EquivalentTo(other) && other is LegacySampleControlPoint otherTyped &&
-                CustomSampleBank == otherTyped.CustomSampleBank;
+            public override bool IsRedundant(ControlPoint existing)
+                => base.IsRedundant(existing)
+                   && existing is LegacySampleControlPoint existingSample
+                   && CustomSampleBank == existingSample.CustomSampleBank;
         }
     }
 }

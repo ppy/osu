@@ -241,6 +241,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var controlPoints = decoder.Decode(stream).ControlPointInfo;
 
+                Assert.That(controlPoints.TimingPoints.Count, Is.EqualTo(4));
+                Assert.That(controlPoints.DifficultyPoints.Count, Is.EqualTo(3));
+                Assert.That(controlPoints.EffectPoints.Count, Is.EqualTo(3));
+                Assert.That(controlPoints.SamplePoints.Count, Is.EqualTo(3));
+
                 Assert.That(controlPoints.DifficultyPointAt(500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
                 Assert.That(controlPoints.DifficultyPointAt(1500).SpeedMultiplier, Is.EqualTo(1.5).Within(0.1));
                 Assert.That(controlPoints.DifficultyPointAt(2500).SpeedMultiplier, Is.EqualTo(0.75).Within(0.1));

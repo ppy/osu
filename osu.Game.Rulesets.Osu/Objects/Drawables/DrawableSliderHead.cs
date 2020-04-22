@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Slider slider;
 
-        public DrawableSliderHead(Slider slider, HitCircle h)
+        public DrawableSliderHead(Slider slider, SliderHeadCircle h)
             : base(h)
         {
             this.slider = slider;

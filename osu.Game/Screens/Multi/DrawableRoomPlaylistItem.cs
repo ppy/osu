@@ -21,7 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -210,10 +210,10 @@ namespace osu.Game.Screens.Multi
             return true;
         }
 
-        private class PlaylistDownloadButton : PanelDownloadButton
+        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet)
+                : base(beatmapSet)
             {
                 Alpha = 0;
             }
