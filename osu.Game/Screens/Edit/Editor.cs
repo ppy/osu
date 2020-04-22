@@ -158,8 +158,8 @@ namespace osu.Game.Screens.Edit
                                 {
                                     Items = new[]
                                     {
-                                        undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, undo),
-                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, redo)
+                                        undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
+                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo)
                                     }
                                 }
                             }
@@ -236,11 +236,11 @@ namespace osu.Game.Screens.Edit
             switch (action.ActionType)
             {
                 case PlatformActionType.Undo:
-                    undo();
+                    Undo();
                     return true;
 
                 case PlatformActionType.Redo:
-                    redo();
+                    Redo();
                     return true;
 
                 case PlatformActionType.Save:
@@ -329,9 +329,9 @@ namespace osu.Game.Screens.Edit
             return base.OnExiting(next);
         }
 
-        private void undo() => changeHandler.RestoreState(-1);
+        protected void Undo() => changeHandler.RestoreState(-1);
 
-        private void redo() => changeHandler.RestoreState(1);
+        protected void Redo() => changeHandler.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {
