@@ -150,14 +150,14 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
+        /// <param name="scale">The scale of the catcher.</param>
         internal static float CalculateCatchWidth(Vector2 scale)
             => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * allowed_catch_range;
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
+        /// <param name="difficulty">The beatmap difficulty.</param>
         internal static float CalculateCatchWidth(BeatmapDifficulty difficulty)
             => CalculateCatchWidth(CalculateScale(difficulty));
 
