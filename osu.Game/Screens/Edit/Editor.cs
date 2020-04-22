@@ -22,6 +22,7 @@ using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -37,7 +38,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IBeatSnapProvider
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -230,6 +231,30 @@ namespace osu.Game.Screens.Edit
             clock.ProcessFrame();
         }
 
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.Undo:
+                    undo();
+                    return true;
+
+                case PlatformActionType.Redo:
+                    redo();
+                    return true;
+
+                case PlatformActionType.Save:
+                    saveBeatmap();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(PlatformAction action)
+        {
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             switch (e.Key)
@@ -241,28 +266,6 @@ namespace osu.Game.Screens.Edit
                 case Key.Right:
                     seek(e, 1);
                     return true;
-
-                case Key.S:
-                    if (e.ControlPressed)
-                    {
-                        saveBeatmap();
-                        return true;
-                    }
-
-                    break;
-
-                case Key.Z:
-                    if (e.ControlPressed)
-                    {
-                        if (e.ShiftPressed)
-                            redo();
-                        else
-                            undo();
-
-                        return true;
-                    }
-
-                    break;
             }
 
             return base.OnKeyDown(e);
