@@ -254,13 +254,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Colour = IsHovered || hasMouseDown ? Color4.OrangeRed : Color4.White;
             }
 
-            protected override bool OnDragStart(DragStartEvent e) => true;
-
             [Resolved]
             private EditorBeatmap beatmap { get; set; }
 
             [Resolved]
             private IBeatSnapProvider beatSnapProvider { get; set; }
+
+            [Resolved(CanBeNull = true)]
+            private IEditorChangeHandler changeHandler { get; set; }
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                changeHandler?.BeginChange();
+                return true;
+            }
 
             protected override void OnDrag(DragEvent e)
             {
@@ -301,6 +308,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 base.OnDragEnd(e);
 
                 OnDragHandled?.Invoke(null);
+                changeHandler?.EndChange();
             }
         }
     }

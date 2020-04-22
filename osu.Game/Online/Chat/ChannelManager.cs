@@ -18,7 +18,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : PollingComponent
+    public class ChannelManager : PollingComponent, IChannelPostTarget
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -204,6 +204,10 @@ namespace osu.Game.Online.Chat
 
             switch (command)
             {
+                case "np":
+                    AddInternal(new NowPlayingCommand());
+                    break;
+
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
@@ -234,7 +238,7 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
                     break;
 
                 default:
