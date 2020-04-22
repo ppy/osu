@@ -30,6 +30,9 @@ namespace osu.Game.Screens.Ranking.Expanded
         private readonly ScoreInfo score;
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
+
+        private FillFlowContainer starAndModDisplay;
+
         private RollingCounter<long> scoreCounter;
 
         /// <summary>
@@ -119,11 +122,12 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Alpha = 0,
                                 AlwaysPresent = true
                             },
-                            new FillFlowContainer
+                            starAndModDisplay = new FillFlowContainer
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     new StarRatingDisplay(beatmap)
@@ -131,15 +135,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft
                                     },
-                                    new ModDisplay
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        DisplayUnrankedText = false,
-                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                        Scale = new Vector2(0.5f),
-                                        Current = { Value = score.Mods }
-                                    }
                                 }
                             },
                             new FillFlowContainer
@@ -214,6 +209,19 @@ namespace osu.Game.Screens.Ranking.Expanded
                     }
                 }
             };
+
+            if (score.Mods.Any())
+            {
+                starAndModDisplay.Add(new ModDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    DisplayUnrankedText = false,
+                    ExpansionMode = ExpansionMode.AlwaysExpanded,
+                    Scale = new Vector2(0.5f),
+                    Current = { Value = score.Mods }
+                });
+            }
         }
 
         protected override void LoadComplete()

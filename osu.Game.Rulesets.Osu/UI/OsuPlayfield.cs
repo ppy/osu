@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly FollowPointRenderer followPoints;
+        private readonly OrderedHitPolicy hitPolicy;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -51,6 +52,8 @@ namespace osu.Game.Rulesets.Osu.UI
                     Depth = -1,
                 },
             };
+
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
         }
 
         public override void Add(DrawableHitObject h)
@@ -64,7 +67,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
             base.Add(h);
 
-            followPoints.AddFollowPoints((DrawableOsuHitObject)h);
+            DrawableOsuHitObject osuHitObject = (DrawableOsuHitObject)h;
+            osuHitObject.CheckHittable = hitPolicy.IsHittable;
+
+            followPoints.AddFollowPoints(osuHitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
@@ -79,6 +85,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
+            // Hitobjects that block future hits should miss previous hitobjects if they're hit out-of-order.
+            hitPolicy.HandleHit(judgedObject);
+
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 

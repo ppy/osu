@@ -15,8 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
-using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -274,10 +274,11 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new PanelDownloadButton(BeatmapSet.Value)
+                    downloadButtonsContainer.Child = new BeatmapPanelDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
-                        RelativeSizeAxes = Axes.Y
+                        RelativeSizeAxes = Axes.Y,
+                        SelectedBeatmap = { BindTarget = Picker.Beatmap }
                     };
                     break;
 

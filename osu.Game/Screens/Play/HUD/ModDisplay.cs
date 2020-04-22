@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected readonly FillFlowContainer<ModIcon> IconsContainer;
+        private readonly FillFlowContainer<ModIcon> iconsContainer;
         private readonly OsuSpriteText unrankedText;
 
         public ModDisplay()
@@ -50,13 +50,12 @@ namespace osu.Game.Screens.Play.HUD
 
             Children = new Drawable[]
             {
-                IconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Left = 10, Right = 10 },
                 },
                 unrankedText = new OsuSpriteText
                 {
@@ -69,11 +68,11 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.ValueChanged += mods =>
             {
-                IconsContainer.Clear();
+                iconsContainer.Clear();
 
                 foreach (Mod mod in mods.NewValue)
                 {
-                    IconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }
 
                 if (IsLoaded)
@@ -92,7 +91,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             appearTransform();
-            IconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
+            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         private void appearTransform()
@@ -104,20 +103,20 @@ namespace osu.Game.Screens.Play.HUD
 
             expand();
 
-            using (IconsContainer.BeginDelayedSequence(1200))
+            using (iconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
         private void expand()
         {
             if (ExpansionMode != ExpansionMode.AlwaysContracted)
-                IconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
         }
 
         private void contract()
         {
             if (ExpansionMode != ExpansionMode.AlwaysExpanded)
-                IconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)

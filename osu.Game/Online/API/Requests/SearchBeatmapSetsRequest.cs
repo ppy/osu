@@ -1,30 +1,40 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.IO.Network;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
+        public SearchCategory SearchCategory { get; set; }
+
+        public SortCriteria SortCriteria { get; set; }
+
+        public SortDirection SortDirection { get; set; }
+
+        public SearchGenre Genre { get; set; }
+
+        public SearchLanguage Language { get; set; }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
-        private readonly BeatmapSearchCategory searchCategory;
-        private readonly DirectSortCriteria sortCriteria;
-        private readonly SortDirection direction;
-        private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        private string directionString => SortDirection == SortDirection.Descending ? @"desc" : @"asc";
+
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
-            this.searchCategory = searchCategory;
-            this.sortCriteria = sortCriteria;
-            this.direction = direction;
+
+            SearchCategory = SearchCategory.Any;
+            SortCriteria = SortCriteria.Ranked;
+            SortDirection = SortDirection.Descending;
+            Genre = SearchGenre.Any;
+            Language = SearchLanguage.Any;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -35,31 +45,19 @@ namespace osu.Game.Online.API.Requests
             if (ruleset.ID.HasValue)
                 req.AddParameter("m", ruleset.ID.Value.ToString());
 
-            req.AddParameter("s", searchCategory.ToString().ToLowerInvariant());
-            req.AddParameter("sort", $"{sortCriteria.ToString().ToLowerInvariant()}_{directionString}");
+            req.AddParameter("s", SearchCategory.ToString().ToLowerInvariant());
+
+            if (Genre != SearchGenre.Any)
+                req.AddParameter("g", ((int)Genre).ToString());
+
+            if (Language != SearchLanguage.Any)
+                req.AddParameter("l", ((int)Language).ToString());
+
+            req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
             return req;
         }
 
         protected override string Target => @"beatmapsets/search";
-    }
-
-    public enum BeatmapSearchCategory
-    {
-        Any,
-
-        [Description("Has Leaderboard")]
-        Leaderboard,
-        Ranked,
-        Qualified,
-        Loved,
-        Favourites,
-
-        [Description("Pending & WIP")]
-        Pending,
-        Graveyard,
-
-        [Description("My Maps")]
-        Mine,
     }
 }
