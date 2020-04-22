@@ -4,35 +4,28 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    public class TestSceneEditorChangeStates : ScreenTestScene
+    public class TestSceneEditorChangeStates : EditorTestScene
     {
+        public TestSceneEditorChangeStates()
+            : base(new OsuRuleset())
+        {
+        }
+
         private EditorBeatmap editorBeatmap;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            Screens.Edit.Editor editor = null;
-
-            AddStep("load editor", () =>
-            {
-                Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                LoadScreen(editor = new Screens.Edit.Editor());
-            });
-
-            AddUntilStep("wait for editor to load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                          && editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
-            AddStep("get beatmap", () => editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single());
+            AddStep("get beatmap", () => editorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
         }
 
         [Test]
