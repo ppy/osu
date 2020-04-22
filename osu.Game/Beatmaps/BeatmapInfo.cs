@@ -149,7 +149,12 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        public override string ToString() => $"{Metadata} [{Version}]".Trim();
+        public override string ToString()
+        {
+            string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+
+            return $"{Metadata} {version}".Trim();
+        }
 
         public bool Equals(BeatmapInfo other)
         {

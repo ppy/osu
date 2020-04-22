@@ -519,3 +519,12 @@
     *   [m] [Update framework #8825]
 
 *   实现了Mvis播放器的键位绑定、单曲循环、锁定以及在选歌界面中查看歌曲的功能
+
+### 2020/4/22
+*   合并上游pr
+    *   [m] [Fix beatmap string output having empty brackets when pieces are missing #8828]
+    *   [m] [Fix beatmap encoder by enabling untested test cases #8818]
+    *   [m] [Load user rulesets from the game data directory #8607]
+    *   [m] [Add static internal catcher calculation methods for CatchDifficultyCalculator #8830]
+    *   [m] [Use platform bindings for editor actions #8832]
+    *   [m] [Remove obsolete nested hitobject methods #8833]

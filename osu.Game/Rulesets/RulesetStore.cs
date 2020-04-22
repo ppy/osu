@@ -29,6 +29,10 @@ namespace osu.Game.Rulesets
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
             loadFromDisk();
+
+            // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
+            // It needs to be attached to the assembly lookup event before the actual call to loadUserRulesets() else rulesets located out of the base game directory will fail
+            // to load as unable to locate the game core assembly.
             AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
             loadUserRulesets();
             addMissingRulesets();
@@ -58,10 +62,13 @@ namespace osu.Game.Rulesets
             var asm = new AssemblyName(args.Name);
 
             // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
-            // this assumes the only explicit dependency of the ruleset is the game core assembly.
-            // the ruleset dependency on the game core assembly requires manual resolving, transient dependencies should be resolved automatically
-            if (asm.Name.Equals(typeof(OsuGame).Assembly.GetName().Name, StringComparison.Ordinal))
-                return Assembly.GetExecutingAssembly();
+            // this attempts resolving the ruleset dependencies on game core and framework assemblies by returning assemblies with the same assembly name
+            // already loaded in the AppDomain.
+            foreach (var curAsm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.Name.Equals(curAsm.GetName().Name, StringComparison.Ordinal))
+                    return curAsm;
+            }
 
             return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
         }
