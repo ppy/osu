@@ -17,6 +17,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Masking = true,
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     FillMode = FillMode.Fit,
                                     Blending = BlendingParameters.Additive,
                                 },
-                                HitTarget = new HitTarget
+                                HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new HitTarget())
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,

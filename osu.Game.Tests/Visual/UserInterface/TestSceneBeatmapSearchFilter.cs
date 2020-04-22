@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osuTK;
@@ -20,8 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(BeatmapSearchFilterRow<>),
-            typeof(BeatmapSearchRulesetFilterRow),
-            typeof(BeatmapSearchSmallFilterRow<>),
+            typeof(BeatmapSearchRulesetFilterRow)
         };
 
         [Cached]
@@ -42,8 +40,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Children = new Drawable[]
                 {
                     new BeatmapSearchRulesetFilterRow(),
-                    new BeatmapSearchFilterRow<BeatmapSearchCategory>("Categories"),
-                    new BeatmapSearchSmallFilterRow<BeatmapSearchCategory>("Header Name")
+                    new BeatmapSearchFilterRow<SearchCategory>("Categories"),
+                    new BeatmapSearchFilterRow<SearchCategory>("Header Name")
                 }
             });
         }

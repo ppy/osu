@@ -7,6 +7,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -17,13 +18,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableRimHit(Hit hit)
             : base(hit)
         {
-            MainPiece.Add(new RimHitSymbolPiece());
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            MainPiece.AccentColour = colours.BlueDarker;
-        }
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.RimHit),
+            _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
     }
 }
