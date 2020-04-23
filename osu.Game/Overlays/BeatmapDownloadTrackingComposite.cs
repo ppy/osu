@@ -5,7 +5,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays
 {
     public abstract class BeatmapDownloadTrackingComposite : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
     {
