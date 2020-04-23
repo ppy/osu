@@ -7,6 +7,10 @@ namespace osu.Game.Rulesets.Taiko
     {
         InputDrum,
         CentreHit,
-        RimHit
+        RimHit,
+        DrumRollBody,
+        DrumRollTick,
+        Swell,
+        HitTarget
     }
 }
