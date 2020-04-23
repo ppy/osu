@@ -76,8 +76,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
-        public void RemoveProxiedContent() => UnproxyContent();
-
         public abstract bool OnPressed(TaikoAction action);
 
         public virtual void OnReleased(TaikoAction action)
