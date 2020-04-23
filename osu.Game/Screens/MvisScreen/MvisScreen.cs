@@ -65,6 +65,7 @@ namespace osu.Game.Screens
 
         ScheduledDelegate scheduledHideOverlays;
         ScheduledDelegate scheduledShowOverlays;
+        Box bgBox;
         BottomBar bottomBar;
         Container buttons;
         BeatmapLogo beatmapLogo;
@@ -79,6 +80,12 @@ namespace osu.Game.Screens
         {
             InternalChildren = new Drawable[]
             {
+                bgBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                    Alpha = 0.3f
+                },
                 new SpaceParticlesContainer(),
                 new ParallaxContainer
                 {
@@ -260,6 +267,7 @@ namespace osu.Game.Screens
             loopToggleButton.ToggleableValue.ValueChanged += _ => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             inputManager = GetContainingInputManager();
+            bgBox.ScaleTo(1.1f);
 
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
 
@@ -282,7 +290,6 @@ namespace osu.Game.Screens
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
             }
-            
         }
 
         public override void OnEntering(IScreen last)
@@ -389,8 +396,7 @@ namespace osu.Game.Screens
         private void HideOverlays()
         {
             game?.Toolbar.Hide();
-            Background.FadeTo(0.7f, DURATION);
-            //bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
+            bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
             buttons.MoveToY(20, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
                      .FadeTo(0.01f, DURATION, Easing.OutQuint);
@@ -402,8 +408,7 @@ namespace osu.Game.Screens
         private void ShowOverlays(bool Locked = false)
         {
             game?.Toolbar.Show();
-            Background.FadeTo(0.4f, DURATION);
-            //bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
+            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             buttons.MoveToY(0, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
                      .FadeIn(DURATION, Easing.OutQuint);
@@ -412,7 +417,6 @@ namespace osu.Game.Screens
             OverlaysHidden = false;
         }
 
-        
         /// <summary>
         /// 因为未知原因, <see cref="TryHideOverlays"/>调用的<see cref="HideOverlays"/>无法被<see cref="ShowOverlays"/>中断
         /// 因此将相关功能独立出来作为单独的函数用来调用
@@ -433,7 +437,7 @@ namespace osu.Game.Screens
                 lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
                 return;
             }
-                ShowOverlays();
+            ShowOverlays();
         }
 
         private void TryHideOverlays()
