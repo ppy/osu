@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
             int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
 
-            adjustOrigins(maniaBlueprint);
+            // adjustOrigins(maniaBlueprint);
             performDragMovement(moveEvent);
             performColumnMovement(lastColumn, moveEvent);
 
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             // When scrolling downwards the anchor position is at the bottom of the screen, however the movement event assumes the anchor is at the top of the screen.
             // This causes the delta to assume a positive hitobject position, and which can be corrected for by subtracting the parent height.
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                delta -= moveEvent.Blueprint.Parent.DrawHeight; // todo: probably wrong
+                delta -= moveEvent.Blueprint.Parent.DrawHeight; // todo: definitely wrong
 
             foreach (var selectionBlueprint in SelectedBlueprints)
             {
