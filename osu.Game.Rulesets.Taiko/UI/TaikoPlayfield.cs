@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
         private readonly ScrollingHitObjectContainer drumRollHitContainer;
-        internal readonly HitTarget HitTarget;
+        internal readonly Drawable HitTarget;
 
         private readonly ProxyContainer topLevelHitContainer;
         private readonly ProxyContainer barlineContainer;
