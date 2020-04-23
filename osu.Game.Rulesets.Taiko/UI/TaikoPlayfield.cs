@@ -242,7 +242,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 drawableHit = new DrawableFlyingCentreHit(Time.Current, isStrong);
 
             drumRollHitContainer.Add(drawableHit);
-
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -289,8 +288,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             if (Time.Elapsed < 0)
             {
-                foreach (DrawableHit taikoHit in drumRollHitContainer.Objects)
+                foreach (var o in drumRollHitContainer.Objects)
                 {
+                    var taikoHit = (DrawableHit)o;
                     taikoHit.RemoveProxiedContent();
                     drumRollHitContainer.Remove(taikoHit);
                 }
