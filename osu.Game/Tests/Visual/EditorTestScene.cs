@@ -36,9 +36,11 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
-            AddStep("load editor", () => LoadScreen(Editor = new Editor()));
+            AddStep("load editor", () => LoadScreen(Editor = CreateEditor()));
             AddUntilStep("wait for editor to load", () => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
                                                           && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
         }
+
+        protected virtual Editor CreateEditor() => new Editor();
     }
 }

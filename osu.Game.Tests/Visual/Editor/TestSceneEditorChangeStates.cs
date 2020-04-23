@@ -19,7 +19,6 @@ namespace osu.Game.Tests.Visual.Editor
         }
 
         private EditorBeatmap editorBeatmap;
-        private TestEditor editor;
 
         public override void SetUpSteps()
         {
@@ -153,9 +152,11 @@ namespace osu.Game.Tests.Visual.Editor
             AddAssert("no hitobject added", () => addedObject == null);
         }
 
-        private void addUndoSteps() => AddStep("undo", () => editor.Undo());
+        private void addUndoSteps() => AddStep("undo", () => ((TestEditor)Editor).Undo());
 
-        private void addRedoSteps() => AddStep("redo", () => editor.Redo());
+        private void addRedoSteps() => AddStep("redo", () => ((TestEditor)Editor).Redo());
+
+        protected override Screens.Edit.Editor CreateEditor() => new TestEditor();
 
         private class TestEditor : Screens.Edit.Editor
         {
