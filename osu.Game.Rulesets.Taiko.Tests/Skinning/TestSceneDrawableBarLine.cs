@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
@@ -24,6 +25,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(DrawableBarLine),
+            typeof(LegacyBarLine),
+            typeof(BarLine),
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
