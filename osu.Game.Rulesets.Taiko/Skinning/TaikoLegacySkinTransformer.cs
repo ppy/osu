@@ -59,11 +59,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.PlayfieldBackgroundRight:
                     if (GetTexture("taiko-bar-right") != null)
+                    {
                         return this.GetAnimation("taiko-bar-right", false, false).With(d =>
                         {
                             d.RelativeSizeAxes = Axes.Both;
                             d.Size = Vector2.One;
                         });
+                    }
 
                     return null;
 

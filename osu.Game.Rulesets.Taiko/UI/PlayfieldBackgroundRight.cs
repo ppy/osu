@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class PlayfieldBackground : CompositeDrawable
+    public class PlayfieldBackgroundRight : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

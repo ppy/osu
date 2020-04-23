@@ -3,10 +3,8 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,7 +16,6 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -58,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new Drawable[]
             {
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackground()),
+                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
                 rightArea = new Container
                 {
                     Name = "Right area",
@@ -126,25 +123,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Size = new Vector2(left_area_size, 1),
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = colours.Gray1,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new Box
-                                {
-                                    Anchor = Anchor.TopRight,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Width = 10,
-                                    Colour = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
-                                },
-                            }
-                        }),
+                        new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
                         new InputDrum(controlPoints)
                         {
                             Anchor = Anchor.CentreLeft,
