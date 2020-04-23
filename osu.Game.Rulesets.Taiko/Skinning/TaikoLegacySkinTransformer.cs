@@ -75,6 +75,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                         return Drawable.Empty();
 
                     return null;
+
+                case TaikoSkinComponents.BarLine:
+                    if (GetTexture("taiko-barline") != null)
+                        return new LegacyBarLine();
+
+                    return null;
             }
 
             return source.GetDrawableComponent(component);
