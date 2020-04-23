@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {
-    public class LegacyHitTarget : CompositeDrawable
+    public class TaikoLegacyHitTarget : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 new Sprite
                 {
                     Texture = skin.GetTexture("approachcircle"),
-                    Scale = new Vector2(0.73f),
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.73f) * 0.625f,
                     Alpha = 0.7f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -30,7 +31,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 new Sprite
                 {
                     Texture = skin.GetTexture("taikobigcircle"),
-                    Scale = new Vector2(0.7f),
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.7f) * 0.625f,
                     Alpha = 0.5f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

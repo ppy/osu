@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.HitTarget:
                     if (GetTexture("taikobigcircle") != null)
-                        return new LegacyHitTarget();
+                        return new TaikoLegacyHitTarget();
 
                     return null;
             }

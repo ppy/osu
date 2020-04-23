@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
-            typeof(HitTarget),
-            typeof(LegacyHitTarget),
+            typeof(TaikoHitTarget),
+            typeof(TaikoLegacyHitTarget),
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
