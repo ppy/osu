@@ -78,6 +78,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             }
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
+            // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
+            Scale = new Vector2(Parent.DrawHeight / Size.Y);
+        }
+
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
