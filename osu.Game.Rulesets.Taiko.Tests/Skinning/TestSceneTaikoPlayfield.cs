@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Rulesets.Taiko.UI;
@@ -20,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             typeof(TaikoHitTarget),
             typeof(TaikoLegacyHitTarget),
+            typeof(PlayfieldBackground),
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
@@ -33,10 +36,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("Load playfield", () => SetContents(() => new TaikoPlayfield(new ControlPointInfo())
             {
-                Height = 0.4f,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
             }));
+
+            AddRepeatStep("change height", () => this.ChildrenOfType<TaikoPlayfield>().ForEach(p => p.Height = Math.Max(0.2f, (p.Height + 0.2f) % 1f)), 50);
         }
     }
 }
