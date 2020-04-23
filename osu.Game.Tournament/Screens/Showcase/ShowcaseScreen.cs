@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
@@ -10,7 +12,14 @@ namespace osu.Game.Tournament.Screens.Showcase
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new TournamentLogo());
+            AddRangeInternal(new Drawable[] {
+                new TournamentLogo(),
+                new TourneyVideo("showcase")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                }
+            });
         }
     }
 }
