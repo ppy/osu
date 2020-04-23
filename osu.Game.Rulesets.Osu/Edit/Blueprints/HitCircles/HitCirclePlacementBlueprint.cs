@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
@@ -28,16 +29,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             circlePiece.UpdateFrom(HitObject);
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            EndPlacement(true);
-            return true;
+            if (e.Button == MouseButton.Left)
+            {
+                BeginPlacement();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            BeginPlacement();
-            HitObject.Position = ToLocalSpace(screenSpacePosition);
+            if (e.Button == MouseButton.Left)
+                EndPlacement(true);
         }
+
+        public override void UpdatePosition(Vector2 screenSpacePosition) => HitObject.Position = ToLocalSpace(screenSpacePosition);
     }
 }
