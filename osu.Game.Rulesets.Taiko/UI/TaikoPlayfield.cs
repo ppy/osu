@@ -286,14 +286,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.Update();
 
+            // When rewinding, make sure to remove any auxilliary hit notes that were
+            // spawned and played during a drumroll.
             if (Time.Elapsed < 0)
             {
                 foreach (var o in drumRollHitContainer.Objects)
-                {
-                    var taikoHit = (DrawableHit)o;
-                    taikoHit.RemoveProxiedContent();
-                    drumRollHitContainer.Remove(taikoHit);
-                }
+                    drumRollHitContainer.Remove(o);
             }
         }
 
