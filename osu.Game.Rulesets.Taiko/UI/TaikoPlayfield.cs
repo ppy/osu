@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     FillMode = FillMode.Fit,
                                     Blending = BlendingParameters.Additive,
                                 },
-                                HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new HitTarget())
+                                HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
