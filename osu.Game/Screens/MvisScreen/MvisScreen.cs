@@ -65,31 +65,25 @@ namespace osu.Game.Screens
 
         ScheduledDelegate scheduledHideOverlays;
         ScheduledDelegate scheduledShowOverlays;
-        Box bgBox;
         BottomBar bottomBar;
         Container buttons;
-        ParallaxContainer beatmapParallax;
+        BeatmapLogo beatmapLogo;
         HoverCheckContainer hoverCheckContainer;
         HoverableProgressBarContainer progressBarContainer;
         ToggleableButton loopToggleButton;
         ToggleableOverlayLockButton lockButton;
+        Track track;
         private bool OverlaysHidden = false;
 
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
             {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.3f
-                },
                 new SpaceParticlesContainer(),
-                beatmapParallax = new ParallaxContainer
+                new ParallaxContainer
                 {
                     ParallaxAmount = -0.0025f,
-                    Child = new BeatmapLogo
+                    Child = beatmapLogo = new BeatmapLogo
                     {
                         Anchor = Anchor.Centre,
                     }
@@ -266,7 +260,6 @@ namespace osu.Game.Screens
             loopToggleButton.ToggleableValue.ValueChanged += _ => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             inputManager = GetContainingInputManager();
-            bgBox.ScaleTo(1.1f);
 
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
 
@@ -278,7 +271,6 @@ namespace osu.Game.Screens
         protected override void Update()
         {
             base.Update();
-            var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
 
             if (track?.IsDummyDevice == false)
             {
@@ -297,18 +289,14 @@ namespace osu.Game.Screens
         {
             base.OnEntering(last);
 
-            Track musicTrack = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
-
-            if (musicTrack?.IsDummyDevice == false)
-                musicTrack.RestartPoint = 0;
-
-            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
+            updateComponentFromBeatmap(Beatmap.Value);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            beatmapParallax.Hide();
-            beatmapParallax.Expire();
+            track = new TrackVirtual(Beatmap.Value.Track.Length);
+            beatmapLogo.Exit();
+
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
         }
@@ -401,7 +389,8 @@ namespace osu.Game.Screens
         private void HideOverlays()
         {
             game?.Toolbar.Hide();
-            bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
+            Background.FadeTo(0.7f, DURATION);
+            //bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
             buttons.MoveToY(20, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
                      .FadeTo(0.01f, DURATION, Easing.OutQuint);
@@ -413,7 +402,8 @@ namespace osu.Game.Screens
         private void ShowOverlays(bool Locked = false)
         {
             game?.Toolbar.Show();
-            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
+            Background.FadeTo(0.4f, DURATION);
+            //bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             buttons.MoveToY(0, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
                      .FadeIn(DURATION, Easing.OutQuint);
@@ -479,7 +469,11 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
+            track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
+            track.RestartPoint = 0;
+
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
+
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
             {
                 backgroundBeatmap.Beatmap = beatmap;
