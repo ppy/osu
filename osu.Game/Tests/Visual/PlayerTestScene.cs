@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
@@ -22,6 +23,22 @@ namespace osu.Game.Tests.Visual
         protected TestPlayer Player;
 
         protected OsuConfigManager LocalConfig;
+
+        /// <summary>
+        /// Creates the ruleset for setting up the <see cref="Player"/> component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreatePlayerRuleset();
+
+        protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
+
+        [NotNull]
+        private readonly Ruleset ruleset;
+
+        protected PlayerTestScene()
+        {
+            ruleset = CreatePlayerRuleset();
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -46,7 +63,7 @@ namespace osu.Game.Tests.Visual
 
             action?.Invoke();
 
-            AddStep(CreateRuleset().RulesetInfo.Name, LoadPlayer);
+            AddStep(ruleset.Description, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -56,28 +73,27 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer()
         {
-            var beatmap = CreateBeatmap(Ruleset.Value);
+            var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
+            Ruleset.Value = ruleset.RulesetInfo;
             SelectedMods.Value = Array.Empty<Mod>();
-
-            var rulesetInstance = Ruleset.Value.CreateInstance();
 
             if (!AllowFail)
             {
-                var noFailMod = rulesetInstance.GetAllMods().FirstOrDefault(m => m is ModNoFail);
+                var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);
                 if (noFailMod != null)
                     SelectedMods.Value = new[] { noFailMod };
             }
 
             if (Autoplay)
             {
-                var mod = rulesetInstance.GetAutoplayMod();
+                var mod = ruleset.GetAutoplayMod();
                 if (mod != null)
                     SelectedMods.Value = SelectedMods.Value.Concat(mod.Yield()).ToArray();
             }
 
-            Player = CreatePlayer(rulesetInstance);
+            Player = CreatePlayer(ruleset);
             LoadScreen(Player);
         }
 

@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(OsuRuleset),
         };
 
-        protected override Ruleset CreateRuleset() => new OsuRuleset();
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
     }
 }

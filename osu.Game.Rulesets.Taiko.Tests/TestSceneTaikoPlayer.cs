@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             typeof(TaikoRuleset)
         };
 
-        protected override Ruleset CreateRuleset() => new TaikoRuleset();
+        protected override Ruleset CreatePlayerRuleset() => new TaikoRuleset();
     }
 }

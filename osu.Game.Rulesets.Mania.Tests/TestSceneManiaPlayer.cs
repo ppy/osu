@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             typeof(ManiaRuleset),
         };
 
-        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+        protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
     }
 }

@@ -11,6 +11,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     /// </summary>
     public abstract class TestPlayerTestScene : PlayerTestScene
     {
-        protected override Ruleset CreateRuleset() => new OsuRuleset();
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
     }
 }
