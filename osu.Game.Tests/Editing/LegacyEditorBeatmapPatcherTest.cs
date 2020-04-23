@@ -17,7 +17,7 @@ using osu.Game.Screens.Edit;
 using osuTK;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
-namespace osu.Game.Tests.Editor
+namespace osu.Game.Tests.Editing
 {
     [TestFixture]
     public class LegacyEditorBeatmapPatcherTest

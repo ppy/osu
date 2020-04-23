@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneEditorChangeStates : ScreenTestScene
     {
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.Editor
 
         private void addRedoSteps() => AddStep("redo", () => editor.Redo());
 
-        private class TestEditor : Screens.Edit.Editor
+        private class TestEditor : Editor
         {
             public new void Undo() => base.Undo();
 
