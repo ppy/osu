@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(OsuLegacySkinTransformer),
         };
 
-        protected override Ruleset CreateRuleset() => new OsuRuleset();
+        protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
     }
 }

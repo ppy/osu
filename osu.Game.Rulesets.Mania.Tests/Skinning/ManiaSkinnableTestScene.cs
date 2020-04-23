@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             typeof(ManiaSettingsSubsection)
         };
 
+        protected override Ruleset CreateRulesetForSkinProvider() => new ManiaRuleset();
+
         protected ManiaSkinnableTestScene()
         {
             scrollingInfo.Direction.Value = ScrollingDirection.Down;
@@ -57,8 +59,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         {
             AddStep("change direction to up", () => scrollingInfo.Direction.Value = ScrollingDirection.Up);
         }
-
-        protected override Ruleset CreateRuleset() => new ManiaRuleset();
 
         private class TestScrollingInfo : IScrollingInfo
         {

@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
     public class TestSceneTaikoModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new TestTaikoRuleset();
+
         public TestSceneTaikoModPerfect()
             : base(new TaikoModPerfect())
         {
@@ -28,8 +30,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         [TestCase(false)]
         [TestCase(true)]
         public void TestSwell(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Swell { StartTime = 1000, EndTime = 3000 }), shouldMiss);
-
-        protected override Ruleset CreateRuleset() => new TestTaikoRuleset();
 
         private class TestTaikoRuleset : TaikoRuleset
         {

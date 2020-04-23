@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(CatchRuleset),
         };
 
-        protected override Ruleset CreateRuleset() => new CatchRuleset();
+        protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
     }
 }

@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             typeof(TaikoLegacySkinTransformer),
         };
 
-        protected override Ruleset CreateRuleset() => new TaikoRuleset();
+        protected override Ruleset CreateRulesetForSkinProvider() => new TaikoRuleset();
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -26,16 +28,17 @@ namespace osu.Game.Tests.Visual
         private Skin specialSkin;
         private Skin oldSkin;
 
+        /// <summary>
+        /// Creates the ruleset for adding the ruleset-specific skin transforming component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreateRulesetForSkinProvider();
+
+        protected sealed override Ruleset CreateRuleset() => CreateRulesetForSkinProvider();
+
         protected SkinnableTestScene()
             : base(2, 3)
         {
-            // avoid running silently incorrectly.
-            if (CreateRuleset() == null)
-            {
-                throw new InvalidOperationException(
-                    $"No ruleset provided, override {nameof(CreateRuleset)} to the ruleset belonging to the skinnable content."
-                    + "This is required to add the legacy skin transformer for the content to behave as expected.");
-            }
         }
 
         [BackgroundDependencyLoader]
@@ -110,7 +113,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
+                                new SkinProvidingContainer(CreateRulesetForSkinProvider().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
