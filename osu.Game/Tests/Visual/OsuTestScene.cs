@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -145,6 +146,7 @@ namespace osu.Game.Tests.Visual
         /// <remarks>
         /// When testing against ruleset-specific components, this method must be overriden to their ruleset.
         /// </remarks>
+        [CanBeNull]
         protected virtual Ruleset CreateRuleset() => null;
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
