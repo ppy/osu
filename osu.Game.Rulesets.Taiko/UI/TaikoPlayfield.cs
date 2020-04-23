@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -27,11 +26,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
         public const float DEFAULT_HEIGHT = 178;
-
-        /// <summary>
-        /// The size of the left area of the playfield. This area contains the input drum.
-        /// </summary>
-        private const float left_area_size = 180;
 
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;
@@ -120,7 +114,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
                     BorderColour = colours.Gray0,
-                    Size = new Vector2(left_area_size, 1),
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
