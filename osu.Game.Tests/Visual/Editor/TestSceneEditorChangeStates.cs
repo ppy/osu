@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editor
 {
@@ -20,6 +19,7 @@ namespace osu.Game.Tests.Visual.Editor
         }
 
         private EditorBeatmap editorBeatmap;
+        private TestEditor editor;
 
         public override void SetUpSteps()
         {
@@ -153,36 +153,15 @@ namespace osu.Game.Tests.Visual.Editor
             AddAssert("no hitobject added", () => addedObject == null);
         }
 
-        private void addUndoSteps()
+        private void addUndoSteps() => AddStep("undo", () => editor.Undo());
+
+        private void addRedoSteps() => AddStep("redo", () => editor.Redo());
+
+        private class TestEditor : Screens.Edit.Editor
         {
-            AddStep("press undo", () =>
-            {
-                InputManager.PressKey(Key.LControl);
-                InputManager.PressKey(Key.Z);
-            });
+            public new void Undo() => base.Undo();
 
-            AddStep("release keys", () =>
-            {
-                InputManager.ReleaseKey(Key.LControl);
-                InputManager.ReleaseKey(Key.Z);
-            });
-        }
-
-        private void addRedoSteps()
-        {
-            AddStep("press redo", () =>
-            {
-                InputManager.PressKey(Key.LControl);
-                InputManager.PressKey(Key.LShift);
-                InputManager.PressKey(Key.Z);
-            });
-
-            AddStep("release keys", () =>
-            {
-                InputManager.ReleaseKey(Key.LControl);
-                InputManager.ReleaseKey(Key.LShift);
-                InputManager.ReleaseKey(Key.Z);
-            });
+            public new void Redo() => base.Redo();
         }
     }
 }
