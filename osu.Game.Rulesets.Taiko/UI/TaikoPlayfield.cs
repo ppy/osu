@@ -195,7 +195,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
+                drumRollHitContainer.CreateProxy()
             };
         }
 
@@ -241,7 +242,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 drawableHit = new DrawableFlyingCentreHit(Time.Current, isStrong);
 
             drumRollHitContainer.Add(drawableHit);
-            topLevelHitContainer.Add(drawableHit.CreateProxiedContent());
+
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
