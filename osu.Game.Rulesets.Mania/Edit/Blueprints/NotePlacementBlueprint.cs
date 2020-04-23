@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             base.UpdatePosition(screenSpacePosition);
 
             // Continue updating the position until placement is finished on mouse up.
-            BeginPlacement(TimeAt(screenSpacePosition), true);
+            BeginPlacement(TimeAt(screenSpacePosition), PlacementActive);
         }
     }
 }
