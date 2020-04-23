@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 backgroundContainer = new Container
                 {
