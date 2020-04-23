@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
     public class TestSceneTimingScreen : EditorClockTestScene
