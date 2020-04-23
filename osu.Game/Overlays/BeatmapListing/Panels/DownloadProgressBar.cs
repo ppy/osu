@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays.BeatmapListing.Panels
 {
     public class DownloadProgressBar : BeatmapDownloadTrackingComposite
     {

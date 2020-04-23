@@ -10,13 +10,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
 namespace osu.Game.Overlays
@@ -34,6 +35,8 @@ namespace osu.Game.Overlays
             : base(OverlayColourScheme.Blue)
         {
         }
+
+        private BeatmapListingFilterControl filterControl;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -57,7 +60,7 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             new BeatmapListingHeader(),
-                            new BeatmapListingFilterControl
+                            filterControl = new BeatmapListingFilterControl
                             {
                                 SearchStarted = onSearchStarted,
                                 SearchFinished = onSearchFinished,
@@ -88,6 +91,13 @@ namespace osu.Game.Overlays
             };
         }
 
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            filterControl.TakeFocus();
+        }
+
         private CancellationTokenSource cancellationToken;
 
         private void onSearchStarted()
@@ -108,14 +118,14 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var newPanels = new FillFlowContainer<DirectPanel>
+            var newPanels = new FillFlowContainer<BeatmapPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
                 Alpha = 0,
                 Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
+                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

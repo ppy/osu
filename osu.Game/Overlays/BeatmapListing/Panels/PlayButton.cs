@@ -14,7 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays.BeatmapListing.Panels
 {
     public class PlayButton : Container
     {
