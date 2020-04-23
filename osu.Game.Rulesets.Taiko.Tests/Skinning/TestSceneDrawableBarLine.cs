@@ -7,10 +7,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 
@@ -36,11 +38,19 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("Bar line ", () => SetContents(() =>
             {
-                var hoc = new ScrollingHitObjectContainer
+                ScrollingHitObjectContainer hoc;
+
+                var cont = new Container
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.8f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Height = 0.8f
+                    Children = new Drawable[]
+                    {
+                        new TaikoPlayfield(new ControlPointInfo()),
+                        hoc = new ScrollingHitObjectContainer()
+                    }
                 };
 
                 hoc.Add(new DrawableBarLine(createBarLineAtCurrentTime())
@@ -49,16 +59,24 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Origin = Anchor.Centre,
                 });
 
-                return hoc;
+                return cont;
             }));
 
             AddStep("Bar line (major)", () => SetContents(() =>
             {
-                var hoc = new ScrollingHitObjectContainer
+                ScrollingHitObjectContainer hoc;
+
+                var cont = new Container
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.8f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Height = 0.8f
+                    Children = new Drawable[]
+                    {
+                        new TaikoPlayfield(new ControlPointInfo()),
+                        hoc = new ScrollingHitObjectContainer()
+                    }
                 };
 
                 hoc.Add(new DrawableBarLineMajor(createBarLineAtCurrentTime(true))
@@ -67,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Origin = Anchor.Centre,
                 });
 
-                return hoc;
+                return cont;
             }));
         }
 
@@ -76,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             var drumroll = new BarLine
             {
                 Major = major,
-                StartTime = Time.Current + 1000,
+                StartTime = Time.Current + 2000,
             };
 
             var cpi = new ControlPointInfo();
