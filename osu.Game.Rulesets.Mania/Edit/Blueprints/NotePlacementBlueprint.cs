@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -25,6 +26,14 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             Width = SnappedWidth;
             Position = SnappedMousePosition;
+        }
+
+        public override void UpdatePosition(Vector2 screenSpacePosition)
+        {
+            base.UpdatePosition(screenSpacePosition);
+
+            // Continue updating the position until placement is finished on mouse up.
+            BeginPlacement(TimeAt(screenSpacePosition), true);
         }
     }
 }
