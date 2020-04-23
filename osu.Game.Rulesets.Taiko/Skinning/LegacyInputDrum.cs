@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             const float ratio = 1.6f;
 
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
-            float negativeScaleAdjust = Width / ratio;
+            float negativeScaleAdjust = content.Width / ratio;
 
             if (skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
             {
