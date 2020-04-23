@@ -15,25 +15,27 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBeatmapListingSearchSection : OsuTestScene
+    public class TestSceneBeatmapListingSearchControl : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(BeatmapListingSearchSection),
+            typeof(BeatmapListingSearchControl),
         };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly BeatmapListingSearchSection section;
+        private readonly BeatmapListingSearchControl control;
 
-        public TestSceneBeatmapListingSearchSection()
+        public TestSceneBeatmapListingSearchControl()
         {
             OsuSpriteText query;
             OsuSpriteText ruleset;
             OsuSpriteText category;
+            OsuSpriteText genre;
+            OsuSpriteText language;
 
-            Add(section = new BeatmapListingSearchSection
+            Add(control = new BeatmapListingSearchControl
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -49,20 +51,24 @@ namespace osu.Game.Tests.Visual.UserInterface
                     query = new OsuSpriteText(),
                     ruleset = new OsuSpriteText(),
                     category = new OsuSpriteText(),
+                    genre = new OsuSpriteText(),
+                    language = new OsuSpriteText(),
                 }
             });
 
-            section.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
-            section.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
-            section.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
+            control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
+            control.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
+            control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
+            control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
+            control.Language.BindValueChanged(l => language.Text = $"Language: {l.NewValue}", true);
         }
 
         [Test]
         public void TestCovers()
         {
-            AddStep("Set beatmap", () => section.BeatmapSet = beatmap_set);
-            AddStep("Set beatmap (no cover)", () => section.BeatmapSet = no_cover_beatmap_set);
-            AddStep("Set null beatmap", () => section.BeatmapSet = null);
+            AddStep("Set beatmap", () => control.BeatmapSet = beatmap_set);
+            AddStep("Set beatmap (no cover)", () => control.BeatmapSet = no_cover_beatmap_set);
+            AddStep("Set null beatmap", () => control.BeatmapSet = null);
         }
 
         private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo
