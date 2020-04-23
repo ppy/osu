@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             typeof(TaikoHitTarget),
             typeof(TaikoLegacyHitTarget),
-            typeof(PlayfieldBackground),
+            typeof(PlayfieldBackgroundRight),
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
