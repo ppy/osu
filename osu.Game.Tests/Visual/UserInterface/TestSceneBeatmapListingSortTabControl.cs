@@ -13,18 +13,17 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneBeatmapListingSort : OsuTestScene
+    public class TestSceneBeatmapListingSortTabControl : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(BeatmapListingSortTabControl),
             typeof(OverlaySortTabControl<>),
         };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        public TestSceneBeatmapListingSort()
+        public TestSceneBeatmapListingSortTabControl()
         {
             BeatmapListingSortTabControl control;
             OsuSpriteText current;
