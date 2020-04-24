@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.TaikoDon:
                     if (GetTexture("pippidonclear0") != null)
-                        return new DrawableTaikoCharacter();
+                        return new DrawableTaikoMascot();
 
                     return null;
 

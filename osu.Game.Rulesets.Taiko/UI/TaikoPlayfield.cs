@@ -268,16 +268,18 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
             }
 
-            if (characterDrawable.Drawable is DrawableTaikoCharacter character)
+            if (characterDrawable.Drawable is DrawableTaikoMascot mascot)
             {
-                if (result.Type == HitResult.Miss && result.Judgement.AffectsCombo)
+                var isFailing = result.Type == HitResult.Miss;
+
+                // Only take combo in consideration when it's not a strong hit (it's always false)
+                if (!(judgedObject.HitObject is StrongHitObject))
                 {
-                    character.State = TaikoDonAnimationState.Fail;
+                    if (isFailing)
+                        isFailing = result.Judgement.AffectsCombo;
                 }
-                else
-                {
-                    character.State = judgedObject.HitObject.Kiai ? TaikoDonAnimationState.Kiai : TaikoDonAnimationState.Idle;
-                }
+
+                mascot.PlayfieldState.Value = isFailing ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle;
             }
         }
     }
