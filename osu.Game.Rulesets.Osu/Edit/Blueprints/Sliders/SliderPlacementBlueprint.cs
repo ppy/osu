@@ -82,8 +82,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return base.OnMouseDown(e);
+
             switch (state)
             {
                 case PlacementState.Initial:
@@ -91,9 +94,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
-                    if (e.Button != MouseButton.Left)
-                        break;
-
                     if (canPlaceNewControlPoint(out var lastPoint))
                     {
                         // Place a new point by detatching the current cursor.
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                         currentSegmentLength = 1;
                     }
 
-                    return true;
+                    break;
             }
 
             return true;
