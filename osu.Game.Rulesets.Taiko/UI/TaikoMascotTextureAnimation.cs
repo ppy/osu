@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
             else
             {
-                for (int i = 0;; i++)
+                for (int i = 0; true; i++)
                 {
                     var textureName = _getStateTextureName(i);
                     Texture texture = skin.GetTexture(textureName);
