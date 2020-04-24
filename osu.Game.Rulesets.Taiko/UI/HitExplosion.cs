@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             JudgedObject = judgedObject;
 
-            Anchor = Anchor.CentreLeft;
+            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;

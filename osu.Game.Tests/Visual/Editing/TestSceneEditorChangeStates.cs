@@ -4,33 +4,27 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorChangeStates : ScreenTestScene
+    public class TestSceneEditorChangeStates : EditorTestScene
     {
+        public TestSceneEditorChangeStates()
+            : base(new OsuRuleset())
+        {
+        }
+
         private EditorBeatmap editorBeatmap;
-        private TestEditor editor;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("load editor", () =>
-            {
-                Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                LoadScreen(editor = new TestEditor());
-            });
-
-            AddUntilStep("wait for editor to load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                          && editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
-            AddStep("get beatmap", () => editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single());
+            AddStep("get beatmap", () => editorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
         }
 
         [Test]
@@ -158,11 +152,13 @@ namespace osu.Game.Tests.Visual.Editor
             AddAssert("no hitobject added", () => addedObject == null);
         }
 
-        private void addUndoSteps() => AddStep("undo", () => editor.Undo());
+        private void addUndoSteps() => AddStep("undo", () => ((TestEditor)Editor).Undo());
 
-        private void addRedoSteps() => AddStep("redo", () => editor.Redo());
+        private void addRedoSteps() => AddStep("redo", () => ((TestEditor)Editor).Redo());
 
-        private class TestEditor : Screens.Edit.Editor
+        protected override Editor CreateEditor() => new TestEditor();
+
+        private class TestEditor : Editor
         {
             public new void Undo() => base.Undo();
 

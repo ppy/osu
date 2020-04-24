@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.Comments
             request?.Cancel();
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
-            request.Success += onSuccess;
+            request.Success += res => Schedule(() => onSuccess(res));
             api.PerformAsync(request);
         }
 
