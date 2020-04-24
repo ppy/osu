@@ -15,9 +15,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         public DrawableTaikoCharacter()
         {
             RelativeSizeAxes = Axes.Both;
-            //Size = new Vector2(1f, 2.5f);
-            //Origin = Anchor.BottomLeft;
-            var xd = new Vector2(1);
         }
 
         private TaikoDonTextureAnimation getStateDrawable() => State switch
@@ -63,16 +60,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
             getStateDrawable().Move();
-
-            //var signature = timingPoint.TimeSignature == TimeSignatures.SimpleQuadruple ? 4 : 3;
-            //var length = timingPoint.BeatLength;
-            //var rate = 1000d / length;
-            //adjustableClock.Rate = rate;
-            //
-            //// Start animating on the first beat.
-            //if (beatIndex < 1)
-            //    adjustableClock.Start();
-            // Logger.GetLogger(LoggingTarget.Information).Add($"Length = {length}ms | Rate = {rate}x | BPM = {timingPoint.BPM} / {signature}");
         }
     }
 }

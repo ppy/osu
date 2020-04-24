@@ -22,7 +22,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.Bindables;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
