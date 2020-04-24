@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= Math.Pow(0.96, Math.Max(effectiveMissCount - missCountLeniency, 0));
 
             // Buff long maps
-            aimValue *= 1 + (SpecialFunctions.Logistic((totalHits - 2500) / 500.0) - SpecialFunctions.Logistic(-2500 / 500.0)) * 0.128;
+            aimValue *= 1 + (SpecialFunctions.Logistic((totalHits - 2800) / 500.0) - SpecialFunctions.Logistic(-2800 / 500.0)) * 0.22;
 
             // Buff very high AR and low AR
             double approachRateFactor = 1.0;
