@@ -284,7 +284,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
     }
 
-    class ProxyContainer : LifetimeManagementContainer
+    internal class ProxyContainer : LifetimeManagementContainer
     {
         public new MarginPadding Padding
         {
