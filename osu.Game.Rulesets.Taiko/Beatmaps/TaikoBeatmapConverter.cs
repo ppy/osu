@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         /// osu! is generally slower than taiko, so a factor is added to increase
         /// speed. This must be used everywhere slider length or beat length is used.
         /// </summary>
-        private const float legacy_velocity_multiplier = 1.4f;
+        public const float LEGACY_VELOCITY_MULTIPLIER = 1.4f;
 
         /// <summary>
         /// Because swells are easier in taiko than spinners are in osu!,
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             // Rewrite the beatmap info to add the slider velocity multiplier
             original.BeatmapInfo = original.BeatmapInfo.Clone();
             original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
-            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
+            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= LEGACY_VELOCITY_MULTIPLIER;
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     double speedAdjustedBeatLength = timingPoint.BeatLength / speedAdjustment;
 
                     // The true distance, accounting for any repeats. This ends up being the drum roll distance later
-                    double distance = distanceData.Distance * spans * legacy_velocity_multiplier;
+                    double distance = distanceData.Distance * spans * LEGACY_VELOCITY_MULTIPLIER;
 
                     // The velocity of the taiko hit object - calculated as the velocity of a drum roll
                     double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / speedAdjustedBeatLength;
