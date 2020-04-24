@@ -54,12 +54,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return true;
         }
 
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            EndPlacement(true);
-            base.OnMouseUp(e);
-        }
-
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
             if (!PlacementActive)

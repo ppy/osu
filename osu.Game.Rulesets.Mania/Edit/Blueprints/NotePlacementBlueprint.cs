@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -28,12 +28,14 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             Position = SnappedMousePosition;
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            base.UpdatePosition(screenSpacePosition);
+            base.OnMouseDown(e);
 
-            // Continue updating the position until placement is finished on mouse up.
-            BeginPlacement(TimeAt(screenSpacePosition), PlacementActive);
+            // Place the note immediately.
+            EndPlacement(true);
+
+            return true;
         }
     }
 }
