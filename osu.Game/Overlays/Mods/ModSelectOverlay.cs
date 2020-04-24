@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         new Dimension(GridSizeMode.Absolute, 90),
                         new Dimension(GridSizeMode.Distributed),
-                        new Dimension(GridSizeMode.Absolute, 70),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -197,7 +197,8 @@ namespace osu.Game.Overlays.Mods
                             // Footer
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 Children = new Drawable[]
@@ -215,7 +216,6 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
                                         Width = content_width,
-                                        Direction = FillDirection.Horizontal,
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
