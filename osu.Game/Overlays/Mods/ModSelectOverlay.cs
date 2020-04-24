@@ -219,6 +219,8 @@ namespace osu.Game.Overlays.Mods
                                         RelativeSizeAxes = Axes.X,
                                         Width = content_width,
                                         Spacing = new Vector2(footer_button_spacing, footer_button_spacing / 2),
+                                        LayoutDuration = 100,
+                                        LayoutEasing = Easing.OutQuint,
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
