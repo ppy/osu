@@ -268,18 +268,30 @@ namespace osu.Game.Overlays.Mods
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,
                                                     },
-                                                    MultiplierLabel = new OsuSpriteText
+                                                    new FillFlowContainer
                                                     {
-                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, fixedWidth: true),
+                                                        AutoSizeAxes = Axes.Both,
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,
-                                                    },
-                                                    UnrankedLabel = new OsuSpriteText
-                                                    {
-                                                        Text = @"(Unranked)",
-                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                        Origin = Anchor.CentreLeft,
-                                                        Anchor = Anchor.CentreLeft,
+                                                        Direction = FillDirection.Vertical,
+                                                        LayoutDuration = 100,
+                                                        LayoutEasing = Easing.OutQuint,
+                                                        Children = new Drawable[]
+                                                        {
+                                                            MultiplierLabel = new OsuSpriteText
+                                                            {
+                                                                Font = OsuFont.GetFont(size: 25, weight: FontWeight.Bold, fixedWidth: true),
+                                                                Origin = Anchor.TopCentre,
+                                                                Anchor = Anchor.TopCentre,
+                                                            },
+                                                            UnrankedLabel = new OsuSpriteText
+                                                            {
+                                                                Text = @"(Unranked)",
+                                                                Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
+                                                                Origin = Anchor.TopCentre,
+                                                                Anchor = Anchor.TopCentre,
+                                                            },
+                                                        }
                                                     },
                                                 },
                                             },
