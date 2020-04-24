@@ -4,35 +4,27 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneEditorChangeStates : ScreenTestScene
+    public class TestSceneEditorChangeStates : EditorTestScene
     {
+        public TestSceneEditorChangeStates()
+            : base(new OsuRuleset())
+        {
+        }
+
         private EditorBeatmap editorBeatmap;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            Screens.Edit.Editor editor = null;
-
-            AddStep("load editor", () =>
-            {
-                Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-                LoadScreen(editor = new Screens.Edit.Editor());
-            });
-
-            AddUntilStep("wait for editor to load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
-                                                          && editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
-            AddStep("get beatmap", () => editorBeatmap = editor.ChildrenOfType<EditorBeatmap>().Single());
+            AddStep("get beatmap", () => editorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
         }
 
         [Test]
@@ -160,36 +152,17 @@ namespace osu.Game.Tests.Visual.Editor
             AddAssert("no hitobject added", () => addedObject == null);
         }
 
-        private void addUndoSteps()
+        private void addUndoSteps() => AddStep("undo", () => ((TestEditor)Editor).Undo());
+
+        private void addRedoSteps() => AddStep("redo", () => ((TestEditor)Editor).Redo());
+
+        protected override Editor CreateEditor() => new TestEditor();
+
+        private class TestEditor : Editor
         {
-            AddStep("press undo", () =>
-            {
-                InputManager.PressKey(Key.LControl);
-                InputManager.PressKey(Key.Z);
-            });
+            public new void Undo() => base.Undo();
 
-            AddStep("release keys", () =>
-            {
-                InputManager.ReleaseKey(Key.LControl);
-                InputManager.ReleaseKey(Key.Z);
-            });
-        }
-
-        private void addRedoSteps()
-        {
-            AddStep("press redo", () =>
-            {
-                InputManager.PressKey(Key.LControl);
-                InputManager.PressKey(Key.LShift);
-                InputManager.PressKey(Key.Z);
-            });
-
-            AddStep("release keys", () =>
-            {
-                InputManager.ReleaseKey(Key.LControl);
-                InputManager.ReleaseKey(Key.LShift);
-                InputManager.ReleaseKey(Key.Z);
-            });
+            public new void Redo() => base.Redo();
         }
     }
 }
