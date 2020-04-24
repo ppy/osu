@@ -16,7 +16,6 @@ namespace osu.Game.Overlays
         public MfMenuOverlay()
             : base(OverlayColourScheme.Orange)
         {
-
             Children = new Drawable[]
             {
                 new Box

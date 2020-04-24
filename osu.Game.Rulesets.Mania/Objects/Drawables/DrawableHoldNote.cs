@@ -51,7 +51,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRangeInternal(new[]
             {
-                
                 bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
                 {
                     RelativeSizeAxes = Axes.Both

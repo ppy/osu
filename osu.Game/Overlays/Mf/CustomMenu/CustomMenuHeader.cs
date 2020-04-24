@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.MfMenu
                 Title = "关于Mf-osu 页面";
                 IconTexture = "Icons/news";
             }
-
         }
     }
 }
