@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneEditorChangeStates : EditorTestScene
     {
@@ -156,9 +156,9 @@ namespace osu.Game.Tests.Visual.Editor
 
         private void addRedoSteps() => AddStep("redo", () => ((TestEditor)Editor).Redo());
 
-        protected override Screens.Edit.Editor CreateEditor() => new TestEditor();
+        protected override Editor CreateEditor() => new TestEditor();
 
-        private class TestEditor : Screens.Edit.Editor
+        private class TestEditor : Editor
         {
             public new void Undo() => base.Undo();
 
