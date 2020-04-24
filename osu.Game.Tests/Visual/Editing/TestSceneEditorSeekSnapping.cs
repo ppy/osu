@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
     public class TestSceneEditorSeekSnapping : EditorClockTestScene

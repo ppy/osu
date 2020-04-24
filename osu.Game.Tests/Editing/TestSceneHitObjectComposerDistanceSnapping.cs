@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Tests.Editor
+namespace osu.Game.Tests.Editing
 {
     [HeadlessTest]
     public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
