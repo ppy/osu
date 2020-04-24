@@ -58,6 +58,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return result;
         }
 
+        public override void Clear(bool disposeChildren = true)
+        {
+            base.Clear(disposeChildren);
+
+            initialStateCache.Invalidate();
+            hitObjectInitialStateCache.Clear();
+        }
         private float scrollLength;
 
         protected override void Update()

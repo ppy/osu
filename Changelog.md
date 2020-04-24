@@ -528,3 +528,11 @@
     *   [m] [Add static internal catcher calculation methods for CatchDifficultyCalculator #8830]
     *   [m] [Use platform bindings for editor actions #8832]
     *   [m] [Remove obsolete nested hitobject methods #8833]
+
+### 2020/4/24
+*   合并上游pr
+    *   [m] [Fix editor crashing when entering with no beatmap selected #8856]
+    *   [m] [Make osu! ruleset placements happen on mouse down #8842]
+    *   [m] [Fix mania editor placement not working correctly #8843]
+    *   [m] [Rename editor tests namespace from "Editor" to "Editing" #8849]
+    *   [m] [Fix TestBeatmap not setting appropriate ruleset ID #8834]
