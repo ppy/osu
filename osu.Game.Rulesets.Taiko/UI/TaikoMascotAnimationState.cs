@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public enum TaikoDonAnimationState
+    public enum TaikoMascotAnimationState
     {
         Idle,
         Clear,
