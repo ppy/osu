@@ -11,26 +11,26 @@ namespace osu.Game.Tournament.Screens.Showcase
 {
     public class ShowcaseScreen : BeatmapInfoScreen, IProvideVideo
     {
-        private Box chroma;
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[] {
+            AddRangeInternal(new Drawable[]
+            {
                 new TournamentLogo(),
                 new TourneyVideo("showcase")
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
                 },
-                chroma = new Box
-                        {
-                            // chroma key area for stable gameplay
-                            Name = "chroma",
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Height = 695,
-                            Width = 1366,
-                            Colour = new Color4(0, 255, 0, 255),
+                new Box
+                {
+                    // chroma key area for stable gameplay
+                    Name = "chroma",
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Height = 695,
+                    Width = 1366,
+                    Colour = new Color4(0, 255, 0, 255),
                 }
             });
         }
