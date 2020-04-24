@@ -10,7 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components.Menus;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
     public class TestSceneEditorMenuBar : OsuTestScene
