@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public sealed class TaikoMascotTextureAnimation : TextureAnimation
     {
         private const float clear_animation_speed = 1000 / 10F;
-        private static readonly int[] clear_animation_sequence = new[] { 0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0 };
+        private static readonly int[] clear_animation_sequence = { 0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0 };
         private int currentFrame;
 
         public TaikoMascotAnimationState State { get; }
@@ -76,13 +76,16 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private string _getStateTextureName(int i) => $"pippidon{_getStateString(State)}{i}";
 
-        private string _getStateString(TaikoMascotAnimationState state) => state switch
+        private string _getStateString(TaikoMascotAnimationState state)
         {
-            TaikoMascotAnimationState.Clear => "clear",
-            TaikoMascotAnimationState.Fail  => "fail",
-            TaikoMascotAnimationState.Idle  => "idle",
-            TaikoMascotAnimationState.Kiai  => "kiai",
-            _ => null
-        };
+            return state switch
+            {
+                TaikoMascotAnimationState.Clear => "clear",
+                TaikoMascotAnimationState.Fail => "fail",
+                TaikoMascotAnimationState.Idle => "idle",
+                TaikoMascotAnimationState.Kiai => "kiai",
+                _ => null
+            };
+        }
     }
 }

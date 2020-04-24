@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             RelativeSizeAxes = Axes.Both;
             PlayfieldState = new Bindable<TaikoMascotAnimationState>();
-            PlayfieldState.BindValueChanged((b) =>
+            PlayfieldState.BindValueChanged(b =>
             {
                 if (lastEffectControlPoint != null)
                     State = getFinalAnimationState(lastEffectControlPoint, b.NewValue);
@@ -50,14 +50,17 @@ namespace osu.Game.Rulesets.Taiko.UI
             State = startingState;
         }
 
-        private TaikoMascotTextureAnimation getStateDrawable(TaikoMascotAnimationState state) => state switch
+        private TaikoMascotTextureAnimation getStateDrawable(TaikoMascotAnimationState state)
         {
-            TaikoMascotAnimationState.Idle  => idleDrawable,
-            TaikoMascotAnimationState.Clear => clearDrawable,
-            TaikoMascotAnimationState.Kiai  => kiaiDrawable,
-            TaikoMascotAnimationState.Fail  => failDrawable,
-            _                               => null
-        };
+            return state switch
+            {
+                TaikoMascotAnimationState.Idle => idleDrawable,
+                TaikoMascotAnimationState.Clear => clearDrawable,
+                TaikoMascotAnimationState.Kiai => kiaiDrawable,
+                TaikoMascotAnimationState.Fail => failDrawable,
+                _ => null
+            };
+        }
 
         private TaikoMascotAnimationState getFinalAnimationState(EffectControlPoint effectPoint, TaikoMascotAnimationState playfieldState)
         {
