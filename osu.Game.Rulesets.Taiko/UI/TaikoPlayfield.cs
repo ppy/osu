@@ -12,6 +12,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -222,24 +224,23 @@ namespace osu.Game.Rulesets.Taiko.UI
                     barlineContainer.Add(barline.CreateProxy());
                     break;
 
-                case DrawableDrumRoll drumRoll:
-                    drumRoll.OnHit += onDrumrollArbitraryHit;
-                    break;
-
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
             }
         }
 
-        private void onDrumrollArbitraryHit(TaikoAction action, bool isStrong)
+        private void playDrumrollHit(DrawableDrumRollTick drumrollTick)
         {
-            DrawableHit drawableHit;
+            TaikoAction action = drumrollTick.JudgedAction;
+            bool isStrong = drumrollTick.HitObject.IsStrong;
+            double time = drumrollTick.HitObject.GetEndTime();
 
+            DrawableHit drawableHit;
             if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
-                drawableHit = new DrawableFlyingRimHit(Time.Current, isStrong);
+                drawableHit = new DrawableFlyingRimHit(time, isStrong);
             else
-                drawableHit = new DrawableFlyingCentreHit(Time.Current, isStrong);
+                drawableHit = new DrawableFlyingCentreHit(time, isStrong);
 
             drumRollHitContainer.Add(drawableHit);
         }
@@ -248,6 +249,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             if (!DisplayJudgements.Value)
                 return;
+
+            if ((judgedObject is DrawableDrumRollTick) && result.Type != HitResult.Miss)
+                playDrumrollHit((DrawableDrumRollTick)judgedObject);
 
             if (!judgedObject.DisplayResult)
                 return;
