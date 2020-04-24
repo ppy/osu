@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public sealed class TaikoMascotTextureAnimation : TextureAnimation
     {
-        private const float clear_animation_speed = 1000 / 10F;
+        private const float clear_animation_speed = 1000 / 10f;
         private static readonly int[] clear_animation_sequence = { 0, 1, 2, 3, 4, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0 };
         private int currentFrame;
 
