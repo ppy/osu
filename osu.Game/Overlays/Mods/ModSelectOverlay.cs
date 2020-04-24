@@ -57,6 +57,8 @@ namespace osu.Game.Overlays.Mods
         protected Color4 HighMultiplierColour;
 
         private const float content_width = 0.8f;
+        private const float footer_button_spacing = 20;
+
         private readonly FillFlowContainer footerContainer;
 
         private SampleChannel sampleOn, sampleOff;
@@ -216,6 +218,7 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
                                         Width = content_width,
+                                        Spacing = new Vector2(footer_button_spacing, footer_button_spacing / 2),
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
@@ -228,10 +231,8 @@ namespace osu.Game.Overlays.Mods
                                                 Width = 180,
                                                 Text = "Deselect All",
                                                 Action = DeselectAll,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
                                             CustomiseButton = new TriangleButton
                                             {
@@ -239,49 +240,47 @@ namespace osu.Game.Overlays.Mods
                                                 Text = "Customisation",
                                                 Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
                                                 Enabled = { Value = false },
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
                                                 Text = "Close",
                                                 Action = Hide,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
-                                            new OsuSpriteText
+                                            new FillFlowContainer
                                             {
-                                                Text = @"Score Multiplier:",
-                                                Font = OsuFont.GetFont(size: 30),
-                                                Margin = new MarginPadding
+                                                AutoSizeAxes = Axes.Both,
+                                                Spacing = new Vector2(footer_button_spacing / 2, 0),
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
+                                                Children = new Drawable[]
                                                 {
-                                                    Top = 5,
-                                                    Right = 10
-                                                }
+                                                    new OsuSpriteText
+                                                    {
+                                                        Text = @"Score Multiplier:",
+                                                        Font = OsuFont.GetFont(size: 30),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                    },
+                                                    MultiplierLabel = new OsuSpriteText
+                                                    {
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold, fixedWidth: true),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                    },
+                                                    UnrankedLabel = new OsuSpriteText
+                                                    {
+                                                        Text = @"(Unranked)",
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                    },
+                                                },
                                             },
-                                            MultiplierLabel = new OsuSpriteText
-                                            {
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 5
-                                                }
-                                            },
-                                            UnrankedLabel = new OsuSpriteText
-                                            {
-                                                Text = @"(Unranked)",
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 5,
-                                                    Left = 10
-                                                }
-                                            }
                                         }
                                     }
                                 },
