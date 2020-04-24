@@ -33,17 +33,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
         {
             if (e.Button == MouseButton.Left)
             {
-                BeginPlacement();
+                EndPlacement(true);
                 return true;
             }
 
             return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            if (e.Button == MouseButton.Left)
-                EndPlacement(true);
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition) => HitObject.Position = ToLocalSpace(screenSpacePosition);
