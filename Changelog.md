@@ -536,3 +536,6 @@
     *   [m] [Fix mania editor placement not working correctly #8843]
     *   [m] [Rename editor tests namespace from "Editor" to "Editing" #8849]
     *   [m] [Fix TestBeatmap not setting appropriate ruleset ID #8834]
+    *   [m] [Implement legacy beatmap encoding for all rulesets #8823]
+
+*   更新readme

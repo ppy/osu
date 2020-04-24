@@ -6,8 +6,12 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/u2p01nx7l6og8buh?svg=true)](https://ci.appveyor.com/project/peppy/osu)
 [![GitHub release](https://img.shields.io/github/release/ppy/osu.svg)]()
-[![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu)
 [![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
+
+
+[![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu)CodeFactor(ppy/osu)
+
+[![CodeFactor](https://www.codefactor.io/repository/github/matrix-feather/osu/badge/daily)](https://www.codefactor.io/repository/github/matrix-feather/osu/overview/daily)CodeFactor(matrix-feather/osu)
 
 Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename *osu!lazer*. Pew pew.
 
