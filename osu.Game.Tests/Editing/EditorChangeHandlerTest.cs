@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit;
 
-namespace osu.Game.Tests.Editor
+namespace osu.Game.Tests.Editing
 {
     [TestFixture]
     public class EditorChangeHandlerTest

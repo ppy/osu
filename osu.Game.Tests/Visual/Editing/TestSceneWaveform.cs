@@ -14,7 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
     public class TestSceneWaveform : OsuTestScene

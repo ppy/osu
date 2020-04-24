@@ -51,7 +51,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRangeInternal(new[]
             {
-                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece())
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                {
+                    RelativeSizeAxes = Axes.Both
+                })
                 {
                     RelativeSizeAxes = Axes.X
                 },
@@ -125,6 +128,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.OnDirectionChanged(e);
 
             bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+        }
+
+        public override void PlaySamples()
+        {
+            // Samples are played by the head/tail notes.
         }
 
         protected override void Update()
