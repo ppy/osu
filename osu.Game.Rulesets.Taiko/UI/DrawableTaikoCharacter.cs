@@ -1,16 +1,14 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
-using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public sealed class DrawableTaikoCharacter : BeatSyncedContainer
     {
-        private static DefaultTaikoDonTextureAnimation idleDrawable, clearDrawable, kiaiDrawable, failDrawable;
+        private static TaikoDonTextureAnimation idleDrawable, clearDrawable, kiaiDrawable, failDrawable;
 
         private TaikoDonAnimationState state;
 
@@ -22,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             var xd = new Vector2(1);
         }
 
-        private DefaultTaikoDonTextureAnimation getStateDrawable() => State switch
+        private TaikoDonTextureAnimation getStateDrawable() => State switch
         {
             TaikoDonAnimationState.Idle  => idleDrawable,
             TaikoDonAnimationState.Clear => clearDrawable,
@@ -50,10 +48,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new[]
             {
-                idleDrawable = new DefaultTaikoDonTextureAnimation(TaikoDonAnimationState.Idle),
-                clearDrawable = new DefaultTaikoDonTextureAnimation(TaikoDonAnimationState.Clear),
-                kiaiDrawable = new DefaultTaikoDonTextureAnimation(TaikoDonAnimationState.Kiai),
-                failDrawable = new DefaultTaikoDonTextureAnimation(TaikoDonAnimationState.Fail),
+                idleDrawable = new TaikoDonTextureAnimation(TaikoDonAnimationState.Idle),
+                clearDrawable = new TaikoDonTextureAnimation(TaikoDonAnimationState.Clear),
+                kiaiDrawable = new TaikoDonTextureAnimation(TaikoDonAnimationState.Kiai),
+                failDrawable = new TaikoDonTextureAnimation(TaikoDonAnimationState.Fail),
             };
 
             // sets the state, to make sure we have the correct sprite loaded and set.

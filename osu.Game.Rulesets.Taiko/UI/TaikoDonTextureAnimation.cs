@@ -6,18 +6,19 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public sealed class DefaultTaikoDonTextureAnimation : TextureAnimation
+    public sealed class TaikoDonTextureAnimation : TextureAnimation
     {
-        private readonly TaikoDonAnimationState _state;
+        private readonly TaikoDonAnimationState state;
         private int currentFrame;
 
-        public DefaultTaikoDonTextureAnimation(TaikoDonAnimationState state) : base(false)
+        public TaikoDonTextureAnimation(TaikoDonAnimationState state) : base(false)
         {
-            _state = state;
+            this.state = state;
             this.Stop();
 
             Origin = Anchor.BottomLeft;
             Anchor = Anchor.BottomLeft;
+            AutoSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             for (int i = 0;; i++)
             {
-                var textureName = $"pippidon{_getStateString(_state)}{i}";
+                var textureName = $"pippidon{_getStateString(state)}{i}";
                 Texture texture = skin.GetTexture(textureName);
 
                 if (texture == null)
