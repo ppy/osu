@@ -295,7 +295,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (Time.Elapsed < 0)
             {
                 foreach (var o in drumRollHitContainer.Objects)
-                    drumRollHitContainer.Remove(o);
+                {
+                    if (o.HitObject.StartTime >= Time.Current)
+                        drumRollHitContainer.Remove(o);
+                }
             }
         }
 
