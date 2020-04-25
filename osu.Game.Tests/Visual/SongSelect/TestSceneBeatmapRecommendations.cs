@@ -87,12 +87,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 5; i++)
             {
-                importFunctions.Add(importBeatmap(i, new List<RulesetInfo> { null, null, null, null, null }));
+                importFunctions.Add(importBeatmap(i, Enumerable.Repeat(rulesets.GetRuleset(0), 5)));
             }
 
             for (int i = 0; i < 5; i++)
             {
-                presentAndConfirm(importFunctions[i], i, 2);
+                presentAndConfirm(importFunctions[i], 2);
             }
         }
 
@@ -108,10 +108,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             var mixedImport = importBeatmap(1, new List<RulesetInfo> { taikoRuleset, catchRuleset, maniaRuleset });
 
             // Make sure we are on standard ruleset
-            presentAndConfirm(osuImport, 0, 1);
+            presentAndConfirm(osuImport, 1);
 
             // Present mixed difficulty set, expect ruleset with highest star difficulty
-            presentAndConfirm(mixedImport, 1, 3);
+            presentAndConfirm(mixedImport, 3);
         }
 
         [Test]
@@ -125,13 +125,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             var mixedImport = importBeatmap(1, new List<RulesetInfo> { taikoRuleset, catchRuleset, taikoRuleset });
 
             // Make sure we are on standard ruleset
-            presentAndConfirm(osuImport, 0, 1);
+            presentAndConfirm(osuImport, 1);
 
             // Present mixed difficulty set, expect ruleset with highest star difficulty
-            presentAndConfirm(mixedImport, 1, 2);
+            presentAndConfirm(mixedImport, 2);
         }
 
-        private Func<BeatmapSetInfo> importBeatmap(int importID, List<RulesetInfo> rulesets)
+        private Func<BeatmapSetInfo> importBeatmap(int importID, IEnumerable<RulesetInfo> rulesetEnumerable)
         {
             BeatmapSetInfo imported = null;
             AddStep($"import beatmap {importID}", () =>
@@ -147,14 +147,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var beatmaps = new List<BeatmapInfo>();
                 int difficultyID = 1;
 
-                foreach (RulesetInfo r in rulesets)
+                foreach (RulesetInfo r in rulesetEnumerable)
                 {
                     beatmaps.Add(new BeatmapInfo
                     {
                         OnlineBeatmapID = importID + 1024 * difficultyID,
                         Metadata = metadata,
                         BaseDifficulty = difficulty,
-                        Ruleset = r ?? rulesets.First(),
+                        Ruleset = r ?? rulesets.AvailableRulesets.First(),
                         StarDifficulty = difficultyID,
                     });
                     difficultyID++;
@@ -174,12 +174,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             return () => imported;
         }
 
-        private void presentAndConfirm(Func<BeatmapSetInfo> getImport, int importedID, int expectedDiff)
+        private void presentAndConfirm(Func<BeatmapSetInfo> getImport, int expectedDiff)
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == importedID + 1024 * expectedDiff);
+            AddUntilStep("recommended beatmap displayed", () =>
+            {
+                int? expectedID = getImport().Beatmaps[expectedDiff - 1].OnlineBeatmapID;
+                return Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == expectedID;
+            });
         }
     }
 }
