@@ -174,12 +174,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             return () => imported;
         }
 
-        private void presentAndConfirm(Func<BeatmapSetInfo> getImport, int importedID, int expextedDiff)
+        private void presentAndConfirm(Func<BeatmapSetInfo> getImport, int importedID, int expectedDiff)
         {
             AddStep("present beatmap", () => Game.PresentBeatmap(getImport()));
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is Screens.Select.SongSelect);
-            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == importedID + 1024 * expextedDiff);
+            AddUntilStep("recommended beatmap displayed", () => Game.Beatmap.Value.BeatmapInfo.OnlineBeatmapID == importedID + 1024 * expectedDiff);
         }
     }
 }
