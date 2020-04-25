@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Menu
 
                 if (e.NewValue.IsSupporter)
                 {
-                    supportFlow.AddText("永远感谢您支持osu!", format);
+                    supportFlow.AddText("感谢支持osu!", format);
                 }
                 else
                 {
