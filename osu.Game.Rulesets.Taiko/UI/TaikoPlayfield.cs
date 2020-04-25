@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
                 rightArea = new Container
