@@ -34,7 +34,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
@@ -70,9 +69,6 @@ namespace osu.Game.Screens.Select
         /// Whether entering editor mode should be allowed.
         /// </summary>
         public virtual bool AllowEditing => true;
-
-        [Resolved(canBeNull: true)]
-        private NotificationOverlay notificationOverlay { get; set; }
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
@@ -154,6 +150,8 @@ namespace osu.Game.Screens.Select
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
                                             RelativeSizeAxes = Axes.Both,
+                                            BleedTop = FilterControl.HEIGHT,
+                                            BleedBottom = Footer.HEIGHT,
                                             SelectionChanged = updateSelectedBeatmap,
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
                                             GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
@@ -326,10 +324,7 @@ namespace osu.Game.Screens.Select
         public void Edit(BeatmapInfo beatmap = null)
         {
             if (!AllowEditing)
-            {
-                notificationOverlay?.Post(new SimpleNotification { Text = "Editing is not available from the current mode." });
-                return;
-            }
+                throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             this.Push(new Editor());
@@ -430,7 +425,7 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// selection has been changed as the result of a user interaction.
+        /// Selection has been changed as the result of a user interaction.
         /// </summary>
         private void performUpdateSelected()
         {
@@ -439,7 +434,7 @@ namespace osu.Game.Screens.Select
 
             selectionChangedDebounce?.Cancel();
 
-            if (beatmap == null)
+            if (beatmapNoDebounce == null)
                 run();
             else
                 selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
@@ -452,9 +447,11 @@ namespace osu.Game.Screens.Select
                 {
                     Mods.Value = Array.Empty<Mod>();
 
-                    // required to return once in order to have the carousel in a good state.
-                    // if the ruleset changed, the rest of the selection update will happen via updateSelectedRuleset.
-                    return;
+                    // transferRulesetValue() may trigger a refilter. If the current selection does not match the new ruleset, we want to switch away from it.
+                    // The default logic on WorkingBeatmap change is to switch to a matching ruleset (see workingBeatmapChanged()), but we don't want that here.
+                    // We perform an early selection attempt and clear out the beatmap selection to avoid a second ruleset change (revert).
+                    if (beatmap != null && !Carousel.SelectBeatmap(beatmap, false))
+                        beatmap = null;
                 }
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
@@ -718,7 +715,7 @@ namespace osu.Game.Screens.Select
             if (decoupledRuleset.Value?.Equals(Ruleset.Value) == true)
                 return false;
 
-            Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\"");
+            Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\")");
             rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
 
             // if we have a pending filter operation, we want to run it now.

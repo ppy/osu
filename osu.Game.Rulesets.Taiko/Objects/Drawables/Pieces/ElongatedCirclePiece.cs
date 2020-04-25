@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -12,18 +14,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             RelativeSizeAxes = Axes.Y;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.YellowDark;
+        }
+
         protected override void Update()
         {
             base.Update();
-
-            var padding = Content.DrawHeight * Content.Width / 2;
-
-            Content.Padding = new MarginPadding
-            {
-                Left = padding,
-                Right = padding,
-            };
-
             Width = Parent.DrawSize.X + DrawHeight;
         }
     }

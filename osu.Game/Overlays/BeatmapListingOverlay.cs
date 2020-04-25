@@ -1,27 +1,24 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Threading;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.Direct;
-using osu.Game.Rulesets;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -30,19 +27,16 @@ namespace osu.Game.Overlays
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
-        private SearchBeatmapSetsRequest getSetsRequest;
-
         private Drawable currentContent;
-        private BeatmapListingSearchSection searchSection;
-        private BeatmapListingSortTabControl sortControl;
+        private LoadingLayer loadingLayer;
+        private Container panelTarget;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
         {
         }
+
+        private BeatmapListingFilterControl filterControl;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -63,27 +57,13 @@ namespace osu.Game.Overlays
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10),
                         Children = new Drawable[]
                         {
-                            new FillFlowContainer
+                            new BeatmapListingHeader(),
+                            filterControl = new BeatmapListingFilterControl
                             {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Direction = FillDirection.Vertical,
-                                Masking = true,
-                                EdgeEffect = new EdgeEffectParameters
-                                {
-                                    Colour = Color4.Black.Opacity(0.25f),
-                                    Type = EdgeEffectType.Shadow,
-                                    Radius = 3,
-                                    Offset = new Vector2(0f, 1f),
-                                },
-                                Children = new Drawable[]
-                                {
-                                    new BeatmapListingHeader(),
-                                    searchSection = new BeatmapListingSearchSection(),
-                                }
+                                SearchStarted = onSearchStarted,
+                                SearchFinished = onSearchFinished,
                             },
                             new Container
                             {
@@ -96,154 +76,70 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = ColourProvider.Background4,
                                     },
-                                    new FillFlowContainer
+                                    panelTarget = new Container
                                     {
-                                        RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
-                                        {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 40,
-                                                Children = new Drawable[]
-                                                {
-                                                    new Box
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Colour = ColourProvider.Background5
-                                                    },
-                                                    sortControl = new BeatmapListingSortTabControl
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                        Margin = new MarginPadding { Left = 20 }
-                                                    }
-                                                }
-                                            },
-                                            new Container
-                                            {
-                                                AutoSizeAxes = Axes.Y,
-                                                RelativeSizeAxes = Axes.X,
-                                                Padding = new MarginPadding { Horizontal = 20 },
-                                                Children = new Drawable[]
-                                                {
-                                                    panelTarget = new Container
-                                                    {
-                                                        AutoSizeAxes = Axes.Y,
-                                                        RelativeSizeAxes = Axes.X,
-                                                    },
-                                                    loadingLayer = new LoadingLayer(panelTarget),
-                                                }
-                                            },
-                                        }
-                                    }
+                                        RelativeSizeAxes = Axes.X,
+                                        Padding = new MarginPadding { Horizontal = 20 }
+                                    },
+                                    loadingLayer = new LoadingLayer(panelTarget)
                                 }
-                            }
+                            },
                         }
                     }
                 }
             };
         }
 
-        protected override void LoadComplete()
+        protected override void OnFocus(FocusEvent e)
         {
-            base.LoadComplete();
+            base.OnFocus(e);
 
-            var sortCriteria = sortControl.Current;
-            var sortDirection = sortControl.SortDirection;
-
-            searchSection.Query.BindValueChanged(query =>
-            {
-                sortCriteria.Value = string.IsNullOrEmpty(query.NewValue) ? DirectSortCriteria.Ranked : DirectSortCriteria.Relevance;
-                sortDirection.Value = SortDirection.Descending;
-
-                queueUpdateSearch(true);
-            });
-
-            searchSection.Ruleset.BindValueChanged(_ => queueUpdateSearch());
-            searchSection.Category.BindValueChanged(_ => queueUpdateSearch());
-            sortCriteria.BindValueChanged(_ => queueUpdateSearch());
-            sortDirection.BindValueChanged(_ => queueUpdateSearch());
+            filterControl.TakeFocus();
         }
 
-        private ScheduledDelegate queryChangedDebounce;
+        private CancellationTokenSource cancellationToken;
 
-        private LoadingLayer loadingLayer;
-        private Container panelTarget;
-
-        private void queueUpdateSearch(bool queryTextChanged = false)
+        private void onSearchStarted()
         {
-            getSetsRequest?.Cancel();
-
-            queryChangedDebounce?.Cancel();
-            queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
-        }
-
-        private void updateSearch()
-        {
-            if (!IsLoaded)
-                return;
-
-            if (State.Value == Visibility.Hidden)
-                return;
-
-            if (API == null)
-                return;
+            cancellationToken?.Cancel();
 
             previewTrackManager.StopAnyPlaying(this);
 
-            loadingLayer.Show();
-
-            getSetsRequest = new SearchBeatmapSetsRequest(
-                searchSection.Query.Value,
-                searchSection.Ruleset.Value,
-                searchSection.Category.Value,
-                sortControl.Current.Value,
-                sortControl.SortDirection.Value);
-
-            getSetsRequest.Success += response => Schedule(() => recreatePanels(response));
-
-            API.Queue(getSetsRequest);
+            if (panelTarget.Any())
+                loadingLayer.Show();
         }
 
-        private void recreatePanels(SearchBeatmapSetsResponse response)
+        private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
         {
-            if (response.Total == 0)
+            if (!beatmaps.Any())
             {
-                searchSection.BeatmapSet = null;
-                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder);
+                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
                 return;
             }
 
-            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
-
-            var newPanels = new FillFlowContainer<DirectPanel>
+            var newPanels = new FillFlowContainer<BeatmapPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
                 Alpha = 0,
                 Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, DirectPanel>(b => new DirectGridPanel(b)
+                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                 })
             };
 
-            LoadComponentAsync(newPanels, loaded =>
-            {
-                addContentToPlaceholder(loaded);
-                searchSection.BeatmapSet = beatmaps.First();
-            });
+            LoadComponentAsync(newPanels, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private void addContentToPlaceholder(Drawable content)
         {
             loadingLayer.Hide();
 
-            Drawable lastContent = currentContent;
+            var lastContent = currentContent;
 
             if (lastContent != null)
             {
@@ -262,9 +158,7 @@ namespace osu.Game.Overlays
 
         protected override void Dispose(bool isDisposing)
         {
-            getSetsRequest?.Cancel();
-            queryChangedDebounce?.Cancel();
-
+            cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
 

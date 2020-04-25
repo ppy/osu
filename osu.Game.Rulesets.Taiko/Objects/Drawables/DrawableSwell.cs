@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -114,12 +115,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
 
-        protected override CompositeDrawable CreateMainPiece() => new SwellCirclePiece
-        {
-            // to allow for rotation transform
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-        };
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Swell),
+            _ => new SwellCirclePiece
+            {
+                // to allow for rotation transform
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
 
         protected override void LoadComplete()
         {
@@ -184,7 +186,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     .Then()
                     .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
-                MainPiece.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
+                MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 

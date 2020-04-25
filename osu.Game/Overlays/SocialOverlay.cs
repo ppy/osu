@@ -239,10 +239,4 @@ namespace osu.Game.Overlays
             }
         }
     }
-
-    public enum SortDirection
-    {
-        Ascending,
-        Descending
-    }
 }

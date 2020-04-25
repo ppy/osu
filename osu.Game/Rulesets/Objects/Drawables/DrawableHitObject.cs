@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -180,11 +179,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void apply(HitObject hitObject)
         {
-#pragma warning disable 618 // can be removed 20200417
-            if (GetType().GetMethod(nameof(AddNested), BindingFlags.NonPublic | BindingFlags.Instance)?.DeclaringType != typeof(DrawableHitObject))
-                return;
-#pragma warning restore 618
-
             if (nestedHitObjects.IsValueCreated)
             {
                 nestedHitObjects.Value.Clear();
@@ -195,7 +189,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 var drawableNested = CreateNestedHitObject(h) ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
-                addNested(drawableNested);
+                drawableNested.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
+                drawableNested.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
+                drawableNested.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
+                nestedHitObjects.Value.Add(drawableNested);
                 AddNestedHitObject(drawableNested);
             }
         }
@@ -207,13 +205,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void AddNestedHitObject(DrawableHitObject hitObject)
         {
         }
-
-        /// <summary>
-        /// Adds a nested <see cref="DrawableHitObject"/>. This should not be used except for legacy nested <see cref="DrawableHitObject"/> usages.
-        /// </summary>
-        /// <param name="h"></param>
-        [Obsolete("Use AddNestedHitObject() / ClearNestedHitObjects() / CreateNestedHitObject() instead.")] // can be removed 20200417
-        protected virtual void AddNested(DrawableHitObject h) => addNested(h);
 
         /// <summary>
         /// Invoked by the base <see cref="DrawableHitObject"/> to remove all previously-added nested <see cref="DrawableHitObject"/>s.
@@ -228,17 +219,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="hitObject">The <see cref="HitObject"/>.</param>
         /// <returns>The drawable representation for <paramref name="hitObject"/>.</returns>
         protected virtual DrawableHitObject CreateNestedHitObject(HitObject hitObject) => null;
-
-        private void addNested(DrawableHitObject hitObject)
-        {
-            // Todo: Exists for legacy purposes, can be removed 20200417
-
-            hitObject.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-            hitObject.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
-            hitObject.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
-
-            nestedHitObjects.Value.Add(hitObject);
-        }
 
         #region State / Transform Management
 
@@ -398,7 +378,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => AllJudged && base.UpdateSubTreeMasking(source, maskingBounds);
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
         protected override void UpdateAfterChildren()
         {
