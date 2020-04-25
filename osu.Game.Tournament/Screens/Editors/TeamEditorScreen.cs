@@ -118,13 +118,13 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsTextBox
                             {
-                                LabelText = "种子",
+                                LabelText = "排名",
                                 Width = 0.2f,
                                 Bindable = Model.Seed
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "去年的位置(Last Year Placement)",
+                                LabelText = "上次比赛中的排名",
                                 Width = 0.33f,
                                 Bindable = Model.LastYearPlacing
                             },

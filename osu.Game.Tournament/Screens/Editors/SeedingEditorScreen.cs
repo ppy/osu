@@ -74,7 +74,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "种子",
+                                LabelText = "排名",
                                 Width = 0.33f,
                                 Bindable = Model.Seed
                             },
@@ -187,7 +187,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     },
                                     new SettingsSlider<int>
                                     {
-                                        LabelText = "种子",
+                                        LabelText = "排名",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
                                         Bindable = beatmap.Seed
