@@ -539,3 +539,12 @@
     *   [m] [Implement legacy beatmap encoding for all rulesets #8823]
 
 *   更新readme
+
+### 2020/4/25
+*   合并上游pr
+    *   [m] [Fix crash on switching comments page at an inopportune time #8858]
+    *   [m] [Refactor osu!taiko playfield and add background skinning support #8846]
+    *   [m] [Fix null reference while hiding toolbar on tests #8862]
+
+*   翻译改进
+*   关于界面代码优化

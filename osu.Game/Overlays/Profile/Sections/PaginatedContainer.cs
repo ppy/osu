@@ -84,7 +84,6 @@ namespace osu.Game.Overlays.Profile.Sections
                 },
                 missingText = new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 15),
                     Text = missing,
                     Alpha = 0,
                 },

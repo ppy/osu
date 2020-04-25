@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             public CountAvailable()
                 : base("可用的Kudosu")
             {
-                DescriptionText.Text = "kudosu 可以兑换为 kudosu 星,它可以让你的谱面更引人注意。这是你还没有兑换的 kudosu 数。";//来自官网
+                DescriptionText.Text = "kudosu 可以兑换为 kudosu 星,它可以让你的谱面更引人注意。这是该玩家还没有兑换的 kudosu 数。";//改自官网
             }
         }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             public CountTotal()
                 : base("总共获得的Kudosu")
             {
-                DescriptionText.AddText("取决于你对制谱的贡献如何。");
+                DescriptionText.AddText("取决于你对制谱的贡献如何。通过访问");
                 DescriptionText.AddLink("这个页面", "https://osu.ppy.sh/wiki/Kudosu");
                 DescriptionText.AddText("来获得更多信息。");//同样来自官网qwq
             }

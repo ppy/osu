@@ -14,36 +14,30 @@ namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuTexts : MfMenuContent
     {
+        private static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
         private LinkFlowContainer textFlow;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new FillFlowContainer
             {
-                new FillFlowContainer{
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Padding = new MarginPadding(20),
+                Child = textFlow = new LinkFlowContainer
+                {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding(20),
-                    Spacing = new Vector2(0, 5),
-                    Children = new Drawable[]
-                    {
-                        textFlow = new LinkFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            TextAnchor = Anchor.TopLeft,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Spacing = new Vector2(0, 2),
-                        },
-                    }
-                }
+                    TextAnchor = Anchor.TopLeft,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Spacing = new Vector2(0, 2),
+                },
             };
-            static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
 
             textFlow.AddParagraph("关于Mf-osu", Titlefont );
             textFlow.NewParagraph();
@@ -103,7 +97,7 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.AddText("查询。");
             textFlow.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
             textFlow.AddLink("contact@ppy.sh","mailto:contact@ppy.sh");
-            textFlow.AddParagraph("与汉化版有关的一些问题，您也可以发送邮件至");
+            textFlow.AddParagraph("与汉化版有关的问题，您也可以发送邮件至");
             textFlow.AddLink("midnightcarnival@outlook.com","mailto:midnightcarnival@outlook.com");
 
             textFlow.NewParagraph();
@@ -122,7 +116,7 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.NewParagraph();
             textFlow.AddLink("看板 → pr8771[Merged]","https://github.com/ppy/osu/pull/8771");
             textFlow.NewParagraph();
-            textFlow.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Open]","https://github.com/ppy/osu/pull/8607");
+            textFlow.AddLink("从osu/rulesets目录读取自定义游戏模式 → pr8607[Merged]","https://github.com/ppy/osu/pull/8607");
             textFlow.NewParagraph();
             textFlow.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis","https://github.com/EVAST9919/lazer-m-vis");
             textFlow.AddParagraph("暂时不知道tau模式是否可以使用在线功能");

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,8 +10,6 @@ namespace osu.Game.Overlays
 {
     public class MfMenuOverlay : FullscreenOverlay
     {
-        protected MfMenuHeader Header;
-
         public MfMenuOverlay()
             : base(OverlayColourScheme.Orange)
         {
@@ -48,11 +45,6 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
         }
     }
 }

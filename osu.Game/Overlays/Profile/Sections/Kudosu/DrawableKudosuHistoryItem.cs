@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     break;
             }
 
-            return $"未知事件 ({amount} 改变)";
+            return $"未知事件 (kudosu变动 : {amount})";
         }
     }
 }
