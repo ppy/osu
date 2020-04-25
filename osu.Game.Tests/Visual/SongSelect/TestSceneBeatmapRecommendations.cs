@@ -99,10 +99,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBestRulesetIsRecommended()
         {
-            var osuRuleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            var taikoRuleset = rulesets.AvailableRulesets.First(r => r.ID == 1);
-            var catchRuleset = rulesets.AvailableRulesets.First(r => r.ID == 2);
-            var maniaRuleset = rulesets.AvailableRulesets.First(r => r.ID == 3);
+            var osuRuleset = rulesets.GetRuleset(0);
+            var taikoRuleset = rulesets.GetRuleset(1);
+            var catchRuleset = rulesets.GetRuleset(2);
+            var maniaRuleset = rulesets.GetRuleset(3);
 
             var osuImport = importBeatmap(0, new List<RulesetInfo> { osuRuleset });
             var mixedImport = importBeatmap(1, new List<RulesetInfo> { taikoRuleset, catchRuleset, maniaRuleset });
@@ -117,9 +117,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestSecondBestRulesetIsRecommended()
         {
-            var osuRuleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            var taikoRuleset = rulesets.AvailableRulesets.First(r => r.ID == 1);
-            var catchRuleset = rulesets.AvailableRulesets.First(r => r.ID == 2);
+            var osuRuleset = rulesets.GetRuleset(0);
+            var taikoRuleset = rulesets.GetRuleset(1);
+            var catchRuleset = rulesets.GetRuleset(2);
 
             var osuImport = importBeatmap(0, new List<RulesetInfo> { osuRuleset });
             var mixedImport = importBeatmap(1, new List<RulesetInfo> { taikoRuleset, catchRuleset, taikoRuleset });
