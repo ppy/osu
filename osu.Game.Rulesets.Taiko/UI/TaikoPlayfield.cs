@@ -55,7 +55,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Right area",
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
-                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Container
