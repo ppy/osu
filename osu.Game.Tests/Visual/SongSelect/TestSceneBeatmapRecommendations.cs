@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             // Make sure we are on standard ruleset
             presentAndConfirm(osuImport, 1);
 
-            // Present mixed difficulty set, expect ruleset with highest star difficulty
+            // Present mixed difficulty set, expect ruleset with second highest star difficulty
             presentAndConfirm(mixedImport, 2);
         }
 
