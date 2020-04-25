@@ -33,8 +33,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        // Required for toolbar components that need to listen for key input
-        // to invoke specific actions while toolbar is in hidden state.
+        // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
         public override bool PropagateNonPositionalInputSubTree => true;
 
         public Toolbar()
