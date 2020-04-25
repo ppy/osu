@@ -92,8 +92,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // The input manager processes all input prior to us updating, so this is the perfect time
             // for us to remove the extra press blocking, before input is handled in the next frame
             pressHandledThisFrame = false;
-
-            Size = BaseSize * Parent.RelativeChildSize;
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
@@ -116,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     // If we're far enough away from the left stage, we should bring outselves in front of it
                     ProxyContent();
 
-                    var flash = (MainPiece as CirclePiece)?.FlashBox;
+                    var flash = (MainPiece.Drawable as CirclePiece)?.FlashBox;
                     flash?.FadeTo(0.9f).FadeOut(300);
 
                     const float gravity_time = 300;
