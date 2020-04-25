@@ -11,7 +11,12 @@ namespace osu.Game.Overlays.Settings.Sections
     public class MaintenanceSection : SettingsSection
     {
         public override string Header => "Maintenance";
-        public override IconUsage Icon => FontAwesome.Solid.Wrench;
+
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            RelativeSizeAxes = Axes.Both,
+            Icon = FontAwesome.Solid.Wrench
+        };
 
         public MaintenanceSection()
         {

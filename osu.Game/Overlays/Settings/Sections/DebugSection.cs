@@ -10,7 +10,12 @@ namespace osu.Game.Overlays.Settings.Sections
     public class DebugSection : SettingsSection
     {
         public override string Header => "Debug";
-        public override IconUsage Icon => FontAwesome.Solid.Bug;
+
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            RelativeSizeAxes = Axes.Both,
+            Icon = FontAwesome.Solid.Bug
+        };
 
         public DebugSection()
         {
