@@ -36,31 +36,48 @@ namespace osu.Game.Tests.Visual.SongSelect
                     switch (req)
                     {
                         case GetUserRequest userRequest:
-
-                            decimal pp = userRequest.Ruleset.ID switch
-                            {
-                                0 => 336, // Expected recommended star difficulty 2*
-                                1 => 928, // Expected recommended star difficulty 3*
-                                2 => 1905, // Expected recommended star difficulty 4*
-                                3 => 3329, // Expected recommended star difficulty 5*
-                                _ => 0
-                            };
-
-                            userRequest.TriggerSuccess(new User
-                            {
-                                Username = @"Dummy",
-                                Id = 1001,
-                                Statistics = new UserStatistics
-                                {
-                                    PP = pp
-                                }
-                            });
+                            userRequest.TriggerSuccess(getUser(userRequest.Ruleset.ID));
                             break;
                     }
                 };
-                // Force recommender to calculate its star ratings again
-                recommender.APIStateChanged(API, APIState.Online);
             });
+
+            // Force recommender to calculate its star ratings again
+            AddStep("calculate recommended SRs", () => recommender.APIStateChanged(API, APIState.Online));
+
+            User getUser(int? rulesetID)
+            {
+                return new User
+                {
+                    Username = @"Dummy",
+                    Id = 1001,
+                    Statistics = new UserStatistics
+                    {
+                        PP = getNecessaryPP(rulesetID)
+                    }
+                };
+            }
+
+            decimal getNecessaryPP(int? rulesetID)
+            {
+                switch (rulesetID)
+                {
+                    case 0:
+                        return 336;
+
+                    case 1:
+                        return 928;
+
+                    case 2:
+                        return 1905;
+
+                    case 3:
+                        return 3329;
+
+                    default:
+                        return 0;
+                }
+            }
         }
 
         [Test]
