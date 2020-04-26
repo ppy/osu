@@ -13,7 +13,6 @@ namespace osu.Game.Overlays.KeyBinding
     {
         public override Drawable CreateIcon() => ruleset?.CreateInstance()?.CreateIcon() ?? new SpriteIcon
         {
-            RelativeSizeAxes = Axes.Both,
             Icon = OsuIcon.Hot
         };
 

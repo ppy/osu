@@ -12,7 +12,6 @@ namespace osu.Game.Overlays.KeyBinding
     {
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            RelativeSizeAxes = Axes.Both,
             Icon = FontAwesome.Solid.Globe
         };
 

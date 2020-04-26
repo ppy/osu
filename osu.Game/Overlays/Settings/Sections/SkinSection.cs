@@ -21,7 +21,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            RelativeSizeAxes = Axes.Both,
             Icon = FontAwesome.Solid.PaintBrush
         };
 
