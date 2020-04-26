@@ -282,15 +282,15 @@ namespace osu.Game.Rulesets.Taiko.UI
                 mascot.PlayfieldState.Value = isFailing ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle;
             }
         }
-    }
 
-    internal class ProxyContainer : LifetimeManagementContainer
-    {
-        public new MarginPadding Padding
+        private class ProxyContainer : LifetimeManagementContainer
         {
-            set => base.Padding = value;
-        }
+            public new MarginPadding Padding
+            {
+                set => base.Padding = value;
+            }
 
-        public void Add(Drawable proxy) => AddInternal(proxy);
+            public void Add(Drawable proxy) => AddInternal(proxy);
+        }
     }
 }
