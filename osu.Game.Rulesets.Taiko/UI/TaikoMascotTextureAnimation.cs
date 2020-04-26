@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 foreach (var textureIndex in clear_animation_sequence)
                 {
-                    var textureName = _getStateTextureName(textureIndex);
+                    var textureName = getStateTextureName(textureIndex);
                     Texture texture = skin.GetTexture(textureName);
 
                     if (texture == null)
@@ -52,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 for (int i = 0; true; i++)
                 {
-                    var textureName = _getStateTextureName(i);
+                    var textureName = getStateTextureName(i);
                     Texture texture = skin.GetTexture(textureName);
 
                     if (texture == null)
@@ -63,10 +64,13 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        /// <summary>Advances the current frame by one.</summary>
+        /// <summary>
+        /// Advances the current frame by one.
+        /// </summary>
         public void Move()
         {
-            if (FrameCount == 0) // Frames are apparently broken
+            // Check whether there are frames before causing a crash.
+            if (FrameCount == 0)
                 return;
 
             if (FrameCount <= currentFrame)
@@ -77,18 +81,27 @@ namespace osu.Game.Rulesets.Taiko.UI
             currentFrame += 1;
         }
 
-        private string _getStateTextureName(int i) => $"pippidon{_getStateString(State)}{i}";
+        private string getStateTextureName(int i) => $"pippidon{getStateString(State)}{i}";
 
-        private string _getStateString(TaikoMascotAnimationState state)
+        private string getStateString(TaikoMascotAnimationState state)
         {
-            return state switch
+            switch (state)
             {
-                TaikoMascotAnimationState.Clear => "clear",
-                TaikoMascotAnimationState.Fail => "fail",
-                TaikoMascotAnimationState.Idle => "idle",
-                TaikoMascotAnimationState.Kiai => "kiai",
-                _ => null
-            };
+                case TaikoMascotAnimationState.Clear:
+                    return "clear";
+
+                case TaikoMascotAnimationState.Fail:
+                    return "fail";
+
+                case TaikoMascotAnimationState.Idle:
+                    return "idle";
+
+                case TaikoMascotAnimationState.Kiai:
+                    return "kiai";
+
+                default:
+                    throw new ArgumentException($"There's no case for animation state ${state} available", nameof(state));
+            }
         }
     }
 }

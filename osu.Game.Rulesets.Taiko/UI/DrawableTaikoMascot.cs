@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -11,66 +12,27 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public sealed class DrawableTaikoMascot : BeatSyncedContainer
+    public class DrawableTaikoMascot : BeatSyncedContainer
     {
-        private static TaikoMascotTextureAnimation idleDrawable, clearDrawable, kiaiDrawable, failDrawable;
+        private TaikoMascotTextureAnimation idleDrawable, clearDrawable, kiaiDrawable, failDrawable;
         private EffectControlPoint lastEffectControlPoint;
-        private TaikoMascotAnimationState state;
 
         public Bindable<TaikoMascotAnimationState> PlayfieldState;
 
-        /// <summary>
-        /// Determines if there should be no "state logic", intended for testing.
-        /// </summary>
-        public bool Dumb { get; set; }
-
-        public TaikoMascotAnimationState State
-        {
-            get => state;
-            set
-            {
-                state = value;
-
-                foreach (var child in InternalChildren)
-                    child.Hide();
-
-                var drawable = getStateDrawable(State);
-
-                drawable?.Show();
-            }
-        }
+        public TaikoMascotAnimationState State { get; private set; }
 
         public DrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
         {
             RelativeSizeAxes = Axes.Both;
+
             PlayfieldState = new Bindable<TaikoMascotAnimationState>();
             PlayfieldState.BindValueChanged(b =>
             {
                 if (lastEffectControlPoint != null)
-                    State = getFinalAnimationState(lastEffectControlPoint, b.NewValue);
+                    ShowState(GetFinalAnimationState(lastEffectControlPoint, b.NewValue));
             });
 
             State = startingState;
-        }
-
-        private TaikoMascotTextureAnimation getStateDrawable(TaikoMascotAnimationState state)
-        {
-            return state switch
-            {
-                TaikoMascotAnimationState.Idle => idleDrawable,
-                TaikoMascotAnimationState.Clear => clearDrawable,
-                TaikoMascotAnimationState.Kiai => kiaiDrawable,
-                TaikoMascotAnimationState.Fail => failDrawable,
-                _ => null
-            };
-        }
-
-        private TaikoMascotAnimationState getFinalAnimationState(EffectControlPoint effectPoint, TaikoMascotAnimationState playfieldState)
-        {
-            if (playfieldState == TaikoMascotAnimationState.Fail)
-                return playfieldState;
-
-            return effectPoint.KiaiMode ? TaikoMascotAnimationState.Kiai : TaikoMascotAnimationState.Idle;
         }
 
         [BackgroundDependencyLoader]
@@ -84,21 +46,60 @@ namespace osu.Game.Rulesets.Taiko.UI
                 failDrawable = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Fail),
             };
 
-            // making sure we have the correct sprite set
+            ShowState(State);
+        }
+
+        public void ShowState(TaikoMascotAnimationState state)
+        {
+            foreach (var child in InternalChildren)
+                child.Hide();
+
             State = state;
+
+            var drawable = getStateDrawable(State);
+            drawable.Show();
+        }
+
+        private TaikoMascotTextureAnimation getStateDrawable(TaikoMascotAnimationState state)
+        {
+            switch (state)
+            {
+                case TaikoMascotAnimationState.Idle:
+                    return idleDrawable;
+
+                case TaikoMascotAnimationState.Clear:
+                    return clearDrawable;
+
+                case TaikoMascotAnimationState.Kiai:
+                    return kiaiDrawable;
+
+                case TaikoMascotAnimationState.Fail:
+                    return failDrawable;
+
+                default:
+                    throw new ArgumentException($"There's no case for animation state ${state} available", nameof(state));
+            }
+        }
+
+        protected virtual TaikoMascotAnimationState GetFinalAnimationState(EffectControlPoint effectPoint, TaikoMascotAnimationState playfieldState)
+        {
+            if (playfieldState == TaikoMascotAnimationState.Fail)
+                return playfieldState;
+
+            return effectPoint.KiaiMode ? TaikoMascotAnimationState.Kiai : TaikoMascotAnimationState.Idle;
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            if (!Dumb)
-                State = getFinalAnimationState(lastEffectControlPoint = effectPoint, PlayfieldState.Value);
+            var state = GetFinalAnimationState(lastEffectControlPoint = effectPoint, PlayfieldState.Value);
+            ShowState(state);
 
-            if (State == TaikoMascotAnimationState.Clear)
+            if (state == TaikoMascotAnimationState.Clear)
                 return;
 
-            var drawable = getStateDrawable(State);
+            var drawable = getStateDrawable(state);
             drawable.Move();
         }
     }
