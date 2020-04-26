@@ -27,6 +27,8 @@ using osu.Game.Overlays.Music;
 using osu.Framework.Audio.Track;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Screens
 {
@@ -53,9 +55,10 @@ namespace osu.Game.Screens
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
-
         [Resolved]
         private MusicController musicController { get; set; }
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         [Cached]
         private PlaylistOverlay playlist;
@@ -63,6 +66,7 @@ namespace osu.Game.Screens
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
 
+        protected BeatmapCarousel Carousel { get; private set; }
         ScheduledDelegate scheduledHideOverlays;
         ScheduledDelegate scheduledShowOverlays;
         Box bgBox;
@@ -108,6 +112,14 @@ namespace osu.Game.Screens
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
+                        },
+                        Carousel = new BeatmapCarousel
+                        {
+                            AllowSelection = true, // delay any selection until our bindables are ready to make a good choice.
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            RelativeSizeAxes = Axes.Both,
+                            //BeatmapSetsChanged = SongSelect.carouselBeatmapsLoaded,
                         },
                     }
                 },
@@ -178,19 +190,19 @@ namespace osu.Game.Screens
                                                         new MusicControlButton()
                                                         {
                                                             ButtonIcon = FontAwesome.Solid.StepBackward,
-                                                            Action = () => musicController.PreviousTrack(),
+                                                            Action = () => musicController?.PreviousTrack(),
                                                             TooltipText = "上一首/从头开始",
                                                         },
                                                         new MusicControlButton()
                                                         {
                                                             ButtonIcon = FontAwesome.Solid.Music,
-                                                            Action = () => musicController.TogglePause(),
+                                                            Action = () => musicController?.TogglePause(),
                                                             TooltipText = "切换暂停",
                                                         },
                                                         new MusicControlButton()
                                                         {
                                                             ButtonIcon = FontAwesome.Solid.StepForward,
-                                                            Action = () => musicController.NextTrack(),
+                                                            Action = () => musicController?.NextTrack(),
                                                             TooltipText = "下一首",
                                                         },
                                                     }
