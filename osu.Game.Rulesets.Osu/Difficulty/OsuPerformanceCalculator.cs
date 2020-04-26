@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses and 50s exponentially
             tapValue *= Math.Pow(0.93, Math.Max(effectiveMissCount - missCountLeniency, 0));
-            tapValue *= Math.Pow(0.99, countMeh);
+            tapValue *= Math.Pow(0.98, countMeh < 3 ? 0.5 * countMeh : countMeh - 1.5);
 
             // Buff very high AR
             double approachRateFactor = 1.0;
