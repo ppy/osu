@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private BarLine createBarLineAtCurrentTime(bool major = false)
         {
-            var drumroll = new BarLine
+            var barline = new BarLine
             {
                 Major = major,
                 StartTime = Time.Current + 2000,
@@ -103,9 +103,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             var cpi = new ControlPointInfo();
             cpi.Add(0, new TimingControlPoint { BeatLength = 500 });
 
-            drumroll.ApplyDefaults(cpi, new BeatmapDifficulty());
+            barline.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            return drumroll;
+            return barline;
         }
     }
 }
