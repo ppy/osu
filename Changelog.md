@@ -528,3 +528,31 @@
     *   [m] [Add static internal catcher calculation methods for CatchDifficultyCalculator #8830]
     *   [m] [Use platform bindings for editor actions #8832]
     *   [m] [Remove obsolete nested hitobject methods #8833]
+
+### 2020/4/24
+*   合并上游pr
+    *   [m] [Fix editor crashing when entering with no beatmap selected #8856]
+    *   [m] [Make osu! ruleset placements happen on mouse down #8842]
+    *   [m] [Fix mania editor placement not working correctly #8843]
+    *   [m] [Rename editor tests namespace from "Editor" to "Editing" #8849]
+    *   [m] [Fix TestBeatmap not setting appropriate ruleset ID #8834]
+    *   [m] [Implement legacy beatmap encoding for all rulesets #8823]
+
+*   更新readme
+
+### 2020/4/25
+*   合并上游pr
+    *   [m] [Fix crash on switching comments page at an inopportune time #8858]
+    *   [m] [Refactor osu!taiko playfield and add background skinning support #8846]
+    *   [m] [Fix null reference while hiding toolbar on tests #8862]
+
+*   翻译改进
+*   关于界面代码优化
+
+### 2020/4/27
+*   合并上游pr
+    *   [m] [Fix ruleset selector not receiving key input on toolbar absence #8863]
+    *   [m] [Fix custom rulesets not showing correct icons in key binding settings #8864]
+    *   [m] [Add background video for the Showcase Scene to the tournament client #8859]
+    *   [m] [Adjust editor timeline current marker to promote tick visibility #8873]
+    *   [m] [Add osu!taiko bar line skinning support #8848]

@@ -19,7 +19,10 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override string Header => "皮肤";
 
-        public override IconUsage Icon => FontAwesome.Solid.PaintBrush;
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.PaintBrush
+        };
 
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();

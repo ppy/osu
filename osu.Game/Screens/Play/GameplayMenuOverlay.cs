@@ -175,7 +175,6 @@ namespace osu.Game.Screens.Play
                     VisualSettings.FadeOut(250);
                     break;
             }
-
         }
 
         private int retries;
@@ -301,7 +300,6 @@ namespace osu.Game.Screens.Play
 
         private void BreakSettingsOverlayContainer()
         {
-
         }
 
         private class Button : DialogButton

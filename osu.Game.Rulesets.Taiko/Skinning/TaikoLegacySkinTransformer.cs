@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {
@@ -52,7 +53,32 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.HitTarget:
                     if (GetTexture("taikobigcircle") != null)
-                        return new LegacyHitTarget();
+                        return new TaikoLegacyHitTarget();
+
+                    return null;
+
+                case TaikoSkinComponents.PlayfieldBackgroundRight:
+                    if (GetTexture("taiko-bar-right") != null)
+                    {
+                        return this.GetAnimation("taiko-bar-right", false, false).With(d =>
+                        {
+                            d.RelativeSizeAxes = Axes.Both;
+                            d.Size = Vector2.One;
+                        });
+                    }
+
+                    return null;
+
+                case TaikoSkinComponents.PlayfieldBackgroundLeft:
+                    // This is displayed inside LegacyInputDrum. It is required to be there for layout purposes (can be seen on legacy skins).
+                    if (GetTexture("taiko-bar-right") != null)
+                        return Drawable.Empty();
+
+                    return null;
+
+                case TaikoSkinComponents.BarLine:
+                    if (GetTexture("taiko-barline") != null)
+                        return new LegacyBarLine();
 
                     return null;
             }

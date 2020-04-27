@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             sampleMapping = new DrumSampleMapping(controlPoints);
 
             RelativeSizeAxes = Axes.Both;
-            FillMode = FillMode.Fit;
         }
 
         [BackgroundDependencyLoader]
@@ -40,6 +39,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             Child = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                Scale = new Vector2(0.9f),
                 Children = new Drawable[]
                 {
                     new TaikoHalfDrum(false)

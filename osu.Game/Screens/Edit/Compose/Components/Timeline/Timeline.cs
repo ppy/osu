@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             // We don't want the centre marker to scroll
-            AddInternal(new CentreMarker());
+            AddInternal(new CentreMarker { Depth = float.MaxValue });
 
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
@@ -60,9 +60,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
 
-                MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                if (track.Length > 0)
+                {
+                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
             }, true);
         }
 
@@ -135,7 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void scrollToTrackTime()
         {
-            if (!track.IsLoaded)
+            if (!track.IsLoaded || track.Length == 0)
                 return;
 
             ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
