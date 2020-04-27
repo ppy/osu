@@ -112,6 +112,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             waitForSelection(set_count, 3);
         }
 
+        [Test]
+        public void TestNoTraversalWithoutInitialSelection()
+        {
+            // This is testing behaviour when carousel root doesn't do eager selection. This is only happens in testing.
+
+            loadBeatmaps();
+            checkNoSelection();
+            advanceSelection(direction: 1, diff: true);
+            checkNoSelection();
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestTraversalBeyondVisible(bool forwards)
@@ -889,6 +900,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             public bool PendingFilterTask => PendingFilter != null;
 
             protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
+
+            public new void SelectNext(int direction = 1, bool skipDifficulties = true)
+            {
+                if (!skipDifficulties && SelectedBeatmapSet == null)
+                    return;
+
+                base.SelectNext(direction, skipDifficulties);
+            }
         }
     }
 }
