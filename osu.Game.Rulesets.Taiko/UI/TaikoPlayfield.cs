@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
@@ -43,8 +42,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         private Container hitTargetOffsetContent;
 
         private SkinnableDrawable mascotDrawable;
-
-        private Bindable<double> frameTime = new Bindable<double>(100);
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
