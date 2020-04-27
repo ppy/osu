@@ -12,13 +12,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
+        /// <summary>
+        /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.
+        /// </summary>
+        public HitType JudgementType;
+
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
             FillMode = FillMode.Fit;
         }
-
-        public override bool DisplayResult => false;
 
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
             _ => new TickPiece
@@ -51,7 +54,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        public override bool OnPressed(TaikoAction action) => UpdateResult(true);
+        public override bool OnPressed(TaikoAction action)
+        {
+            JudgementType = action == TaikoAction.LeftRim || action == TaikoAction.RightRim ? HitType.Rim : HitType.Centre;
+            return UpdateResult(true);
+        }
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
