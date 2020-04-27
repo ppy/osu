@@ -92,8 +92,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // The input manager processes all input prior to us updating, so this is the perfect time
             // for us to remove the extra press blocking, before input is handled in the next frame
             pressHandledThisFrame = false;
-
-            Size = BaseSize * Parent.RelativeChildSize;
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
