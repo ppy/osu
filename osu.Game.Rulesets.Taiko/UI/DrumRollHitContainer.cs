@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             for (var i = AliveInternalChildren.Count - 1; i >= 0; i--)
             {
                 var flyingHit = (DrawableFlyingHit)AliveInternalChildren[i];
-                if (Time.Current < flyingHit.HitObject.StartTime)
+                if (Time.Current <= flyingHit.HitObject.StartTime)
                     Remove(flyingHit);
             }
         }

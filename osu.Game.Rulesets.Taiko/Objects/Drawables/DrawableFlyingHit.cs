@@ -11,16 +11,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// </summary>
     public class DrawableFlyingHit : DrawableHit
     {
+        public DrawableFlyingHit(DrawableDrumRollTick drumRollTick)
+            : base(new IgnoreHit
+            {
+                StartTime = drumRollTick.HitObject.StartTime + drumRollTick.Result.TimeOffset,
+                IsStrong = drumRollTick.HitObject.IsStrong,
+                Type = drumRollTick.JudgementType
+            })
+        {
+            HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             ApplyResult(r => r.Type = r.Judgement.MaxResult);
-        }
-
-        public DrawableFlyingHit(double time, bool isStrong = false)
-            : base(new IgnoreHit { StartTime = time, IsStrong = isStrong })
-        {
-            HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
         }
     }
 }
