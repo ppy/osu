@@ -548,3 +548,11 @@
 
 *   翻译改进
 *   关于界面代码优化
+
+### 2020/4/27
+*   合并上游pr
+    *   [m] [Fix ruleset selector not receiving key input on toolbar absence #8863]
+    *   [m] [Fix custom rulesets not showing correct icons in key binding settings #8864]
+    *   [m] [Add background video for the Showcase Scene to the tournament client #8859]
+    *   [m] [Adjust editor timeline current marker to promote tick visibility #8873]
+    *   [m] [Add osu!taiko bar line skinning support #8848]

@@ -10,7 +10,10 @@ namespace osu.Game.Overlays.Settings.Sections
     public class MfSection : SettingsSection
     {
         public override string Header => "Mf-osu";
-        public override IconUsage Icon => FontAwesome.Solid.Lemon;
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.Lemon
+        };
 
         public MfSection(MfSettingsPanel mfpanel)
         {
