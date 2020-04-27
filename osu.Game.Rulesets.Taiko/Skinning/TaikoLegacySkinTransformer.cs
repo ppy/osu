@@ -81,9 +81,36 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                         return new LegacyBarLine();
 
                     return null;
+
+                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionGreat:
+                case TaikoSkinComponents.TaikoExplosionMiss:
+
+                    var sprite = this.GetAnimation(getHitname(taikoComponent.Component), true, false);
+                    if (sprite != null)
+                        return new LegacyHitExplosion(sprite);
+
+                    return null;
             }
 
             return source.GetDrawableComponent(component);
+        }
+
+        private string getHitname(TaikoSkinComponents component)
+        {
+            switch (component)
+            {
+                case TaikoSkinComponents.TaikoExplosionMiss:
+                    return "taiko-hit0";
+
+                case TaikoSkinComponents.TaikoExplosionGood:
+                    return "taiko-hit100";
+
+                case TaikoSkinComponents.TaikoExplosionGreat:
+                    return "taiko-hit300";
+            }
+
+            return string.Empty;
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);
