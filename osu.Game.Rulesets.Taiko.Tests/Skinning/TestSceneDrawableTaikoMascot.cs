@@ -180,7 +180,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         private void collectPlayfields()
         {
             playfields.Clear();
-            foreach (var ruleset in rulesets) playfields.Add(ruleset.ChildrenOfType<TaikoPlayfield>().Single());
+            foreach (var ruleset in rulesets)
+                playfields.Add(ruleset.ChildrenOfType<TaikoPlayfield>().Single());
         }
 
         private void collectMascots()
