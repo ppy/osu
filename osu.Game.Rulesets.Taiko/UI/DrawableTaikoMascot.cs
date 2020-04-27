@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return failDrawable;
 
                 default:
-                    throw new ArgumentException($"There's no case for animation state ${state} available", nameof(state));
+                    throw new ArgumentOutOfRangeException(nameof(state), $"There's no animation available for state {state}");
             }
         }
 
