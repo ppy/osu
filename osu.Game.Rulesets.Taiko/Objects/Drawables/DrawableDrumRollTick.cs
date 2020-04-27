@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        public override bool DisplayResult => false;
-
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
             _ => new TickPiece
             {
