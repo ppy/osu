@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 case TaikoDrumRollTickJudgement _:
                     if (!result.IsHit)
-                        return;
+                        break;
 
                     var drawableTick = (DrawableDrumRollTick)judgedObject;
 
@@ -218,7 +218,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                         break;
 
                     addExplosion(judgedObject, (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre);
-
                     break;
             }
         }
