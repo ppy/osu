@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (FrameCount == 0)
                 return;
 
-            if (FrameCount <= currentFrame)
+            if (currentFrame >= FrameCount)
                 currentFrame = 0;
 
             GotoFrame(currentFrame);
