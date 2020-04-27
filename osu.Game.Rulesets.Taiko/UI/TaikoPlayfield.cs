@@ -150,8 +150,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
 
-            // When rewinding, make sure to remove any auxilliary hit notes that were
-            // spawned and played during a drumroll.
+            // When rewinding, make sure to remove any auxiliary hit notes that were
+            // spawned and played during a drum roll.
             if (Time.Elapsed < 0)
             {
                 foreach (var o in drumRollHitContainer.Objects)
