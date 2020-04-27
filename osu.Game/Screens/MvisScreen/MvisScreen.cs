@@ -30,6 +30,8 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Screens
 {
@@ -68,6 +70,8 @@ namespace osu.Game.Screens
         private ScheduledDelegate scheduledHideOverlays;
         private ScheduledDelegate scheduledShowOverlays;
         private Box bgBox;
+        private Container sbContainer;
+        ClockContainer sbClock;
         private BottomBar bottomBar;
         private SideBarSettingsPanel sidebarContainer;
         private BeatmapLogo beatmapLogo;
@@ -96,6 +100,10 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        sbContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
                         new SpaceParticlesContainer(),
                         new ParallaxContainer
                         {
@@ -274,6 +282,7 @@ namespace osu.Game.Screens
                                 },
                                 lockButton = new ToggleableOverlayLockButton
                                 {
+                                    TooltipText = "开启悬浮锁",
                                     Action = () => UpdateLockButton(),
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
@@ -524,6 +533,24 @@ namespace osu.Game.Screens
             }
         }
 
+        private void UpdateStoryBoardSource()
+        {
+            sbClock?.Stop();
+            foreach (var s in sbContainer)
+            {
+                s.Hide();
+                s.Expire();
+            }
+            
+            sbContainer.Add(
+                sbClock = new ClockContainer(Beatmap.Value, 0)
+                {
+                    Child = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both }
+                });
+
+            sbClock.Start();
+        }
+
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
@@ -533,6 +560,7 @@ namespace osu.Game.Screens
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
+            UpdateStoryBoardSource();
         }
     }
 }
