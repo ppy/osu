@@ -273,30 +273,13 @@ namespace osu.Game.Screens.Select
                 return;
 
             if (selectedBeatmapSet == null || selectedBeatmap == null)
-            {
-                performInitialSelection(direction, skipDifficulties);
+                // all initial selections should happen via the CarouselRoot.
                 return;
-            }
 
             if (skipDifficulties)
                 selectNextSet(direction, true);
             else
                 selectNextDifficulty(direction);
-        }
-
-        private void performInitialSelection(int direction, bool skipDifficulties)
-        {
-            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value);
-            CarouselItem toSelect = direction > 0 ? unfilteredSets.First() : unfilteredSets.Last();
-
-            if (!skipDifficulties)
-            {
-                // We are not skipping difficulties so we want to select the very first (or the very last) difficulty
-                var selectedBeatmaps = ((CarouselBeatmapSet)toSelect).Beatmaps.Where(s => !s.Filtered.Value);
-                toSelect = direction > 0 ? selectedBeatmaps.First() : selectedBeatmaps.Last();
-            }
-
-            select(toSelect);
         }
 
         private void selectNextSet(int direction, bool skipDifficulties)
