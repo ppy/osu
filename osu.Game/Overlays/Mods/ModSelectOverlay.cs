@@ -272,7 +272,7 @@ namespace osu.Game.Overlays.Mods
                                                         Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,
-                                                        Width = 70, // to avoid footer from flowing when clicking mods
+                                                        Width = 70, // to prevent footer from flowing when clicking mods
                                                     },
                                                 },
                                             },
