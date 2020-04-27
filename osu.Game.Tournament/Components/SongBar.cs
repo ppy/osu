@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Components
     {
         private BeatmapInfo beatmap;
 
-        private const float height = 145;
+        public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
@@ -157,7 +157,7 @@ namespace osu.Game.Tournament.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = height / 2,
+                    Height = HEIGHT,
                     Width = 0.5f,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -229,7 +229,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.X,
                     Width = 0.5f,
-                    Height = height / 2,
+                    Height = HEIGHT,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                 }
