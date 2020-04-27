@@ -50,14 +50,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 return base.OnMouseDown(e);
 
             HitObject.Column = Column.Index;
-            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition));
+            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition), true);
             return true;
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            EndPlacement(true);
-            base.OnMouseUp(e);
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition)

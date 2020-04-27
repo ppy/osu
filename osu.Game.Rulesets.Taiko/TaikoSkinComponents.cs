@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Taiko
         DrumRollTick,
         Swell,
         HitTarget,
+        PlayfieldBackgroundLeft,
+        PlayfieldBackgroundRight,
         TaikoDon
     }
 }

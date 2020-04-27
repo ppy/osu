@@ -41,8 +41,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AccentColour = Color4.OrangeRed,
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
-
-            AddStep("change direction", () => ((ScrollingTestContainer)HitObjectContainer).Flip());
         }
 
         protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };
