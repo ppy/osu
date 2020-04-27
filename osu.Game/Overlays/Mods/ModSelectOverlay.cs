@@ -269,9 +269,10 @@ namespace osu.Game.Overlays.Mods
                                                     },
                                                     MultiplierLabel = new OsuSpriteText
                                                     {
-                                                        Font = OsuFont.GetFont(size: 25, weight: FontWeight.Bold, fixedWidth: true),
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,
+                                                        Width = 70, // to avoid footer from flowing when clicking mods
                                                     },
                                                 },
                                             },
