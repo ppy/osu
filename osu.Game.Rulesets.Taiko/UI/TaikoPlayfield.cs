@@ -270,16 +270,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             if (characterDrawable.Drawable is DrawableTaikoMascot mascot)
             {
-                var isFailing = result.Type == HitResult.Miss;
+                var miss = result.Type == HitResult.Miss;
 
-                // Only take combo in consideration when it's not a strong hit (it's always false)
-                if (!(judgedObject.HitObject is StrongHitObject))
-                {
-                    if (isFailing)
-                        isFailing = result.Judgement.AffectsCombo;
-                }
+                if (miss && judgedObject.HitObject is StrongHitObject)
+                    miss = result.Judgement.AffectsCombo;
 
-                mascot.PlayfieldState.Value = isFailing ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle;
+                mascot.PlayfieldState.Value = miss ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle;
             }
         }
 
