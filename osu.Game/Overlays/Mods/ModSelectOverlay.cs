@@ -37,7 +37,6 @@ namespace osu.Game.Overlays.Mods
         protected readonly TriangleButton CloseButton;
 
         protected readonly OsuSpriteText MultiplierLabel;
-        protected readonly OsuSpriteText UnrankedLabel;
 
         protected override bool BlockNonPositionalInput => false;
 
@@ -268,30 +267,11 @@ namespace osu.Game.Overlays.Mods
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,
                                                     },
-                                                    new FillFlowContainer
+                                                    MultiplierLabel = new OsuSpriteText
                                                     {
-                                                        AutoSizeAxes = Axes.Both,
+                                                        Font = OsuFont.GetFont(size: 25, weight: FontWeight.Bold, fixedWidth: true),
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,
-                                                        Direction = FillDirection.Vertical,
-                                                        LayoutDuration = 100,
-                                                        LayoutEasing = Easing.OutQuint,
-                                                        Children = new Drawable[]
-                                                        {
-                                                            MultiplierLabel = new OsuSpriteText
-                                                            {
-                                                                Font = OsuFont.GetFont(size: 25, weight: FontWeight.Bold, fixedWidth: true),
-                                                                Origin = Anchor.TopCentre,
-                                                                Anchor = Anchor.TopCentre,
-                                                            },
-                                                            UnrankedLabel = new OsuSpriteText
-                                                            {
-                                                                Text = @"(Unranked)",
-                                                                Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
-                                                                Origin = Anchor.TopCentre,
-                                                                Anchor = Anchor.TopCentre,
-                                                            },
-                                                        }
                                                     },
                                                 },
                                             },
@@ -340,7 +320,6 @@ namespace osu.Game.Overlays.Mods
         {
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
-            UnrankedLabel.Colour = colours.Blue;
 
             availableMods = osu.AvailableMods.GetBoundCopy();
 
@@ -444,12 +423,10 @@ namespace osu.Game.Overlays.Mods
         private void updateMods()
         {
             var multiplier = 1.0;
-            var ranked = true;
 
             foreach (var mod in SelectedMods.Value)
             {
                 multiplier *= mod.ScoreMultiplier;
-                ranked &= mod.Ranked;
             }
 
             MultiplierLabel.Text = $"{multiplier:N2}x";
@@ -459,8 +436,6 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
-
-            UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
         }
 
         private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
