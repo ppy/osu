@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
+        private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
 
         private ProxyContainer topLevelHitContainer;
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
                 rightArea = new Container
@@ -94,7 +95,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     Name = "Hit objects",
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = HitObjectContainer
+                                    Children = new Drawable[]
+                                    {
+                                        HitObjectContainer,
+                                        drumRollHitContainer = new DrumRollHitContainer()
+                                    }
                                 },
                                 kiaiExplosionContainer = new Container<KiaiHitExplosion>
                                 {
@@ -134,6 +139,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
                 },
+                drumRollHitContainer.CreateProxy(),
                 mascotDrawable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => new Container(), confineMode: ConfineMode.ScaleToFit)
                 {
                     Origin = Anchor.BottomLeft,
@@ -156,7 +162,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += OnNewResult;
-
             base.Add(h);
 
             switch (h)
@@ -175,7 +180,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             if (!DisplayJudgements.Value)
                 return;
-
             if (!judgedObject.DisplayResult)
                 return;
 
@@ -184,6 +188,16 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                    break;
+
+                case TaikoDrumRollTickJudgement _:
+                    if (!result.IsHit)
+                        break;
+
+                    var drawableTick = (DrawableDrumRollTick)judgedObject;
+
+                    addDrumRollHit(drawableTick);
+                    addExplosion(drawableTick, drawableTick.JudgementType);
                     break;
 
                 default:
@@ -198,13 +212,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (!result.IsHit)
                         break;
 
-                    bool isRim = (judgedObject.HitObject as Hit)?.Type == HitType.Rim;
-
-                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
-
-                    if (judgedObject.HitObject.Kiai)
-                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
-
+                    addExplosion(judgedObject, (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre);
                     break;
             }
 
@@ -217,6 +225,16 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 mascot.PlayfieldState.Value = miss ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle;
             }
+        }
+
+        private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
+            drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
+
+        private void addExplosion(DrawableHitObject drawableObject, HitType type)
+        {
+            hitExplosionContainer.Add(new HitExplosion(drawableObject, type));
+            if (drawableObject.HitObject.Kiai)
+                kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
 
         private class ProxyContainer : LifetimeManagementContainer

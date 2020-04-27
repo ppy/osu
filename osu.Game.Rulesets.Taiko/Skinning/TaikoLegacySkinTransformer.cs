@@ -77,6 +77,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
+                case TaikoSkinComponents.BarLine:
+                    if (GetTexture("taiko-barline") != null)
+                        return new LegacyBarLine();
+
+                    return null;
+
                 case TaikoSkinComponents.TaikoDon:
                     if (GetTexture("pippidonclear0") != null)
                         return new DrawableTaikoMascot();

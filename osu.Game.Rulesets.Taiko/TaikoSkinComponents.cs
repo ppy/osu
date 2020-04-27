@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Taiko
         HitTarget,
         PlayfieldBackgroundLeft,
         PlayfieldBackgroundRight,
+        BarLine,
         TaikoDon
     }
 }

@@ -18,14 +18,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         public override bool RemoveWhenNotAlive => true;
 
         public readonly DrawableHitObject JudgedObject;
+        private readonly HitType type;
 
-        private readonly bool isRim;
-
-        public KiaiHitExplosion(DrawableHitObject judgedObject, bool isRim)
+        public KiaiHitExplosion(DrawableHitObject judgedObject, HitType type)
         {
-            this.isRim = isRim;
-
             JudgedObject = judgedObject;
+            this.type = type;
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;
@@ -53,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = isRim ? colours.BlueDarker : colours.PinkDarker,
+                Colour = type == HitType.Rim ? colours.BlueDarker : colours.PinkDarker,
                 Radius = 60,
             };
         }
