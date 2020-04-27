@@ -9,7 +9,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -206,12 +205,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        private void addDrumRollHit(DrawableDrumRollTick drawableTick)
-        {
-            bool isStrong = drawableTick.HitObject.IsStrong;
-            double time = drawableTick.HitObject.GetEndTime();
-            drumRollHitContainer.Add(new DrawableFlyingHit(time, isStrong));
-        }
+        private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
+            drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
 
         private void addExplosion(DrawableHitObject drawableObject, HitType type)
         {
