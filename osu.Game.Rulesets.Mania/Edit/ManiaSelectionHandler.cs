@@ -45,11 +45,6 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             float delta = moveEvent.InstantDelta.Y;
 
-            // When scrolling downwards the anchor position is at the bottom of the screen, however the movement event assumes the anchor is at the top of the screen.
-            // This causes the delta to assume a positive hitobject position, and which can be corrected for by subtracting the parent height.
-            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                delta -= moveEvent.Blueprint.Parent.DrawHeight; // todo: definitely wrong
-
             foreach (var selectionBlueprint in SelectedBlueprints)
             {
                 var b = (OverlaySelectionBlueprint)selectionBlueprint;
@@ -57,24 +52,24 @@ namespace osu.Game.Rulesets.Mania.Edit
                 var hitObject = b.DrawableObject;
                 var objectParent = (HitObjectContainer)hitObject.Parent;
 
-                // StartTime could be used to adjust the position if only one movement event was received per frame.
-                // However this is not the case and ScrollingHitObjectContainer performs movement in UpdateAfterChildren() so the position must also be updated to be valid for further movement events
+                // We receive multiple movement events per frame such that we can't rely on updating the start time
+                // since the scrolling hitobject container requires at least one update frame to update the position.
+                // However the position needs to be valid for future movement events to calculate the correct deltas.
                 hitObject.Y += delta;
 
                 float targetPosition = hitObject.Position.Y;
 
-                // The scrolling algorithm always assumes an anchor at the top of the screen, so the position must be flipped when scrolling downwards to reflect a top anchor
                 if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
+                {
+                    // When scrolling downwards, the position is _negative_ when the object's start time is after the current time (e.g. in the middle of the stage).
+                    // However all scrolling algorithms upwards scrolling, meaning that a positive (inverse) position is expected in the same scenario.
                     targetPosition = -targetPosition;
-
-                objectParent.Remove(hitObject);
+                }
 
                 hitObject.HitObject.StartTime = scrollingInfo.Algorithm.TimeAt(targetPosition,
                     editorClock.CurrentTime,
                     scrollingInfo.TimeRange.Value,
                     objectParent.DrawHeight);
-
-                objectParent.Add(hitObject);
             }
         }
 
