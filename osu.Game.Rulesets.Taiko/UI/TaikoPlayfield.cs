@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -197,8 +196,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 case TaikoDrumRollTickJudgement _:
-                    if (result.IsHit)
-                        playDrumrollHit((DrawableDrumRollTick)judgedObject);
+                    if (!result.IsHit)
+                        return;
+
+                    var drawableTick = (DrawableDrumRollTick)judgedObject;
+
+                    addDrumRollHit(drawableTick);
+                    addExplosion(drawableTick, drawableTick.JudgementType);
                     break;
 
                 default:
@@ -213,30 +217,32 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (!result.IsHit)
                         break;
 
-                    bool isRim = (judgedObject.HitObject as Hit)?.Type == HitType.Rim;
-
-                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
-
-                    if (judgedObject.HitObject.Kiai)
-                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+                    addExplosion(judgedObject, (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre);
 
                     break;
             }
         }
 
-        private void playDrumrollHit(DrawableDrumRollTick drumrollTick)
+        private void addDrumRollHit(DrawableDrumRollTick drawableTick)
         {
-            TaikoAction action = drumrollTick.JudgedAction;
-            bool isStrong = drumrollTick.HitObject.IsStrong;
-            double time = drumrollTick.HitObject.GetEndTime();
+            bool isStrong = drawableTick.HitObject.IsStrong;
+            double time = drawableTick.HitObject.GetEndTime();
 
             DrawableHit drawableHit;
-            if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
+            if (drawableTick.JudgementType == HitType.Rim)
                 drawableHit = new DrawableFlyingRimHit(time, isStrong);
             else
                 drawableHit = new DrawableFlyingCentreHit(time, isStrong);
 
             drumRollHitContainer.Add(drawableHit);
+        }
+
+        private void addExplosion(DrawableHitObject drawableObject, HitType type)
+        {
+            hitExplosionContainer.Add(new HitExplosion(drawableObject, type));
+
+            if (drawableObject.HitObject.Kiai)
+                kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
 
         private class ProxyContainer : LifetimeManagementContainer

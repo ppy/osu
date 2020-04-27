@@ -13,10 +13,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
         /// <summary>
-        /// The action type that the user took which caused this tick to
-        /// have been judged as "hit"
+        /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.
         /// </summary>
-        public TaikoAction JudgedAction;
+        public HitType JudgementType;
 
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
@@ -57,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action)
         {
-            JudgedAction = action;
+            JudgementType = action == TaikoAction.LeftRim || action == TaikoAction.RightRim ? HitType.Rim : HitType.Centre;
             return UpdateResult(true);
         }
 
