@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            drawableRuleset.Playfield.Add(new DrawableCentreHit(h));
+            drawableRuleset.Playfield.Add(new DrawableHit(h));
         }
 
         private void addRimHit(bool strong)
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            drawableRuleset.Playfield.Add(new DrawableRimHit(h));
+            drawableRuleset.Playfield.Add(new DrawableHit(h));
         }
 
         private class TestStrongNestedHit : DrawableStrongNestedHit

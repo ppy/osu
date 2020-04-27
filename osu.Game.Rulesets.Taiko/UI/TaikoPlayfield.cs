@@ -93,10 +93,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Children = new Drawable[]
                                     {
                                         HitObjectContainer,
-                                        drumRollHitContainer = new ScrollingHitObjectContainer
-                                        {
-                                            Name = "Drumroll hit"
-                                        }
+                                        drumRollHitContainer = new DrumRollHitContainer()
                                     }
                                 },
                                 kiaiExplosionContainer = new Container<KiaiHitExplosion>
@@ -149,23 +146,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             // This is basically allowing for correct alignment as relative pieces move around them.
             rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
-
-            // When rewinding, make sure to remove any auxiliary hit notes that were
-            // spawned and played during a drum roll.
-            if (Time.Elapsed < 0)
-            {
-                foreach (var o in drumRollHitContainer.Objects)
-                {
-                    if (o.HitObject.StartTime >= Time.Current)
-                        drumRollHitContainer.Remove(o);
-                }
-            }
         }
 
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += OnNewResult;
-
             base.Add(h);
 
             switch (h)
@@ -184,7 +169,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             if (!DisplayJudgements.Value)
                 return;
-
             if (!judgedObject.DisplayResult)
                 return;
 
@@ -226,20 +210,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             bool isStrong = drawableTick.HitObject.IsStrong;
             double time = drawableTick.HitObject.GetEndTime();
-
-            DrawableHit drawableHit;
-            if (drawableTick.JudgementType == HitType.Rim)
-                drawableHit = new DrawableFlyingRimHit(time, isStrong);
-            else
-                drawableHit = new DrawableFlyingCentreHit(time, isStrong);
-
-            drumRollHitContainer.Add(drawableHit);
+            drumRollHitContainer.Add(new DrawableFlyingHit(time, isStrong));
         }
 
         private void addExplosion(DrawableHitObject drawableObject, HitType type)
         {
             hitExplosionContainer.Add(new HitExplosion(drawableObject, type));
-
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
