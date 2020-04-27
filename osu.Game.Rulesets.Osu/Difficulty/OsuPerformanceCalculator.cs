@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Buff very high AR and low AR
             double approachRateFactor = 1.0;
             if (Attributes.ApproachRate > 10)
-                approachRateFactor += (0.05 + 0.35 * Math.Pow(Math.Sin(Math.PI * Math.Min(totalHits, 1250) / 2500), 2.5)) *
+                approachRateFactor += 0.8 * (SpecialFunctions.Logistic(totalHits / 500) - 0.5) *
                                       Math.Pow(Attributes.ApproachRate - 10, 2);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
