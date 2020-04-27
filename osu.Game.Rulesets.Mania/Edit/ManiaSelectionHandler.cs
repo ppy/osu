@@ -56,20 +56,6 @@ namespace osu.Game.Rulesets.Mania.Edit
                 // since the scrolling hitobject container requires at least one update frame to update the position.
                 // However the position needs to be valid for future movement events to calculate the correct deltas.
                 hitObject.Y += delta;
-
-                float targetPosition = hitObject.Position.Y;
-
-                if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                {
-                    // When scrolling downwards, the position is _negative_ when the object's start time is after the current time (e.g. in the middle of the stage).
-                    // However all scrolling algorithms upwards scrolling, meaning that a positive (inverse) position is expected in the same scenario.
-                    targetPosition = -targetPosition;
-                }
-
-                hitObject.HitObject.StartTime = scrollingInfo.Algorithm.TimeAt(targetPosition,
-                    editorClock.CurrentTime,
-                    scrollingInfo.TimeRange.Value,
-                    objectParent.DrawHeight);
             }
         }
 

@@ -87,6 +87,22 @@ namespace osu.Game.Rulesets.Mania.UI
             return found;
         }
 
+        public Column GetColumn(int index)
+        {
+            foreach (var stage in stages)
+            {
+                if (index >= stage.Columns.Count)
+                {
+                    index -= stage.Columns.Count;
+                    continue;
+                }
+
+                return stage.Columns[index];
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
         /// <summary>
         /// Retrieves the total amount of columns across all stages in this playfield.
         /// </summary>
