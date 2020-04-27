@@ -35,33 +35,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
             int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
 
-            // adjustOrigins(maniaBlueprint);
             performDragMovement(moveEvent);
             performColumnMovement(lastColumn, moveEvent);
 
             return true;
-        }
-
-        /// <summary>
-        /// Ensures that the position of hitobjects remains centred to the mouse position.
-        /// E.g. The hitobject position will change if the editor scrolls while a hitobject is dragged.
-        /// </summary>
-        /// <param name="reference">The <see cref="ManiaSelectionBlueprint"/> that received the drag event.</param>
-        private void adjustOrigins(ManiaSelectionBlueprint reference)
-        {
-            var referenceParent = (HitObjectContainer)reference.DrawableObject.Parent;
-
-            float offsetFromReferenceOrigin = reference.DragPosition.Y - reference.DrawableObject.OriginPosition.Y;
-            float targetPosition = referenceParent.ToLocalSpace(reference.ScreenSpaceDragPosition).Y - offsetFromReferenceOrigin;
-
-            // Flip the vertical coordinate space when scrolling downwards
-            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                targetPosition -= referenceParent.DrawHeight;
-
-            float movementDelta = targetPosition - reference.DrawableObject.Position.Y;
-
-            foreach (var b in SelectedBlueprints.OfType<ManiaSelectionBlueprint>())
-                b.DrawableObject.Y += movementDelta;
         }
 
         private void performDragMovement(MoveSelectionEvent moveEvent)
