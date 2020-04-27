@@ -3,7 +3,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -12,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ApplyResult(r => r.Type = HitResult.Good);
+            ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
 
         public DrawableFlyingCentreHit(double time, bool isStrong = false)
