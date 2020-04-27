@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 if (miss && judgedObject.HitObject is StrongHitObject)
                     miss = result.Judgement.AffectsCombo;
 
-                mascot.PlayfieldState.Value = miss ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle;
+                mascot.SetPlayfieldState(miss ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle);
             }
         }
 

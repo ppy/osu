@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.ControlPoints;
@@ -16,21 +15,13 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private TaikoMascotTextureAnimation idleDrawable, clearDrawable, kiaiDrawable, failDrawable;
         private EffectControlPoint lastEffectControlPoint;
-
-        public Bindable<TaikoMascotAnimationState> PlayfieldState;
+        private TaikoMascotAnimationState playfieldState;
 
         public TaikoMascotAnimationState State { get; private set; }
 
         public DrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
         {
             RelativeSizeAxes = Axes.Both;
-
-            PlayfieldState = new Bindable<TaikoMascotAnimationState>();
-            PlayfieldState.BindValueChanged(b =>
-            {
-                if (lastEffectControlPoint != null)
-                    ShowState(GetFinalAnimationState(lastEffectControlPoint, b.NewValue));
-            });
 
             State = startingState;
         }
@@ -58,6 +49,20 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var drawable = getStateDrawable(State);
             drawable.Show();
+        }
+
+        /// <summary>
+        /// Sets the playfield state used for determining the final state.
+        /// </summary>
+        /// <remarks>
+        /// If you're looking to change the state manually, please look at <see cref="ShowState"/>.
+        /// </remarks>
+        public void SetPlayfieldState(TaikoMascotAnimationState state)
+        {
+            playfieldState = state;
+
+            if (lastEffectControlPoint != null)
+                ShowState(GetFinalAnimationState(lastEffectControlPoint, playfieldState));
         }
 
         private TaikoMascotTextureAnimation getStateDrawable(TaikoMascotAnimationState state)
@@ -93,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            var state = GetFinalAnimationState(lastEffectControlPoint = effectPoint, PlayfieldState.Value);
+            var state = GetFinalAnimationState(lastEffectControlPoint = effectPoint, playfieldState);
             ShowState(state);
 
             if (state == TaikoMascotAnimationState.Clear)
