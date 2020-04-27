@@ -27,8 +27,7 @@ using osu.Game.Overlays.Music;
 using osu.Framework.Audio.Track;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
-using osu.Game.Screens.Select;
-using osu.Game.Screens.Mvis;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens
 {
@@ -38,7 +37,6 @@ namespace osu.Game.Screens
     public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         private const float DURATION = 750;
-        protected const float BACKGROUND_BLUR = 20;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
 
         private bool AllowCursor = false;
@@ -65,19 +63,18 @@ namespace osu.Game.Screens
 
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
-
-        protected BeatmapCarousel Carousel { get; private set; }
-        ScheduledDelegate scheduledHideOverlays;
-        ScheduledDelegate scheduledShowOverlays;
-        Box bgBox;
-        BottomBar bottomBar;
-        Container buttons;
-        BeatmapLogo beatmapLogo;
-        HoverCheckContainer hoverCheckContainer;
-        HoverableProgressBarContainer progressBarContainer;
-        ToggleableButton loopToggleButton;
-        ToggleableOverlayLockButton lockButton;
-        Track track;
+        private ScheduledDelegate scheduledHideOverlays;
+        private ScheduledDelegate scheduledShowOverlays;
+        private Box bgBox;
+        private BottomBar bottomBar;
+        private Container buttons;
+        private BeatmapLogo beatmapLogo;
+        private HoverCheckContainer hoverCheckContainer;
+        private HoverableProgressBarContainer progressBarContainer;
+        private ToggleableButton loopToggleButton;
+        private ToggleableOverlayLockButton lockButton;
+        private Track track;
+        private Bindable<float> BgBlur = new Bindable<float>();
         private bool OverlaysHidden = false;
 
         public MvisScreen()
@@ -112,14 +109,6 @@ namespace osu.Game.Screens
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
-                        },
-                        Carousel = new BeatmapCarousel
-                        {
-                            AllowSelection = true, // delay any selection until our bindables are ready to make a good choice.
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            RelativeSizeAxes = Axes.Both,
-                            //BeatmapSetsChanged = SongSelect.carouselBeatmapsLoaded,
                         },
                     }
                 },
@@ -266,13 +255,16 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
-            Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
+            config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
+
+            BgBlur.ValueChanged += _ => UpdateBgBlur();
         }
 
         protected override void LoadComplete()
         {
+            Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
             lockButton.ToggleableValue.ValueChanged += _ => UpdateLockButton();
@@ -369,6 +361,7 @@ namespace osu.Game.Screens
         {
             var mouseIdle = idleTracker.IsIdle.Value;
 
+            //如果有其他弹窗显示在播放器上方，解锁切换并显示界面
             if ( !hoverCheckContainer.ScreenHovered.Value )
             {
                 if ( lockButton.ToggleableValue.Value && OverlaysHidden )
@@ -483,6 +476,14 @@ namespace osu.Game.Screens
             }
         }
 
+        private void UpdateBgBlur()
+        {
+            if (Background is BackgroundScreenBeatmap backgroundBeatmap)
+            {
+                backgroundBeatmap.BlurAmount.Value =  BgBlur.Value * 100;
+            }
+        }
+
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
             track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
@@ -493,7 +494,7 @@ namespace osu.Game.Screens
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
             {
                 backgroundBeatmap.Beatmap = beatmap;
-                backgroundBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
+                backgroundBeatmap.BlurAmount.Value =  BgBlur.Value * 100;
             }
         }
 

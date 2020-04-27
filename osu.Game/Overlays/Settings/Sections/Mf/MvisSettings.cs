@@ -24,6 +24,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Bindable = config.GetBindable<int>(OsuSetting.MvisParticleAmount),
                     KeyboardStep = 1,
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = "背景模糊",
+                    Bindable = config.GetBindable<float>(OsuSetting.MvisBgBlur),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "使用原版Logo效果",
