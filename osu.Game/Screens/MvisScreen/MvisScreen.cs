@@ -476,7 +476,8 @@ namespace osu.Game.Screens
 
         private void RunShowOverlays()
         {
-            if ( lockButton.ToggleableValue.Value && OverlaysHidden )
+            //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
+            if ( (lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden )
             {
                 lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
                 return;
