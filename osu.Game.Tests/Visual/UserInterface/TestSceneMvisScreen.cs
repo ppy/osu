@@ -15,6 +15,7 @@ using osu.Game.Overlays.Toolbar;
 using System.Linq;
 using osu.Game.Screens.Mvis.UI;
 using osu.Game.Screens.Mvis.Buttons;
+using osu.Game.Screens.Mvis.SideBar;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -26,6 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(BottomBar),
             typeof(MvisScreen),
             typeof(BottomBarButton),
+            typeof(SideBarSettingsPanel),
             typeof(ToggleableButton),
             typeof(MusicControlButton),
             typeof(ToggleableOverlayLockButton),

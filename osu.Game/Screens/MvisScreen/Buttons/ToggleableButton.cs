@@ -21,10 +21,12 @@ namespace osu.Game.Screens.Mvis.Buttons
         private void load()
         {
             ToggleableValue.Value = defaultValue;
-            this.Action = () =>
-            {
-                Toggle();
-            };
+        }
+
+        protected override bool OnClick(Framework.Input.Events.ClickEvent e)
+        {
+            Toggle();
+            return base.OnClick(e);
         }
 
         public void Toggle()

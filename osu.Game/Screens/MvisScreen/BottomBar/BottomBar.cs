@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Mvis.UI
 {
     public class BottomBar : Container
     {
-        public readonly Bindable<bool> bar_IsHovered = new Bindable<bool>();
+        public readonly Bindable<bool> Hovered = new Bindable<bool>();
         public BottomBar()
         {
             Anchor = Anchor.BottomCentre;
@@ -20,13 +20,13 @@ namespace osu.Game.Screens.Mvis.UI
         }
         protected override bool OnHover(Framework.Input.Events.HoverEvent e)
         {
-            this.bar_IsHovered.Value = true;
+            this.Hovered.Value = true;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(Framework.Input.Events.HoverLostEvent e)
         {
-            this.bar_IsHovered.Value = false;
+            this.Hovered.Value = false;
             base.OnHoverLost(e);
         }
     }
