@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private void addJudgement(TaikoPlayfield playfield, HitResult result)
         {
-            playfield.OnNewResult(new DrawableRimHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = result });
+            playfield.OnNewResult(new DrawableHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = result });
         }
 
         private class TestDrawableTaikoMascot : DrawableTaikoMascot
