@@ -121,8 +121,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
+
             if (countHit >= HitObject.RequiredGoodHits)
+            {
                 ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+            }
             else
                 ApplyResult(r => r.Type = HitResult.Miss);
         }
