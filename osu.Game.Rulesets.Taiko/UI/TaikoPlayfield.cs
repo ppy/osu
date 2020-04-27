@@ -185,7 +185,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     var drawableTick = (DrawableDrumRollTick)judgedObject;
 
                     addDrumRollHit(drawableTick);
-                    addExplosion(drawableTick, drawableTick.JudgementType);
                     break;
 
                 default:
@@ -200,7 +199,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (!result.IsHit)
                         break;
 
-                    addExplosion(judgedObject, (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre);
+                    var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
+
+                    addExplosion(judgedObject, type);
                     break;
             }
         }
@@ -210,7 +211,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void addExplosion(DrawableHitObject drawableObject, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject, type));
+            hitExplosionContainer.Add(new HitExplosion(drawableObject));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
