@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -40,28 +39,31 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 foreach (var textureIndex in clear_animation_sequence)
                 {
-                    var textureName = getStateTextureName(textureIndex);
-                    Texture texture = skin.GetTexture(textureName);
-
-                    if (texture == null)
+                    if (!addFrame(skin, textureIndex))
                         break;
-
-                    AddFrame(texture);
                 }
             }
             else
             {
                 for (int i = 0; true; i++)
                 {
-                    var textureName = getStateTextureName(i);
-                    Texture texture = skin.GetTexture(textureName);
-
-                    if (texture == null)
+                    if (!addFrame(skin, i))
                         break;
-
-                    AddFrame(texture);
                 }
             }
+        }
+
+        private bool addFrame(ISkinSource skin, int textureIndex)
+        {
+            var textureName = getStateTextureName(textureIndex);
+            var texture = skin.GetTexture(textureName);
+
+            if (texture == null)
+                return false;
+
+            AddFrame(texture);
+
+            return true;
         }
 
         /// <summary>
