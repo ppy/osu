@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         private ToggleableButton loopToggleButton;
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
-        private Track track;
+        private Track Track;
         private Bindable<float> BgBlur = new Bindable<float>();
         private bool OverlaysHidden = false;
 
@@ -315,10 +315,11 @@ namespace osu.Game.Screens
         {
             base.Update();
 
-            if (track?.IsDummyDevice == false)
+            Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
+            if (Track?.IsDummyDevice == false)
             {
-                progressBarContainer.progressBar.EndTime = track.Length;
-                progressBarContainer.progressBar.CurrentTime = track.CurrentTime;
+                progressBarContainer.progressBar.EndTime = Track.Length;
+                progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
             }
             else
             {
@@ -331,12 +332,15 @@ namespace osu.Game.Screens
         {
             base.OnEntering(last);
 
+            var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
+            track.RestartPoint = 0;
+
             updateComponentFromBeatmap(Beatmap.Value);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            track = new TrackVirtual(Beatmap.Value.Track.Length);
+            Track = new TrackVirtual(Beatmap.Value.Track.Length);
             beatmapLogo.Exit();
 
             this.FadeOut(500, Easing.OutQuint);
@@ -521,9 +525,6 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
-            track.RestartPoint = 0;
-
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
