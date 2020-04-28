@@ -15,6 +15,9 @@ namespace osu.Game.Rulesets.Taiko
         PlayfieldBackgroundLeft,
         PlayfieldBackgroundRight,
         BarLine,
-        TaikoDon
+        TaikoExplosionMiss,
+        TaikoExplosionGood,
+        TaikoExplosionGreat,
+        TaikoDon,
     }
 }
