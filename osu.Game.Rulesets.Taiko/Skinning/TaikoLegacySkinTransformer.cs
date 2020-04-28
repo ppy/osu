@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -83,15 +84,41 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
+                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionGreat:
+                case TaikoSkinComponents.TaikoExplosionMiss:
+
+                    var sprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
+                    if (sprite != null)
+                        return new LegacyHitExplosion(sprite);
+
+                    return null;
+
                 case TaikoSkinComponents.TaikoDon:
                     if (GetTexture("pippidonclear0") != null)
                         return new DrawableTaikoMascot();
 
                     return null;
-
-                default:
-                    return source.GetDrawableComponent(component);
             }
+
+            return source.GetDrawableComponent(component);
+        }
+
+        private string getHitName(TaikoSkinComponents component)
+        {
+            switch (component)
+            {
+                case TaikoSkinComponents.TaikoExplosionMiss:
+                    return "taiko-hit0";
+
+                case TaikoSkinComponents.TaikoExplosionGood:
+                    return "taiko-hit100";
+
+                case TaikoSkinComponents.TaikoExplosionGreat:
+                    return "taiko-hit300";
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);
