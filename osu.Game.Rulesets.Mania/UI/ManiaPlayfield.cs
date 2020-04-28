@@ -87,8 +87,17 @@ namespace osu.Game.Rulesets.Mania.UI
             return found;
         }
 
+        /// <summary>
+        /// Retrieves a <see cref="Column"/> by index.
+        /// </summary>
+        /// <param name="index">The index of the column.</param>
+        /// <returns>The <see cref="Column"/> corresponding to the given index.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is less than 0 or greater than <see cref="TotalColumns"/>.</exception>
         public Column GetColumn(int index)
         {
+            if (index < 0 || index > TotalColumns - 1)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
             foreach (var stage in stages)
             {
                 if (index >= stage.Columns.Count)
