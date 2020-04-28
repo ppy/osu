@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return TaikoSkinComponents.TaikoExplosionGreat;
             }
 
-            throw new ArgumentException("Invalid result type", nameof(resultType));
+            throw new ArgumentOutOfRangeException(nameof(resultType), "Invalid result type");
         }
 
         protected override void LoadComplete()

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 case TaikoSkinComponents.TaikoExplosionGreat:
                 case TaikoSkinComponents.TaikoExplosionMiss:
 
-                    var sprite = this.GetAnimation(getHitname(taikoComponent.Component), true, false);
+                    var sprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
                     if (sprite != null)
                         return new LegacyHitExplosion(sprite);
 
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             return source.GetDrawableComponent(component);
         }
 
-        private string getHitname(TaikoSkinComponents component)
+        private string getHitName(TaikoSkinComponents component)
         {
             switch (component)
             {
@@ -110,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     return "taiko-hit300";
             }
 
-            return string.Empty;
+            throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);
