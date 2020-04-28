@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     addJudgement(playfield, HitResult.Miss);
             });
 
-            AddUntilStep("Wait for fail state", () => mascots.Where(d => d != null).All(d => d.State == TaikoMascotAnimationState.Fail));
+            AddUntilStep("Wait for fail state", () => mascots.All(d => d.State == TaikoMascotAnimationState.Fail));
 
             AddStep("Create hit (great)", () =>
             {
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     addJudgement(playfield, HitResult.Great);
             });
 
-            AddUntilStep("Wait for idle state", () => mascots.Where(d => d != null).All(d => d.State == TaikoMascotAnimationState.Idle));
+            AddUntilStep("Wait for idle state", () => mascots.All(d => d.State == TaikoMascotAnimationState.Idle));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 });
             });
 
-            AddUntilStep("Wait for fail state", () => mascots.Where(d => d != null).All(d => d.State == TaikoMascotAnimationState.Fail));
+            AddUntilStep("Wait for fail state", () => mascots.All(d => d.State == TaikoMascotAnimationState.Fail));
 
             AddStep("Create hit (great)", () =>
             {
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     addJudgement(playfield, HitResult.Great);
             });
 
-            AddUntilStep("Wait for kiai state", () => mascots.Where(d => d != null).All(d => d.State == TaikoMascotAnimationState.Kiai));
+            AddUntilStep("Wait for kiai state", () => mascots.All(d => d.State == TaikoMascotAnimationState.Kiai));
         }
 
         private void setBeatmap(bool kiai = false)
