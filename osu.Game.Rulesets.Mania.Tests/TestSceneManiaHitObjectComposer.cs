@@ -119,8 +119,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("seek to last object", () =>
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
-                originalPosition = lastObject.DrawPosition;
-
                 Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
             });
 
@@ -128,13 +126,18 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("click last object", () =>
             {
+                originalPosition = lastObject.DrawPosition;
+
                 InputManager.MoveMouseTo(lastObject);
                 InputManager.PressButton(MouseButton.Left);
             });
 
             AddStep("move mouse right", () =>
             {
-                InputManager.MoveMouseTo(lastObject, new Vector2(40, 0));
+                var firstColumn = composer.Composer.Playfield.GetColumn(0);
+                var secondColumn = composer.Composer.Playfield.GetColumn(1);
+
+                InputManager.MoveMouseTo(lastObject, new Vector2(secondColumn.ScreenSpaceDrawQuad.Centre.X - firstColumn.ScreenSpaceDrawQuad.Centre.X + 1, 0));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
