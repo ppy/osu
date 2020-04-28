@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         protected override Container<Drawable> Content { get; }
 
-        private ManiaHitObjectComposer composer;
-
         public TestSceneManiaHitObjectComposer()
         {
             base.Content.Add(new Container
@@ -60,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             Children = new Drawable[]
             {
-                composer = new ManiaHitObjectComposer(new ManiaRuleset())
+                new ManiaHitObjectComposer(new ManiaRuleset())
             };
 
             BeatDivisor.Value = 8;
