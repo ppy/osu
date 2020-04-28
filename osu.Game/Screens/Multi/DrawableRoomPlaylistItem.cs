@@ -21,7 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Multi
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
+                                    Spacing = new Vector2(15, 0),
                                     Children = new Drawable[]
                                     {
                                         authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },
@@ -210,10 +210,10 @@ namespace osu.Game.Screens.Multi
             return true;
         }
 
-        private class PlaylistDownloadButton : PanelDownloadButton
+        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet)
+                : base(beatmapSet)
             {
                 Alpha = 0;
             }

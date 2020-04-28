@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -29,9 +30,9 @@ namespace osu.Game.Screens.Edit
         public event Action<HitObject> HitObjectRemoved;
 
         /// <summary>
-        /// Invoked when the start time of a <see cref="HitObject"/> in this <see cref="EditorBeatmap"/> was changed.
+        /// Invoked when a <see cref="HitObject"/> is updated.
         /// </summary>
-        public event Action<HitObject> StartTimeChanged;
+        public event Action<HitObject> HitObjectUpdated;
 
         /// <summary>
         /// All currently selected <see cref="HitObject"/>s.
@@ -62,21 +63,39 @@ namespace osu.Game.Screens.Edit
                 trackStartTime(obj);
         }
 
+        private readonly HashSet<HitObject> pendingUpdates = new HashSet<HitObject>();
         private ScheduledDelegate scheduledUpdate;
 
         /// <summary>
         /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void UpdateHitObject(HitObject hitObject)
+        public void UpdateHitObject([NotNull] HitObject hitObject) => updateHitObject(hitObject, false);
+
+        private void updateHitObject([CanBeNull] HitObject hitObject, bool silent)
         {
             scheduledUpdate?.Cancel();
-            scheduledUpdate = Scheduler.AddDelayed(() =>
+
+            if (hitObject != null)
+                pendingUpdates.Add(hitObject);
+
+            scheduledUpdate = Schedule(() =>
             {
                 beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+
+                foreach (var obj in pendingUpdates)
+                    obj.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+
                 beatmapProcessor?.PostProcess();
-            }, 0);
+
+                if (!silent)
+                {
+                    foreach (var obj in pendingUpdates)
+                        HitObjectUpdated?.Invoke(obj);
+                }
+
+                pendingUpdates.Clear();
+            });
         }
 
         public BeatmapInfo BeatmapInfo
@@ -102,6 +121,16 @@ namespace osu.Game.Screens.Edit
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
 
         /// <summary>
+        /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="hitObjects">The <see cref="HitObject"/>s to add.</param>
+        public void AddRange(IEnumerable<HitObject> hitObjects)
+        {
+            foreach (var h in hitObjects)
+                Add(h);
+        }
+
+        /// <summary>
         /// Adds a <see cref="HitObject"/> to this <see cref="EditorBeatmap"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
@@ -114,24 +143,50 @@ namespace osu.Game.Screens.Edit
             mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
             HitObjectAdded?.Invoke(hitObject);
+
+            updateHitObject(hitObject, true);
         }
 
         /// <summary>
         /// Removes a <see cref="HitObject"/> from this <see cref="EditorBeatmap"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Remove(HitObject hitObject)
+        /// <returns>True if the <see cref="HitObject"/> has been removed, false otherwise.</returns>
+        public bool Remove(HitObject hitObject)
         {
-            if (!mutableHitObjects.Contains(hitObject))
-                return;
+            int index = FindIndex(hitObject);
 
-            mutableHitObjects.Remove(hitObject);
+            if (index == -1)
+                return false;
+
+            RemoveAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// Finds the index of a <see cref="HitObject"/> in this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to search for.</param>
+        /// <returns>The index of <paramref name="hitObject"/>.</returns>
+        public int FindIndex(HitObject hitObject) => mutableHitObjects.IndexOf(hitObject);
+
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> at an index in this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <param name="index">The index of the <see cref="HitObject"/> to remove.</param>
+        public void RemoveAt(int index)
+        {
+            var hitObject = (HitObject)mutableHitObjects[index];
+
+            mutableHitObjects.RemoveAt(index);
 
             var bindable = startTimeBindables[hitObject];
             bindable.UnbindAll();
 
             startTimeBindables.Remove(hitObject);
             HitObjectRemoved?.Invoke(hitObject);
+
+            updateHitObject(null, true);
         }
 
         private void trackStartTime(HitObject hitObject)
@@ -145,7 +200,7 @@ namespace osu.Game.Screens.Edit
                 var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
                 mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
-                StartTimeChanged?.Invoke(hitObject);
+                UpdateHitObject(hitObject);
             };
         }
 

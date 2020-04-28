@@ -21,18 +21,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         public override bool RemoveWhenNotAlive => true;
 
         public readonly DrawableHitObject JudgedObject;
+        private readonly HitType type;
 
         private readonly Box innerFill;
 
-        private readonly bool isRim;
-
-        public HitExplosion(DrawableHitObject judgedObject, bool isRim)
+        public HitExplosion(DrawableHitObject judgedObject, HitType type)
         {
-            this.isRim = isRim;
-
             JudgedObject = judgedObject;
+            this.type = type;
 
-            Anchor = Anchor.CentreLeft;
+            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
@@ -58,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            innerFill.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
+            innerFill.Colour = type == HitType.Rim ? colours.BlueDarker : colours.PinkDarker;
         }
 
         protected override void LoadComplete()

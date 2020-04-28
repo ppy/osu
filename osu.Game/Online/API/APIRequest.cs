@@ -16,20 +16,35 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
-
-        protected APIRequest()
-        {
-            base.Success += onSuccess;
-        }
-
-        private void onSuccess() => Success?.Invoke(Result);
+        public T Result { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        protected override void PostProcess()
+        {
+            base.PostProcess();
+            Result = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+        }
+
+        internal void TriggerSuccess(T result)
+        {
+            if (Result != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            Result = result;
+
+            TriggerSuccess();
+        }
+
+        internal override void TriggerSuccess()
+        {
+            base.TriggerSuccess();
+            Success?.Invoke(Result);
+        }
     }
 
     /// <summary>
@@ -92,12 +107,26 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
+            PostProcess();
+
             API.Schedule(delegate
             {
                 if (cancelled) return;
 
-                Success?.Invoke();
+                TriggerSuccess();
             });
+        }
+
+        /// <summary>
+        /// Perform any post-processing actions after a successful request.
+        /// </summary>
+        protected virtual void PostProcess()
+        {
+        }
+
+        internal virtual void TriggerSuccess()
+        {
+            Success?.Invoke();
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
