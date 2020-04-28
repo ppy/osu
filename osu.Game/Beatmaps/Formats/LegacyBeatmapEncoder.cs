@@ -240,7 +240,7 @@ namespace osu.Game.Beatmaps.Formats
             }
             else
             {
-                if (hitObject is IHasEndTime _)
+                if (hitObject is IHasEndTime)
                     addEndTimeData(writer, hitObject);
 
                 writer.Write(getSampleBank(hitObject.Samples));

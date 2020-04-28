@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             });
 
-            Tracker.Alpha = 1f;
+            Line.Alpha = 1f;
         }
 
         protected override void LoadComplete()
