@@ -53,25 +53,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             };
         }
 
-        private DrawableTaikoHitObject createHit(HitResult type) => new TestDrawableHit(new Hit { StartTime = Time.Current }, type);
-
-        private class TestDrawableHit : DrawableTaikoHitObject
-        {
-            private readonly HitResult type;
-
-            public TestDrawableHit(Hit hit, HitResult type)
-                : base(hit)
-            {
-                this.type = type;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Result.Type = type;
-            }
-
-            public override bool OnPressed(TaikoAction action) => false;
-        }
+        private DrawableTaikoHitObject createHit(HitResult type) => new DrawableTestHit(new Hit { StartTime = Time.Current }, type);
     }
 }
