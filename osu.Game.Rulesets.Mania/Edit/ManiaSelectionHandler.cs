@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -25,27 +24,9 @@ namespace osu.Game.Rulesets.Mania.Edit
             var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
             int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
 
-            performDragMovement(moveEvent);
             performColumnMovement(lastColumn, moveEvent);
 
             return true;
-        }
-
-        private void performDragMovement(MoveSelectionEvent moveEvent)
-        {
-            float delta = moveEvent.InstantDelta.Y;
-
-            foreach (var selectionBlueprint in SelectedBlueprints)
-            {
-                var b = (OverlaySelectionBlueprint)selectionBlueprint;
-
-                var hitObject = b.DrawableObject;
-
-                // We receive multiple movement events per frame such that we can't rely on updating the start time
-                // since the scrolling hitobject container requires at least one update frame to update the position.
-                // However the position needs to be valid for future movement events to calculate the correct deltas.
-                hitObject.Y += delta;
-            }
         }
 
         private void performColumnMovement(int lastColumn, MoveSelectionEvent moveEvent)
