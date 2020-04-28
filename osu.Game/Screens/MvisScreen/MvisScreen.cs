@@ -557,10 +557,12 @@ namespace osu.Game.Screens
         {
             if ( Track?.IsRunning == true )
             {
+                bgSB?.sbClock?.Stop();
                 musicController.Stop();
             }
             else
             {
+                bgSB?.sbClock?.Start();
                 musicController.Play();
             }
         }

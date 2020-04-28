@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Mvis
     {
         private const float DURATION = 750;
         private Container sbContainer;
-        private ClockContainer sbClock;
+        public ClockContainer sbClock;
         private CancellationTokenSource ChangeSB;
         private DimmableStoryboard dimmableStoryboard;
         private WorkingBeatmap Beatmap;
@@ -48,26 +48,26 @@ namespace osu.Game.Screens.Mvis
             storyboardReplacesBackground.Value = b.Storyboard.ReplacesBackground && b.Storyboard.HasDrawable;
 
             IsReady.Value = false;
-            sbContainer.FadeOut(DURATION, Easing.OutQuint);
 
-            sbClock?.Stop();
-            sbClock?.Hide();
-            sbClock?.Expire();
             ChangeSB?.Cancel();
 
             try
             {
-                LoadComponentAsync(sbClock = new ClockContainer(b, 0)
+                LoadComponentAsync(new ClockContainer(b, 0)
                 {
                     Child = dimmableStoryboard = new DimmableStoryboard(b.Storyboard) { RelativeSizeAxes = Axes.Both }
-                }, loaded =>
+                }, newsbC =>
                 {
+                    sbClock?.Stop();
+                    sbClock?.Hide();
+                    sbClock?.Expire();
+                    sbClock = newsbC;
+
                     dimmableStoryboard.IgnoreUserSettings.Value = true;
 
                     sbContainer.Add(sbClock);
                     sbClock.Start();
                     sbClock.Seek(b.Track.CurrentTime);
-                    sbContainer.FadeIn(DURATION, Easing.OutQuint);
 
                     IsReady.Value = true;
                 }, (ChangeSB = new CancellationTokenSource()).Token);

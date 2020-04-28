@@ -39,7 +39,7 @@
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
 
 ### 2020/04/28
-* 描述 : ~~修复`MvisScreen`的背景视频无法循环的问题~~(已有临时解决方案)
+* 描述 : 修复`MvisScreen`的背景视频无法循环的问题(osu Storyboard本身的缺陷)
 * 相关文件
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
     *   [ClockContainer.cs](osu.Game/Screens/MvisScreen/ClockContainer.cs)
