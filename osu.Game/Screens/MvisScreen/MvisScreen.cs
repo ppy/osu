@@ -30,11 +30,9 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Mvis;
-using System;
+using System.Threading.Tasks;
 using osu.Framework.Logging;
-using System.Threading;
 
 namespace osu.Game.Screens
 {
@@ -72,10 +70,7 @@ namespace osu.Game.Screens
         private MouseIdleTracker idleTracker;
         private ScheduledDelegate scheduledHideOverlays;
         private ScheduledDelegate scheduledShowOverlays;
-        private ScheduledDelegate scheduledLoadStoryboards;
         private Box bgBox;
-        private Container sbContainer;
-        private ClockContainer sbClock;
         private BottomBar bottomBar;
         private SideBarSettingsPanel sidebarContainer;
         private BeatmapLogo beatmapLogo;
@@ -85,31 +80,27 @@ namespace osu.Game.Screens
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
         private Track Track;
-        private CancellationTokenSource ChangeSB;
-        private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
-        private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
         private bool OverlaysHidden = false;
+        Container sbC;
+        private BgStoryBoard bgSB;
+        private LoadingSpinner loadingSpinner;
+        private Task LoadSBTask { get; set; }
 
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
             {
-                sbContainer = new Container
+                sbC = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Child = bgSB = new BgStoryBoard(),
                 },
                 bgBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                     Alpha = 0
-                },
-                loadingSpinner = new LoadingSpinner(true)
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Margin = new MarginPadding{ Bottom = 100 }
                 },
                 new Container
                 {
@@ -140,6 +131,12 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        loadingSpinner = new LoadingSpinner(true, true)
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Margin = new MarginPadding{ Bottom = 100 }
+                        },
                         sidebarContainer = new SideBarSettingsPanel
                         {
                             Name = "Sidebar Container",
@@ -321,6 +318,24 @@ namespace osu.Game.Screens
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
+            bgSB.IsReady.ValueChanged += _ =>
+            {
+                switch (bgSB.IsReady.Value)
+                {
+                    case true:
+                        loadingSpinner.Hide();
+                        break;
+
+                    case false:
+                        loadingSpinner.Show();
+                        break;
+                }
+            };
+            bgSB.SBReplacesBg.ValueChanged += _ => 
+            {
+                if (Background is BackgroundScreenBeatmap backgroundBeatmap)
+                    backgroundBeatmap.StoryboardReplacesBackground.Value = bgSB.SBReplacesBg.Value;
+            };
 
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
@@ -542,12 +557,10 @@ namespace osu.Game.Screens
         {
             if ( Track?.IsRunning == true )
             {
-                sbClock?.Stop();
                 musicController.Stop();
             }
             else
             {
-                sbClock?.Start();
                 musicController.Play();
             }
         }
@@ -560,64 +573,30 @@ namespace osu.Game.Screens
             }
         }
 
-        private void UpdateStoryBoardSource()
+        private Task ResetStoryBoard() => Task.Run(async () =>
         {
-            DimmableStoryboard dimmableStoryboard;
-
-            loadingSpinner.Show();
-            sbContainer.FadeOut(DURATION, Easing.OutQuint);
-
-            sbClock?.Stop();
-            foreach (var s in sbContainer)
-            {
-                s.Hide();
-                s.Expire();
-            }
-
-            ChangeSB?.Cancel();
-            scheduledLoadStoryboards?.Cancel();
+            bgSB.UpdateComponent(Beatmap.Value);
             try
             {
-                scheduledLoadStoryboards = Scheduler.AddDelayed( () =>
-                LoadComponentAsync(sbClock = new ClockContainer(Beatmap.Value, 0)
-                {
-                    Child = dimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both }
-                }, loaded =>
-                {
-                    loadingSpinner.Hide();
-                    dimmableStoryboard.IgnoreUserSettings.Value = true;
-                    dimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
-
-                    if ( Background is BackgroundScreenBeatmap backgroundBeatmap)
-                        backgroundBeatmap.StoryboardReplacesBackground.Value = storyboardReplacesBackground.Value;
-
-                    sbContainer.Add(sbClock);
-                    sbClock.Start();
-                    sbClock.Seek(Track.CurrentTime);
-                    sbContainer.FadeIn(DURATION, Easing.OutQuint);
-                }, (ChangeSB = new CancellationTokenSource()).Token), 500);
+                LoadSBTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{Beatmap.Value.BeatmapSetInfo}\"..."));
+                await LoadSBTask;
             }
-            catch (Exception e)
+            finally
             {
-                loadingSpinner.Hide();
-                Logger.Error(e, $"加载Storyboard时出现错误! 请检查你的谱面! {e}");
-                return;
             }
-        }
+        });
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
             {
-                backgroundBeatmap.StoryboardReplacesBackground.Value = false;
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
 
-            UpdateStoryBoardSource();
+            ResetStoryBoard();
         }
     }
 }
