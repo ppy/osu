@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public PassThroughInputManager KeyBindingInputManager;
 
-        public override double GameplayStartTime => Objects.First().StartTime - 2000;
+        public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
         private readonly Lazy<Playfield> playfield;
 
