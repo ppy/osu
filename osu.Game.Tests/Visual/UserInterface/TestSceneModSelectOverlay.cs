@@ -14,8 +14,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -117,8 +115,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestManiaMods()
         {
             changeRuleset(3);
-
-            testRankedText(new ManiaRuleset().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
         }
 
         [Test]
@@ -217,15 +213,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkLabelColor(() => Color4.White);
         }
 
-        private void testRankedText(Mod mod)
-        {
-            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
-            selectNext(mod);
-            AddUntilStep("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
-            selectPrevious(mod);
-            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
-        }
-
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
 
         private void selectPrevious(Mod mod) => AddStep($"right click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(-1));
@@ -272,7 +259,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
-            public new OsuSpriteText UnrankedLabel => base.UnrankedLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
