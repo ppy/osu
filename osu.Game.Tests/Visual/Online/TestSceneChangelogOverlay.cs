@@ -24,7 +24,6 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ChangelogListing),
             typeof(ChangelogSingleBuild),
             typeof(ChangelogBuild),
-            typeof(Comments),
         };
 
         protected override bool UseOnlineAPI => true;

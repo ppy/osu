@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         {
             isLegacySkin = new Lazy<bool>(() => source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() => source.GetAnimation(
-                source.GetConfig<ManiaSkinConfigurationLookup, string>(
+                GetConfig<ManiaSkinConfigurationLookup, string>(
                     new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value
                 ?? "mania-key1", true, true) != null);
         }
@@ -81,6 +81,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
                         case ManiaSkinComponents.HitExplosion:
                             return new LegacyHitExplosion();
+
+                        case ManiaSkinComponents.StageBackground:
+                            return new LegacyStageBackground();
+
+                        case ManiaSkinComponents.StageForeground:
+                            return new LegacyStageForeground();
                     }
 
                     break;

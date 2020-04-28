@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Play
         public readonly HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
+        public readonly FailingLayer FailingLayer;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
@@ -75,6 +76,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
+                FailingLayer = CreateFailingLayer(),
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -260,6 +262,8 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20 }
         };
 
+        protected virtual FailingLayer CreateFailingLayer() => new FailingLayer();
+
         protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
             Anchor = Anchor.BottomRight,
@@ -285,7 +289,7 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
-            Margin = new MarginPadding { Top = 20, Right = 10 },
+            Margin = new MarginPadding { Top = 20, Right = 20 },
         };
 
         protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
@@ -304,7 +308,8 @@ namespace osu.Game.Screens.Play
 
         protected virtual void BindHealthProcessor(HealthProcessor processor)
         {
-            HealthDisplay?.Current.BindTo(processor.Health);
+            HealthDisplay?.BindHealthProcessor(processor);
+            FailingLayer?.BindHealthProcessor(processor);
         }
     }
 }
