@@ -4,11 +4,9 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -21,14 +19,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
-
-        private IClock editorClock;
-
-        [BackgroundDependencyLoader]
-        private void load(IAdjustableClock clock)
-        {
-            editorClock = clock;
-        }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent)
         {
@@ -50,7 +40,6 @@ namespace osu.Game.Rulesets.Mania.Edit
                 var b = (OverlaySelectionBlueprint)selectionBlueprint;
 
                 var hitObject = b.DrawableObject;
-                var objectParent = (HitObjectContainer)hitObject.Parent;
 
                 // We receive multiple movement events per frame such that we can't rely on updating the start time
                 // since the scrolling hitobject container requires at least one update frame to update the position.
