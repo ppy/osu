@@ -52,9 +52,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
-                // When scrolling downwards, the position is _negative_ when the object's start time is after the current time (e.g. in the middle of the stage).
-                // However all scrolling algorithms upwards scrolling, meaning that a positive (inverse) position is expected in the same scenario.
-                targetPosition = -targetPosition;
+                // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+                // The scrolling algorithm assumes a top anchor meaning an increase in time corresponds to an increase in position, so when scrolling downwards the coordinates need to be flipped.
+                targetPosition = hoc.DrawHeight - targetPosition;
             }
 
             double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
