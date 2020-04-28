@@ -3,16 +3,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -23,45 +30,141 @@ namespace osu.Game.Rulesets.Mania.Tests
             typeof(ManiaBlueprintContainer)
         };
 
-        [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
-        private readonly EditorBeatmap editorBeatmap;
-
-        protected override Container<Drawable> Content { get; }
-
-        public TestSceneManiaHitObjectComposer()
-        {
-            base.Content.Add(new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
-                    {
-                        BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
-                    },
-                    Content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                },
-            });
-
-            for (int i = 0; i < 10; i++)
-            {
-                editorBeatmap.Add(new Note { StartTime = 100 * i });
-            }
-        }
+        private TestComposer composer;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Children = new Drawable[]
-            {
-                new ManiaHitObjectComposer(new ManiaRuleset())
-            };
-
             BeatDivisor.Value = 8;
+            Clock.Seek(0);
+
+            Child = composer = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
+
+        [Test]
+        public void TestDragOffscreenSelectionVerticallyUpScroll()
+        {
+            DrawableHitObject lastObject = null;
+            Vector2 originalPosition = Vector2.Zero;
+
+            AddStep("seek to last object", () =>
+            {
+                lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
+                Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
+            });
+
+            AddStep("select all objects", () => composer.EditorBeatmap.SelectedHitObjects.AddRange(composer.EditorBeatmap.HitObjects));
+
+            AddStep("click last object", () =>
+            {
+                originalPosition = lastObject.DrawPosition;
+
+                InputManager.MoveMouseTo(lastObject);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("move mouse downwards", () =>
+            {
+                InputManager.MoveMouseTo(lastObject, new Vector2(0, 20));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("hitobjects not moved columns", () => composer.EditorBeatmap.HitObjects.All(h => ((ManiaHitObject)h).Column == 0));
+            AddAssert("hitobjects moved downwards", () => lastObject.DrawPosition.Y - originalPosition.Y > 0);
+            AddAssert("hitobjects not moved too far", () => lastObject.DrawPosition.Y - originalPosition.Y < 50);
+        }
+
+        [Test]
+        public void TestDragOffscreenSelectionVerticallyDownScroll()
+        {
+            DrawableHitObject lastObject = null;
+            Vector2 originalPosition = Vector2.Zero;
+
+            AddStep("set down scroll", () => ((Bindable<ScrollingDirection>)composer.Composer.ScrollingInfo.Direction).Value = ScrollingDirection.Down);
+
+            AddStep("seek to last object", () =>
+            {
+                lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
+                Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
+            });
+
+            AddStep("select all objects", () => composer.EditorBeatmap.SelectedHitObjects.AddRange(composer.EditorBeatmap.HitObjects));
+
+            AddStep("click last object", () =>
+            {
+                originalPosition = lastObject.DrawPosition;
+
+                InputManager.MoveMouseTo(lastObject);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("move mouse upwards", () =>
+            {
+                InputManager.MoveMouseTo(lastObject, new Vector2(0, -20));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("hitobjects not moved columns", () => composer.EditorBeatmap.HitObjects.All(h => ((ManiaHitObject)h).Column == 0));
+            AddAssert("hitobjects moved upwards", () => originalPosition.Y - lastObject.DrawPosition.Y > 0);
+            AddAssert("hitobjects not moved too far", () => originalPosition.Y - lastObject.DrawPosition.Y < 50);
+        }
+
+        [Test]
+        public void TestDragOffscreenSelectionHorizontally()
+        {
+            DrawableHitObject lastObject = null;
+            Vector2 originalPosition = Vector2.Zero;
+
+            AddStep("seek to last object", () =>
+            {
+                lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
+                originalPosition = lastObject.DrawPosition;
+
+                Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
+            });
+
+            AddStep("select all objects", () => composer.EditorBeatmap.SelectedHitObjects.AddRange(composer.EditorBeatmap.HitObjects));
+
+            AddStep("click last object", () =>
+            {
+                InputManager.MoveMouseTo(lastObject);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("move mouse right", () =>
+            {
+                InputManager.MoveMouseTo(lastObject, new Vector2(40, 0));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("hitobjects moved columns", () => composer.EditorBeatmap.HitObjects.All(h => ((ManiaHitObject)h).Column == 1));
+
+            // Todo: They'll have moved vertically by half the height of a note. Probably a problem.
+            AddAssert("hitobjects not moved vertically", () => lastObject.DrawPosition.Y - originalPosition.Y < 10);
+        }
+
+        private class TestComposer : CompositeDrawable
+        {
+            [Cached(typeof(EditorBeatmap))]
+            [Cached(typeof(IBeatSnapProvider))]
+            public readonly EditorBeatmap EditorBeatmap;
+
+            public readonly ManiaHitObjectComposer Composer;
+
+            public TestComposer()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                    {
+                        BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
+                    },
+                    Composer = new ManiaHitObjectComposer(new ManiaRuleset())
+                };
+
+                for (int i = 0; i < 10; i++)
+                    EditorBeatmap.Add(new Note { StartTime = 100 * i });
+            }
+        }
     }
 }
