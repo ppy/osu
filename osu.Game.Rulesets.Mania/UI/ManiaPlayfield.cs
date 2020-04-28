@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 foreach (var column in stage.Columns)
                 {
-                    if (column.ReceivePositionalInputAt(screenSpacePosition))
+                    if (column.ReceivePositionalInputAt(new Vector2(screenSpacePosition.X, column.ScreenSpaceDrawQuad.Centre.Y)))
                     {
                         found = column;
                         break;
