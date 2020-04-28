@@ -47,18 +47,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestPrevTrackBehavior()
         {
-            AddStep(@"Play track", () =>
-            {
-                musicController.NextTrack();
-                currentBeatmap = Beatmap.Value;
-            });
+            AddStep(@"Next track", () => musicController.NextTrack());
+            AddStep("Store track", () => currentBeatmap = Beatmap.Value);
 
             AddStep(@"Seek track to 6 second", () => musicController.SeekTo(6000));
             AddUntilStep(@"Wait for current time to update", () => currentBeatmap.Track.CurrentTime > 5000);
-            AddAssert(@"Check action is restart track", () => musicController.PreviousTrack() == PreviousTrackResult.Restart);
-            AddUntilStep("Wait for current time to update", () => Precision.AlmostEquals(currentBeatmap.Track.CurrentTime, 0));
+
+            AddStep(@"Set previous", () => musicController.PreviousTrack());
+
             AddAssert(@"Check track didn't change", () => currentBeatmap == Beatmap.Value);
-            AddAssert(@"Check action is not restart", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
+            AddUntilStep("Wait for current time to update", () => currentBeatmap.Track.CurrentTime < 5000);
+
+            AddStep(@"Set previous", () => musicController.PreviousTrack());
+            AddAssert(@"Check track did change", () => currentBeatmap != Beatmap.Value);
         }
     }
 }

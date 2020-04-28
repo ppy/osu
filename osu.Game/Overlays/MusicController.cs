@@ -172,10 +172,15 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>
+        /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
         /// </summary>
-        /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action</returns>
-        public PreviousTrackResult PreviousTrack()
+        public void PreviousTrack() => Schedule(() => prev());
+
+        /// <summary>
+        /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>.
+        /// </summary>
+        /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
+        private PreviousTrackResult prev()
         {
             var currentTrackPosition = current?.Track.CurrentTime;
 
@@ -204,8 +209,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the next random or playlist track.
         /// </summary>
-        /// <returns>Whether the operation was successful.</returns>
-        public bool NextTrack() => next();
+        public void NextTrack() => Schedule(() => next());
 
         private bool next(bool instant = false)
         {
@@ -319,13 +323,13 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicNext:
-                    if (NextTrack())
+                    if (next())
                         onScreenDisplay?.Display(new MusicControllerToast("Next track"));
 
                     return true;
 
                 case GlobalAction.MusicPrev:
-                    switch (PreviousTrack())
+                    switch (prev())
                     {
                         case PreviousTrackResult.Restart:
                             onScreenDisplay?.Display(new MusicControllerToast("Restart track"));
