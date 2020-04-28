@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
@@ -150,7 +149,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private void addJudgement(TaikoPlayfield playfield, HitResult result)
         {
-            playfield.OnNewResult(new DrawableHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = result });
+            var hit = new DrawableTestHit(new Hit(), result);
+            Add(hit);
+
+            playfield.OnNewResult(hit, new JudgementResult(hit.HitObject, new TaikoJudgement()) { Type = result });
         }
 
         private class TestDrawableTaikoMascot : DrawableTaikoMascot
