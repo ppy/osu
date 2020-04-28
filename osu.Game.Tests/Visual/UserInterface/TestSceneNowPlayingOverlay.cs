@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapManager manager { get; set; }
 
-        private int importId = 0;
+        private int importId;
 
         [Test]
         public void TestPrevTrackBehavior()
