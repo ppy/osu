@@ -4,9 +4,12 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -21,9 +24,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private NowPlayingOverlay nowPlayingOverlay;
 
+        private RulesetStore rulesets;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio, GameHost host)
         {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             nowPlayingOverlay = new NowPlayingOverlay
@@ -44,8 +52,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
         }
 
-        [Resolved]
         private BeatmapManager manager { get; set; }
+
+        private int importId = 0;
 
         [Test]
         public void TestPrevTrackBehavior()
@@ -62,7 +71,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
                 Metadata = new BeatmapMetadata
                 {
-                    Artist = "a test map",
+                    Artist = $"a test map {importId++}",
                     Title = "title",
                 }
             }).Wait(), 5);
