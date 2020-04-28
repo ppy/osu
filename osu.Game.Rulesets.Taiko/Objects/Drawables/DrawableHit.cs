@@ -8,30 +8,44 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableHit : DrawableTaikoHitObject<Hit>
+    public class DrawableHit : DrawableTaikoHitObject<Hit>
     {
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public abstract TaikoAction[] HitActions { get; }
+        public TaikoAction[] HitActions { get; }
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.
         /// </summary>
-        public TaikoAction? HitAction { get; private set; }
+        public TaikoAction? HitAction
+        {
+            get;
+            private set;
+        }
 
         private bool validActionPressed;
 
         private bool pressHandledThisFrame;
 
-        protected DrawableHit(Hit hit)
+        public DrawableHit(Hit hit)
             : base(hit)
         {
             FillMode = FillMode.Fit;
+
+            HitActions =
+                HitObject.Type == HitType.Centre
+                    ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
+                    : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
         }
+
+        protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
+            ? new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
+            : new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -58,7 +72,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (pressHandledThisFrame)
                 return true;
-
             if (Judged)
                 return false;
 
@@ -66,14 +79,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             // Only count this as handled if the new judgement is a hit
             var result = UpdateResult(true);
-
             if (IsHit)
                 HitAction = action;
 
             // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
             // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
             pressHandledThisFrame = true;
-
             return result;
         }
 
@@ -81,7 +92,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (action == HitAction)
                 HitAction = null;
-
             base.OnReleased(action);
         }
 
