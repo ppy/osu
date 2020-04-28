@@ -149,6 +149,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
+            Add(h);
+
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
         }
 
@@ -163,6 +165,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
+
+            Add(h);
 
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
             ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
@@ -248,14 +252,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             }
 
             public override bool OnPressed(TaikoAction action) => false;
-        }
-
-        private class DrawableTestHit : DrawableHitObject<TaikoHitObject>
-        {
-            public DrawableTestHit(TaikoHitObject hitObject)
-                : base(hitObject)
-            {
-            }
         }
     }
 }
