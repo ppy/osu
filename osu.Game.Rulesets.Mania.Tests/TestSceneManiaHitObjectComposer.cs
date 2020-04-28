@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -139,8 +140,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("hitobjects moved columns", () => composer.EditorBeatmap.HitObjects.All(h => ((ManiaHitObject)h).Column == 1));
 
-            // Todo: They'll have moved vertically by half the height of a note. Probably a problem.
-            AddAssert("hitobjects not moved vertically", () => lastObject.DrawPosition.Y - originalPosition.Y < 10);
+            // Todo: They'll move vertically by the height of a note since there's no snapping and the selection point is the middle of the note.
+            AddAssert("hitobjects not moved vertically", () => lastObject.DrawPosition.Y - originalPosition.Y <= DefaultNotePiece.NOTE_HEIGHT);
         }
 
         private class TestComposer : CompositeDrawable
