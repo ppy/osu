@@ -53,7 +53,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
                 // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
-                // The scrolling algorithm assumes a top anchor meaning an increase in time corresponds to an increase in position, so when scrolling downwards the coordinates need to be flipped.
+                // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
+                // so when scrolling downwards the coordinates need to be flipped.
                 targetPosition = hoc.DrawHeight - targetPosition;
             }
 
