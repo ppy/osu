@@ -46,9 +46,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             var hoc = Playfield.GetColumn(0).HitObjectContainer;
 
-            position.Y -= ToLocalSpace(hoc.ScreenSpaceDrawQuad.TopLeft).Y;
-
-            float targetPosition = position.Y;
+            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
 
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
