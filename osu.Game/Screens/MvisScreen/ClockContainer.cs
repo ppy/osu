@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -15,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Mvis
@@ -42,14 +40,6 @@ namespace osu.Game.Screens.Mvis
         private readonly double gameplayStartTime;
 
         private readonly double firstHitObjectTime;
-
-        public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
-        {
-            Default = 1,
-            MinValue = 0.5,
-            MaxValue = 2,
-            Precision = 0.1,
-        };
 
         /// <summary>
         /// The final clock which is exposed to underlying components.
@@ -89,11 +79,6 @@ namespace osu.Game.Screens.Mvis
         }
 
         private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
-
-        /// <summary>
-        /// Duration before gameplay start time required before skip button displays.
-        /// </summary>
-        public const double MINIMUM_SKIP_TIME = 1000;
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
@@ -153,23 +138,6 @@ namespace osu.Game.Screens.Mvis
         }
 
         /// <summary>
-        /// Skip forward to the next valid skip point.
-        /// </summary>
-        public void Skip()
-        {
-            if (GameplayClock.CurrentTime > gameplayStartTime - MINIMUM_SKIP_TIME)
-                return;
-
-            double skipTarget = gameplayStartTime - MINIMUM_SKIP_TIME;
-
-            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
-                // double skip exception for storyboards with very long intros
-                skipTarget = 0;
-
-            Seek(skipTarget);
-        }
-
-        /// <summary>
         /// Seek to a specific time in gameplay.
         /// <remarks>
         /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
@@ -193,26 +161,12 @@ namespace osu.Game.Screens.Mvis
             IsPaused.Value = true;
         }
 
-        /// <summary>
-        /// Changes the backing clock to avoid using the originally provided beatmap's track.
-        /// </summary>
-        public void StopUsingBeatmapClock()
-        {
-            if (track != beatmap.Track)
-                return;
-
-            removeSourceClockAdjustments();
-
-            track = new TrackVirtual(beatmap.Track.Length);
-            adjustableClock.ChangeSource(track);
-        }
-
         protected override void Update()
         {
             if (!IsPaused.Value)
                 userOffsetClock.ProcessFrame();
 
-            this.Seek(beatmap.Track.CurrentTime);
+            Seek(beatmap.Track.CurrentTime);
 
             base.Update();
         }
@@ -227,7 +181,6 @@ namespace osu.Game.Screens.Mvis
             track.ResetSpeedAdjustments();
 
             track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
         }
 
         protected override void Dispose(bool isDisposing)

@@ -37,3 +37,9 @@
 * 描述 : ~~添加`MvisScreen`的键位绑定支持~~(已解决)
 * 相关文件
     *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
+
+### 2020/04/28
+* 描述 : 修复`MvisScreen`的背景视频无法循环的问题
+* 相关文件
+    *   [MvisScreen.cs](osu.Game/Screens/MvisScreen.cs)
+    *   [ClockContainer.cs](osu.Game/Screens/MvisScreen/ClockContainer.cs)

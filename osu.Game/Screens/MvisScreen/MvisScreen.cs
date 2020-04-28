@@ -32,6 +32,9 @@ using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Mvis;
+using System;
+using osu.Framework.Logging;
+using System.Threading;
 
 namespace osu.Game.Screens
 {
@@ -69,9 +72,10 @@ namespace osu.Game.Screens
         private MouseIdleTracker idleTracker;
         private ScheduledDelegate scheduledHideOverlays;
         private ScheduledDelegate scheduledShowOverlays;
+        private ScheduledDelegate scheduledLoadStoryboards;
         private Box bgBox;
         private Container sbContainer;
-        ClockContainer sbClock;
+        private ClockContainer sbClock;
         private BottomBar bottomBar;
         private SideBarSettingsPanel sidebarContainer;
         private BeatmapLogo beatmapLogo;
@@ -81,18 +85,31 @@ namespace osu.Game.Screens
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
         private Track Track;
+        private CancellationTokenSource ChangeSB;
+        private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
+        private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
         private bool OverlaysHidden = false;
 
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
             {
+                sbContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
                 bgBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                     Alpha = 0
+                },
+                loadingSpinner = new LoadingSpinner(true)
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding{ Bottom = 100 }
                 },
                 new Container
                 {
@@ -100,10 +117,6 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        sbContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
                         new SpaceParticlesContainer(),
                         new ParallaxContainer
                         {
@@ -233,7 +246,7 @@ namespace osu.Game.Screens
                                                                 new MusicControlButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Music,
-                                                                    Action = () => musicController?.TogglePause(),
+                                                                    Action = () => TogglePause(),
                                                                     TooltipText = "切换暂停",
                                                                 },
                                                                 new MusicControlButton()
@@ -369,7 +382,7 @@ namespace osu.Game.Screens
                     return true;
 
                 case GlobalAction.MvisTogglePause:
-                    musicController.TogglePause();
+                    TogglePause();
                     return true;
 
                 case GlobalAction.MvisTogglePlayList:
@@ -396,6 +409,19 @@ namespace osu.Game.Screens
         {
         }
 
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case MouseMoveEvent _:
+                    TryShowOverlays();
+                    return base.Handle(e);
+
+                default:
+                    return base.Handle(e);
+            }
+        }
+
         private void InvokeSolo()
         {
             game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
@@ -404,7 +430,7 @@ namespace osu.Game.Screens
         private void ToggleSideBar()
         {
             sidebarContainer.ToggleVisibility();
-            this.Delay(DURATION).Schedule( () => UpdateVisuals());
+            this.Delay(DURATION).Schedule(() => UpdateVisuals());
         }
 
         private void UpdateVisuals()
@@ -412,9 +438,9 @@ namespace osu.Game.Screens
             var mouseIdle = idleTracker.IsIdle.Value;
 
             //如果有其他弹窗显示在播放器上方，解锁切换并显示界面
-            if ( !hoverCheckContainer.ScreenHovered.Value )
+            if (!hoverCheckContainer.ScreenHovered.Value)
             {
-                if ( lockButton.ToggleableValue.Value && OverlaysHidden )
+                if (lockButton.ToggleableValue.Value && OverlaysHidden)
                     lockButton.Toggle();
 
                 ShowOverlays();
@@ -426,19 +452,6 @@ namespace osu.Game.Screens
                 case true:
                     TryHideOverlays();
                     break;
-            }
-        }
-
-        protected override bool Handle(UIEvent e)
-        {
-            switch (e)
-            {
-                case MouseMoveEvent _:
-                    TryShowOverlays();
-                    return base.Handle(e);
-
-                default:
-                    return base.Handle(e);
             }
         }
 
@@ -476,8 +489,8 @@ namespace osu.Game.Screens
         /// </summary>
         private void RunHideOverlays()
         {
-            if ( !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
-                 || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value )
+            if (!idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
+                 || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value)
                 return;
 
             HideOverlays();
@@ -486,7 +499,7 @@ namespace osu.Game.Screens
         private void RunShowOverlays()
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if ( (lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden )
+            if ((lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden)
             {
                 lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
                 return;
@@ -496,7 +509,7 @@ namespace osu.Game.Screens
 
         private void TryHideOverlays()
         {
-            if ( !canReallyHide || bottomBar.Hovered.Value)
+            if (!canReallyHide || bottomBar.Hovered.Value)
                 return;
 
             try
@@ -515,13 +528,27 @@ namespace osu.Game.Screens
         {
             try
             {
-                scheduledShowOverlays = Scheduler.AddDelayed(() => 
+                scheduledShowOverlays = Scheduler.AddDelayed(() =>
                 {
                     RunShowOverlays();
                 }, 0);
             }
             finally
             {
+            }
+        }
+
+        private void TogglePause()
+        {
+            if ( Track?.IsRunning == true )
+            {
+                sbClock?.Stop();
+                musicController.Stop();
+            }
+            else
+            {
+                sbClock?.Start();
+                musicController.Play();
             }
         }
 
@@ -535,31 +562,61 @@ namespace osu.Game.Screens
 
         private void UpdateStoryBoardSource()
         {
+            DimmableStoryboard dimmableStoryboard;
+
+            loadingSpinner.Show();
+            sbContainer.FadeOut(DURATION, Easing.OutQuint);
+
             sbClock?.Stop();
             foreach (var s in sbContainer)
             {
                 s.Hide();
                 s.Expire();
             }
-            
-            sbContainer.Add(
-                sbClock = new ClockContainer(Beatmap.Value, 0)
-                {
-                    Child = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both }
-                });
 
-            sbClock.Start();
+            ChangeSB?.Cancel();
+            scheduledLoadStoryboards?.Cancel();
+            try
+            {
+                scheduledLoadStoryboards = Scheduler.AddDelayed( () =>
+                LoadComponentAsync(sbClock = new ClockContainer(Beatmap.Value, 0)
+                {
+                    Child = dimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both }
+                }, loaded =>
+                {
+                    loadingSpinner.Hide();
+                    dimmableStoryboard.IgnoreUserSettings.Value = true;
+                    dimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+
+                    if ( Background is BackgroundScreenBeatmap backgroundBeatmap)
+                        backgroundBeatmap.StoryboardReplacesBackground.Value = storyboardReplacesBackground.Value;
+
+                    sbContainer.Add(sbClock);
+                    sbClock.Start();
+                    sbClock.Seek(Track.CurrentTime);
+                    sbContainer.FadeIn(DURATION, Easing.OutQuint);
+                }, (ChangeSB = new CancellationTokenSource()).Token), 500);
+            }
+            catch (Exception e)
+            {
+                loadingSpinner.Hide();
+                Logger.Error(e, $"加载Storyboard时出现错误! 请检查你的谱面! {e}");
+                return;
+            }
         }
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
+            storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
             {
+                backgroundBeatmap.StoryboardReplacesBackground.Value = false;
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
+
             UpdateStoryBoardSource();
         }
     }
