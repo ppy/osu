@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public ManiaPlayfield Playfield => ((ManiaPlayfield)drawableRuleset.Playfield);
 
+        public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
+
         public int TotalColumns => Playfield.TotalColumns;
 
         public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
