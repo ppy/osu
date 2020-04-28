@@ -556,3 +556,13 @@
     *   [m] [Add background video for the Showcase Scene to the tournament client #8859]
     *   [m] [Adjust editor timeline current marker to promote tick visibility #8873]
     *   [m] [Add osu!taiko bar line skinning support #8848]
+
+### 2020/4/28
+*   合并上游pr
+    *   [m] [Show visual feedback for taiko drumrolls #8675]
+    *   [m] [Bump ppy.osu.Game.Resources from 2020.412.0 to 2020.427.0 #8875]
+    *   [m] [Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.1 #8874]
+    *   [m] [Fix taiko hit target alpha on legacy skins #8876]
+    *   [m] [Add taiko hit explosion skinning support #8877]
+    *   [m] [Fix score multiplier being cut off in mod select at higher ui scales #8860]
+    *   [m] [Avoid calls on MusicController executing before it may have finished loading #8881]
