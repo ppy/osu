@@ -13,6 +13,10 @@ namespace osu.Game.Rulesets.Taiko
         Swell,
         HitTarget,
         PlayfieldBackgroundLeft,
-        PlayfieldBackgroundRight
+        PlayfieldBackgroundRight,
+        BarLine,
+        TaikoExplosionMiss,
+        TaikoExplosionGood,
+        TaikoExplosionGreat,
     }
 }

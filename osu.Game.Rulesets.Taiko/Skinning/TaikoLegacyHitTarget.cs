@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     {
                         Texture = skin.GetTexture("approachcircle"),
                         Scale = new Vector2(0.73f),
-                        Alpha = 0.7f,
+                        Alpha = 0.47f, // eyeballed to match stable
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     {
                         Texture = skin.GetTexture("taikobigcircle"),
                         Scale = new Vector2(0.7f),
-                        Alpha = 0.5f,
+                        Alpha = 0.22f, // eyeballed to match stable
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },

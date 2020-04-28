@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -20,16 +20,11 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public override bool RemoveWhenNotAlive => true;
 
+        [Cached(typeof(DrawableHitObject))]
         public readonly DrawableHitObject JudgedObject;
 
-        private readonly Box innerFill;
-
-        private readonly bool isRim;
-
-        public HitExplosion(DrawableHitObject judgedObject, bool isRim)
+        public HitExplosion(DrawableHitObject judgedObject)
         {
-            this.isRim = isRim;
-
             JudgedObject = judgedObject;
 
             Anchor = Anchor.Centre;
@@ -39,35 +34,36 @@ namespace osu.Game.Rulesets.Taiko.UI
             Size = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             RelativePositionAxes = Axes.Both;
-
-            BorderColour = Color4.White;
-            BorderThickness = 1;
-
-            Alpha = 0.15f;
-            Masking = true;
-
-            Children = new[]
-            {
-                innerFill = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            innerFill.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
+            Child = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject.Result?.Type ?? HitResult.Great)), _ => new DefaultHitExplosion());
+        }
+
+        private TaikoSkinComponents getComponentName(HitResult resultType)
+        {
+            switch (resultType)
+            {
+                case HitResult.Miss:
+                    return TaikoSkinComponents.TaikoExplosionMiss;
+
+                case HitResult.Good:
+                    return TaikoSkinComponents.TaikoExplosionGood;
+
+                case HitResult.Great:
+                    return TaikoSkinComponents.TaikoExplosionGreat;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(resultType), "Invalid result type");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.ScaleTo(3f, 1000, Easing.OutQuint);
             this.FadeOut(500);
-
             Expire(true);
         }
 
