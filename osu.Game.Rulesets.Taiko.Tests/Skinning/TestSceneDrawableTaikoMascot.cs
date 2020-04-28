@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -37,16 +36,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             TimeRange = { Value = 5000 },
         };
 
-        private Bindable<WorkingBeatmap> workingBeatmap;
-
         private IEnumerable<TestDrawableTaikoMascot> mascots => this.ChildrenOfType<TestDrawableTaikoMascot>();
         private IEnumerable<TaikoPlayfield> playfields => this.ChildrenOfType<TaikoPlayfield>();
-
-        [BackgroundDependencyLoader]
-        private void load(Bindable<WorkingBeatmap> beatmap)
-        {
-            workingBeatmap = beatmap;
-        }
 
         [Test]
         public void TestStateTextures()
@@ -75,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 SetContents(() =>
                 {
                     var ruleset = new TaikoRuleset();
-                    return new DrawableTaikoRuleset(ruleset, workingBeatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
+                    return new DrawableTaikoRuleset(ruleset, Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
                 });
             });
 
@@ -101,16 +92,16 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("Set beatmap", () => setBeatmap(true));
 
-            AddUntilStep("Wait for beatmap to be loaded", () => workingBeatmap.Value.Track.IsLoaded);
+            AddUntilStep("Wait for beatmap to be loaded", () => Beatmap.Value.Track.IsLoaded);
 
             AddStep("Create kiai ruleset", () =>
             {
-                workingBeatmap.Value.Track.Start();
+                Beatmap.Value.Track.Start();
 
                 SetContents(() =>
                 {
                     var ruleset = new TaikoRuleset();
-                    return new DrawableTaikoRuleset(ruleset, workingBeatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
+                    return new DrawableTaikoRuleset(ruleset, Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
                 });
             });
 
@@ -133,7 +124,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             if (kiai)
                 controlPointInfo.Add(0, new EffectControlPoint { KiaiMode = true });
 
-            workingBeatmap.Value = CreateWorkingBeatmap(new Beatmap
+            Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject> { new Hit { Type = HitType.Centre } },
                 BeatmapInfo = new BeatmapInfo
