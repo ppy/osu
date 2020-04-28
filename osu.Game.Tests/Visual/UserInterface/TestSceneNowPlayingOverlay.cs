@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -43,9 +44,29 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
         }
 
+        [Resolved]
+        private BeatmapManager manager { get; set; }
+
         [Test]
         public void TestPrevTrackBehavior()
         {
+            // ensure we have at least two beatmaps available.
+            AddRepeatStep("import beatmap", () => manager.Import(new BeatmapSetInfo
+            {
+                Beatmaps = new List<BeatmapInfo>
+                {
+                    new BeatmapInfo
+                    {
+                        BaseDifficulty = new BeatmapDifficulty(),
+                    }
+                },
+                Metadata = new BeatmapMetadata
+                {
+                    Artist = "a test map",
+                    Title = "title",
+                }
+            }).Wait(), 5);
+
             AddStep(@"Next track", () => musicController.NextTrack());
             AddStep("Store track", () => currentBeatmap = Beatmap.Value);
 
@@ -54,11 +75,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep(@"Set previous", () => musicController.PreviousTrack());
 
-            AddAssert(@"Check track didn't change", () => currentBeatmap == Beatmap.Value);
+            AddAssert(@"Check beatmap didn't change", () => currentBeatmap == Beatmap.Value);
             AddUntilStep("Wait for current time to update", () => currentBeatmap.Track.CurrentTime < 5000);
 
             AddStep(@"Set previous", () => musicController.PreviousTrack());
-            AddAssert(@"Check track did change", () => currentBeatmap != Beatmap.Value);
+            AddAssert(@"Check beatmap did change", () => currentBeatmap != Beatmap.Value);
         }
     }
 }
