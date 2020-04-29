@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Bindable<double> configTimeRange = new BindableDouble();
 
         // Stores the current speed adjustment active in gameplay.
-        private readonly Track speedAdjustmentTrack = new TrackVirtual(1000);
+        private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
 
         public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
