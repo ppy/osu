@@ -483,7 +483,7 @@ namespace osu.Game.Screens
             game?.Toolbar.Hide();
             bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
-                     .FadeOut(DURATION, Easing.OutQuint);
+                     .FadeTo(0.01f, DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
             OverlaysHidden = true;
