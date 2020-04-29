@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private readonly Bindable<double> configTimeRange = new Bindable<double>();
+        private readonly Bindable<double> configTimeRange = new BindableDouble();
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(1000);
