@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal).OrderBy(_ => RNG.Next()));
         }
 
         protected override void LoadComplete()

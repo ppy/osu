@@ -566,3 +566,8 @@
     *   [m] [Add taiko hit explosion skinning support #8877]
     *   [m] [Fix score multiplier being cut off in mod select at higher ui scales #8860]
     *   [m] [Avoid calls on MusicController executing before it may have finished loading #8881]
+
+### 2020/4/29
+*   合并上游pr
+    *   [m] [Reduce database includes where possible #8889]
+    *   [m] [Avoid using internal EF methods in tests #8883]
