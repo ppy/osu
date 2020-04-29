@@ -31,6 +31,7 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
+using System;
 
 namespace osu.Game.Screens
 {
@@ -146,21 +147,27 @@ namespace osu.Game.Screens
                                     Colour = Color4.Black,
                                     Alpha = 0.5f,
                                 },
-                                new FillFlowContainer
+                                new OsuScrollContainer
                                 {
-                                    Spacing = new Vector2(10),
-                                    Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
                                     RelativeSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
+                                    Child = new FillFlowContainer
                                     {
-                                        new MvisSettings(),
-                                        playlist = new PlaylistOverlay
+                                        Spacing = new Vector2(10),
+                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
+                                        Height = Math.Max(768, DrawHeight),
+                                        RelativeSizeAxes = Axes.X,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
                                         {
-                                            TakeFocusOnPopIn = false,
-                                            RelativeSizeAxes = Axes.X,
-                                        },
-                                    }
+                                            new MvisSettings(),
+                                            playlist = new PlaylistOverlay
+                                            {
+                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
+                                                TakeFocusOnPopIn = false,
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                        }
+                                    },
                                 },
                             }
                         },
