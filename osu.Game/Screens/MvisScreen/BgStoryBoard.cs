@@ -21,15 +21,14 @@ namespace osu.Game.Screens.Mvis
         private DimmableStoryboard dimmableStoryboard;
         private Bindable<bool> EnableSB = new Bindable<bool>();
         public readonly Bindable<bool> IsReady = new Bindable<bool>();
-        public readonly Bindable<bool> SBReplacesBg = new Bindable<bool>();
-        private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
+        public readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
         private Task LogTask;
         private Task LoadSBAsyncTask;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private IBindable<WorkingBeatmap> b { get; set; }
 
-        public BgStoryBoard(WorkingBeatmap beatmap = null)
+        public BgStoryBoard()
         {
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -51,15 +50,19 @@ namespace osu.Game.Screens.Mvis
 
         protected override void LoadComplete()
         {
+            b.ValueChanged += _ =>
+            {
+                CancelUpdateComponent();
+                UpdateStoryBoardAsync();
+            };
             dimmableStoryboard?.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
-            SBReplacesBg.BindTo(storyboardReplacesBackground);
         }
 
         public void UpdateVisuals()
         {
             if ( EnableSB.Value )
             {
-                storyboardReplacesBackground.Value = beatmap.Value.Storyboard.ReplacesBackground && beatmap.Value.Storyboard.HasDrawable;;
+                storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;;
                 sbClock?.FadeIn(DURATION, Easing.OutQuint);
             }
             else
@@ -81,12 +84,12 @@ namespace osu.Game.Screens.Mvis
             }
         }
 
-        public bool UpdateComponent(WorkingBeatmap b)
+        public bool UpdateComponent()
         {
             if ( b == null )
                 return false;
 
-            storyboardReplacesBackground.Value = b.Storyboard.ReplacesBackground && b.Storyboard.HasDrawable;
+            storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
 
             IsReady.Value = false;
 
@@ -94,9 +97,9 @@ namespace osu.Game.Screens.Mvis
 
             try
             {
-                LoadComponentAsync(new ClockContainer(b, 0)
+                LoadComponentAsync(new ClockContainer(b.Value, 0)
                 {
-                    Child = dimmableStoryboard = new DimmableStoryboard(b.Storyboard) { RelativeSizeAxes = Axes.Both }
+                    Child = dimmableStoryboard = new DimmableStoryboard(b.Value.Storyboard) { RelativeSizeAxes = Axes.Both }
                 }, newsbC =>
                 {
                     sbClock?.Stop();
@@ -108,7 +111,7 @@ namespace osu.Game.Screens.Mvis
 
                     sbContainer.Add(sbClock);
                     sbClock.Start();
-                    sbClock.Seek(b.Track.CurrentTime);
+                    sbClock.Seek(b.Value.Track.CurrentTime);
 
                     IsReady.Value = true;
 
@@ -126,14 +129,14 @@ namespace osu.Game.Screens.Mvis
             return true;
         }
 
-        public Task UpdateStoryBoardAsync(WorkingBeatmap b) => LoadSBAsyncTask = Task.Run(async () =>
+        public Task UpdateStoryBoardAsync() => LoadSBAsyncTask = Task.Run(async () =>
         {
-            UpdateComponent(b);
+            UpdateComponent();
             UpdateVisuals();
 
             try
             {
-                LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.BeatmapSetInfo}\"..."));
+                LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"..."));
                 await LogTask;
             }
             finally

@@ -325,10 +325,10 @@ namespace osu.Game.Screens
                         break;
                 }
             };
-            bgSB.SBReplacesBg.ValueChanged += _ => 
+            bgSB.storyboardReplacesBackground.ValueChanged += _ => 
             {
                 if (Background is BackgroundScreenBeatmap backgroundBeatmap)
-                    backgroundBeatmap.StoryboardReplacesBackground.Value = bgSB.SBReplacesBg.Value;
+                    backgroundBeatmap.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
             };
 
             inputManager = GetContainingInputManager();
@@ -578,9 +578,6 @@ namespace osu.Game.Screens
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
-
-            bgSB.CancelUpdateComponent();
-            bgSB.UpdateStoryBoardAsync(Beatmap.Value);
         }
     }
 }
