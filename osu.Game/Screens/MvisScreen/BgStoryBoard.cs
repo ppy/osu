@@ -50,11 +50,6 @@ namespace osu.Game.Screens.Mvis
 
         protected override void LoadComplete()
         {
-            b.ValueChanged += _ =>
-            {
-                CancelUpdateComponent();
-                UpdateStoryBoardAsync();
-            };
             dimmableStoryboard?.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
         }
 

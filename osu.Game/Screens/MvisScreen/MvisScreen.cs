@@ -366,6 +366,7 @@ namespace osu.Game.Screens
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
             track.RestartPoint = 0;
 
+            loadingSpinner.Show();
             updateComponentFromBeatmap(Beatmap.Value);
         }
 
@@ -578,6 +579,9 @@ namespace osu.Game.Screens
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
+
+            bgSB.CancelUpdateComponent();
+            this.Delay(20).Schedule( () => bgSB.UpdateStoryBoardAsync() );
         }
     }
 }
