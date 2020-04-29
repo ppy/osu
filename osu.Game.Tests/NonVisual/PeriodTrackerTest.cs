@@ -29,9 +29,9 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker { Periods = test_single_period };
 
             var period = test_single_period.Single();
-            Assert.IsTrue(tracker.Contains(period.Start));
-            Assert.IsTrue(tracker.Contains(getMidTime(period)));
-            Assert.IsTrue(tracker.Contains(period.End));
+            Assert.IsTrue(tracker.IsInAny(period.Start));
+            Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
+            Assert.IsTrue(tracker.IsInAny(period.End));
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker { Periods = test_periods };
 
             foreach (var period in test_periods)
-                Assert.IsTrue(tracker.Contains(getMidTime(period)));
+                Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker { Periods = test_periods };
 
             foreach (var period in test_periods.OrderBy(_ => RNG.Next()))
-                Assert.IsTrue(tracker.Contains(getMidTime(period)));
+                Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
         }
 
         [Test]
@@ -64,12 +64,12 @@ namespace osu.Game.Tests.NonVisual
                 }
             };
 
-            Assert.IsFalse(tracker.Contains(0.9), "Time before first period is being considered inside");
+            Assert.IsFalse(tracker.IsInAny(0.9), "Time before first period is being considered inside");
 
-            Assert.IsFalse(tracker.Contains(2.1), "Time right after first period is being considered inside");
-            Assert.IsFalse(tracker.Contains(2.9), "Time right before second period is being considered inside");
+            Assert.IsFalse(tracker.IsInAny(2.1), "Time right after first period is being considered inside");
+            Assert.IsFalse(tracker.IsInAny(2.9), "Time right before second period is being considered inside");
 
-            Assert.IsFalse(tracker.Contains(4.1), "Time after last period is being considered inside");
+            Assert.IsFalse(tracker.IsInAny(4.1), "Time after last period is being considered inside");
         }
 
         [Test]
@@ -78,10 +78,10 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker { Periods = test_single_period };
 
             var period = test_single_period.Single();
-            Assert.IsTrue(tracker.Contains(getMidTime(period)));
+            Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
 
             tracker.Periods = null;
-            Assert.IsFalse(tracker.Contains(getMidTime(period)));
+            Assert.IsFalse(tracker.IsInAny(getMidTime(period)));
         }
 
         [Test]
