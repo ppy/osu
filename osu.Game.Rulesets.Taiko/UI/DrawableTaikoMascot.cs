@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly Bindable<TaikoMascotAnimationState> state;
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
-        private Drawable currentAnimation;
+        private TaikoMascotAnimation currentAnimation;
 
         private bool lastHitMissed;
         private bool kiaiMode;
@@ -44,8 +44,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 animations[TaikoMascotAnimationState.Kiai] = new TaikoMascotAnimation(TaikoMascotAnimationState.Kiai),
                 animations[TaikoMascotAnimationState.Fail] = new TaikoMascotAnimation(TaikoMascotAnimationState.Fail),
             };
-
-            updateState();
         }
 
         protected override void LoadComplete()
@@ -53,28 +51,32 @@ namespace osu.Game.Rulesets.Taiko.UI
             base.LoadComplete();
 
             animations.Values.ForEach(animation => animation.Hide());
-            State.BindValueChanged(mascotStateChanged, true);
+            state.BindValueChanged(mascotStateChanged, true);
         }
 
         public void OnNewResult(JudgementResult result)
         {
             lastHitMissed = result.Type == HitResult.Miss && result.Judgement.AffectsCombo;
-            updateState();
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             kiaiMode = effectPoint.KiaiMode;
-            updateState();
         }
 
-        private void updateState()
+        protected override void Update()
         {
+            base.Update();
             state.Value = getNextState();
         }
 
         private TaikoMascotAnimationState getNextState()
         {
+            // don't change state if current animation is playing
+            // (used for clear state - others are manually animated on new beats)
+            if (currentAnimation != null && !currentAnimation.Completed)
+                return state.Value;
+
             if (lastHitMissed)
                 return TaikoMascotAnimationState.Fail;
 
