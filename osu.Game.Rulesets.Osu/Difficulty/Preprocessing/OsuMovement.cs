@@ -419,7 +419,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((d12 - 2.2) / 0.7, 2)) *
                                              SpecialFunctions.Logistic((255 - effectiveBpm) / 10);
 
-            // Correction #10 - Hidden Mod
+            // Correction #10 - Slow big jump buff
+            double bigJumpBuffFactor = 1 + 0.15 * SpecialFunctions.Logistic((d12 - 6) / 0.5) *
+                                           SpecialFunctions.Logistic((210 - effectiveBpm) / 8);
+
+            // Correction #11 - Hidden Mod
             double correctionHidden = 0;
             if (hidden)
             {
@@ -427,7 +431,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
 
-            // Correction #11 - Stacked wiggle fix
+            // Correction #12 - Stacked wiggle fix
             if (obj0 != null && obj3 != null)
             {
                 var d13 = ((pos3 - pos1) / (2 * obj2.Radius)).L2Norm();
@@ -442,13 +446,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
             }
 
-            // Correction #12 - Nerf to big jumps where obj0 and obj2 are close
+            // Correction #13 - Nerf to big jumps where obj0 and obj2 are close
             double jumpOverlapCorrection = 1 - Math.Max(0.15 - 0.1 * d02, 0) *
                                                SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
 
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
-                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * (1 + correctionHidden) *
+                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * bigJumpBuffFactor * (1 + correctionHidden) *
                                        jumpOverlapCorrection;
 
             movement.D = d12WithCorrection;
