@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (timingPoint.Equals(lastTimingPoint) && beatIndex == lastBeat)
+            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))

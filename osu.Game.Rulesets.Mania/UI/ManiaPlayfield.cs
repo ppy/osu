@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -14,6 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    [Cached]
     public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<Stage> stages = new List<Stage>();

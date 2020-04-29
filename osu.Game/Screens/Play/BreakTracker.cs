@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
 
             isBreakTime.Value = tracker.IsInAny(time)
                                 || time < gameplayStartTime
-                                || scoreProcessor?.HasCompleted == true;
+                                || scoreProcessor?.HasCompleted.Value == true;
         }
     }
 }

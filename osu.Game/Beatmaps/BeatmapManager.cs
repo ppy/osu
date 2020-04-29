@@ -246,6 +246,12 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
+            if (beatmapInfo.BeatmapSet.Files == null)
+            {
+                var info = beatmapInfo;
+                beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
+            }
+
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
@@ -287,13 +293,34 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => GetAllUsableBeatmapSetsEnumerable().ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All) => GetAllUsableBeatmapSetsEnumerable(includes).ToList();
 
         /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
         /// </summary>
+        /// <param name="includes">The level of detail to include in the returned objects.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected);
+        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes)
+        {
+            IQueryable<BeatmapSetInfo> queryable;
+
+            switch (includes)
+            {
+                case IncludedDetails.Minimal:
+                    queryable = beatmaps.BeatmapSetsOverview;
+                    break;
+
+                case IncludedDetails.AllButFiles:
+                    queryable = beatmaps.BeatmapSetsWithoutFiles;
+                    break;
+
+                default:
+                    queryable = beatmaps.ConsumableItems;
+                    break;
+            }
+
+            return queryable.Where(s => !s.DeletePending && !s.Protected);
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
@@ -481,5 +508,26 @@ namespace osu.Game.Beatmaps
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// The level of detail to include in database results.
+    /// </summary>
+    public enum IncludedDetails
+    {
+        /// <summary>
+        /// Only include beatmap difficulties and set level metadata.
+        /// </summary>
+        Minimal,
+
+        /// <summary>
+        /// Include all difficulties, rulesets, difficulty metadata but no files.
+        /// </summary>
+        AllButFiles,
+
+        /// <summary>
+        /// Include everything.
+        /// </summary>
+        All
     }
 }
