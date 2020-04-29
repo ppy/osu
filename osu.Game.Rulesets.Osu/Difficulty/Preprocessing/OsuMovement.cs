@@ -197,6 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var s01 = Vector<double>.Build.Dense(2);
             var s23 = Vector<double>.Build.Dense(2);
             double d01 = 0;
+            double d02 = 0;
             double d23 = 0;
             double t01 = 0;
             double t23 = 0;
@@ -216,6 +217,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 s01 = (pos1 - pos0) / (2 * obj2.Radius);
                 d01 = s01.L2Norm();
                 t01 = (obj1.StartTime - obj0.StartTime) / clockRate / 1000.0;
+                d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
 
                 if (d12 != 0)
                 {
@@ -428,7 +430,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Correction #11 - Stacked wiggle fix
             if (obj0 != null && obj3 != null)
             {
-                var d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
                 var d13 = ((pos3 - pos1) / (2 * obj2.Radius)).L2Norm();
                 var d03 = ((pos3 - pos0) / (2 * obj2.Radius)).L2Norm();
 
@@ -441,9 +442,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
             }
 
+            // Correction #12 - Nerf to big jumps where obj0 and obj2 are close
+            double jumpOverlapCorrection = 1 - Math.Max(0.15 - 0.1 * d02, 0) *
+                                               SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
+
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
-                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * (1 + correctionHidden);
+                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * (1 + correctionHidden) *
+                                       jumpOverlapCorrection;
 
             movement.D = d12WithCorrection;
             movement.MT = t12;
