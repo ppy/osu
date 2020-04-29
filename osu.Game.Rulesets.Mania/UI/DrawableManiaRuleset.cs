@@ -86,7 +86,6 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
-            configTimeRange.BindValueChanged(_ => updateTimeRange());
         }
 
         protected override void AdjustScrollSpeed(int amount)
