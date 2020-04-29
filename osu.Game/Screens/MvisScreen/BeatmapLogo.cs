@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,6 +22,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         private LogoVisualisation visualisation;
         private Container circularContainer;
         private readonly CircularProgress progressGlow;
+        Track track;
+        private bool ScreenExiting = false;
+        private float progressLast = 0;
 
         private Bindable<bool> UseLogoVisuals = new Bindable<bool>();
         public BeatmapLogo(int barsCount = 120, float barWidth = 3f)
@@ -128,14 +132,31 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         {
             base.Update();
 
-            var track = Beatmap.Value?.Track;
+            track = ScreenExiting ? new TrackVirtual(Beatmap.Value.Track.Length) : Beatmap.Value?.Track;
 
-            progressGlow.Current.Value = track == null ? 0 : (float)(track.CurrentTime / track.Length);
+            progressGlow.Current.Value = track == null ? 0 : UpdateProgress();
         }
 
         private class CircularVisualizer : MusicCircularVisualizer
         {
             protected override BasicBar CreateBar() => new CircularBar();
+        }
+
+        protected virtual float UpdateProgress()
+        {
+            if (track?.IsDummyDevice == false)
+            {
+                var progress = (float)(track.CurrentTime / track.Length);
+                progressLast = progress;
+                return progress;
+            }
+
+            return (float)progressLast;
+        }
+
+        public void Exit()
+        {
+            ScreenExiting = true;
         }
     }
 }

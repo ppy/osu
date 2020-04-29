@@ -519,3 +519,60 @@
     *   [m] [Update framework #8825]
 
 *   实现了Mvis播放器的键位绑定、单曲循环、锁定以及在选歌界面中查看歌曲的功能
+
+### 2020/4/22
+*   合并上游pr
+    *   [m] [Fix beatmap string output having empty brackets when pieces are missing #8828]
+    *   [m] [Fix beatmap encoder by enabling untested test cases #8818]
+    *   [m] [Load user rulesets from the game data directory #8607]
+    *   [m] [Add static internal catcher calculation methods for CatchDifficultyCalculator #8830]
+    *   [m] [Use platform bindings for editor actions #8832]
+    *   [m] [Remove obsolete nested hitobject methods #8833]
+
+### 2020/4/24
+*   合并上游pr
+    *   [m] [Fix editor crashing when entering with no beatmap selected #8856]
+    *   [m] [Make osu! ruleset placements happen on mouse down #8842]
+    *   [m] [Fix mania editor placement not working correctly #8843]
+    *   [m] [Rename editor tests namespace from "Editor" to "Editing" #8849]
+    *   [m] [Fix TestBeatmap not setting appropriate ruleset ID #8834]
+    *   [m] [Implement legacy beatmap encoding for all rulesets #8823]
+
+*   更新readme
+
+### 2020/4/25
+*   合并上游pr
+    *   [m] [Fix crash on switching comments page at an inopportune time #8858]
+    *   [m] [Refactor osu!taiko playfield and add background skinning support #8846]
+    *   [m] [Fix null reference while hiding toolbar on tests #8862]
+
+*   翻译改进
+*   关于界面代码优化
+
+### 2020/4/27
+*   合并上游pr
+    *   [m] [Fix ruleset selector not receiving key input on toolbar absence #8863]
+    *   [m] [Fix custom rulesets not showing correct icons in key binding settings #8864]
+    *   [m] [Add background video for the Showcase Scene to the tournament client #8859]
+    *   [m] [Adjust editor timeline current marker to promote tick visibility #8873]
+    *   [m] [Add osu!taiko bar line skinning support #8848]
+
+### 2020/4/28
+*   合并上游pr
+    *   [m] [Show visual feedback for taiko drumrolls #8675]
+    *   [m] [Bump ppy.osu.Game.Resources from 2020.412.0 to 2020.427.0 #8875]
+    *   [m] [Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.1 #8874]
+    *   [m] [Fix taiko hit target alpha on legacy skins #8876]
+    *   [m] [Add taiko hit explosion skinning support #8877]
+    *   [m] [Fix score multiplier being cut off in mod select at higher ui scales #8860]
+    *   [m] [Avoid calls on MusicController executing before it may have finished loading #8881]
+
+### 2020/4/29
+*   合并上游pr
+    *   [m] [Reduce database includes where possible #8889]
+    *   [m] [Avoid using internal EF methods in tests #8883]
+    *   [m] [Fix speed adjustment mods affecting mania scroll speed #8887]
+    *   [m] [Fix mania selection blueprints not moving/moving incorrectly #8886]
+    *   [m] [Change taiko hit explosion animation to match stable for skins #8896]
+    *   [m] [Further improve beatmap carousel load performance by avoiding incorrect query construction #8895]
+    *   [m] [Reduce initial channel load overhead by only loading history on active channel #8893]

@@ -674,7 +674,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { mfmenu, chatOverlay, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {

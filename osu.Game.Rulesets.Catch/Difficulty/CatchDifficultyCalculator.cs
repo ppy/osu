@@ -71,8 +71,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
-            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
-                halfCatcherWidth = catcher.CatchWidth * 0.5f;
+            halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
 
             return new Skill[]
             {

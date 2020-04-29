@@ -318,7 +318,6 @@ namespace osu.Game.Screens.Play
                                 Colour = Color4.White,
                                 Size = new Vector2(20),
                             }
-
                         }
                     },
                 };

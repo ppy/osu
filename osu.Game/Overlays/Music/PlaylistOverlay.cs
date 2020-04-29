@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Music
         private const float playlist_height = 510;
 
         public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+        public bool TakeFocusOnPopIn = true;
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -97,8 +98,9 @@ namespace osu.Game.Overlays.Music
 
         protected override void PopIn()
         {
-            filter.Search.HoldFocus = true;
-            Schedule(() => filter.Search.TakeFocus());
+            filter.Search.HoldFocus = TakeFocusOnPopIn;
+            if ( TakeFocusOnPopIn )
+                Schedule(() => filter.Search.TakeFocus());
 
             this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);

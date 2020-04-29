@@ -123,7 +123,6 @@ namespace osu.Game.Screens.Ranking
                                 }
                             }
                         },
-
                     }
                 }
             };

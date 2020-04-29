@@ -129,6 +129,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.OptUI, true);
             Set(OsuSetting.TrianglesEnabled, true);
             Set(OsuSetting.MvisParticleAmount, 350, 0, 350);
+            Set(OsuSetting.MvisBgBlur, 0.2f, 0f, 1f);
+            Set(OsuSetting.MvisEnableStoryboard, false);
             Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
         }
 
@@ -237,6 +239,8 @@ namespace osu.Game.Configuration
         OptUI,
         TrianglesEnabled,
         MvisParticleAmount,
-        MvisUseOsuLogoVisualisation
+        MvisBgBlur,
+        MvisUseOsuLogoVisualisation,
+        MvisEnableStoryboard
     }
 }

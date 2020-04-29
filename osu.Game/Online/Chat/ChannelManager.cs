@@ -25,7 +25,6 @@ namespace osu.Game.Online.Chat
         /// </summary>
         private readonly string[] defaultChannels =
         {
-            @"#chinese",
             @"#lazer",
             @"#osu",
             @"#lobby"
@@ -94,6 +93,12 @@ namespace osu.Game.Online.Chat
         {
             if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 JoinChannel(e.NewValue);
+
+            if (e.NewValue?.MessagesLoaded == false)
+            {
+                // let's fetch a small number of messages to bring us up-to-date with the backlog.
+                fetchInitalMessages(e.NewValue);
+            }
         }
 
         /// <summary>
@@ -212,7 +217,7 @@ namespace osu.Game.Online.Chat
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("用法: /me [动作]"));
+                        target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                         break;
                     }
 
@@ -222,7 +227,7 @@ namespace osu.Game.Online.Chat
                 case "join":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("用法: /join [频道]"));
+                        target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
                         break;
                     }
 
@@ -230,7 +235,7 @@ namespace osu.Game.Online.Chat
 
                     if (channel == null)
                     {
-                        target.AddNewMessages(new ErrorMessage($"频道 '{content}' 未找到."));
+                        target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
                         break;
                     }
 
@@ -239,11 +244,11 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    target.AddNewMessages(new InfoMessage("当前支持的指令: /help, /me [动作], /join [频道]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /np"));
                     break;
 
                 default:
-                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" 尚未支持! 请输入/help查看帮助"));
+                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                     break;
             }
         }
@@ -375,12 +380,6 @@ namespace osu.Game.Online.Chat
 
             if (CurrentChannel.Value == null)
                 CurrentChannel.Value = channel;
-
-            if (!channel.MessagesLoaded)
-            {
-                // let's fetch a small number of messages to bring us up-to-date with the backlog.
-                fetchInitalMessages(channel);
-            }
 
             return channel;
         }
