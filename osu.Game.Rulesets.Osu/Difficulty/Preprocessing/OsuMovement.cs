@@ -455,7 +455,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Correction #13 - Repetitive jump nerf
             // Nerf big jumps where obj0 and obj2 are close or where objMinus2 and obj2 are close
-            double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * d02, 0) + Math.Max(0.15 - 0.1 * dMinus22, 0)) *
+            double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * d02, 0) + Math.Max(0.1125 - 0.075 * dMinus22, 0)) *
                                                SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
 
             // Apply the corrections
