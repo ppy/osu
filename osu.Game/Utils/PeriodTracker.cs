@@ -43,7 +43,7 @@ namespace osu.Game.Utils
         /// Whether the provided time is in any of the added periods.
         /// </summary>
         /// <param name="time">The time value to check for.</param>
-        public bool Contains(double time)
+        public bool IsInAny(double time)
         {
             if (periods.Count == 0)
                 return false;

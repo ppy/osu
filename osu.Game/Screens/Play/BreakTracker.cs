@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
 
             var time = Clock.CurrentTime;
 
-            isBreakTime.Value = tracker.Contains(time)
+            isBreakTime.Value = tracker.IsInAny(time)
                                 || time < gameplayStartTime
                                 || scoreProcessor?.HasCompleted == true;
         }
