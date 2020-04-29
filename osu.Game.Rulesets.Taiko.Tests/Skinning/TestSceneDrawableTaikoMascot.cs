@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -27,6 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(DrawableTaikoMascot),
+            typeof(TaikoMascotAnimation)
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
@@ -36,23 +36,18 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             TimeRange = { Value = 5000 },
         };
 
-        private IEnumerable<TestDrawableTaikoMascot> mascots => this.ChildrenOfType<TestDrawableTaikoMascot>();
+        private IEnumerable<DrawableTaikoMascot> mascots => this.ChildrenOfType<DrawableTaikoMascot>();
         private IEnumerable<TaikoPlayfield> playfields => this.ChildrenOfType<TaikoPlayfield>();
 
         [Test]
-        public void TestStateTextures()
+        public void TestStateAnimations()
         {
             AddStep("set beatmap", () => setBeatmap());
 
-            AddStep("create mascot", () =>
-            {
-                SetContents(() => new TestDrawableTaikoMascot());
-            });
-
-            AddStep("clear state", () => setState(TaikoMascotAnimationState.Clear));
-            AddStep("kiai state", () => setState(TaikoMascotAnimationState.Kiai));
-            AddStep("fail state", () => setState(TaikoMascotAnimationState.Fail));
-            AddStep("idle state", () => setState(TaikoMascotAnimationState.Idle));
+            AddStep("clear state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Clear)));
+            AddStep("idle state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Idle)));
+            AddStep("kiai state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Kiai)));
+            AddStep("fail state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Fail)));
         }
 
         [Test]
@@ -126,12 +121,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             });
         }
 
-        private void setState(TaikoMascotAnimationState state)
-        {
-            foreach (var mascot in mascots)
-                mascot.State.Value = state;
-        }
-
         private void addJudgement(HitResult result)
         {
             foreach (var playfield in playfields)
@@ -144,15 +133,5 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         }
 
         private bool assertState(TaikoMascotAnimationState state) => mascots.All(d => d.State.Value == state);
-
-        private class TestDrawableTaikoMascot : DrawableTaikoMascot
-        {
-            public TestDrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
-                : base(startingState)
-            {
-            }
-
-            public new Bindable<TaikoMascotAnimationState> State => base.State;
-        }
     }
 }

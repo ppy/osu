@@ -17,9 +17,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoMascot : BeatSyncedContainer
     {
-        protected Bindable<TaikoMascotAnimationState> State { get; }
+        public IBindable<TaikoMascotAnimationState> State => state;
 
-        private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotTextureAnimation> animations;
+        private readonly Bindable<TaikoMascotAnimationState> state;
+        private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
         private Drawable currentAnimation;
 
         private bool lastHitMissed;
@@ -29,8 +30,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             RelativeSizeAxes = Axes.Both;
 
-            State = new Bindable<TaikoMascotAnimationState>(startingState);
-            animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotTextureAnimation>();
+            state = new Bindable<TaikoMascotAnimationState>(startingState);
+            animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation>();
         }
 
         [BackgroundDependencyLoader]
@@ -38,10 +39,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new[]
             {
-                animations[TaikoMascotAnimationState.Idle] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Idle),
-                animations[TaikoMascotAnimationState.Clear] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Clear),
-                animations[TaikoMascotAnimationState.Kiai] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Kiai),
-                animations[TaikoMascotAnimationState.Fail] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Fail),
+                animations[TaikoMascotAnimationState.Idle] = new TaikoMascotAnimation(TaikoMascotAnimationState.Idle),
+                animations[TaikoMascotAnimationState.Clear] = new TaikoMascotAnimation(TaikoMascotAnimationState.Clear),
+                animations[TaikoMascotAnimationState.Kiai] = new TaikoMascotAnimation(TaikoMascotAnimationState.Kiai),
+                animations[TaikoMascotAnimationState.Fail] = new TaikoMascotAnimation(TaikoMascotAnimationState.Fail),
             };
 
             updateState();
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void updateState()
         {
-            State.Value = getNextState();
+            state.Value = getNextState();
         }
 
         private TaikoMascotAnimationState getNextState()
