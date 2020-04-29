@@ -103,7 +103,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     var texture = getAnimationFrame(skin, TaikoMascotAnimationState.Clear, frameIndex);
 
                     if (texture == null)
-                        continue;
+                        // as per https://osu.ppy.sh/help/wiki/Skinning/osu!taiko#pippidon
+                        break;
 
                     AddFrame(texture);
                 }
