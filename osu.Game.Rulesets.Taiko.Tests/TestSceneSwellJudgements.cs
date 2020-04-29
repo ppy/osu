@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [Test]
         public void TestZeroTickTimeOffsets()
         {
-            AddUntilStep("gameplay finished", () => Player.ScoreProcessor.HasCompleted);
+            AddUntilStep("gameplay finished", () => Player.ScoreProcessor.HasCompleted.Value);
             AddAssert("all tick offsets are 0", () => Player.Results.Where(r => r.HitObject is SwellTick).All(r => r.TimeOffset == 0));
         }
 

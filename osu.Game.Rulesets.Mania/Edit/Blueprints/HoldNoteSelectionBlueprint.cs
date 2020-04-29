@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Masking = true,
                     BorderThickness = 1,
                     BorderColour = colours.Yellow,
                     Child = new Box
