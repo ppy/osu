@@ -2,19 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Lists;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
     public class BreakTracker : Component
     {
         private readonly ScoreProcessor scoreProcessor;
-
         private readonly double gameplayStartTime;
+
+        private readonly PeriodTracker tracker = new PeriodTracker();
 
         /// <summary>
         /// Whether the gameplay is currently in a break.
@@ -23,22 +25,14 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableBool isBreakTime = new BindableBool();
 
-        private readonly IntervalList<double> breakIntervals = new IntervalList<double>();
-
         public IReadOnlyList<BreakPeriod> Breaks
         {
             set
             {
                 isBreakTime.Value = false;
-                breakIntervals.Clear();
 
-                foreach (var b in value)
-                {
-                    if (!b.HasEffect)
-                        continue;
-
-                    breakIntervals.Add(b.StartTime, b.EndTime - BreakOverlay.BREAK_FADE_DURATION);
-                }
+                tracker.Periods = value?.Where(b => b.HasEffect)
+                                       .Select(b => new Period(b.StartTime, b.EndTime - BreakOverlay.BREAK_FADE_DURATION));
             }
         }
 
@@ -54,7 +48,7 @@ namespace osu.Game.Screens.Play
 
             var time = Clock.CurrentTime;
 
-            isBreakTime.Value = breakIntervals.IsInAnyInterval(time)
+            isBreakTime.Value = tracker.Contains(time)
                                 || time < gameplayStartTime
                                 || scoreProcessor?.HasCompleted == true;
         }
