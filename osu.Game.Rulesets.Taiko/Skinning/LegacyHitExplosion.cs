@@ -22,8 +22,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         {
             base.LoadComplete();
 
-            this.FadeIn(120);
-            this.ScaleTo(0.6f).Then().ScaleTo(1, 240, Easing.OutElastic);
+            const double animation_time = 120;
+
+            this.FadeInFromZero(animation_time).Then().FadeOut(animation_time * 1.5);
+
+            this.ScaleTo(0.6f)
+                .Then().ScaleTo(1.1f, animation_time * 0.8)
+                .Then().ScaleTo(0.9f, animation_time * 0.4)
+                .Then().ScaleTo(1f, animation_time * 0.2);
         }
     }
 }
