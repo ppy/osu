@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -51,6 +53,31 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         }
 
         [Test]
+        public void TestClearStateTransition()
+        {
+            AddStep("set beatmap", () => setBeatmap());
+
+            // the bindables need to be independent for each content cell to prevent interference,
+            // as if some of the skins don't implement the animation they'll immediately revert to the previous state from the clear state.
+            var states = new List<Bindable<TaikoMascotAnimationState>>();
+
+            AddStep("create mascot", () => SetContents(() =>
+            {
+                var state = new Bindable<TaikoMascotAnimationState>(TaikoMascotAnimationState.Clear);
+                states.Add(state);
+                return new DrawableTaikoMascot { State = { BindTarget = state } };
+            }));
+
+            AddStep("set clear state", () => states.ForEach(state => state.Value = TaikoMascotAnimationState.Clear));
+            AddStep("miss", () => mascots.ForEach(mascot => mascot.OnNewResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss })));
+            AddAssert("skins with animations remain in clear state", () => mascots.Any(mascot => mascot.State.Value == TaikoMascotAnimationState.Clear));
+            AddUntilStep("state reverts to fail", () => someMascotsIn(TaikoMascotAnimationState.Fail));
+
+            AddStep("set clear state again", () => states.ForEach(state => state.Value = TaikoMascotAnimationState.Clear));
+            AddAssert("skins with animations change to clear", () => someMascotsIn(TaikoMascotAnimationState.Clear));
+        }
+
+        [Test]
         public void TestPlayfield()
         {
             AddStep("set beatmap", () => setBeatmap());
@@ -65,13 +92,13 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             });
 
             AddStep("miss result for normal hit", () => addJudgement(HitResult.Miss, new TaikoJudgement()));
-            AddUntilStep("state is fail", () => assertState(TaikoMascotAnimationState.Fail));
+            AddUntilStep("state is fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
 
             AddStep("great result for normal hit", () => addJudgement(HitResult.Great, new TaikoJudgement()));
-            AddUntilStep("state is idle", () => assertState(TaikoMascotAnimationState.Idle));
+            AddUntilStep("state is idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
 
             AddStep("miss result for strong hit", () => addJudgement(HitResult.Miss, new TaikoStrongJudgement()));
-            AddAssert("state remains idle", () => assertState(TaikoMascotAnimationState.Idle));
+            AddAssert("state remains idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
         }
 
         [Test]
@@ -92,10 +119,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 });
             });
 
-            AddUntilStep("state is fail", () => assertState(TaikoMascotAnimationState.Fail));
+            AddUntilStep("state is fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
 
             AddStep("great result for normal hit", () => addJudgement(HitResult.Great, new TaikoJudgement()));
-            AddUntilStep("state is kiai", () => assertState(TaikoMascotAnimationState.Kiai));
+            AddUntilStep("state is kiai", () => allMascotsIn(TaikoMascotAnimationState.Kiai));
         }
 
         private void setBeatmap(bool kiai = false)
@@ -135,6 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             }
         }
 
-        private bool assertState(TaikoMascotAnimationState state) => mascots.All(d => d.State.Value == state);
+        private bool allMascotsIn(TaikoMascotAnimationState state) => mascots.All(d => d.State.Value == state);
+        private bool someMascotsIn(TaikoMascotAnimationState state) => mascots.Any(d => d.State.Value == state);
     }
 }

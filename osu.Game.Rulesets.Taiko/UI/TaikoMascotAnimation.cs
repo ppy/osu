@@ -29,6 +29,15 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor = Anchor.BottomLeft;
+            AlwaysPresent = true;
+        }
+
+        public bool Completed => !textureAnimation.IsPlaying || textureAnimation.PlaybackPosition >= textureAnimation.Duration;
+
+        public override void Show()
+        {
+            base.Show();
+            textureAnimation.Seek(0);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
@@ -93,6 +102,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             public ClearMascotTextureAnimation()
             {
                 DefaultFrameLength = clear_animation_speed;
+                Loop = false;
             }
 
             [BackgroundDependencyLoader]
