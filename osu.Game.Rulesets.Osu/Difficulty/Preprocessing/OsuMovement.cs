@@ -156,7 +156,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         public static List<OsuMovement> ExtractMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
-                           Vector<double> tapStrain, double clockRate, bool hidden = false, double noteDensity = 0)
+                                                        Vector<double> tapStrain, double clockRate,
+                                                        bool hidden = false, double noteDensity = 0, OsuHitObject objMinus2 = null)
         {
             
             var movement = new OsuMovement();
@@ -207,6 +208,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             bool obj1InTheMiddle = false;
             bool obj2InTheMiddle = false;
 
+            double dMinus22 = 0;
+            if (objMinus2 != null)
+            {
+                var posMinus2 = Vector<double>.Build.Dense(new[] { (double)objMinus2.Position.X, (double)objMinus2.Position.Y });
+                dMinus22 = ((pos2 - posMinus2) / (2 * obj2.Radius)).L2Norm();
+            }
 
             // Correction #1 - The Previous Object
             // Estimate how obj0 affects the difficulty of hitting obj2
@@ -446,8 +453,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
             }
 
-            // Correction #13 - Nerf to big jumps where obj0 and obj2 are close
-            double jumpOverlapCorrection = 1 - Math.Max(0.15 - 0.1 * d02, 0) *
+            // Correction #13 - Repetitive jump nerf
+            // Nerf big jumps where obj0 and obj2 are close or where objMinus2 and obj2 are close
+            double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * d02, 0) + Math.Max(0.15 - 0.1 * dMinus22, 0)) *
                                                SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
 
             // Apply the corrections

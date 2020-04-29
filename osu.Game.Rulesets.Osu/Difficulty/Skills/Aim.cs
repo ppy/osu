@@ -80,6 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // the rest
             for (int i = 1; i < hitObjects.Count; i++)
             {
+                var objMinus2 = i > 3 ? hitObjects[i - 4] : null;
                 var obj0 = i > 1 ? hitObjects[i - 2] : null;
                 var obj1 = hitObjects[i - 1];
                 var obj2 = hitObjects[i];
@@ -88,9 +89,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (hidden)
                     movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate,
-                                                                   hidden: true, noteDensity: noteDensities[i]));
+                                                                   hidden: true, noteDensity: noteDensities[i], objMinus2: objMinus2));
                 else
-                    movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate));
+                    movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate, objMinus2: objMinus2));
 
                 
             }
