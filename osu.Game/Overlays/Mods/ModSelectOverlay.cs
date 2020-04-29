@@ -37,7 +37,6 @@ namespace osu.Game.Overlays.Mods
         protected readonly TriangleButton CloseButton;
 
         protected readonly OsuSpriteText MultiplierLabel;
-        protected readonly OsuSpriteText UnrankedLabel;
 
         protected override bool BlockNonPositionalInput => false;
 
@@ -57,6 +56,8 @@ namespace osu.Game.Overlays.Mods
         protected Color4 HighMultiplierColour;
 
         private const float content_width = 0.8f;
+        private const float footer_button_spacing = 20;
+
         private readonly FillFlowContainer footerContainer;
 
         private SampleChannel sampleOn, sampleOff;
@@ -103,7 +104,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         new Dimension(GridSizeMode.Absolute, 90),
                         new Dimension(GridSizeMode.Distributed),
-                        new Dimension(GridSizeMode.Absolute, 70),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -197,7 +198,8 @@ namespace osu.Game.Overlays.Mods
                             // Footer
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 Children = new Drawable[]
@@ -215,7 +217,9 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
                                         Width = content_width,
-                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(footer_button_spacing, footer_button_spacing / 2),
+                                        LayoutDuration = 100,
+                                        LayoutEasing = Easing.OutQuint,
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
@@ -228,10 +232,8 @@ namespace osu.Game.Overlays.Mods
                                                 Width = 180,
                                                 Text = "Deselect All",
                                                 Action = DeselectAll,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
                                             CustomiseButton = new TriangleButton
                                             {
@@ -239,49 +241,41 @@ namespace osu.Game.Overlays.Mods
                                                 Text = "Customisation",
                                                 Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
                                                 Enabled = { Value = false },
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
                                                 Text = "Close",
                                                 Action = Hide,
-                                                Margin = new MarginPadding
-                                                {
-                                                    Right = 20
-                                                }
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
                                             },
-                                            new OsuSpriteText
+                                            new FillFlowContainer
                                             {
-                                                Text = @"Score Multiplier:",
-                                                Font = OsuFont.GetFont(size: 30),
-                                                Margin = new MarginPadding
+                                                AutoSizeAxes = Axes.Both,
+                                                Spacing = new Vector2(footer_button_spacing / 2, 0),
+                                                Origin = Anchor.CentreLeft,
+                                                Anchor = Anchor.CentreLeft,
+                                                Children = new Drawable[]
                                                 {
-                                                    Top = 5,
-                                                    Right = 10
-                                                }
+                                                    new OsuSpriteText
+                                                    {
+                                                        Text = @"Score Multiplier:",
+                                                        Font = OsuFont.GetFont(size: 30),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                    },
+                                                    MultiplierLabel = new OsuSpriteText
+                                                    {
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
+                                                        Origin = Anchor.CentreLeft,
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Width = 70, // make width fixed so reflow doesn't occur when multiplier number changes.
+                                                    },
+                                                },
                                             },
-                                            MultiplierLabel = new OsuSpriteText
-                                            {
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 5
-                                                }
-                                            },
-                                            UnrankedLabel = new OsuSpriteText
-                                            {
-                                                Text = @"(Unranked)",
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                Margin = new MarginPadding
-                                                {
-                                                    Top = 5,
-                                                    Left = 10
-                                                }
-                                            }
                                         }
                                     }
                                 },
@@ -327,7 +321,6 @@ namespace osu.Game.Overlays.Mods
         {
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
-            UnrankedLabel.Colour = colours.Blue;
 
             availableMods = osu.AvailableMods.GetBoundCopy();
 
@@ -431,12 +424,10 @@ namespace osu.Game.Overlays.Mods
         private void updateMods()
         {
             var multiplier = 1.0;
-            var ranked = true;
 
             foreach (var mod in SelectedMods.Value)
             {
                 multiplier *= mod.ScoreMultiplier;
-                ranked &= mod.Ranked;
             }
 
             MultiplierLabel.Text = $"{multiplier:N2}x";
@@ -446,8 +437,6 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
-
-            UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
         }
 
         private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
