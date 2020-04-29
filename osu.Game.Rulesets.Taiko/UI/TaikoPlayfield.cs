@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -216,12 +215,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             if (mascotDrawable.Drawable is DrawableTaikoMascot mascot)
             {
-                var miss = result.Type == HitResult.Miss;
-
-                if (miss && judgedObject.HitObject is StrongHitObject)
-                    miss = result.Judgement.AffectsCombo;
-
-                mascot.SetPlayfieldState(miss ? TaikoMascotAnimationState.Fail : TaikoMascotAnimationState.Idle);
+                mascot.OnNewResult(result);
             }
         }
 

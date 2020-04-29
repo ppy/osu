@@ -1,29 +1,36 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoMascot : BeatSyncedContainer
     {
-        private TaikoMascotTextureAnimation idleDrawable, clearDrawable, kiaiDrawable, failDrawable;
-        private EffectControlPoint lastEffectControlPoint;
-        private TaikoMascotAnimationState playfieldState;
+        protected Bindable<TaikoMascotAnimationState> State { get; }
 
-        public TaikoMascotAnimationState State { get; private set; }
+        private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotTextureAnimation> animations;
+        private Drawable currentAnimation;
+
+        private bool lastHitMissed;
+        private bool kiaiMode;
 
         public DrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
         {
             RelativeSizeAxes = Axes.Both;
 
-            State = startingState;
+            State = new Bindable<TaikoMascotAnimationState>(startingState);
+            animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotTextureAnimation>();
         }
 
         [BackgroundDependencyLoader]
@@ -31,81 +38,53 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new[]
             {
-                idleDrawable = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Idle),
-                clearDrawable = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Clear),
-                kiaiDrawable = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Kiai),
-                failDrawable = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Fail),
+                animations[TaikoMascotAnimationState.Idle] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Idle),
+                animations[TaikoMascotAnimationState.Clear] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Clear),
+                animations[TaikoMascotAnimationState.Kiai] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Kiai),
+                animations[TaikoMascotAnimationState.Fail] = new TaikoMascotTextureAnimation(TaikoMascotAnimationState.Fail),
             };
 
-            ShowState(State);
+            updateState();
         }
 
-        public void ShowState(TaikoMascotAnimationState state)
+        protected override void LoadComplete()
         {
-            foreach (var child in InternalChildren)
-                child.Hide();
+            base.LoadComplete();
 
-            State = state;
-
-            var drawable = getStateDrawable(State);
-            drawable.Show();
+            animations.Values.ForEach(animation => animation.Hide());
+            State.BindValueChanged(mascotStateChanged, true);
         }
 
-        /// <summary>
-        /// Sets the playfield state used for determining the final state.
-        /// </summary>
-        /// <remarks>
-        /// If you're looking to change the state manually, please look at <see cref="ShowState"/>.
-        /// </remarks>
-        public void SetPlayfieldState(TaikoMascotAnimationState state)
+        public void OnNewResult(JudgementResult result)
         {
-            playfieldState = state;
-
-            if (lastEffectControlPoint != null)
-                ShowState(GetFinalAnimationState(lastEffectControlPoint, playfieldState));
-        }
-
-        private TaikoMascotTextureAnimation getStateDrawable(TaikoMascotAnimationState state)
-        {
-            switch (state)
-            {
-                case TaikoMascotAnimationState.Idle:
-                    return idleDrawable;
-
-                case TaikoMascotAnimationState.Clear:
-                    return clearDrawable;
-
-                case TaikoMascotAnimationState.Kiai:
-                    return kiaiDrawable;
-
-                case TaikoMascotAnimationState.Fail:
-                    return failDrawable;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), $"There's no animation available for state {state}");
-            }
-        }
-
-        protected virtual TaikoMascotAnimationState GetFinalAnimationState(EffectControlPoint effectPoint, TaikoMascotAnimationState playfieldState)
-        {
-            if (playfieldState == TaikoMascotAnimationState.Fail)
-                return playfieldState;
-
-            return effectPoint.KiaiMode ? TaikoMascotAnimationState.Kiai : TaikoMascotAnimationState.Idle;
+            lastHitMissed = result.Type == HitResult.Miss && result.Judgement.AffectsCombo;
+            updateState();
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+            kiaiMode = effectPoint.KiaiMode;
+            updateState();
+        }
 
-            var state = GetFinalAnimationState(lastEffectControlPoint = effectPoint, playfieldState);
-            ShowState(state);
+        private void updateState()
+        {
+            State.Value = getNextState();
+        }
 
-            if (state == TaikoMascotAnimationState.Clear)
-                return;
+        private TaikoMascotAnimationState getNextState()
+        {
+            if (lastHitMissed)
+                return TaikoMascotAnimationState.Fail;
 
-            var drawable = getStateDrawable(state);
-            drawable.Move();
+            return kiaiMode ? TaikoMascotAnimationState.Kiai : TaikoMascotAnimationState.Idle;
+        }
+
+        private void mascotStateChanged(ValueChangedEvent<TaikoMascotAnimationState> state)
+        {
+            currentAnimation?.Hide();
+            currentAnimation = animations[state.NewValue];
+            currentAnimation.Show();
         }
     }
 }
