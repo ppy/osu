@@ -23,6 +23,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         [Cached(typeof(DrawableHitObject))]
         public readonly DrawableHitObject JudgedObject;
 
+        private SkinnableDrawable skinnable;
+
+        public override double LifetimeStart => skinnable.Drawable.LifetimeStart;
+
+        public override double LifetimeEnd => skinnable.Drawable.LifetimeEnd;
+
         public HitExplosion(DrawableHitObject judgedObject)
         {
             JudgedObject = judgedObject;
@@ -39,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject.Result?.Type ?? HitResult.Great)), _ => new DefaultHitExplosion());
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject.Result?.Type ?? HitResult.Great)), _ => new DefaultHitExplosion());
         }
 
         private TaikoSkinComponents getComponentName(HitResult resultType)
@@ -57,14 +63,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
 
             throw new ArgumentOutOfRangeException(nameof(resultType), "Invalid result type");
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            this.FadeOut(500);
-            Expire(true);
         }
 
         /// <summary>
