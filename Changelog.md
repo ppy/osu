@@ -571,3 +571,8 @@
 *   合并上游pr
     *   [m] [Reduce database includes where possible #8889]
     *   [m] [Avoid using internal EF methods in tests #8883]
+    *   [m] [Fix speed adjustment mods affecting mania scroll speed #8887]
+    *   [m] [Fix mania selection blueprints not moving/moving incorrectly #8886]
+    *   [m] [Change taiko hit explosion animation to match stable for skins #8896]
+    *   [m] [Further improve beatmap carousel load performance by avoiding incorrect query construction #8895]
+    *   [m] [Reduce initial channel load overhead by only loading history on active channel #8893]
