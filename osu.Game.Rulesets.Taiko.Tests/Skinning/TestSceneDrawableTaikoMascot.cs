@@ -64,11 +64,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 });
             });
 
-            AddStep("new judgement (miss)", () => addJudgement(HitResult.Miss));
-            AddUntilStep("wait for fail state", () => assertState(TaikoMascotAnimationState.Fail));
+            AddStep("miss result for normal hit", () => addJudgement(HitResult.Miss, new TaikoJudgement()));
+            AddUntilStep("state is fail", () => assertState(TaikoMascotAnimationState.Fail));
 
-            AddStep("new judgement (great)", () => addJudgement(HitResult.Great));
-            AddUntilStep("wait for idle state", () => assertState(TaikoMascotAnimationState.Idle));
+            AddStep("great result for normal hit", () => addJudgement(HitResult.Great, new TaikoJudgement()));
+            AddUntilStep("state is idle", () => assertState(TaikoMascotAnimationState.Idle));
+
+            AddStep("miss result for strong hit", () => addJudgement(HitResult.Miss, new TaikoStrongJudgement()));
+            AddAssert("state remains idle", () => assertState(TaikoMascotAnimationState.Idle));
         }
 
         [Test]
@@ -89,10 +92,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 });
             });
 
-            AddUntilStep("wait for fail state", () => assertState(TaikoMascotAnimationState.Fail));
+            AddUntilStep("state is fail", () => assertState(TaikoMascotAnimationState.Fail));
 
-            AddStep("new judgement (great)", () => addJudgement(HitResult.Great));
-            AddUntilStep("wait for kiai state", () => assertState(TaikoMascotAnimationState.Kiai));
+            AddStep("great result for normal hit", () => addJudgement(HitResult.Great, new TaikoJudgement()));
+            AddUntilStep("state is kiai", () => assertState(TaikoMascotAnimationState.Kiai));
         }
 
         private void setBeatmap(bool kiai = false)
@@ -121,14 +124,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             });
         }
 
-        private void addJudgement(HitResult result)
+        private void addJudgement(HitResult result, Judgement judgement)
         {
             foreach (var playfield in playfields)
             {
                 var hit = new DrawableTestHit(new Hit(), result);
                 Add(hit);
 
-                playfield.OnNewResult(hit, new JudgementResult(hit.HitObject, new TaikoJudgement()) { Type = result });
+                playfield.OnNewResult(hit, new JudgementResult(hit.HitObject, judgement) { Type = result });
             }
         }
 
