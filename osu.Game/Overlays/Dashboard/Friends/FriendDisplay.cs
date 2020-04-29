@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            InternalChild = new FillFlowContainer
+            Child = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
