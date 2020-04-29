@@ -1,11 +1,13 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Mvis
@@ -17,13 +19,18 @@ namespace osu.Game.Screens.Mvis
         public ClockContainer sbClock;
         private CancellationTokenSource ChangeSB;
         private DimmableStoryboard dimmableStoryboard;
-        private WorkingBeatmap Beatmap;
+        private Bindable<bool> EnableSB = new Bindable<bool>();
         public readonly Bindable<bool> IsReady = new Bindable<bool>();
         public readonly Bindable<bool> SBReplacesBg = new Bindable<bool>();
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
+        private Task LogTask;
+        private Task LoadSBAsyncTask;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
         public BgStoryBoard(WorkingBeatmap beatmap = null)
         {
-            this.Beatmap = beatmap;
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
@@ -33,11 +40,45 @@ namespace osu.Game.Screens.Mvis
                 },
             };
         }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.MvisEnableStoryboard, EnableSB);
+
+            EnableSB.ValueChanged += _ => UpdateVisuals();
+        }
+
         protected override void LoadComplete()
         {
             dimmableStoryboard?.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             SBReplacesBg.BindTo(storyboardReplacesBackground);
-            UpdateComponent(Beatmap);
+        }
+
+        public void UpdateVisuals()
+        {
+            if ( EnableSB.Value )
+            {
+                storyboardReplacesBackground.Value = beatmap.Value.Storyboard.ReplacesBackground && beatmap.Value.Storyboard.HasDrawable;;
+                sbClock?.FadeIn(DURATION, Easing.OutQuint);
+            }
+            else
+            {
+                storyboardReplacesBackground.Value = false;
+                sbClock?.FadeOut(DURATION, Easing.OutQuint);
+            }
+        }
+
+        public void CancelUpdateComponent()
+        {
+            ChangeSB?.Cancel();
+            ChangeSB = new CancellationTokenSource();
+
+            if ( LoadSBAsyncTask?.IsCompleted != true || LogTask?.IsCompleted != true )
+            {
+                LoadSBAsyncTask = null;
+                LogTask = null;
+            }
         }
 
         public bool UpdateComponent(WorkingBeatmap b)
@@ -70,6 +111,10 @@ namespace osu.Game.Screens.Mvis
                     sbClock.Seek(b.Track.CurrentTime);
 
                     IsReady.Value = true;
+
+                    if ( !EnableSB.Value )
+                        sbClock.Hide();
+
                 }, (ChangeSB = new CancellationTokenSource()).Token);
             }
             catch (Exception e)
@@ -80,5 +125,20 @@ namespace osu.Game.Screens.Mvis
 
             return true;
         }
+
+        public Task UpdateStoryBoardAsync(WorkingBeatmap b) => LoadSBAsyncTask = Task.Run(async () =>
+        {
+            UpdateComponent(b);
+            UpdateVisuals();
+
+            try
+            {
+                LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.BeatmapSetInfo}\"..."));
+                await LogTask;
+            }
+            finally
+            {
+            }
+        });
     }
 }

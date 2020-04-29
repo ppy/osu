@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "启用故事版",
+                    Bindable = config.GetBindable<bool>(OsuSetting.MvisEnableStoryboard),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "使用原版Logo效果",
                     Bindable = config.GetBindable<bool>(OsuSetting.MvisUseOsuLogoVisualisation),
                 },

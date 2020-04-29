@@ -31,8 +31,6 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
-using System.Threading.Tasks;
-using osu.Framework.Logging;
 
 namespace osu.Game.Screens
 {
@@ -68,8 +66,6 @@ namespace osu.Game.Screens
 
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
-        private ScheduledDelegate scheduledHideOverlays;
-        private ScheduledDelegate scheduledShowOverlays;
         private Box bgBox;
         private BottomBar bottomBar;
         private SideBarSettingsPanel sidebarContainer;
@@ -80,18 +76,16 @@ namespace osu.Game.Screens
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
         private Track Track;
-        private Bindable<float> BgBlur = new Bindable<float>();
-        private bool OverlaysHidden = false;
-        Container sbC;
         private BgStoryBoard bgSB;
         private LoadingSpinner loadingSpinner;
-        private Task LoadSBTask { get; set; }
+        private Bindable<float> BgBlur = new Bindable<float>();
+        private bool OverlaysHidden = false;
 
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
             {
-                sbC = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = bgSB = new BgStoryBoard(),
@@ -529,7 +523,7 @@ namespace osu.Game.Screens
 
             try
             {
-                scheduledHideOverlays = Scheduler.AddDelayed(() =>
+                Scheduler.AddDelayed(() =>
                 {
                     RunHideOverlays();
                 }, 1000);
@@ -543,7 +537,7 @@ namespace osu.Game.Screens
         {
             try
             {
-                scheduledShowOverlays = Scheduler.AddDelayed(() =>
+                Scheduler.AddDelayed(() =>
                 {
                     RunShowOverlays();
                 }, 0);
@@ -575,19 +569,6 @@ namespace osu.Game.Screens
             }
         }
 
-        private Task ResetStoryBoard() => Task.Run(async () =>
-        {
-            bgSB.UpdateComponent(Beatmap.Value);
-            try
-            {
-                LoadSBTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{Beatmap.Value.BeatmapSetInfo}\"..."));
-                await LoadSBTask;
-            }
-            finally
-            {
-            }
-        });
-
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
@@ -598,7 +579,8 @@ namespace osu.Game.Screens
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
 
-            ResetStoryBoard();
+            bgSB.CancelUpdateComponent();
+            bgSB.UpdateStoryBoardAsync(Beatmap.Value);
         }
     }
 }
