@@ -304,6 +304,31 @@ namespace osu.Game.Tests.Editing
             runTest(patch);
         }
 
+        [Test]
+        public void TestChangeHitObjectAtSameTime()
+        {
+            current.AddRange(new[]
+            {
+                new HitCircle { StartTime = 500, Position = new Vector2(50) },
+                new HitCircle { StartTime = 500, Position = new Vector2(100) },
+                new HitCircle { StartTime = 500, Position = new Vector2(150) },
+                new HitCircle { StartTime = 500, Position = new Vector2(200) },
+            });
+
+            var patch = new OsuBeatmap
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 500, Position = new Vector2(150) },
+                    new HitCircle { StartTime = 500, Position = new Vector2(100) },
+                    new HitCircle { StartTime = 500, Position = new Vector2(50) },
+                    new HitCircle { StartTime = 500, Position = new Vector2(200) },
+                }
+            };
+
+            runTest(patch);
+        }
+
         private void runTest(IBeatmap patch)
         {
             // Due to the method of testing, "patch" comes in without having been decoded via a beatmap decoder.
