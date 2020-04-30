@@ -260,8 +260,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
 
-        protected override double SkillMultiplier => throw new NotImplementedException();
-        protected override double StrainDecayBase => throw new NotImplementedException();
+        protected override double SkillMultiplier => 0;
+        protected override double StrainDecayBase => 0;
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             throw new NotImplementedException();

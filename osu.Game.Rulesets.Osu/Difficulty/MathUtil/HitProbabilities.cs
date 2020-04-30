@@ -8,8 +8,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 {
     public class HitProbabilities
     {
-        public static int cacheHit = 0;
-        public static int cacheMiss = 0;
+        private static int cacheHit = 0;
+        private static int cacheMiss = 0;
 
         private List<MapSectionCache> sections = new List<MapSectionCache>();
 
