@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public DrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
         {
-            RelativeSizeAxes = Axes.Both;
+            Origin = Anchor = Anchor.BottomLeft;
 
             state = new Bindable<TaikoMascotAnimationState>(startingState);
             animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation>();

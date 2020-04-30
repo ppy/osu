@@ -130,18 +130,21 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                     }
                 },
+                mascotDrawable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => Empty())
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.TopLeft,
+                    RelativePositionAxes = Axes.None,
+                    RelativeSizeAxes = Axes.None,
+                    X = 15,
+                    Y = 45
+                },
                 topLevelHitContainer = new ProxyContainer
                 {
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
-                mascotDrawable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => new Container(), confineMode: ConfineMode.ScaleToFit)
-                {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.TopLeft,
-                    RelativePositionAxes = Axes.None
-                }
             };
         }
 
