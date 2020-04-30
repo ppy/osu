@@ -58,12 +58,12 @@ namespace osu.Game.Screens.Mvis
             if ( EnableSB.Value )
             {
                 storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;;
-                sbClock?.FadeIn(DURATION, Easing.OutQuint);
+                sbContainer.FadeIn(DURATION, Easing.OutQuint);
             }
             else
             {
                 storyboardReplacesBackground.Value = false;
-                sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                sbContainer.FadeOut(DURATION, Easing.OutQuint);
             }
         }
 
@@ -84,9 +84,12 @@ namespace osu.Game.Screens.Mvis
             if ( b == null )
                 return false;
 
-            storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
-
             IsReady.Value = false;
+
+            sbClock?.FadeOut(DURATION, Easing.OutQuint);
+            sbClock?.Expire();
+
+            storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
 
             ChangeSB?.Cancel();
 
@@ -94,25 +97,26 @@ namespace osu.Game.Screens.Mvis
             {
                 LoadComponentAsync(new ClockContainer(b.Value, 0)
                 {
-                    Child = dimmableStoryboard = new DimmableStoryboard(b.Value.Storyboard) { RelativeSizeAxes = Axes.Both }
-                }, newsbC =>
+                    Name = "ClockContainer",
+                    Alpha = 0,
+                    Child = dimmableStoryboard = new DimmableStoryboard(b.Value.Storyboard)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Name = "Storyboard"
+                    }
+                }, newsbClock =>
                 {
-                    sbClock?.Stop();
-                    sbClock?.Hide();
-                    sbClock?.Expire();
-                    sbClock = newsbC;
+                    sbClock = newsbClock;
 
                     dimmableStoryboard.IgnoreUserSettings.Value = true;
 
                     sbContainer.Add(sbClock);
+
+                    sbClock.FadeIn(DURATION, Easing.OutQuint);
                     sbClock.Start();
                     sbClock.Seek(b.Value.Track.CurrentTime);
 
                     IsReady.Value = true;
-
-                    if ( !EnableSB.Value )
-                        sbClock.Hide();
-
                 }, (ChangeSB = new CancellationTokenSource()).Token);
             }
             catch (Exception e)
@@ -127,16 +131,9 @@ namespace osu.Game.Screens.Mvis
         public Task UpdateStoryBoardAsync() => LoadSBAsyncTask = Task.Run(async () =>
         {
             UpdateComponent();
-            UpdateVisuals();
 
-            try
-            {
-                LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"..."));
-                await LogTask;
-            }
-            finally
-            {
-            }
+            LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"..."));
+            await LogTask;
         });
     }
 }
