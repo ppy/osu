@@ -61,7 +61,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (triggerComboClear(result) || triggerSwellClear(result))
             {
                 state.Value = TaikoMascotAnimationState.Clear;
-                return;
+                // never play fail immediately after clear.
+                lastObjectHit = true;
             }
 
             if (!result.Judgement.AffectsCombo)

@@ -144,15 +144,16 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Clear);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestClearStateOnClearedSwell(bool kiai)
+        [TestCase(true, TaikoMascotAnimationState.Kiai)]
+        [TestCase(false, TaikoMascotAnimationState.Idle)]
+        public void TestClearStateOnClearedSwell(bool kiai, TaikoMascotAnimationState expectedStateAfterClear)
         {
             AddStep("set beatmap", () => setBeatmap(kiai));
 
             createDrawableRuleset();
 
             assertStateAfterResult(new JudgementResult(new Swell(), new TaikoSwellJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Clear);
+            AddUntilStep($"state reverts to {expectedStateAfterClear.ToString().ToLower()}", () => allMascotsIn(expectedStateAfterClear));
         }
 
         private void setBeatmap(bool kiai = false)
