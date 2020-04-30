@@ -16,6 +16,7 @@ using System.Linq;
 using osu.Game.Screens.Mvis.UI;
 using osu.Game.Screens.Mvis.Buttons;
 using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -26,6 +27,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(BottomBar),
             typeof(MvisScreen),
+            typeof(ClockContainer),
+            typeof(BgStoryBoard),
             typeof(BottomBarButton),
             typeof(SideBarSettingsPanel),
             typeof(ToggleableButton),
