@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestInitialState()
         {
-            AddStep("create mascot", () => SetContents(() => new DrawableTaikoMascot()));
+            AddStep("create mascot", () => SetContents(() => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
 
             AddAssert("mascot initially idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
         }
@@ -83,13 +84,13 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             {
                 var state = new Bindable<TaikoMascotAnimationState>(TaikoMascotAnimationState.Clear);
                 states.Add(state);
-                return new DrawableTaikoMascot { State = { BindTarget = state } };
+                return new DrawableTaikoMascot { State = { BindTarget = state }, RelativeSizeAxes = Axes.Both };
             }));
 
             AddStep("set clear state", () => states.ForEach(state => state.Value = TaikoMascotAnimationState.Clear));
             AddStep("miss", () => mascots.ForEach(mascot => mascot.OnNewResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss })));
-            AddAssert("skins with animations remain in clear state", () => mascots.Any(mascot => mascot.State.Value == TaikoMascotAnimationState.Clear));
-            AddUntilStep("state reverts to fail", () => someMascotsIn(TaikoMascotAnimationState.Fail));
+            AddAssert("skins with animations remain in clear state", () => someMascotsIn(TaikoMascotAnimationState.Clear));
+            AddUntilStep("state reverts to fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
 
             AddStep("set clear state again", () => states.ForEach(state => state.Value = TaikoMascotAnimationState.Clear));
             AddAssert("skins with animations change to clear", () => someMascotsIn(TaikoMascotAnimationState.Clear));
