@@ -68,7 +68,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Blending = BlendingParameters.Additive,
                                 },
                                 HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
                                 {
@@ -100,13 +99,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Name = "Kiai hit explosions",
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    Blending = BlendingParameters.Additive
                                 },
                                 judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
                                 {
                                     Name = "Judgements",
                                     RelativeSizeAxes = Axes.Y,
-                                    Blending = BlendingParameters.Additive
                                 },
                             }
                         },
