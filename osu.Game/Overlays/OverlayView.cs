@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected LoadingSpinner LoadingSpinner { get; private set; }
+        protected LoadingSpinner LoadingSpinner { get; }
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -35,9 +35,9 @@ namespace osu.Game.Overlays
             AutoSizeAxes = Axes.Y,
         };
 
-        private Placeholder currentPlaceholder;
+        private readonly Placeholder currentPlaceholder;
 
-        private BlockingBox blockingBox;
+        private readonly BlockingBox blockingBox;
 
         private APIRequest<T> request;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                currentPlaceholder = new LoginPlaceholder("Please login to view content!")
+                currentPlaceholder = new LoginPlaceholder(@"Please login to view content!")
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
                     Size = new osuTK.Vector2(40),
                     Margin = new MarginPadding { Top = 25 }
                 }
-}           ;
+            };
         }
 
         protected override void LoadComplete()
