@@ -96,8 +96,6 @@ namespace osu.Game.Screens.Menu
             Track = introBeatmap.Track;
         }
 
-        public override bool OnExiting(IScreen next) => !DidLoadMenu;
-
         public override void OnResuming(IScreen last)
         {
             this.FadeIn(300);
