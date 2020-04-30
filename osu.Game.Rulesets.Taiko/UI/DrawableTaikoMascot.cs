@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (triggerComboClear(result) || triggerSwellClear(result))
             {
                 state.Value = TaikoMascotAnimationState.Clear;
-                // never play fail immediately after clear.
+                // always consider a clear equivalent to a hit to avoid clear -> miss transitions
                 lastObjectHit = true;
             }
 
