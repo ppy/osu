@@ -29,6 +29,8 @@ namespace osu.Game.Overlays
 
         private LoadingSpinner spinner { get; }
 
+        private const double transform_time = 600;
+
         protected override Container<Drawable> Content { get; } = new Container
         {
             RelativeSizeAxes = Axes.X,
@@ -104,15 +106,15 @@ namespace osu.Game.Overlays
             switch (state)
             {
                 case APIState.Offline:
-                    blockingBox.FadeIn(300, Easing.OutQuint);
-                    currentPlaceholder.ScaleTo(0.8f).Then().ScaleTo(1, 600, Easing.OutQuint);
-                    currentPlaceholder.FadeInFromZero(2 * 300, Easing.OutQuint);
+                    blockingBox.FadeIn(transform_time, Easing.OutQuint);
+                    currentPlaceholder.ScaleTo(0.8f).Then().ScaleTo(1, transform_time, Easing.OutQuint);
+                    currentPlaceholder.FadeInFromZero(transform_time, Easing.OutQuint);
                     spinner.Hide();
                     break;
 
                 case APIState.Online:
-                    blockingBox.FadeOut(300, Easing.OutQuint);
-                    currentPlaceholder.FadeOut(300, Easing.OutQuint);
+                    blockingBox.FadeOut(transform_time / 2, Easing.OutQuint);
+                    currentPlaceholder.FadeOut(transform_time / 2, Easing.OutQuint);
                     spinner.Hide();
                     PerformFetch();
                     break;
@@ -120,8 +122,8 @@ namespace osu.Game.Overlays
                 case APIState.Failing:
                 case APIState.Connecting:
                     spinner.Show();
-                    blockingBox.FadeIn(300, Easing.OutQuint);
-                    currentPlaceholder.FadeOut(300, Easing.OutQuint);
+                    blockingBox.FadeIn(transform_time, Easing.OutQuint);
+                    currentPlaceholder.FadeOut(transform_time / 2, Easing.OutQuint);
                     break;
             }
         }
