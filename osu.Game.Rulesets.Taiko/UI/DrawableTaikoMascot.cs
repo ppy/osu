@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
         private TaikoMascotAnimation currentAnimation;
 
-        private bool lastObjectHit;
+        private bool lastObjectHit = true;
         private bool kiaiMode;
 
         public DrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
