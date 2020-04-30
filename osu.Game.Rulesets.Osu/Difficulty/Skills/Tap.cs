@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private static double calculateSpacedness(double d)
         {
-            return SpecialFunctions.Logistic((d - 0.5) * 10) - SpecialFunctions.Logistic(-5);
+            return SpecialFunctions.Logistic((d - 0.57) / 0.15) - SpecialFunctions.Logistic(-3.8);
         }
 	        
     }
