@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -50,16 +51,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// </summary>
         private Vector2 snakedPathOffset;
 
-        private readonly Slider slider;
-
-        public SnakingSliderBody(Slider slider)
-        {
-            this.slider = slider;
-        }
+        private Slider slider;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject drawableObject)
         {
+            slider = (Slider)drawableObject.HitObject;
+
             Refresh();
         }
 
@@ -69,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var spanProgress = slider.ProgressAt(completionProgress);
 
             double start = 0;
-            double end = SnakingIn.Value ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / (slider.TimePreempt / 3), 0, 1) : 1;
+            double end = SnakingIn.Value ? Math.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / (slider.TimePreempt / 3), 0, 1) : 1;
 
             if (span >= slider.SpanCount() - 1)
             {
@@ -127,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private void setRange(double p0, double p1)
         {
             if (p0 > p1)
-                MathHelper.Swap(ref p0, ref p1);
+                (p0, p1) = (p1, p0);
 
             if (SnakedStart == p0 && SnakedEnd == p1) return;
 

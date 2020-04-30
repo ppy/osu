@@ -4,13 +4,14 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osuTK;
 using System.Linq;
 using osu.Game.Audio;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         /// <summary>
         /// Moves <see cref="Content"/> to a layer proxied above the playfield.
-        /// Does nothing is content is already proxied.
+        /// Does nothing if content is already proxied.
         /// </summary>
         protected void ProxyContent()
         {
@@ -76,7 +77,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
         public abstract bool OnPressed(TaikoAction action);
-        public virtual bool OnReleased(TaikoAction action) => false;
+
+        public virtual void OnReleased(TaikoAction action)
+        {
+        }
 
         public override double LifetimeStart
         {
@@ -104,18 +108,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
     }
 
-    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableTaikoHitObject
-        where TaikoHitType : TaikoHitObject
+    public abstract class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
+        where TObject : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
+        public new TObject HitObject;
+
         protected readonly Vector2 BaseSize;
+        protected readonly SkinnableDrawable MainPiece;
 
-        protected readonly TaikoPiece MainPiece;
+        private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
-        public new TaikoHitType HitObject;
-
-        protected DrawableTaikoHitObject(TaikoHitType hitObject)
+        protected DrawableTaikoHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
@@ -127,25 +132,43 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
             Content.Add(MainPiece = CreateMainPiece());
-            MainPiece.KiaiMode = HitObject.Kiai;
 
-            var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+            AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
+        }
 
-            if (strongObject != null)
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
             {
-                var strongHit = CreateStrongHit(strongObject);
-
-                AddNested(strongHit);
-                AddInternal(strongHit);
+                case DrawableStrongNestedHit strong:
+                    strongHitContainer.Add(strong);
+                    break;
             }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            strongHitContainer.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case StrongHitObject strong:
+                    return CreateStrongHit(strong);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         // Normal and clap samples are handled by the drum
         protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
 
-        protected override string SampleNamespace => "taiko";
-
-        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
+        protected abstract SkinnableDrawable CreateMainPiece();
 
         /// <summary>
         /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.

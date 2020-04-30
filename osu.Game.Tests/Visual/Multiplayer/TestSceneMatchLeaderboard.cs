@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchLeaderboard : MultiplayerTestScene
     {
-        protected override bool RequiresAPIAccess => true;
+        protected override bool UseOnlineAPI => true;
 
         public TestSceneMatchLeaderboard()
         {

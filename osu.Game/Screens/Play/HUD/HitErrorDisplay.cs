@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
@@ -32,7 +31,8 @@ namespace osu.Game.Screens.Play.HUD
 
             RelativeSizeAxes = Axes.Both;
 
-            processor.NewJudgement += onNewJudgement;
+            if (processor != null)
+                processor.NewJudgement += onNewJudgement;
         }
 
         [BackgroundDependencyLoader]
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult result)
         {
-            if (result.HitObject.HitWindows == null)
+            if (result.HitObject.HitWindows.WindowFor(HitResult.Miss) == 0)
                 return;
 
             foreach (var c in Children)
@@ -77,6 +77,19 @@ namespace osu.Game.Screens.Play.HUD
                 case ScoreMeterType.HitErrorRight:
                     createBar(true);
                     break;
+
+                case ScoreMeterType.ColourBoth:
+                    createColour(false);
+                    createColour(true);
+                    break;
+
+                case ScoreMeterType.ColourLeft:
+                    createColour(false);
+                    break;
+
+                case ScoreMeterType.ColourRight:
+                    createColour(true);
+                    break;
             }
         }
 
@@ -90,6 +103,24 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 0,
             };
 
+            completeDisplayLoading(display);
+        }
+
+        private void createColour(bool rightAligned)
+        {
+            var display = new ColourHitErrorMeter(hitWindows)
+            {
+                Margin = new MarginPadding(margin),
+                Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Alpha = 0,
+            };
+
+            completeDisplayLoading(display);
+        }
+
+        private void completeDisplayLoading(HitErrorMeter display)
+        {
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
@@ -97,7 +128,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            processor.NewJudgement -= onNewJudgement;
+
+            if (processor != null)
+                processor.NewJudgement -= onNewJudgement;
         }
     }
 }

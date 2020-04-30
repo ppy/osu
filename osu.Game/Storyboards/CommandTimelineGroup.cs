@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -16,7 +17,8 @@ namespace osu.Game.Storyboards
     {
         public CommandTimeline<float> X = new CommandTimeline<float>();
         public CommandTimeline<float> Y = new CommandTimeline<float>();
-        public CommandTimeline<Vector2> Scale = new CommandTimeline<Vector2>();
+        public CommandTimeline<float> Scale = new CommandTimeline<float>();
+        public CommandTimeline<Vector2> VectorScale = new CommandTimeline<Vector2>();
         public CommandTimeline<float> Rotation = new CommandTimeline<float>();
         public CommandTimeline<Color4> Colour = new CommandTimeline<Color4>();
         public CommandTimeline<float> Alpha = new CommandTimeline<float>();
@@ -24,28 +26,52 @@ namespace osu.Game.Storyboards
         public CommandTimeline<bool> FlipH = new CommandTimeline<bool>();
         public CommandTimeline<bool> FlipV = new CommandTimeline<bool>();
 
+        private readonly ICommandTimeline[] timelines;
+
+        public CommandTimelineGroup()
+        {
+            timelines = new ICommandTimeline[]
+            {
+                X,
+                Y,
+                Scale,
+                VectorScale,
+                Rotation,
+                Colour,
+                Alpha,
+                BlendingParameters,
+                FlipH,
+                FlipV
+            };
+        }
+
         [JsonIgnore]
-        public IEnumerable<ICommandTimeline> Timelines
+        public double CommandsStartTime
         {
             get
             {
-                yield return X;
-                yield return Y;
-                yield return Scale;
-                yield return Rotation;
-                yield return Colour;
-                yield return Alpha;
-                yield return BlendingParameters;
-                yield return FlipH;
-                yield return FlipV;
+                double min = double.MaxValue;
+
+                for (int i = 0; i < timelines.Length; i++)
+                    min = Math.Min(min, timelines[i].StartTime);
+
+                return min;
             }
         }
 
         [JsonIgnore]
-        public double CommandsStartTime => Timelines.Where(t => t.HasCommands).Min(t => t.StartTime);
+        public double CommandsEndTime
+        {
+            get
+            {
+                double max = double.MinValue;
 
-        [JsonIgnore]
-        public double CommandsEndTime => Timelines.Where(t => t.HasCommands).Max(t => t.EndTime);
+                for (int i = 0; i < timelines.Length; i++)
+                    max = Math.Max(max, timelines[i].EndTime);
+
+                return max;
+            }
+        }
 
         [JsonIgnore]
         public double CommandsDuration => CommandsEndTime - CommandsStartTime;
@@ -60,11 +86,24 @@ namespace osu.Game.Storyboards
         public double Duration => EndTime - StartTime;
 
         [JsonIgnore]
-        public bool HasCommands => Timelines.Any(t => t.HasCommands);
+        public bool HasCommands
+        {
+            get
+            {
+                for (int i = 0; i < timelines.Length; i++)
+                {
+                    if (timelines[i].HasCommands)
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         public virtual IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {
             if (offset != 0)
+            {
                 return timelineSelector(this).Commands.Select(command =>
                     new CommandTimeline<T>.TypedCommand
                     {
@@ -74,6 +113,7 @@ namespace osu.Game.Storyboards
                         StartValue = command.StartValue,
                         EndValue = command.EndValue,
                     });
+            }
 
             return timelineSelector(this).Commands;
         }

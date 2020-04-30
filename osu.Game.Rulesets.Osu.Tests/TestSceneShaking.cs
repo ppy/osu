@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Debug.Assert(drawableHitObject.HitObject.HitWindows != null);
 
-            double delay = drawableHitObject.HitObject.StartTime - (drawableHitObject.HitObject.HitWindows.HalfWindowFor(HitResult.Miss) + RNG.Next(0, 300)) - Time.Current;
+            double delay = drawableHitObject.HitObject.StartTime - (drawableHitObject.HitObject.HitWindows.WindowFor(HitResult.Miss) + RNG.Next(0, 300)) - Time.Current;
             Scheduler.AddDelayed(() => drawableHitObject.TriggerJudgement(), delay);
 
             return drawableHitObject;

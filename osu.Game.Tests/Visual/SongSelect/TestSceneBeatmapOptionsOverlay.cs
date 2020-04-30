@@ -18,8 +18,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             overlay.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, Color4.Purple, null, Key.Number1);
             overlay.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, Color4.Purple, null, Key.Number2);
-            overlay.AddButton(@"Edit", @"Beatmap", FontAwesome.Solid.PencilAlt, Color4.Yellow, null, Key.Number3);
-            overlay.AddButton(@"Delete", @"Beatmap", FontAwesome.Solid.Trash, Color4.Pink, null, Key.Number4, float.MaxValue);
+            overlay.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, Color4.Pink, null, Key.Number3);
+            overlay.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, Color4.Yellow, null, Key.Number4);
 
             Add(overlay);
 

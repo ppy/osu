@@ -15,40 +15,36 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
     {
-        private readonly bool includeWeight;
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing)
             : base(user, header, missing)
         {
             this.type = type;
-            this.includeWeight = includeWeight;
 
             ItemsPerPage = 5;
 
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override void UpdateItems(List<APILegacyScoreInfo> items)
-        {
-            foreach (var item in items)
-                item.Ruleset = Rulesets.GetRuleset(item.RulesetID);
-
-            base.UpdateItems(items);
-        }
-
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+
+        protected override int GetCount(User user) => type switch
+        {
+            ScoreType.Firsts => user.ScoresFirstCount,
+            _ => 0
+        };
 
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {
             switch (type)
             {
                 default:
-                    return new DrawablePerformanceScore(model, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
+                    return new DrawableProfileScore(model.CreateScoreInfo(Rulesets));
 
-                case ScoreType.Recent:
-                    return new DrawableTotalScore(model);
+                case ScoreType.Best:
+                    return new DrawableProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, ItemsContainer.Count));
             }
         }
     }

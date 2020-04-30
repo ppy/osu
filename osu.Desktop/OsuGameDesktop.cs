@@ -17,6 +17,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
+using osu.Game.Updater;
 
 namespace osu.Desktop
 {
@@ -46,19 +47,26 @@ namespace osu.Desktop
             return null;
         }
 
+        protected override UpdateManager CreateUpdateManager()
+        {
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    return new SquirrelUpdateManager();
+
+                default:
+                    return new SimpleUpdateManager();
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             if (!noVersionOverlay)
-            {
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
-                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                    Add(new SquirrelUpdateManager());
-                else
-                    Add(new SimpleUpdateManager());
-            }
+            LoadComponentAsync(new DiscordRichPresence(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
@@ -111,14 +119,14 @@ namespace osu.Desktop
         {
             protected override string LocateBasePath()
             {
-                bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+                static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
 
                 string stableInstallPath;
 
                 try
                 {
                     using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                        stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(String.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+                        stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
                     if (checkExists(stableInstallPath))
                         return stableInstallPath;

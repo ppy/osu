@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework;
-using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +13,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
+using osu.Framework.Layout;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
@@ -21,6 +21,11 @@ namespace osu.Game.Screens.Play
     public class SquareGraph : Container
     {
         private BufferedContainer<Column> columns;
+
+        public SquareGraph()
+        {
+            AddLayout(layout);
+        }
 
         public int ColumnCount => columns?.Children.Count ?? 0;
 
@@ -38,7 +43,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private float[] calculatedValues = Array.Empty<float>(); // values but adjusted to fit the amount of columns
 
         private int[] values;
 
@@ -68,14 +73,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                layout.Invalidate();
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
-
-        private readonly Cached layout = new Cached();
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
         private ScheduledDelegate scheduledCreate;
 
         protected override void Update()
@@ -256,7 +254,7 @@ namespace osu.Game.Screens.Play
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)Math.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;

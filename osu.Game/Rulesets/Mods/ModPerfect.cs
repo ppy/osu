@@ -12,9 +12,11 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Perfect";
         public override string Acronym => "PF";
-        public override IconUsage Icon => OsuIcon.ModPerfect;
+        public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override string Description => "SS or quit.";
 
-        protected override bool FailCondition(ScoreProcessor scoreProcessor, JudgementResult result) => scoreProcessor.Accuracy.Value != 1;
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+            => !(result.Judgement is IgnoreJudgement)
+               && result.Type != result.Judgement.MaxResult;
     }
 }

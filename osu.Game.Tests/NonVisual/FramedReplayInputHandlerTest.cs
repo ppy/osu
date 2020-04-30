@@ -225,8 +225,10 @@ namespace osu.Game.Tests.NonVisual
         private void fastForwardToPoint(double destination)
         {
             for (int i = 0; i < 1000; i++)
+            {
                 if (handler.SetFrameFromTime(destination) == null)
                     return;
+            }
 
             throw new TimeoutException("Seek was never fulfilled");
         }

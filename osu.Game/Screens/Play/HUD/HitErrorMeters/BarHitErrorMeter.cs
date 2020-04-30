@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private void createColourBars(OsuColour colours)
         {
-            var windows = HitWindows.GetAllAvailableHalfWindows().ToArray();
+            var windows = HitWindows.GetAllAvailableWindows().ToArray();
 
             maxHitWindow = windows.First().length;
 
@@ -164,30 +164,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             centre.Width = 2.5f;
             colourBars.Add(centre);
 
-            Color4 getColour(HitResult result)
-            {
-                switch (result)
-                {
-                    case HitResult.Meh:
-                        return colours.Yellow;
-
-                    case HitResult.Ok:
-                        return colours.Green;
-
-                    case HitResult.Good:
-                        return colours.GreenLight;
-
-                    case HitResult.Great:
-                        return colours.Blue;
-
-                    default:
-                        return colours.BlueLight;
-                }
-            }
-
             Drawable createColourBar(HitResult result, float height, bool first = false)
             {
-                var colour = getColour(result);
+                var colour = GetColourForHitResult(result);
 
                 if (first)
                 {
@@ -202,7 +181,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = getColour(result),
+                                Colour = colour,
                                 Height = height * gradient_start
                             },
                             new Box
@@ -229,10 +208,26 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private double floatingAverage;
         private Container colourBars;
 
+        private const int max_concurrent_judgements = 50;
+
         public override void OnNewJudgement(JudgementResult judgement)
         {
             if (!judgement.IsHit)
                 return;
+
+            if (judgementsContainer.Count > max_concurrent_judgements)
+            {
+                const double quick_fade_time = 100;
+
+                // check with a bit of lenience to avoid precision error in comparison.
+                var old = judgementsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + quick_fade_time * 1.1);
+
+                if (old != null)
+                {
+                    old.ClearTransforms();
+                    old.FadeOut(quick_fade_time).Expire();
+                }
+            }
 
             judgementsContainer.Add(new JudgementLine
             {
@@ -246,11 +241,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 , arrow_move_duration, Easing.Out);
         }
 
-        private float getRelativeJudgementPosition(double value) => (float)((value / maxHitWindow) + 1) / 2;
+        private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
         private class JudgementLine : CompositeDrawable
         {
-            private const int judgement_fade_duration = 10000;
+            private const int judgement_fade_duration = 5000;
 
             public JudgementLine()
             {
@@ -277,7 +272,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Width = 0;
 
                 this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
-                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
+                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration).Expire();
             }
         }
     }

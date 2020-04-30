@@ -37,12 +37,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
-            countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countOk = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+            countPerfect = Score.Statistics[HitResult.Perfect];
+            countGreat = Score.Statistics[HitResult.Great];
+            countGood = Score.Statistics[HitResult.Good];
+            countOk = Score.Statistics[HitResult.Ok];
+            countMeh = Score.Statistics[HitResult.Meh];
+            countMiss = Score.Statistics[HitResult.Miss];
 
             if (mods.Any(m => !m.Ranked))
                 return 0;

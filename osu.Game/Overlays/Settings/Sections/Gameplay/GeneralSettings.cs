@@ -21,13 +21,20 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Background dim",
                     Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = "Background blur",
                     Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Lighten playfield during breaks",
+                    Bindable = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
                 },
                 new SettingsCheckbox
                 {
@@ -36,13 +43,29 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Show difficulty graph on progress bar",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show health display even when you can't fail",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
+                    Keywords = new[] { "hp", "bar" }
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Fade playfield to red when health is low",
+                    Bindable = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Positional hitsounds",
+                    Bindable = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
                 },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {

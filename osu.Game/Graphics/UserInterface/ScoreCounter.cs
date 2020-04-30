@@ -16,11 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// How many leading zeroes the counter has.
         /// </summary>
-        public uint LeadingZeroes
-        {
-            get;
-            protected set;
-        }
+        public uint LeadingZeroes { get; }
 
         /// <summary>
         /// Displays score.
@@ -43,16 +39,19 @@ namespace osu.Game.Graphics.UserInterface
         protected override string FormatCount(double count)
         {
             string format = new string('0', (int)LeadingZeroes);
+
             if (UseCommaSeparator)
+            {
                 for (int i = format.Length - 3; i > 0; i -= 3)
                     format = format.Insert(i, @",");
+            }
 
             return ((long)count).ToString(format);
         }
 
         public override void Increment(double amount)
         {
-            Current.Value = Current.Value + amount;
+            Current.Value += amount;
         }
     }
 }

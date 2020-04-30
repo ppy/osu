@@ -19,32 +19,34 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override string Header => "Skin";
 
-        public override IconUsage Icon => FontAwesome.Solid.PaintBrush;
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.PaintBrush
+        };
 
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
-        private SkinManager skins;
+        [Resolved]
+        private SkinManager skins { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skins)
+        private void load(OsuConfigManager config)
         {
-            this.skins = skins;
-
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
-                new SettingsSlider<double, SizeSlider>
+                new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize),
+                    Bindable = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
-                new SettingsSlider<double, SizeSlider>
+                new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize),
+                    Bindable = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
@@ -95,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        private class SizeSlider : OsuSliderBar<double>
+        private class SizeSlider : OsuSliderBar<float>
         {
             public override string TooltipText => Current.Value.ToString(@"0.##x");
         }

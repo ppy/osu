@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -30,7 +30,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// A user-facing title for this screen.
         /// </summary>
-        public virtual string Title => GetType().ShortDisplayName();
+        public virtual string Title => GetType().Name;
 
         public string Description => Title;
 
@@ -87,21 +87,38 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
+        public virtual bool AllowRateAdjustments => true;
+
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }
 
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
+        private OsuScreenDependencies screenDependencies;
+
+        internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
+            if (screenDependencies == null)
+            {
+                if (DisallowExternalBeatmapRulesetChanges)
+                    throw new InvalidOperationException($"Screens that specify {nameof(DisallowExternalBeatmapRulesetChanges)} must be pushed immediately.");
+
+                createDependencies(parent);
+            }
+
+            return base.CreateChildDependencies(screenDependencies);
+        }
+
+        private void createDependencies(IReadOnlyDependencyContainer dependencies)
+        {
+            screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, dependencies);
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
             Mods = screenDependencies.Mods;
-
-            return base.CreateChildDependencies(screenDependencies);
         }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;

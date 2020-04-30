@@ -6,7 +6,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetRoomScoresRequest : APIRequest<List<APIRoomScoreInfo>>
+    public class GetRoomScoresRequest : APIRequest<List<APIUserScoreAggregate>>
     {
         private readonly int roomId;
 

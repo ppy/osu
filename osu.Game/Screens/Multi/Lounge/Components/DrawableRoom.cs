@@ -74,7 +74,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             set
             {
                 matchingFilter = value;
-                this.FadeTo(MatchingFilter ? 1 : 0, 200);
+
+                if (!IsLoaded)
+                    return;
+
+                if (matchingFilter)
+                    this.FadeIn(200);
+                else
+                    Hide();
             }
         }
 
@@ -127,7 +134,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"212121"),
+                                Colour = Color4Extensions.FromHex(@"212121"),
                             },
                             new StatusColouredContainer(transition_duration)
                             {
@@ -203,7 +210,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            this.FadeInFromZero(transition_duration);
+
+            if (matchingFilter)
+                this.FadeInFromZero(transition_duration);
+            else
+                Alpha = 0;
         }
 
         private class RoomName : OsuSpriteText

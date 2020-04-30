@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
@@ -17,18 +17,20 @@ namespace osu.Game.Storyboards
 
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
 
+        public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
+
         public Storyboard()
         {
+            layers.Add("Video", new StoryboardLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
-            layers.Add("Fail", new StoryboardLayer("Fail", 2) { EnabledWhenPassing = false, });
-            layers.Add("Pass", new StoryboardLayer("Pass", 1) { EnabledWhenFailing = false, });
+            layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
+            layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
             layers.Add("Foreground", new StoryboardLayer("Foreground", 0));
         }
 
         public StoryboardLayer GetLayer(string name)
         {
-            StoryboardLayer layer;
-            if (!layers.TryGetValue(name, out layer))
+            if (!layers.TryGetValue(name, out var layer))
                 layers[name] = layer = new StoryboardLayer(name, layers.Values.Min(l => l.Depth) - 1);
 
             return layer;

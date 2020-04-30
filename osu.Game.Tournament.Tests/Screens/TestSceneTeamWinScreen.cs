@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.TeamWin;
@@ -13,7 +12,7 @@ namespace osu.Game.Tournament.Tests.Screens
     public class TestSceneTeamWinScreen : LadderTestScene
     {
         [Cached]
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
+        private readonly LadderInfo ladder = new LadderInfo();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -22,7 +21,8 @@ namespace osu.Game.Tournament.Tests.Screens
             match.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
             match.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
             match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
-            currentMatch.Value = match;
+            match.Completed.Value = true;
+            ladder.CurrentMatch.Value = match;
 
             Add(new TeamWinScreen
             {

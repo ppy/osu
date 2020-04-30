@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual.Menus
         {
             typeof(StartupScreen),
             typeof(IntroScreen),
-            typeof(OsuScreen),
             typeof(IntroTestScene),
         };
 
@@ -31,7 +30,7 @@ namespace osu.Game.Tests.Visual.Menus
 
         protected IntroTestScene()
         {
-            Drawable introStack = null;
+            OsuScreenStack introStack = null;
 
             Children = new Drawable[]
             {
@@ -57,11 +56,15 @@ namespace osu.Game.Tests.Visual.Menus
 
                 introStack?.Expire();
 
-                Add(introStack = new OsuScreenStack(CreateScreen())
+                Add(introStack = new OsuScreenStack
                 {
                     RelativeSizeAxes = Axes.Both,
                 });
+
+                introStack.Push(CreateScreen());
             });
+
+            AddUntilStep("wait for menu", () => introStack.CurrentScreen is MainMenu);
         }
 
         protected abstract IScreen CreateScreen();

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,11 +9,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -30,13 +30,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
-        private readonly List<DrawableSwellTick> ticks = new List<DrawableSwellTick>();
-
+        private readonly Container<DrawableSwellTick> ticks;
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
-
-        private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
             : base(swell)
@@ -108,25 +105,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             });
 
-            MainPiece.Add(symbol = new SwellSymbolPiece());
-
-            foreach (var tick in HitObject.NestedHitObjects.OfType<SwellTick>())
-            {
-                var vis = new DrawableSwellTick(tick);
-
-                ticks.Add(vis);
-                AddInternal(vis);
-                AddNested(vis);
-            }
+            AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
+
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Swell),
+            _ => new SwellCirclePiece
+            {
+                // to allow for rotation transform
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
 
         protected override void LoadComplete()
         {
@@ -136,11 +131,49 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Width *= Parent.RelativeChildSize.X;
         }
 
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableSwellTick tick:
+                    ticks.Add(tick);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            ticks.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case SwellTick tick:
+                    return new DrawableSwellTick(tick);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
             {
-                var nextTick = ticks.Find(j => !j.IsHit);
+                DrawableSwellTick nextTick = null;
+
+                foreach (var t in ticks)
+                {
+                    if (!t.IsHit)
+                    {
+                        nextTick = t;
+                        break;
+                    }
+                }
 
                 nextTick?.TriggerResult(HitResult.Great);
 
@@ -149,11 +182,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 var completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
-                    .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
                     .Then()
                     .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
-                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
+                MainPiece.Drawable.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
@@ -208,8 +241,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     {
                         this.FadeOut(transition_duration, Easing.Out);
                         bodyContainer.ScaleTo(1.4f, transition_duration);
-
-                        Expire();
                     }
 
                     break;

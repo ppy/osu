@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
             Content.CornerRadius = DrawHeight / 2f;
+            Content.CornerExponent = 2;
         }
     }
 }

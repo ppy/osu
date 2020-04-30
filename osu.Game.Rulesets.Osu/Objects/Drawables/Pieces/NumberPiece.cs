@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
 
@@ -30,17 +29,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                new CircularContainer
+                new Container
                 {
                     Masking = true,
-                    Origin = Anchor.Centre,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Radius = 60,
                         Colour = Color4.White.Opacity(0.5f),
                     },
-                    Child = new Box()
                 },
                 number = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {

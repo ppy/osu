@@ -13,23 +13,25 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneDrawableJudgement : SkinnableTestScene
+    public class TestSceneDrawableJudgement : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(DrawableJudgement),
             typeof(DrawableOsuJudgement)
-        };
+        }).ToList();
 
         public TestSceneDrawableJudgement()
         {
             foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
+            {
                 AddStep("Show " + result.GetDescription(), () => SetContents(() =>
                     new DrawableOsuJudgement(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }));
+            }
         }
     }
 }

@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -29,6 +28,11 @@ namespace osu.Game.Rulesets.UI
         /// A function that converts gamefield coordinates to screen space.
         /// </summary>
         public Func<Vector2, Vector2> GamefieldToScreenSpace => HitObjectContainer.ToScreenSpace;
+
+        /// <summary>
+        /// A function that converts screen space coordinates to gamefield.
+        /// </summary>
+        public Func<Vector2, Vector2> ScreenSpaceToGamefield => HitObjectContainer.ToLocalSpace;
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
@@ -57,10 +61,7 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
@@ -100,10 +101,13 @@ namespace osu.Game.Rulesets.UI
         public GameplayCursorContainer Cursor { get; private set; }
 
         /// <summary>
-        /// Provide an optional cursor which is to be used for gameplay.
+        /// Provide a cursor which is to be used for gameplay.
         /// </summary>
-        /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => null;
+        /// <remarks>
+        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
+        /// </remarks>
+        /// <returns>The cursor, or null to show the menu cursor.</returns>
+        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -129,15 +133,28 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (beatmap != null)
+            if (mods != null)
+            {
                 foreach (var mod in mods)
+                {
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
+                }
+            }
         }
 
         /// <summary>
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        public class InvisibleCursorContainer : GameplayCursorContainer
+        {
+            protected override Drawable CreateCursor() => new InvisibleCursor();
+
+            private class InvisibleCursor : Drawable
+            {
+            }
+        }
     }
 }

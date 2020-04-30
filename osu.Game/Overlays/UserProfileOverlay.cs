@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
@@ -24,9 +24,14 @@ namespace osu.Game.Overlays
         private GetUserRequest userReq;
         protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
-        private ProfileTabControl tabs;
+        private ProfileSectionTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
+
+        public UserProfileOverlay()
+            : base(OverlayColourScheme.Pink)
+        {
+        }
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -44,29 +49,30 @@ namespace osu.Game.Overlays
             Clear();
             lastSection = null;
 
-            sections = new ProfileSection[]
-            {
-                //new AboutSection(),
-                new RecentSection(),
-                new RanksSection(),
-                //new MedalsSection(),
-                new HistoricalSection(),
-                new BeatmapsSection(),
-                new KudosuSection()
-            };
+            sections = !user.IsBot
+                ? new ProfileSection[]
+                {
+                    //new AboutSection(),
+                    new RecentSection(),
+                    new RanksSection(),
+                    //new MedalsSection(),
+                    new HistoricalSection(),
+                    new BeatmapsSection(),
+                    new KudosuSection()
+                }
+                : Array.Empty<ProfileSection>();
 
-            tabs = new ProfileTabControl
+            tabs = new ProfileSectionTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Height = 30
             };
 
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.1f)
+                Colour = ColourProvider.Background6
             });
 
             Add(sectionsContainer = new ProfileSectionsContainer
@@ -75,7 +81,8 @@ namespace osu.Game.Overlays
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
-                    Colour = OsuColour.Gray(34),
+                    // this is only visible as the ProfileTabControl background
+                    Colour = ColourProvider.Background5,
                     RelativeSizeAxes = Axes.Both
                 },
             });
@@ -141,33 +148,42 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class ProfileTabControl : OverlayTabControl<ProfileSection>
+        private class ProfileSectionTabControl : OverlayTabControl<ProfileSection>
         {
-            public ProfileTabControl()
+            private const float bar_height = 2;
+
+            public ProfileSectionTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
+
+                Height = 36 + bar_height;
+                BarHeight = bar_height;
             }
 
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value)
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileSectionTabItem(value)
             {
-                AccentColour = AccentColour
+                AccentColour = AccentColour,
             };
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                AccentColour = colours.Seafoam;
+                AccentColour = colourProvider.Highlight1;
             }
 
-            private class ProfileTabItem : OverlayTabItem<ProfileSection>
+            private class ProfileSectionTabItem : OverlayTabItem
             {
-                public ProfileTabItem(ProfileSection value)
+                public ProfileSectionTabItem(ProfileSection value)
                     : base(value)
                 {
                     Text.Text = value.Title;
+                    Text.Font = Text.Font.With(size: 16);
+                    Text.Margin = new MarginPadding { Bottom = 10 + bar_height };
+                    Bar.ExpandedSize = 10;
+                    Bar.Margin = new MarginPadding { Bottom = bar_height };
                 }
             }
         }
@@ -178,6 +194,8 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both;
             }
+
+            protected override OsuScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
 
             protected override FlowContainer<ProfileSection> CreateScrollContentContainer() => new FillFlowContainer<ProfileSection>
             {

@@ -8,11 +8,12 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 StarRating = skills.Single().DifficultyValue() * star_scaling_factor,
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)(hitWindows.Great / 2) / clockRate,
+                GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };

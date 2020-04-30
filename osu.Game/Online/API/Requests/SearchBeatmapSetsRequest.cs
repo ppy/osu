@@ -1,51 +1,63 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+using osu.Framework.IO.Network;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
+        public SearchCategory SearchCategory { get; set; }
+
+        public SortCriteria SortCriteria { get; set; }
+
+        public SortDirection SortDirection { get; set; }
+
+        public SearchGenre Genre { get; set; }
+
+        public SearchLanguage Language { get; set; }
+
         private readonly string query;
         private readonly RulesetInfo ruleset;
-        private readonly BeatmapSearchCategory searchCategory;
-        private readonly DirectSortCriteria sortCriteria;
-        private readonly SortDirection direction;
-        private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        private string directionString => SortDirection == SortDirection.Descending ? @"desc" : @"asc";
+
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset)
         {
-            this.query = System.Uri.EscapeDataString(query);
+            this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
-            this.searchCategory = searchCategory;
-            this.sortCriteria = sortCriteria;
-            this.direction = direction;
+
+            SearchCategory = SearchCategory.Any;
+            SortCriteria = SortCriteria.Ranked;
+            SortDirection = SortDirection.Descending;
+            Genre = SearchGenre.Any;
+            Language = SearchLanguage.Any;
         }
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={searchCategory.ToString().ToLowerInvariant()}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
-    }
+        protected override WebRequest CreateWebRequest()
+        {
+            var req = base.CreateWebRequest();
+            req.AddParameter("q", query);
 
-    public enum BeatmapSearchCategory
-    {
-        Any,
+            if (ruleset.ID.HasValue)
+                req.AddParameter("m", ruleset.ID.Value.ToString());
 
-        [Description("Has Leaderboard")]
-        Leaderboard,
-        Ranked,
-        Qualified,
-        Loved,
-        Favourites,
+            req.AddParameter("s", SearchCategory.ToString().ToLowerInvariant());
 
-        [Description("Pending & WIP")]
-        Pending,
-        Graveyard,
+            if (Genre != SearchGenre.Any)
+                req.AddParameter("g", ((int)Genre).ToString());
 
-        [Description("My Maps")]
-        Mine,
+            if (Language != SearchLanguage.Any)
+                req.AddParameter("l", ((int)Language).ToString());
+
+            req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
+
+            return req;
+        }
+
+        protected override string Target => @"beatmapsets/search";
     }
 }

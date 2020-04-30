@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -17,6 +20,7 @@ using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -28,12 +32,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
+        private const int time_range = 5000;
+        private const int spawn_rate = time_range / 10;
+
         private readonly ScrollingTestContainer[] scrollContainers = new ScrollingTestContainer[4];
         private readonly TestPlayfield[] playfields = new TestPlayfield[4];
+        private ScheduledDelegate hitObjectSpawnDelegate;
 
-        public TestSceneScrollingHitObjects()
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
-            Add(new GridContainer
+            Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Content = new[]
@@ -43,48 +52,90 @@ namespace osu.Game.Tests.Visual.Gameplay
                         scrollContainers[0] = new ScrollingTestContainer(ScrollingDirection.Up)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = playfields[0] = new TestPlayfield()
+                            Child = playfields[0] = new TestPlayfield(),
+                            TimeRange = time_range
                         },
-                        scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Down)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = playfields[1] = new TestPlayfield()
+                            Child = playfields[1] = new TestPlayfield(),
+                            TimeRange = time_range
                         },
                     },
                     new Drawable[]
                     {
-                        scrollContainers[2] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        scrollContainers[2] = new ScrollingTestContainer(ScrollingDirection.Left)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = playfields[2] = new TestPlayfield()
+                            Child = playfields[2] = new TestPlayfield(),
+                            TimeRange = time_range
                         },
-                        scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Right)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = playfields[3] = new TestPlayfield()
+                            Child = playfields[3] = new TestPlayfield(),
+                            TimeRange = time_range
                         }
                     }
                 }
-            });
+            };
 
-            AddStep("Constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
-            AddStep("Overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
-            AddStep("Sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
+            setUpHitObjects();
+        });
 
-            AddSliderStep("Time range", 100, 10000, 5000, v => scrollContainers.ForEach(c => c.TimeRange = v));
-            AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
-        }
-
-        protected override void LoadComplete()
+        private void setUpHitObjects()
         {
-            base.LoadComplete();
-
             scrollContainers.ForEach(c => c.ControlPoints.Add(new MultiplierControlPoint(0)));
 
-            for (int i = 0; i <= 5000; i += 1000)
+            for (int i = spawn_rate / 2; i <= time_range; i += spawn_rate)
                 addHitObject(Time.Current + i);
 
-            Scheduler.AddDelayed(() => addHitObject(Time.Current + 5000), 1000, true);
+            hitObjectSpawnDelegate?.Cancel();
+            hitObjectSpawnDelegate = Scheduler.AddDelayed(() => addHitObject(Time.Current + time_range), spawn_rate, true);
+        }
+
+        private IList<MultiplierControlPoint> testControlPoints => new List<MultiplierControlPoint>
+        {
+            new MultiplierControlPoint(time_range) { DifficultyPoint = { SpeedMultiplier = 1.25 } },
+            new MultiplierControlPoint(1.5 * time_range) { DifficultyPoint = { SpeedMultiplier = 1 } },
+            new MultiplierControlPoint(2 * time_range) { DifficultyPoint = { SpeedMultiplier = 1.5 } }
+        };
+
+        [Test]
+        public void TestScrollAlgorithms()
+        {
+            AddStep("constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
+            AddStep("overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
+            AddStep("sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
+
+            AddSliderStep("time range", 100, 10000, time_range, v => scrollContainers.Where(c => c != null).ForEach(c => c.TimeRange = v));
+
+            AddStep("add control points", () => addControlPoints(testControlPoints, Time.Current));
+        }
+
+        [Test]
+        public void TestConstantScrollLifetime()
+        {
+            AddStep("set constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
+            // scroll container time range must be less than the rate of spawning hitobjects
+            // otherwise the hitobjects will spawn already partly visible on screen and look wrong
+            AddStep("set time range", () => scrollContainers.ForEach(c => c.TimeRange = time_range / 2.0));
+        }
+
+        [Test]
+        public void TestSequentialScrollLifetime()
+        {
+            AddStep("set sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
+            AddStep("set time range", () => scrollContainers.ForEach(c => c.TimeRange = time_range / 2.0));
+            AddStep("add control points", () => addControlPoints(testControlPoints, Time.Current));
+        }
+
+        [Test]
+        public void TestOverlappingScrollLifetime()
+        {
+            AddStep("set overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
+            AddStep("set time range", () => scrollContainers.ForEach(c => c.TimeRange = time_range / 2.0));
+            AddStep("add control points", () => addControlPoints(testControlPoints, Time.Current));
         }
 
         private void addHitObject(double time)
@@ -98,28 +149,27 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void addControlPoint(double time)
+        private TestDrawableControlPoint createDrawablePoint(TestPlayfield playfield, double t)
         {
-            scrollContainers.ForEach(c =>
+            var obj = new TestDrawableControlPoint(playfield.Direction, t);
+            setAnchor(obj, playfield);
+            return obj;
+        }
+
+        private void addControlPoints(IList<MultiplierControlPoint> controlPoints, double sequenceStartTime)
+        {
+            controlPoints.ForEach(point => point.StartTime += sequenceStartTime);
+
+            scrollContainers.ForEach(container =>
             {
-                c.ControlPoints.Add(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
-                c.ControlPoints.Add(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
-                c.ControlPoints.Add(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
+                container.ControlPoints.AddRange(controlPoints);
             });
 
-            playfields.ForEach(p =>
+            foreach (var playfield in playfields)
             {
-                TestDrawableControlPoint createDrawablePoint(double t)
-                {
-                    var obj = new TestDrawableControlPoint(p.Direction, t);
-                    setAnchor(obj, p);
-                    return obj;
-                }
-
-                p.Add(createDrawablePoint(time));
-                p.Add(createDrawablePoint(time + 2000));
-                p.Add(createDrawablePoint(time + 3000));
-            });
+                foreach (var controlPoint in controlPoints)
+                    playfield.Add(createDrawablePoint(playfield, controlPoint.StartTime));
+            }
         }
 
         private void setAnchor(DrawableHitObject obj, TestPlayfield playfield)
@@ -207,10 +257,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestDrawableHitObject(double time)
                 : base(new HitObject { StartTime = time })
             {
-                Origin = Anchor.Centre;
+                Origin = Anchor.Custom;
+                OriginPosition = new Vector2(75 / 4.0f);
+
                 AutoSizeAxes = Axes.Both;
 
-                AddInternal(new Box { Size = new Vector2(75) });
+                AddInternal(new Box
+                {
+                    Size = new Vector2(75),
+                    Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
+                });
             }
         }
     }

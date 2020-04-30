@@ -4,14 +4,18 @@
 using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Swell : TaikoHitObject, IHasEndTime
     {
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
 
@@ -35,6 +39,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         public override Judgement CreateJudgement() => new TaikoSwellJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

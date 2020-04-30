@@ -3,15 +3,17 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     /// <summary>
     /// A line that scrolls alongside hit objects in the playfield and visualises control points.
     /// </summary>
-    public class DrawableBarLine : DrawableHitObject<TaikoHitObject>
+    public class DrawableBarLine : DrawableHitObject<HitObject>
     {
         /// <summary>
         /// The width of the line tracker.
@@ -26,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// The visual line tracker.
         /// </summary>
-        protected Box Tracker;
+        protected SkinnableDrawable Line;
 
         /// <summary>
         /// The bar line.
@@ -44,14 +46,18 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            AddInternal(Tracker = new Box
+            AddInternal(Line = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.BarLine), _ => new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                EdgeSmoothness = new Vector2(0.5f, 0),
+            })
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                EdgeSmoothness = new Vector2(0.5f, 0),
-                Alpha = 0.75f
+                Alpha = 0.75f,
             });
         }
+
+        protected override void UpdateStateTransforms(ArmedState state) => this.FadeOut(150);
     }
 }

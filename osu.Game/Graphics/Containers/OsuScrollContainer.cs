@@ -14,6 +14,9 @@ namespace osu.Game.Graphics.Containers
 {
     public class OsuScrollContainer : ScrollContainer<Drawable>
     {
+        public const float SCROLL_BAR_HEIGHT = 10;
+        public const float SCROLL_BAR_PADDING = 3;
+
         /// <summary>
         /// Allows controlling the scroll bar from any position in the container using the right mouse button.
         /// Uses the value of <see cref="DistanceDecayOnRightMouseScrollbar"/> to smoothly scroll to the dragged location.
@@ -50,15 +53,15 @@ namespace osu.Game.Graphics.Containers
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (rightMouseDragging)
             {
                 scrollFromMouseEvent(e);
-                return true;
+                return;
             }
 
-            return base.OnDrag(e);
+            base.OnDrag(e);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -72,23 +75,30 @@ namespace osu.Game.Graphics.Containers
             return base.OnDragStart(e);
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             if (rightMouseDragging)
             {
                 rightMouseDragging = false;
-                return true;
+                return;
             }
 
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // allow for controlling volume when alt is held.
+            // mostly for compatibility with osu-stable.
+            if (e.AltPressed) return false;
+
+            return base.OnScroll(e);
         }
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
         protected class OsuScrollbar : ScrollbarContainer
         {
-            private const float dim_size = 10;
-
             private Color4 hoverColour;
             private Color4 defaultColour;
             private Color4 highlightColour;
@@ -114,8 +124,6 @@ namespace osu.Game.Graphics.Containers
 
                 Masking = true;
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
-
-                ResizeTo(1);
             }
 
             [BackgroundDependencyLoader]
@@ -128,7 +136,7 @@ namespace osu.Game.Graphics.Containers
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
             {
-                Vector2 size = new Vector2(dim_size)
+                Vector2 size = new Vector2(SCROLL_BAR_HEIGHT)
                 {
                     [(int)ScrollDirection] = val
                 };
@@ -155,13 +163,13 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
-                if (e.Button != MouseButton.Left) return false;
+                if (e.Button != MouseButton.Left) return;
 
                 box.FadeColour(Color4.White, 100);
 
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
         }
     }

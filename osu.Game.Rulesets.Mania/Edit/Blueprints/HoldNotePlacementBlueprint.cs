@@ -47,15 +47,21 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             bodyPiece.Height = (bottomPosition - topPosition).Y;
         }
 
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+            EndPlacement(true);
+        }
+
         private double originalStartTime;
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        public override void UpdatePosition(Vector2 screenSpacePosition)
         {
-            base.OnMouseMove(e);
+            base.UpdatePosition(screenSpacePosition);
 
-            if (PlacementBegun)
+            if (PlacementActive)
             {
-                var endTime = TimeAt(e.ScreenSpaceMousePosition);
+                var endTime = TimeAt(screenSpacePosition);
 
                 HitObject.StartTime = endTime < originalStartTime ? endTime : originalStartTime;
                 HitObject.Duration = Math.Abs(endTime - originalStartTime);
@@ -65,10 +71,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 headPiece.Width = tailPiece.Width = SnappedWidth;
                 headPiece.X = tailPiece.X = SnappedMousePosition.X;
 
-                originalStartTime = HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
+                originalStartTime = HitObject.StartTime = TimeAt(screenSpacePosition);
             }
-
-            return true;
         }
     }
 }

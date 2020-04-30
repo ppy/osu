@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Users;
 using osuTK;
 
@@ -33,10 +33,20 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         protected override Drawable CreateDrawableItem(APIBeatmapSet model) => !model.OnlineBeatmapSetID.HasValue
             ? null
-            : new DirectGridPanel(model.ToBeatmapSet(Rulesets))
+            : new GridBeatmapPanel(model.ToBeatmapSet(Rulesets))
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             };
+
+        protected override int GetCount(User user) => type switch
+        {
+            BeatmapSetType.Favourite => user.FavouriteBeatmapsetCount,
+            BeatmapSetType.Graveyard => user.GraveyardBeatmapsetCount,
+            BeatmapSetType.Loved => user.LovedBeatmapsetCount,
+            BeatmapSetType.RankedAndApproved => user.RankedAndApprovedBeatmapsetCount,
+            BeatmapSetType.Unranked => user.UnrankedBeatmapsetCount,
+            _ => 0
+        };
     }
 }

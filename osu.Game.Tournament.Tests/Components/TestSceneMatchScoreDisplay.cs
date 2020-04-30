@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 

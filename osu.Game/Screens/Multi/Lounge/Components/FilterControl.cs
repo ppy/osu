@@ -4,15 +4,17 @@
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Threading;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
     {
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
+        protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
         protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
         protected override SecondaryFilter DefaultCategory => SecondaryFilter.Public;
 
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
 
         public FilterControl()
         {
@@ -37,17 +42,29 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
 
-            Search.Current.BindValueChanged(_ => updateFilter());
+            ruleset.BindValueChanged(_ => updateFilter());
+            Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
             Tabs.Current.BindValueChanged(_ => updateFilter(), true);
+        }
+
+        private ScheduledDelegate scheduledFilterUpdate;
+
+        private void scheduleUpdateFilter()
+        {
+            scheduledFilterUpdate?.Cancel();
+            scheduledFilterUpdate = Scheduler.AddDelayed(updateFilter, 200);
         }
 
         private void updateFilter()
         {
+            scheduledFilterUpdate?.Cancel();
+
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
                 PrimaryFilter = Tabs.Current.Value,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value
+                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value,
+                Ruleset = ruleset.Value
             };
         }
     }

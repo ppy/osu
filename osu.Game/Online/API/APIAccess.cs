@@ -7,8 +7,10 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -20,6 +22,7 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
         private readonly OAuth authentication;
 
         public string Endpoint => @"https://osu.ppy.sh";
@@ -151,6 +154,10 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
+
+                            // todo: save/pull from settings
+                            LocalUser.Value.Status.Value = new UserStatusOnline();
+
                             failureCount = 0;
 
                             //we're connected!
@@ -198,6 +205,22 @@ namespace osu.Game.Online.API
             }
         }
 
+        public void Perform(APIRequest request)
+        {
+            try
+            {
+                request.Perform(this);
+            }
+            catch (Exception e)
+            {
+                // todo: fix exception handling
+                request.Fail(e);
+            }
+        }
+
+        public Task PerformAsync(APIRequest request) =>
+            Task.Factory.StartNew(() => Perform(request), TaskCreationOptions.LongRunning);
+
         public void Login(string username, string password)
         {
             Debug.Assert(State == APIState.Offline);
@@ -227,12 +250,12 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.ResponseString).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
                     // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    throw e;
+                    e.Rethrow();
                 }
             }
 

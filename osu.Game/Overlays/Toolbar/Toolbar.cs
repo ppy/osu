@@ -16,7 +16,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : OverlayContainer
+    public class Toolbar : VisibilityContainer
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -26,14 +26,15 @@ namespace osu.Game.Overlays.Toolbar
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
 
-        protected override bool BlockPositionalInput => false;
-
         private const double transition_time = 500;
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
 
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
+        // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
+        public override bool PropagateNonPositionalInputSubTree => true;
 
         public Toolbar()
         {
@@ -72,7 +73,8 @@ namespace osu.Game.Overlays.Toolbar
                     Children = new Drawable[]
                     {
                         new ToolbarChangelogButton(),
-                        new ToolbarDirectButton(),
+                        new ToolbarRankingsButton(),
+                        new ToolbarBeatmapListingButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
@@ -149,7 +151,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopOut()
         {
-            userButton?.StateContainer.Hide();
+            userButton.StateContainer?.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);

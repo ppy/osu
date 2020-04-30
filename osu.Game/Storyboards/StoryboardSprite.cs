@@ -7,6 +7,7 @@ using osu.Game.Storyboards.Drawables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace osu.Game.Storyboards
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Storyboards
         private readonly List<CommandLoop> loops = new List<CommandLoop>();
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
 
-        public string Path { get; set; }
+        public string Path { get; }
         public bool IsDrawable => HasCommands;
 
         public Anchor Origin;
@@ -63,40 +64,56 @@ namespace osu.Game.Storyboards
 
         public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups = null)
         {
-            applyCommands(drawable, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = value, (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
+            // For performance reasons, we need to apply the commands in order by start time. Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
+            // To achieve this, commands are "generated" as pairs of (command, initFunc, transformFunc) and batched into a contiguous list
+            // The list is then stably-sorted (to preserve command order), and applied to the drawable sequentially.
+
+            List<IGeneratedCommand> generated = new List<IGeneratedCommand>();
+
+            generateCommands(generated, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
+            generateCommands(generated, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
+            generateCommands(generated, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = new Vector2(value), (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
+            generateCommands(generated, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
+            generateCommands(generated, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
+            generateCommands(generated, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
+            generateCommands(generated, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration),
+                false);
+
+            if (drawable is IVectorScalable vectorScalable)
+            {
+                generateCommands(generated, getCommands(g => g.VectorScale, triggeredGroups), (d, value) => vectorScalable.VectorScale = value,
+                    (d, value, duration, easing) => vectorScalable.VectorScaleTo(value, duration, easing));
+            }
 
             if (drawable is IFlippable flippable)
             {
-                applyCommands(drawable, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration), false);
-                applyCommands(drawable, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration), false);
+                generateCommands(generated, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration),
+                    false);
+                generateCommands(generated, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration),
+                    false);
             }
+
+            foreach (var command in generated.OrderBy(g => g.StartTime))
+                command.ApplyTo(drawable);
         }
 
-        private void applyCommands<T>(Drawable drawable, IEnumerable<CommandTimeline<T>.TypedCommand> commands, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
-            where T : struct
+        private void generateCommands<T>(List<IGeneratedCommand> resultList, IEnumerable<CommandTimeline<T>.TypedCommand> commands,
+                                         DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
         {
-            var initialized = false;
+            bool initialized = false;
 
-            foreach (var command in commands.OrderBy(l => l))
+            foreach (var command in commands)
             {
+                DrawablePropertyInitializer<T> initFunc = null;
+
                 if (!initialized)
                 {
                     if (alwaysInitialize || command.StartTime == command.EndTime)
-                        initializeProperty.Invoke(drawable, command.StartValue);
+                        initFunc = initializeProperty;
                     initialized = true;
                 }
 
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                {
-                    transform(drawable, command.StartValue, 0, Easing.None);
-                    transform(drawable, command.EndValue, command.Duration, command.Easing);
-                }
+                resultList.Add(new GeneratedCommand<T>(command, initFunc, transform));
             }
         }
 
@@ -105,13 +122,51 @@ namespace osu.Game.Storyboards
             var commands = TimelineGroup.GetCommands(timelineSelector);
             foreach (var loop in loops)
                 commands = commands.Concat(loop.GetCommands(timelineSelector));
+
             if (triggeredGroups != null)
+            {
                 foreach (var pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
+            }
+
             return commands;
         }
 
         public override string ToString()
             => $"{Path}, {Origin}, {InitialPosition}";
+
+        private interface IGeneratedCommand
+        {
+            double StartTime { get; }
+
+            void ApplyTo(Drawable drawable);
+        }
+
+        private readonly struct GeneratedCommand<T> : IGeneratedCommand
+        {
+            public double StartTime => command.StartTime;
+
+            private readonly DrawablePropertyInitializer<T> initializeProperty;
+            private readonly DrawableTransformer<T> transform;
+            private readonly CommandTimeline<T>.TypedCommand command;
+
+            public GeneratedCommand([NotNull] CommandTimeline<T>.TypedCommand command, [CanBeNull] DrawablePropertyInitializer<T> initializeProperty, [NotNull] DrawableTransformer<T> transform)
+            {
+                this.command = command;
+                this.initializeProperty = initializeProperty;
+                this.transform = transform;
+            }
+
+            public void ApplyTo(Drawable drawable)
+            {
+                initializeProperty?.Invoke(drawable, command.StartValue);
+
+                using (drawable.BeginAbsoluteSequence(command.StartTime))
+                {
+                    transform(drawable, command.StartValue, 0, Easing.None);
+                    transform(drawable, command.EndValue, command.Duration, command.Easing);
+                }
+            }
+        }
     }
 }

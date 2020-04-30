@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 
@@ -11,24 +12,39 @@ namespace osu.Game.Online.API
     /// An API request with a well-defined response type.
     /// </summary>
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    public abstract class APIRequest<T> : APIRequest
+    public abstract class APIRequest<T> : APIRequest where T : class
     {
-        protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
+        protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
-
-        protected APIRequest()
-        {
-            base.Success += onSuccess;
-        }
-
-        private void onSuccess() => Success?.Invoke(Result);
+        public T Result { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        protected override void PostProcess()
+        {
+            base.PostProcess();
+            Result = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+        }
+
+        internal void TriggerSuccess(T result)
+        {
+            if (Result != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            Result = result;
+
+            TriggerSuccess();
+        }
+
+        internal override void TriggerSuccess()
+        {
+            base.TriggerSuccess();
+            Success?.Invoke(Result);
+        }
     }
 
     /// <summary>
@@ -38,7 +54,7 @@ namespace osu.Game.Online.API
     {
         protected abstract string Target { get; }
 
-        protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
+        protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
@@ -64,7 +80,10 @@ namespace osu.Game.Online.API
         public void Perform(IAPIProvider api)
         {
             if (!(api is APIAccess apiAccess))
-                throw new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests.");
+            {
+                Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
+                return;
+            }
 
             API = apiAccess;
 
@@ -88,12 +107,26 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
+            PostProcess();
+
             API.Schedule(delegate
             {
                 if (cancelled) return;
 
-                Success?.Invoke();
+                TriggerSuccess();
             });
+        }
+
+        /// <summary>
+        /// Perform any post-processing actions after a successful request.
+        /// </summary>
+        protected virtual void PostProcess()
+        {
+        }
+
+        internal virtual void TriggerSuccess()
+        {
+            Success?.Invoke();
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
@@ -108,6 +141,22 @@ namespace osu.Game.Online.API
 
             cancelled = true;
             WebRequest?.Abort();
+
+            string responseString = WebRequest?.GetResponseString();
+
+            if (!string.IsNullOrEmpty(responseString))
+            {
+                try
+                {
+                    // attempt to decode a displayable error string.
+                    var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
+                    if (error != null)
+                        e = new APIException(error.ErrorMessage, e);
+                }
+                catch
+                {
+                }
+            }
 
             Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
             pendingFailure = () => Failure?.Invoke(e);
@@ -125,6 +174,20 @@ namespace osu.Game.Online.API
             API.Schedule(pendingFailure);
             pendingFailure = null;
             return true;
+        }
+
+        private class DisplayableError
+        {
+            [JsonProperty("error")]
+            public string ErrorMessage { get; set; }
+        }
+    }
+
+    public class APIException : InvalidOperationException
+    {
+        public APIException(string messsage, Exception innerException)
+            : base(messsage, innerException)
+        {
         }
     }
 

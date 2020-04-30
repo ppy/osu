@@ -21,7 +21,8 @@ namespace osu.Game.Skinning
 
         private SampleChannel[] channels;
 
-        private ISampleStore samples;
+        [Resolved]
+        private ISampleStore samples { get; set; }
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
@@ -31,12 +32,6 @@ namespace osu.Game.Skinning
         public SkinnableSound(ISampleInfo hitSamples)
         {
             this.hitSamples = new[] { hitSamples };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ISampleStore samples)
-        {
-            this.samples = samples;
         }
 
         private bool looping;
@@ -81,9 +76,13 @@ namespace osu.Game.Skinning
                 var ch = skin.GetSample(s);
 
                 if (ch == null && allowFallback)
+                {
                     foreach (var lookup in s.LookupNames)
+                    {
                         if ((ch = samples.Get($"Gameplay/{lookup}")) != null)
                             break;
+                    }
+                }
 
                 if (ch != null)
                 {
@@ -91,8 +90,10 @@ namespace osu.Game.Skinning
                     ch.Volume.Value = s.Volume / 100.0;
 
                     if (adjustments != null)
-                        foreach (var adjustment in adjustments)
-                            ch.AddAdjustment(adjustment.property, adjustment.bindable);
+                    {
+                        foreach (var (property, bindable) in adjustments)
+                            ch.AddAdjustment(property, bindable);
+                    }
                 }
 
                 return ch;
@@ -104,8 +105,10 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (channels != null)
+            {
                 foreach (var c in channels)
                     c.Dispose();
+            }
         }
     }
 }

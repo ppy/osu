@@ -66,13 +66,12 @@ namespace osu.Game.Overlays.KeyBinding
             CornerRadius = padding;
         }
 
-        private KeyBindingStore store;
+        [Resolved]
+        private KeyBindingStore store { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, KeyBindingStore store)
+        private void load(OsuColour colours)
         {
-            this.store = store;
-
             EdgeEffect = new EdgeEffectParameters
             {
                 Radius = 2,
@@ -177,17 +176,19 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             // don't do anything until the last button is released.
             if (!HasFocus || e.HasAnyButtonPressed)
-                return base.OnMouseUp(e);
+            {
+                base.OnMouseUp(e);
+                return;
+            }
 
             if (bindTarget.IsHovered)
                 finalise();
             else
                 updateBindTarget();
-            return true;
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -216,12 +217,15 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
-            if (!HasFocus) return base.OnKeyUp(e);
+            if (!HasFocus)
+            {
+                base.OnKeyUp(e);
+                return;
+            }
 
             finalise();
-            return true;
         }
 
         protected override bool OnJoystickPress(JoystickPressEvent e)
@@ -235,13 +239,15 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickRelease(JoystickReleaseEvent e)
+        protected override void OnJoystickRelease(JoystickReleaseEvent e)
         {
             if (!HasFocus)
-                return base.OnJoystickRelease(e);
+            {
+                base.OnJoystickRelease(e);
+                return;
+            }
 
             finalise();
-            return true;
         }
 
         private void clear()
@@ -311,14 +317,6 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 Text = "Clear";
                 Size = new Vector2(80, 20);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                base.OnMouseUp(e);
-
-                // without this, the mouse up triggers a finalise (and deselection) of the current binding target.
-                return true;
             }
 
             [BackgroundDependencyLoader]

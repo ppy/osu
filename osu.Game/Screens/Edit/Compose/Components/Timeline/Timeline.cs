@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -11,32 +12,34 @@ using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class Timeline : ZoomableScrollContainer
+    [Cached(typeof(IDistanceSnapProvider))]
+    [Cached]
+    public class Timeline : ZoomableScrollContainer, IDistanceSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
 
         public Timeline()
         {
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
-            Zoom = 10;
             ScrollbarVisible = false;
         }
 
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock adjustableClock, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
-            this.adjustableClock = adjustableClock;
-
-            Child = waveform = new WaveformGraph
+            Add(waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colours.Blue.Opacity(0.2f),
@@ -44,10 +47,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 MidColour = colours.BlueDark,
                 HighColour = colours.BlueDarker,
                 Depth = float.MaxValue
-            };
+            });
 
             // We don't want the centre marker to scroll
-            AddInternal(new CentreMarker());
+            AddInternal(new CentreMarker { Depth = float.MaxValue });
 
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
@@ -56,8 +59,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
+
+                if (track.Length > 0)
+                {
+                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
             }, true);
         }
+
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -126,7 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void scrollToTrackTime()
         {
-            if (!track.IsLoaded)
+            if (!track.IsLoaded || track.Length == 0)
                 return;
 
             ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
@@ -143,10 +155,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             endUserDrag();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         private void beginUserDrag()
@@ -162,5 +174,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (trackWasPlaying)
                 adjustableClock.Start();
         }
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private IBeatSnapProvider beatSnapProvider { get; set; }
+
+        public double GetTimeFromScreenSpacePosition(Vector2 position)
+            => getTimeFromPosition(Content.ToLocalSpace(position));
+
+        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) =>
+            (position, beatSnapProvider.SnapTime(getTimeFromPosition(position)));
+
+        private double getTimeFromPosition(Vector2 localPosition) =>
+            (localPosition.X / Content.DrawWidth) * track.Length;
+
+        public float GetBeatSnapDistanceAt(double referenceTime) => throw new NotImplementedException();
+
+        public float DurationToDistance(double referenceTime, double duration) => throw new NotImplementedException();
+
+        public double DistanceToDuration(double referenceTime, float distance) => throw new NotImplementedException();
+
+        public double GetSnappedDurationFromDistance(double referenceTime, float distance) => throw new NotImplementedException();
+
+        public float GetSnappedDistanceFromDistance(double referenceTime, float distance) => throw new NotImplementedException();
     }
 }

@@ -14,9 +14,10 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[] { typeof(OsuModHidden) }).ToList();
 
-        public TestSceneHitCircleHidden()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            Mods.Value = new[] { new OsuModHidden() };
-        }
+            SelectedMods.Value = new[] { new OsuModHidden() };
+        });
     }
 }

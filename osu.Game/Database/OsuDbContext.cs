@@ -166,19 +166,6 @@ namespace osu.Game.Database
                 // no-op. called by tooling.
             }
 
-            private class OsuDbLoggerProvider : ILoggerProvider
-            {
-                #region Disposal
-
-                public void Dispose()
-                {
-                }
-
-                #endregion
-
-                public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
-            }
-
             private class OsuDbLogger : ILogger
             {
                 public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

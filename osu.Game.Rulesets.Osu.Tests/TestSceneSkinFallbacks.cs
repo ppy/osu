@@ -16,9 +16,10 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNextHitObject(string skin) =>
             AddUntilStep($"check skin from {skin}", () =>
             {
-                var firstObject = ((TestPlayer)Player).DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
+                var firstObject = Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
 
                 if (firstObject == null)
                     return false;
@@ -73,16 +74,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audio { get; set; }
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap) => new CustomSkinWorkingBeatmap(beatmap, Clock, audio, testBeatmapSkin);
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, audio, testBeatmapSkin);
 
         public class CustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
         {
             private readonly ISkinSource skin;
 
-            public CustomSkinWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock frameBasedClock, AudioManager audio, ISkinSource skin)
-                : base(beatmap, frameBasedClock, audio)
+            public CustomSkinWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock frameBasedClock, AudioManager audio, ISkinSource skin)
+                : base(beatmap, storyboard, frameBasedClock, audio)
             {
                 this.skin = skin;
             }
@@ -124,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (!enabled) return null;
 
-                return new SpriteText
+                return new OsuSpriteText
                 {
                     Text = identifier,
                     Font = OsuFont.Default.With(size: 30),
