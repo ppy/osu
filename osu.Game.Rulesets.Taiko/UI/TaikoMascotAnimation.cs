@@ -24,11 +24,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             InternalChild = textureAnimation = createTextureAnimation(state).With(animation =>
             {
                 animation.Origin = animation.Anchor = Anchor.BottomLeft;
-                RelativeSizeAxes = Axes.Both;
             });
 
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor = Anchor.BottomLeft;
+
+            // needs to be always present to prevent the animation clock consuming time spent when not present.
             AlwaysPresent = true;
         }
 
