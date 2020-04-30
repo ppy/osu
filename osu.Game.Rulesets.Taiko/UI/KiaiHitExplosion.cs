@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(TaikoHitObject.DEFAULT_SIZE, 1);
 
+            Blending = BlendingParameters.Additive;
+
             Masking = true;
             Alpha = 0.25f;
 
