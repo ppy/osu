@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             Origin = Anchor.Centre;
 
             AutoSizeAxes = Axes.Both;
-
-            Blending = BlendingParameters.Additive;
         }
 
         protected override void LoadComplete()
