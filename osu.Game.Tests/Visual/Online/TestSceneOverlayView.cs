@@ -64,15 +64,6 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("spinner is hidden", () => !view.InternalContents.OfType<LoadingSpinner>().First().IsPresent);
         }
 
-        [Test]
-        public void TestPerformFetch()
-        {
-            AddStep("setup API request handler", () => ((DummyAPIAccess)API).HandleRequest = req => Task.Delay(2000).ContinueWith(t => req.TriggerSuccess()));
-            AddStep("perform fetch request", () => view.PerformFetch());
-            AddUntilStep("spinner is visible", () => view.InternalContents.OfType<LoadingSpinner>().First().IsPresent);
-            AddUntilStep("spinner hid on request completion", () => !view.InternalContents.OfType<LoadingSpinner>().First().IsPresent);
-        }
-
         private class TestOverlayView : OverlayView<DummyData>
         {
             public IEnumerable<Drawable> InternalContents => InternalChildren;

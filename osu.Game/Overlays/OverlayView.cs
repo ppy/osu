@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected LoadingSpinner LoadingSpinner { get; }
+        private LoadingSpinner spinner { get; }
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 },
-                LoadingSpinner = new LoadingSpinner
+                spinner = new LoadingSpinner
                 {
                     Alpha = 0,
                     Size = new osuTK.Vector2(40),
@@ -96,8 +96,6 @@ namespace osu.Game.Overlays
             request = CreateRequest();
             request.Success += onSuccess;
 
-            LoadingSpinner.Show();
-
             API.Queue(request);
         }
 
@@ -109,19 +107,19 @@ namespace osu.Game.Overlays
                     blockingBox.FadeIn(300, Easing.OutQuint);
                     currentPlaceholder.ScaleTo(0.8f).Then().ScaleTo(1, 600, Easing.OutQuint);
                     currentPlaceholder.FadeInFromZero(2 * 300, Easing.OutQuint);
-                    LoadingSpinner.Hide();
+                    spinner.Hide();
                     break;
 
                 case APIState.Online:
                     blockingBox.FadeOut(300, Easing.OutQuint);
                     currentPlaceholder.FadeOut(300, Easing.OutQuint);
-                    LoadingSpinner.Hide();
+                    spinner.Hide();
                     PerformFetch();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
-                    LoadingSpinner.Show();
+                    spinner.Show();
                     blockingBox.FadeIn(300, Easing.OutQuint);
                     currentPlaceholder.FadeOut(300, Easing.OutQuint);
                     break;
@@ -130,7 +128,6 @@ namespace osu.Game.Overlays
 
         private void onSuccess(T content)
         {
-            LoadingSpinner.Hide();
             Schedule(() => OnSuccess(content));
         }
 
