@@ -54,6 +54,35 @@ namespace osu.Game.Tests.Visual.SongSelect
             this.rulesets = rulesets;
         }
 
+        [Test]
+        public void TestRecommendedSelection()
+        {
+            loadBeatmaps();
+
+            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.LastOrDefault());
+
+            // check recommended was selected
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(1, 3);
+
+            // change away from recommended
+            advanceSelection(direction: -1, diff: true);
+            waitForSelection(1, 2);
+
+            // next set, check recommended
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(2, 3);
+
+            // next set, check recommended
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(3, 3);
+
+            // go back to first set and ensure user selection was retained
+            advanceSelection(direction: -1, diff: false);
+            advanceSelection(direction: -1, diff: false);
+            waitForSelection(1, 2);
+        }
+
         /// <summary>
         /// Test keyboard traversal
         /// </summary>

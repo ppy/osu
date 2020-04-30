@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Skinning
 {
@@ -31,6 +34,17 @@ namespace osu.Game.Skinning
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        {
+            if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
+            {
+                // When no custom sample bank is provided, always fall-back to the default samples.
+                return null;
+            }
+
+            return base.GetSample(sampleInfo);
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>

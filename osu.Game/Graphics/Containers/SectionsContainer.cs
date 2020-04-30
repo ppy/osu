@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,12 +17,7 @@ namespace osu.Game.Graphics.Containers
     public class SectionsContainer<T> : Container<T>
         where T : Drawable
     {
-        private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        private readonly OsuScrollContainer scrollContainer;
-        private readonly Container headerBackgroundContainer;
-        private readonly FlowContainer<T> scrollContentContainer;
-
-        protected override Container<T> Content => scrollContentContainer;
+        public Bindable<T> SelectedSection { get; } = new Bindable<T>();
 
         public Drawable ExpandableHeader
         {
@@ -83,6 +79,7 @@ namespace osu.Game.Graphics.Containers
 
                 headerBackgroundContainer.Clear();
                 headerBackground = value;
+
                 if (value == null) return;
 
                 headerBackgroundContainer.Add(headerBackground);
@@ -91,15 +88,37 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+        protected override Container<T> Content => scrollContentContainer;
 
-        protected virtual FlowContainer<T> CreateScrollContentContainer()
-            => new FillFlowContainer<T>
+        private readonly OsuScrollContainer scrollContainer;
+        private readonly Container headerBackgroundContainer;
+        private readonly MarginPadding originalSectionsMargin;
+        private Drawable expandableHeader, fixedHeader, footer, headerBackground;
+        private FlowContainer<T> scrollContentContainer;
+
+        private float headerHeight, footerHeight;
+
+        private float lastKnownScroll;
+
+        public SectionsContainer()
+        {
+            AddRangeInternal(new Drawable[]
             {
-                Direction = FillDirection.Vertical,
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-            };
+                scrollContainer = CreateScrollContainer().With(s =>
+                {
+                    s.RelativeSizeAxes = Axes.Both;
+                    s.Masking = true;
+                    s.ScrollbarVisible = false;
+                    s.Child = scrollContentContainer = CreateScrollContentContainer();
+                }),
+                headerBackgroundContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X
+                }
+            });
+
+            originalSectionsMargin = scrollContentContainer.Margin;
+        }
 
         public override void Add(T drawable)
         {
@@ -109,39 +128,22 @@ namespace osu.Game.Graphics.Containers
             footerHeight = float.NaN;
         }
 
-        private float headerHeight, footerHeight;
-        private readonly MarginPadding originalSectionsMargin;
-
-        private void updateSectionsMargin()
-        {
-            if (!Children.Any()) return;
-
-            var newMargin = originalSectionsMargin;
-            newMargin.Top += headerHeight;
-            newMargin.Bottom += footerHeight;
-
-            scrollContentContainer.Margin = newMargin;
-        }
-
-        public SectionsContainer()
-        {
-            AddInternal(scrollContainer = new OsuScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                ScrollbarVisible = false,
-                Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() }
-            });
-            AddInternal(headerBackgroundContainer = new Container
-            {
-                RelativeSizeAxes = Axes.X
-            });
-            originalSectionsMargin = scrollContentContainer.Margin;
-        }
-
-        public void ScrollTo(Drawable section) => scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
+        public void ScrollTo(Drawable section) =>
+            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
+
+        [NotNull]
+        protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
+
+        [NotNull]
+        protected virtual FlowContainer<T> CreateScrollContentContainer() =>
+            new FillFlowContainer<T>
+            {
+                Direction = FillDirection.Vertical,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+            };
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
@@ -155,8 +157,6 @@ namespace osu.Game.Graphics.Containers
 
             return result;
         }
-
-        private float lastKnownScroll;
 
         protected override void UpdateAfterChildren()
         {
@@ -207,6 +207,17 @@ namespace osu.Game.Graphics.Containers
                 if (bestMatch != null)
                     SelectedSection.Value = bestMatch;
             }
+        }
+
+        private void updateSectionsMargin()
+        {
+            if (!Children.Any()) return;
+
+            var newMargin = originalSectionsMargin;
+            newMargin.Top += headerHeight;
+            newMargin.Bottom += footerHeight;
+
+            scrollContentContainer.Margin = newMargin;
         }
     }
 }

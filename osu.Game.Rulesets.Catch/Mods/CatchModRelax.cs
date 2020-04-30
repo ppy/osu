@@ -9,17 +9,26 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>
+    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
         public override string Description => @"Use the mouse to control the catcher.";
 
+        private DrawableRuleset<CatchHitObject> drawableRuleset;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
+            this.drawableRuleset = drawableRuleset;
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            if (!drawableRuleset.HasReplayLoaded.Value)
+                drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
         }
 
         private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition

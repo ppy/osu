@@ -8,17 +8,16 @@ using osu.Framework.Graphics;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Input.Events;
-using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public class BeatmapListingSortTabControl : OverlaySortTabControl<DirectSortCriteria>
+    public class BeatmapListingSortTabControl : OverlaySortTabControl<SortCriteria>
     {
         public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>(Overlays.SortDirection.Descending);
 
         public BeatmapListingSortTabControl()
         {
-            Current.Value = DirectSortCriteria.Ranked;
+            Current.Value = SortCriteria.Ranked;
         }
 
         protected override SortTabControl CreateControl() => new BeatmapSortTabControl
@@ -30,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
-            protected override TabItem<DirectSortCriteria> CreateTabItem(DirectSortCriteria value) => new BeatmapSortTabItem(value)
+            protected override TabItem<SortCriteria> CreateTabItem(SortCriteria value) => new BeatmapSortTabItem(value)
             {
                 SortDirection = { BindTarget = SortDirection }
             };
@@ -40,12 +39,12 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
-            public BeatmapSortTabItem(DirectSortCriteria value)
+            public BeatmapSortTabItem(SortCriteria value)
                 : base(value)
             {
             }
 
-            protected override TabButton CreateTabButton(DirectSortCriteria value) => new BeatmapTabButton(value)
+            protected override TabButton CreateTabButton(SortCriteria value) => new BeatmapTabButton(value)
             {
                 Active = { BindTarget = Active },
                 SortDirection = { BindTarget = SortDirection }
@@ -67,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             private readonly SpriteIcon icon;
 
-            public BeatmapTabButton(DirectSortCriteria value)
+            public BeatmapTabButton(SortCriteria value)
                 : base(value)
             {
                 Add(icon = new SpriteIcon

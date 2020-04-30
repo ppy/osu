@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -14,6 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    [Cached]
     public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<Stage> stages = new List<Stage>();
@@ -71,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 foreach (var column in stage.Columns)
                 {
-                    if (column.ReceivePositionalInputAt(screenSpacePosition))
+                    if (column.ReceivePositionalInputAt(new Vector2(screenSpacePosition.X, column.ScreenSpaceDrawQuad.Centre.Y)))
                     {
                         found = column;
                         break;
@@ -83,6 +85,31 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return found;
+        }
+
+        /// <summary>
+        /// Retrieves a <see cref="Column"/> by index.
+        /// </summary>
+        /// <param name="index">The index of the column.</param>
+        /// <returns>The <see cref="Column"/> corresponding to the given index.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is less than 0 or greater than <see cref="TotalColumns"/>.</exception>
+        public Column GetColumn(int index)
+        {
+            if (index < 0 || index > TotalColumns - 1)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            foreach (var stage in stages)
+            {
+                if (index >= stage.Columns.Count)
+                {
+                    index -= stage.Columns.Count;
+                    continue;
+                }
+
+                return stage.Columns[index];
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(index));
         }
 
         /// <summary>
