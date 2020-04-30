@@ -63,6 +63,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         }
 
         [Test]
+        public void TestInitialState()
+        {
+            AddStep("create mascot", () => SetContents(() => new DrawableTaikoMascot()));
+
+            AddAssert("mascot initially idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
+        }
+
+        [Test]
         public void TestClearStateTransition()
         {
             AddStep("set beatmap", () => setBeatmap());
