@@ -131,6 +131,7 @@ namespace osu.Game.Screens.Mvis
         public Task UpdateStoryBoardAsync() => LoadSBAsyncTask = Task.Run(async () =>
         {
             UpdateComponent();
+            UpdateVisuals();
 
             LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"..."));
             await LogTask;
