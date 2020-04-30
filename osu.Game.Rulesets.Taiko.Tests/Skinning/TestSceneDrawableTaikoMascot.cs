@@ -201,13 +201,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private void applyNewResult(JudgementResult judgementResult)
         {
+            scoreProcessor.ApplyResult(judgementResult);
+
             foreach (var playfield in playfields)
             {
                 var hit = new DrawableTestHit(new Hit(), judgementResult.Type);
                 Add(hit);
 
                 playfield.OnNewResult(hit, judgementResult);
-                scoreProcessor.ApplyResult(judgementResult);
             }
         }
 

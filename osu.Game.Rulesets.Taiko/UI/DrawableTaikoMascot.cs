@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
         private TaikoMascotAnimation currentAnimation;
 
-        private bool lastHitMissed;
+        private bool lastObjectHit;
         private bool kiaiMode;
 
         public DrawableTaikoMascot(TaikoMascotAnimationState startingState = TaikoMascotAnimationState.Idle)
@@ -56,7 +56,18 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void OnNewResult(JudgementResult result)
         {
-            lastHitMissed = result.Type == HitResult.Miss && result.Judgement.AffectsCombo;
+            // TODO: missing support for clear/fail state transition at end of beatmap gameplay
+
+            if (triggerComboClear(result) || triggerSwellClear(result))
+            {
+                state.Value = TaikoMascotAnimationState.Clear;
+                return;
+            }
+
+            if (!result.Judgement.AffectsCombo)
+                return;
+
+            lastObjectHit = result.IsHit;
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
@@ -77,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (currentAnimation != null && !currentAnimation.Completed)
                 return state.Value;
 
-            if (lastHitMissed)
+            if (!lastObjectHit)
                 return TaikoMascotAnimationState.Fail;
 
             return kiaiMode ? TaikoMascotAnimationState.Kiai : TaikoMascotAnimationState.Idle;
@@ -89,5 +100,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             currentAnimation = animations[state.NewValue];
             currentAnimation.Show();
         }
+
+        private bool triggerComboClear(JudgementResult judgementResult)
+            => (judgementResult.ComboAtJudgement + 1) % 50 == 0 && judgementResult.Judgement.AffectsCombo && judgementResult.IsHit;
+
+        private bool triggerSwellClear(JudgementResult judgementResult)
+            => judgementResult.Judgement is TaikoSwellJudgement && judgementResult.IsHit;
     }
 }
