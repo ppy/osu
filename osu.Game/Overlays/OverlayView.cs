@@ -65,8 +65,6 @@ namespace osu.Game.Overlays
                 spinner = new LoadingSpinner
                 {
                     Alpha = 0,
-                    Size = new osuTK.Vector2(40),
-                    Margin = new MarginPadding { Top = 25 }
                 }
             };
         }
@@ -96,7 +94,7 @@ namespace osu.Game.Overlays
             request?.Cancel();
 
             request = CreateRequest();
-            request.Success += onSuccess;
+            request.Success += response => Schedule(() => OnSuccess(response));
 
             API.Queue(request);
         }
@@ -126,11 +124,6 @@ namespace osu.Game.Overlays
                     currentPlaceholder.FadeOut(transform_time / 2, Easing.OutQuint);
                     break;
             }
-        }
-
-        private void onSuccess(T content)
-        {
-            Schedule(() => OnSuccess(content));
         }
 
         protected override void Dispose(bool isDisposing)

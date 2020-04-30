@@ -57,7 +57,6 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOnlineStatus()
         {
-            AddStep("setup API request handler", () => ((DummyAPIAccess)API).HandleRequest = req => req.TriggerSuccess());
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
             AddUntilStep("placeholder is hidden", () => !view.InternalContents.OfType<LoginPlaceholder>().First().IsPresent);
             AddUntilStep("spinner is hidden", () => !view.InternalContents.OfType<LoadingSpinner>().First().IsPresent);
@@ -66,8 +65,6 @@ namespace osu.Game.Tests.Visual.Online
         private class TestOverlayView : OverlayView<DummyData>
         {
             public IEnumerable<Drawable> InternalContents => InternalChildren;
-
-            public new void PerformFetch() => base.PerformFetch();
 
             public TestOverlayView()
             {
