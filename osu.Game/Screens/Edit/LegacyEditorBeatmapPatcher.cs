@@ -84,7 +84,11 @@ namespace osu.Game.Screens.Edit
         {
             using (var stream = new MemoryStream(state))
             using (var reader = new LineBufferedReader(stream, true))
-                return new PassThroughWorkingBeatmap(Decoder.GetDecoder<Beatmap>(reader).Decode(reader)).GetPlayableBeatmap(editorBeatmap.BeatmapInfo.Ruleset);
+            {
+                var decoded = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+                decoded.BeatmapInfo.Ruleset = editorBeatmap.BeatmapInfo.Ruleset;
+                return new PassThroughWorkingBeatmap(decoded).GetPlayableBeatmap(editorBeatmap.BeatmapInfo.Ruleset);
+            }
         }
 
         private class PassThroughWorkingBeatmap : WorkingBeatmap
