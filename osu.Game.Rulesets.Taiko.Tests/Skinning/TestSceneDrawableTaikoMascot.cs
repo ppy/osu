@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
@@ -38,8 +40,16 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             TimeRange = { Value = 5000 },
         };
 
+        private TaikoScoreProcessor scoreProcessor;
+
         private IEnumerable<DrawableTaikoMascot> mascots => this.ChildrenOfType<DrawableTaikoMascot>();
         private IEnumerable<TaikoPlayfield> playfields => this.ChildrenOfType<TaikoPlayfield>();
+
+        [SetUp]
+        public void SetUp()
+        {
+            scoreProcessor = new TaikoScoreProcessor();
+        }
 
         [Test]
         public void TestStateAnimations()
@@ -78,51 +88,63 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         }
 
         [Test]
-        public void TestPlayfield()
+        public void TestIdleState()
         {
             AddStep("set beatmap", () => setBeatmap());
 
-            AddStep("create drawable ruleset", () =>
-            {
-                SetContents(() =>
-                {
-                    var ruleset = new TaikoRuleset();
-                    return new DrawableTaikoRuleset(ruleset, Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
-                });
-            });
+            createDrawableRuleset();
 
-            AddStep("miss result for normal hit", () => addJudgement(HitResult.Miss, new TaikoJudgement()));
-            AddUntilStep("state is fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
-
-            AddStep("great result for normal hit", () => addJudgement(HitResult.Great, new TaikoJudgement()));
-            AddUntilStep("state is idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
-
-            AddStep("miss result for strong hit", () => addJudgement(HitResult.Miss, new TaikoStrongJudgement()));
-            AddAssert("state remains idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new StrongHitObject(), new TaikoStrongJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Idle);
         }
 
         [Test]
-        public void TestKiai()
+        public void TestKiaiState()
         {
             AddStep("set beatmap", () => setBeatmap(true));
 
-            AddUntilStep("wait for beatmap to be loaded", () => Beatmap.Value.Track.IsLoaded);
+            createDrawableRuleset();
 
-            AddStep("create drawable ruleset", () =>
-            {
-                Beatmap.Value.Track.Start();
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Kiai);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoStrongJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Kiai);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
+        }
 
-                SetContents(() =>
-                {
-                    var ruleset = new TaikoRuleset();
-                    return new DrawableTaikoRuleset(ruleset, Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
-                });
-            });
+        [Test]
+        public void TestMissState()
+        {
+            AddStep("set beatmap", () => setBeatmap());
 
-            AddUntilStep("state is fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
+            createDrawableRuleset();
 
-            AddStep("great result for normal hit", () => addJudgement(HitResult.Great, new TaikoJudgement()));
-            AddUntilStep("state is kiai", () => allMascotsIn(TaikoMascotAnimationState.Kiai));
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
+            assertStateAfterResult(new JudgementResult(new DrumRoll(), new TaikoDrumRollJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Fail);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Idle);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestClearStateOnComboMilestone(bool kiai)
+        {
+            AddStep("set beatmap", () => setBeatmap(kiai));
+
+            createDrawableRuleset();
+
+            AddRepeatStep("reach 49 combo", () => applyNewResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }), 49);
+
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Clear);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestClearStateOnClearedSwell(bool kiai)
+        {
+            AddStep("set beatmap", () => setBeatmap(kiai));
+
+            createDrawableRuleset();
+
+            assertStateAfterResult(new JudgementResult(new Swell(), new TaikoSwellJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Clear);
         }
 
         private void setBeatmap(bool kiai = false)
@@ -141,24 +163,51 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     BaseDifficulty = new BeatmapDifficulty(),
                     Metadata = new BeatmapMetadata
                     {
-                        Artist = @"Unknown",
-                        Title = @"Sample Beatmap",
-                        AuthorString = @"Craftplacer",
+                        Artist = "Unknown",
+                        Title = "Sample Beatmap",
+                        AuthorString = "Craftplacer",
                     },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },
                 ControlPointInfo = controlPointInfo
             });
+
+            scoreProcessor.ApplyBeatmap(Beatmap.Value.Beatmap);
         }
 
-        private void addJudgement(HitResult result, Judgement judgement)
+        private void createDrawableRuleset()
+        {
+            AddUntilStep("wait for beatmap to be loaded", () => Beatmap.Value.Track.IsLoaded);
+
+            AddStep("create drawable ruleset", () =>
+            {
+                Beatmap.Value.Track.Start();
+
+                SetContents(() =>
+                {
+                    var ruleset = new TaikoRuleset();
+                    return new DrawableTaikoRuleset(ruleset, Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
+                });
+            });
+        }
+
+        private void assertStateAfterResult(JudgementResult judgementResult, TaikoMascotAnimationState expectedState)
+        {
+            AddStep($"{judgementResult.Type.ToString().ToLower()} result for {judgementResult.Judgement.GetType().Name.Humanize(LetterCasing.LowerCase)}",
+                () => applyNewResult(judgementResult));
+
+            AddAssert($"state is {expectedState.ToString().ToLower()}", () => allMascotsIn(expectedState));
+        }
+
+        private void applyNewResult(JudgementResult judgementResult)
         {
             foreach (var playfield in playfields)
             {
-                var hit = new DrawableTestHit(new Hit(), result);
+                var hit = new DrawableTestHit(new Hit(), judgementResult.Type);
                 Add(hit);
 
-                playfield.OnNewResult(hit, new JudgementResult(hit.HitObject, judgement) { Type = result });
+                playfield.OnNewResult(hit, judgementResult);
+                scoreProcessor.ApplyResult(judgementResult);
             }
         }
 
