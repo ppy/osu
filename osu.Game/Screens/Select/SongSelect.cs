@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
-        private DifficultyRecommender recommender;
+        private readonly DifficultyRecommender recommender = new DifficultyRecommender();
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
-                GetRecommendedBeatmap = (recommender = new DifficultyRecommender()).GetRecommendedBeatmap,
+                GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
             }, c => carouselContainer.Child = c);
 
             AddRangeInternal(new Drawable[]
