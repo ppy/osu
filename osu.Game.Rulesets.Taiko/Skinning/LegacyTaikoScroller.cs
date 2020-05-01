@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {
@@ -15,6 +16,23 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         public LegacyTaikoScroller()
         {
             RelativeSizeAxes = Axes.Both;
+        }
+
+        private bool passing = true;
+
+        public bool Passing
+        {
+            get => passing;
+            set
+            {
+                if (value == passing)
+                    return;
+
+                passing = value;
+
+                foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
+                    sprite.Passing = passing;
+            }
         }
 
         protected override void Update()
