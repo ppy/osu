@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Menu
 
             if (!MenuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
+                var sets = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
                 if (sets.Count > 0)
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
             }
@@ -95,8 +95,6 @@ namespace osu.Game.Screens.Menu
             introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
             Track = introBeatmap.Track;
         }
-
-        public override bool OnExiting(IScreen next) => !DidLoadMenu;
 
         public override void OnResuming(IScreen last)
         {

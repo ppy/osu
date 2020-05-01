@@ -924,10 +924,7 @@ namespace osu.Game
             if (ScreenStack.CurrentScreen is Loader)
                 return false;
 
-            if (introScreen == null)
-                return true;
-
-            if (!introScreen.DidLoadMenu || !(ScreenStack.CurrentScreen is IntroScreen))
+            if (introScreen.DidLoadMenu && !(ScreenStack.CurrentScreen is IntroScreen))
             {
                 Scheduler.Add(introScreen.MakeCurrent);
                 return true;
