@@ -50,13 +50,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             InternalChildren = new[]
             {
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoScroller), _ => Drawable.Empty())
-                {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.TopLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 100,
-                },
                 new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
                 rightArea = new Container
                 {
