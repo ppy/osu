@@ -797,6 +797,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("create song select", () => LoadScreen(songSelect = new TestSongSelect()));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
+            AddUntilStep("wait for carousel loaded", () => songSelect.Carousel.IsAlive);
         }
 
         private void addManyTestMaps()

@@ -68,7 +68,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Blending = BlendingParameters.Additive,
                                 },
                                 HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
                                 {
@@ -100,13 +99,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Name = "Kiai hit explosions",
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    Blending = BlendingParameters.Additive
                                 },
                                 judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
                                 {
                                     Name = "Judgements",
                                     RelativeSizeAxes = Axes.Y,
-                                    Blending = BlendingParameters.Additive
                                 },
                             }
                         },
@@ -185,7 +182,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     var drawableTick = (DrawableDrumRollTick)judgedObject;
 
                     addDrumRollHit(drawableTick);
-                    addExplosion(drawableTick, drawableTick.JudgementType);
                     break;
 
                 default:
@@ -200,7 +196,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (!result.IsHit)
                         break;
 
-                    addExplosion(judgedObject, (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre);
+                    var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
+
+                    addExplosion(judgedObject, type);
                     break;
             }
         }
@@ -210,7 +208,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void addExplosion(DrawableHitObject drawableObject, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject, type));
+            hitExplosionContainer.Add(new HitExplosion(drawableObject));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
