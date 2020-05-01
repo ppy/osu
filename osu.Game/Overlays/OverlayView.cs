@@ -27,15 +27,15 @@ namespace osu.Game.Overlays
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        private LoadingSpinner spinner { get; }
-
-        private const double transform_time = 600;
-
         protected override Container<Drawable> Content { get; } = new Container
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
         };
+
+        private const double transform_time = 600;
+
+        private readonly LoadingSpinner spinner;
 
         private readonly Placeholder currentPlaceholder;
 
