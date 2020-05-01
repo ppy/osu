@@ -587,8 +587,7 @@ namespace osu.Game.Screens
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
 
-            bgSB.CancelUpdateComponent();
-            this.Delay(20).Schedule( () => bgSB.UpdateStoryBoardAsync() );
+            bgSB.UpdateStoryBoardAsync();
         }
     }
 }

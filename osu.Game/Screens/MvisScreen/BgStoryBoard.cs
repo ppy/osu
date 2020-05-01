@@ -22,8 +22,21 @@ namespace osu.Game.Screens.Mvis
         private Bindable<bool> EnableSB = new Bindable<bool>();
         public readonly Bindable<bool> IsReady = new Bindable<bool>();
         public readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
+
+        /// <summary>
+        /// This will log which beatmap's storyboard we are loading
+        /// </summary>
         private Task LogTask;
+
+        /// <summary>
+        /// This will invoke LoadSBTask and run asyncly
+        /// </summary>
         private Task LoadSBAsyncTask;
+
+        /// <summary>
+        /// This will be invoked by LoadSBAsyncTask and loads the current beatmap's storyboard
+        /// </summary>
+        private Task LoadSBTask;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -67,24 +80,14 @@ namespace osu.Game.Screens.Mvis
             }
         }
 
-        public void CancelUpdateComponent()
-        {
-            ChangeSB?.Cancel();
-            ChangeSB = new CancellationTokenSource();
-
-            if ( LoadSBAsyncTask?.IsCompleted != true || LogTask?.IsCompleted != true )
-            {
-                LoadSBAsyncTask = null;
-                LogTask = null;
-            }
-        }
-
         public bool UpdateComponent()
         {
             if ( b == null )
                 return false;
 
             IsReady.Value = false;
+
+            Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
 
             sbClock?.FadeOut(DURATION, Easing.OutQuint);
             sbClock?.Expire();
@@ -95,7 +98,7 @@ namespace osu.Game.Screens.Mvis
 
             try
             {
-                LoadComponentAsync(new ClockContainer(b.Value, 0)
+                LoadSBTask = LoadComponentAsync(new ClockContainer(b.Value, 0)
                 {
                     Name = "ClockContainer",
                     Alpha = 0,
@@ -128,13 +131,33 @@ namespace osu.Game.Screens.Mvis
             return true;
         }
 
-        public Task UpdateStoryBoardAsync() => LoadSBAsyncTask = Task.Run(async () =>
+        private void DoNothing()
         {
-            UpdateComponent();
-            UpdateVisuals();
+        }
 
-            LogTask = Task.Run( () => Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"..."));
-            await LogTask;
-        });
+        public void UpdateStoryBoardAsync()
+        {
+            Schedule(() =>
+            {
+                ChangeSB?.Cancel();
+                ChangeSB = new CancellationTokenSource();
+
+                if ( LoadSBAsyncTask != null || LogTask != null || LoadSBTask != null )
+                {
+                    LoadSBTask = null;
+                    LoadSBAsyncTask = null;
+                    LogTask = null;
+                }
+
+                LoadSBAsyncTask = Task.Run( async () =>
+                {
+                    UpdateComponent();
+                    UpdateVisuals();
+
+                    LogTask = Task.Run( () => DoNothing() );
+                    await LogTask;
+                });
+            });
+        }
     }
 }
