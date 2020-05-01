@@ -3,9 +3,11 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -18,22 +20,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        private bool passing = true;
-
-        public bool Passing
+        [BackgroundDependencyLoader(true)]
+        private void load(GameplayBeatmap gameplayBeatmap)
         {
-            get => passing;
-            set
-            {
-                if (value == passing)
-                    return;
-
-                passing = value;
-
-                foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
-                    sprite.Passing = passing;
-            }
+            if (gameplayBeatmap != null)
+                ((IBindable<bool>)Passing).BindTo(gameplayBeatmap.Passing);
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Passing.BindValueChanged(passing =>
+            {
+                foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
+                    sprite.Passing = passing.NewValue;
+            }, true);
+        }
+
+        public Bindable<bool> Passing = new BindableBool(true);
 
         protected override void Update()
         {
