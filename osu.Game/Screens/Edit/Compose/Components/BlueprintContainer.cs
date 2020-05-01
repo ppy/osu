@@ -401,12 +401,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             HitObject draggedObject = movementBlueprint.HitObject;
 
-            // The final movement position, relative to screenSpaceMovementStartPosition
+            // The final movement position, relative to movementBlueprintOriginalPosition.
             Vector2 movePosition = movementBlueprintOriginalPosition.Value + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
 
+            // Retrieve a snapped position.
             (Vector2 snappedPosition, double snappedTime) = snapProvider.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
-            // Move the hitobjects
+            // Move the hitobjects.
             if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, ToScreenSpace(snappedPosition))))
                 return true;
 
