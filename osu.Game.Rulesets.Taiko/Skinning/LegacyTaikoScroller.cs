@@ -79,13 +79,24 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             [BackgroundDependencyLoader]
             private void load(ISkinSource skin)
             {
-                AutoSizeAxes = Axes.Both;
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+
+                FillMode = FillMode.Fit;
 
                 InternalChildren = new Drawable[]
                 {
                     passingSprite = new Sprite { Texture = skin.GetTexture("taiko-slider") },
                     failingSprite = new Sprite { Texture = skin.GetTexture("taiko-slider-fail"), Alpha = 0 },
                 };
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                foreach (var c in InternalChildren)
+                    c.Scale = new Vector2(DrawHeight / c.Height);
             }
         }
     }
