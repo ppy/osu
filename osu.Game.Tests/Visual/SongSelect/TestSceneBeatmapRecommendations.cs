@@ -141,6 +141,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             presentAndConfirm(() => mixedSet, 2);
         }
 
+        [Test]
+        public void TestCorrectStarRatingIsUsed()
+        {
+            BeatmapSetInfo osuSet = null, maniaSet = null;
+
+            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(0, new[] { new OsuRuleset().RulesetInfo }));
+            AddStep("create mania beatmapset", () => maniaSet = importBeatmapSet(1, Enumerable.Repeat(new ManiaRuleset().RulesetInfo, 10)));
+
+            AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { osuSet, maniaSet }));
+
+            // Make sure we are on standard ruleset
+            presentAndConfirm(() => osuSet, 1);
+
+            // Present mania set, expect the difficulty that matches recommended mania star rating
+            presentAndConfirm(() => maniaSet, 5);
+        }
+
         private BeatmapSetInfo importBeatmapSet(int importID, IEnumerable<RulesetInfo> difficultyRulesets)
         {
             var metadata = new BeatmapMetadata
@@ -161,7 +178,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty(),
                     Ruleset = ruleset,
-                    StarDifficulty = difficultyIndex + 1
+                    StarDifficulty = difficultyIndex + 1,
+                    Version = $"SR{difficultyIndex + 1}"
                 }).ToList()
             };
 
