@@ -67,16 +67,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                 switch (rulesetID)
                 {
                     case 0:
-                        return 336;
+                        return 336; // recommended star rating of 2
 
                     case 1:
-                        return 928;
+                        return 928; // SR 3
 
                     case 2:
-                        return 1905;
+                        return 1905; // SR 4
 
                     case 3:
-                        return 3329;
+                        return 3329; // SR 5
 
                     default:
                         return 0;
