@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play
         private readonly ScoreProcessor scoreProcessor;
         private readonly double gameplayStartTime;
 
-        private readonly PeriodTracker tracker = new PeriodTracker();
+        private PeriodTracker breaks;
 
         /// <summary>
         /// Whether the gameplay is currently in a break.
@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Play
             {
                 isBreakTime.Value = false;
 
-                tracker.Periods = value?.Where(b => b.HasEffect)
-                                       .Select(b => new Period(b.StartTime, b.EndTime - BreakOverlay.BREAK_FADE_DURATION));
+                breaks = new PeriodTracker(value.Where(b => b.HasEffect)
+                                                .Select(b => new Period(b.StartTime, b.EndTime - BreakOverlay.BREAK_FADE_DURATION)));
             }
         }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
 
             var time = Clock.CurrentTime;
 
-            isBreakTime.Value = tracker.IsInAny(time)
+            isBreakTime.Value = breaks?.IsInAny(time) == true
                                 || time < gameplayStartTime
                                 || scoreProcessor?.HasCompleted.Value == true;
         }

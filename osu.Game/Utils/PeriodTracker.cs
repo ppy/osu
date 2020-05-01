@@ -8,41 +8,22 @@ using System.Linq;
 namespace osu.Game.Utils
 {
     /// <summary>
-    /// Represents a tracking component used for whether a
-    /// specific time falls into any of the provided periods.
+    /// Represents a tracking component used for whether a specific time instant falls into any of the provided periods.
     /// </summary>
     public class PeriodTracker
     {
-        private readonly List<Period> periods = new List<Period>();
+        private readonly List<Period> periods;
         private int nearestIndex;
 
-        /// <summary>
-        /// The list of periods to add to the tracker for using the required check methods.
-        /// </summary>
-        public IEnumerable<Period> Periods
+        public PeriodTracker(IEnumerable<Period> periods)
         {
-            set
-            {
-                var sortedValue = value?.ToList();
-                sortedValue?.Sort();
-
-                if (sortedValue != null && periods.SequenceEqual(sortedValue))
-                    return;
-
-                periods.Clear();
-                nearestIndex = 0;
-
-                if (value?.Any() != true)
-                    return;
-
-                periods.AddRange(sortedValue);
-            }
+            this.periods = periods.OrderBy(period => period.Start).ToList();
         }
 
         /// <summary>
         /// Whether the provided time is in any of the added periods.
         /// </summary>
-        /// <param name="time">The time value to check for.</param>
+        /// <param name="time">The time value to check.</param>
         public bool IsInAny(double time)
         {
             if (periods.Count == 0)
@@ -64,7 +45,7 @@ namespace osu.Game.Utils
         }
     }
 
-    public readonly struct Period : IComparable<Period>
+    public readonly struct Period
     {
         /// <summary>
         /// The start time of this period.
@@ -79,12 +60,10 @@ namespace osu.Game.Utils
         public Period(double start, double end)
         {
             if (start >= end)
-                throw new ArgumentException($"Invalid period provided, {nameof(start)} must be less than {nameof(end)}", nameof(start));
+                throw new ArgumentException($"Invalid period provided, {nameof(start)} must be less than {nameof(end)}");
 
             Start = start;
             End = end;
         }
-
-        public int CompareTo(Period other) => Start.CompareTo(other.Start);
     }
 }
