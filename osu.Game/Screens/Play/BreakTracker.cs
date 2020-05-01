@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
 
             isBreakTime.Value = getCurrentBreak()?.HasEffect == true
                                 || Clock.CurrentTime < gameplayStartTime
-                                || scoreProcessor?.HasCompleted == true;
+                                || scoreProcessor?.HasCompleted.Value == true;
         }
 
         private BreakPeriod getCurrentBreak()
