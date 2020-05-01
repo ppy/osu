@@ -12,10 +12,9 @@ namespace osu.Game.Tests.NonVisual
     [TestFixture]
     public class PeriodTrackerTest
     {
-        private static readonly Period[] test_single_period = { new Period(1.0, 2.0) };
+        private static readonly Period[] single_period = { new Period(1.0, 2.0) };
 
-        // this is intended to be unordered to test adding periods in unordered way.
-        private static readonly Period[] test_periods =
+        private static readonly Period[] unordered_periods =
         {
             new Period(-9.1, -8.3),
             new Period(-3.4, 2.1),
@@ -26,43 +25,40 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestCheckValueInsideSinglePeriod()
         {
-            var tracker = new PeriodTracker { Periods = test_single_period };
+            var tracker = new PeriodTracker(single_period);
 
-            var period = test_single_period.Single();
+            var period = single_period.Single();
             Assert.IsTrue(tracker.IsInAny(period.Start));
-            Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
+            Assert.IsTrue(tracker.IsInAny(getMidpoint(period)));
             Assert.IsTrue(tracker.IsInAny(period.End));
         }
 
         [Test]
         public void TestCheckValuesInsidePeriods()
         {
-            var tracker = new PeriodTracker { Periods = test_periods };
+            var tracker = new PeriodTracker(unordered_periods);
 
-            foreach (var period in test_periods)
-                Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
+            foreach (var period in unordered_periods)
+                Assert.IsTrue(tracker.IsInAny(getMidpoint(period)));
         }
 
         [Test]
         public void TestCheckValuesInRandomOrder()
         {
-            var tracker = new PeriodTracker { Periods = test_periods };
+            var tracker = new PeriodTracker(unordered_periods);
 
-            foreach (var period in test_periods.OrderBy(_ => RNG.Next()))
-                Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
+            foreach (var period in unordered_periods.OrderBy(_ => RNG.Next()))
+                Assert.IsTrue(tracker.IsInAny(getMidpoint(period)));
         }
 
         [Test]
         public void TestCheckValuesOutOfPeriods()
         {
-            var tracker = new PeriodTracker
+            var tracker = new PeriodTracker(new[]
             {
-                Periods = new[]
-                {
-                    new Period(1.0, 2.0),
-                    new Period(3.0, 4.0)
-                }
-            };
+                new Period(1.0, 2.0),
+                new Period(3.0, 4.0)
+            });
 
             Assert.IsFalse(tracker.IsInAny(0.9), "Time before first period is being considered inside");
 
@@ -73,31 +69,17 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
-        public void TestNullRemovesExistingPeriods()
-        {
-            var tracker = new PeriodTracker { Periods = test_single_period };
-
-            var period = test_single_period.Single();
-            Assert.IsTrue(tracker.IsInAny(getMidTime(period)));
-
-            tracker.Periods = null;
-            Assert.IsFalse(tracker.IsInAny(getMidTime(period)));
-        }
-
-        [Test]
         public void TestReversedPeriodHandling()
         {
-            var tracker = new PeriodTracker();
-
             Assert.Throws<ArgumentException>(() =>
             {
-                tracker.Periods = new[]
+                _ = new PeriodTracker(new[]
                 {
                     new Period(2.0, 1.0)
-                };
+                });
             });
         }
 
-        private double getMidTime(Period period) => period.Start + (period.End - period.Start) / 2;
+        private double getMidpoint(Period period) => period.Start + (period.End - period.Start) / 2;
     }
 }
