@@ -68,7 +68,8 @@ namespace osu.Game.Screens.Select
 
         private void calculateRecommendedDifficulties()
         {
-            rulesets.AvailableRulesets.ForEach(rulesetInfo =>
+            // only query API for built-in rulesets
+            rulesets.AvailableRulesets.Where(ruleset => ruleset.ID <= 3).ForEach(rulesetInfo =>
             {
                 var req = new GetUserRequest(api.LocalUser.Value.Id, rulesetInfo);
 
