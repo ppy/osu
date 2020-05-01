@@ -576,3 +576,14 @@
     *   [m] [Change taiko hit explosion animation to match stable for skins #8896]
     *   [m] [Further improve beatmap carousel load performance by avoiding incorrect query construction #8895]
     *   [m] [Reduce initial channel load overhead by only loading history on active channel #8893]
+
+### 2020/5/1
+*   合并上游pr
+    *   [m] [Move taiko additive blending locally to avoid applying to legacy skins #8901]
+    *   [m] [Allow closing the game during intro #8905]
+    *   [m] [Add kiai support to osu!taiko skinned playfields #8910]
+    *   [m] [Fix skinned taiko hit explosions not being removed on rewind #8909]
+    *   [m] [Fix mania crashing on undo/redo #8913]
+    *   [m] [Show loading spinner when carousel is not ready to be displayed #8903]
+    *   [m] [Fix undo/redo behaving poorly with simultaneous objects #8914]
+    *   [m] [Use DisplayModes rather than AvailableResolutions #8623]

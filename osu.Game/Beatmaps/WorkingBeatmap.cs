@@ -197,7 +197,7 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
         public IBeatmap Beatmap
         {
@@ -233,7 +233,7 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
-        public bool TrackLoaded => track.IsResultAvailable;
+        public virtual bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value;
         protected abstract Track GetTrack();
         private RecyclableLazy<Track> track;
