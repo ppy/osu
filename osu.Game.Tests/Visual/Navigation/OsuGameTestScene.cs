@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public virtual void SetUpSteps()
         {
             AddStep("Create new game instance", () =>
             {

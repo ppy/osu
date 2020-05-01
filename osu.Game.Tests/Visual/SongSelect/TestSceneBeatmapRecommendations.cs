@@ -11,23 +11,25 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Visual.Navigation;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    [HeadlessTest]
     public class TestSceneBeatmapRecommendations : OsuGameTestScene
     {
+        protected override bool UseOnlineAPI => false;
+
         [Resolved]
         private DifficultyRecommender recommender { get; set; }
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
         [SetUpSteps]
-        public new void SetUpSteps()
+        public override void SetUpSteps()
         {
             AddStep("register request handling", () =>
             {
@@ -41,6 +43,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 };
             });
+
+            base.SetUpSteps();
 
             // Force recommender to calculate its star ratings again
             AddStep("calculate recommended SRs", () => recommender.APIStateChanged(API, APIState.Online));
@@ -83,96 +87,88 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestPresentedBeatmapIsRecommended()
         {
-            var importFunctions = new List<Func<BeatmapSetInfo>>();
+            List<BeatmapSetInfo> beatmapSets = null;
+            const int import_count = 5;
 
-            for (int i = 0; i < 5; i++)
+            AddStep("import 5 maps", () =>
             {
-                importFunctions.Add(importBeatmap(i, Enumerable.Repeat(rulesets.GetRuleset(0), 5)));
-            }
+                beatmapSets = new List<BeatmapSetInfo>();
 
-            for (int i = 0; i < 5; i++)
-            {
-                presentAndConfirm(importFunctions[i], 2);
-            }
+                for (int i = 0; i < import_count; ++i)
+                {
+                    beatmapSets.Add(importBeatmapSet(i, Enumerable.Repeat(new OsuRuleset().RulesetInfo, 5)));
+                }
+            });
+
+            AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(beatmapSets));
+
+            presentAndConfirm(() => beatmapSets[3], 2);
         }
 
         [Test]
         public void TestBestRulesetIsRecommended()
         {
-            var osuRuleset = rulesets.GetRuleset(0);
-            var taikoRuleset = rulesets.GetRuleset(1);
-            var catchRuleset = rulesets.GetRuleset(2);
-            var maniaRuleset = rulesets.GetRuleset(3);
+            BeatmapSetInfo osuSet = null, mixedSet = null;
 
-            var osuImport = importBeatmap(0, new List<RulesetInfo> { osuRuleset });
-            var mixedImport = importBeatmap(1, new List<RulesetInfo> { taikoRuleset, catchRuleset, maniaRuleset });
+            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(0, new[] { new OsuRuleset().RulesetInfo }));
+            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(1,
+                new[] { new TaikoRuleset().RulesetInfo, new CatchRuleset().RulesetInfo, new ManiaRuleset().RulesetInfo }));
+
+            AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { osuSet, mixedSet }));
 
             // Make sure we are on standard ruleset
-            presentAndConfirm(osuImport, 1);
+            presentAndConfirm(() => osuSet, 1);
 
             // Present mixed difficulty set, expect ruleset with highest star difficulty
-            presentAndConfirm(mixedImport, 3);
+            presentAndConfirm(() => mixedSet, 3);
         }
 
         [Test]
         public void TestSecondBestRulesetIsRecommended()
         {
-            var osuRuleset = rulesets.GetRuleset(0);
-            var taikoRuleset = rulesets.GetRuleset(1);
-            var catchRuleset = rulesets.GetRuleset(2);
+            BeatmapSetInfo osuSet = null, mixedSet = null;
 
-            var osuImport = importBeatmap(0, new List<RulesetInfo> { osuRuleset });
-            var mixedImport = importBeatmap(1, new List<RulesetInfo> { taikoRuleset, catchRuleset, taikoRuleset });
+            AddStep("create osu! beatmapset", () => osuSet = importBeatmapSet(0, new[] { new OsuRuleset().RulesetInfo }));
+            AddStep("create mixed beatmapset", () => mixedSet = importBeatmapSet(1,
+                new[] { new TaikoRuleset().RulesetInfo, new CatchRuleset().RulesetInfo, new TaikoRuleset().RulesetInfo }));
+
+            AddAssert("all sets imported", () => ensureAllBeatmapSetsImported(new[] { osuSet, mixedSet }));
 
             // Make sure we are on standard ruleset
-            presentAndConfirm(osuImport, 1);
+            presentAndConfirm(() => osuSet, 1);
 
             // Present mixed difficulty set, expect ruleset with second highest star difficulty
-            presentAndConfirm(mixedImport, 2);
+            presentAndConfirm(() => mixedSet, 2);
         }
 
-        private Func<BeatmapSetInfo> importBeatmap(int importID, IEnumerable<RulesetInfo> rulesetEnumerable)
+        private BeatmapSetInfo importBeatmapSet(int importID, IEnumerable<RulesetInfo> difficultyRulesets)
         {
-            BeatmapSetInfo imported = null;
-            AddStep($"import beatmap {importID}", () =>
+            var metadata = new BeatmapMetadata
             {
-                var difficulty = new BeatmapDifficulty();
-                var metadata = new BeatmapMetadata
-                {
-                    Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
-                    Title = $"import {importID}"
-                };
+                Artist = "SomeArtist",
+                AuthorString = "SomeAuthor",
+                Title = $"import {importID}"
+            };
 
-                var beatmaps = new List<BeatmapInfo>();
-                int difficultyID = 1;
-
-                foreach (RulesetInfo r in rulesetEnumerable)
+            var beatmapSet = new BeatmapSetInfo
+            {
+                Hash = Guid.NewGuid().ToString(),
+                OnlineBeatmapSetID = importID,
+                Metadata = metadata,
+                Beatmaps = difficultyRulesets.Select((ruleset, difficultyIndex) => new BeatmapInfo
                 {
-                    beatmaps.Add(new BeatmapInfo
-                    {
-                        OnlineBeatmapID = importID + 1024 * difficultyID,
-                        Metadata = metadata,
-                        BaseDifficulty = difficulty,
-                        Ruleset = r ?? rulesets.AvailableRulesets.First(),
-                        StarDifficulty = difficultyID,
-                    });
-                    difficultyID++;
-                }
-
-                imported = Game.BeatmapManager.Import(new BeatmapSetInfo
-                {
-                    Hash = Guid.NewGuid().ToString(),
-                    OnlineBeatmapSetID = importID,
+                    OnlineBeatmapID = importID * 1024 + difficultyIndex,
                     Metadata = metadata,
-                    Beatmaps = beatmaps,
-                }).Result;
-            });
+                    BaseDifficulty = new BeatmapDifficulty(),
+                    Ruleset = ruleset,
+                    StarDifficulty = difficultyIndex + 1
+                }).ToList()
+            };
 
-            AddAssert($"import {importID} succeeded", () => imported != null);
-
-            return () => imported;
+            return Game.BeatmapManager.Import(beatmapSet).Result;
         }
+
+        private bool ensureAllBeatmapSetsImported(IEnumerable<BeatmapSetInfo> beatmapSets) => beatmapSets.All(set => set != null);
 
         private void presentAndConfirm(Func<BeatmapSetInfo> getImport, int expectedDiff)
         {
