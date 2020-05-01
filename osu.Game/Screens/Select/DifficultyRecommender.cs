@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
 
             foreach (var r in getBestRulesetOrder())
             {
-                recommendedStarDifficulty.TryGetValue(ruleset.Value, out var stars);
+                recommendedStarDifficulty.TryGetValue(r, out var stars);
 
                 beatmap = beatmaps.Where(b => b.Ruleset.Equals(r)).OrderBy(b =>
                 {
