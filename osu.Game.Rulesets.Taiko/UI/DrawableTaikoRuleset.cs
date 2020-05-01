@@ -49,10 +49,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (h)
             {
                 case Hit hit:
-                    if (hit.Type == HitType.Centre)
-                        return new DrawableCentreHit(hit);
-                    else
-                        return new DrawableRimHit(hit);
+                    return new DrawableHit(hit);
 
                 case DrumRoll drumRoll:
                     return new DrawableDrumRoll(drumRoll);
