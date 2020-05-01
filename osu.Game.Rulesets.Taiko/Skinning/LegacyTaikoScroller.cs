@@ -21,19 +21,28 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         {
             base.Update();
 
-            foreach (var sprite in InternalChildren)
+            while (true)
             {
-                sprite.X -= (float)Time.Elapsed * 0.1f;
+                float? additiveX = null;
 
-                if (sprite.X + sprite.DrawWidth < 0)
-                    sprite.Expire();
-            }
+                foreach (var sprite in InternalChildren)
+                {
+                    // add the x coordinates and perform re-layout on all sprites as spacing may change with gameplay scale.
+                    sprite.X = additiveX ??= sprite.X - (float)Time.Elapsed * 0.1f;
 
-            var last = InternalChildren.LastOrDefault();
+                    additiveX += sprite.DrawWidth - 1;
 
-            if (last == null || last.ScreenSpaceDrawQuad.TopRight.X < ScreenSpaceDrawQuad.TopRight.X)
-            {
-                AddInternal(new ScrollerSprite { X = last == null ? 0 : last.X + last.DrawWidth });
+                    if (sprite.X + sprite.DrawWidth < 0)
+                        sprite.Expire();
+                }
+
+                var last = InternalChildren.LastOrDefault();
+
+                // only break from this loop once we have saturated horizontal space completely.
+                if (last != null && last.ScreenSpaceDrawQuad.TopRight.X >= ScreenSpaceDrawQuad.TopRight.X)
+                    break;
+
+                AddInternal(new ScrollerSprite());
             }
         }
 
