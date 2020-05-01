@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public TestSceneTaikoScroller()
         {
             AddStep("Load scroller", () => SetContents(() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoScroller), _ => Empty())));
-            AddToggleStep("Toggle passing", passing => this.ChildrenOfType<LegacyTaikoScroller>().ForEach(s => s.Passing = !passing));
+            AddToggleStep("Toggle passing", passing => this.ChildrenOfType<LegacyTaikoScroller>().ForEach(s => s.Passing.Value = !passing));
         }
     }
 }

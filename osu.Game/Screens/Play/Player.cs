@@ -193,6 +193,7 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
+                gameplayBeatmap.OnNewResult(r);
             };
 
             DrawableRuleset.OnRevertResult += r =>
