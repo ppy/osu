@@ -20,9 +20,9 @@ namespace osu.Game.Online.API.Requests
 
         private string CalcSayoUri()
         {
-            int IdFull = (int)Model.OnlineBeatmapSetID;
+            var IdFull = Model.OnlineBeatmapSetID.ToString();
 
-            var Target = $@"{(IsMini? ( noVideo? "novideo" : "full") : "mini")}/{IdFull}";
+            var Target = $@"{(IsMini? "mini" : ( noVideo? "novideo" : "full"))}/{IdFull}";
             return Target;
         }
 
