@@ -128,10 +128,13 @@ namespace osu.Game.Configuration
             //Optimize Settings
             Set(OsuSetting.OptUI, true);
             Set(OsuSetting.TrianglesEnabled, true);
+
             Set(OsuSetting.MvisParticleAmount, 350, 0, 350);
             Set(OsuSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(OsuSetting.MvisEnableStoryboard, false);
             Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
+
+            Set(OsuSetting.DownloadFromSayobot, true);
         }
 
         public OsuConfigManager(Storage storage)
@@ -241,6 +244,7 @@ namespace osu.Game.Configuration
         MvisParticleAmount,
         MvisBgBlur,
         MvisUseOsuLogoVisualisation,
-        MvisEnableStoryboard
+        MvisEnableStoryboard,
+        DownloadFromSayobot
     }
 }
