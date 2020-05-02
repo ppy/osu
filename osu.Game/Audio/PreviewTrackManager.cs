@@ -102,7 +102,7 @@ namespace osu.Game.Audio
                 this.trackManager = trackManager;
             }
 
-            protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
+            protected override Track GetTrack() => trackManager.Get($"https://cdnx.sayobot.cn:25225/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
         }
 
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore

@@ -133,8 +133,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(OsuSetting.MvisEnableStoryboard, false);
             Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
-
-            Set(OsuSetting.DownloadFromSayobot, true);
         }
 
         public OsuConfigManager(Storage storage)
@@ -244,7 +242,6 @@ namespace osu.Game.Configuration
         MvisParticleAmount,
         MvisBgBlur,
         MvisUseOsuLogoVisualisation,
-        MvisEnableStoryboard,
-        DownloadFromSayobot
+        MvisEnableStoryboard
     }
 }

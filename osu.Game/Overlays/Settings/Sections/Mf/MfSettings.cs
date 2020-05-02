@@ -26,11 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     LabelText = "启用三角形粒子动画",
                     Bindable = config.GetBindable<bool>(OsuSetting.TrianglesEnabled)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "通过Sayobot镜像站下图(可能需要重启)",
-                    Bindable = config.GetBindable<bool>(OsuSetting.DownloadFromSayobot)
-                },
             };
         }
     }

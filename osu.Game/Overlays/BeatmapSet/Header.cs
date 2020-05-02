@@ -52,8 +52,6 @@ namespace osu.Game.Overlays.BeatmapSet
         [Cached(typeof(IBindable<RulesetInfo>))]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private Bindable<bool> UseSayobot = new Bindable<bool>();
-
         public Header()
         {
             ExternalLinkButton externalLink;
@@ -216,15 +214,13 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
-                externalLink.Link = $@"{GetLinkForm(Details.Beatmap)}";
+                externalLink.Link = $@"https://osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
             };
         }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.DownloadFromSayobot, UseSayobot);
-
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
             onlineStatusPill.BackgroundColour = colourProvider.Background6;
 
@@ -263,18 +259,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     updateDownloadButtons();
                 }
             }, true);
-        }
-
-        private string GetLinkForm( Beatmaps.BeatmapInfo b )
-        {
-            var uriLink = "";
-
-            if ( UseSayobot.Value )
-                uriLink = $"https://osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
-            else
-                uriLink = $"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
-        
-            return uriLink;
         }
 
         private void updateDownloadButtons()
