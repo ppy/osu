@@ -30,7 +30,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
-using osu.Game.Screens.Mvis;
 using System;
 
 namespace osu.Game.Screens
@@ -77,8 +76,6 @@ namespace osu.Game.Screens
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
         private Track Track;
-        private BgStoryBoard bgSB;
-        private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
         private bool OverlaysHidden = false;
 
@@ -86,11 +83,6 @@ namespace osu.Game.Screens
         {
             InternalChildren = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = bgSB = new BgStoryBoard(),
-                },
                 bgBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -126,12 +118,6 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        loadingSpinner = new LoadingSpinner(true, true)
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Margin = new MarginPadding{ Bottom = 100 }
-                        },
                         sidebarContainer = new SideBarSettingsPanel
                         {
                             Name = "Sidebar Container",
@@ -244,7 +230,7 @@ namespace osu.Game.Screens
                                                                 new MusicControlButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Music,
-                                                                    Action = () => TogglePause(),
+                                                                    Action = () => musicController.TogglePause(),
                                                                     TooltipText = "切换暂停",
                                                                 },
                                                                 new MusicControlButton()
@@ -319,24 +305,6 @@ namespace osu.Game.Screens
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
-            bgSB.IsReady.ValueChanged += _ =>
-            {
-                switch (bgSB.IsReady.Value)
-                {
-                    case true:
-                        loadingSpinner.Hide();
-                        break;
-
-                    case false:
-                        loadingSpinner.Show();
-                        break;
-                }
-            };
-            bgSB.storyboardReplacesBackground.ValueChanged += _ => 
-            {
-                if (Background is BackgroundScreenBeatmap backgroundBeatmap)
-                    backgroundBeatmap.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
-            };
 
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
@@ -373,7 +341,6 @@ namespace osu.Game.Screens
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
             track.RestartPoint = 0;
 
-            loadingSpinner.Show();
             updateComponentFromBeatmap(Beatmap.Value);
         }
 
@@ -399,7 +366,7 @@ namespace osu.Game.Screens
                     return true;
 
                 case GlobalAction.MvisTogglePause:
-                    TogglePause();
+                    musicController.TogglePause();
                     return true;
 
                 case GlobalAction.MvisTogglePlayList:
@@ -555,20 +522,6 @@ namespace osu.Game.Screens
             }
         }
 
-        private void TogglePause()
-        {
-            if ( Track?.IsRunning == true )
-            {
-                bgSB?.sbClock?.Stop();
-                musicController.Stop();
-            }
-            else
-            {
-                bgSB?.sbClock?.Start();
-                musicController.Play();
-            }
-        }
-
         private void UpdateBgBlur()
         {
             if (Background is BackgroundScreenBeatmap backgroundBeatmap)
@@ -586,8 +539,6 @@ namespace osu.Game.Screens
                 backgroundBeatmap.Beatmap = beatmap;
                 backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
             }
-
-            bgSB.UpdateStoryBoardAsync();
         }
     }
 }
