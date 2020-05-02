@@ -290,9 +290,11 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
+                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false ,true);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
+                    if (BeatmapSet.Value.OnlineInfo.HasStoryboard || BeatmapSet.Value.OnlineInfo.HasVideo)
+                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, false, true)); //Mini
                     break;
             }
         }

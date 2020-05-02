@@ -9,18 +9,20 @@ namespace osu.Game.Online.API.Requests
     public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
     {
         private readonly bool noVideo;
+        private readonly bool IsMini;
 
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool noVideo)
+        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool noVideo, bool IsMini = false)
             : base(set)
         {
             this.noVideo = noVideo;
+            this.IsMini = IsMini;
         }
 
         private string CalcSayoUri()
         {
             int IdFull = (int)Model.OnlineBeatmapSetID;
 
-            var Target = $@"{( noVideo? "novideo" : "full")}/{IdFull}";
+            var Target = $@"{(IsMini? ( noVideo? "novideo" : "full") : "mini")}/{IdFull}";
             return Target;
         }
 

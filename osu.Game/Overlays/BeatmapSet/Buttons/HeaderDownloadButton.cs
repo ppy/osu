@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private const int text_size = 17;
 
         private readonly bool noVideo;
+        private readonly bool IsMini;
+        private readonly bool NoSuffix;
 
         public string TooltipText => button.Enabled.Value ? "下载该谱面" : "请先登录再进行下载";
 
@@ -33,10 +35,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private ShakeContainer shakeContainer;
         private HeaderButton button;
 
-        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+        public HeaderDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false, bool IsMini = false, bool NoSuffix = false)
             : base(beatmapSet)
         {
             this.noVideo = noVideo;
+            this.IsMini = IsMini;
+            this.NoSuffix = NoSuffix;
 
             Width = 120;
             RelativeSizeAxes = Axes.Y;
@@ -104,7 +108,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, noVideo);
+                beatmaps.Download(BeatmapSet.Value, noVideo, IsMini);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -151,7 +155,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = getVideoSuffixText(),
+                                Text = NoSuffix ? string.Empty : getVideoSuffixText(),
                                 Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
                             },
                         };
@@ -167,10 +171,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private string getVideoSuffixText()
         {
-            if (!BeatmapSet.Value.OnlineInfo.HasVideo)
+            if (!BeatmapSet.Value.OnlineInfo.HasVideo && !BeatmapSet.Value.OnlineInfo.HasStoryboard)
                 return string.Empty;
 
-            return noVideo ? "不带视频" : "带视频";
+            return (IsMini == true ? "Mini" : (noVideo ? "不带视频" : "带视频"));
         }
     }
 }

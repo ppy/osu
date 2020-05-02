@@ -67,7 +67,7 @@ namespace osu.Game.Scoring
 
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
-        protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
+        protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload, bool IsMini) => new DownloadReplayRequest(score);
 
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
