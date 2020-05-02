@@ -31,6 +31,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
     <PackageReference Include="DiscordRichPresence" Version="1.0.150" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" PrivateAssets="all"/>
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" PrivateAssets="all"/>
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" PrivateAssets="all"/>
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="osu.Game.Rulesets.Tau\Resources\**" />

@@ -20,7 +20,15 @@ namespace osu.Game.Online.API.Requests
         {
             int IdFull = (int)Model.OnlineBeatmapSetID;
             int IdHead = (int)Math.Floor(IdFull / 10000f);
-            int IdTail = (int)IdFull - (IdHead * 10000);
+            string IdTail = ( IdFull - (IdHead * 10000) ).ToString();
+
+            if ( IdTail.ToString().Length != 4 )
+            {
+                for (int i = IdTail.ToString().Length; i < 4; i++)
+                {
+                    IdTail = "0" + $"{IdTail}";
+                }
+            }
 
             var Target = $@"{IdHead}/{IdTail}/{( noVideo? "novideo" : "full")}?filename=b-{IdFull}";
             return Target;
