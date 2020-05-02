@@ -19,29 +19,13 @@ namespace osu.Game.Online.API.Requests
         private string CalcSayoUri()
         {
             int IdFull = (int)Model.OnlineBeatmapSetID;
-            int IdHead = (int)Math.Floor(IdFull / 10000f);
-            string IdTail = ( IdFull - (IdHead * 10000) ).ToString();
 
-            if ( IdTail.ToString().Length != 4 )
-            {
-                for (int i = IdTail.ToString().Length; i < 4; i++)
-                {
-                    IdTail = "0" + $"{IdTail}";
-                }
-            }
-
-            var Target = $@"{IdHead}/{IdTail}/{( noVideo? "novideo" : "full")}?filename=b-{IdFull}";
+            var Target = $@"{( noVideo? "novideo" : "full")}/{IdFull}";
             return Target;
-        }
-
-        private string UpdateUriRoot()
-        {
-            var uri = $"https://b2.sayobot.cn:25225/beatmaps/{Target}";
-            return uri;
         }
 
         protected override string Target => $@"{CalcSayoUri()}";
 
-        protected override string Uri => $@"{UpdateUriRoot()}";
+        protected override string Uri => $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
     }
 }
