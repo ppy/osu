@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -78,7 +77,7 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
-            updateQueue = new BeatmapUpdateQueue(api);
+            updateQueue = new BeatmapUpdateQueue(api, storage);
             exportStorage = storage.GetStorageForDirectory("exports");
         }
 
@@ -445,71 +444,6 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetTrack() => null;
-        }
-
-        private class BeatmapUpdateQueue
-        {
-            private readonly IAPIProvider api;
-
-            private const int update_queue_request_concurrency = 4;
-
-            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdateQueue));
-
-            public BeatmapUpdateQueue(IAPIProvider api)
-            {
-                this.api = api;
-            }
-
-            public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
-            {
-                if (api?.State != APIState.Online)
-                    return Task.CompletedTask;
-
-                LogForModel(beatmapSet, "Performing online lookups...");
-                return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
-            }
-
-            // todo: expose this when we need to do individual difficulty lookups.
-            protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => update(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
-
-            private void update(BeatmapSetInfo set, BeatmapInfo beatmap)
-            {
-                if (api?.State != APIState.Online)
-                    return;
-
-                var req = new GetBeatmapRequest(beatmap);
-
-                req.Failure += fail;
-
-                try
-                {
-                    // intentionally blocking to limit web request concurrency
-                    api.Perform(req);
-
-                    var res = req.Result;
-
-                    if (res != null)
-                    {
-                        beatmap.Status = res.Status;
-                        beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                        beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                        beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-
-                        LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
-                    }
-                }
-                catch (Exception e)
-                {
-                    fail(e);
-                }
-
-                void fail(Exception e)
-                {
-                    beatmap.OnlineBeatmapID = null;
-                    LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})");
-                }
-            }
         }
     }
 
