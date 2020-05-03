@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
         private readonly GameHost host;
-        private readonly BeatmapUpdateQueue updateQueue;
+        private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
         private readonly Storage exportStorage;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
-            updateQueue = new BeatmapUpdateQueue(api, storage);
+            onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
             exportStorage = storage.GetStorageForDirectory("exports");
         }
 
@@ -104,7 +104,7 @@ namespace osu.Game.Beatmaps
 
             bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
 
-            await updateQueue.UpdateAsync(beatmapSet, cancellationToken);
+            await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
