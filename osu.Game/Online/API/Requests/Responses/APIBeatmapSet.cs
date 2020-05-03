@@ -94,7 +94,7 @@ namespace osu.Game.Online.API.Requests.Responses
                         Card = $"https://a.sayobot.cn/beatmaps/{OnlineBeatmapSetID}/covers/cover.jpg",
                         List = $"https://a.sayobot.cn/beatmaps/{OnlineBeatmapSetID}/covers/cover.jpg"
                     },
-                    Preview = preview,
+                    Preview = $"https://a.sayobot.cn/preview/{OnlineBeatmapSetID}.mp3",
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
                     BPM = bpm,

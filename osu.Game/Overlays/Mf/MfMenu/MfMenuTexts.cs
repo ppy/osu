@@ -17,8 +17,8 @@ namespace osu.Game.Overlays.MfMenu
     public class MfMenuTexts : MfMenuContent
     {
         private static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
-        private static void QuestionTitlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 27, weight: FontWeight.SemiBold);
-        private static void AnswerTitlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 22, weight: FontWeight.SemiBold);
+        private static void QuestionTitlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 22, weight: FontWeight.SemiBold);
+        private static void AnswerTitlefont(SpriteText t) => t.Font = OsuFont.GetFont(weight: FontWeight.SemiBold);
         private LinkFlowContainer textFlow;
         private LinkFlowContainer faqFlow;
 
@@ -64,6 +64,7 @@ namespace osu.Game.Overlays.MfMenu
                 }
             };
             AddTextFlow();
+            AddFaqFlow();
         }
 
         private void AddTextFlow()
@@ -126,7 +127,7 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.AddText("查询。");
             textFlow.AddParagraph("如果仍有疑惑, 您可以发送邮件至");
             textFlow.AddLink("contact@ppy.sh","mailto:contact@ppy.sh");
-            textFlow.AddParagraph("与汉化版有关的问题，您也可以发送邮件至");
+            textFlow.AddParagraph("与汉化版有关的问题，请发送邮件至");
             textFlow.AddLink("midnightcarnival@outlook.com","mailto:midnightcarnival@outlook.com");
 
             textFlow.NewParagraph();
@@ -139,7 +140,7 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.NewParagraph();
             textFlow.AddLink("osu!下的Mirror Mod → pr7334[Open]","https://github.com/ppy/osu/pull/7334");
             textFlow.NewParagraph();
-            textFlow.AddLink("osu!tau模式 → Altenhh/tau (9c77fab)","https://github.com/Altenhh/tau");
+            textFlow.AddLink("osu!tau模式(因为兼容性问题不在此版本中) → Altenhh/tau (9c77fab)","https://github.com/Altenhh/tau");
             textFlow.NewParagraph();
             textFlow.AddLink("谱面在线列表 → pr7912[Merged]","https://github.com/ppy/osu/pull/7912");
             textFlow.NewParagraph();
@@ -154,10 +155,17 @@ namespace osu.Game.Overlays.MfMenu
         private void AddFaqFlow()
         {
             faqFlow.AddParagraph("一些常见问题", Titlefont );
+            faqFlow.AddParagraph("Q: 为什么加载谱面封面/音频预览的时间会那么长?", QuestionTitlefont);
+            faqFlow.AddParagraph("A: 这与你的系统和当前的网络环境等一系列因素有关, 也可能是你一次性发送了过多的资源请求, 请多等待一会, 你也可以尝试重新进入谱面列表/信息界面", AnswerTitlefont);
             faqFlow.NewParagraph();
-            faqFlow.AddParagraph("Q: 为什么加载谱面列表会这么慢?", QuestionTitlefont);
-            faqFlow.AddParagraph("A: 因为该版本中lazer的下图源为sayobot api而不是osu官方的api, 因此会更快一些", AnswerTitlefont);
+            faqFlow.AddParagraph("Q: 为什么我突然没法下图了?", QuestionTitlefont);
+            faqFlow.AddParagraph("A: 这可能是因为小夜那边出了点状况, 尝试访问一下", AnswerTitlefont);
+            faqFlow.AddLink("镜像站官网","https://osu.sayobot.cn/", AnswerTitlefont);
+            faqFlow.AddText(", 如果页面空白, 请通过右上角的 更多>帮助 进行反馈； 如果官网正常, 而游戏内无法下图, 请联系", AnswerTitlefont);
+            faqFlow.AddLink("MATRIX-feather", "mailto:midnightcarnival@outlook.com" ,AnswerTitlefont);
+            faqFlow.AddText("并附上日志文件", AnswerTitlefont);
             faqFlow.NewParagraph();
+            faqFlow.AddParagraph("未完待续...");
         }
     }
 }
