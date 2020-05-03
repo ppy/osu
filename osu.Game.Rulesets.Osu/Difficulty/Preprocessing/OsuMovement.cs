@@ -414,13 +414,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.3;
 
             // Correction #8 - Stacked notes nerf
-            double stackedThreshold = 0.8;
-            double d12StackedNerf;
-
-            if (d12 < stackedThreshold)
-                d12StackedNerf = Math.Max(1.4 * (d12 - stackedThreshold) + stackedThreshold, 0);
-            else
-                d12StackedNerf = d12;
+            double d12StackedNerf = Math.Max(0, Math.Min(d12, Math.Min(1.2 * d12 - 0.185, 1.4 * d12 - 0.32)));
 
             // Correction #9 - Slow small jump nerf
             double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((d12 - 2.2) / 0.7, 2)) *
