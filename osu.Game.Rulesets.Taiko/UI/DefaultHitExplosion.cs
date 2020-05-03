@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             BorderColour = Color4.White;
             BorderThickness = 1;
 
+            Blending = BlendingParameters.Additive;
+
             Alpha = 0.15f;
             Masking = true;
 
@@ -49,6 +51,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             base.LoadComplete();
 
             this.ScaleTo(3f, 1000, Easing.OutQuint);
+            this.FadeOut(500);
+
+            Expire(true);
         }
     }
 }
