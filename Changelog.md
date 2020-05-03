@@ -587,3 +587,8 @@
     *   [m] [Show loading spinner when carousel is not ready to be displayed #8903]
     *   [m] [Fix undo/redo behaving poorly with simultaneous objects #8914]
     *   [m] [Use DisplayModes rather than AvailableResolutions #8623]
+
+### 2020/5/3
+*   合并上游pr
+    *   [m] [Truncate beatmap title and artist on score panel #8919]
+    *   [m] [Update framework #8925]
