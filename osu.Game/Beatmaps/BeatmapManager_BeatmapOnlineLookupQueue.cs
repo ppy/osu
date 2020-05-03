@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
+using osu.Framework.Development;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -40,7 +41,8 @@ namespace osu.Game.Beatmaps
                 this.api = api;
                 this.storage = storage;
 
-                if (!storage.Exists(cache_database_name))
+                // avoid downloading / using cache for unit tests.
+                if (!DebugUtils.IsNUnitRunning && !storage.Exists(cache_database_name))
                     prepareLocalCache();
             }
 
