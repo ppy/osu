@@ -65,7 +65,7 @@ namespace osu.Game.Beatmaps
                     {
                         using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))
                         {
-                            var found = db.QueryFirstOrDefault<CachedOnlineBeatmapLookup>(
+                            var found = db.QuerySingleOrDefault<CachedOnlineBeatmapLookup>(
                                 "SELECT * FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path", beatmap);
 
                             if (found != null)
