@@ -7,6 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
@@ -24,21 +26,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         private void load(GameplayBeatmap gameplayBeatmap)
         {
             if (gameplayBeatmap != null)
-                ((IBindable<bool>)Passing).BindTo(gameplayBeatmap.Passing);
+                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayBeatmap.LastJudgementResult);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Passing.BindValueChanged(passing =>
+            LastResult.BindValueChanged(result =>
             {
                 foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
-                    sprite.Passing = passing.NewValue;
+                    sprite.Passing = result.NewValue == null || result.NewValue.Type > HitResult.Miss;
             }, true);
         }
 
-        public Bindable<bool> Passing = new BindableBool(true);
+        public Bindable<JudgementResult> LastResult = new Bindable<JudgementResult>();
 
         protected override void Update()
         {
