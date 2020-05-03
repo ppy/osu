@@ -22,20 +22,20 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
-        private class BeatmapUpdateQueue
+        private class BeatmapOnlineLookupQueue
         {
             private readonly IAPIProvider api;
             private readonly Storage storage;
 
             private const int update_queue_request_concurrency = 4;
 
-            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdateQueue));
+            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapOnlineLookupQueue));
 
             private FileWebRequest cacheDownloadRequest;
 
             private const string cache_database_name = "online.db";
 
-            public BeatmapUpdateQueue(IAPIProvider api, Storage storage)
+            public BeatmapOnlineLookupQueue(IAPIProvider api, Storage storage)
             {
                 this.api = api;
                 this.storage = storage;
@@ -55,38 +55,12 @@ namespace osu.Game.Beatmaps
 
             // todo: expose this when we need to do individual difficulty lookups.
             protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => update(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
 
-            private void update(BeatmapSetInfo set, BeatmapInfo beatmap)
+            private void lookup(BeatmapSetInfo set, BeatmapInfo beatmap)
             {
-                if (cacheDownloadRequest == null && storage.Exists(cache_database_name))
-                {
-                    try
-                    {
-                        using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))
-                        {
-                            var found = db.QuerySingleOrDefault<CachedOnlineBeatmapLookup>(
-                                "SELECT * FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path", beatmap);
-
-                            if (found != null)
-                            {
-                                var status = (BeatmapSetOnlineStatus)found.approved;
-
-                                beatmap.Status = status;
-                                beatmap.BeatmapSet.Status = status;
-                                beatmap.BeatmapSet.OnlineBeatmapSetID = found.beatmapset_id;
-                                beatmap.OnlineBeatmapID = found.beatmap_id;
-
-                                LogForModel(set, $"Cached local retrieval for {beatmap}.");
-                                return;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogForModel(set, $"Cached local retrieval for {beatmap} failed with {ex}.");
-                    }
-                }
+                if (checkLocalCache(set, beatmap))
+                    return;
 
                 if (api?.State != APIState.Online)
                     return;
@@ -136,7 +110,7 @@ namespace osu.Game.Beatmaps
                     File.Delete(compressedCacheFilePath);
                     File.Delete(cacheFilePath);
 
-                    Logger.Log($"{nameof(BeatmapUpdateQueue)}'s online cache download failed: {ex}", LoggingTarget.Database);
+                    Logger.Log($"{nameof(BeatmapOnlineLookupQueue)}'s online cache download failed: {ex}", LoggingTarget.Database);
                 };
 
                 cacheDownloadRequest.Finished += () =>
@@ -153,7 +127,7 @@ namespace osu.Game.Beatmaps
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"{nameof(BeatmapUpdateQueue)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
+                        Logger.Log($"{nameof(BeatmapOnlineLookupQueue)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
                         File.Delete(cacheFilePath);
                     }
                     finally
@@ -163,6 +137,45 @@ namespace osu.Game.Beatmaps
                 };
 
                 cacheDownloadRequest.PerformAsync();
+            }
+
+            private bool checkLocalCache(BeatmapSetInfo set, BeatmapInfo beatmap)
+            {
+                // download is in progress (or was, and failed).
+                if (cacheDownloadRequest != null)
+                    return false;
+
+                // database is unavailable.
+                if (!storage.Exists(cache_database_name))
+                    return false;
+
+                try
+                {
+                    using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))
+                    {
+                        var found = db.QuerySingleOrDefault<CachedOnlineBeatmapLookup>(
+                            "SELECT * FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path", beatmap);
+
+                        if (found != null)
+                        {
+                            var status = (BeatmapSetOnlineStatus)found.approved;
+
+                            beatmap.Status = status;
+                            beatmap.BeatmapSet.Status = status;
+                            beatmap.BeatmapSet.OnlineBeatmapSetID = found.beatmapset_id;
+                            beatmap.OnlineBeatmapID = found.beatmap_id;
+
+                            LogForModel(set, $"Cached local retrieval for {beatmap}.");
+                            return true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogForModel(set, $"Cached local retrieval for {beatmap} failed with {ex}.");
+                }
+
+                return false;
             }
 
             [Serializable]
