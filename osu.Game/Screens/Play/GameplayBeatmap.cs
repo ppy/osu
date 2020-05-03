@@ -9,7 +9,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play
 {
@@ -42,13 +41,10 @@ namespace osu.Game.Screens.Play
 
         public IBeatmap Clone() => PlayableBeatmap.Clone();
 
-        public IBindable<bool> Passing => passing;
+        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
-        private readonly BindableBool passing = new BindableBool(true);
+        public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
 
-        public void OnNewResult(JudgementResult result)
-        {
-            passing.Value = result.Type > HitResult.Miss;
-        }
+        public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
     }
 }
