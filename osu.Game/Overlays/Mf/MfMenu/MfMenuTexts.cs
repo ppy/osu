@@ -150,6 +150,17 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.NewParagraph();
             textFlow.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis","https://github.com/EVAST9919/lazer-m-vis");
             textFlow.AddParagraph("暂时不知道tau模式是否可以使用在线功能");
+            textFlow.NewParagraph();
+            textFlow.AddParagraph("Special Thanks", Titlefont );
+            textFlow.NewParagraph();
+            textFlow.AddUserLink(new User
+            {
+                Username = "A M D",
+                Id = 5321112
+            });
+            textFlow.NewParagraph();
+            textFlow.AddLink("小夜", "https://osu.sayobot.cn/");
+            textFlow.NewParagraph();
         }
 
         private void AddFaqFlow()
