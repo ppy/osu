@@ -592,3 +592,4 @@
 *   合并上游pr
     *   [m] [Truncate beatmap title and artist on score panel #8919]
     *   [m] [Update framework #8925]
+    *   [m] [Add local beatmap lookup cache to improve performance of imports #8924]
