@@ -9,13 +9,18 @@ using osuTK;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Users;
+using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuTexts : MfMenuContent
     {
         private static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
+        private static void QuestionTitlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 27, weight: FontWeight.SemiBold);
+        private static void AnswerTitlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 22, weight: FontWeight.SemiBold);
         private LinkFlowContainer textFlow;
+        private LinkFlowContainer faqFlow;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -28,17 +33,41 @@ namespace osu.Game.Overlays.MfMenu
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 Padding = new MarginPadding(20),
-                Child = textFlow = new LinkFlowContainer
+                Spacing = new Vector2(0, 5),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    TextAnchor = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    Spacing = new Vector2(0, 2),
-                },
+                    textFlow = new LinkFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        TextAnchor = Anchor.TopLeft,
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                        Spacing = new Vector2(0, 2),
+                    },
+                    new Box
+                    {
+                        Colour = new Color4(0, 0, 0, 255),
+                        Alpha = 0.3f,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                    },
+                    faqFlow = new LinkFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        TextAnchor = Anchor.TopLeft,
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                        Spacing = new Vector2(0, 2),
+                    },
+                }
             };
+            AddTextFlow();
+        }
 
+        private void AddTextFlow()
+        {
             textFlow.AddParagraph("关于Mf-osu", Titlefont );
             textFlow.NewParagraph();
             textFlow.AddLink("Mf-osu","https://github.com/MATRIX-feather/osu");
@@ -120,6 +149,15 @@ namespace osu.Game.Overlays.MfMenu
             textFlow.NewParagraph();
             textFlow.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis","https://github.com/EVAST9919/lazer-m-vis");
             textFlow.AddParagraph("暂时不知道tau模式是否可以使用在线功能");
+        }
+
+        private void AddFaqFlow()
+        {
+            faqFlow.AddParagraph("一些常见问题", Titlefont );
+            faqFlow.NewParagraph();
+            faqFlow.AddParagraph("Q: 为什么加载谱面列表会这么慢?", QuestionTitlefont);
+            faqFlow.AddParagraph("A: 因为该版本中lazer的下图源为sayobot api而不是osu官方的api, 因此会更快一些", AnswerTitlefont);
+            faqFlow.NewParagraph();
         }
     }
 }

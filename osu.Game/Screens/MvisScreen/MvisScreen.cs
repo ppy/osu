@@ -296,8 +296,6 @@ namespace osu.Game.Screens
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
-
-            BgBlur.ValueChanged += _ => UpdateBgBlur();
         }
 
         protected override void LoadComplete()
@@ -305,6 +303,7 @@ namespace osu.Game.Screens
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
+            BgBlur.ValueChanged += _ => this.Schedule( () => UpdateBgBlur() );
 
             inputManager = GetContainingInputManager();
             bgBox.ScaleTo(1.1f);
