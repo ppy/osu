@@ -93,6 +93,12 @@ namespace osu.Game.Online.Chat
         {
             if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 JoinChannel(e.NewValue);
+
+            if (e.NewValue?.MessagesLoaded == false)
+            {
+                // let's fetch a small number of messages to bring us up-to-date with the backlog.
+                fetchInitalMessages(e.NewValue);
+            }
         }
 
         /// <summary>
@@ -374,12 +380,6 @@ namespace osu.Game.Online.Chat
 
             if (CurrentChannel.Value == null)
                 CurrentChannel.Value = channel;
-
-            if (!channel.MessagesLoaded)
-            {
-                // let's fetch a small number of messages to bring us up-to-date with the backlog.
-                fetchInitalMessages(channel);
-            }
 
             return channel;
         }
