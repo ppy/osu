@@ -121,7 +121,7 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(SetupScreen)) { Text = "设置", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(TeamEditorScreen)) { Text = "队伍编辑器", RequestSelection = SetScreen },
-                                new ScreenButton(typeof(RoundEditorScreen)) { Text = "回合编辑器", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(RoundEditorScreen)) { Text = "回合/图池编辑器", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(LadderEditorScreen)) { Text = "晋级榜图编辑器", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(ScheduleScreen)) { Text = "时间表", RequestSelection = SetScreen },
