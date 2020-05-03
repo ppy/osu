@@ -154,11 +154,11 @@ namespace osu.Game.Beatmaps
                     catch (Exception ex)
                     {
                         Logger.Log($"{nameof(BeatmapUpdateQueue)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
+                        File.Delete(cacheFilePath);
                     }
                     finally
                     {
                         File.Delete(compressedCacheFilePath);
-                        File.Delete(cacheFilePath);
                     }
                 };
 
