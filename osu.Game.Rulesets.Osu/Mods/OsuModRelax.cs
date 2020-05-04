@@ -11,11 +11,12 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
@@ -33,15 +34,30 @@ namespace osu.Game.Rulesets.Osu.Mods
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
 
+        private bool hasReplay;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            if (osuInputManager.ReplayInputHandler != null)
+            {
+                hasReplay = true;
+                return;
+            }
+
             osuInputManager.AllowUserPresses = false;
         }
 
         public void Update(Playfield playfield)
         {
+            if (hasReplay)
+                return;
+
             bool requiresHold = false;
             bool requiresHit = false;
 
