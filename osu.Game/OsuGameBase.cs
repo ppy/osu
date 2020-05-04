@@ -132,6 +132,8 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.CacheAs(Storage);
+
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
@@ -300,8 +302,13 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null)
-                Storage = host.Storage;
+            var storageConfig = new StorageConfigManager(host.Storage);
+
+            var customStoragePath = storageConfig.Get<string>(StorageConfig.FullPath);
+
+            Storage = !string.IsNullOrEmpty(customStoragePath)
+                ? new CustomStorage(customStoragePath, host)
+                : host.Storage;
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
@@ -351,6 +358,18 @@ namespace osu.Game
                 public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
+            }
+        }
+
+        /// <summary>
+        /// A storage pointing to an absolute location specified by the user to store game data files.
+        /// </summary>
+        private class CustomStorage : NativeStorage
+        {
+            public CustomStorage(string fullPath, GameHost host)
+                : base(string.Empty, host)
+            {
+                BasePath = fullPath;
             }
         }
     }
