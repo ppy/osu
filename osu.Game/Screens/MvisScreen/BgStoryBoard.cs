@@ -57,12 +57,11 @@ namespace osu.Game.Screens.Mvis
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.MvisEnableStoryboard, EnableSB);
-
-            EnableSB.ValueChanged += _ => UpdateVisuals();
         }
 
         protected override void LoadComplete()
         {
+            EnableSB.ValueChanged += _ => UpdateVisuals();
             dimmableStoryboard?.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
         }
 
@@ -82,20 +81,6 @@ namespace osu.Game.Screens.Mvis
 
         public bool UpdateComponent()
         {
-            if ( b == null )
-                return false;
-
-            IsReady.Value = false;
-
-            Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
-
-            sbClock?.FadeOut(DURATION, Easing.OutQuint);
-            sbClock?.Expire();
-
-            storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
-
-            ChangeSB?.Cancel();
-
             try
             {
                 LoadSBTask = LoadComponentAsync(new ClockContainer(b.Value, 0)
@@ -137,8 +122,20 @@ namespace osu.Game.Screens.Mvis
 
         public void UpdateStoryBoardAsync()
         {
+            if ( b == null )
+                return;
+
             Schedule(() =>
             {
+                IsReady.Value = false;
+
+                Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
+
+                sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                sbClock?.Expire();
+
+                storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
+
                 ChangeSB?.Cancel();
                 ChangeSB = new CancellationTokenSource();
 
@@ -149,10 +146,10 @@ namespace osu.Game.Screens.Mvis
                     LogTask = null;
                 }
 
+                UpdateVisuals();
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
                     UpdateComponent();
-                    UpdateVisuals();
 
                     LogTask = Task.Run( () => DoNothing() );
                     await LogTask;

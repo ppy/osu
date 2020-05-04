@@ -32,13 +32,14 @@ using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using System;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens
 {
     /// <summary>
     /// 缝合怪 + 奥利给山警告
     /// </summary>
-    public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         private const float DURATION = 750;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
@@ -80,7 +81,9 @@ namespace osu.Game.Screens
         private BgStoryBoard bgSB;
         private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
+        private Bindable<float> IdleBgDim = new Bindable<float>();
         private bool OverlaysHidden = false;
+        public float BottombarOffset => bottomBar.Position.Y + bottomBar.DrawHeight;
 
         public MvisScreen()
         {
@@ -88,95 +91,15 @@ namespace osu.Game.Screens
             {
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = bgSB = new BgStoryBoard(),
-                },
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0
-                },
-                new Container
-                {
-                    Name = "Content Container",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new SpaceParticlesContainer(),
-                        new ParallaxContainer
-                        {
-                            ParallaxAmount = -0.0025f,
-                            Child = beatmapLogo = new BeatmapLogo
-                            {
-                                Anchor = Anchor.Centre,
-                            }
-                        },
-                        hoverCheckContainer = new HoverCheckContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                    }
-                },
-                new Container
-                {
                     Name = "Overlay Container",
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        loadingSpinner = new LoadingSpinner(true, true)
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Margin = new MarginPadding{ Bottom = 100 }
-                        },
-                        sidebarContainer = new SideBarSettingsPanel
-                        {
-                            Name = "Sidebar Container",
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 400,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                    Alpha = 0.5f,
-                                },
-                                new OsuScrollContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = new FillFlowContainer
-                                    {
-                                        Spacing = new Vector2(10),
-                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
-                                        Height = Math.Max(768, DrawHeight),
-                                        RelativeSizeAxes = Axes.X,
-                                        Direction = FillDirection.Vertical,
-                                        Children = new Drawable[]
-                                        {
-                                            new MvisSettings(),
-                                            playlist = new PlaylistOverlay
-                                            {
-                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
-                                                TakeFocusOnPopIn = false,
-                                                RelativeSizeAxes = Axes.X,
-                                            },
-                                        }
-                                    },
-                                },
-                            }
-                        },
                         new FillFlowContainer
                         {
                             Name = "Bottom FillFlow",
                             RelativeSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
                                 bottomBar = new BottomBar
@@ -291,18 +214,112 @@ namespace osu.Game.Screens
                                         },
                                     }
                                 },
-                                lockButton = new ToggleableOverlayLockButton
+                                new Container
                                 {
-                                    TooltipText = "开启悬浮锁",
-                                    Action = () => UpdateLockButton(),
+                                    Name = "Lock Button Container",
+                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
+                                    Margin = new MarginPadding{ Bottom = 5 },
+                                    Child = lockButton = new ToggleableOverlayLockButton
+                                    {
+                                        TooltipText = "开启悬浮锁",
+                                        Action = () => UpdateLockButton(),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                    }
                                 }
                             }
                         },
                     }
                 },
+                new MvisScreenContentContainer
+                {
+                    Depth = 1,
+                    GetBottombarHeight = () => BottombarOffset,
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = bgSB = new BgStoryBoard(),
+                        },
+                        bgBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new SpaceParticlesContainer(),
+                                new ParallaxContainer
+                                {
+                                    ParallaxAmount = -0.0025f,
+                                    Child = beatmapLogo = new BeatmapLogo
+                                    {
+                                        Anchor = Anchor.Centre,
+                                    }
+                                },
+                            }
+                        },
+                        sidebarContainer = new SideBarSettingsPanel
+                        {
+                            Name = "Sidebar Container",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 400,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Alpha = 0.5f,
+                                },
+                                new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new FillFlowContainer
+                                    {
+                                        Spacing = new Vector2(10),
+                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
+                                        Height = Math.Max(768, DrawHeight),
+                                        RelativeSizeAxes = Axes.X,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new MvisSettings(),
+                                            playlist = new PlaylistOverlay
+                                            {
+                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
+                                                TakeFocusOnPopIn = false,
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        loadingSpinner = new LoadingSpinner(true, true)
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Margin = new MarginPadding(40)
+                        },
+                    }
+                },
                 idleTracker = new MouseIdleTracker(2000),
+                hoverCheckContainer = new HoverCheckContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             };
         }
 
@@ -310,12 +327,17 @@ namespace osu.Game.Screens
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
-
-            BgBlur.ValueChanged += _ => UpdateBgBlur();
+            config.BindWith(OsuSetting.MvisIdleBgDim, IdleBgDim);
         }
 
         protected override void LoadComplete()
         {
+            BgBlur.ValueChanged += _ => UpdateBgBlur();
+            IdleBgDim.ValueChanged += _ => 
+            {
+                if ( OverlaysHidden )
+                    bgBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
+            };
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
@@ -334,8 +356,7 @@ namespace osu.Game.Screens
             };
             bgSB.storyboardReplacesBackground.ValueChanged += _ => 
             {
-                if (Background is BackgroundScreenBeatmap backgroundBeatmap)
-                    backgroundBeatmap.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
+                Background.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
             };
 
             inputManager = GetContainingInputManager();
@@ -481,9 +502,9 @@ namespace osu.Game.Screens
         private void HideOverlays()
         {
             game?.Toolbar.Hide();
-            bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
+            bgBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
-                     .FadeTo(0.01f, DURATION, Easing.OutQuint);
+                     .FadeOut(DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
             OverlaysHidden = true;
@@ -571,9 +592,14 @@ namespace osu.Game.Screens
 
         private void UpdateBgBlur()
         {
-            if (Background is BackgroundScreenBeatmap backgroundBeatmap)
+            Background.BlurAmount.Value = BgBlur.Value * 100;
+        }
+
+        private void UpdateBgDim()
+        {
+            if ( OverlaysHidden )
             {
-                backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
+                bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             }
         }
 
@@ -581,11 +607,8 @@ namespace osu.Game.Screens
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
-            if (Background is BackgroundScreenBeatmap backgroundBeatmap)
-            {
-                backgroundBeatmap.Beatmap = beatmap;
-                backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
-            }
+            Background.Beatmap = beatmap;
+            Background.BlurAmount.Value = BgBlur.Value * 100;
 
             bgSB.UpdateStoryBoardAsync();
         }
