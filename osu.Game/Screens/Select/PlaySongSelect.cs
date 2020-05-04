@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
@@ -32,8 +33,11 @@ namespace osu.Game.Screens.Select
                 Edit();
             }, Key.Number4);
 
-            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += score => this.Push(new ResultsScreen(score));
+            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
+
+        protected void PresentScore(ScoreInfo score) =>
+            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new ResultsScreen(score)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
