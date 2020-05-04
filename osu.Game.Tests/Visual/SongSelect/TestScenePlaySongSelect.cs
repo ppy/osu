@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            waitForInitialSelection();
 
             WorkingBeatmap selected = null;
 
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            waitForInitialSelection();
 
             WorkingBeatmap selected = null;
 
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            waitForInitialSelection();
 
             WorkingBeatmap selected = null;
 
@@ -767,6 +767,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
 
             AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo == groupIcon.Items.First().Beatmap);
+        }
+
+        private void waitForInitialSelection()
+        {
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+            AddUntilStep("wait for difficulty panels visible", () => songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>().Any());
         }
 
         private int getBeatmapIndex(BeatmapSetInfo set, BeatmapInfo info) => set.Beatmaps.FindIndex(b => b == info);
