@@ -239,19 +239,25 @@ namespace osu.Game.Screens
                     GetBottombarHeight = () => BottombarOffset,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Container()
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = bgSB = new BgStoryBoard(),
-                        },
-                        bgBox = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0
+                            Name = "Background Elements Container",
+                            Children = new Drawable[]
+                            {
+                                bgSB = new BgStoryBoard(),
+                                bgBox = new Box
+                                {
+                                    Name = "Dim Box",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Alpha = 0
+                                },
+                            }
                         },
                         new Container
                         {
+                            Name = "Mvis Gameplay Item Container",
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -307,9 +313,9 @@ namespace osu.Game.Screens
                         },
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Margin = new MarginPadding(40)
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Margin = new MarginPadding(60)
                         },
                     }
                 },
@@ -402,6 +408,7 @@ namespace osu.Game.Screens
         {
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
             beatmapLogo.Exit();
+            bgSB.CancelAllTasks();
 
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);

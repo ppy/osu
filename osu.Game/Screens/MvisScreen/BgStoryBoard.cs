@@ -116,8 +116,14 @@ namespace osu.Game.Screens.Mvis
             return true;
         }
 
-        private void DoNothing()
+        public void CancelAllTasks()
         {
+            ChangeSB?.Cancel();
+            ChangeSB = new CancellationTokenSource();
+
+            LoadSBTask = null;
+            LoadSBAsyncTask = null;
+            LogTask = null;
         }
 
         public void UpdateStoryBoardAsync()
@@ -125,33 +131,25 @@ namespace osu.Game.Screens.Mvis
             if ( b == null )
                 return;
 
+            IsReady.Value = false;
+            CancelAllTasks();
+
             Schedule(() =>
             {
-                IsReady.Value = false;
-
-                Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
-
-                sbClock?.FadeOut(DURATION, Easing.OutQuint);
-                sbClock?.Expire();
-
-                storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
-
-                ChangeSB?.Cancel();
-                ChangeSB = new CancellationTokenSource();
-
-                if ( LoadSBAsyncTask != null || LogTask != null || LoadSBTask != null )
-                {
-                    LoadSBTask = null;
-                    LoadSBAsyncTask = null;
-                    LogTask = null;
-                }
-
-                UpdateVisuals();
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
-                    UpdateComponent();
+                    LogTask = Task.Run( () => 
+                    {
+                        Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
 
-                    LogTask = Task.Run( () => DoNothing() );
+                        sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                        sbClock?.Expire();
+
+                        storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
+
+                        UpdateComponent();
+                        UpdateVisuals();
+                    });
                     await LogTask;
                 });
             });
