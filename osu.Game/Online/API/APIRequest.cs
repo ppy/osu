@@ -18,16 +18,17 @@ namespace osu.Game.Online.API
 
         public T Result { get; private set; }
 
-        protected APIRequest()
-        {
-            base.Success += () => TriggerSuccess(((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject);
-        }
-
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        protected override void PostProcess()
+        {
+            base.PostProcess();
+            Result = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+        }
 
         internal void TriggerSuccess(T result)
         {
@@ -35,7 +36,14 @@ namespace osu.Game.Online.API
                 throw new InvalidOperationException("Attempted to trigger success more than once");
 
             Result = result;
-            Success?.Invoke(result);
+
+            TriggerSuccess();
+        }
+
+        internal override void TriggerSuccess()
+        {
+            base.TriggerSuccess();
+            Success?.Invoke(Result);
         }
     }
 
@@ -99,6 +107,8 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
+            PostProcess();
+
             API.Schedule(delegate
             {
                 if (cancelled) return;
@@ -107,7 +117,14 @@ namespace osu.Game.Online.API
             });
         }
 
-        internal void TriggerSuccess()
+        /// <summary>
+        /// Perform any post-processing actions after a successful request.
+        /// </summary>
+        protected virtual void PostProcess()
+        {
+        }
+
+        internal virtual void TriggerSuccess()
         {
             Success?.Invoke();
         }

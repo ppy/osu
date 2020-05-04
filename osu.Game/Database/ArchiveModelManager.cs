@@ -245,7 +245,7 @@ namespace osu.Game.Database
         /// </summary>
         protected abstract string[] HashableFileTypes { get; }
 
-        protected static void LogForModel(TModel model, string message, Exception e = null)
+        internal static void LogForModel(TModel model, string message, Exception e = null)
         {
             string prefix = $"[{(model?.Hash ?? "?????").Substring(0, 5)}]";
 
