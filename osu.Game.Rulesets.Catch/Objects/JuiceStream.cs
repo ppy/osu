@@ -58,8 +58,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             SliderEventDescriptor? lastEvent = null;
 
-            int ticksGenerated = 0;
-
             foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
             {
                 // generate tiny droplets since the last point
@@ -75,9 +73,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                         for (double t = timeBetweenTiny; t < sinceLastTick; t += timeBetweenTiny)
                         {
-                            if (ticksGenerated++ >= 10000)
-                                break;
-
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
