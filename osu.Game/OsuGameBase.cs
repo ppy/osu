@@ -71,6 +71,8 @@ namespace osu.Game
 
         protected MenuCursorContainer MenuCursorContainer;
 
+        protected StorageConfigManager StorageConfig;
+
         private Container content;
 
         protected override Container<Drawable> Content => content;
@@ -302,13 +304,17 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            var storageConfig = new StorageConfigManager(host.Storage);
+            StorageConfig = new StorageConfigManager(host.Storage);
 
-            var customStoragePath = storageConfig.Get<string>(StorageConfig.FullPath);
+            var customStoragePath = StorageConfig.Get<string>(Configuration.StorageConfig.FullPath);
 
-            Storage = !string.IsNullOrEmpty(customStoragePath)
-                ? new CustomStorage(customStoragePath, host)
-                : host.Storage;
+            if (!string.IsNullOrEmpty(customStoragePath))
+            {
+                Storage = new CustomStorage(customStoragePath, host);
+                Logger.Storage = Storage.GetStorageForDirectory("logs");
+            }
+            else
+                Storage = host.Storage;
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
