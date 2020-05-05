@@ -37,6 +37,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = "空闲时的Mvis面板不透明度",
+                    Bindable = config.GetBindable<float>(OsuSetting.MvisContentAlpha),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "启用故事版/背景视频(实验性)",

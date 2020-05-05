@@ -70,6 +70,7 @@ namespace osu.Game.Screens
         private MouseIdleTracker idleTracker;
         private Box bgBox;
         private BottomBar bottomBar;
+        private Container gameplayContent;
         private SideBarSettingsPanel sidebarContainer;
         private BeatmapLogo beatmapLogo;
         private HoverCheckContainer hoverCheckContainer;
@@ -82,6 +83,7 @@ namespace osu.Game.Screens
         private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
         private Bindable<float> IdleBgDim = new Bindable<float>();
+        private Bindable<float> ContentAlpha = new Bindable<float>();
         private bool OverlaysHidden = false;
         public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
 
@@ -255,7 +257,7 @@ namespace osu.Game.Screens
                                 },
                             }
                         },
-                        new Container
+                        gameplayContent = new Container
                         {
                             Name = "Mvis Gameplay Item Container",
                             RelativeSizeAxes = Axes.Both,
@@ -292,10 +294,10 @@ namespace osu.Game.Screens
                                     RelativeSizeAxes = Axes.Both,
                                     Child = new FillFlowContainer
                                     {
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
                                         Spacing = new Vector2(10),
                                         Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
-                                        Height = Math.Max(768, DrawHeight),
-                                        RelativeSizeAxes = Axes.X,
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
@@ -334,16 +336,14 @@ namespace osu.Game.Screens
         {
             config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
             config.BindWith(OsuSetting.MvisIdleBgDim, IdleBgDim);
+            config.BindWith(OsuSetting.MvisContentAlpha, ContentAlpha);
         }
 
         protected override void LoadComplete()
         {
             BgBlur.ValueChanged += _ => UpdateBgBlur();
-            IdleBgDim.ValueChanged += _ => 
-            {
-                if ( OverlaysHidden )
-                    bgBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
-            };
+            ContentAlpha.ValueChanged += _ => UpdateIdleVisuals();
+            IdleBgDim.ValueChanged += _ => UpdateIdleVisuals();
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
@@ -406,6 +406,7 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
+            Beatmap.Value.Track.Looping = false;
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
             beatmapLogo.Exit();
             bgSB.CancelAllTasks();
@@ -509,17 +510,18 @@ namespace osu.Game.Screens
         private void HideOverlays()
         {
             game?.Toolbar.Hide();
-            bgBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
                      .FadeOut(DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
             OverlaysHidden = true;
+            UpdateIdleVisuals();
         }
 
         private void ShowOverlays(bool Locked = false)
         {
             game?.Toolbar.Show();
+            gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
             bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
                      .FadeIn(DURATION, Easing.OutQuint);
@@ -600,6 +602,15 @@ namespace osu.Game.Screens
         private void UpdateBgBlur()
         {
             Background.BlurAmount.Value = BgBlur.Value * 100;
+        }
+
+        private void UpdateIdleVisuals()
+        {
+            if (!OverlaysHidden)
+                return;
+
+            bgBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
+            gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
         }
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
