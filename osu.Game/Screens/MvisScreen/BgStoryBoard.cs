@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Mvis
     public class BgStoryBoard : Container
     {
         private const float DURATION = 750;
-        private Container sbContainer;
+        public Container sbContainer;
         public ClockContainer sbClock;
         private CancellationTokenSource ChangeSB;
         private DimmableStoryboard dimmableStoryboard;
@@ -44,12 +44,9 @@ namespace osu.Game.Screens.Mvis
         public BgStoryBoard()
         {
             RelativeSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            Child = sbContainer = new Container
             {
-                sbContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
+                RelativeSizeAxes = Axes.Both
             };
         }
 
@@ -94,6 +91,9 @@ namespace osu.Game.Screens.Mvis
                     }
                 }, newsbClock =>
                 {
+                    sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                    sbClock?.Expire();
+
                     sbClock = newsbClock;
 
                     dimmableStoryboard.IgnoreUserSettings.Value = true;
@@ -131,25 +131,25 @@ namespace osu.Game.Screens.Mvis
             if ( b == null )
                 return;
 
-            IsReady.Value = false;
-            CancelAllTasks();
-
             Schedule(() =>
             {
+                CancelAllTasks();
+
+                IsReady.Value = false;
+
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
+                    Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
+
+                    storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
+
+                    UpdateVisuals();
+
                     LogTask = Task.Run( () => 
                     {
-                        Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
-
-                        sbClock?.FadeOut(DURATION, Easing.OutQuint);
-                        sbClock?.Expire();
-
-                        storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
-
                         UpdateComponent();
-                        UpdateVisuals();
                     });
+
                     await LogTask;
                 });
             });

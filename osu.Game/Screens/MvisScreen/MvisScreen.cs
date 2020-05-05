@@ -83,7 +83,7 @@ namespace osu.Game.Screens
         private Bindable<float> BgBlur = new Bindable<float>();
         private Bindable<float> IdleBgDim = new Bindable<float>();
         private bool OverlaysHidden = false;
-        public float BottombarOffset => bottomBar.Position.Y + bottomBar.DrawHeight;
+        public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
 
         public MvisScreen()
         {
@@ -236,7 +236,7 @@ namespace osu.Game.Screens
                 new MvisScreenContentContainer
                 {
                     Depth = 1,
-                    GetBottombarHeight = () => BottombarOffset,
+                    GetBottombarHeight = () => BottombarHeight,
                     Children = new Drawable[]
                     {
                         new Container()
@@ -600,14 +600,6 @@ namespace osu.Game.Screens
         private void UpdateBgBlur()
         {
             Background.BlurAmount.Value = BgBlur.Value * 100;
-        }
-
-        private void UpdateBgDim()
-        {
-            if ( OverlaysHidden )
-            {
-                bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
-            }
         }
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
