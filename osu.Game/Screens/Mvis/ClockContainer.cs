@@ -118,7 +118,6 @@ namespace osu.Game.Screens.Mvis
                 Schedule(() =>
                 {
                     adjustableClock.ChangeSource(track);
-                    updateRate();
 
                     if (!IsPaused.Value)
                         Start();
@@ -169,33 +168,11 @@ namespace osu.Game.Screens.Mvis
             base.Update();
         }
 
-        private bool speedAdjustmentsApplied;
-
-        private void updateRate()
-        {
-            if (track == null) return;
-
-            speedAdjustmentsApplied = true;
-            track.ResetSpeedAdjustments();
-
-            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            removeSourceClockAdjustments();
             track = null;
-        }
-
-        private void removeSourceClockAdjustments()
-        {
-            if (speedAdjustmentsApplied)
-            {
-                track.ResetSpeedAdjustments();
-                speedAdjustmentsApplied = false;
-            }
         }
     }
 }
