@@ -593,3 +593,15 @@
     *   [m] [Truncate beatmap title and artist on score panel #8919]
     *   [m] [Update framework #8925]
     *   [m] [Add local beatmap lookup cache to improve performance of imports #8924]
+
+### 2020/5/5
+*   合并上游pr
+    *   [m] [Implement period-tracking component #8701]
+    *   [m] [Fix song select tests potentially failing due to difficulty panels not yet displayed #8932]
+    *   [m] [Fix hard crash when changing ruleset while presenting a score #8933]
+    *   [m] [Bump Humanizer from 2.8.2 to 2.8.11 #8939]
+    *   [m] [Bump Microsoft.CodeAnalysis.FxCopAnalyzers from 2.9.8 to 3.0.0 #8937]
+    *   [m] [Bump Microsoft.CodeAnalysis.BannedApiAnalyzers from 2.9.8 to 3.0.0 #8938]
+
+*   暂不合并
+    *   [m] [Fix typo and add spaces to comments #8944]
