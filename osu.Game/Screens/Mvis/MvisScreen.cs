@@ -30,14 +30,15 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
-using System;
+using osu.Game.Screens.Mvis;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens
 {
     /// <summary>
     /// 缝合怪 + 奥利给山警告
     /// </summary>
-    public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         private const float DURATION = 750;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
@@ -66,8 +67,9 @@ namespace osu.Game.Screens
 
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
-        private Box bgBox;
+        private Box dimBox;
         private BottomBar bottomBar;
+        private Container gameplayContent;
         private SideBarSettingsPanel sidebarContainer;
         private BeatmapLogo beatmapLogo;
         private HoverCheckContainer hoverCheckContainer;
@@ -76,93 +78,29 @@ namespace osu.Game.Screens
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
         private Track Track;
+        private BackgroundStoryBoard bgSB;
+        private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
+        private Bindable<float> IdleBgDim = new Bindable<float>();
+        private Bindable<float> ContentAlpha = new Bindable<float>();
         private bool OverlaysHidden = false;
+        public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
 
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
             {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0
-                },
-                new Container
-                {
-                    Name = "Content Container",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new SpaceParticlesContainer(),
-                        new ParallaxContainer
-                        {
-                            ParallaxAmount = -0.0025f,
-                            Child = beatmapLogo = new BeatmapLogo
-                            {
-                                Anchor = Anchor.Centre,
-                            }
-                        },
-                        hoverCheckContainer = new HoverCheckContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                    }
-                },
                 new Container
                 {
                     Name = "Overlay Container",
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        sidebarContainer = new SideBarSettingsPanel
-                        {
-                            Name = "Sidebar Container",
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 400,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                    Alpha = 0.5f,
-                                },
-                                new OsuScrollContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = new FillFlowContainer
-                                    {
-                                        Spacing = new Vector2(10),
-                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
-                                        Height = Math.Max(768, DrawHeight),
-                                        RelativeSizeAxes = Axes.X,
-                                        Direction = FillDirection.Vertical,
-                                        Children = new Drawable[]
-                                        {
-                                            new MvisSettings(),
-                                            playlist = new PlaylistOverlay
-                                            {
-                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
-                                                TakeFocusOnPopIn = false,
-                                                RelativeSizeAxes = Axes.X,
-                                            },
-                                        }
-                                    },
-                                },
-                            }
-                        },
                         new FillFlowContainer
                         {
                             Name = "Bottom FillFlow",
                             RelativeSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
                                 bottomBar = new BottomBar
@@ -277,18 +215,118 @@ namespace osu.Game.Screens
                                         },
                                     }
                                 },
-                                lockButton = new ToggleableOverlayLockButton
+                                new Container
                                 {
-                                    TooltipText = "开启悬浮锁",
-                                    Action = () => UpdateLockButton(),
+                                    Name = "Lock Button Container",
+                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
+                                    Margin = new MarginPadding{ Bottom = 5 },
+                                    Child = lockButton = new ToggleableOverlayLockButton
+                                    {
+                                        TooltipText = "开启悬浮锁",
+                                        Action = () => UpdateLockButton(),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                    }
                                 }
                             }
                         },
                     }
                 },
+                new MvisScreenContentContainer
+                {
+                    Depth = 1,
+                    GetBottombarHeight = () => BottombarHeight,
+                    Children = new Drawable[]
+                    {
+                        new Container()
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Name = "Background Elements Container",
+                            Children = new Drawable[]
+                            {
+                                bgSB = new BackgroundStoryBoard(),
+                                dimBox = new Box
+                                {
+                                    Name = "Dim Box",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Alpha = 0
+                                },
+                            }
+                        },
+                        gameplayContent = new Container
+                        {
+                            Name = "Mvis Gameplay Item Container",
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new SpaceParticlesContainer(),
+                                new ParallaxContainer
+                                {
+                                    ParallaxAmount = -0.0025f,
+                                    Child = beatmapLogo = new BeatmapLogo
+                                    {
+                                        Anchor = Anchor.Centre,
+                                    }
+                                },
+                            }
+                        },
+                        sidebarContainer = new SideBarSettingsPanel
+                        {
+                            Name = "Sidebar Container",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 400,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                    Alpha = 0.5f,
+                                },
+                                new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new FillFlowContainer
+                                    {
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Spacing = new Vector2(10),
+                                        Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new MvisSettings(),
+                                            playlist = new PlaylistOverlay
+                                            {
+                                                Padding = new MarginPadding{ Left = 5, Right = 10 },
+                                                TakeFocusOnPopIn = false,
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        loadingSpinner = new LoadingSpinner(true, true)
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Margin = new MarginPadding(60)
+                        },
+                    }
+                },
                 idleTracker = new MouseIdleTracker(2000),
+                hoverCheckContainer = new HoverCheckContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             };
         }
 
@@ -296,17 +334,38 @@ namespace osu.Game.Screens
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
+            config.BindWith(OsuSetting.MvisIdleBgDim, IdleBgDim);
+            config.BindWith(OsuSetting.MvisContentAlpha, ContentAlpha);
         }
 
         protected override void LoadComplete()
         {
+            BgBlur.ValueChanged += _ => UpdateBgBlur();
+            ContentAlpha.ValueChanged += _ => UpdateIdleVisuals();
+            IdleBgDim.ValueChanged += _ => UpdateIdleVisuals();
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
-            BgBlur.ValueChanged += _ => this.Schedule( () => UpdateBgBlur() );
+            bgSB.IsReady.ValueChanged += _ =>
+            {
+                switch (bgSB.IsReady.Value)
+                {
+                    case true:
+                        loadingSpinner.Hide();
+                        break;
+
+                    case false:
+                        loadingSpinner.Show();
+                        break;
+                }
+            };
+            bgSB.storyboardReplacesBackground.ValueChanged += _ => 
+            {
+                Background.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
+            };
 
             inputManager = GetContainingInputManager();
-            bgBox.ScaleTo(1.1f);
+            dimBox.ScaleTo(1.1f);
 
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
             playlist.Show();
@@ -340,13 +399,16 @@ namespace osu.Game.Screens
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
             track.RestartPoint = 0;
 
-            updateComponentFromBeatmap(Beatmap.Value);
+            loadingSpinner.Show();
+            updateComponentFromBeatmap(Beatmap.Value, 500);
         }
 
         public override bool OnExiting(IScreen next)
         {
+            Beatmap.Value.Track.Looping = false;
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
             beatmapLogo.Exit();
+            bgSB.CancelAllTasks();
 
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);
@@ -447,18 +509,19 @@ namespace osu.Game.Screens
         private void HideOverlays()
         {
             game?.Toolbar.Hide();
-            bgBox.FadeTo(0.3f, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
-                     .FadeTo(0.01f, DURATION, Easing.OutQuint);
+                     .FadeOut(DURATION, Easing.OutQuint);
             AllowBack = false;
             AllowCursor = false;
             OverlaysHidden = true;
+            UpdateIdleVisuals();
         }
 
         private void ShowOverlays(bool Locked = false)
         {
             game?.Toolbar.Show();
-            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
+            gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
+            dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
                      .FadeIn(DURATION, Easing.OutQuint);
             AllowCursor = true;
@@ -523,21 +586,26 @@ namespace osu.Game.Screens
 
         private void UpdateBgBlur()
         {
-            if (Background is BackgroundScreenBeatmap backgroundBeatmap)
-            {
-                backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
-            }
+            Background.BlurAmount.Value = BgBlur.Value * 100;
         }
 
-        private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
+        private void UpdateIdleVisuals()
+        {
+            if (!OverlaysHidden)
+                return;
+
+            dimBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
+            gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
+        }
+
+        private void updateComponentFromBeatmap(WorkingBeatmap beatmap, float displayDelay = 0)
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
-            if (Background is BackgroundScreenBeatmap backgroundBeatmap)
-            {
-                backgroundBeatmap.Beatmap = beatmap;
-                backgroundBeatmap.BlurAmount.Value = BgBlur.Value * 100;
-            }
+            Background.Beatmap = beatmap;
+            Background.BlurAmount.Value = BgBlur.Value * 100;
+
+            bgSB.UpdateStoryBoardAsync( displayDelay );
         }
     }
 }

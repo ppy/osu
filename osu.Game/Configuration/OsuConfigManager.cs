@@ -130,9 +130,11 @@ namespace osu.Game.Configuration
             Set(OsuSetting.TrianglesEnabled, true);
 
             Set(OsuSetting.MvisParticleAmount, 350, 0, 350);
+            Set(OsuSetting.MvisContentAlpha, 1f, 0f, 1f);
             Set(OsuSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(OsuSetting.MvisEnableStoryboard, false);
             Set(OsuSetting.MvisUseOsuLogoVisualisation, false);
+            Set(OsuSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -242,6 +244,8 @@ namespace osu.Game.Configuration
         MvisParticleAmount,
         MvisBgBlur,
         MvisUseOsuLogoVisualisation,
-        MvisEnableStoryboard
+        MvisEnableStoryboard,
+        MvisIdleBgDim,
+        MvisContentAlpha
     }
 }

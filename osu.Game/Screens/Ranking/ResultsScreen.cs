@@ -202,7 +202,6 @@ namespace osu.Game.Screens.Ranking
             return texts[RNG.Next(0, texts.Length)];
         }
 
-
         private void UpdateVisualEffects()
         {
             if (OptUIEnabled.Value)

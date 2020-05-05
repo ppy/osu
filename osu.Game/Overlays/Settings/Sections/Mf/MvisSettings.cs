@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
@@ -28,6 +27,20 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = "背景模糊",
                     Bindable = config.GetBindable<float>(OsuSetting.MvisBgBlur),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "空闲时的背景暗化",
+                    Bindable = config.GetBindable<float>(OsuSetting.MvisIdleBgDim),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "空闲时的Mvis面板不透明度",
+                    Bindable = config.GetBindable<float>(OsuSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },

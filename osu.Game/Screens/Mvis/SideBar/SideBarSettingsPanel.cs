@@ -7,10 +7,6 @@ namespace osu.Game.Screens.Mvis.SideBar
     {
         private const float DURATION = 750;
 
-        public SideBarSettingsPanel()
-        {
-        }
-
         protected override void PopIn()
         {
             this.MoveToX(0, DURATION, Easing.OutQuint).FadeIn(DURATION, Easing.OutQuint);
