@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     var b = res.ToBeatmap(rulesets);
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     updateMetrics();

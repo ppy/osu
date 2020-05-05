@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets
 
                 var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r)).ToList();
 
-                //add all legacy rulesets first to ensure they have exclusive choice of primary key.
+                // add all legacy rulesets first to ensure they have exclusive choice of primary key.
                 foreach (var r in instances.Where(r => r is ILegacyRuleset))
                 {
                     if (context.RulesetInfo.SingleOrDefault(dbRuleset => dbRuleset.ID == r.RulesetInfo.ID) == null)
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets
 
                 context.SaveChanges();
 
-                //add any other modes
+                // add any other modes
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets
 
                 context.SaveChanges();
 
-                //perform a consistency check
+                // perform a consistency check
                 foreach (var r in context.RulesetInfo)
                 {
                     try
