@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "启用故事版/背景视频(实验性)",
+                    LabelText = "启用故事版/背景视频",
                     Bindable = config.GetBindable<bool>(OsuSetting.MvisEnableStoryboard),
                 },
                 new SettingsCheckbox
