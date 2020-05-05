@@ -166,8 +166,6 @@ namespace osu.Game.Screens.Mvis
             if (!IsPaused.Value)
                 userOffsetClock.ProcessFrame();
 
-            Seek(beatmap.Track.CurrentTime);
-
             base.Update();
         }
 

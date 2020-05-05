@@ -79,7 +79,7 @@ namespace osu.Game.Screens
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
         private Track Track;
-        private BgStoryBoard bgSB;
+        private BackgroundStoryBoard bgSB;
         private LoadingSpinner loadingSpinner;
         private Bindable<float> BgBlur = new Bindable<float>();
         private Bindable<float> IdleBgDim = new Bindable<float>();
@@ -247,7 +247,7 @@ namespace osu.Game.Screens
                             Name = "Background Elements Container",
                             Children = new Drawable[]
                             {
-                                bgSB = new BgStoryBoard(),
+                                bgSB = new BackgroundStoryBoard(),
                                 bgBox = new Box
                                 {
                                     Name = "Dim Box",

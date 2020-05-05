@@ -12,7 +12,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Mvis
 {
-    public class BgStoryBoard : Container
+    public class BackgroundStoryBoard : Container
     {
         private const float DURATION = 750;
         public Container sbContainer;
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Mvis
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
 
-        public BgStoryBoard()
+        public BackgroundStoryBoard()
         {
             RelativeSizeAxes = Axes.Both;
             Child = sbContainer = new Container
@@ -60,6 +60,12 @@ namespace osu.Game.Screens.Mvis
         {
             EnableSB.ValueChanged += _ => UpdateVisuals();
             dimmableStoryboard?.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+        }
+
+        protected override void Update()
+        {
+            if ( IsReady.Value )
+                sbClock?.Seek(b.Value.Track.CurrentTime);
         }
 
         public void UpdateVisuals()
@@ -91,9 +97,6 @@ namespace osu.Game.Screens.Mvis
                     }
                 }, newsbClock =>
                 {
-                    sbClock?.FadeOut(DURATION, Easing.OutQuint);
-                    sbClock?.Expire();
-
                     sbClock = newsbClock;
 
                     dimmableStoryboard.IgnoreUserSettings.Value = true;
@@ -136,6 +139,14 @@ namespace osu.Game.Screens.Mvis
                 CancelAllTasks();
 
                 IsReady.Value = false;
+
+                var lastdimmableSB = dimmableStoryboard;
+
+                lastdimmableSB?.FadeOut(DURATION, Easing.OutQuint);
+                sbClock?.FadeOut(DURATION, Easing.OutQuint);
+
+                lastdimmableSB?.Expire();
+                sbClock?.Expire();
 
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
