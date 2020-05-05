@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.OSD
 
             InternalChildren = new Drawable[]
             {
-                new Container //this container exists just to set a minimum width for the toast
+                new Container // this container exists just to set a minimum width for the toast
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
