@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select.Details
                 AutoSizeAxes = Axes.Y,
                 Children = new[]
                 {
-                    FirstValue = new StatisticRow(), //circle size/key amount
+                    FirstValue = new StatisticRow(), // circle size/key amount
                     HpDrain = new StatisticRow { Title = "HP Drain" },
                     Accuracy = new StatisticRow { Title = "Accuracy" },
                     ApproachRate = new StatisticRow { Title = "Approach Rate" },

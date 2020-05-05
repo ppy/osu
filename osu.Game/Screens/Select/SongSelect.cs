@@ -798,7 +798,7 @@ namespace osu.Game.Screens.Select
                 Masking = true;
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
                 InternalChild = Content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
