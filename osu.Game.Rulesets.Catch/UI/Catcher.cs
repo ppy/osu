@@ -24,7 +24,8 @@ namespace osu.Game.Rulesets.Catch.UI
     public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
     {
         /// <summary>
-        /// The default colour used for all hyper-dashing components. (catcher drawables and fruit)
+        /// The default colour used to tint hyper-dash fruit, along with the moving catcher, its trail
+        /// and end glow/after-image during a hyper-dash.
         /// </summary>
         public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
 
