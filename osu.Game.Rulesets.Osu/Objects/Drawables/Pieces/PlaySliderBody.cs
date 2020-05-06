@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, SnakingIn);
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, SnakingOut);
 
-            BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? 1;
+            BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? .8f;
             BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
         }
 
