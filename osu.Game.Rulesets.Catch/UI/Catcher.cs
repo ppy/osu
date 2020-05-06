@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 dashing = value;
 
-                trails.DisplayTrail |= dashing;
+                trails.DisplayTrail = value || HyperDashing;
             }
         }
 

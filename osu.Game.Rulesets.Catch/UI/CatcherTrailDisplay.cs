@@ -103,11 +103,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void displayTrail()
         {
-            if (!catcher.Dashing && !catcher.HyperDashing)
-            {
-                DisplayTrail = false;
+            if (!DisplayTrail)
                 return;
-            }
 
             var sprite = createTrailSprite(catcher.HyperDashing ? hyperDashTrails : dashTrails);
 
