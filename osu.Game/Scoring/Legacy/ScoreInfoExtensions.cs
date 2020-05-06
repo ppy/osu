@@ -66,6 +66,9 @@ namespace osu.Game.Scoring.Legacy
             {
                 case 3:
                     return scoreInfo.Statistics[HitResult.Good];
+
+                case 2:
+                    return scoreInfo.Statistics[HitResult.SmallTickMiss];
             }
 
             return null;
@@ -77,6 +80,10 @@ namespace osu.Game.Scoring.Legacy
             {
                 case 3:
                     scoreInfo.Statistics[HitResult.Good] = value;
+                    break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.SmallTickMiss] = value;
                     break;
             }
         }
@@ -91,6 +98,9 @@ namespace osu.Game.Scoring.Legacy
 
                 case 3:
                     return scoreInfo.Statistics[HitResult.Ok];
+
+                case 2:
+                    return scoreInfo.Statistics[HitResult.LargeTickHit];
             }
 
             return null;
@@ -108,6 +118,10 @@ namespace osu.Game.Scoring.Legacy
                 case 3:
                     scoreInfo.Statistics[HitResult.Ok] = value;
                     break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.LargeTickHit] = value;
+                    break;
             }
         }
 
@@ -118,6 +132,9 @@ namespace osu.Game.Scoring.Legacy
                 case 0:
                 case 3:
                     return scoreInfo.Statistics[HitResult.Meh];
+
+                case 2:
+                    return scoreInfo.Statistics[HitResult.SmallTickHit];
             }
 
             return null;
@@ -130,6 +147,10 @@ namespace osu.Game.Scoring.Legacy
                 case 0:
                 case 3:
                     scoreInfo.Statistics[HitResult.Meh] = value;
+                    break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.SmallTickHit] = value;
                     break;
             }
         }
