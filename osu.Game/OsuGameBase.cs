@@ -71,8 +71,6 @@ namespace osu.Game
 
         protected MenuCursorContainer MenuCursorContainer;
 
-        protected StorageConfigManager StorageConfig;
-
         private Container content;
 
         protected override Container<Drawable> Content => content;
@@ -304,17 +302,7 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            StorageConfig = new StorageConfigManager(host.Storage);
-
-            var customStoragePath = StorageConfig.Get<string>(Configuration.StorageConfig.FullPath);
-
-            if (!string.IsNullOrEmpty(customStoragePath))
-            {
-                Storage = new CustomStorage(customStoragePath, host);
-                Logger.Storage = Storage.GetStorageForDirectory("logs");
-            }
-            else
-                Storage = host.Storage;
+            Storage = new OsuStorage(host);
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
@@ -364,18 +352,6 @@ namespace osu.Game
                 public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
-            }
-        }
-
-        /// <summary>
-        /// A storage pointing to an absolute location specified by the user to store game data files.
-        /// </summary>
-        private class CustomStorage : NativeStorage
-        {
-            public CustomStorage(string fullPath, GameHost host)
-                : base(string.Empty, host)
-            {
-                BasePath = fullPath;
             }
         }
     }
