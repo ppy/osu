@@ -265,23 +265,20 @@ namespace osu.Game.Screens.Play
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value)
+                HUDOverlay = DrawableRuleset.CreateHUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value).With(hudOverlay=>
                 {
-                    HoldToQuit =
-                    {
-                        Action = performUserRequestedExit,
-                        IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
-                    },
-                    PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
-                    KeyCounter =
-                    {
-                        AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
-                        IsCounting = false
-                    },
-                    RequestSeek = GameplayClockContainer.Seek,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
+                    hudOverlay.HoldToQuit.Action = performUserRequestedExit;
+                    hudOverlay.HoldToQuit.IsPaused.BindTarget = GameplayClockContainer.IsPaused;
+
+                    hudOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = GameplayClockContainer.UserPlaybackRate;
+
+                    hudOverlay.KeyCounter.AlwaysVisible.BindTarget = DrawableRuleset.HasReplayLoaded;
+                    hudOverlay.KeyCounter.IsCounting = false;
+
+                    hudOverlay.RequestSeek = GameplayClockContainer.Seek;
+                    hudOverlay.Anchor = Anchor.Centre;
+                    hudOverlay.Origin = Anchor.Centre;
+                }),
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
                     RequestSkip = GameplayClockContainer.Skip

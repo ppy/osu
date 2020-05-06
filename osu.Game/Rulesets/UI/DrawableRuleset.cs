@@ -487,6 +487,9 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
+        public virtual HUDOverlay CreateHUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+            => new HUDOverlay(scoreProcessor, healthProcessor, drawableRuleset, mods);
+
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
