@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private float borderSize = 1;
+        private float borderSize = .8f;
 
         public float BorderSize
         {
