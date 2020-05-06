@@ -128,17 +128,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 catcherArea.MovableCatcher.SetHyperDashState(2);
             });
 
-            AddUntilStep("catcher colour is correct", () =>
-            {
-                var expected = expectedCatcherColour;
-
-                if (expected == Catcher.DEFAULT_HYPER_DASH_COLOUR)
-                    // The expected colour for Catcher.Colour is another colour
-                    // for the default skin, assert with that instead.
-                    expected = Catcher.DEFAULT_CATCHER_HYPER_DASH_COLOUR;
-
-                return catcherArea.MovableCatcher.Colour == expected;
-            });
+            AddUntilStep("catcher colour is correct", () => catcherArea.MovableCatcher.Colour == expectedCatcherColour);
 
             AddAssert("catcher trails colours are correct", () => trails.HyperDashTrailsColour == expectedCatcherColour);
             AddAssert("catcher end-glow colours are correct", () => trails.EndGlowSpritesColour == (expectedEndGlowColour ?? expectedCatcherColour));

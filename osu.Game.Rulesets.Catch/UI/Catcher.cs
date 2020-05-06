@@ -29,15 +29,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
 
         /// <summary>
-        /// The default hyper-dash colour used directly for this
-        /// <see cref="Catcher"/>'s <see cref="Drawable.Colour"/>.
-        /// </summary>
-        /// <remarks>
-        /// This colour is only used when no skin overrides <see cref="CatchSkinColour.HyperDash"/>.
-        /// </remarks>
-        public static readonly Color4 DEFAULT_CATCHER_HYPER_DASH_COLOUR = Color4.OrangeRed;
-
-        /// <summary>
         /// The duration between transitioning to hyper-dash state.
         /// </summary>
         public const double HYPER_DASH_TRANSITION_DURATION = 180;
@@ -288,13 +279,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             if (hyperDashing)
             {
-                // special behaviour for catcher colour if no skin overrides.
-                var catcherColour =
-                    hyperDashColour == DEFAULT_HYPER_DASH_COLOUR
-                        ? DEFAULT_CATCHER_HYPER_DASH_COLOUR
-                        : hyperDashColour;
-
-                this.FadeColour(catcherColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
                 this.FadeTo(0.2f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
             }
             else
