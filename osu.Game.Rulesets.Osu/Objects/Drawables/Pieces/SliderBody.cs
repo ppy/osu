@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 p.PathRadius = path?.PathRadius ?? 10;
                 p.AccentColour = path?.AccentColour ?? Color4.White;
                 p.BorderColour = path?.BorderColour ?? Color4.White;
-                p.BorderSize = path?.BorderSize ?? 1;
+                p.BorderSize = path?.BorderSize ?? .8f;
                 p.Vertices = path?.Vertices ?? Array.Empty<Vector2>();
             });
         }
