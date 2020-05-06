@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Play
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                HUDOverlay = DrawableRuleset.CreateHUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value).With(hudOverlay=>
+                HUDOverlay = DrawableRuleset.CreateHUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value).With(hudOverlay =>
                 {
                     hudOverlay.HoldToQuit.Action = performUserRequestedExit;
                     hudOverlay.HoldToQuit.IsPaused.BindTarget = GameplayClockContainer.IsPaused;
