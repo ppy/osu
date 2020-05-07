@@ -90,7 +90,7 @@ namespace osu.Game
 
         protected BackButton BackButton;
 
-        protected SettingsPanel Settings;
+        protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
@@ -609,6 +609,9 @@ namespace osu.Game
 
             loadComponentSingleFile(screenshotManager, Add);
 
+            // dependency on notification overlay
+            loadComponentSingleFile(CreateUpdateManager(), Add, true);
+
             // overlay elements
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
@@ -641,7 +644,6 @@ namespace osu.Game
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
-            Add(CreateUpdateManager()); // dependency on notification overlay
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
@@ -765,11 +767,17 @@ namespace osu.Game
 
         private Task asyncLoadStream;
 
+        /// <summary>
+        /// Schedules loading the provided <paramref name="d"/> in a single file.
+        /// </summary>
+        /// <param name="d">The component to load.</param>
+        /// <param name="add">The method to invoke for adding the component.</param>
+        /// <param name="cache">Whether to cache the component as type <typeparamref name="T"/> into the game dependencies before any scheduling.</param>
         private T loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
             where T : Drawable
         {
             if (cache)
-                dependencies.Cache(d);
+                dependencies.CacheAs(d);
 
             if (d is OverlayContainer overlay)
                 overlays.Add(overlay);
