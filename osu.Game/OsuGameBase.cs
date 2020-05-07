@@ -50,6 +50,7 @@ namespace osu.Game
         public const int SAMPLE_CONCURRENCY = 6;
 
         protected OsuConfigManager LocalConfig;
+        protected MfConfigManager MfConfig;
 
         protected BeatmapManager BeatmapManager;
 
@@ -138,6 +139,7 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
+            dependencies.Cache(MfConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
             AddFont(Resources, @"Fonts/Torus-Regular");
@@ -304,6 +306,9 @@ namespace osu.Game
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
+
+            if (MfConfig == null)
+                MfConfig = new MfConfigManager(Storage);
         }
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();

@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override string Header => "Mvis播放器";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -20,39 +20,39 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = "屏幕粒子数",
                     TransferValueOnCommit = true,
-                    Bindable = config.GetBindable<int>(OsuSetting.MvisParticleAmount),
+                    Bindable = config.GetBindable<int>(MfSetting.MvisParticleAmount),
                     KeyboardStep = 1,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "背景模糊",
-                    Bindable = config.GetBindable<float>(OsuSetting.MvisBgBlur),
+                    Bindable = config.GetBindable<float>(MfSetting.MvisBgBlur),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "空闲时的背景暗化",
-                    Bindable = config.GetBindable<float>(OsuSetting.MvisIdleBgDim),
+                    Bindable = config.GetBindable<float>(MfSetting.MvisIdleBgDim),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "空闲时的Mvis面板不透明度",
-                    Bindable = config.GetBindable<float>(OsuSetting.MvisContentAlpha),
+                    Bindable = config.GetBindable<float>(MfSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "启用故事版/背景视频(实验性)",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MvisEnableStoryboard),
+                    LabelText = "启用故事版/背景视频",
+                    Bindable = config.GetBindable<bool>(MfSetting.MvisEnableStoryboard),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "使用原版Logo效果",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MvisUseOsuLogoVisualisation),
+                    Bindable = config.GetBindable<bool>(MfSetting.MvisUseOsuLogoVisualisation),
                 },
             };
         }

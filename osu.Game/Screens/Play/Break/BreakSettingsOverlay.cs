@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Play.HUD
         public readonly VisualSettings VisualSettings;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Optui.ValueChanged += _ => UpdateVisibilities();
             UpdateVisibilities();

@@ -67,7 +67,7 @@ namespace osu.Game.Screens
 
         private InputManager inputManager { get; set; }
         private MouseIdleTracker idleTracker;
-        private Box bgBox;
+        private Box dimBox;
         private BottomBar bottomBar;
         private Container gameplayContent;
         private SideBarSettingsPanel sidebarContainer;
@@ -247,7 +247,7 @@ namespace osu.Game.Screens
                             Children = new Drawable[]
                             {
                                 bgSB = new BackgroundStoryBoard(),
-                                bgBox = new Box
+                                dimBox = new Box
                                 {
                                     Name = "Dim Box",
                                     RelativeSizeAxes = Axes.Both,
@@ -331,11 +331,11 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
-            config.BindWith(OsuSetting.MvisIdleBgDim, IdleBgDim);
-            config.BindWith(OsuSetting.MvisContentAlpha, ContentAlpha);
+            config.BindWith(MfSetting.MvisBgBlur, BgBlur);
+            config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);
+            config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
         }
 
         protected override void LoadComplete()
@@ -365,14 +365,22 @@ namespace osu.Game.Screens
             };
 
             inputManager = GetContainingInputManager();
-            bgBox.ScaleTo(1.1f);
+            dimBox.ScaleTo(1.1f);
 
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
             playlist.Show();
 
+            progressBarContainer.progressBar.OnSeek = SeekTo;
+
             ShowOverlays();
 
             base.LoadComplete();
+        }
+
+        private void SeekTo(double position)
+        {
+            musicController?.SeekTo(position);
+            bgSB?.sbClock?.Seek(position);
         }
 
         protected override void Update()
@@ -400,7 +408,7 @@ namespace osu.Game.Screens
             track.RestartPoint = 0;
 
             loadingSpinner.Show();
-            updateComponentFromBeatmap(Beatmap.Value);
+            updateComponentFromBeatmap(Beatmap.Value, 500);
         }
 
         public override bool OnExiting(IScreen next)
@@ -419,11 +427,11 @@ namespace osu.Game.Screens
             switch (action)
             {
                 case GlobalAction.MvisMusicPrev:
-                    musicController.PreviousTrack();
+                    musicController?.PreviousTrack();
                     return true;
 
                 case GlobalAction.MvisMusicNext:
-                    musicController.NextTrack();
+                    musicController?.NextTrack();
                     return true;
 
                 case GlobalAction.MvisTogglePause:
@@ -521,7 +529,7 @@ namespace osu.Game.Screens
         {
             game?.Toolbar.Show();
             gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
-            bgBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
+            dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
             bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
                      .FadeIn(DURATION, Easing.OutQuint);
             AllowCursor = true;
@@ -589,12 +597,12 @@ namespace osu.Game.Screens
             if ( Track?.IsRunning == true )
             {
                 bgSB?.sbClock?.Stop();
-                musicController.Stop();
+                musicController?.Stop();
             }
             else
             {
                 bgSB?.sbClock?.Start();
-                musicController.Play();
+                musicController?.Play();
             }
         }
 
@@ -608,18 +616,18 @@ namespace osu.Game.Screens
             if (!OverlaysHidden)
                 return;
 
-            bgBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
+            dimBox.FadeTo(IdleBgDim.Value, DURATION, Easing.OutQuint);
             gameplayContent.FadeTo(ContentAlpha.Value, DURATION, Easing.OutQuint);
         }
 
-        private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
+        private void updateComponentFromBeatmap(WorkingBeatmap beatmap, float displayDelay = 0)
         {
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             Background.Beatmap = beatmap;
             Background.BlurAmount.Value = BgBlur.Value * 100;
 
-            bgSB.UpdateStoryBoardAsync();
+            bgSB.UpdateStoryBoardAsync( displayDelay );
         }
     }
 }
