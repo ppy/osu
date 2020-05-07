@@ -489,7 +489,7 @@ namespace osu.Game.Rulesets.UI
 
         /// <summary>
         /// Whether to display the HUD with this ruleset.
-        /// Override to false to completely disable the display of the HUD with this ruleset. 
+        /// Override to false to completely disable the display of the HUD with this ruleset.
         /// </summary>
         /// <remarks>
         /// HUD refers here to <see cref="HUDOverlay"/> in player as well as <see cref="BreakOverlay"/>.
