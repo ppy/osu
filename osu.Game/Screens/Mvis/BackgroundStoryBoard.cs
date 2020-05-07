@@ -105,7 +105,11 @@ namespace osu.Game.Screens.Mvis
 
                     sbContainer.Add(sbClock);
 
-                    sbClock.Start();
+                    if ( b.Value.Track.IsRunning == true )
+                        sbClock.Start();
+                    else
+                        sbClock.Stop();
+
                     sbClock.Seek(b.Value.Track.CurrentTime);
 
                     IsReady.Value = true;

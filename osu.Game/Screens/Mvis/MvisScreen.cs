@@ -370,9 +370,17 @@ namespace osu.Game.Screens
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
             playlist.Show();
 
+            progressBarContainer.progressBar.OnSeek = SeekTo;
+
             ShowOverlays();
 
             base.LoadComplete();
+        }
+
+        private void SeekTo(double position)
+        {
+            musicController?.SeekTo(position);
+            bgSB?.sbClock?.Seek(position);
         }
 
         protected override void Update()
@@ -419,11 +427,11 @@ namespace osu.Game.Screens
             switch (action)
             {
                 case GlobalAction.MvisMusicPrev:
-                    musicController.PreviousTrack();
+                    musicController?.PreviousTrack();
                     return true;
 
                 case GlobalAction.MvisMusicNext:
-                    musicController.NextTrack();
+                    musicController?.NextTrack();
                     return true;
 
                 case GlobalAction.MvisTogglePause:
@@ -589,12 +597,12 @@ namespace osu.Game.Screens
             if ( Track?.IsRunning == true )
             {
                 bgSB?.sbClock?.Stop();
-                musicController.Stop();
+                musicController?.Stop();
             }
             else
             {
                 bgSB?.sbClock?.Start();
-                musicController.Play();
+                musicController?.Play();
             }
         }
 
