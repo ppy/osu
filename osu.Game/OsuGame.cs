@@ -609,7 +609,7 @@ namespace osu.Game
 
             loadComponentSingleFile(screenshotManager, Add);
 
-            // dependency on notification overlay
+            // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
             // overlay elements
