@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select.Carousel
                 terms.Add(Beatmap.Version);
 
                 foreach (var criteriaTerm in criteria.SearchTerms)
-                    match &= terms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
+                    match &= terms.Any(term => term?.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
             }
 
             Filtered.Value = !match;
