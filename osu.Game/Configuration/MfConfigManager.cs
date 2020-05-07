@@ -19,9 +19,11 @@ namespace osu.Game.Configuration
         {
             base.InitialiseDefaults();
 
-            //Optimize Settings
+            //UI Settings
             Set(MfSetting.OptUI, true);
             Set(MfSetting.TrianglesEnabled, true);
+
+            //MvisSettings
             Set(MfSetting.MvisParticleAmount, 350, 0, 350);
             Set(MfSetting.MvisContentAlpha, 1f, 0f, 1f);
             Set(MfSetting.MvisBgBlur, 0.2f, 0f, 1f);

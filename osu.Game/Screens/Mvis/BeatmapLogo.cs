@@ -26,9 +26,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         Track track;
         private bool ScreenExiting = false;
         private float progressLast = 0;
-
         private Bindable<bool> UseLogoVisuals = new Bindable<bool>();
-        public BeatmapLogo(int barsCount = 72, float barWidth = 5f)
+
+        public BeatmapLogo(int barsCount = 120, float barWidth = 3f)
         {
             Origin = Anchor.Centre;
             Size = new Vector2(radius);
