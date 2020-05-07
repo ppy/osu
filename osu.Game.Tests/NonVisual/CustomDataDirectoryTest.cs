@@ -25,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
-                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, $"headless", nameof(TestDefaultDirectory));
+                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, "headless", nameof(TestDefaultDirectory));
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
                 }
