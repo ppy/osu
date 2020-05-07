@@ -30,6 +30,8 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisEnableStoryboard, false);
             Set(MfSetting.MvisUseOsuLogoVisualisation, false);
             Set(MfSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
+            Set(MfSetting.MvisBarCount, 120, 20, 120);
+            Set(MfSetting.MvisBarRGBLighting, false);
         }
     }
 
@@ -42,6 +44,8 @@ namespace osu.Game.Configuration
         MvisUseOsuLogoVisualisation,
         MvisEnableStoryboard,
         MvisIdleBgDim,
-        MvisContentAlpha
+        MvisContentAlpha,
+        MvisBarCount,
+        MvisBarRGBLighting
     }
 }

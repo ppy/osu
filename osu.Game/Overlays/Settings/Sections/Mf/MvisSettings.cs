@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
@@ -53,6 +54,17 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = "使用原版Logo效果",
                     Bindable = config.GetBindable<bool>(MfSetting.MvisUseOsuLogoVisualisation),
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "频谱密度",
+                    Bindable = config.GetBindable<int>(MfSetting.MvisBarCount),
+                    KeyboardStep = 1,
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "频谱RGB光效",
+                    Bindable = config.GetBindable<bool>(MfSetting.MvisBarRGBLighting),
                 },
             };
         }

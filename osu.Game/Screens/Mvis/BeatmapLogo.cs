@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         private bool ScreenExiting = false;
         private float progressLast = 0;
         private Bindable<bool> UseLogoVisuals = new Bindable<bool>();
+        private Bindable<bool> RGBCircularLighting = new Bindable<bool>();
 
         public BeatmapLogo(int barsCount = 120, float barWidth = 3f)
         {
@@ -107,8 +108,10 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         private void load(MfConfigManager config)
         {
             config.BindWith(MfSetting.MvisUseOsuLogoVisualisation, UseLogoVisuals);
+            config.BindWith(MfSetting.MvisBarRGBLighting, RGBCircularLighting);
 
             UseLogoVisuals.ValueChanged += _ => UpdateVisuals();
+            RGBCircularLighting.ValueChanged += _ => UpdateVisuals();
 
             UpdateVisuals();
         }
@@ -119,16 +122,26 @@ namespace osu.Game.Screens.Mvis.UI.Objects
             {
                 case true:
                     circularContainer.FadeOut(500, Easing.OutQuint);
-                    circularContainer.FadeColour( Color4Extensions.FromHex("#ff0000"), 2000 ).Then()
-                                     .FadeColour( Color4Extensions.FromHex("#00ff00"), 2000 ).Then()
-                                     .FadeColour( Color4Extensions.FromHex("#0000ff"), 2000 ).Then()
-                                     .Loop();
                     visualisation.FadeIn(500, Easing.OutQuint);
                     break;
 
                 case false:
                     circularContainer.FadeIn(500, Easing.OutQuint);
                     visualisation.FadeOut(500, Easing.OutQuint);
+                    break;
+            }
+
+            switch ( RGBCircularLighting.Value )
+            {
+                case true:
+                    circularContainer.FadeColour( Color4Extensions.FromHex("#ff0000"), 2000 ).Then()
+                                     .FadeColour( Color4Extensions.FromHex("#00ff00"), 2000 ).Then()
+                                     .FadeColour( Color4Extensions.FromHex("#0000ff"), 2000 ).Then()
+                                     .Loop();
+                    break;
+
+                case false:
+                    circularContainer.FadeColour( Color4Extensions.FromHex("#ffffff"), 500 );
                     break;
             }
         }
