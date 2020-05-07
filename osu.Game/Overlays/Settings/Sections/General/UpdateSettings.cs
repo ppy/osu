@@ -11,10 +11,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class UpdateSettings : SettingsSubsection
     {
+        [Resolved(CanBeNull = true)]
+        private OsuGameBase game { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private UpdateManager updateManager { get; set; }
+
         protected override string Header => "Updates";
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, OsuConfigManager config, OsuGameBase game, UpdateManager updateManager)
+        private void load(Storage storage, OsuConfigManager config)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
