@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisParticleAmount, MvisParticleAmount);
+            config.BindWith(MfSetting.MvisParticleAmount, MvisParticleAmount);
             MaxParticlesCount = MvisParticleAmount.Value;
 
             MvisParticleAmount.ValueChanged += _ => MaxParticlesCount = MvisParticleAmount.Value;

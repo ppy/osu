@@ -331,11 +331,11 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
-            config.BindWith(OsuSetting.MvisIdleBgDim, IdleBgDim);
-            config.BindWith(OsuSetting.MvisContentAlpha, ContentAlpha);
+            config.BindWith(MfSetting.MvisBgBlur, BgBlur);
+            config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);
+            config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
         }
 
         protected override void LoadComplete()

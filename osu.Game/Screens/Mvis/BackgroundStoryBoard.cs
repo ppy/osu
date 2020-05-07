@@ -53,9 +53,9 @@ namespace osu.Game.Screens.Mvis
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisEnableStoryboard, EnableSB);
+            config.BindWith(MfSetting.MvisEnableStoryboard, EnableSB);
         }
 
         protected override void LoadComplete()

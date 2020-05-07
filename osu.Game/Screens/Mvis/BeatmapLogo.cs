@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         private float progressLast = 0;
 
         private Bindable<bool> UseLogoVisuals = new Bindable<bool>();
-        public BeatmapLogo(int barsCount = 120, float barWidth = 3f)
+        public BeatmapLogo(int barsCount = 72, float barWidth = 5f)
         {
             Origin = Anchor.Centre;
             Size = new Vector2(radius);
@@ -103,9 +104,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisUseOsuLogoVisualisation, UseLogoVisuals);
+            config.BindWith(MfSetting.MvisUseOsuLogoVisualisation, UseLogoVisuals);
 
             UseLogoVisuals.ValueChanged += _ => UpdateVisuals();
 
@@ -118,6 +119,10 @@ namespace osu.Game.Screens.Mvis.UI.Objects
             {
                 case true:
                     circularContainer.FadeOut(500, Easing.OutQuint);
+                    circularContainer.FadeColour( Color4Extensions.FromHex("#ff0000"), 2000 ).Then()
+                                     .FadeColour( Color4Extensions.FromHex("#00ff00"), 2000 ).Then()
+                                     .FadeColour( Color4Extensions.FromHex("#0000ff"), 2000 ).Then()
+                                     .Loop();
                     visualisation.FadeIn(500, Easing.OutQuint);
                     break;
 

@@ -66,9 +66,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuColour colours, MfConfigManager config)
         {
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Children = new Drawable[]
             {

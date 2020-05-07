@@ -70,9 +70,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            optUI = config.GetBindable<bool>(OsuSetting.OptUI);
+            optUI = config.GetBindable<bool>(MfSetting.OptUI);
             Children = new Drawable[]
             {
                 dragContainer = new DragContainer

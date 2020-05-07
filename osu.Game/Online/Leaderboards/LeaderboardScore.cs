@@ -76,11 +76,11 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, OsuConfigManager config)
+        private void load(IAPIProvider api, OsuColour colour, MfConfigManager config)
         {
             var user = score.User;
 
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Optui.ValueChanged += _ => UpdateTooltip();
             UpdateTooltip();

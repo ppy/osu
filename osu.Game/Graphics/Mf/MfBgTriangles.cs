@@ -17,9 +17,9 @@ namespace osu.Game.Graphics
         private BackgroundTriangles BackgroundTriangle;
         
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colour)
+        private void load(MfConfigManager config, OsuColour colour)
         {
-            config.BindWith(OsuSetting.OptUI, Optui);
+            config.BindWith(MfSetting.OptUI, Optui);
 
             Optui.ValueChanged += _ => UpdateIcons();
             UpdateIcons();
