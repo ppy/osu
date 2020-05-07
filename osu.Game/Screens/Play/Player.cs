@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
 
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
-        public HUDOverlay HUDOverlay { get; private set; }
+        protected HUDOverlay HUDOverlay { get; private set; }
 
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
@@ -183,6 +183,13 @@ namespace osu.Game.Screens.Play
             addUnderlayComponents(GameplayClockContainer);
             addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
+
+            if (!DrawableRuleset.DisplayHud)
+            {
+                HUDOverlay.ShowHud.Value = false;
+                HUDOverlay.ShowHud.Disabled = true;
+                BreakOverlay.Hide();
+            }
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
