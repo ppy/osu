@@ -37,9 +37,11 @@ namespace osu.Desktop.Updater
             if (game.IsDeployedBuild)
             {
                 Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
-                Schedule(() => Task.Run(() => checkForUpdateAsync()));
+                CheckForUpdate();
             }
         }
+
+        public override void CheckForUpdate() => Schedule(() => Task.Run(() => checkForUpdateAsync()));
 
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {

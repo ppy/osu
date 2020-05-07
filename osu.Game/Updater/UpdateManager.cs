@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -42,6 +43,11 @@ namespace osu.Game.Updater
             // debug / local compilations will reset to a non-release string.
             // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
             config.Set(OsuSetting.Version, version);
+        }
+
+        public virtual void CheckForUpdate()
+        {
+            Logger.Log("CheckForUpdate was called on the base class (UpdateManager)", LoggingTarget.Information);
         }
 
         private class UpdateCompleteNotification : SimpleNotification
