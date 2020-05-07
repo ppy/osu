@@ -11,13 +11,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class UpdateSettings : SettingsSubsection
     {
-        [Resolved(CanBeNull = true)]
-        private UpdateManager updateManager { get; set; }
-
         protected override string Header => "Updates";
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage, OsuConfigManager config, OsuGameBase game)
+        private void load(Storage storage, OsuConfigManager config, OsuGameBase game, UpdateManager updateManager)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
@@ -28,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             Add(new SettingsButton
             {
                 Text = "Check for updates",
-                Action = () => updateManager?.CheckForUpdate(),
+                Action = () => updateManager.CheckForUpdate(),
                 Enabled = { Value = game.IsDeployedBuild }
             });
 
