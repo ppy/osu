@@ -12,15 +12,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
     public class UpdateSettings : SettingsSubsection
     {
         [Resolved(CanBeNull = true)]
-        private OsuGameBase game { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
 
         protected override string Header => "Updates";
 
-        [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(Storage storage, OsuConfigManager config, OsuGameBase game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
@@ -28,7 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
-            if (game != null && updateManager != null)
+            // We shouldn't display the button for the base UpdateManager (without updating logic)
+            if (updateManager != null && updateManager.GetType() != typeof(UpdateManager))
             {
                 Add(new SettingsButton
                 {
