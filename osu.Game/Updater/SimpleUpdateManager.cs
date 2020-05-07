@@ -33,7 +33,7 @@ namespace osu.Game.Updater
                 CheckForUpdate();
         }
 
-        public override void CheckForUpdate() => Schedule(() => Task.Run(() => checkForUpdateAsync()));
+        public override void CheckForUpdate() => Schedule(() => Task.Run(checkForUpdateAsync));
 
         private async void checkForUpdateAsync()
         {

@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             Add(new SettingsButton
             {
                 Text = "Check for updates",
-                Action = () => updateManager.CheckForUpdate(),
+                Action = updateManager.CheckForUpdate,
                 Enabled = { Value = game.IsDeployedBuild }
             });
 
