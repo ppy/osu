@@ -25,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
-                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, $"headless-{nameof(TestDefaultDirectory)}");
+                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, $"headless", nameof(TestDefaultDirectory));
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
                 }
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.NonVisual
         {
             using (var host = new HeadlessGameHost(nameof(TestCustomDirectory)))
             {
-                string headlessPrefix = $"headless-{nameof(TestCustomDirectory)}";
+                string headlessPrefix = Path.Combine("headless", nameof(TestCustomDirectory));
 
                 // need access before the game has constructed its own storage yet.
                 Storage storage = new DesktopStorage(headlessPrefix, host);
