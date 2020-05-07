@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -13,6 +14,14 @@ namespace osu.Game.IO
     {
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
+
+        internal static readonly string[] IGNORE_DIRECTORIES = { "cache" };
+
+        internal static readonly string[] IGNORE_FILES =
+        {
+            "framework.ini",
+            "storage.ini"
+        };
 
         public OsuStorage(GameHost host)
             : base(host.Storage, string.Empty)
@@ -43,20 +52,58 @@ namespace osu.Game.IO
                 Directory.Delete(newLocation, true);
             }
 
-            Directory.Move(oldLocation, newLocation);
+            var source = new DirectoryInfo(oldLocation);
+            var destination = new DirectoryInfo(newLocation);
 
-            Directory.CreateDirectory(newLocation);
-            // temporary
-            Directory.CreateDirectory(oldLocation);
-
-            // move back exceptions for now
-            Directory.Move(Path.Combine(newLocation, "cache"), Path.Combine(oldLocation, "cache"));
-            File.Move(Path.Combine(newLocation, "framework.ini"), Path.Combine(oldLocation, "framework.ini"));
+            copyRecursive(source, destination);
 
             ChangeTargetStorage(host.GetStorage(newLocation));
 
             storageConfig.Set(StorageConfig.FullPath, newLocation);
             storageConfig.Save();
+
+            deleteRecursive(source);
+        }
+
+        private static void deleteRecursive(DirectoryInfo target, bool topLevelExcludes = true)
+        {
+            foreach (System.IO.FileInfo fi in target.GetFiles())
+            {
+                if (IGNORE_FILES.Contains(fi.Name))
+                    continue;
+
+                fi.Delete();
+            }
+
+            foreach (DirectoryInfo dir in target.GetDirectories())
+            {
+                if (IGNORE_DIRECTORIES.Contains(dir.Name))
+                    continue;
+
+                dir.Delete(true);
+            }
+        }
+
+        private static void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
+        {
+            // based off example code https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo
+            Directory.CreateDirectory(destination.FullName);
+
+            foreach (System.IO.FileInfo fi in source.GetFiles())
+            {
+                if (IGNORE_FILES.Contains(fi.Name))
+                    continue;
+
+                fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true);
+            }
+
+            foreach (DirectoryInfo dir in source.GetDirectories())
+            {
+                if (IGNORE_DIRECTORIES.Contains(dir.Name))
+                    continue;
+
+                copyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
+            }
         }
     }
 }
