@@ -7,14 +7,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.IO;
 
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
     public class CustomDataDirectoryTest
     {
+        [SetUp]
+        public void SetUp()
+        {
+            if (Directory.Exists(customPath))
+                Directory.Delete(customPath, true);
+        }
+
         [Test]
         public void TestDefaultDirectory()
         {
@@ -36,6 +45,8 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
+        private string customPath => Path.Combine(Environment.CurrentDirectory, "custom-path");
+
         [Test]
         public void TestCustomDirectory()
         {
@@ -49,7 +60,7 @@ namespace osu.Game.Tests.NonVisual
                 storage.DeleteDirectory(string.Empty);
 
                 using (var storageConfig = new StorageConfigManager(storage))
-                    storageConfig.Set(StorageConfig.FullPath, Path.Combine(Environment.CurrentDirectory, "custom-path"));
+                    storageConfig.Set(StorageConfig.FullPath, customPath);
 
                 try
                 {
@@ -58,7 +69,52 @@ namespace osu.Game.Tests.NonVisual
                     // switch to DI'd storage
                     storage = osu.Dependencies.Get<Storage>();
 
-                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(Environment.CurrentDirectory, "custom-path")));
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestMigration()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigration)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var storage = osu.Dependencies.Get<Storage>();
+
+                    // ensure we perform a save
+                    host.Dependencies.Get<FrameworkConfigManager>().Save();
+
+                    // ensure we "use" cache
+                    host.Storage.GetStorageForDirectory("cache");
+
+                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, "headless", nameof(TestMigration));
+
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
+
+                    (storage as OsuStorage)?.Migrate(customPath);
+
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
+
+                    foreach (var file in OsuStorage.IGNORE_FILES)
+                    {
+                        Assert.That(host.Storage.Exists(file), Is.True);
+                        Assert.That(storage.Exists(file), Is.False);
+                    }
+
+                    foreach (var dir in OsuStorage.IGNORE_DIRECTORIES)
+                    {
+                        Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
+                        Assert.That(storage.ExistsDirectory(dir), Is.False);
+                    }
+
+                    Assert.That(new StreamReader(host.Storage.GetStream("storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
                 }
                 finally
                 {
