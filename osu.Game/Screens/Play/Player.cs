@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
             addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
-            if (!DrawableRuleset.DisplayHud)
+            if (!DrawableRuleset.AllowGameplayOverlays)
             {
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
