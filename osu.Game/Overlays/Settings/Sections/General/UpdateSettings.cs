@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             });
 
             // We should only display the button for UpdateManagers that do check for updates
-            if (updateManager != null && updateManager.CanCheckForUpdate)
+            if (updateManager?.CanCheckForUpdate == true)
             {
                 Add(new SettingsButton
                 {
