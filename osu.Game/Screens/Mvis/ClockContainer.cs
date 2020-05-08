@@ -3,10 +3,8 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -47,8 +45,6 @@ namespace osu.Game.Screens.Mvis
         [Cached]
         public readonly GameplayClock GameplayClock;
 
-        private Bindable<double> userAudioOffset;
-
         private readonly FramedOffsetClock userOffsetClock;
 
         private readonly FramedOffsetClock platformOffsetClock;
@@ -85,9 +81,6 @@ namespace osu.Game.Screens.Mvis
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
-
             // sane default provided by ruleset.
             double startTime = Math.Min(0, gameplayStartTime);
 
@@ -103,27 +96,6 @@ namespace osu.Game.Screens.Mvis
             Seek(startTime);
 
             adjustableClock.ProcessFrame();
-        }
-
-        public void Restart()
-        {
-            // The Reset() call below causes speed adjustments to be reset in an async context, leading to deadlocks.
-            // The deadlock can be prevented by resetting the track synchronously before entering the async context.
-            track.ResetSpeedAdjustments();
-
-            Task.Run(() =>
-            {
-                track.Reset();
-
-                Schedule(() =>
-                {
-                    adjustableClock.ChangeSource(track);
-                    updateRate();
-
-                    if (!IsPaused.Value)
-                        Start();
-                });
-            });
         }
 
         public void Start()
@@ -166,38 +138,7 @@ namespace osu.Game.Screens.Mvis
             if (!IsPaused.Value)
                 userOffsetClock.ProcessFrame();
 
-            Seek(beatmap.Track.CurrentTime);
-
             base.Update();
-        }
-
-        private bool speedAdjustmentsApplied;
-
-        private void updateRate()
-        {
-            if (track == null) return;
-
-            speedAdjustmentsApplied = true;
-            track.ResetSpeedAdjustments();
-
-            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            removeSourceClockAdjustments();
-            track = null;
-        }
-
-        private void removeSourceClockAdjustments()
-        {
-            if (speedAdjustmentsApplied)
-            {
-                track.ResetSpeedAdjustments();
-                speedAdjustmentsApplied = false;
-            }
         }
     }
 }

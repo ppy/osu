@@ -63,8 +63,10 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
-            // Make the removal indices are sorted so that iteration order doesn't get messed up post-removal.
+            // Sort the indices to ensure that removal + insertion indices don't get jumbled up post-removal or post-insertion.
+            // This isn't strictly required, but the differ makes no guarantees about order.
             toRemove.Sort();
+            toAdd.Sort();
 
             // Apply the changes.
             for (int i = toRemove.Count - 1; i >= 0; i--)
@@ -74,7 +76,7 @@ namespace osu.Game.Screens.Edit
             {
                 IBeatmap newBeatmap = readBeatmap(newState);
                 foreach (var i in toAdd)
-                    editorBeatmap.Add(newBeatmap.HitObjects[i]);
+                    editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
             }
         }
 
@@ -84,7 +86,11 @@ namespace osu.Game.Screens.Edit
         {
             using (var stream = new MemoryStream(state))
             using (var reader = new LineBufferedReader(stream, true))
-                return new PassThroughWorkingBeatmap(Decoder.GetDecoder<Beatmap>(reader).Decode(reader)).GetPlayableBeatmap(editorBeatmap.BeatmapInfo.Ruleset);
+            {
+                var decoded = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+                decoded.BeatmapInfo.Ruleset = editorBeatmap.BeatmapInfo.Ruleset;
+                return new PassThroughWorkingBeatmap(decoded).GetPlayableBeatmap(editorBeatmap.BeatmapInfo.Ruleset);
+            }
         }
 
         private class PassThroughWorkingBeatmap : WorkingBeatmap

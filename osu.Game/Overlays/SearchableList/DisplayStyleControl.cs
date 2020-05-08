@@ -105,6 +105,8 @@ namespace osu.Game.Overlays.SearchableList
 
             protected override void Dispose(bool isDisposing)
             {
+                base.Dispose(isDisposing);
+
                 bindable.ValueChanged -= Bindable_ValueChanged;
             }
         }

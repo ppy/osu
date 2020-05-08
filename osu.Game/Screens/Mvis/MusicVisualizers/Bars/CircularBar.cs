@@ -4,7 +4,6 @@
     {
         public CircularBar()
         {
-            Masking = true;
         }
 
         protected override void LoadComplete()

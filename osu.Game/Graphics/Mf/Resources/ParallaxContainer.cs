@@ -42,9 +42,9 @@ namespace osu.Game.Graphics.Mf.Resources
         protected override Container<Drawable> Content => content;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, MfConfigManager mfConfig)
         {
-            OptUIEnabled = config.GetBindable<bool>(OsuSetting.OptUI);
+            OptUIEnabled = mfConfig.GetBindable<bool>(MfSetting.OptUI);
             parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
 
             OptUIEnabled.ValueChanged += delegate
