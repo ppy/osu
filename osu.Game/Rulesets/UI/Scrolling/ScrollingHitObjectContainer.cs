@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         objCache = hitObjectInitialStateCache[obj] = new Cached();
 
                     if (objCache.IsValid)
-                        return;
+                        continue;
 
                     computeLifetimeStartRecursive(obj);
                     computeInitialStateRecursive(obj);
