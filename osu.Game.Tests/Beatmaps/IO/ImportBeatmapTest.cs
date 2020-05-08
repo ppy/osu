@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWhenClosed()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWhenClosed)))
             {
                 try
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenDelete()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenDelete)))
             {
                 try
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImport()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImport)))
             {
                 try
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportCorruptThenImport()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportCorruptThenImport)))
             {
                 try
@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestRollbackOnFailure()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestRollbackOnFailure)))
             {
                 try
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportDifferentHash()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportDifferentHash)))
             {
                 try
@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenDeleteThenImport()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenDeleteThenImport)))
             {
                 try
@@ -274,7 +274,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [TestCase(false)]
         public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(TestImportThenDeleteThenImportWithOnlineIDMismatch)}-{set}"))
             {
                 try
@@ -308,7 +308,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportWithDuplicateBeatmapIDs()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWithDuplicateBeatmapIDs)))
             {
                 try
@@ -695,12 +695,12 @@ namespace osu.Game.Tests.Beatmaps.IO
             waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any(),
                 @"BeatmapSet did not import to the database in allocated time.", timeout);
 
-            //ensure we were stored to beatmap database backing...
+            // ensure we were stored to beatmap database backing...
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
             IEnumerable<BeatmapInfo> queryBeatmaps() => store.QueryBeatmaps(s => s.BeatmapSet.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
             IEnumerable<BeatmapSetInfo> queryBeatmapSets() => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
 
-            //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
+            // if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitForOrAssert(() => queryBeatmaps().Count() == 12,
                 @"Beatmaps did not import to the database in allocated time", timeout);
             waitForOrAssert(() => queryBeatmapSets().Count() == 1,
