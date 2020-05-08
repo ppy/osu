@@ -381,7 +381,7 @@ namespace osu.Game.Beatmaps
             foreach (var file in files.Where(f => f.Filename.EndsWith(".osu")))
             {
                 using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
-                using (var ms = new MemoryStream()) //we need a memory stream so we can seek
+                using (var ms = new MemoryStream()) // we need a memory stream so we can seek
                 using (var sr = new LineBufferedReader(ms))
                 {
                     raw.CopyTo(ms);
