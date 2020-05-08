@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, //To better lineup with the font
+                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
                                                     },
                                                 }
                                             },

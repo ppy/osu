@@ -139,7 +139,7 @@ namespace osu.Game.Graphics
                     return false;
 
                 dateText.Text = $"{date:d MMMM yyyy} ";
-                timeText.Text = $"{date:hh:mm:ss \"UTC\"z}";
+                timeText.Text = $"{date:HH:mm:ss \"UTC\"z}";
                 return true;
             }
 
