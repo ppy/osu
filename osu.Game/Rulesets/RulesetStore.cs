@@ -93,7 +93,9 @@ namespace osu.Game.Rulesets
                 // add any other modes
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
-                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
+                    // todo: StartsWith can be changed to Equals on 2020-11-08
+                    // This is to give users enough time to have their database use new abbreviated info).
+                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo.StartsWith(r.RulesetInfo.InstantiationInfo)) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
                 }
 
@@ -104,13 +106,7 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
-                        {
-                            // for the time being, let's ignore the version being loaded.
-                            // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
-                            asm.Version = null;
-                            return Assembly.Load(asm);
-                        }, null))).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo))).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
