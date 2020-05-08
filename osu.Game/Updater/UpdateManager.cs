@@ -17,7 +17,10 @@ namespace osu.Game.Updater
     /// </summary>
     public class UpdateManager : CompositeDrawable
     {
-        public virtual bool CanPerformUpdate => false;
+        /// <summary>
+        /// Whether this UpdateManager is capable of checking for updates.
+        /// </summary>
+        public virtual bool CanCheckForUpdate => false;
 
         [Resolved]
         private OsuConfigManager config { get; set; }
