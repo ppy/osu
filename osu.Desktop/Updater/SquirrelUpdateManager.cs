@@ -26,6 +26,7 @@ namespace osu.Desktop.Updater
 
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
+        private OsuGameBase gameBase;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -34,16 +35,18 @@ namespace osu.Desktop.Updater
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuGameBase game)
         {
+            gameBase = game;
             notificationOverlay = notification;
 
-            if (game.IsDeployedBuild)
-            {
-                Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
-                CheckForUpdate();
-            }
+            Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
+            CheckForUpdate();
         }
 
-        public override void CheckForUpdate() => Schedule(() => Task.Run(() => checkForUpdateAsync()));
+        public override void CheckForUpdate()
+        {
+            if (gameBase.IsDeployedBuild)
+                Schedule(() => Task.Run(() => checkForUpdateAsync()));
+        }
 
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
