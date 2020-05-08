@@ -35,8 +35,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
             LastResult.BindValueChanged(result =>
             {
+                var r = result.NewValue;
+
+                bool passing = r == null || (r.Judgement.AffectsCombo && r.Type > HitResult.Miss);
+
                 foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
-                    sprite.Passing = result.NewValue == null || result.NewValue.Type > HitResult.Miss;
+                    sprite.Passing = passing;
             }, true);
         }
 
