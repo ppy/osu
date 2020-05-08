@@ -19,6 +19,8 @@ namespace osu.Game.Updater
     /// </summary>
     public class SimpleUpdateManager : UpdateManager
     {
+        public override bool CanPerformUpdate => true;
+
         private string version;
 
         [Resolved]

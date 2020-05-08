@@ -17,6 +17,8 @@ namespace osu.Game.Updater
     /// </summary>
     public class UpdateManager : CompositeDrawable
     {
+        public virtual bool CanPerformUpdate => false;
+
         [Resolved]
         private OsuConfigManager config { get; set; }
 

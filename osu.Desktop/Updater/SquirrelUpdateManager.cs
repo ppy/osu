@@ -22,6 +22,8 @@ namespace osu.Desktop.Updater
 {
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
+        public override bool CanPerformUpdate => true;
+
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
