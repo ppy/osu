@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 ((IBindable<JudgementResult>)LastResult).BindTo(gameplayBeatmap.LastJudgementResult);
         }
 
+        private bool passing;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             {
                 var r = result.NewValue;
 
-                bool passing = r == null || (r.Judgement.AffectsCombo && r.Type > HitResult.Miss);
+                passing = r == null || (r.Judgement.AffectsCombo && r.Type > HitResult.Miss);
 
                 foreach (var sprite in InternalChildren.OfType<ScrollerSprite>())
                     sprite.Passing = passing;
@@ -71,7 +73,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 if (last != null && last.ScreenSpaceDrawQuad.TopRight.X >= ScreenSpaceDrawQuad.TopRight.X)
                     break;
 
-                AddInternal(new ScrollerSprite());
+                AddInternal(new ScrollerSprite
+                {
+                    Passing = passing
+                });
             }
         }
 
