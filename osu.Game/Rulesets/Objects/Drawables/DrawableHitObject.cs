@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
-            onDefaultsApplied();
+            apply(HitObject);
         }
 
         private void loadSamples()
@@ -175,7 +175,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             AddInternal(Samples);
         }
 
-        private void onDefaultsApplied() => apply(HitObject);
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            apply(hitObject);
+        }
 
         private void apply(HitObject hitObject)
         {
