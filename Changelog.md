@@ -605,3 +605,9 @@
 
 *   暂不合并
     *   [m] [Fix typo and add spaces to comments #8944]
+
+### 2020/5/8
+*   合并上游pr
+    *   [m] [Implement Sorcerer's osu!catch difficulty calculation adjustments #8934]
+    *   [m] [Fix date tooltip not showing in 24-hour format #8960]
+    *   [m] [Add support for 3v3 tournament chroma key layout #8961]
