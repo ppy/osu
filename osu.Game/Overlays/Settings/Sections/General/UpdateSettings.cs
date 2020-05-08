@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             });
 
             // We should only display the button for UpdateManagers that do update the client
-            if (updateManager != null && updateManager.CanPerformUpdate)
+            if (updateManager?.CanPerformUpdate == true)
             {
                 Add(new SettingsButton
                 {
