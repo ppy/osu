@@ -25,8 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
-            // We should only display the button for UpdateManagers that do update the client
-            if (updateManager != null && updateManager.CanPerformUpdate)
+            // We should only display the button for UpdateManagers that do check for updates
+            if (updateManager != null && updateManager.CanCheckForUpdate)
             {
                 Add(new SettingsButton
                 {
