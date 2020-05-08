@@ -302,7 +302,8 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            Storage = new OsuStorage(host);
+            if (Storage == null) // may be non-null for certain tests
+                Storage = new OsuStorage(host);
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
