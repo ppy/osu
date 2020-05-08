@@ -295,12 +295,13 @@ namespace osu.Game.Screens
                                     {
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Spacing = new Vector2(10),
+                                        Spacing = new Vector2(20),
                                         Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new MvisSettings(),
+                                            new MvisUISettings(),
+                                            new MvisVisualSettings(),
                                             playlist = new PlaylistOverlay
                                             {
                                                 Padding = new MarginPadding{ Left = 5, Right = 10 },

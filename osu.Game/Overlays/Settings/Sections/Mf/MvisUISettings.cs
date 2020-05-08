@@ -8,22 +8,15 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class MvisSettings : SettingsSubsection
+    public class MvisUISettings : SettingsSubsection
     {
-        protected override string Header => "Mvis播放器";
+        protected override string Header => "Mvis播放器 - 界面";
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<int>
-                {
-                    LabelText = "屏幕粒子数",
-                    TransferValueOnCommit = true,
-                    Bindable = config.GetBindable<int>(MfSetting.MvisParticleAmount),
-                    KeyboardStep = 1,
-                },
                 new SettingsSlider<float>
                 {
                     LabelText = "背景模糊",
@@ -49,23 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = "启用故事版/背景视频",
                     Bindable = config.GetBindable<bool>(MfSetting.MvisEnableStoryboard),
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "使用原版Logo效果",
-                    Bindable = config.GetBindable<bool>(MfSetting.MvisUseOsuLogoVisualisation),
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "频谱密度",
-                    Bindable = config.GetBindable<int>(MfSetting.MvisBarCount),
-                    KeyboardStep = 1,
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "频谱RGB光效",
-                    Bindable = config.GetBindable<bool>(MfSetting.MvisBarRGBLighting),
-                },
+                }
             };
         }
     }

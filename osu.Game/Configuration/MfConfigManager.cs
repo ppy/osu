@@ -32,6 +32,7 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisIdleBgDim, 0.3f, 0f, 1f);
             Set(MfSetting.MvisBarCount, 120, 20, 120);
             Set(MfSetting.MvisBarRGBLighting, false);
+            Set(MfSetting.MvisEnableBrick, false);
         }
     }
 
@@ -46,6 +47,7 @@ namespace osu.Game.Configuration
         MvisIdleBgDim,
         MvisContentAlpha,
         MvisBarCount,
-        MvisBarRGBLighting
+        MvisBarRGBLighting,
+        MvisEnableBrick
     }
 }

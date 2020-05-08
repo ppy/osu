@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(BottomBar),
             typeof(MvisScreen),
             typeof(ClockContainer),
-            typeof(BgStoryBoard),
+            typeof(BackgroundStoryBoard),
             typeof(BottomBarButton),
             typeof(SideBarSettingsPanel),
             typeof(ToggleableButton),

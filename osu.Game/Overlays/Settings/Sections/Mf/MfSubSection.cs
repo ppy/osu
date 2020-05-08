@@ -19,7 +19,8 @@ namespace osu.Game.Overlays
         public MfMainSection()
         {
             Add(new MfSettings());
-            Add(new MvisSettings());
+            Add(new MvisUISettings());
+            Add(new MvisVisualSettings());
         }
     }
 }
