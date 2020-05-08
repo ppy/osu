@@ -125,7 +125,6 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
 
-            //Optimize Settings
             Set(OsuSetting.OptUI, true);
             Set(OsuSetting.TrianglesEnabled, true);
 

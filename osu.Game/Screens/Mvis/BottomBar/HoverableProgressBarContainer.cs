@@ -33,12 +33,11 @@ namespace osu.Game.Screens.Mvis.UI
                     Height = 0.1f,
                     FillColour = colour.Yellow,
                     BackgroundColour = colour.YellowDarker.Opacity(0.5f),
-                    OnSeek = musicController.SeekTo,
                     Alpha = idle_alpha,
                 },
             };
         }
-        
+
         private class HoverableProgressBar : ProgressBar
         {
             protected override bool OnHover(HoverEvent e)

@@ -47,9 +47,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects.MusicVisualizers
 
         private void setBarProperties()
         {
-            float spacing = DegreeValue / BarsCount;
+            float spacing = DegreeValue / base.BarCount.Value;
 
-            for (int i = 0; i < BarsCount; i++)
+            for (int i = 0; i < base.BarCount.Value; i++)
             {
                 var bar = EqualizerBars[i];
                 bar.Origin = Anchor.BottomCentre;

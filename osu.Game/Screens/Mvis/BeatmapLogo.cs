@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -25,8 +26,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         Track track;
         private bool ScreenExiting = false;
         private float progressLast = 0;
-
         private Bindable<bool> UseLogoVisuals = new Bindable<bool>();
+        private Bindable<bool> RGBCircularLighting = new Bindable<bool>();
+
         public BeatmapLogo(int barsCount = 120, float barWidth = 3f)
         {
             Origin = Anchor.Centre;
@@ -103,11 +105,13 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisUseOsuLogoVisualisation, UseLogoVisuals);
+            config.BindWith(MfSetting.MvisUseOsuLogoVisualisation, UseLogoVisuals);
+            config.BindWith(MfSetting.MvisBarRGBLighting, RGBCircularLighting);
 
             UseLogoVisuals.ValueChanged += _ => UpdateVisuals();
+            RGBCircularLighting.ValueChanged += _ => UpdateVisuals();
 
             UpdateVisuals();
         }
@@ -124,6 +128,20 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 case false:
                     circularContainer.FadeIn(500, Easing.OutQuint);
                     visualisation.FadeOut(500, Easing.OutQuint);
+                    break;
+            }
+
+            switch ( RGBCircularLighting.Value )
+            {
+                case true:
+                    circularContainer.FadeColour( Color4Extensions.FromHex("#ff0000"), 2000 ).Then()
+                                     .FadeColour( Color4Extensions.FromHex("#00ff00"), 2000 ).Then()
+                                     .FadeColour( Color4Extensions.FromHex("#0000ff"), 2000 ).Then()
+                                     .Loop();
+                    break;
+
+                case false:
+                    circularContainer.FadeColour( Color4Extensions.FromHex("#ffffff"), 500 );
                     break;
             }
         }

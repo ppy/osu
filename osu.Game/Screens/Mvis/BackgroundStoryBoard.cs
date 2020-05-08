@@ -53,9 +53,9 @@ namespace osu.Game.Screens.Mvis
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisEnableStoryboard, EnableSB);
+            config.BindWith(MfSetting.MvisEnableStoryboard, EnableSB);
         }
 
         protected override void LoadComplete()
@@ -99,13 +99,20 @@ namespace osu.Game.Screens.Mvis
                     }
                 }, newsbClock =>
                 {
+                    sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                    sbClock?.Expire();
+
                     sbClock = newsbClock;
 
                     dimmableStoryboard.IgnoreUserSettings.Value = true;
 
                     sbContainer.Add(sbClock);
 
-                    sbClock.Start();
+                    if ( b.Value.Track.IsRunning == true )
+                        sbClock.Start();
+                    else
+                        sbClock.Stop();
+
                     sbClock.Seek(b.Value.Track.CurrentTime);
 
                     IsReady.Value = true;

@@ -295,12 +295,13 @@ namespace osu.Game.Screens
                                     {
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Spacing = new Vector2(10),
+                                        Spacing = new Vector2(20),
                                         Padding = new MarginPadding{ Top = 10, Left = 5, Right = 5 },
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new MvisSettings(),
+                                            new MvisUISettings(),
+                                            new MvisVisualSettings(),
                                             playlist = new PlaylistOverlay
                                             {
                                                 Padding = new MarginPadding{ Left = 5, Right = 10 },
@@ -331,11 +332,11 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(MfConfigManager config)
         {
-            config.BindWith(OsuSetting.MvisBgBlur, BgBlur);
-            config.BindWith(OsuSetting.MvisIdleBgDim, IdleBgDim);
-            config.BindWith(OsuSetting.MvisContentAlpha, ContentAlpha);
+            config.BindWith(MfSetting.MvisBgBlur, BgBlur);
+            config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);
+            config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
         }
 
         protected override void LoadComplete()
@@ -370,9 +371,17 @@ namespace osu.Game.Screens
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
             playlist.Show();
 
+            progressBarContainer.progressBar.OnSeek = SeekTo;
+
             ShowOverlays();
 
             base.LoadComplete();
+        }
+
+        private void SeekTo(double position)
+        {
+            musicController?.SeekTo(position);
+            bgSB?.sbClock?.Seek(position);
         }
 
         protected override void Update()
@@ -419,11 +428,11 @@ namespace osu.Game.Screens
             switch (action)
             {
                 case GlobalAction.MvisMusicPrev:
-                    musicController.PreviousTrack();
+                    musicController?.PreviousTrack();
                     return true;
 
                 case GlobalAction.MvisMusicNext:
-                    musicController.NextTrack();
+                    musicController?.NextTrack();
                     return true;
 
                 case GlobalAction.MvisTogglePause:
@@ -581,6 +590,20 @@ namespace osu.Game.Screens
             }
             finally
             {
+            }
+        }
+
+        private void TogglePause()
+        {
+            if ( Track?.IsRunning == true )
+            {
+                bgSB?.sbClock?.Stop();
+                musicController?.Stop();
+            }
+            else
+            {
+                bgSB?.sbClock?.Start();
+                musicController?.Play();
             }
         }
 

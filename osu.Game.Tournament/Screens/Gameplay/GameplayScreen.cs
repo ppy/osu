@@ -36,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         [Resolved]
         private TournamentMatchChatDisplay chat { get; set; }
 
-        private Box chroma;
+        private Drawable chroma;
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
@@ -61,16 +61,30 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Y = 110,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        chroma = new Box
+                        chroma = new Container
                         {
-                            // chroma key area for stable gameplay
-                            Name = "chroma",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Height = 512,
-                            Colour = new Color4(0, 255, 0, 255),
+                            Children = new Drawable[]
+                            {
+                                new ChromaArea
+                                {
+                                    Name = "左侧绿幕",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.5f,
+                                },
+                                new ChromaArea
+                                {
+                                    Name = "右侧绿幕",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Width = 0.5f,
+                                }
+                            }
                         },
                     }
                 },
@@ -100,6 +114,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         {
                             LabelText = "绿幕宽度",
                             Bindable = LadderInfo.ChromaKeyWidth,
+                            KeyboardStep = 1,
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "每队玩家数量",
+                            Bindable = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         }
                     }
@@ -199,6 +219,55 @@ namespace osu.Game.Tournament.Screens.Gameplay
             finally
             {
                 lastState = state.NewValue;
+            }
+        }
+
+        private class ChromaArea : CompositeDrawable
+        {
+            [Resolved]
+            private LadderInfo ladder { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                // chroma key area for stable gameplay
+                Colour = new Color4(0, 255, 0, 255);
+
+                ladder.PlayersPerTeam.BindValueChanged(performLayout, true);
+            }
+
+            private void performLayout(ValueChangedEvent<int> playerCount)
+            {
+                switch (playerCount.NewValue)
+                {
+                    case 3:
+                        InternalChildren = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.5f,
+                                Height = 0.5f,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Height = 0.5f,
+                            },
+                        };
+                        break;
+
+                    default:
+                        InternalChild = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        };
+                        break;
+                }
             }
         }
     }
