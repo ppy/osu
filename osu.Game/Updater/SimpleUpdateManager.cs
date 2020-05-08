@@ -26,16 +26,22 @@ namespace osu.Game.Updater
         [Resolved]
         private GameHost host { get; set; }
 
+        private OsuGameBase gameBase;
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
+            gameBase = game;
             version = game.Version;
 
-            if (game.IsDeployedBuild)
-                CheckForUpdate();
+            CheckForUpdate();
         }
 
-        public override void CheckForUpdate() => Schedule(() => Task.Run(checkForUpdateAsync));
+        public override void CheckForUpdate()
+        {
+            if (gameBase.IsDeployedBuild)
+                Schedule(() => Task.Run(checkForUpdateAsync));
+        }
 
         private async void checkForUpdateAsync()
         {
