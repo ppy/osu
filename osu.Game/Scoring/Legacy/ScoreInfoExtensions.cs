@@ -12,7 +12,7 @@ namespace osu.Game.Scoring.Legacy
             switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
                 case 3:
-                    return scoreInfo.Statistics[HitResult.Perfect];
+                    return getCount(scoreInfo, HitResult.Perfect);
             }
 
             return null;
@@ -35,10 +35,10 @@ namespace osu.Game.Scoring.Legacy
                 case 0:
                 case 1:
                 case 3:
-                    return scoreInfo.Statistics[HitResult.Great];
+                    return getCount(scoreInfo, HitResult.Great);
 
                 case 2:
-                    return scoreInfo.Statistics[HitResult.Perfect];
+                    return getCount(scoreInfo, HitResult.Perfect);
             }
 
             return null;
@@ -65,7 +65,10 @@ namespace osu.Game.Scoring.Legacy
             switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
                 case 3:
-                    return scoreInfo.Statistics[HitResult.Good];
+                    return getCount(scoreInfo, HitResult.Good);
+
+                case 2:
+                    return getCount(scoreInfo, HitResult.SmallTickMiss);
             }
 
             return null;
@@ -78,6 +81,10 @@ namespace osu.Game.Scoring.Legacy
                 case 3:
                     scoreInfo.Statistics[HitResult.Good] = value;
                     break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.SmallTickMiss] = value;
+                    break;
             }
         }
 
@@ -87,10 +94,13 @@ namespace osu.Game.Scoring.Legacy
             {
                 case 0:
                 case 1:
-                    return scoreInfo.Statistics[HitResult.Good];
+                    return getCount(scoreInfo, HitResult.Good);
 
                 case 3:
-                    return scoreInfo.Statistics[HitResult.Ok];
+                    return getCount(scoreInfo, HitResult.Ok);
+
+                case 2:
+                    return getCount(scoreInfo, HitResult.LargeTickHit);
             }
 
             return null;
@@ -108,6 +118,10 @@ namespace osu.Game.Scoring.Legacy
                 case 3:
                     scoreInfo.Statistics[HitResult.Ok] = value;
                     break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.LargeTickHit] = value;
+                    break;
             }
         }
 
@@ -117,7 +131,10 @@ namespace osu.Game.Scoring.Legacy
             {
                 case 0:
                 case 3:
-                    return scoreInfo.Statistics[HitResult.Meh];
+                    return getCount(scoreInfo, HitResult.Meh);
+
+                case 2:
+                    return getCount(scoreInfo, HitResult.SmallTickHit);
             }
 
             return null;
@@ -131,13 +148,25 @@ namespace osu.Game.Scoring.Legacy
                 case 3:
                     scoreInfo.Statistics[HitResult.Meh] = value;
                     break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.SmallTickHit] = value;
+                    break;
             }
         }
 
         public static int? GetCountMiss(this ScoreInfo scoreInfo) =>
-            scoreInfo.Statistics[HitResult.Miss];
+            getCount(scoreInfo, HitResult.Miss);
 
         public static void SetCountMiss(this ScoreInfo scoreInfo, int value) =>
             scoreInfo.Statistics[HitResult.Miss] = value;
+
+        private static int? getCount(ScoreInfo scoreInfo, HitResult result)
+        {
+            if (scoreInfo.Statistics.TryGetValue(result, out var existing))
+                return existing;
+
+            return null;
+        }
     }
 }
