@@ -9,12 +9,12 @@ using Newtonsoft.Json.Linq;
 namespace osu.Game.IO.Serialization.Converters
 {
     /// <summary>
-    /// A type of <see cref="JsonConverter"/> that serializes a <see cref="List{T}"/> alongside
+    /// A type of <see cref="JsonConverter"/> that serializes an <see cref="IEnumerable{T}"/> alongside
     /// a lookup table for the types contained. The lookup table is used in deserialization to
     /// reconstruct the objects with their original types.
     /// </summary>
-    /// <typeparam name="T">The type of objects contained in the <see cref="List{T}"/> this attribute is attached to.</typeparam>
-    public class TypedListConverter<T> : JsonConverter<List<T>>
+    /// <typeparam name="T">The type of objects contained in the <see cref="IEnumerable{T}"/> this attribute is attached to.</typeparam>
+    public class TypedListConverter<T> : JsonConverter<IEnumerable<T>>
     {
         private readonly bool requiresTypeVersion;
 
@@ -36,7 +36,7 @@ namespace osu.Game.IO.Serialization.Converters
             this.requiresTypeVersion = requiresTypeVersion;
         }
 
-        public override List<T> ReadJson(JsonReader reader, Type objectType, List<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override IEnumerable<T> ReadJson(JsonReader reader, Type objectType, IEnumerable<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var list = new List<T>();
 
@@ -57,7 +57,7 @@ namespace osu.Game.IO.Serialization.Converters
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, List<T> value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IEnumerable<T> value, JsonSerializer serializer)
         {
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
