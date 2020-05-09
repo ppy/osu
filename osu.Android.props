@@ -52,6 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ppy.osu.Game.Resources" Version="2020.427.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2020.507.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2020.508.1" />
   </ItemGroup>
 </Project>

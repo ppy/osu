@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Replays
         {
             int newFrame = nextFrameIndex;
 
-            //ensure we aren't at an extent.
+            // ensure we aren't at an extent.
             if (newFrame == currentFrameIndex) return false;
 
             currentFrameIndex = newFrame;
@@ -99,8 +99,8 @@ namespace osu.Game.Rulesets.Replays
                 if (frame == null)
                     return false;
 
-                return IsImportant(frame) && //a button is in a pressed state
-                       Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan; //the next frame is within an allowable time span
+                return IsImportant(frame) && // a button is in a pressed state
+                       Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= AllowedImportantTimeSpan; // the next frame is within an allowable time span
             }
         }
 

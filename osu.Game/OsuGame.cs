@@ -609,7 +609,7 @@ namespace osu.Game
 
             loadComponentSingleFile(screenshotManager, Add);
 
-            //overlay elements
+            // overlay elements
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
@@ -781,7 +781,7 @@ namespace osu.Game
             {
                 var previousLoadStream = asyncLoadStream;
 
-                //chain with existing load stream
+                // chain with existing load stream
                 asyncLoadStream = Task.Run(async () =>
                 {
                     if (previousLoadStream != null)
