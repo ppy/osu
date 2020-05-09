@@ -20,7 +20,6 @@ using osuTK.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Framework.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays.Music;
@@ -32,6 +31,7 @@ using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
+using System;
 
 namespace osu.Game.Screens
 {
@@ -80,11 +80,13 @@ namespace osu.Game.Screens
         private Track Track;
         private BackgroundStoryBoard bgSB;
         private LoadingSpinner loadingSpinner;
+        private BottomBarSongProgressInfo progressInfo;
         private Bindable<float> BgBlur = new Bindable<float>();
         private Bindable<float> IdleBgDim = new Bindable<float>();
         private Bindable<float> ContentAlpha = new Bindable<float>();
         private bool OverlaysHidden = false;
         public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
+        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
         public MvisScreen()
         {
@@ -123,6 +125,14 @@ namespace osu.Game.Screens
                                                 progressBarContainer = new HoverableProgressBarContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
+                                                },
+                                                progressInfo = new BottomBarSongProgressInfo
+                                                {
+                                                    Margin = new MarginPadding{ Left = 50 },
+                                                    RelativeSizeAxes = Axes.Y,
+                                                    AutoSizeAxes = Axes.X,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
                                                 },
                                                 new Container
                                                 {
@@ -360,7 +370,7 @@ namespace osu.Game.Screens
                         break;
                 }
             };
-            bgSB.storyboardReplacesBackground.ValueChanged += _ => 
+            bgSB.storyboardReplacesBackground.ValueChanged += _ =>
             {
                 Background.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
             };
@@ -391,13 +401,16 @@ namespace osu.Game.Screens
             Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             if (Track?.IsDummyDevice == false)
             {
-                progressBarContainer.progressBar.EndTime = Track.Length;
+                int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
+                progressInfo.timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond));
             }
             else
             {
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
+                progressInfo.timeCurrent.Text = "???";
+                progressInfo.timeTotal.Text = "???";
             }
         }
 
@@ -541,7 +554,7 @@ namespace osu.Game.Screens
 
         private void TryHideOverlays()
         {
-            if ( !canReallyHide || !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
+            if (!canReallyHide || !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
                  || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value)
                 return;
 
@@ -561,7 +574,7 @@ namespace osu.Game.Screens
 
         private void TogglePause()
         {
-            if ( Track?.IsRunning == true )
+            if (Track?.IsRunning == true)
             {
                 bgSB?.sbClock?.Stop();
                 musicController?.Stop();
@@ -589,7 +602,12 @@ namespace osu.Game.Screens
             Background.Beatmap = beatmap;
             Background.BlurAmount.Value = BgBlur.Value * 100;
 
-            bgSB.UpdateStoryBoardAsync( displayDelay );
+            this.Schedule(() =>
+            {
+                progressBarContainer.progressBar.EndTime = beatmap.Track.Length;
+                progressInfo.timeTotal.Text = formatTime(TimeSpan.FromMilliseconds(beatmap.Track.Length));
+            });
+            bgSB.UpdateStoryBoardAsync(displayDelay);
         }
     }
 }
