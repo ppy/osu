@@ -1,5 +1,10 @@
+using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -9,6 +14,11 @@ namespace osu.Game.Screens.Mvis.UI
     {
         public OsuSpriteText timeCurrent;
         public OsuSpriteText timeTotal;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> b { get; set; }
+
+        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
         public BottomBarSongProgressInfo()
         {
@@ -24,7 +34,7 @@ namespace osu.Game.Screens.Mvis.UI
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Text = "/"
+                    Text = "/",
                 },
                 timeTotal = new OsuSpriteText
                 {
@@ -32,6 +42,38 @@ namespace osu.Game.Screens.Mvis.UI
                     Anchor = Anchor.CentreLeft,
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            b.ValueChanged += _  => UpdateEndTime();
+
+            UpdateEndTime();
+        }
+
+        protected override void Update()
+        {
+            var Track = b.Value?.TrackLoaded ?? false ? b.Value.Track : null;
+            if (Track?.IsDummyDevice == false)
+            {
+                int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
+                timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond));
+            }
+            else
+            {
+                timeCurrent.Text = "谱面数据";
+                timeTotal.Text = "是无效的";
+            }
+        }
+
+        private void UpdateEndTime()
+        {
+            this.Schedule(() =>
+            {
+                timeTotal.Text = formatTime(TimeSpan.FromMilliseconds(b.Value.Track.Length));
+            });
         }
     }
 }

@@ -59,6 +59,7 @@ namespace osu.Game.Screens
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
+
         [Resolved]
         private MusicController musicController { get; set; }
 
@@ -77,6 +78,7 @@ namespace osu.Game.Screens
         private ToggleableButton loopToggleButton;
         private ToggleableButton sidebarToggleButton;
         private ToggleableOverlayLockButton lockButton;
+        private BottomBarButton songProgressButton;
         private Track Track;
         private BackgroundStoryBoard bgSB;
         private LoadingSpinner loadingSpinner;
@@ -86,8 +88,6 @@ namespace osu.Game.Screens
         private Bindable<float> ContentAlpha = new Bindable<float>();
         private bool OverlaysHidden = false;
         public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
-        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
-
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
@@ -126,14 +126,6 @@ namespace osu.Game.Screens
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                 },
-                                                progressInfo = new BottomBarSongProgressInfo
-                                                {
-                                                    Margin = new MarginPadding{ Left = 50 },
-                                                    RelativeSizeAxes = Axes.Y,
-                                                    AutoSizeAxes = Axes.X,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
                                                 new Container
                                                 {
                                                     Name = "Buttons Container",
@@ -169,20 +161,35 @@ namespace osu.Game.Screens
                                                             Spacing = new Vector2(5),
                                                             Children = new Drawable[]
                                                             {
-                                                                new MusicControlButton()
+                                                                new BottomBarButton()
                                                                 {
+                                                                    Size = new Vector2(50, 30),
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepBackward,
                                                                     Action = () => musicController?.PreviousTrack(),
                                                                     TooltipText = "上一首/从头开始",
                                                                 },
-                                                                new MusicControlButton()
+                                                                songProgressButton = new BottomBarButton()
                                                                 {
-                                                                    ButtonIcon = FontAwesome.Solid.Music,
-                                                                    Action = () => TogglePause(),
                                                                     TooltipText = "切换暂停",
+                                                                    AutoSizeAxes = Axes.X,
+                                                                    Action = () => TogglePause(),
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
+                                                                    NoIcon = true,
+                                                                    ExtraDrawable = progressInfo = new BottomBarSongProgressInfo
+                                                                    {
+                                                                        AutoSizeAxes = Axes.Both,
+                                                                        Anchor = Anchor.Centre,
+                                                                        Origin = Anchor.Centre,
+                                                                    }
                                                                 },
-                                                                new MusicControlButton()
+                                                                new BottomBarButton()
                                                                 {
+                                                                    Size = new Vector2(50, 30),
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepForward,
                                                                     Action = () => musicController?.NextTrack(),
                                                                     TooltipText = "下一首",
@@ -234,7 +241,7 @@ namespace osu.Game.Screens
                                     Margin = new MarginPadding{ Bottom = 5 },
                                     Child = lockButton = new ToggleableOverlayLockButton
                                     {
-                                        TooltipText = "开启悬浮锁",
+                                        TooltipText = "切换悬浮锁",
                                         Action = () => UpdateLockButton(),
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.BottomCentre,
@@ -401,16 +408,12 @@ namespace osu.Game.Screens
             Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             if (Track?.IsDummyDevice == false)
             {
-                int currentSecond = (int)Math.Floor(Track.CurrentTime / 1000.0);
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
-                progressInfo.timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond));
             }
             else
             {
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
-                progressInfo.timeCurrent.Text = "???";
-                progressInfo.timeTotal.Text = "???";
             }
         }
 
@@ -605,7 +608,6 @@ namespace osu.Game.Screens
             this.Schedule(() =>
             {
                 progressBarContainer.progressBar.EndTime = beatmap.Track.Length;
-                progressInfo.timeTotal.Text = formatTime(TimeSpan.FromMilliseconds(beatmap.Track.Length));
             });
             bgSB.UpdateStoryBoardAsync(displayDelay);
         }
