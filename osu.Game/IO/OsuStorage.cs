@@ -41,19 +41,17 @@ namespace osu.Game.IO
 
         public void Migrate(string newLocation)
         {
-            string oldLocation = GetFullPath(".");
+            var source = new DirectoryInfo(GetFullPath("."));
+            var destination = new DirectoryInfo(newLocation);
 
             // ensure the new location has no files present, else hard abort
-            if (Directory.Exists(newLocation))
+            if (destination.Exists)
             {
-                if (Directory.GetFiles(newLocation).Length > 0)
+                if (destination.GetFiles().Length > 0)
                     throw new InvalidOperationException("Migration destination already has files present");
 
-                Directory.Delete(newLocation, true);
+                deleteRecursive(destination);
             }
-
-            var source = new DirectoryInfo(oldLocation);
-            var destination = new DirectoryInfo(newLocation);
 
             copyRecursive(source, destination);
 
