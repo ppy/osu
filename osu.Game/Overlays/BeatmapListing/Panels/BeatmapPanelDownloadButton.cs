@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig)
         {
-            if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
+            if ((BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false) && State.Value != DownloadState.LocallyAvailable)
             {
                 button.Enabled.Value = false;
                 button.TooltipText = "this beatmap is currently not available for download.";
