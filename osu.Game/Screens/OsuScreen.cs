@@ -23,7 +23,7 @@ namespace osu.Game.Screens
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
-        /// This allows for the game content to be pushed byt he options/notification overlays without causing black areas to appear.
+        /// This allows for the game content to be pushed by the options/notification overlays without causing black areas to appear.
         /// </summary>
         public const float HORIZONTAL_OVERFLOW_PADDING = 50;
 

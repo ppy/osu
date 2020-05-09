@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 RelativeSizeAxes = Axes.Both;
             }
 
-            //disable keyboard controls
+            // disable keyboard controls
             public bool OnPressed(CatchAction action) => true;
 
             public void OnReleased(CatchAction action)
