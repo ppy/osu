@@ -101,16 +101,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     passing = value;
 
-                    if (passing)
-                    {
-                        passingSprite.Show();
-                        failingSprite.FadeOut(200);
-                    }
-                    else
-                    {
-                        failingSprite.FadeIn(200);
-                        passingSprite.Delay(200).FadeOut();
-                    }
+                    if (IsLoaded)
+                        updatePassing();
                 }
             }
 
@@ -127,6 +119,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     passingSprite = new Sprite { Texture = skin.GetTexture("taiko-slider") },
                     failingSprite = new Sprite { Texture = skin.GetTexture("taiko-slider-fail"), Alpha = 0 },
                 };
+
+                updatePassing();
             }
 
             protected override void Update()
@@ -135,6 +129,20 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 foreach (var c in InternalChildren)
                     c.Scale = new Vector2(DrawHeight / c.Height);
+            }
+
+            private void updatePassing()
+            {
+                if (passing)
+                {
+                    passingSprite.Show();
+                    failingSprite.FadeOut(200);
+                }
+                else
+                {
+                    failingSprite.FadeIn(200);
+                    passingSprite.Delay(200).FadeOut();
+                }
             }
         }
     }
