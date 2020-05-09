@@ -321,7 +321,7 @@ namespace osu.Game.Screens
                         },
                     }
                 },
-                idleTracker = new MouseIdleTracker(2000),
+                idleTracker = new MouseIdleTracker(3000),
                 hoverCheckContainer = new HoverCheckContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -341,7 +341,7 @@ namespace osu.Game.Screens
 
         protected override void LoadComplete()
         {
-            BgBlur.ValueChanged += _ => UpdateBgBlur();
+            BgBlur.ValueChanged += _ => Background.BlurAmount.Value = BgBlur.Value * 100;
             ContentAlpha.ValueChanged += _ => UpdateIdleVisuals();
             IdleBgDim.ValueChanged += _ => UpdateIdleVisuals();
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
@@ -512,6 +512,7 @@ namespace osu.Game.Screens
         private void UpdateLockButton()
         {
             lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
+            idleTracker?.Reset();
             UpdateVisuals();
         }
 
@@ -538,20 +539,16 @@ namespace osu.Game.Screens
             OverlaysHidden = false;
         }
 
-        /// <summary>
-        /// 因为未知原因, <see cref="TryHideOverlays"/>调用的<see cref="HideOverlays"/>无法被<see cref="ShowOverlays"/>中断
-        /// 因此将相关功能独立出来作为单独的函数用来调用
-        /// </summary>
-        private void RunHideOverlays()
+        private void TryHideOverlays()
         {
-            if (!idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
+            if ( !canReallyHide || !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
                  || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value)
                 return;
 
             HideOverlays();
         }
 
-        private void RunShowOverlays()
+        private void TryShowOverlays()
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
             if ((lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden)
@@ -560,37 +557,6 @@ namespace osu.Game.Screens
                 return;
             }
             ShowOverlays();
-        }
-
-        private void TryHideOverlays()
-        {
-            if (!canReallyHide || bottomBar.Hovered.Value)
-                return;
-
-            try
-            {
-                Scheduler.AddDelayed(() =>
-                {
-                    RunHideOverlays();
-                }, 1000);
-            }
-            finally
-            {
-            }
-        }
-
-        private void TryShowOverlays()
-        {
-            try
-            {
-                Scheduler.AddDelayed(() =>
-                {
-                    RunShowOverlays();
-                }, 0);
-            }
-            finally
-            {
-            }
         }
 
         private void TogglePause()
@@ -605,11 +571,6 @@ namespace osu.Game.Screens
                 bgSB?.sbClock?.Start();
                 musicController?.Play();
             }
-        }
-
-        private void UpdateBgBlur()
-        {
-            Background.BlurAmount.Value = BgBlur.Value * 100;
         }
 
         private void UpdateIdleVisuals()
