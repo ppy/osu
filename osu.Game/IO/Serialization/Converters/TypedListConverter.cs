@@ -14,7 +14,7 @@ namespace osu.Game.IO.Serialization.Converters
     /// reconstruct the objects with their original types.
     /// </summary>
     /// <typeparam name="T">The type of objects contained in the <see cref="List{T}"/> this attribute is attached to.</typeparam>
-    public class TypedListConverter<T> : JsonConverter
+    public class TypedListConverter<T> : JsonConverter<List<T>>
     {
         private readonly bool requiresTypeVersion;
 
@@ -36,9 +36,7 @@ namespace osu.Game.IO.Serialization.Converters
             this.requiresTypeVersion = requiresTypeVersion;
         }
 
-        public override bool CanConvert(Type objectType) => objectType == typeof(List<T>);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override List<T> ReadJson(JsonReader reader, Type objectType, List<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var list = new List<T>();
 
@@ -59,14 +57,12 @@ namespace osu.Game.IO.Serialization.Converters
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, List<T> value, JsonSerializer serializer)
         {
-            var list = (IEnumerable<T>)value;
-
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
 
-            foreach (var item in list)
+            foreach (var item in value)
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
