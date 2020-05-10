@@ -259,6 +259,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertControlPointType(2, PathType.PerfectCurve);
         }
 
+        [Test]
+        public void TestBeginPlacementWithoutReleasingMouse()
+        {
+            addMovementStep(new Vector2(200));
+            AddStep("press left button", () => InputManager.PressButton(MouseButton.Left));
+
+            addMovementStep(new Vector2(400, 200));
+            AddStep("release left button", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertLength(200);
+            assertControlPointCount(2);
+            assertControlPointType(0, PathType.Linear);
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button)

@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osuTK;
@@ -44,6 +45,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             bodyPiece.Position = topPosition;
             bodyPiece.Width = headPiece.Width;
             bodyPiece.Height = (bottomPosition - topPosition).Y;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+            EndPlacement(true);
         }
 
         private double originalStartTime;
