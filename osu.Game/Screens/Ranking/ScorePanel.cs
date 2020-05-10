@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Width of the panel when expanded.
         /// </summary>
-        private const float expanded_width = 360;
+        public const float EXPANDED_WIDTH = 360;
 
         /// <summary>
         /// Height of the panel when expanded.
@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Ranking
             switch (state)
             {
                 case PanelState.Expanded:
-                    this.ResizeTo(new Vector2(expanded_width, expanded_height), resize_duration, Easing.OutQuint);
+                    this.ResizeTo(new Vector2(EXPANDED_WIDTH, expanded_height), resize_duration, Easing.OutQuint);
 
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
