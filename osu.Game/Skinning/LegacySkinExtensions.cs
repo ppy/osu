@@ -14,7 +14,7 @@ namespace osu.Game.Skinning
     public static class LegacySkinExtensions
     {
         public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
-                                            bool startAtCurrentTime = false, double? frameLength = null)
+                                            bool startAtCurrentTime = true, double? frameLength = null)
         {
             Texture texture;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
                 if (timeReference != null)
                 {
                     Clock = timeReference.Clock;
-                    PlaybackPosition = timeReference.AnimationStartTime - timeReference.Clock.CurrentTime;
+                    PlaybackPosition = timeReference.Clock.CurrentTime - timeReference.AnimationStartTime;
                 }
             }
         }

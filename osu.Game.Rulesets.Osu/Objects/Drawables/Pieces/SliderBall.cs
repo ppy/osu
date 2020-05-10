@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.drawableSlider = drawableSlider;
             this.slider = slider;
 
-            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -241,6 +240,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Scale = new Vector2(radius / OsuHitObject.OBJECT_RADIUS),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Blending = BlendingParameters.Additive,
                     BorderThickness = 10,
                     BorderColour = Color4.White,
                     Alpha = 1,

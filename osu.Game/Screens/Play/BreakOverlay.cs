@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
-            if (breaks == null) return; //we need breaks.
+            if (breaks == null) return; // we need breaks.
 
             foreach (var b in breaks)
             {

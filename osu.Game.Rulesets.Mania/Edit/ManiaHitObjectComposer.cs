@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -37,7 +38,33 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        public int TotalColumns => ((ManiaPlayfield)drawableRuleset.Playfield).TotalColumns;
+        public ManiaPlayfield Playfield => ((ManiaPlayfield)drawableRuleset.Playfield);
+
+        public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
+
+        public int TotalColumns => Playfield.TotalColumns;
+
+        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
+        {
+            var hoc = Playfield.GetColumn(0).HitObjectContainer;
+
+            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
+
+            if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
+            {
+                // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+                // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
+                // so when scrolling downwards the coordinates need to be flipped.
+                targetPosition = hoc.DrawHeight - targetPosition;
+            }
+
+            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
+                EditorClock.CurrentTime,
+                drawableRuleset.ScrollingInfo.TimeRange.Value,
+                hoc.DrawHeight);
+
+            return base.GetSnappedPosition(position, targetTime);
+        }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {

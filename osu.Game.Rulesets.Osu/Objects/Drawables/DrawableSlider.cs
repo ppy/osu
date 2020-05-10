@@ -124,8 +124,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case SliderTailCircle tail:
                     return new DrawableSliderTail(slider, tail);
 
-                case HitCircle head:
-                    return new DrawableSliderHead(slider, head) { OnShake = Shake };
+                case SliderHeadCircle head:
+                    return new DrawableSliderHead(slider, head)
+                    {
+                        OnShake = Shake,
+                        CheckHittable = (d, t) => CheckHittable?.Invoke(d, t) ?? true
+                    };
 
                 case SliderTick tick:
                     return new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
@@ -186,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplySkin(skin, allowFallback);
 
             bool allowBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
-            Ball.Colour = allowBallTint ? AccentColour.Value : Color4.White;
+            Ball.AccentColour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

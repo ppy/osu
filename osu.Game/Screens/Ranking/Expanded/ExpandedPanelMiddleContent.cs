@@ -30,7 +30,12 @@ namespace osu.Game.Screens.Ranking.Expanded
         private readonly ScoreInfo score;
 
         private readonly List<StatisticDisplay> statisticDisplays = new List<StatisticDisplay>();
+
+        private FillFlowContainer starAndModDisplay;
+
         private RollingCounter<long> scoreCounter;
+
+        private const float padding = 10;
 
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
@@ -43,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             RelativeSizeAxes = Axes.Both;
             Masking = true;
 
-            Padding = new MarginPadding { Vertical = 10, Horizontal = 10 };
+            Padding = new MarginPadding(padding);
         }
 
         [BackgroundDependencyLoader]
@@ -89,13 +94,17 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                Truncate = true,
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
+                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                Truncate = true,
                             },
                             new Container
                             {
@@ -119,11 +128,12 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Alpha = 0,
                                 AlwaysPresent = true
                             },
-                            new FillFlowContainer
+                            starAndModDisplay = new FillFlowContainer
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     new StarRatingDisplay(beatmap)
@@ -131,15 +141,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft
                                     },
-                                    new ModDisplay
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        DisplayUnrankedText = false,
-                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                        Scale = new Vector2(0.5f),
-                                        Current = { Value = score.Mods }
-                                    }
                                 }
                             },
                             new FillFlowContainer
@@ -214,6 +215,19 @@ namespace osu.Game.Screens.Ranking.Expanded
                     }
                 }
             };
+
+            if (score.Mods.Any())
+            {
+                starAndModDisplay.Add(new ModDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    DisplayUnrankedText = false,
+                    ExpansionMode = ExpansionMode.AlwaysExpanded,
+                    Scale = new Vector2(0.5f),
+                    Current = { Value = score.Mods }
+                });
+            }
         }
 
         protected override void LoadComplete()
