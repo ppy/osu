@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
                     {
                         volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
                         {
-                            Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } //to counter the mute button and re-center the volume meters
+                            Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } // to counter the mute button and re-center the volume meters
                         },
                         volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),

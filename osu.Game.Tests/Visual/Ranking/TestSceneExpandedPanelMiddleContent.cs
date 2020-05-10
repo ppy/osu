@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Expanded.Statistics;
@@ -74,6 +75,8 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0));
             beatmap.Metadata.Author = author;
+            beatmap.Metadata.Title = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap title";
+            beatmap.Metadata.Artist = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap artist";
 
             return new TestWorkingBeatmap(beatmap);
         }
@@ -114,7 +117,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Size = new Vector2(500, 700);
+                Size = new Vector2(ScorePanel.EXPANDED_WIDTH, 700);
                 Children = new Drawable[]
                 {
                     new Box

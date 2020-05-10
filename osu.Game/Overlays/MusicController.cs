@@ -250,7 +250,7 @@ namespace osu.Game.Overlays
                 }
                 else
                 {
-                    //figure out the best direction based on order in playlist.
+                    // figure out the best direction based on order in playlist.
                     var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
                     var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
 

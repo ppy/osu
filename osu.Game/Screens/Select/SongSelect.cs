@@ -34,6 +34,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
-        private DifficultyRecommender recommender;
+        private readonly DifficultyRecommender recommender = new DifficultyRecommender();
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -92,6 +93,8 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
+        private Container carouselContainer;
+
         protected BeatmapDetailArea BeatmapDetails { get; private set; }
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
@@ -105,9 +108,22 @@ namespace osu.Game.Screens.Select
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
+            LoadComponentAsync(Carousel = new BeatmapCarousel
+            {
+                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.Both,
+                BleedTop = FilterControl.HEIGHT,
+                BleedBottom = Footer.HEIGHT,
+                SelectionChanged = updateSelectedBeatmap,
+                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
+            }, c => carouselContainer.Child = c);
+
             AddRangeInternal(new Drawable[]
             {
-                recommender = new DifficultyRecommender(),
+                recommender,
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -139,7 +155,7 @@ namespace osu.Game.Screens.Select
                                             Padding = new MarginPadding { Right = -150 },
                                         },
                                     },
-                                    new Container
+                                    carouselContainer = new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding
@@ -147,18 +163,7 @@ namespace osu.Game.Screens.Select
                                             Top = FilterControl.HEIGHT,
                                             Bottom = Footer.HEIGHT
                                         },
-                                        Child = Carousel = new BeatmapCarousel
-                                        {
-                                            AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                            RelativeSizeAxes = Axes.Both,
-                                            BleedTop = FilterControl.HEIGHT,
-                                            BleedBottom = Footer.HEIGHT,
-                                            SelectionChanged = updateSelectedBeatmap,
-                                            BeatmapSetsChanged = carouselBeatmapsLoaded,
-                                            GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
-                                        },
+                                        Child = new LoadingSpinner(true) { State = { Value = Visibility.Visible } }
                                     }
                                 },
                             }
@@ -337,12 +342,16 @@ namespace osu.Game.Screens.Select
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
         /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
-        /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
-        public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
+        /// <param name="ruleset">An optional ruleset to override the current carousel selection.</param>
+        /// <param name="customStartAction">An optional custom action to perform instead of <see cref="OnStart"/>.</param>
+        public void FinaliseSelection(BeatmapInfo beatmap = null, RulesetInfo ruleset = null, Action customStartAction = null)
         {
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
                 return;
+
+            if (ruleset != null)
+                Ruleset.Value = ruleset;
 
             transferRulesetValue();
 
@@ -364,7 +373,12 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            if (performStartAction && OnStart())
+            if (customStartAction != null)
+            {
+                customStartAction();
+                Carousel.AllowSelection = false;
+            }
+            else if (OnStart())
                 Carousel.AllowSelection = false;
         }
 
@@ -793,7 +807,7 @@ namespace osu.Game.Screens.Select
                 Masking = true;
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
                 InternalChild = Content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
