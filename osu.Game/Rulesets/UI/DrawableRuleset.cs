@@ -488,12 +488,8 @@ namespace osu.Game.Rulesets.UI
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
-        /// Whether to display gameplay overlays with this ruleset.
-        /// Override to false to completely disable the display of gameplay overlays.
+        /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
         /// </summary>
-        /// <remarks>
-        /// Gameplay overlays refer here to <see cref="HUDOverlay"/> in player as well as <see cref="BreakOverlay"/>.
-        /// </remarks>
         public virtual bool AllowGameplayOverlays => true;
 
         /// <summary>
