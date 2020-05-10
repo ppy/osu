@@ -8,14 +8,18 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Mvis.Buttons
 {
     public class BottomBarButton : OsuAnimatedButton
     {
-        private SpriteIcon spriteIcon;
+        protected FillFlowContainer contentFillFlow;
         protected readonly Box bgBox;
+        public SpriteIcon spriteIcon;
         public IconUsage ButtonIcon;
+        public Drawable ExtraDrawable;
+        public bool NoIcon;
 
         public BottomBarButton()
         {
@@ -29,12 +33,24 @@ namespace osu.Game.Screens.Mvis.Buttons
                     Depth = float.MaxValue,
                     Colour = Color4Extensions.FromHex("#5a5a5a"),
                 },
-                spriteIcon = new SpriteIcon
+                contentFillFlow = new FillFlowContainer
                 {
+                    Margin = new MarginPadding{ Left = 15, Right = 15 },
+                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(13),
-                    Icon = ButtonIcon,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        spriteIcon = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(13),
+                            Icon = ButtonIcon,
+                        },
+                    }
                 },
             };
         }
@@ -43,6 +59,15 @@ namespace osu.Game.Screens.Mvis.Buttons
         private void load()
         {
             this.spriteIcon.Icon = ButtonIcon;
+
+            if ( ExtraDrawable != null )
+            {
+                this.contentFillFlow.Add(ExtraDrawable);
+                this.spriteIcon.Size = new Vector2(18);
+            }
+
+            if ( NoIcon == true )
+                this.contentFillFlow.Remove(spriteIcon);
         }
     }
 }

@@ -41,6 +41,13 @@ namespace osu.Game.Screens.Mvis.Objects.Helpers
             RelativeSizeAxes = Axes.Both;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateLastInteractionTime();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -59,6 +66,12 @@ namespace osu.Game.Screens.Mvis.Objects.Helpers
                 default:
                     return base.Handle(e);
             }
+        }
+
+        public void Reset()
+        {
+            updateLastInteractionTime();
+            isIdle.Value = false;
         }
 
         private bool updateLastInteractionTime()

@@ -34,15 +34,25 @@ namespace osu.Game.Screens.Mvis.Buttons
             switch ( ToggleableValue.Value )
             {
                 case true:
-                    ToggleableValue.Value = false;
-                    bgBox.FadeColour( Color4Extensions.FromHex("#5a5a5a"), 500, Easing.OutQuint );
+                    OnToggledOn();
                     break;
 
                 case false:
-                    ToggleableValue.Value = true;
-                    bgBox.FadeColour( colour.Green, 500, Easing.OutQuint );
+                    OnToggledOff();
                     break;
             }
+        }
+
+        protected virtual void OnToggledOn()
+        {
+            ToggleableValue.Value = false;
+            bgBox.FadeColour( Color4Extensions.FromHex("#5a5a5a"), 500, Easing.OutQuint );
+        }
+
+        protected virtual void OnToggledOff()
+        {
+            ToggleableValue.Value = true;
+            bgBox.FadeColour( colour.Green, 500, Easing.OutQuint );
         }
     }
 }

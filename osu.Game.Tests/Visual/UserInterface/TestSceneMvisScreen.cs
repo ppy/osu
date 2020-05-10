@@ -4,24 +4,20 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Screens;
 using osu.Game.Input;
-using osu.Framework.Audio;
-using osu.Game.Overlays.Toolbar;
-using System.Linq;
 using osu.Game.Screens.Mvis.UI;
 using osu.Game.Screens.Mvis.Buttons;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneMvisScreen : TestSceneBeatSyncedContainer
+    public class TestSceneMvisScreen : ScreenTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -32,11 +28,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(BottomBarButton),
             typeof(SideBarSettingsPanel),
             typeof(ToggleableButton),
-            typeof(MusicControlButton),
             typeof(ToggleableOverlayLockButton),
             typeof(HoverableProgressBarContainer)
         };
-
 
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
@@ -48,47 +42,27 @@ namespace osu.Game.Tests.Visual.UserInterface
         };
 
         [Cached]
-        private Toolbar toolbar = new Toolbar();
+        private MusicController musicController = new MusicController();
 
-        [Cached]
-        private IdleTracker idleTracker = new IdleTracker(1000);
-
-
-        [Resolved]
-        private AudioManager audioManager { get; set; }
+        private MvisScreen mvisScreen;
 
         [Test]
-        public void Mvis()
+        public void CreateMvisScreen()
         {
-            OsuScreenStack stack;
-            idleTracker = new IdleTracker(3000);
-
-            AddStep("Run test", () =>
+            AddStep("Create screen", () =>
             {
-                Child = stack = new OsuScreenStack
-                {
-                    RelativeSizeAxes = Axes.Both
-                };
+                if (Stack.CurrentScreen != null)
+                    Stack?.Exit();
 
-                stack.Push( new MvisScreen() );
+                LoadScreen( mvisScreen = new MvisScreen() );
             });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Add(musicController);
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-        }
-
-        
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-
-            Beatmap.Value.Track.Start();
-            Beatmap.Value.Track.Seek(Beatmap.Value.Beatmap.HitObjects.First().StartTime - 1000);
         }
     }
 }

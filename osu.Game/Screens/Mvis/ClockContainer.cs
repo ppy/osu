@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Mvis
     /// <summary>
     /// Encapsulates gameplay timing logic and provides a <see cref="Play.GameplayClock"/> for children.
     /// </summary>
+    [LongRunningLoad]
     public class ClockContainer : Container
     {
         private readonly WorkingBeatmap beatmap;
