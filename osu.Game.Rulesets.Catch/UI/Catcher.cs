@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 dashing = value;
 
-                trails.DisplayTrail = value || HyperDashing;
+                updateTrailVisibility();
             }
         }
 
@@ -255,10 +255,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashDirection = 0;
 
                 if (wasHyperDashing)
-                {
-                    updateCatcherColour(false);
-                    trails.DisplayTrail &= Dashing;
-                }
+                    runHyperDashStateTransition(false);
             }
             else
             {
@@ -268,16 +265,18 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!wasHyperDashing)
                 {
-                    updateCatcherColour(true);
-
-                    trails.DisplayTrail = true;
                     trails.DisplayEndGlow();
+                    runHyperDashStateTransition(true);
                 }
             }
         }
 
-        private void updateCatcherColour(bool hyperDashing)
+        private void runHyperDashStateTransition(bool hyperDashing)
         {
+            trails.HyperDashTrailsColour = hyperDashColour;
+            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
+            updateTrailVisibility();
+
             if (hyperDashing)
             {
                 this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
@@ -288,10 +287,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
                 this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
             }
-
-            trails.HyperDashTrailsColour = hyperDashColour;
-            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
         }
+
+        private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
         public bool OnPressed(CatchAction action)
         {
@@ -393,7 +391,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
                 hyperDashColour;
 
-            updateCatcherColour(HyperDashing);
+            runHyperDashStateTransition(HyperDashing);
         }
 
         protected override void Update()
