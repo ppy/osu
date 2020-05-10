@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        // Responds to changes in the layout. When the layout is changes, all hit object states must be recomputed.
+        // Responds to changes in the layout. When the layout changes, all hit object states must be recomputed.
         private readonly LayoutValue layoutCache = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
 
         // A combined cache across all hit object states to reduce per-update iterations.
