@@ -14,7 +14,7 @@ namespace osu.Game.Overlays
         {
             Icon = FontAwesome.Solid.Globe
         };
-        public override string Header => "界面选项";
+        public override string Header => "整体";
 
         public MfMainSection()
         {

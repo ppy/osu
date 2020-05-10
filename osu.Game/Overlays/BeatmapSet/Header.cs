@@ -52,9 +52,11 @@ namespace osu.Game.Overlays.BeatmapSet
         [Cached(typeof(IBindable<RulesetInfo>))]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
+        private BindableBool UseSayobot = new BindableBool();
+        private ExternalLinkButton externalLink;
+
         public Header()
         {
-            ExternalLinkButton externalLink;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -214,13 +216,33 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
-                externalLink.Link = $@"https://osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
+                externalLink.Link = SelectServer(Details.Beatmap);
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
+        protected virtual string SelectServer(Beatmaps.BeatmapInfo b)
         {
+            switch ( mfConfig.Get<bool>(MfSetting.UseSayobot) )
+            {
+                case true:
+                    return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
+
+                case false:
+                    return $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
+            }
+        }
+
+        private MfConfigManager mfConfig;
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MfConfigManager mfconfig)
+        {
+            this.mfConfig = mfconfig;
+            mfconfig.BindWith(MfSetting.UseSayobot, UseSayobot);
+            UseSayobot.ValueChanged += _ =>
+            {
+                externalLink.Link = SelectServer(Details.Beatmap);
+            };
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
             onlineStatusPill.BackgroundColour = colourProvider.Background6;
 

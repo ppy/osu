@@ -88,12 +88,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = $"https://a.sayobot.cn/beatmaps/{OnlineBeatmapSetID}/covers/cover.jpg",
-                        Card = $"https://a.sayobot.cn/beatmaps/{OnlineBeatmapSetID}/covers/cover.jpg",
-                        List = $"https://a.sayobot.cn/beatmaps/{OnlineBeatmapSetID}/covers/cover.jpg"
-                    },
+                    Covers = covers,
                     Preview = $"https://a.sayobot.cn/preview/{OnlineBeatmapSetID}.mp3",
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
