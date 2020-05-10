@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -36,6 +37,8 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
+        private string customPath => Path.Combine(Environment.CurrentDirectory, "custom-path");
+
         [Test]
         public void TestCustomDirectory()
         {
@@ -49,7 +52,7 @@ namespace osu.Game.Tests.NonVisual
                 storage.DeleteDirectory(string.Empty);
 
                 using (var storageConfig = new StorageConfigManager(storage))
-                    storageConfig.Set(StorageConfig.FullPath, Path.Combine(Environment.CurrentDirectory, "custom-path"));
+                    storageConfig.Set(StorageConfig.FullPath, customPath);
 
                 try
                 {
@@ -58,7 +61,45 @@ namespace osu.Game.Tests.NonVisual
                     // switch to DI'd storage
                     storage = osu.Dependencies.Get<Storage>();
 
-                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(Environment.CurrentDirectory, "custom-path")));
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestSubDirectoryLookup()
+        {
+            using (var host = new HeadlessGameHost(nameof(TestSubDirectoryLookup)))
+            {
+                string headlessPrefix = Path.Combine("headless", nameof(TestSubDirectoryLookup));
+
+                // need access before the game has constructed its own storage yet.
+                Storage storage = new DesktopStorage(headlessPrefix, host);
+                // manual cleaning so we can prepare a config file.
+                storage.DeleteDirectory(string.Empty);
+
+                using (var storageConfig = new StorageConfigManager(storage))
+                    storageConfig.Set(StorageConfig.FullPath, customPath);
+
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    // switch to DI'd storage
+                    storage = osu.Dependencies.Get<Storage>();
+
+                    string actualTestFile = Path.Combine(customPath, "rulesets", "test");
+
+                    File.WriteAllText(actualTestFile, "test");
+
+                    var rulesetStorage = storage.GetStorageForDirectory("rulesets");
+                    var lookupPath = rulesetStorage.GetFiles(".").Single();
+
+                    Assert.That(lookupPath, Is.EqualTo("test"));
                 }
                 finally
                 {
