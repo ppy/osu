@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
             typeof(DrawableHit),
-            typeof(DrawableCentreHit),
-            typeof(DrawableRimHit),
             typeof(LegacyHit),
             typeof(LegacyCirclePiece),
         }).ToList();
@@ -30,25 +28,25 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Centre hit", () => SetContents(() => new DrawableCentreHit(createHitAtCurrentTime())
+            AddStep("Centre hit", () => SetContents(() => new DrawableHit(createHitAtCurrentTime())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Centre hit (strong)", () => SetContents(() => new DrawableCentreHit(createHitAtCurrentTime(true))
+            AddStep("Centre hit (strong)", () => SetContents(() => new DrawableHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit", () => SetContents(() => new DrawableRimHit(createHitAtCurrentTime())
+            AddStep("Rim hit", () => SetContents(() => new DrawableHit(createHitAtCurrentTime())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit (strong)", () => SetContents(() => new DrawableRimHit(createHitAtCurrentTime(true))
+            AddStep("Rim hit (strong)", () => SetContents(() => new DrawableHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

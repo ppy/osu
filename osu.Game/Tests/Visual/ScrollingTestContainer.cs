@@ -30,6 +30,11 @@ namespace osu.Game.Tests.Visual
             set => scrollingInfo.TimeRange.Value = value;
         }
 
+        public ScrollingDirection Direction
+        {
+            set => scrollingInfo.Direction.Value = value;
+        }
+
         public IScrollingInfo ScrollingInfo => scrollingInfo;
 
         [Cached(Type = typeof(IScrollingInfo))]
