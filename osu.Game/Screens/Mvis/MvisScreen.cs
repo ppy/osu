@@ -31,7 +31,6 @@ using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
-using System;
 
 namespace osu.Game.Screens
 {

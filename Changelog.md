@@ -627,3 +627,4 @@
 *   合并上游pr
     *   [m] [Check local availability of beatmap before disabling download buttons #8980]
     *   [m] [Fix null reference causing hard freeze if game is forcefully closed during disclaimer #8982]
+*   [Mvis播放器] 在不启用故事版时换图将不再加载故事版直到故事版被启用
