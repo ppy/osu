@@ -109,11 +109,6 @@ namespace osu.Game.Rulesets.Edit
         public bool IsSelected => State == SelectionState.Selected;
 
         /// <summary>
-        /// Updates the <see cref="Objects.HitObject"/>, invoking <see cref="Objects.HitObject.ApplyDefaults"/> and re-processing the beatmap.
-        /// </summary>
-        protected void UpdateHitObject() => composer?.UpdateHitObject(HitObject);
-
-        /// <summary>
         /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="OverlaySelectionBlueprint"/>.
         /// </summary>
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();

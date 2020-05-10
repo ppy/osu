@@ -10,11 +10,10 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public class TestSceneDrawableJudgement : SkinnableTestScene
+    public class TestSceneDrawableJudgement : ManiaSkinnableTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

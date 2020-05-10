@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 using osu.Game.Tests.Visual;
@@ -23,6 +26,15 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ManiaRuleset),
+            typeof(ManiaLegacySkinTransformer),
+            typeof(ManiaSettingsSubsection)
+        };
+
+        protected override Ruleset CreateRulesetForSkinProvider() => new ManiaRuleset();
 
         protected ManiaSkinnableTestScene()
         {

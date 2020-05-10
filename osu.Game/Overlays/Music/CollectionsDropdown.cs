@@ -29,14 +29,8 @@ namespace osu.Game.Overlays.Music
         {
             public CollectionsMenu()
             {
+                Masking = true;
                 CornerRadius = 5;
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.3f),
-                    Radius = 3,
-                    Offset = new Vector2(0f, 1f),
-                };
             }
 
             [BackgroundDependencyLoader]

@@ -17,12 +17,11 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcherArea : SkinnableTestScene
+    public class TestSceneCatcherArea : CatchSkinnableTestScene
     {
         private RulesetInfo catchRuleset;
 

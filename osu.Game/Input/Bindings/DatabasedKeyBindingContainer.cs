@@ -62,6 +62,14 @@ namespace osu.Game.Input.Bindings
                 store.KeyBindingChanged -= ReloadMappings;
         }
 
-        protected override void ReloadMappings() => KeyBindings = store.Query(ruleset?.ID, variant).ToList();
+        protected override void ReloadMappings()
+        {
+            if (ruleset != null && !ruleset.ID.HasValue)
+                // if the provided ruleset is not stored to the database, we have no way to retrieve custom bindings.
+                // fallback to defaults instead.
+                KeyBindings = DefaultKeyBindings;
+            else
+                KeyBindings = store.Query(ruleset?.ID, variant).ToList();
+        }
     }
 }

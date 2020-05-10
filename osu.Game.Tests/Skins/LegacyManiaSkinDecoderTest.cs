@@ -99,5 +99,20 @@ namespace osu.Game.Tests.Skins
                 Assert.That(configs[0].CustomColours, Contains.Key("ColourBarline").And.ContainValue(new Color4(50, 50, 50, 50)));
             }
         }
+
+        [Test]
+        public void TestMinimumColumnWidthFallsBackWhenZeroIsProvided()
+        {
+            var decoder = new LegacyManiaSkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("mania-skin-zero-minwidth.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var configs = decoder.Decode(stream);
+
+                Assert.That(configs.Count, Is.EqualTo(1));
+                Assert.That(configs[0].MinimumColumnWidth, Is.EqualTo(16));
+            }
+        }
     }
 }
