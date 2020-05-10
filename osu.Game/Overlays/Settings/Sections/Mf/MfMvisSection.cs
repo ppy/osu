@@ -8,17 +8,16 @@ using osu.Game.Overlays.Settings.Sections.General;
 
 namespace osu.Game.Overlays
 {
-    public class MfMainSection : SettingsSection
+    public class MfMvisSection : SettingsSection
     {
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Globe
+            Icon = FontAwesome.Regular.PlayCircle
         };
-        public override string Header => "整体";
+        public override string Header => "M-vis播放器";
 
-        public MfMainSection()
+        public MfMvisSection()
         {
-            Add(new MfSettings());
             Add(new MvisUISettings());
             Add(new MvisVisualSettings());
         }

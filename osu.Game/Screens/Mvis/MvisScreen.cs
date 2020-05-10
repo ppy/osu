@@ -316,8 +316,10 @@ namespace osu.Game.Screens
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new MvisUISettings(),
-                                            new MvisVisualSettings(),
+                                            new MfMvisSection
+                                            {
+                                                Margin = new MarginPadding { Top = 0 },
+                                            },
                                             playlist = new PlaylistOverlay
                                             {
                                                 Padding = new MarginPadding{ Left = 5, Right = 10 },

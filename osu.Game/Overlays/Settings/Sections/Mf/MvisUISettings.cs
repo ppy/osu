@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class MvisUISettings : SettingsSubsection
     {
-        protected override string Header => "Mvis播放器 - 界面";
+        protected override string Header => "界面";
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "空闲时的Mvis面板不透明度",
+                    LabelText = "空闲时的M-vis面板不透明度",
                     Bindable = config.GetBindable<float>(MfSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
