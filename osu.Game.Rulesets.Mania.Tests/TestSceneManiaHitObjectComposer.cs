@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("grab hold note", () =>
             {
-                holdNote = this.ChildrenOfType<DrawableHoldNote>().FirstOrDefault();
+                holdNote = this.ChildrenOfType<DrawableHoldNote>().Single();
                 InputManager.MoveMouseTo(holdNote);
                 InputManager.PressButton(MouseButton.Left);
             });
