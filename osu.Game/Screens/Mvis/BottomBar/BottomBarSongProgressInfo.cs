@@ -63,8 +63,8 @@ namespace osu.Game.Screens.Mvis.UI
             }
             else
             {
-                timeCurrent.Text = "谱面数据";
-                timeTotal.Text = "是无效的";
+                timeCurrent.Text = "???";
+                timeTotal.Text = "???";
             }
         }
 
