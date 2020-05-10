@@ -622,3 +622,6 @@
 ### 2020/5/9
 *   合并上游pr
     *   [m] [Fix loading a ruleset with a new version specification causing a crash #8972]
+
+### 2020/5/10
+*   [Mvis播放器] 在不启用故事版时换图将不再加载故事版直到故事版被启用
