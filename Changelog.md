@@ -622,3 +622,8 @@
 ### 2020/5/9
 *   合并上游pr
     *   [m] [Fix loading a ruleset with a new version specification causing a crash #8972]
+
+### 2020/5/10
+*   合并上游pr
+    *   [m] [Check local availability of beatmap before disabling download buttons #8980]
+    *   [m] [Fix null reference causing hard freeze if game is forcefully closed during disclaimer #8982]
