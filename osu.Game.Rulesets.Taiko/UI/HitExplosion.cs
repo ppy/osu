@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -20,55 +20,49 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public override bool RemoveWhenNotAlive => true;
 
+        [Cached(typeof(DrawableHitObject))]
         public readonly DrawableHitObject JudgedObject;
 
-        private readonly Box innerFill;
+        private SkinnableDrawable skinnable;
 
-        private readonly bool isRim;
+        public override double LifetimeStart => skinnable.Drawable.LifetimeStart;
 
-        public HitExplosion(DrawableHitObject judgedObject, bool isRim)
+        public override double LifetimeEnd => skinnable.Drawable.LifetimeEnd;
+
+        public HitExplosion(DrawableHitObject judgedObject)
         {
-            this.isRim = isRim;
-
             JudgedObject = judgedObject;
 
-            Anchor = Anchor.CentreLeft;
+            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             RelativePositionAxes = Axes.Both;
-
-            BorderColour = Color4.White;
-            BorderThickness = 1;
-
-            Alpha = 0.15f;
-            Masking = true;
-
-            Children = new[]
-            {
-                innerFill = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            innerFill.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
+            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(JudgedObject.Result?.Type ?? HitResult.Great)), _ => new DefaultHitExplosion());
         }
 
-        protected override void LoadComplete()
+        private TaikoSkinComponents getComponentName(HitResult resultType)
         {
-            base.LoadComplete();
+            switch (resultType)
+            {
+                case HitResult.Miss:
+                    return TaikoSkinComponents.TaikoExplosionMiss;
 
-            this.ScaleTo(3f, 1000, Easing.OutQuint);
-            this.FadeOut(500);
+                case HitResult.Good:
+                    return TaikoSkinComponents.TaikoExplosionGood;
 
-            Expire(true);
+                case HitResult.Great:
+                    return TaikoSkinComponents.TaikoExplosionGreat;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(resultType), "Invalid result type");
         }
 
         /// <summary>

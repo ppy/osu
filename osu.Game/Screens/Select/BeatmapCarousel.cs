@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Select
             loadBeatmapSets(GetLoadableBeatmaps());
         }
 
-        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.AllButFiles);
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Select
             // without this, during a large beatmap import it is impossible to navigate the carousel.
             applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
-            //check if we can/need to maintain our current selection.
+            // check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
                 select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
 

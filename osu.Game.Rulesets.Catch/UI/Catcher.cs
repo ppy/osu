@@ -44,11 +44,6 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private const float allowed_catch_range = 0.8f;
 
-        /// <summary>
-        /// Width of the area that can be used to attempt catches during gameplay.
-        /// </summary>
-        internal float CatchWidth => CatcherArea.CATCHER_SIZE * Math.Abs(Scale.X) * allowed_catch_range;
-
         protected bool Dashing
         {
             get => dashing;
@@ -79,6 +74,11 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
+        /// <summary>
+        /// Width of the area that can be used to attempt catches during gameplay.
+        /// </summary>
+        private readonly float catchWidth;
+
         private Container<DrawableHitObject> caughtFruit;
 
         private CatcherSprite catcherIdle;
@@ -106,7 +106,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
             if (difficulty != null)
-                Scale = new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+                Scale = calculateScale(difficulty);
+
+            catchWidth = CalculateCatchWidth(Scale);
         }
 
         [BackgroundDependencyLoader]
@@ -138,6 +140,26 @@ namespace osu.Game.Rulesets.Catch.UI
 
             updateCatcher();
         }
+
+        /// <summary>
+        /// Calculates the scale of the catcher based off the provided beatmap difficulty.
+        /// </summary>
+        private static Vector2 calculateScale(BeatmapDifficulty difficulty)
+            => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+
+        /// <summary>
+        /// Calculates the width of the area used for attempting catches in gameplay.
+        /// </summary>
+        /// <param name="scale">The scale of the catcher.</param>
+        internal static float CalculateCatchWidth(Vector2 scale)
+            => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * allowed_catch_range;
+
+        /// <summary>
+        /// Calculates the width of the area used for attempting catches in gameplay.
+        /// </summary>
+        /// <param name="difficulty">The beatmap difficulty.</param>
+        internal static float CalculateCatchWidth(BeatmapDifficulty difficulty)
+            => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Add a caught fruit to the catcher's stack.
@@ -177,7 +199,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <returns>Whether the catch is possible.</returns>
         public bool AttemptCatch(CatchHitObject fruit)
         {
-            var halfCatchWidth = CatchWidth * 0.5f;
+            var halfCatchWidth = catchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
             var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;

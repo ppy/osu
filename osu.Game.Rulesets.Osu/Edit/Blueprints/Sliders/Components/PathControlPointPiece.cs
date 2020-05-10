@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
         public readonly BindableBool IsSelected = new BindableBool();
-
         public readonly PathControlPoint ControlPoint;
 
         private readonly Slider slider;
@@ -146,6 +145,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            if (RequestSelection == null)
+                return false;
+
             if (e.Button == MouseButton.Left)
             {
                 changeHandler?.BeginChange();
