@@ -1,24 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Stamina : Skill
     {
-
         private int hand;
         private int noteNumber = 0;
 
         protected override double SkillMultiplier => 1;
+
         protected override double StrainDecayBase => 0.4;
         // i only add strain every second note so its kind of like using 0.16
 
@@ -51,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             noteNumber += 1;
 
-            TaikoDifficultyHitObject currentHO = (TaikoDifficultyHitObject) current;
+            TaikoDifficultyHitObject currentHO = (TaikoDifficultyHitObject)current;
 
             if (noteNumber % 2 == hand)
             {
@@ -87,17 +83,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 if (d < minimum)
                     minimum = d;
             }
+
             return minimum;
         }
 
         public Stamina(bool rightHand)
         {
             hand = 0;
+
             if (rightHand)
             {
                 hand = 1;
             }
         }
-
     }
 }

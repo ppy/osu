@@ -11,7 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class Rhythm : Skill
     {
-
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0;
         private const double strain_decay = 0.96;
@@ -64,8 +63,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         {
             currentStrain *= strain_decay;
 
-            TaikoDifficultyHitObject currentHO = (TaikoDifficultyHitObject) dho;
+            TaikoDifficultyHitObject currentHO = (TaikoDifficultyHitObject)dho;
             rhythmLength += 1;
+
             if (!currentHO.HasTimingChange)
             {
                 return 0.0;
@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             ratioObjectHistory.Add(currentHO);
             ratioHistoryLength += 1;
+
             if (ratioHistoryLength > ratio_history_max_length)
             {
                 ratioObjectHistory.RemoveAt(0);
@@ -88,6 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 for (int start = ratioHistoryLength - l - 1; start >= 0; start--)
                 {
                     bool samePattern = true;
+
                     for (int i = 0; i < l; i++)
                     {
                         if (ratioObjectHistory[start + i].RhythmID != ratioObjectHistory[ratioHistoryLength - l + i].RhythmID)
@@ -104,7 +106,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                     }
                 }
             }
-
 
             if (currentHO.Rhythm.IsSpeedup())
             {
@@ -126,8 +127,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             currentStrain += objectDifficulty;
             return currentStrain;
-
         }
-
     }
 }

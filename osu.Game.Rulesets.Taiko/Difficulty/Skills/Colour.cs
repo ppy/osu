@@ -17,8 +17,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
         private int sameColourCount = 1;
 
-        private int[] previousDonLengths = {0, 0}, previousKatLengths = {0, 0};
+        private int[] previousDonLengths = { 0, 0 }, previousKatLengths = { 0, 0 };
+
         private int sameTypeCount = 1;
+
         // TODO: make this smarter (dont initialise with "Don")
         private bool previousIsKat = false;
 
@@ -29,11 +31,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         protected double StrainValueOfNew(DifficultyHitObject current)
         {
-
             double returnVal = 0.0;
             double returnMultiplier = 1.0;
 
-            if (previousIsKat != ((TaikoDifficultyHitObject) current).IsKat)
+            if (previousIsKat != ((TaikoDifficultyHitObject)current).IsKat)
             {
                 returnVal = 1.5 - (1.75 / (sameTypeCount + 0.65));
 
@@ -78,10 +79,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                     previousDonLengths[0] = sameTypeCount;
                 }
 
-
                 sameTypeCount = 1;
-                previousIsKat = ((TaikoDifficultyHitObject) current).IsKat;
-
+                previousIsKat = ((TaikoDifficultyHitObject)current).IsKat;
             }
 
             else
@@ -94,7 +93,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         protected double StrainValueOfOld(DifficultyHitObject current)
         {
-
             double addition = 0;
 
             // We get an extra addition if we are not a slider or spinner
@@ -112,10 +110,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return addition;
         }
 
-
         private bool hasColourChange(DifficultyHitObject current)
         {
-            var taikoCurrent = (TaikoDifficultyHitObject) current;
+            var taikoCurrent = (TaikoDifficultyHitObject)current;
 
             if (!taikoCurrent.HasTypeChange)
             {
@@ -139,6 +136,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             Even,
             Odd
         }
-
     }
 }

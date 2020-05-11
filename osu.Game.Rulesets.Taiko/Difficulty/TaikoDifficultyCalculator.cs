@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-
         private const double rhythmSkillMultiplier = 0.15;
         private const double colourSkillMultiplier = 0.01;
         private const double staminaSkillMultiplier = 0.02;
@@ -56,14 +55,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double combinedDifficulty(Skill colour, Skill rhythm, Skill stamina1, Skill stamina2)
         {
-
             double staminaRating = (stamina1.DifficultyValue() + stamina2.DifficultyValue()) * staminaSkillMultiplier;
             double readingPenalty = this.readingPenalty(staminaRating);
-
 
             double difficulty = 0;
             double weight = 1;
             List<double> peaks = new List<double>();
+
             for (int i = 0; i < colour.StrainPeaks.Count; i++)
             {
                 double colourPeak = colour.StrainPeaks[i] * colourSkillMultiplier * readingPenalty;
@@ -71,6 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double staminaPeak = (stamina1.StrainPeaks[i] + stamina2.StrainPeaks[i]) * staminaSkillMultiplier;
                 peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
             }
+
             foreach (double strain in peaks.OrderByDescending(d => d))
             {
                 difficulty += strain * weight;
@@ -113,16 +112,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };
-
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
+
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
                 taikoDifficultyHitObjects.Add(new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate));
             }
+
             new StaminaCheeseDetector().FindCheese(taikoDifficultyHitObjects);
             for (int i = 0; i < taikoDifficultyHitObjects.Count; i++)
                 yield return taikoDifficultyHitObjects[i];
@@ -148,6 +148,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override DifficultyAttributes VirtualCalculate(IBeatmap beatmap, Mod[] mods, double clockRate)
             => taikoCalculate(beatmap, mods, clockRate);
         */
-
     }
 }

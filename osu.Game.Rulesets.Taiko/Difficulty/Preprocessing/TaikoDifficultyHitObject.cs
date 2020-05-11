@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -27,12 +26,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)
         {
+            var lastHit = lastObject as Hit;
+            var currentHit = hitObject as Hit;
+
             NoteLength = DeltaTime;
             double prevLength = (lastObject.StartTime - lastLastObject.StartTime) / clockRate;
             Rhythm = TaikoDifficultyHitObjectRhythm.GetClosest(NoteLength / prevLength);
             RhythmID = Rhythm.ID;
-            HasTypeChange = lastObject is RimHit != hitObject is RimHit;
-            IsKat = lastObject is RimHit;
+            HasTypeChange = lastHit?.Type != currentHit?.Type;
+            IsKat = lastHit?.Type == HitType.Rim;
             HasTimingChange = !TaikoDifficultyHitObjectRhythm.IsRepeat(RhythmID);
 
             n = counter;
@@ -40,7 +42,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         }
 
         public const int CONST_RHYTHM_ID = 0;
-
-
     }
 }
