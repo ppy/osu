@@ -167,13 +167,39 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 default:
                 {
-                    bool isRim = samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE);
+                    bool isRimDefinition(HitSampleInfo s) => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE;
+
+                    bool isRim = samples.Any(isRimDefinition);
+
+                    if (isRim)
+                    {
+                        // consume then remove the rim definition sample types.
+                        var updatedSamples = samples.Where(s => !isRimDefinition(s)).ToList();
+
+                        // strong + rim always maps to whistle.
+                        if (strong)
+                        {
+                            for (var i = 0; i < updatedSamples.Count; i++)
+                            {
+                                var s = samples[i];
+
+                                if (s.Name != HitSampleInfo.HIT_FINISH)
+                                    continue;
+
+                                var sClone = s.Clone();
+                                sClone.Name = HitSampleInfo.HIT_WHISTLE;
+                                updatedSamples[i] = sClone;
+                            }
+                        }
+
+                        samples = updatedSamples;
+                    }
 
                     yield return new Hit
                     {
                         StartTime = obj.StartTime,
                         Type = isRim ? HitType.Rim : HitType.Centre,
-                        Samples = obj.Samples,
+                        Samples = samples,
                         IsStrong = strong
                     };
 
