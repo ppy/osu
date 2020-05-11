@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -43,52 +41,61 @@ namespace osu.Game.Tests.Gameplay
         }
 
         [Test]
-        public void TestHealthNotDrainedBeforeBreak()
+        public void TestHealthDrainBetweenBreakAndObjects()
         {
-            createProcessor(createBeatmap(0, 2000,
-                new BreakPeriod(400, 600), new BreakPeriod(1200, 1400)));
+            createProcessor(createBeatmap(0, 2000, new BreakPeriod(325, 375)));
 
-            setTime(300);
+            //               275    300    325    350    375    400    425
+            // hitobjects            o                           o
+            // break                        [-------------]
+            // no drain              [---------------------------]
+
+            setTime(285);
             setHealth(1);
 
-            setTime(400);
-            assertHealthEqualTo(1);
+            setTime(295);
+            assertHealthNotEqualTo(1);
 
-            setTime(1100);
+            setTime(305);
             setHealth(1);
 
-            setTime(1200);
+            setTime(315);
             assertHealthEqualTo(1);
+
+            setTime(365);
+            assertHealthEqualTo(1);
+
+            setTime(395);
+            assertHealthEqualTo(1);
+
+            setTime(425);
+            assertHealthNotEqualTo(1);
         }
 
         [Test]
-        public void TestHealthNotDrainedDuringBreak()
+        public void TestHealthDrainDuringMaximalBreak()
         {
-            createProcessor(createBeatmap(0, 2000, new BreakPeriod(0, 1200)));
+            createProcessor(createBeatmap(0, 2000, new BreakPeriod(300, 400)));
 
-            setTime(700);
-            assertHealthEqualTo(1);
-            setTime(900);
-            assertHealthEqualTo(1);
-        }
+            //               275    300    325    350    375    400    425
+            // hitobjects            o                           o
+            // break                 [---------------------------]
+            // no drain              [---------------------------]
 
-        [Test]
-        public void TestHealthNotDrainedAfterBreak()
-        {
-            createProcessor(createBeatmap(0, 2000,
-                new BreakPeriod(400, 600), new BreakPeriod(1200, 1400)));
-
-            setTime(600);
+            setTime(285);
             setHealth(1);
 
-            setTime(700);
-            assertHealthEqualTo(1);
+            setTime(295);
+            assertHealthNotEqualTo(1);
 
-            setTime(1400);
+            setTime(305);
             setHealth(1);
 
-            setTime(1500);
+            setTime(395);
             assertHealthEqualTo(1);
+
+            setTime(425);
+            assertHealthNotEqualTo(1);
         }
 
         [Test]
@@ -154,23 +161,15 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap
             {
-                BeatmapInfo = { BaseDifficulty = { DrainRate = 5 } },
+                BeatmapInfo = { BaseDifficulty = { DrainRate = 10 } },
             };
 
-            double time = startTime;
-
-            while (time <= endTime)
+            for (double time = startTime; time <= endTime; time += 100)
             {
                 beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = time });
-
-                // leave a 100ms gap between the start and end of a break period.
-                time += (getCurrentBreak(breaks, time)?.Duration ?? 0) + 100;
             }
 
             beatmap.Breaks.AddRange(breaks);
-
-            static BreakPeriod getCurrentBreak(IEnumerable<BreakPeriod> breaks, double time) =>
-                breaks?.FirstOrDefault(b => time >= b.StartTime && time <= b.EndTime);
 
             return beatmap;
         }
