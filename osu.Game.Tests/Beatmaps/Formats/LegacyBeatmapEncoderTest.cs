@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var stream = new MemoryStream();
 
-            using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
+            using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                 new LegacyBeatmapEncoder(beatmap).Encode(writer);
 
             stream.Position = 0;
