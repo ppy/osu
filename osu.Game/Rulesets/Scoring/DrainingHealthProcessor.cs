@@ -84,12 +84,12 @@ namespace osu.Game.Rulesets.Scoring
             noDrainPeriodTracker = new PeriodTracker(beatmap.Breaks.Select(breakPeriod => new Period(
                 beatmap.HitObjects
                        .Select(hitObject => hitObject.GetEndTime())
-                       .Where(endTime => endTime < breakPeriod.StartTime)
+                       .Where(endTime => endTime <= breakPeriod.StartTime)
                        .DefaultIfEmpty(double.MinValue)
                        .Last(),
                 beatmap.HitObjects
                        .Select(hitObject => hitObject.StartTime)
-                       .Where(startTime => startTime > breakPeriod.EndTime)
+                       .Where(startTime => startTime >= breakPeriod.EndTime)
                        .DefaultIfEmpty(double.MaxValue)
                        .First()
             )));
