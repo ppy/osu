@@ -33,10 +33,13 @@ namespace osu.Game.IO
             var customStoragePath = storageConfig.Get<string>(StorageConfig.FullPath);
 
             if (!string.IsNullOrEmpty(customStoragePath))
-            {
                 ChangeTargetStorage(host.GetStorage(customStoragePath));
-                Logger.Storage = UnderlyingStorage.GetStorageForDirectory("logs");
-            }
+        }
+
+        protected override void ChangeTargetStorage(Storage newStorage)
+        {
+            base.ChangeTargetStorage(newStorage);
+            Logger.Storage = UnderlyingStorage.GetStorageForDirectory("logs");
         }
 
         public void Migrate(string newLocation)
