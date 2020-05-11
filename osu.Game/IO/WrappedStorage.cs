@@ -48,10 +48,18 @@ namespace osu.Game.IO
             UnderlyingStorage.Delete(MutatePath(path));
 
         public override IEnumerable<string> GetDirectories(string path) =>
-            UnderlyingStorage.GetDirectories(MutatePath(path));
+            ToLocalRelative(UnderlyingStorage.GetDirectories(MutatePath(path)));
+
+        public IEnumerable<string> ToLocalRelative(IEnumerable<string> paths)
+        {
+            string localRoot = GetFullPath(string.Empty);
+
+            foreach (var path in paths)
+                yield return Path.GetRelativePath(localRoot, UnderlyingStorage.GetFullPath(path));
+        }
 
         public override IEnumerable<string> GetFiles(string path, string pattern = "*") =>
-            UnderlyingStorage.GetFiles(MutatePath(path), pattern);
+            ToLocalRelative(UnderlyingStorage.GetFiles(MutatePath(path), pattern));
 
         public override Stream GetStream(string path, FileAccess access = FileAccess.Read, FileMode mode = FileMode.OpenOrCreate) =>
             UnderlyingStorage.GetStream(MutatePath(path), access, mode);
