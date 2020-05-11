@@ -137,7 +137,7 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
 
-                    (storage as OsuStorage)?.Migrate(customPath);
+                    osu.Migrate(customPath);
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
 
@@ -170,19 +170,18 @@ namespace osu.Game.Tests.NonVisual
                 try
                 {
                     var osu = loadOsu(host);
-                    var storage = osu.Dependencies.Get<Storage>();
 
                     string customPath2 = $"{customPath}-2";
 
                     const string database_filename = "client.db";
 
-                    Assert.DoesNotThrow(() => (storage as OsuStorage)?.Migrate(customPath));
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
 
-                    Assert.DoesNotThrow(() => (storage as OsuStorage)?.Migrate(customPath2));
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath2));
                     Assert.That(File.Exists(Path.Combine(customPath2, database_filename)));
 
-                    Assert.DoesNotThrow(() => (storage as OsuStorage)?.Migrate(customPath));
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
                 }
                 finally
@@ -200,10 +199,9 @@ namespace osu.Game.Tests.NonVisual
                 try
                 {
                     var osu = loadOsu(host);
-                    var storage = osu.Dependencies.Get<Storage>();
 
-                    Assert.DoesNotThrow(() => (storage as OsuStorage)?.Migrate(customPath));
-                    Assert.Throws<InvalidOperationException>(() => (storage as OsuStorage)?.Migrate(customPath));
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
+                    Assert.Throws<InvalidOperationException>(() => osu.Migrate(customPath));
                 }
                 finally
                 {

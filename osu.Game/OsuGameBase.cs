@@ -328,6 +328,8 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+
+            ContextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
@@ -354,6 +356,12 @@ namespace osu.Game
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
+        }
+
+        public void Migrate(string path)
+        {
+            ContextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(path);
         }
     }
 }
