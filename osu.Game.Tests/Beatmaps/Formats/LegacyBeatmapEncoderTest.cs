@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -59,7 +60,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var stream = new MemoryStream();
 
-            using (var writer = new StreamWriter(stream, leaveOpen: true))
+            using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
                 new LegacyBeatmapEncoder(beatmap).Encode(writer);
 
             stream.Position = 0;
