@@ -85,6 +85,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                         return new LegacyHitExplosion(sprite);
 
                     return null;
+
+                case TaikoSkinComponents.TaikoScroller:
+                    if (GetTexture("taiko-slider") != null)
+                        return new LegacyTaikoScroller();
+
+                    return null;
             }
 
             return source.GetDrawableComponent(component);
