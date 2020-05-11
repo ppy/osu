@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
     [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
+        public event Action<DrawableHitObject> DefaultsApplied;
+
         public readonly HitObject HitObject;
 
         /// <summary>
@@ -148,7 +150,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
-            onDefaultsApplied();
+            apply(HitObject);
         }
 
         private void loadSamples()
@@ -175,7 +177,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             AddInternal(Samples);
         }
 
-        private void onDefaultsApplied() => apply(HitObject);
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            apply(hitObject);
+            DefaultsApplied?.Invoke(this);
+        }
 
         private void apply(HitObject hitObject)
         {

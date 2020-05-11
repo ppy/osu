@@ -10,10 +10,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
+using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -48,6 +51,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             DrawableHitObject lastObject = null;
             Vector2 originalPosition = Vector2.Zero;
 
+            setScrollStep(ScrollingDirection.Up);
+
             AddStep("seek to last object", () =>
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
@@ -81,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             DrawableHitObject lastObject = null;
             Vector2 originalPosition = Vector2.Zero;
 
-            AddStep("set down scroll", () => ((Bindable<ScrollingDirection>)composer.Composer.ScrollingInfo.Direction).Value = ScrollingDirection.Down);
+            setScrollStep(ScrollingDirection.Down);
 
             AddStep("seek to last object", () =>
             {
@@ -116,6 +121,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             DrawableHitObject lastObject = null;
             Vector2 originalPosition = Vector2.Zero;
 
+            setScrollStep(ScrollingDirection.Down);
+
             AddStep("seek to last object", () =>
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
@@ -146,6 +153,46 @@ namespace osu.Game.Rulesets.Mania.Tests
             // Todo: They'll move vertically by the height of a note since there's no snapping and the selection point is the middle of the note.
             AddAssert("hitobjects not moved vertically", () => lastObject.DrawPosition.Y - originalPosition.Y <= DefaultNotePiece.NOTE_HEIGHT);
         }
+
+        [Test]
+        public void TestDragHoldNoteSelectionVertically()
+        {
+            setScrollStep(ScrollingDirection.Down);
+
+            AddStep("setup beatmap", () =>
+            {
+                composer.EditorBeatmap.Clear();
+                composer.EditorBeatmap.Add(new HoldNote
+                {
+                    Column = 1,
+                    EndTime = 200
+                });
+            });
+
+            DrawableHoldNote holdNote = null;
+
+            AddStep("grab hold note", () =>
+            {
+                holdNote = this.ChildrenOfType<DrawableHoldNote>().Single();
+                InputManager.MoveMouseTo(holdNote);
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("move drag upwards", () =>
+            {
+                InputManager.MoveMouseTo(holdNote, new Vector2(0, -100));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("head note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.BottomLeft, holdNote.Head.ScreenSpaceDrawQuad.BottomLeft));
+            AddAssert("tail note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.TopLeft, holdNote.Tail.ScreenSpaceDrawQuad.BottomLeft));
+
+            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<HoldNoteNoteSelectionBlueprint>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
+            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<HoldNoteNoteSelectionBlueprint>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
+        }
+
+        private void setScrollStep(ScrollingDirection direction)
+            => AddStep($"set scroll direction = {direction}", () => ((Bindable<ScrollingDirection>)composer.Composer.ScrollingInfo.Direction).Value = direction);
 
         private class TestComposer : CompositeDrawable
         {
