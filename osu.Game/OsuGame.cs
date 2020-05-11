@@ -71,6 +71,8 @@ namespace osu.Game
         private DashboardOverlay dashboard;
 
         private MfMenuOverlay mfmenu;
+        
+        private PictureOverlay picture;
 
         private UserProfileOverlay userProfile;
 
@@ -246,6 +248,10 @@ namespace osu.Game
 
                 case LinkAction.OpenChannel:
                     ShowChannel(link.Argument);
+                    break;
+
+                case LinkAction.OpenPictureURL:
+                    picture.UpdateImage($@"https://osu.ppy.sh/ss/{link.Argument}", true);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -621,6 +627,7 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(picture = new PictureOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);

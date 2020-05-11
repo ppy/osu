@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
+using osu.Game.Overlays.Mf;
 
 namespace osu.Game.Overlays.MfMenu
 {
@@ -44,6 +45,11 @@ namespace osu.Game.Overlays.MfMenu
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
                         Spacing = new Vector2(0, 2),
+                    },
+                    new UpdateableOnlinePictureContainer("https://i0.hdslb.com/bfs/album/e5df8968887d5c6e8ed73d1158685f07239e726d.png@518w_1e_1c.png")
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 300,
                     },
                     new Box
                     {
