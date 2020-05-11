@@ -7,7 +7,6 @@ using System.Linq;
 using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
@@ -76,23 +75,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("set beatmap", () => setBeatmap());
 
-            // the bindables need to be independent for each content cell to prevent interference,
-            // as if some of the skins don't implement the animation they'll immediately revert to the previous state from the clear state.
-            var states = new List<Bindable<TaikoMascotAnimationState>>();
+            AddStep("create mascot", () => SetContents(() => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
 
-            AddStep("create mascot", () => SetContents(() =>
-            {
-                var state = new Bindable<TaikoMascotAnimationState>(TaikoMascotAnimationState.Clear);
-                states.Add(state);
-                return new DrawableTaikoMascot { State = { BindTarget = state }, RelativeSizeAxes = Axes.Both };
-            }));
-
-            AddStep("set clear state", () => states.ForEach(state => state.Value = TaikoMascotAnimationState.Clear));
-            AddStep("miss", () => mascots.ForEach(mascot => mascot.OnNewResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss })));
+            AddStep("set clear state", () => mascots.ForEach(mascot => mascot.State.Value = TaikoMascotAnimationState.Clear));
+            AddStep("miss", () => mascots.ForEach(mascot => mascot.LastResult.Value = new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }));
             AddAssert("skins with animations remain in clear state", () => someMascotsIn(TaikoMascotAnimationState.Clear));
             AddUntilStep("state reverts to fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
 
-            AddStep("set clear state again", () => states.ForEach(state => state.Value = TaikoMascotAnimationState.Clear));
+            AddStep("set clear state again", () => mascots.ForEach(mascot => mascot.State.Value = TaikoMascotAnimationState.Clear));
             AddAssert("skins with animations change to clear", () => someMascotsIn(TaikoMascotAnimationState.Clear));
         }
 
@@ -219,6 +209,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 Add(hit);
 
                 playfield.OnNewResult(hit, judgementResult);
+            }
+
+            foreach (var mascot in mascots)
+            {
+                mascot.LastResult.Value = judgementResult;
             }
         }
 

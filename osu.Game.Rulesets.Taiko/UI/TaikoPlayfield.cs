@@ -40,8 +40,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Container hitTargetOffsetContent;
 
-        private SkinnableDrawable mascotDrawable;
-
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
             this.controlPoints = controlPoints;
@@ -127,7 +125,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                     }
                 },
-                mascotDrawable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => Empty())
+                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => Empty())
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.TopLeft,
@@ -211,11 +209,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     addExplosion(judgedObject, type);
                     break;
-            }
-
-            if (mascotDrawable.Drawable is DrawableTaikoMascot mascot)
-            {
-                mascot.OnNewResult(result);
             }
         }
 

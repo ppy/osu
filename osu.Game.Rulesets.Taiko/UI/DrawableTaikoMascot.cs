@@ -12,14 +12,15 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class DrawableTaikoMascot : BeatSyncedContainer
     {
-        public IBindable<TaikoMascotAnimationState> State => state;
+        public readonly Bindable<TaikoMascotAnimationState> State;
+        public readonly Bindable<JudgementResult> LastResult;
 
-        private readonly Bindable<TaikoMascotAnimationState> state;
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
         private TaikoMascotAnimation currentAnimation;
 
@@ -30,12 +31,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Origin = Anchor = Anchor.BottomLeft;
 
-            state = new Bindable<TaikoMascotAnimationState>(startingState);
+            State = new Bindable<TaikoMascotAnimationState>(startingState);
+            LastResult = new Bindable<JudgementResult>();
+
             animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation>();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        [BackgroundDependencyLoader(true)]
+        private void load(TextureStore textures, GameplayBeatmap gameplayBeatmap)
         {
             InternalChildren = new[]
             {
@@ -44,6 +47,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                 animations[TaikoMascotAnimationState.Kiai] = new TaikoMascotAnimation(TaikoMascotAnimationState.Kiai),
                 animations[TaikoMascotAnimationState.Fail] = new TaikoMascotAnimation(TaikoMascotAnimationState.Fail),
             };
+
+            if (gameplayBeatmap != null)
+                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayBeatmap.LastJudgementResult);
         }
 
         protected override void LoadComplete()
@@ -51,16 +57,22 @@ namespace osu.Game.Rulesets.Taiko.UI
             base.LoadComplete();
 
             animations.Values.ForEach(animation => animation.Hide());
-            state.BindValueChanged(mascotStateChanged, true);
+
+            State.BindValueChanged(mascotStateChanged, true);
+            LastResult.BindValueChanged(onNewResult);
         }
 
-        public void OnNewResult(JudgementResult result)
+        private void onNewResult(ValueChangedEvent<JudgementResult> resultChangedEvent)
         {
+            var result = resultChangedEvent.NewValue;
+            if (result == null)
+                return;
+
             // TODO: missing support for clear/fail state transition at end of beatmap gameplay
 
             if (triggerComboClear(result) || triggerSwellClear(result))
             {
-                state.Value = TaikoMascotAnimationState.Clear;
+                State.Value = TaikoMascotAnimationState.Clear;
                 // always consider a clear equivalent to a hit to avoid clear -> miss transitions
                 lastObjectHit = true;
             }
@@ -79,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override void Update()
         {
             base.Update();
-            state.Value = getNextState();
+            State.Value = getNextState();
         }
 
         private TaikoMascotAnimationState getNextState()
@@ -87,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             // don't change state if current animation is playing
             // (used for clear state - others are manually animated on new beats)
             if (currentAnimation != null && !currentAnimation.Completed)
-                return state.Value;
+                return State.Value;
 
             if (!lastObjectHit)
                 return TaikoMascotAnimationState.Fail;
