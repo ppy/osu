@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public readonly int n;
         private int counter = 0;
 
-        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate)
+        public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastLastObject, double clockRate, TaikoDifficultyHitObjectRhythm rhythm)
             : base(hitObject, lastObject, clockRate)
         {
             var lastHit = lastObject as Hit;
@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             NoteLength = DeltaTime;
             double prevLength = (lastObject.StartTime - lastLastObject.StartTime) / clockRate;
-            Rhythm = TaikoDifficultyHitObjectRhythm.GetClosest(NoteLength / prevLength);
+            Rhythm = rhythm.GetClosest(NoteLength / prevLength);
             RhythmID = Rhythm.ID;
             HasTypeChange = lastHit?.Type != currentHit?.Type;
             IsKat = lastHit?.Type == HitType.Rim;
-            HasTimingChange = !TaikoDifficultyHitObjectRhythm.IsRepeat(RhythmID);
+            HasTimingChange = !rhythm.IsRepeat(RhythmID);
 
             n = counter;
             counter++;

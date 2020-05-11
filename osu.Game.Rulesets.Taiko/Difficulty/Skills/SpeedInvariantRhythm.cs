@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0;
         private const double strain_decay = 0.96;
-        private double currentStrain = 0.0;
+        private double currentStrain;
 
         private readonly List<TaikoDifficultyHitObject> ratioObjectHistory = new List<TaikoDifficultyHitObject>();
-        private int ratioHistoryLength = 0;
+        private int ratioHistoryLength;
         private const int ratio_history_max_length = 8;
 
-        private int rhythmLength = 0;
+        private int rhythmLength;
 
         // Penalty for repeated sequences of rhythm changes
         private double repititionPenalty(double timeSinceRepititionMS)
