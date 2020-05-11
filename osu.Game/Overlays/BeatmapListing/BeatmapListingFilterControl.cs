@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -24,6 +22,8 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public Action<List<BeatmapSetInfo>> SearchFinished;
         public Action SearchStarted;
+        /// <summary> List of currently displayed beatmap entries </summary>
+        private List<BeatmapSetInfo> currentBeatmaps;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapListingSortTabControl sortControl;
         private readonly Box sortControlBackground;
 
-        private SearchBeatmapSetsRequest getSetsRequest;
+        private BeatmapListingPager beatmapListingPager;
 
         public BeatmapListingFilterControl()
         {
@@ -115,12 +115,13 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private ScheduledDelegate queryChangedDebounce;
+        private ScheduledDelegate queryPagingDebounce;
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
             SearchStarted?.Invoke();
 
-            getSetsRequest?.Cancel();
+            beatmapListingPager?.Reset();
 
             queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
@@ -128,37 +129,55 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void updateSearch()
         {
-            getSetsRequest = new SearchBeatmapSetsRequest(searchControl.Query.Value, searchControl.Ruleset.Value)
-            {
-                SearchCategory = searchControl.Category.Value,
-                SortCriteria = sortControl.Current.Value,
-                SortDirection = sortControl.SortDirection.Value,
-                Genre = searchControl.Genre.Value,
-                Language = searchControl.Language.Value
-            };
+            beatmapListingPager = new BeatmapListingPager(
+                api,
+                rulesets,
+                searchControl.Query.Value,
+                searchControl.Ruleset.Value,
+                searchControl.Category.Value,
+                sortControl.Current.Value,
+                sortControl.SortDirection.Value
+            );
 
-            getSetsRequest.Success += response => Schedule(() => onSearchFinished(response));
+            queryPagingDebounce?.Cancel();
+            queryPagingDebounce = null;
+            beatmapListingPager.PageFetched += onSearchFinished;
 
-            api.Queue(getSetsRequest);
+            AddPageToResult();
         }
 
-        private void onSearchFinished(SearchBeatmapSetsResponse response)
+        private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
         {
-            var beatmaps = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+            queryPagingDebounce = Scheduler.AddDelayed(() => queryPagingDebounce = null, 1000);
 
-            searchControl.BeatmapSet = response.Total == 0 ? null : beatmaps.First();
-
+            if (currentBeatmaps == null || !beatmapListingPager.IsPastFirstPage)
+                currentBeatmaps = beatmaps;
+            else
+                currentBeatmaps.AddRange(beatmaps);
+            
             SearchFinished?.Invoke(beatmaps);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            getSetsRequest?.Cancel();
+            beatmapListingPager?.Reset();
             queryChangedDebounce?.Cancel();
+            queryPagingDebounce?.Cancel();
 
             base.Dispose(isDisposing);
         }
 
         public void TakeFocus() => searchControl.TakeFocus();
+
+        /// <summary> Request next 50 matches if available </summary>
+        public void AddPageToResult()
+        {
+            if (beatmapListingPager == null || !beatmapListingPager.CanFetchNextPage)
+                return;
+            if (queryPagingDebounce != null)
+                return;
+
+            beatmapListingPager.FetchNextPage();
+        }
     }
 }
