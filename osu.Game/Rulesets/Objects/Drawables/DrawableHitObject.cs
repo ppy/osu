@@ -99,6 +99,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
         private Bindable<bool> userPositionalHitSounds;
+        private Bindable<float> PositionGain;
         private Bindable<int> comboIndexBindable;
 
         public override bool RemoveWhenNotAlive => false;
@@ -117,9 +118,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, MfConfigManager mfConfig)
         {
             userPositionalHitSounds = config.GetBindable<bool>(OsuSetting.PositionalHitSounds);
+            PositionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
             var judgement = HitObject.CreateJudgement();
 
             Result = CreateResult(judgement);
@@ -354,7 +356,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             const float balance_adjust_amount = 0.4f;
 
-            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0);
+            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? (SamplePlaybackPosition - 0.5f) : 0) * PositionGain.Value;
             Samples?.Play();
         }
 

@@ -23,6 +23,9 @@ namespace osu.Game.Configuration
             Set(MfSetting.OptUI, true);
             Set(MfSetting.TrianglesEnabled, true);
 
+            //Gameplay Settings
+            Set(MfSetting.SamplePlaybackGain, 1f, 0f, 20f);
+
             //MvisSettings
             Set(MfSetting.MvisParticleAmount, 350, 0, 350);
             Set(MfSetting.MvisContentAlpha, 1f, 0f, 1f);
@@ -41,6 +44,7 @@ namespace osu.Game.Configuration
     {
         OptUI,
         TrianglesEnabled,
+        UseSayobot,
         MvisParticleAmount,
         MvisBgBlur,
         MvisUseOsuLogoVisualisation,
@@ -50,6 +54,6 @@ namespace osu.Game.Configuration
         MvisBarCount,
         MvisBarRGBLighting,
         MvisEnableBrick,
-        UseSayobot
+        SamplePlaybackGain
     }
 }
