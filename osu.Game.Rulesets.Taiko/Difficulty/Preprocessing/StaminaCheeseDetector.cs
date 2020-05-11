@@ -1,15 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
     public class StaminaCheeseDetector
     {
-
         private const int roll_min_repetitions = 12;
         private const int tl_min_repetitions = 16;
 
@@ -39,6 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 if (history.Count > 2 * patternLength) history.RemoveAt(0);
 
                 bool isRepeat = true;
+
                 for (int j = 0; j < patternLength; j++)
                 {
                     if (history[j].IsKat != history[j + patternLength].IsKat)
@@ -62,13 +60,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                         (hitObjects[i]).StaminaCheese = true;
                     }
                 }
-
             }
         }
 
         private void findTLTap(int parity, bool kat)
         {
             int tl_length = -2;
+
             for (int i = parity; i < hitObjects.Count; i += 2)
             {
                 if (kat == hitObjects[i].IsKat)
@@ -90,6 +88,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
                 }
             }
         }
-
     }
 }
