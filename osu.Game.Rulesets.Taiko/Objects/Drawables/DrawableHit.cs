@@ -52,7 +52,32 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override IEnumerable<HitSampleInfo> GetSamples()
         {
             // normal and claps are always handled by the drum (see DrumSampleMapping).
-            return HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
+            var samples = HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
+
+            if (HitObject.Type == HitType.Rim && HitObject.IsStrong)
+            {
+                // strong + rim always maps to whistle.
+                // TODO: this should really be in the legacy decoder, but can't be because legacy encoding parity would be broken.
+                // when we add a taiko editor, this is probably not going to play nice.
+
+                var corrected = samples.ToList();
+
+                for (var i = 0; i < corrected.Count; i++)
+                {
+                    var s = corrected[i];
+
+                    if (s.Name != HitSampleInfo.HIT_FINISH)
+                        continue;
+
+                    var sClone = s.Clone();
+                    sClone.Name = HitSampleInfo.HIT_WHISTLE;
+                    corrected[i] = sClone;
+                }
+
+                return corrected;
+            }
+
+            return samples;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
