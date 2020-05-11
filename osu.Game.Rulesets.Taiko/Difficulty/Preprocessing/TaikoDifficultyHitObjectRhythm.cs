@@ -7,18 +7,36 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 {
     public class TaikoDifficultyHitObjectRhythm
     {
-
-        private static TaikoDifficultyHitObjectRhythm[] commonRhythms;
-        private static TaikoDifficultyHitObjectRhythm constRhythm;
-        private static int constRhythmID;
+        private readonly TaikoDifficultyHitObjectRhythm[] commonRhythms;
+        private readonly TaikoDifficultyHitObjectRhythm constRhythm;
+        private int constRhythmID;
 
         public int ID = 0;
         public readonly double Difficulty;
         private readonly double ratio;
 
-        private static void initialiseCommonRhythms()
+        public bool IsRepeat()
         {
+            return ID == constRhythmID;
+        }
 
+        public bool IsRepeat(int id)
+        {
+            return id == constRhythmID;
+        }
+
+        public bool IsSpeedup()
+        {
+            return ratio < 1.0;
+        }
+
+        public bool IsLargeSpeedup()
+        {
+            return ratio < 0.49;
+        }
+
+        public TaikoDifficultyHitObjectRhythm()
+        {
             /*
 
                 ALCHYRS CODE
@@ -40,8 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             */
 
-
-            commonRhythms = new TaikoDifficultyHitObjectRhythm[]
+            commonRhythms = new[]
             {
                 new TaikoDifficultyHitObjectRhythm(1, 1, 0.1),
                 new TaikoDifficultyHitObjectRhythm(2, 1, 0.3),
@@ -61,33 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
             constRhythmID = 0;
             constRhythm = commonRhythms[constRhythmID];
-
-        }
-
-        public bool IsRepeat()
-        {
-            return ID == constRhythmID;
-        }
-
-        public static bool IsRepeat(int id)
-        {
-            return id == constRhythmID;
-        }
-
-        public bool IsSpeedup()
-        {
-            return ratio < 1.0;
-        }
-
-        public bool IsLargeSpeedup()
-        {
-            return ratio < 0.49;
-        }
-
-        private TaikoDifficultyHitObjectRhythm(double ratio, double difficulty)
-        {
-            this.ratio = ratio;
-            this.Difficulty = difficulty;
         }
 
         private TaikoDifficultyHitObjectRhythm(int numerator, int denominator, double difficulty)
@@ -97,13 +87,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         }
 
         // Code is inefficient - we are searching exhaustively through the sorted list commonRhythms
-        public static TaikoDifficultyHitObjectRhythm GetClosest(double ratio)
+        public TaikoDifficultyHitObjectRhythm GetClosest(double ratio)
         {
-            if (commonRhythms == null)
-            {
-                initialiseCommonRhythms();
-            }
-
             TaikoDifficultyHitObjectRhythm closestRhythm = commonRhythms[0];
             double closestDistance = Double.MaxValue;
 
@@ -117,8 +102,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             }
 
             return closestRhythm;
-
         }
-
     }
 }

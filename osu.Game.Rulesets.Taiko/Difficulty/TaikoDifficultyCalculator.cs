@@ -117,10 +117,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
+            var rhythm = new TaikoDifficultyHitObjectRhythm();
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
-                taikoDifficultyHitObjects.Add(new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate));
+                taikoDifficultyHitObjects.Add(new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, rhythm));
             }
 
             new StaminaCheeseDetector().FindCheese(taikoDifficultyHitObjects);

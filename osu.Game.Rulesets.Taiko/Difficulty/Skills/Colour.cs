@@ -17,12 +17,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
         private int sameColourCount = 1;
 
-        private int[] previousDonLengths = { 0, 0 }, previousKatLengths = { 0, 0 };
+        private readonly int[] previousDonLengths = { 0, 0 };
+        private readonly int[] previousKatLengths = { 0, 0 };
 
         private int sameTypeCount = 1;
 
         // TODO: make this smarter (dont initialise with "Don")
-        private bool previousIsKat = false;
+        private bool previousIsKat;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
