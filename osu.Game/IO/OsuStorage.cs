@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -95,7 +96,20 @@ namespace osu.Game.IO
                 if (IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true);
+                int tries = 5;
+
+                while (tries-- > 0)
+                {
+                    try
+                    {
+                        fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true);
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(50);
+                    }
+                }
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
