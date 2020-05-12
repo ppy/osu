@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override bool AllowFail => true;
+            protected override bool CheckModsAllowFailure() => false;
 
             public bool CheckFailed(bool failed)
             {
