@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
 
-            AddInternal(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoScroller), _ => Empty())
+            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoScroller), _ => Empty())
             {
                 RelativeSizeAxes = Axes.X,
                 Depth = float.MaxValue
