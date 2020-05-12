@@ -628,3 +628,9 @@
     *   [m] [Check local availability of beatmap before disabling download buttons #8980]
     *   [m] [Fix null reference causing hard freeze if game is forcefully closed during disclaimer #8982]
 *   [Mvis播放器] 在不启用故事版时换图将不再加载故事版直到故事版被启用
+
+### 2020/5/12
+*   合并上游pr
+    *   [m] [Fix hold note selection pieces disappearing on movement #8973]
+    *   [m] [Add ability for a ruleset to disable gameplay overlays from displaying #8945]
+    *   [m] [Add taiko scroller #8920]
