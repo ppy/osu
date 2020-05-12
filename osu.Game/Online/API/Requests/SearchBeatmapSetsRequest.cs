@@ -2,24 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.IO.Network;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Extensions;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
-        public class Cursor
-        {
-            [JsonExtensionData]
-            public IDictionary<string, JToken> Properties;
-        }
-
         public SearchCategory SearchCategory { get; set; }
 
         public SortCriteria SortCriteria { get; set; }
@@ -68,10 +59,7 @@ namespace osu.Game.Online.API.Requests
 
             req.AddParameter("sort", $"{SortCriteria.ToString().ToLowerInvariant()}_{directionString}");
 
-            cursor?.Properties.ForEach(x =>
-            {
-                req.AddParameter("cursor[" + x.Key + "]", x.Value?.ToString());
-            });
+            req.AddCursor(cursor);
 
             return req;
         }
