@@ -121,7 +121,7 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        protected DatabaseContextFactory ContextFactory;
+        private DatabaseContextFactory contextFactory;
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
@@ -130,7 +130,7 @@ namespace osu.Game
         {
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
-            dependencies.Cache(ContextFactory = new DatabaseContextFactory(Storage));
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             dependencies.CacheAs(Storage);
 
@@ -161,7 +161,7 @@ namespace osu.Game
 
             runMigrations();
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, ContextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             if (API == null) API = new APIAccess(LocalConfig);
@@ -170,12 +170,12 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(ContextFactory, Storage));
-            dependencies.Cache(FileStore = new FileStore(ContextFactory, Storage));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, ContextFactory, Host));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, ContextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -189,8 +189,8 @@ namespace osu.Game
             BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
             BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
 
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(ContextFactory, RulesetStore));
-            dependencies.Cache(SettingsStore = new SettingsStore(ContextFactory));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
@@ -279,7 +279,7 @@ namespace osu.Game
         {
             try
             {
-                using (var db = ContextFactory.GetForWrite(false))
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
             catch (Exception e)
@@ -288,12 +288,12 @@ namespace osu.Game
 
                 // if we failed, let's delete the database and start fresh.
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
-                ContextFactory.ResetDatabase();
+                contextFactory.ResetDatabase();
 
                 Logger.Log("Database purged successfully.", LoggingTarget.Database);
 
                 // only run once more, then hard bail.
-                using (var db = ContextFactory.GetForWrite(false))
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
         }
@@ -329,7 +329,7 @@ namespace osu.Game
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
 
-            ContextFactory.FlushConnections();
+            contextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
@@ -360,7 +360,7 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
-            ContextFactory.FlushConnections();
+            contextFactory.FlushConnections();
             (Storage as OsuStorage)?.Migrate(path);
         }
     }
