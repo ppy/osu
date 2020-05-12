@@ -90,7 +90,7 @@ namespace osu.Game
 
         protected BackButton BackButton;
 
-        protected SettingsOverlay Settings;
+        protected SettingsPanel Settings;
 
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
@@ -767,17 +767,11 @@ namespace osu.Game
 
         private Task asyncLoadStream;
 
-        /// <summary>
-        /// Schedules loading the provided <paramref name="d"/> in a single file.
-        /// </summary>
-        /// <param name="d">The component to load.</param>
-        /// <param name="add">The method to invoke for adding the component.</param>
-        /// <param name="cache">Whether to cache the component as type <typeparamref name="T"/> into the game dependencies before any scheduling.</param>
         private T loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
             where T : Drawable
         {
             if (cache)
-                dependencies.CacheAs(d);
+                dependencies.Cache(d);
 
             if (d is OverlayContainer overlay)
                 overlays.Add(overlay);
