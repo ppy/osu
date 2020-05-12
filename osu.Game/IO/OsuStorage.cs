@@ -71,7 +71,7 @@ namespace osu.Game.IO
         {
             foreach (System.IO.FileInfo fi in target.GetFiles())
             {
-                if (IGNORE_FILES.Contains(fi.Name))
+                if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
                 fi.Delete();
@@ -79,7 +79,7 @@ namespace osu.Game.IO
 
             foreach (DirectoryInfo dir in target.GetDirectories())
             {
-                if (IGNORE_DIRECTORIES.Contains(dir.Name))
+                if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
                     continue;
 
                 dir.Delete(true);
@@ -93,7 +93,7 @@ namespace osu.Game.IO
 
             foreach (System.IO.FileInfo fi in source.GetFiles())
             {
-                if (IGNORE_FILES.Contains(fi.Name))
+                if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
                 int tries = 5;
@@ -114,7 +114,7 @@ namespace osu.Game.IO
 
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
-                if (IGNORE_DIRECTORIES.Contains(dir.Name))
+                if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
                     continue;
 
                 copyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);

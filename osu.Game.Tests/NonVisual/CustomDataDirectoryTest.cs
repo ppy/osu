@@ -133,6 +133,9 @@ namespace osu.Game.Tests.NonVisual
                     // ensure we "use" cache
                     host.Storage.GetStorageForDirectory("cache");
 
+                    // for testing nested files are not ignored (only top level)
+                    host.Storage.GetStorageForDirectory("test-nested").GetStorageForDirectory("cache");
+
                     string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, "headless", nameof(TestMigration));
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
@@ -140,6 +143,13 @@ namespace osu.Game.Tests.NonVisual
                     osu.Migrate(customPath);
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
+
+                    // ensure cache was not moved
+                    Assert.That(host.Storage.ExistsDirectory("cache"));
+
+                    // ensure nested cache was moved
+                    Assert.That(!host.Storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
+                    Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
                     foreach (var file in OsuStorage.IGNORE_FILES)
                     {
