@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             {
                 // add the x coordinates and perform re-layout on all sprites as spacing may change with gameplay scale.
                 sprite.X = currentX;
-                currentX += sprite.DrawWidth - 1;
+                currentX += sprite.DrawWidth;
             }
 
             if (first.ScreenSpaceDrawQuad.TopLeft.X >= ScreenSpaceDrawQuad.TopLeft.X)
