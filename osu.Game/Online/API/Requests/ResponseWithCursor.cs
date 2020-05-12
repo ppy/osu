@@ -16,9 +16,6 @@ namespace osu.Game.Online.API.Requests
 
     public abstract class ResponseWithCursor<T> : ResponseWithCursor where T : class
     {
-        /// <summary>
-        /// Cursor deserialized into T class type (cannot implicitly convert type to object using raw Cursor)
-        /// </summary>
         [JsonProperty("cursor")]
         public T Cursor;
     }

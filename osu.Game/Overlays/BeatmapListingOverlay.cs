@@ -34,9 +34,7 @@ namespace osu.Game.Overlays
         private NotFoundDrawable notFoundContent;
 
         private OverlayScrollContainer resultScrollContainer;
-        /// <summary> Scroll distance threshold from results tail, higher means sooner </summary>
         private const int pagination_scroll_distance = 500;
-        /// <summary> This is paging event flag </summary>
         private bool shouldAddNextPage => resultScrollContainer.ScrollableExtent > 0 && resultScrollContainer.IsScrolledToEnd(pagination_scroll_distance);
 
         public BeatmapListingOverlay()

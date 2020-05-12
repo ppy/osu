@@ -22,7 +22,6 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public Action<List<BeatmapSetInfo>> SearchFinished;
         public Action SearchStarted;
-        /// <summary> List of currently displayed beatmap entries </summary>
         private List<BeatmapSetInfo> currentBeatmaps;
 
         [Resolved]
@@ -169,7 +168,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void TakeFocus() => searchControl.TakeFocus();
 
-        /// <summary> Request next 50 matches if available </summary>
         public void AddPageToResult()
         {
             if (beatmapListingPager == null || !beatmapListingPager.CanFetchNextPage)

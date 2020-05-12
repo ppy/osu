@@ -24,13 +24,9 @@ namespace osu.Game.Overlays.BeatmapListing
         private SearchBeatmapSetsRequest getSetsRequest;
         private SearchBeatmapSetsResponse lastResponse;
 
-        /// <summary> Reports end of results </summary>
         private bool isLastPageFetched = false;
-        /// <summary> Job in process lock flag </summary>
         private bool isFetching => getSetsRequest != null;
-        /// <summary> Whether beatmaps should be appended or replaced </summary>
         public bool IsPastFirstPage { get; private set; } = false;
-        /// <summary> call FetchNextPage() safe-check </summary>
         public bool CanFetchNextPage => !isLastPageFetched && !isFetching;
 
         public BeatmapListingPager(IAPIProvider api, RulesetStore rulesets, string query, RulesetInfo ruleset, SearchCategory searchCategory = SearchCategory.Any, SortCriteria sortCriteria = SortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
