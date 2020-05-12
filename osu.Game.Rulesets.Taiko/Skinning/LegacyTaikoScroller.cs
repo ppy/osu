@@ -17,6 +17,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 {
     public class LegacyTaikoScroller : CompositeDrawable
     {
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
         public LegacyTaikoScroller()
         {
             RelativeSizeAxes = Axes.Both;
@@ -63,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 foreach (var sprite in InternalChildren)
                 {
                     // add the x coordinates and perform re-layout on all sprites as spacing may change with gameplay scale.
-                    sprite.X = additiveX ??= sprite.X - (float)Time.Elapsed * 0.1f;
+                    sprite.X = additiveX ??= sprite.X - (float)(gameplayClock ?? Clock).ElapsedFrameTime * 0.1f;
 
                     additiveX += sprite.DrawWidth - 1;
 
