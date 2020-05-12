@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
         {
         }
 
-        private BeatmapListingFilterControl filterControl;//actual search settings
+        private BeatmapListingFilterControl filterControl;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -157,7 +157,6 @@ namespace osu.Game.Overlays
             //Pagination case
             else
             {
-
                 beatmaps.ForEach(x =>
                 {
                     LoadComponentAsync(new GridBeatmapPanel(x)
@@ -197,7 +196,6 @@ namespace osu.Game.Overlays
 
             currentContent = content;
         }
-
 
         protected override void Dispose(bool isDisposing)
         {
@@ -253,7 +251,6 @@ namespace osu.Game.Overlays
 
             if (shouldAddNextPage)
                 filterControl.AddPageToResult();
-
         }
     }
 }

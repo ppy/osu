@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 currentBeatmaps = beatmaps;
             else
                 currentBeatmaps.AddRange(beatmaps);
-            
+
             SearchFinished?.Invoke(beatmaps);
         }
 
