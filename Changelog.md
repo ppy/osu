@@ -634,3 +634,4 @@
     *   [m] [Fix hold note selection pieces disappearing on movement #8973]
     *   [m] [Add ability for a ruleset to disable gameplay overlays from displaying #8945]
     *   [m] [Add taiko scroller #8920]
+    *   [m] [Add basic custom data directory support #8935]
