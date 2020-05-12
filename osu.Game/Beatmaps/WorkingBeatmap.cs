@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -84,7 +85,7 @@ namespace osu.Game.Beatmaps
 
         public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
         {
-            using (var cancellationSource = new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10)))
+            using (var cancellationSource = createCancellationTokenSource(timeout))
             {
                 mods ??= Array.Empty<Mod>();
 
@@ -179,6 +180,15 @@ namespace osu.Game.Beatmaps
 
             if (beatmapLoadTask?.IsCompleted != true)
                 beatmapLoadTask = null;
+        }
+
+        private CancellationTokenSource createCancellationTokenSource(TimeSpan? timeout)
+        {
+            if (Debugger.IsAttached)
+                // ignore timeout when debugger is attached (may be breakpointing / debugging).
+                return new CancellationTokenSource();
+
+            return new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10));
         }
 
         private Task<IBeatmap> loadBeatmapAsync() => beatmapLoadTask ??= Task.Factory.StartNew(() =>

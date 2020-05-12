@@ -628,3 +628,17 @@
     *   [m] [Check local availability of beatmap before disabling download buttons #8980]
     *   [m] [Fix null reference causing hard freeze if game is forcefully closed during disclaimer #8982]
 *   [Mvis播放器] 在不启用故事版时换图将不再加载故事版直到故事版被启用
+
+### 2020/5/12
+*   合并上游pr
+    *   [m] [Fix hold note selection pieces disappearing on movement #8973]
+    *   [m] [Add ability for a ruleset to disable gameplay overlays from displaying #8945]
+    *   [m] [Add taiko scroller #8920]
+    *   [m] [Add basic custom data directory support #8935]
+    *   [m] [Don't timeout on long beatmap load when debugging #8988]
+    *   [m] [Fix hardrock potentially taking a long time to load #8990]
+    *   [m] [Fix taiko sample mapping for strong hits #8989]
+    *   [m] [Refactor beatmap encoder test to be a bit easier to understand #8993]
+    *   [m] [Implement midi keybindings #8986]
+    *   [m] [Fix version-dependent skin elements looking incorrect when beatmap skins are enabled #9000]
+    *   [m] [Fix null reference in difficulty recommender #9001]
