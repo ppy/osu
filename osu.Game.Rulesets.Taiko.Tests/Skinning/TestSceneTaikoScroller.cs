@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             AddStep("Load scroller", () => SetContents(() =>
                 new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoScroller), _ => Empty())
                 {
-                    Clock = new FramedClock(clock)
+                    Clock = new FramedClock(clock),
+                    Height = 0.4f,
                 }));
             AddToggleStep("Toggle passing", passing => this.ChildrenOfType<LegacyTaikoScroller>().ForEach(s => s.LastResult.Value =
                 new JudgementResult(null, new Judgement()) { Type = passing ? HitResult.Perfect : HitResult.Miss }));

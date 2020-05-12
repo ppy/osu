@@ -64,13 +64,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             float currentX = (InternalChildren?.FirstOrDefault()?.X ?? 0) - (float)Clock.ElapsedFrameTime * 0.1f;
 
             // ensure we have enough sprites
-            if (!wideEnough())
-            {
-                ClearInternal();
-
-                while (!wideEnough())
-                    AddInternal(new ScrollerSprite { Passing = passing });
-            }
+            while (!wideEnough())
+                AddInternal(new ScrollerSprite { Passing = passing });
 
             var first = InternalChildren.First();
             var last = InternalChildren.Last();
