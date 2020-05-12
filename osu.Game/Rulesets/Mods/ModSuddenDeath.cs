@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        public bool AllowFail => true;
+        public bool PerformFail() => true;
+
         public bool RestartOnFail => true;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
