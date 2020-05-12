@@ -18,6 +18,7 @@ using osu.Game.Screens.Menu;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -97,6 +98,7 @@ namespace osu.Game
 
         private MainMenu menuScreen;
 
+        [CanBeNull]
         private IntroScreen introScreen;
 
         private Bindable<int> configRuleset;
@@ -914,7 +916,7 @@ namespace osu.Game
             if (ScreenStack.CurrentScreen is Loader)
                 return false;
 
-            if (introScreen.DidLoadMenu && !(ScreenStack.CurrentScreen is IntroScreen))
+            if (introScreen?.DidLoadMenu == true && !(ScreenStack.CurrentScreen is IntroScreen))
             {
                 Scheduler.Add(introScreen.MakeCurrent);
                 return true;
