@@ -251,7 +251,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenPictureURL:
-                    picture.UpdateImage($@"https://osu.ppy.sh/ss/{link.Argument}", true);
+                    picture.UpdateImage(link.Argument, true);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -259,7 +259,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"This link type is not yet supported!",
+                        Text = @"暂不支持打开该链接!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;

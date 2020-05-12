@@ -12,10 +12,10 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Mf;
 using osu.Game.Overlays.OnlinePicture;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -26,17 +26,24 @@ namespace osu.Game.Overlays
         private GameHost host { get; set; }
 
         private const float DURATION = 1000;
-        private float OriginalWidth;
-        private float OriginalHeight;
 
         private string Target;
-        
+
         private OnlinePictureContentContainer contentContainer;
+        private Container topbarContainer;
         private Container bottomContainer;
         private TriangleButton openInBrowserButton;
         private TriangleButton closeButton;
+        private OsuSpriteText infoText;
+        private EdgeEffectParameters edgeEffect = new EdgeEffectParameters
+        {
+            Type = EdgeEffectType.Shadow,
+            Colour = Color4.Black.Opacity(0.5f),
+            Radius = 12,
+        };
 
         public float BottomContainerHeight => bottomContainer.Position.Y + bottomContainer.DrawHeight;
+        public float TopBarHeight => topbarContainer.DrawHeight;
 
         public PictureOverlay()
         {
@@ -46,13 +53,14 @@ namespace osu.Game.Overlays
             Height = 0.9f;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            CornerRadius = 10;
+            EdgeEffect = edgeEffect;
             Masking = true;
             Children = new Drawable[]
             {
                 contentContainer = new OnlinePictureContentContainer
                 {
                     GetBottomContainerHeight = () => BottomContainerHeight,
+                    GetTopBarHeight = () => TopBarHeight,
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -72,12 +80,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     Height = 60f,
                     Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.5f),
-                        Radius = 12,
-                    },
+                    EdgeEffect = edgeEffect,
                     Children = new Drawable[]
                     {
                         new Box
@@ -117,6 +120,30 @@ namespace osu.Game.Overlays
                             }
                         }
                     }
+                },
+                topbarContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    EdgeEffect = edgeEffect,
+                    Masking = true,
+                    Height = 0.04f,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4Extensions.FromHex("#333"),
+                            Alpha = 1f,
+                        },
+                        infoText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    }
                 }
             };
         }
@@ -139,29 +166,6 @@ namespace osu.Game.Overlays
             this.ScaleTo(0.9f, DURATION, Easing.OutQuint);
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            
-            OriginalWidth = DrawWidth;
-            OriginalHeight = DrawHeight;
-        }
-
-        private void UpdateSize()
-        {
-            var NewHeight = pict.DrawHeight / OriginalHeight;
-            var NewWidth = pict.DrawWidth / OriginalWidth;
-
-            this.ResizeHeightTo( Math.Min(0.8f, NewHeight > 0.5f ? NewHeight : 0.5f), DURATION / 2, Easing.OutQuint );
-            this.ResizeWidthTo( Math.Min(0.9f, NewWidth > 0.5f ? NewWidth : 0.5f), DURATION / 2, Easing.OutQuint );
-        }
-
-        private void ResetSize()
-        {
-            this.ResizeHeightTo( 0.8f, DURATION / 2, Easing.OutQuint );
-            this.ResizeWidthTo( 0.9f, DURATION / 2, Easing.OutQuint );
-        }
-
         DelayedLoadWrapper delayedLoadWrapper;
         UpdateableOnlinePicture pict;
 
@@ -172,11 +176,13 @@ namespace osu.Game.Overlays
             if (popIn)
                 this.Show();
 
-            if ( delayedLoadWrapper != null )
+            if (delayedLoadWrapper != null)
             {
                 delayedLoadWrapper.FadeOut(DURATION / 2, Easing.OutQuint);
                 delayedLoadWrapper.Expire();
             }
+
+            infoText.Text = $"{Target}";
 
             contentContainer.Add(delayedLoadWrapper = new DelayedLoadWrapper(
                 pict = new UpdateableOnlinePicture(Target)

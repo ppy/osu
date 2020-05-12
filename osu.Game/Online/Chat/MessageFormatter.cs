@@ -133,7 +133,7 @@ namespace osu.Game.Online.Chat
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
 
                             case "ss":
-                                return new LinkDetails(LinkAction.OpenPictureURL, $"{args[3]}/{args[4]}");
+                                return new LinkDetails(LinkAction.OpenPictureURL, url );
 
                             case "u":
                             case "users":

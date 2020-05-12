@@ -6,6 +6,7 @@ namespace osu.Game.Overlays.OnlinePicture
 {
     public class OnlinePictureContentContainer : Container
     {
+        public Func<float> GetTopBarHeight;
         public Func<float> GetBottomContainerHeight;
 
         public OnlinePictureContentContainer()
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.OnlinePicture
         {
             base.UpdateAfterChildren();
 
-            Padding = new MarginPadding { Bottom = GetBottomContainerHeight?.Invoke() ?? 0 };
+            Padding = new MarginPadding { Bottom = GetBottomContainerHeight?.Invoke() ?? 0, Top = GetTopBarHeight?.Invoke() ?? 0 };
         }
     }
 }

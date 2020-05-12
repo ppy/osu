@@ -1,9 +1,8 @@
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 
-namespace osu.Game.Overlays.Mf
+namespace osu.Game.Overlays.OnlinePicture
 {
     [LongRunningLoad]
     public class UpdateableOnlinePicture : Sprite
