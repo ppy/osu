@@ -40,10 +40,11 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public virtual bool DisplayOnTop => true;
 
-        protected NotificationLight Light;
-        private readonly CloseButton closeButton;
-        protected Container IconContent;
         private readonly Container content;
+
+        protected readonly NotificationCloseButton CloseButton;
+        protected NotificationLight Light;
+        protected Container IconContent;
 
         protected override Container<Drawable> Content => content;
 
@@ -104,16 +105,14 @@ namespace osu.Game.Overlays.Notifications
                                 }
                             }
                         },
-                        closeButton = new CloseButton
+                        CloseButton = new NotificationCloseButton
                         {
                             Alpha = 0,
                             Action = Close,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Margin = new MarginPadding
-                            {
-                                Right = 5
-                            },
+                            Size = new Vector2(20f),
+                            Margin = new MarginPadding { Right = 5f },
                         }
                     }
                 }
@@ -122,13 +121,13 @@ namespace osu.Game.Overlays.Notifications
 
         protected override bool OnHover(HoverEvent e)
         {
-            closeButton.FadeIn(75);
+            CloseButton.FadeIn(75);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            closeButton.FadeOut(75);
+            CloseButton.FadeOut(75);
             base.OnHoverLost(e);
         }
 
@@ -161,25 +160,32 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer
+        public class NotificationCloseButton : OsuClickableContainer
         {
+            private readonly ShakeContainer shakeContainer;
+
             private Color4 hoverColour;
 
-            public CloseButton()
+            public NotificationCloseButton()
             {
                 Colour = OsuColour.Gray(0.2f);
-                AutoSizeAxes = Axes.Both;
 
                 Children = new[]
                 {
-                    new SpriteIcon
+                    shakeContainer = new ShakeContainer
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.Solid.TimesCircle,
-                        Size = new Vector2(20),
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Icon = FontAwesome.Solid.TimesCircle,
+                            RelativeSizeAxes = Axes.Both,
+                        }
                     }
                 };
+
+                Enabled.ValueChanged += _ => updateState();
             }
 
             [BackgroundDependencyLoader]
@@ -190,14 +196,33 @@ namespace osu.Game.Overlays.Notifications
 
             protected override bool OnHover(HoverEvent e)
             {
-                this.FadeColour(hoverColour, 200);
+                updateState();
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                this.FadeColour(OsuColour.Gray(0.2f), 200);
+                updateState();
                 base.OnHoverLost(e);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (!Enabled.Value)
+                    shakeContainer.Shake();
+
+                return base.OnClick(e);
+            }
+
+            private void updateState()
+            {
+                if (!Enabled.Value)
+                {
+                    this.FadeColour(OsuColour.Gray(0.8f), 200);
+                    return;
+                }
+
+                this.FadeColour(IsHovered ? hoverColour : OsuColour.Gray(0.2f), 200);
             }
         }
 
