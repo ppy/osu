@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             InternalChild = textureAnimation = createTextureAnimation(state).With(animation =>
             {
                 animation.Origin = animation.Anchor = Anchor.BottomLeft;
-                animation.Scale = new Vector2(0.6f);
+                animation.Scale = new Vector2(0.51f); // close enough to stable
             });
 
             RelativeSizeAxes = Axes.Both;

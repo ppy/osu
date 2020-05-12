@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -15,6 +16,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -32,6 +34,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
         private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
+        private SkinnableDrawable mascot;
 
         private ProxyContainer topLevelHitContainer;
         private ProxyContainer barlineContainer;
@@ -40,9 +43,14 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Container hitTargetOffsetContent;
 
+        private readonly LayoutValue<float> playfieldScaleLayout = new LayoutValue<float>(Invalidation.DrawSize);
+        private float playfieldScale => playfieldScaleLayout.IsValid ? playfieldScaleLayout.Value : playfieldScaleLayout.Value = DrawHeight / DEFAULT_HEIGHT;
+
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
             this.controlPoints = controlPoints;
+
+            AddLayout(playfieldScaleLayout);
         }
 
         [BackgroundDependencyLoader]
@@ -125,14 +133,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                     }
                 },
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => Empty())
+                mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => Empty())
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.TopLeft,
-                    RelativePositionAxes = Axes.None,
+                    RelativePositionAxes = Axes.Y,
                     RelativeSizeAxes = Axes.None,
-                    X = 15,
-                    Y = 45
+                    Y = 0.2f
                 },
                 topLevelHitContainer = new ProxyContainer
                 {
@@ -151,6 +158,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             // This is basically allowing for correct alignment as relative pieces move around them.
             rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
+
+            mascot.Scale = new Vector2(playfieldScale);
         }
 
         public override void Add(DrawableHitObject h)
