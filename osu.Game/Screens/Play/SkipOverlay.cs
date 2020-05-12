@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
 
+        public bool Disabled { get; set; }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
@@ -105,7 +107,8 @@ namespace osu.Game.Screens.Play
             button.Action = () => RequestSkip?.Invoke();
             displayTime = gameplayClock.CurrentTime;
 
-            Show();
+            if (!Disabled)
+                Show();
         }
 
         protected override void PopIn() => this.FadeIn(fade_time);
@@ -121,7 +124,7 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             button.Enabled.Value = progress > 0;
-            State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
+            State.Value = progress > 0 && !Disabled ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
