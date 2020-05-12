@@ -17,9 +17,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 {
     public class LegacyTaikoScroller : CompositeDrawable
     {
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
-
         public LegacyTaikoScroller()
         {
             RelativeSizeAxes = Axes.Both;
@@ -59,31 +56,42 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         {
             base.Update();
 
-            while (true)
+            bool wideEnough() =>
+                InternalChildren.Any()
+                && InternalChildren.First().ScreenSpaceDrawQuad.Width * InternalChildren.Count >= ScreenSpaceDrawQuad.Width * 2;
+
+            // store X before checking wide enough so if we perform layout there is no positional discrepancy.
+            float currentX = (InternalChildren?.FirstOrDefault()?.X ?? 0) - (float)Clock.ElapsedFrameTime * 0.1f;
+
+            // ensure we have enough sprites
+            if (!wideEnough())
             {
-                float? additiveX = null;
+                ClearInternal();
 
-                foreach (var sprite in InternalChildren)
-                {
-                    // add the x coordinates and perform re-layout on all sprites as spacing may change with gameplay scale.
-                    sprite.X = additiveX ??= sprite.X - (float)(gameplayClock ?? Clock).ElapsedFrameTime * 0.1f;
+                while (!wideEnough())
+                    AddInternal(new ScrollerSprite { Passing = passing });
+            }
 
-                    additiveX += sprite.DrawWidth - 1;
+            var first = InternalChildren.First();
+            var last = InternalChildren.Last();
 
-                    if (sprite.X + sprite.DrawWidth < 0)
-                        sprite.Expire();
-                }
+            foreach (var sprite in InternalChildren)
+            {
+                // add the x coordinates and perform re-layout on all sprites as spacing may change with gameplay scale.
+                sprite.X = currentX;
+                currentX += sprite.DrawWidth - 1;
+            }
 
-                var last = InternalChildren.LastOrDefault();
+            if (first.ScreenSpaceDrawQuad.TopLeft.X >= ScreenSpaceDrawQuad.TopLeft.X)
+            {
+                foreach (var internalChild in InternalChildren)
+                    internalChild.X -= first.DrawWidth;
+            }
 
-                // only break from this loop once we have saturated horizontal space completely.
-                if (last != null && last.ScreenSpaceDrawQuad.TopRight.X >= ScreenSpaceDrawQuad.TopRight.X)
-                    break;
-
-                AddInternal(new ScrollerSprite
-                {
-                    Passing = passing
-                });
+            if (last.ScreenSpaceDrawQuad.TopRight.X <= ScreenSpaceDrawQuad.TopRight.X)
+            {
+                foreach (var internalChild in InternalChildren)
+                    internalChild.X += first.DrawWidth;
             }
         }
 
