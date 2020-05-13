@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public DirectorySelector(string initialPath = null)
         {
-            currentDirectory.Value = new DirectoryInfo(initialPath ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            currentDirectory.Value = new DirectoryInfo(initialPath ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
 
         [BackgroundDependencyLoader]
