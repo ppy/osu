@@ -92,6 +92,8 @@ namespace osu.Game.Screens.Mvis
             {
                 storyboardReplacesBackground.Value = false;
                 sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                IsReady.Value = true;
+                CancelAllTasks();
             }
         }
 
