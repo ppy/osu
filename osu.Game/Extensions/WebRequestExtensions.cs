@@ -6,11 +6,13 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JetBrains.Annotations;
 
 namespace osu.Game.Extensions
 {
     public class Cursor
     {
+        [UsedImplicitly]
         [JsonExtensionData]
         public IDictionary<string, JToken> Properties;
     }
