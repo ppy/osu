@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -8,11 +9,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -28,18 +29,17 @@ namespace osu.Game.Tests.Visual.Settings
 
     public class DirectorySelector : CompositeDrawable
     {
-        private Storage root;
         private FillFlowContainer directoryFlow;
-        private CurrentDirectoryDisplay current;
 
         [Resolved]
         private GameHost host { get; set; }
 
-        private readonly Bindable<string> currentDirectory = new Bindable<string>();
+        [Cached]
+        private readonly Bindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
 
-        public DirectorySelector(Storage root = null)
+        public DirectorySelector(string initialPath = null)
         {
-            this.root = root;
+            currentDirectory.Value = new DirectoryInfo(initialPath ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
 
         protected override void LoadComplete()
@@ -47,9 +47,6 @@ namespace osu.Game.Tests.Visual.Settings
             base.LoadComplete();
 
             Padding = new MarginPadding(10);
-
-            if (root == null)
-                root = host.GetStorage("/Users/");
 
             InternalChildren = new Drawable[]
             {
@@ -59,9 +56,8 @@ namespace osu.Game.Tests.Visual.Settings
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        current = new CurrentDirectoryDisplay
+                        new CurrentDirectoryDisplay
                         {
-                            CurrentDirectory = { BindTarget = currentDirectory },
                             RelativeSizeAxes = Axes.X,
                             Height = 50,
                         },
@@ -79,29 +75,39 @@ namespace osu.Game.Tests.Visual.Settings
                 },
             };
 
-            currentDirectory.BindValueChanged(updateDisplay);
-            currentDirectory.Value = root.GetFullPath(string.Empty);
+            currentDirectory.BindValueChanged(updateDisplay, true);
         }
 
-        private void updateDisplay(ValueChangedEvent<string> directory)
+        private void updateDisplay(ValueChangedEvent<DirectoryInfo> directory)
         {
-            root = host.GetStorage(directory.NewValue);
-
             directoryFlow.Clear();
 
-            directoryFlow.Add(new ParentDirectoryRow(getParentPath()) { CurrentDirectory = { BindTarget = currentDirectory }, });
+            if (directory.NewValue == null)
+            {
+                // var drives = DriveInfo.GetDrives();
+                //
+                // foreach (var drive in drives)
+                //     directoryFlow.Add(new DirectoryRow(drive.RootDirectory));
+            }
+            else
+            {
+                directoryFlow.Add(new ParentDirectoryRow(currentDirectory.Value.Parent));
 
-            foreach (var dir in root.GetDirectories(string.Empty))
-                directoryFlow.Add(new DirectoryRow(dir, root.GetFullPath(dir)) { CurrentDirectory = { BindTarget = currentDirectory }, });
+                foreach (var dir in currentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
+                {
+                    if ((dir.Attributes & FileAttributes.Hidden) == 0)
+                        directoryFlow.Add(new DirectoryRow(dir));
+                }
+            }
         }
-
-        private string getParentPath() => Path.GetFullPath(Path.Combine(root.GetFullPath(string.Empty), ".."));
 
         public class CurrentDirectoryDisplay : CompositeDrawable
         {
-            public readonly Bindable<string> CurrentDirectory = new Bindable<string>();
+            [Resolved]
+            private Bindable<DirectoryInfo> currentDirectory { get; set; }
 
-            public CurrentDirectoryDisplay()
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 FillFlowContainer flow;
 
@@ -118,26 +124,26 @@ namespace osu.Game.Tests.Visual.Settings
                     },
                 };
 
-                CurrentDirectory.BindValueChanged(dir =>
+                currentDirectory.BindValueChanged(dir =>
                 {
                     flow.Clear();
 
-                    flow.Add(new OsuSpriteText { Text = "Current Directory: " });
-
-                    var pieces = dir.NewValue.Split(Path.DirectorySeparatorChar);
-
-                    pieces[0] = "/";
-
-                    for (int i = 0; i < pieces.Length; i++)
+                    flow.Add(new OsuSpriteText
                     {
-                        flow.Add(new DirectoryRow(pieces[i], Path.Combine(pieces.Take(i + 1).ToArray()))
-                        {
-                            CurrentDirectory = { BindTarget = CurrentDirectory },
-                            RelativeSizeAxes = Axes.Y,
-                            Size = new Vector2(100, 1)
-                        });
+                        Text = "Current Directory: ",
+                        Font = OsuFont.Default.With(size: DirectoryRow.HEIGHT),
+                    });
+
+                    flow.Add(new DirectoryRow(null, "Computer"));
+
+                    DirectoryInfo traverse = dir.NewValue;
+
+                    while (traverse != null)
+                    {
+                        flow.Add(new DirectoryRow(traverse));
+                        traverse = traverse.Parent;
                     }
-                });
+                }, true);
             }
         }
 
@@ -145,48 +151,48 @@ namespace osu.Game.Tests.Visual.Settings
         {
             public override IconUsage Icon => FontAwesome.Solid.Folder;
 
-            public ParentDirectoryRow(string fullPath)
-                : base("..", fullPath)
+            public ParentDirectoryRow(DirectoryInfo directory)
+                : base(directory, "..")
             {
             }
         }
 
-        private class DirectoryRow : OsuButton
+        private class DirectoryRow : CompositeDrawable
         {
-            private readonly string fullPath;
+            public const float HEIGHT = 20;
 
-            public readonly Bindable<string> CurrentDirectory = new Bindable<string>();
+            private readonly DirectoryInfo directory;
 
-            public DirectoryRow(string display, string fullPath)
+            [Resolved]
+            private Bindable<DirectoryInfo> currentDirectory { get; set; }
+
+            public DirectoryRow(DirectoryInfo directory, string display = null)
             {
-                this.fullPath = fullPath;
+                this.directory = directory;
 
-                RelativeSizeAxes = Axes.X;
-                Height = 20;
+                AutoSizeAxes = Axes.X;
+                Height = HEIGHT;
 
-                BackgroundColour = OsuColour.Gray(0.1f);
-
-                AddRange(new Drawable[]
+                AddRangeInternal(new Drawable[]
                 {
                     new SpriteIcon
                     {
                         Icon = Icon,
-                        Size = new Vector2(20)
+                        Size = new Vector2(HEIGHT)
                     },
                     new OsuSpriteText
                     {
-                        X = 25,
-                        Text = display,
-                        Font = OsuFont.Default.With(size: 20)
+                        X = HEIGHT + 5,
+                        Text = display ?? directory.Name,
+                        Font = OsuFont.Default.With(size: HEIGHT)
                     }
                 });
-
-                Action = PerformDirectoryTraversal;
             }
 
-            protected virtual void PerformDirectoryTraversal()
+            protected override bool OnClick(ClickEvent e)
             {
-                CurrentDirectory.Value = fullPath;
+                currentDirectory.Value = directory;
+                return true;
             }
 
             public virtual IconUsage Icon => FontAwesome.Regular.Folder;
