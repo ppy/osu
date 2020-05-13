@@ -19,7 +19,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class PictureOverlay : OsuFocusedOverlayContainer
+    public class OnlinePictureOverlay : OsuFocusedOverlayContainer
     {
 
         [Resolved]
@@ -32,6 +32,7 @@ namespace osu.Game.Overlays
         private OnlinePictureContentContainer contentContainer;
         private Container topbarContainer;
         private Container bottomContainer;
+        private LoadingSpinner loadingSpinner;
         private TriangleButton openInBrowserButton;
         private TriangleButton closeButton;
         private OsuSpriteText infoText;
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays
         public float BottomContainerHeight => bottomContainer.Position.Y + bottomContainer.DrawHeight;
         public float TopBarHeight => topbarContainer.DrawHeight;
 
-        public PictureOverlay()
+        public OnlinePictureOverlay()
         {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -71,6 +72,12 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
                         },
+                        loadingSpinner = new LoadingSpinner(true)
+                        {
+                            Depth = -1,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
                     }
                 },
                 bottomContainer = new Container
@@ -176,6 +183,8 @@ namespace osu.Game.Overlays
             if (popIn)
                 this.Show();
 
+            loadingSpinner.Show();
+
             if (delayedLoadWrapper != null)
             {
                 delayedLoadWrapper.FadeOut(DURATION / 2, Easing.OutQuint);
@@ -198,6 +207,7 @@ namespace osu.Game.Overlays
             {
                 d.Hide();
                 d.FadeInFromZero(DURATION / 2, Easing.Out);
+                loadingSpinner.Hide();
             };
         }
     }

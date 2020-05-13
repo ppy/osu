@@ -13,9 +13,9 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         public TestScenePictureOverlay()
         {
-            PictureOverlay overlay;
+            OnlinePictureOverlay overlay;
 
-            Add(overlay = new PictureOverlay());
+            Add(overlay = new OnlinePictureOverlay());
 
             AddStep("Show Empty", () => overlay.UpdateImage("localhost", true));
             AddStep("Show MATRIX-feather", () => overlay.UpdateImage("https://a.ppy.sh/13870362", true));
