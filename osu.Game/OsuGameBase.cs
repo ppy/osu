@@ -132,6 +132,8 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.CacheAs(Storage);
+
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
@@ -300,8 +302,8 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null)
-                Storage = host.Storage;
+            if (Storage == null) // may be non-null for certain tests
+                Storage = new OsuStorage(host);
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
