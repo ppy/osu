@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 {
     public class LegacyTaikoScroller : CompositeDrawable
     {
+        public Bindable<JudgementResult> LastResult = new Bindable<JudgementResult>();
+
         public LegacyTaikoScroller()
         {
             RelativeSizeAxes = Axes.Both;
@@ -50,21 +52,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             }, true);
         }
 
-        public Bindable<JudgementResult> LastResult = new Bindable<JudgementResult>();
-
         protected override void Update()
         {
             base.Update();
-
-            bool wideEnough() =>
-                InternalChildren.Any()
-                && InternalChildren.First().ScreenSpaceDrawQuad.Width * InternalChildren.Count >= ScreenSpaceDrawQuad.Width * 2;
 
             // store X before checking wide enough so if we perform layout there is no positional discrepancy.
             float currentX = (InternalChildren?.FirstOrDefault()?.X ?? 0) - (float)Clock.ElapsedFrameTime * 0.1f;
 
             // ensure we have enough sprites
-            while (!wideEnough())
+            if (!InternalChildren.Any()
+                || InternalChildren.First().ScreenSpaceDrawQuad.Width * InternalChildren.Count < ScreenSpaceDrawQuad.Width * 2)
                 AddInternal(new ScrollerSprite { Passing = passing });
 
             var first = InternalChildren.First();
