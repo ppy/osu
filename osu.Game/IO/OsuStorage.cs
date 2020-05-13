@@ -87,6 +87,9 @@ namespace osu.Game.IO
 
                 dir.Delete(true);
             }
+
+            if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
+                target.Delete();
         }
 
         private static void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
