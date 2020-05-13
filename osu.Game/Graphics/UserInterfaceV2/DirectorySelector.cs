@@ -34,10 +34,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             currentDirectory.Value = new DirectoryInfo(initialPath ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
             Padding = new MarginPadding(10);
 
             InternalChildren = new Drawable[]
@@ -80,30 +79,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 var drives = DriveInfo.GetDrives();
 
                 foreach (var drive in drives)
-                    directoryFlow.Add(new DirectoryRow(drive.RootDirectory));
+                    directoryFlow.Add(new DirectoryPiece(drive.RootDirectory));
             }
             else
             {
-                directoryFlow.Add(new ParentDirectoryRow(currentDirectory.Value.Parent));
+                directoryFlow.Add(new ParentDirectoryPiece(currentDirectory.Value.Parent));
 
                 foreach (var dir in currentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
                 {
                     if ((dir.Attributes & FileAttributes.Hidden) == 0)
-                        directoryFlow.Add(new DirectoryRow(dir));
+                        directoryFlow.Add(new DirectoryPiece(dir));
                 }
             }
         }
 
-        public class CurrentDirectoryDisplay : CompositeDrawable
+        private class CurrentDirectoryDisplay : CompositeDrawable
         {
             [Resolved]
             private Bindable<DirectoryInfo> currentDirectory { get; set; }
 
+            private FillFlowContainer flow;
+
             [BackgroundDependencyLoader]
             private void load()
             {
-                FillFlowContainer flow;
-
                 InternalChildren = new Drawable[]
                 {
                     flow = new FillFlowContainer
@@ -112,50 +111,48 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.X,
                         Spacing = new Vector2(5),
-                        Height = DirectoryRow.HEIGHT,
+                        Height = DirectoryPiece.HEIGHT,
                         Direction = FillDirection.Horizontal,
                     },
                 };
 
-                currentDirectory.BindValueChanged(dir =>
-                {
-                    flow.Clear();
-
-                    flow.Add(new OsuSpriteText
-                    {
-                        Text = "Current Directory: ",
-                        Font = OsuFont.Default.With(size: DirectoryRow.HEIGHT),
-                    });
-
-                    flow.Add(new ComputerRow());
-
-                    List<DirectoryRow> traversalRows = new List<DirectoryRow>();
-
-                    DirectoryInfo traverse = dir.NewValue;
-
-                    while (traverse != null)
-                    {
-                        traversalRows.Insert(0, new CurrentDisplayRow(traverse));
-                        traverse = traverse.Parent;
-                    }
-
-                    flow.AddRange(traversalRows);
-                }, true);
+                currentDirectory.BindValueChanged(updateDisplay, true);
             }
 
-            private class ComputerRow : CurrentDisplayRow
+            private void updateDisplay(ValueChangedEvent<DirectoryInfo> dir)
+            {
+                flow.Clear();
+
+                List<DirectoryPiece> pathPieces = new List<DirectoryPiece>();
+
+                DirectoryInfo ptr = dir.NewValue;
+
+                while (ptr != null)
+                {
+                    pathPieces.Insert(0, new CurrentDisplayPiece(ptr));
+                    ptr = ptr.Parent;
+                }
+
+                flow.ChildrenEnumerable = new Drawable[]
+                {
+                    new OsuSpriteText { Text = "Current Directory: ", Font = OsuFont.Default.With(size: DirectoryPiece.HEIGHT), },
+                    new ComputerPiece(),
+                }.Concat(pathPieces);
+            }
+
+            private class ComputerPiece : CurrentDisplayPiece
             {
                 protected override IconUsage? Icon => null;
 
-                public ComputerRow()
+                public ComputerPiece()
                     : base(null, "Computer")
                 {
                 }
             }
 
-            private class CurrentDisplayRow : DirectoryRow
+            private class CurrentDisplayPiece : DirectoryPiece
             {
-                public CurrentDisplayRow(DirectoryInfo directory, string displayName = null)
+                public CurrentDisplayPiece(DirectoryInfo directory, string displayName = null)
                     : base(directory, displayName)
                 {
                 }
@@ -172,21 +169,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     });
                 }
 
-                protected override IconUsage? Icon => Directory.Name.Contains("/") ? base.Icon : null;
+                protected override IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar) ? base.Icon : null;
             }
         }
 
-        private class ParentDirectoryRow : DirectoryRow
+        private class ParentDirectoryPiece : DirectoryPiece
         {
             protected override IconUsage? Icon => FontAwesome.Solid.Folder;
 
-            public ParentDirectoryRow(DirectoryInfo directory)
+            public ParentDirectoryPiece(DirectoryInfo directory)
                 : base(directory, "..")
             {
             }
         }
 
-        private class DirectoryRow : CompositeDrawable
+        private class DirectoryPiece : CompositeDrawable
         {
             public const float HEIGHT = 20;
 
@@ -201,7 +198,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [Resolved]
             private Bindable<DirectoryInfo> currentDirectory { get; set; }
 
-            public DirectoryRow(DirectoryInfo directory, string displayName = null)
+            public DirectoryPiece(DirectoryInfo directory, string displayName = null)
             {
                 Directory = directory;
                 this.displayName = displayName;
@@ -258,7 +255,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 return true;
             }
 
-            protected virtual IconUsage? Icon => Directory.Name.Contains("/") ? FontAwesome.Solid.Database : FontAwesome.Regular.Folder;
+            protected virtual IconUsage? Icon => Directory.Name.Contains(Path.DirectorySeparatorChar)
+                ? FontAwesome.Solid.Database
+                : FontAwesome.Regular.Folder;
         }
     }
 }
