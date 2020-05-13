@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private class ComputerRow : CurrentDisplayRow
             {
-                public override IconUsage? Icon => null;
+                protected override IconUsage? Icon => null;
 
                 public ComputerRow()
                     : base(null, "Computer")
@@ -171,12 +171,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Size = new Vector2(FONT_SIZE / 2)
                     });
                 }
+
+                protected override IconUsage? Icon => Directory.Name.Contains("/") ? base.Icon : null;
             }
         }
 
         private class ParentDirectoryRow : DirectoryRow
         {
-            public override IconUsage? Icon => FontAwesome.Solid.Folder;
+            protected override IconUsage? Icon => FontAwesome.Solid.Folder;
 
             public ParentDirectoryRow(DirectoryInfo directory)
                 : base(directory, "..")
@@ -190,7 +192,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected const float FONT_SIZE = 16;
 
-            private readonly DirectoryInfo directory;
+            protected readonly DirectoryInfo Directory;
+
             private readonly string displayName;
 
             protected FillFlowContainer Flow;
@@ -200,7 +203,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public DirectoryRow(DirectoryInfo directory, string displayName = null)
             {
-                this.directory = directory;
+                Directory = directory;
                 this.displayName = displayName;
             }
 
@@ -244,18 +247,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Text = displayName ?? directory.Name,
+                    Text = displayName ?? Directory.Name,
                     Font = OsuFont.Default.With(size: FONT_SIZE)
                 });
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                currentDirectory.Value = directory;
+                currentDirectory.Value = Directory;
                 return true;
             }
 
-            public virtual IconUsage? Icon => FontAwesome.Regular.Folder;
+            protected virtual IconUsage? Icon => Directory.Name.Contains("/") ? FontAwesome.Solid.Database : FontAwesome.Regular.Folder;
         }
     }
 }
