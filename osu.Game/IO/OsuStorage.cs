@@ -96,20 +96,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                int tries = 5;
-
-                while (tries-- > 0)
-                {
-                    try
-                    {
-                        fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true);
-                        break;
-                    }
-                    catch (Exception)
-                    {
-                        Thread.Sleep(50);
-                    }
-                }
+                attemptCopy(fi, Path.Combine(destination.FullName, fi.Name));
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
@@ -118,6 +105,27 @@ namespace osu.Game.IO
                     continue;
 
                 copyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
+            }
+        }
+
+        private static void attemptCopy(System.IO.FileInfo fileInfo, string destination)
+        {
+            int tries = 5;
+
+            while (true)
+            {
+                try
+                {
+                    fileInfo.CopyTo(destination, true);
+                    return;
+                }
+                catch (Exception)
+                {
+                    if (tries-- == 0)
+                        throw;
+                }
+
+                Thread.Sleep(50);
             }
         }
     }
