@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Layout;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -43,14 +42,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Container hitTargetOffsetContent;
 
-        private readonly LayoutValue<float> playfieldScaleLayout = new LayoutValue<float>(Invalidation.DrawSize);
-        private float playfieldScale => playfieldScaleLayout.IsValid ? playfieldScaleLayout.Value : playfieldScaleLayout.Value = DrawHeight / DEFAULT_HEIGHT;
-
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
             this.controlPoints = controlPoints;
-
-            AddLayout(playfieldScaleLayout);
         }
 
         [BackgroundDependencyLoader]
@@ -159,7 +153,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
 
-            mascot.Scale = new Vector2(playfieldScale);
+            mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
 
         public override void Add(DrawableHitObject h)
