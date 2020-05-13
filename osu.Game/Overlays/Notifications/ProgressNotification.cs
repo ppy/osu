@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,6 +17,10 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressNotification : Notification, IHasCompletionTarget
     {
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+        public CancellationToken CancellationToken => cancellationTokenSource.Token;
+
         public string Text
         {
             set => Schedule(() => textDrawable.Text = value);
@@ -35,6 +40,27 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
+        private bool cancellable = true;
+
+        /// <summary>
+        /// Whether this progress notification can be cancelled by user request.
+        /// </summary>
+        public bool Cancellable
+        {
+            get => cancellable;
+            set
+            {
+                if (cancellable == value)
+                    return;
+
+                if (state == ProgressNotificationState.Cancelled && value == false)
+                    throw new InvalidOperationException("Attempting to disable user cancelling while the notification is already cancelled.");
+
+                cancellable = value;
+                CloseButton.Enabled.Value = cancellable;
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -43,16 +69,17 @@ namespace osu.Game.Overlays.Notifications
             updateState();
         }
 
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
-        public CancellationToken CancellationToken => cancellationTokenSource.Token;
-
         public ProgressNotificationState State
         {
             get => state;
             set
             {
                 if (state == value) return;
+
+                // Enable back user cancelling if notification transitioned to
+                // cancelled state by the component using it. likely due to task failure.
+                if (value == ProgressNotificationState.Cancelled)
+                    Cancellable = true;
 
                 state = value;
 
@@ -160,6 +187,12 @@ namespace osu.Game.Overlays.Notifications
 
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
+                    if (!cancellable)
+                    {
+                        CloseButton.FadeAndShake();
+                        return;
+                    }
+
                     if (CancelRequested?.Invoke() != false)
                         State = ProgressNotificationState.Cancelled;
                     break;

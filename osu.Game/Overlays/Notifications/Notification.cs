@@ -194,6 +194,20 @@ namespace osu.Game.Overlays.Notifications
                 hoverColour = colours.Yellow;
             }
 
+            /// <summary>
+            /// Fades the button in (if not visible), shakes it, then fades it back to its original alpha.
+            /// </summary>
+            public void FadeAndShake()
+            {
+                FinishTransforms(true);
+
+                var original = Alpha;
+
+                this.FadeIn(250, Easing.OutExpo)
+                    .Schedule(() => shakeContainer.Shake()).Then()
+                    .FadeTo(original, 250, Easing.InExpo);
+            }
+
             protected override bool OnHover(HoverEvent e)
             {
                 updateState();
