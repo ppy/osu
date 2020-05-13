@@ -8,15 +8,17 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneNotificationOverlay : OsuTestScene
+    public class TestSceneNotificationOverlay : OsuManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -41,10 +43,17 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             Content.Children = new Drawable[]
             {
-                notificationOverlay = new NotificationOverlay
+                new Container
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
+                    RelativeSizeAxes = Axes.Both,
+                    // move the overlay a bit to the bottom to avoid
+                    // conflicting with the input priority overlay
+                    Padding = new MarginPadding { Top = 100f },
+                    Child = notificationOverlay = new NotificationOverlay
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
                 },
                 displayedCount = new OsuSpriteText()
             };
@@ -123,6 +132,56 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddRepeatStep("send barrage", sendBarrage, 10);
         }
 
+        [Test]
+        public void TestCancellable()
+        {
+            ProgressNotification notification = null;
+
+            setState(Visibility.Visible);
+            AddStep("send slow-progressing", () => notification = sendSlowProgressing());
+
+            AddStep("disable user cancelling", () => notification.Cancellable = false);
+            AddStep("click cancel button", clickNotificationCloseButton);
+            AddAssert("notification still active", () => notification.State == ProgressNotificationState.Active);
+
+            AddStep("re-enable user cancelling", () => notification.Cancellable = true);
+            AddStep("click cancel button", clickNotificationCloseButton);
+            AddAssert("notification cancelled", () => notification.State == ProgressNotificationState.Cancelled);
+
+            void clickNotificationCloseButton()
+            {
+                InputManager.MoveMouseTo(notification.ChildrenOfType<Notification.NotificationCloseButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            }
+        }
+
+        [Test]
+        public void TestSwitchToCancelledOnDisabledUserCancel()
+        {
+            ProgressNotification notification = null;
+
+            setState(Visibility.Visible);
+            AddStep("send slow-progressing", () => notification = sendSlowProgressing());
+            AddStep("disable user cancelling", () => notification.Cancellable = false);
+
+            AddStep("switch to cancelled state", () => notification.State = ProgressNotificationState.Cancelled);
+            AddAssert("cancelling enabled automatically", () => notification.Cancellable);
+
+            bool exceptionThrown = false;
+            AddStep("attempt disabling user cancelling", () =>
+            {
+                try
+                {
+                    notification.Cancellable = false;
+                }
+                catch (InvalidOperationException)
+                {
+                    exceptionThrown = true;
+                }
+            });
+            AddAssert("disabling cancel throws", () => exceptionThrown);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -140,47 +199,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
             {
                 if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
+                {
+                    if (n is SlowProgressingNotification)
+                        n.Progress += (float)(Time.Elapsed / 10000);
+                    else
+                        n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
+                }
                 else
+                {
                     n.State = ProgressNotificationState.Completed;
+                }
             }
         }
 
         private void checkDisplayedCount(int expected) =>
             AddAssert($"Displayed count is {expected}", () => notificationOverlay.UnreadCount.Value == expected);
-
-        private void sendDownloadProgress()
-        {
-            var n = new ProgressNotification
-            {
-                Text = @"Downloading Haitai...",
-                CompletionText = "Downloaded Haitai!",
-            };
-            notificationOverlay.Post(n);
-            progressingNotifications.Add(n);
-        }
-
-        private void sendUploadProgress()
-        {
-            var n = new ProgressNotification
-            {
-                Text = @"Uploading to BSS...",
-                CompletionText = "Uploaded to BSS!",
-            };
-            notificationOverlay.Post(n);
-            progressingNotifications.Add(n);
-        }
-
-        private void sendBackgroundUploadProgress()
-        {
-            var n = new BackgroundProgressNotification
-            {
-                Text = @"Uploading to BSS...",
-                CompletionText = "Uploaded to BSS!",
-            };
-            notificationOverlay.Post(n);
-            progressingNotifications.Add(n);
-        }
 
         private void setState(Visibility state) => AddStep(state.ToString(), () => notificationOverlay.State.Value = state);
 
@@ -231,6 +264,51 @@ namespace osu.Game.Tests.Visual.UserInterface
                 notificationOverlay.Post(new SimpleNotification { Text = @"Spam incoming!!" });
         }
 
+        private void sendDownloadProgress()
+        {
+            var n = new ProgressNotification
+            {
+                Text = @"Downloading Haitai...",
+                CompletionText = "Downloaded Haitai!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+        }
+
+        private void sendUploadProgress()
+        {
+            var n = new ProgressNotification
+            {
+                Text = @"Uploading to BSS...",
+                CompletionText = "Uploaded to BSS!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+        }
+
+        private void sendBackgroundUploadProgress()
+        {
+            var n = new BackgroundProgressNotification
+            {
+                Text = @"Uploading to BSS...",
+                CompletionText = "Uploaded to BSS!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+        }
+
+        private SlowProgressingNotification sendSlowProgressing()
+        {
+            var n = new SlowProgressingNotification
+            {
+                Text = "Downloading too slowly...",
+                CompletionText = "Finally made it there!",
+            };
+            notificationOverlay.Post(n);
+            progressingNotifications.Add(n);
+            return n;
+        }
+
         private class BackgroundNotification : SimpleNotification
         {
             public override bool IsImportant => false;
@@ -239,6 +317,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class BackgroundProgressNotification : ProgressNotification
         {
             public override bool IsImportant => false;
+        }
+
+        private class SlowProgressingNotification : ProgressNotification
+        {
         }
     }
 }
