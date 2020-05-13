@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -190,14 +190,13 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
                 T bestMatch = null;
-                float minDiff = float.MaxValue;
-                float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
+                float minDiff = float.MinValue;
 
                 foreach (var section in Children)
                 {
-                    float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
+                    float diff = scrollContainer.GetChildPosInContent(section) - currentScroll - FixedHeader?.BoundingBox.Height ?? 0;
 
-                    if (diff < minDiff)
+                    if (minDiff < diff & diff < 0)
                     {
                         minDiff = diff;
                         bestMatch = section;
