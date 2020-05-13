@@ -11,15 +11,15 @@ namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
-        public SearchCategory SearchCategory { get; set; }
+        public SearchCategory SearchCategory { get; }
 
-        public SortCriteria SortCriteria { get; set; }
+        public SortCriteria SortCriteria { get; }
 
-        public SortDirection SortDirection { get; set; }
+        public SortDirection SortDirection { get; }
 
-        public SearchGenre Genre { get; set; }
+        public SearchGenre Genre { get; }
 
-        public SearchLanguage Language { get; set; }
+        public SearchLanguage Language { get; }
 
         private readonly string query;
         private readonly RulesetInfo ruleset;
@@ -27,8 +27,7 @@ namespace osu.Game.Online.API.Requests
 
         private string directionString => SortDirection == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, Cursor cursor = null,
-            SearchCategory searchCategory = SearchCategory.Any, SortCriteria sortCriteria = SortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, Cursor cursor = null, SearchCategory searchCategory = SearchCategory.Any, SortCriteria sortCriteria = SortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
