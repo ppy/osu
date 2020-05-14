@@ -649,3 +649,5 @@
     *   [m] [Use CacheAs for caching game-wide components #9002]
     *   [m] [Fix crashes when pressing right-click while placing hold notes #9009]
     *   [m] [Storage directory migration support #8962]
+    *   [m] [Add support for custom hyper-dash catcher colouring #8448]
+    *   [m] [Add taiko mascot display for legacy skins #8857]

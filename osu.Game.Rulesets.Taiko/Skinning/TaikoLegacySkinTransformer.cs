@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
@@ -86,9 +87,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
-                case TaikoSkinComponents.TaikoScroller:
+                case TaikoSkinComponents.Scroller:
                     if (GetTexture("taiko-slider") != null)
                         return new LegacyTaikoScroller();
+
+                    return null;
+
+                case TaikoSkinComponents.Mascot:
+                    if (GetTexture("pippidonclear0") != null)
+                        return new DrawableTaikoMascot();
 
                     return null;
             }
