@@ -250,6 +250,28 @@ namespace osu.Game.Overlays.KeyBinding
             finalise();
         }
 
+        protected override bool OnMidiDown(MidiDownEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            finalise();
+
+            return true;
+        }
+
+        protected override void OnMidiUp(MidiUpEvent e)
+        {
+            if (!HasFocus)
+            {
+                base.OnMidiUp(e);
+                return;
+            }
+
+            finalise();
+        }
+
         private void clear()
         {
             bindTarget.UpdateKeyCombination(InputKey.None);

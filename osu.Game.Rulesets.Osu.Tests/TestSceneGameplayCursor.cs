@@ -3,26 +3,32 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing.Input;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneGameplayCursor : SkinnableTestScene
+    public class TestSceneGameplayCursor : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
         {
+            typeof(GameplayCursorContainer),
             typeof(OsuCursorContainer),
+            typeof(OsuCursor),
+            typeof(LegacyCursor),
+            typeof(LegacyCursorTrail),
             typeof(CursorTrail)
-        };
+        }).ToList();
 
         [Cached]
         private GameplayBeatmap gameplayBeatmap;

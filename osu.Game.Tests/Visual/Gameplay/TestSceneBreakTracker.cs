@@ -26,16 +26,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
         {
-            new BreakPeriod
-            {
-                StartTime = 1000,
-                EndTime = 5000,
-            },
-            new BreakPeriod
-            {
-                StartTime = 6000,
-                EndTime = 13500,
-            },
+            new BreakPeriod(1000, 5000),
+            new BreakPeriod(6000, 13500),
         };
 
         public TestSceneBreakTracker()
@@ -70,7 +62,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNoEffectsBreak()
         {
-            var shortBreak = new BreakPeriod { EndTime = 500 };
+            var shortBreak = new BreakPeriod(0, 500);
 
             setClock(true);
             loadBreaksStep("short break", new[] { shortBreak });
@@ -105,8 +97,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadBreaksStep("multiple breaks", testBreaks);
 
             seekAndAssertBreak("seek to break start", testBreaks[1].StartTime, true);
-            AddAssert("is skipped to break #2", () => breakTracker.CurrentBreakIndex == 1);
-
             seekAndAssertBreak("seek to break middle", testBreaks[1].StartTime + testBreaks[1].Duration / 2, true);
             seekAndAssertBreak("seek to break end", testBreaks[1].EndTime, false);
             seekAndAssertBreak("seek to break after end", testBreaks[1].EndTime + 500, false);
@@ -127,13 +117,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addShowBreakStep(double seconds)
         {
-            AddStep($"show '{seconds}s' break", () => breakOverlay.Breaks = breakTracker.Breaks = new List<BreakPeriod>
+            AddStep($"show '{seconds}s' break", () =>
             {
-                new BreakPeriod
+                breakOverlay.Breaks = breakTracker.Breaks = new List<BreakPeriod>
                 {
-                    StartTime = Clock.CurrentTime,
-                    EndTime = Clock.CurrentTime + seconds * 1000,
-                }
+                    new BreakPeriod(Clock.CurrentTime, Clock.CurrentTime + seconds * 1000)
+                };
             });
         }
 
@@ -182,8 +171,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             private readonly ManualClock manualClock;
             private IFrameBasedClock originalClock;
-
-            public new int CurrentBreakIndex => base.CurrentBreakIndex;
 
             public double ManualClockTime
             {

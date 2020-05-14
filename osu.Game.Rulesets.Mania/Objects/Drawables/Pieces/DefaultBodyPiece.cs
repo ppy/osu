@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public DefaultBodyPiece()
         {
-            RelativeSizeAxes = Axes.Both;
             Blending = BlendingParameters.Additive;
 
             AddLayout(subtractionCache);

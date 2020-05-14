@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         AllowSliderBallTint,
         CursorExpand,
         CursorRotate,
-        HitCircleOverlayAboveNumber
+        HitCircleOverlayAboveNumber,
+        HitCircleOverlayAboveNumer // Some old skins will have this typo
     }
 }

@@ -56,14 +56,16 @@ namespace osu.Game.Rulesets.Catch.Skinning
             {
                 var hyperDash = new Sprite
                 {
-                    Texture = skin.GetTexture(lookupName),
-                    Colour = skin.GetHyperDashFruitColour()?.Value ?? Catcher.DefaultHyperDashColour,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Blending = BlendingParameters.Additive,
                     Depth = 1,
                     Alpha = 0.7f,
-                    Scale = new Vector2(1.2f)
+                    Scale = new Vector2(1.2f),
+                    Texture = skin.GetTexture(lookupName),
+                    Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
+                             skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
+                             Catcher.DEFAULT_HYPER_DASH_COLOUR,
                 };
 
                 AddInternal(hyperDash);

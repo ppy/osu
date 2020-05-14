@@ -46,7 +46,6 @@ namespace osu.Game.Storyboards.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Alpha = 0,
-                PlaybackPosition = Video.StartTime
             };
         }
 
@@ -55,6 +54,8 @@ namespace osu.Game.Storyboards.Drawables
             base.LoadComplete();
 
             if (video == null) return;
+
+            video.PlaybackPosition = Clock.CurrentTime - Video.StartTime;
 
             using (video.BeginAbsoluteSequence(0))
                 video.FadeIn(500);

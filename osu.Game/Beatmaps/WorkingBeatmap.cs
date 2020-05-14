@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -84,7 +85,7 @@ namespace osu.Game.Beatmaps
 
         public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
         {
-            using (var cancellationSource = new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10)))
+            using (var cancellationSource = createCancellationTokenSource(timeout))
             {
                 mods ??= Array.Empty<Mod>();
 
@@ -181,6 +182,15 @@ namespace osu.Game.Beatmaps
                 beatmapLoadTask = null;
         }
 
+        private CancellationTokenSource createCancellationTokenSource(TimeSpan? timeout)
+        {
+            if (Debugger.IsAttached)
+                // ignore timeout when debugger is attached (may be breakpointing / debugging).
+                return new CancellationTokenSource();
+
+            return new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10));
+        }
+
         private Task<IBeatmap> loadBeatmapAsync() => beatmapLoadTask ??= Task.Factory.StartNew(() =>
         {
             // Todo: Handle cancellation during beatmap parsing
@@ -197,7 +207,7 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
         public IBeatmap Beatmap
         {
@@ -233,7 +243,7 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
-        public bool TrackLoaded => track.IsResultAvailable;
+        public virtual bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value;
         protected abstract Track GetTrack();
         private RecyclableLazy<Track> track;
