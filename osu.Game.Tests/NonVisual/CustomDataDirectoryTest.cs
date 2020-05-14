@@ -211,7 +211,7 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
-                    Assert.Throws<InvalidOperationException>(() => osu.Migrate(customPath));
+                    Assert.Throws<ArgumentException>(() => osu.Migrate(customPath));
                 }
                 finally
                 {
