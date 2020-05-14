@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public class SeedingEditorScreen : TournamentEditorScreen<SeedingEditorScreen.SeeingResultRow, SeedingResult>
+    public class SeedingEditorScreen : TournamentEditorScreen<SeedingEditorScreen.SeedingResultRow, SeedingResult>
     {
         private readonly TournamentTeam team;
 
@@ -30,14 +30,14 @@ namespace osu.Game.Tournament.Screens.Editors
             this.team = team;
         }
 
-        public class SeeingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
+        public class SeedingResultRow : CompositeDrawable, IModelBacked<SeedingResult>
         {
             public SeedingResult Model { get; }
 
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
-            public SeeingResultRow(TournamentTeam team, SeedingResult round)
+            public SeedingResultRow(TournamentTeam team, SeedingResult round)
             {
                 Model = round;
 
@@ -281,6 +281,6 @@ namespace osu.Game.Tournament.Screens.Editors
             }
         }
 
-        protected override SeeingResultRow CreateDrawable(SeedingResult model) => new SeeingResultRow(team, model);
+        protected override SeedingResultRow CreateDrawable(SeedingResult model) => new SeedingResultRow(team, model);
     }
 }
