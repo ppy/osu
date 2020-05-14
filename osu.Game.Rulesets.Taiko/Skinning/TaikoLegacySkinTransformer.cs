@@ -87,13 +87,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                     return null;
 
-                case TaikoSkinComponents.TaikoScroller:
+                case TaikoSkinComponents.Scroller:
                     if (GetTexture("taiko-slider") != null)
                         return new LegacyTaikoScroller();
 
                     return null;
 
-                case TaikoSkinComponents.TaikoDon:
+                case TaikoSkinComponents.Mascot:
                     if (GetTexture("pippidonclear0") != null)
                         return new DrawableTaikoMascot();
 
