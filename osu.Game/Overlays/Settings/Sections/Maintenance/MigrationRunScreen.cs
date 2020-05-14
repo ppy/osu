@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         public override bool AllowExternalScreenChange => false;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool HideOverlaysOnEnter => true;
 
         private Task migrationTask;
 
@@ -47,6 +50,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Direction = FillDirection.Vertical,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
@@ -54,12 +58,26 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = "Migration in progress",
-                            Font = OsuFont.Default.With(size: 48)
+                            Font = OsuFont.Default.With(size: 40)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "This could take a few minutes depending on the speed of your disk(s).",
+                            Font = OsuFont.Default.With(size: 30)
                         },
                         new LoadingSpinner(true)
                         {
                             State = { Value = Visibility.Visible }
-                        }
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "Please avoid interacting with the game!",
+                            Font = OsuFont.Default.With(size: 30)
+                        },
                     }
                 },
             };
@@ -74,6 +92,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
                                     Schedule(this.Exit);
                                 });
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            this.FadeOut().Delay(250).Then().FadeIn(250);
         }
 
         public override bool OnExiting(IScreen next)
