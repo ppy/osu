@@ -48,6 +48,12 @@ namespace osu.Game.IO
             var source = new DirectoryInfo(GetFullPath("."));
             var destination = new DirectoryInfo(newLocation);
 
+            if (source.FullName == destination.FullName)
+                throw new ArgumentException("Destination provided is already the current location", nameof(newLocation));
+
+            if (destination.FullName.Contains(source.FullName))
+                throw new ArgumentException("Destination provided is inside the source", nameof(newLocation));
+
             // ensure the new location has no files present, else hard abort
             if (destination.Exists)
             {
