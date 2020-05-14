@@ -189,15 +189,15 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                T bestMatch = null;
-                float minDiff = float.MaxValue;
+                T bestMatch = Children.FirstOrDefault();
+                float minDiff = float.MinValue;
                 float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
 
                 foreach (var section in Children)
                 {
-                    float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
+                    float diff = scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
 
-                    if (diff < minDiff)
+                    if ((minDiff < diff) & (diff < 0))
                     {
                         minDiff = diff;
                         bestMatch = section;
