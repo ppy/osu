@@ -247,7 +247,7 @@ namespace osu.Game.Overlays
             base.Update();
 
             if (shouldAddNextPage)
-                filterControl.AddPageToResult();
+                filterControl.ShowMore();
         }
     }
 }
