@@ -29,10 +29,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public override bool HideOverlaysOnEnter => true;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, Storage storage, OsuColour colours)
         {
-            game.Toolbar.Hide();
+            game?.Toolbar.Hide();
 
             // begin selection in the parent directory of the current storage location
             var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
@@ -115,12 +115,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             }
             catch (Exception e)
             {
-                Logger.Log($"Error during migration: {e?.Message}", level: LogLevel.Error);
+                Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
                 return;
             }
 
             ValidForResume = false;
-            this.Push(new MigrationRunScreen(target));
+            BeginMigration(target);
         }
+
+        protected virtual void BeginMigration(DirectoryInfo target) => this.Push(new MigrationRunScreen(target));
     }
 }
