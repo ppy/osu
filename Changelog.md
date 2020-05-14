@@ -651,3 +651,4 @@
     *   [m] [Storage directory migration support #8962]
     *   [m] [Add support for custom hyper-dash catcher colouring #8448]
     *   [m] [Add taiko mascot display for legacy skins #8857]
+    *   [m] [Add a basic directory chooser component #9011]
