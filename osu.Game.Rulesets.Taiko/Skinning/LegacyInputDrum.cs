@@ -18,39 +18,78 @@ namespace osu.Game.Rulesets.Taiko.Skinning
     /// </summary>
     internal class LegacyInputDrum : Container
     {
+        private LegacyHalfDrum left;
+        private LegacyHalfDrum right;
+        private Container content;
+
         public LegacyInputDrum()
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            Children = new Drawable[]
+            Child = content = new Container
             {
-                new Sprite
+                Size = new Vector2(180, 200),
+                Children = new Drawable[]
                 {
-                    Texture = skin.GetTexture("taiko-bar-left")
-                },
-                new LegacyHalfDrum(false)
-                {
-                    Name = "Left Half",
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    RimAction = TaikoAction.LeftRim,
-                    CentreAction = TaikoAction.LeftCentre
-                },
-                new LegacyHalfDrum(true)
-                {
-                    Name = "Right Half",
-                    Anchor = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Scale = new Vector2(-1, 1),
-                    RimAction = TaikoAction.RightRim,
-                    CentreAction = TaikoAction.RightCentre
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("taiko-bar-left")
+                    },
+                    left = new LegacyHalfDrum(false)
+                    {
+                        Name = "Left Half",
+                        RelativeSizeAxes = Axes.Both,
+                        RimAction = TaikoAction.LeftRim,
+                        CentreAction = TaikoAction.LeftCentre
+                    },
+                    right = new LegacyHalfDrum(true)
+                    {
+                        Name = "Right Half",
+                        RelativeSizeAxes = Axes.Both,
+                        Origin = Anchor.TopRight,
+                        Scale = new Vector2(-1, 1),
+                        RimAction = TaikoAction.RightRim,
+                        CentreAction = TaikoAction.RightCentre
+                    }
                 }
             };
+
+            // this will be used in the future for stable skin alignment. keeping here for reference.
+            const float taiko_bar_y = 0;
+
+            // stable things
+            const float ratio = 1.6f;
+
+            // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
+            float negativeScaleAdjust = content.Width / ratio;
+
+            if (skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
+            {
+                left.Centre.Position = new Vector2(0, taiko_bar_y) * ratio;
+                right.Centre.Position = new Vector2(negativeScaleAdjust - 56, taiko_bar_y) * ratio;
+                left.Rim.Position = new Vector2(0, taiko_bar_y) * ratio;
+                right.Rim.Position = new Vector2(negativeScaleAdjust - 56, taiko_bar_y) * ratio;
+            }
+            else
+            {
+                left.Centre.Position = new Vector2(18, taiko_bar_y + 31) * ratio;
+                right.Centre.Position = new Vector2(negativeScaleAdjust - 54, taiko_bar_y + 31) * ratio;
+                left.Rim.Position = new Vector2(8, taiko_bar_y + 23) * ratio;
+                right.Rim.Position = new Vector2(negativeScaleAdjust - 53, taiko_bar_y + 23) * ratio;
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
+            // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
+            content.Scale = new Vector2(DrawHeight / content.Size.Y);
         }
 
         /// <summary>
@@ -68,8 +107,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             /// </summary>
             public TaikoAction CentreAction;
 
-            private readonly Sprite rimHit;
-            private readonly Sprite centreHit;
+            public readonly Sprite Rim;
+            public readonly Sprite Centre;
 
             [Resolved]
             private DrumSampleMapping sampleMappings { get; set; }
@@ -80,18 +119,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 Children = new Drawable[]
                 {
-                    rimHit = new Sprite
+                    Rim = new Sprite
                     {
-                        Anchor = flipped ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Scale = new Vector2(-1, 1),
+                        Origin = flipped ? Anchor.TopLeft : Anchor.TopRight,
                         Alpha = 0,
                     },
-                    centreHit = new Sprite
+                    Centre = new Sprite
                     {
-                        Anchor = flipped ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = flipped ? Anchor.CentreRight : Anchor.CentreLeft,
                         Alpha = 0,
+                        Origin = flipped ? Anchor.TopRight : Anchor.TopLeft,
                     }
                 };
             }
@@ -99,8 +136,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             [BackgroundDependencyLoader]
             private void load(ISkinSource skin)
             {
-                rimHit.Texture = skin.GetTexture(@"taiko-drum-outer");
-                centreHit.Texture = skin.GetTexture(@"taiko-drum-inner");
+                Rim.Texture = skin.GetTexture(@"taiko-drum-outer");
+                Centre.Texture = skin.GetTexture(@"taiko-drum-inner");
             }
 
             public bool OnPressed(TaikoAction action)
@@ -110,12 +147,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 if (action == CentreAction)
                 {
-                    target = centreHit;
+                    target = Centre;
                     drumSample.Centre?.Play();
                 }
                 else if (action == RimAction)
                 {
-                    target = rimHit;
+                    target = Rim;
                     drumSample.Rim?.Play();
                 }
 

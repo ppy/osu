@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
-    public class FriendDisplay : CompositeDrawable
+    public class FriendDisplay : OverlayView<List<User>>
     {
         private List<User> users = new List<User>();
 
@@ -26,34 +26,29 @@ namespace osu.Game.Overlays.Dashboard.Friends
             set
             {
                 users = value;
-
                 onlineStreamControl.Populate(value);
             }
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
 
         private Drawable currentContent;
 
-        private readonly FriendOnlineStreamControl onlineStreamControl;
-        private readonly Box background;
-        private readonly Box controlBackground;
-        private readonly UserListToolbar userListToolbar;
-        private readonly Container itemsPlaceholder;
-        private readonly LoadingLayer loading;
+        private FriendOnlineStreamControl onlineStreamControl;
+        private Box background;
+        private Box controlBackground;
+        private UserListToolbar userListToolbar;
+        private Container itemsPlaceholder;
+        private LoadingLayer loading;
 
-        public FriendDisplay()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
                     new Container
@@ -134,11 +129,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
             background.Colour = colourProvider.Background4;
             controlBackground.Colour = colourProvider.Background5;
         }
@@ -152,14 +143,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
         }
 
-        public void Fetch()
-        {
-            if (!api.IsLoggedIn)
-                return;
+        protected override APIRequest<List<User>> CreateRequest() => new GetFriendsRequest();
 
-            request = new GetFriendsRequest();
-            request.Success += response => Schedule(() => Users = response);
-            api.Queue(request);
+        protected override void OnSuccess(List<User> response)
+        {
+            Users = response;
         }
 
         private void recreatePanels()
@@ -258,9 +246,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }

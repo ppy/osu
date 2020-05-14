@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -46,18 +47,15 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return false;
+
             if (Column == null)
                 return base.OnMouseDown(e);
 
             HitObject.Column = Column.Index;
-            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition));
+            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition), true);
             return true;
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            EndPlacement(true);
-            base.OnMouseUp(e);
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition)

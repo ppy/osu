@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
-        public event Action DefaultsApplied;
+        public event Action<HitObject> DefaultsApplied;
 
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Objects
             foreach (var h in nestedHitObjects)
                 h.ApplyDefaults(controlPointInfo, difficulty);
 
-            DefaultsApplied?.Invoke();
+            DefaultsApplied?.Invoke(this);
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)

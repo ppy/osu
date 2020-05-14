@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -25,6 +27,19 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             Width = SnappedWidth;
             Position = SnappedMousePosition;
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return false;
+
+            base.OnMouseDown(e);
+
+            // Place the note immediately.
+            EndPlacement(true);
+
+            return true;
         }
     }
 }
