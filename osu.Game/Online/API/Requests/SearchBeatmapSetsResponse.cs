@@ -3,12 +3,11 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class SearchBeatmapSetsResponse : ResponseWithCursor<Cursor>
+    public class SearchBeatmapSetsResponse : ResponseWithCursor
     {
         [JsonProperty("beatmapsets")]
         public IEnumerable<APIBeatmapSet> BeatmapSets;
