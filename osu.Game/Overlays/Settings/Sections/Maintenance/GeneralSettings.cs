@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
@@ -29,12 +28,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, DialogOverlay dialogOverlay, OsuGame game)
         {
-            Add(importBeatmapsButton = new SettingsButton
-            {
-                Text = "Migrate storage to new location",
-                Action = () => game.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
-            });
-
             if (beatmaps.SupportsImportFromStable)
             {
                 Add(importBeatmapsButton = new SettingsButton
