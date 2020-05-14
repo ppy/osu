@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Mania.Edit
     {
         Column ColumnAt(Vector2 screenSpacePosition);
 
-        int TotalColumns { get; }
+        ManiaPlayfield Playfield { get; }
     }
 }
