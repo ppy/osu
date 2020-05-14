@@ -197,7 +197,7 @@ namespace osu.Game.Graphics.Containers
                 {
                     float diff = scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
 
-                    if ((minDiff < diff) & (diff < 0))
+                    if (minDiff < diff && diff < 0)
                     {
                         minDiff = diff;
                         bestMatch = section;
