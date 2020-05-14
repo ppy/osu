@@ -220,6 +220,54 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
+        [Test]
+        public void TestMigrationToNestedTargetFails()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSameTargetFails)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
+
+                    string subFolder = Path.Combine(customPath, "sub");
+
+                    Directory.CreateDirectory(subFolder);
+
+                    Assert.Throws<ArgumentException>(() => osu.Migrate(subFolder));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestMigrationToSeeminglyNestedTarget()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSeeminglyNestedTarget)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
+
+                    string subFolder = customPath + "sub";
+
+                    Directory.CreateDirectory(subFolder);
+
+                    osu.Migrate(subFolder);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         private OsuGameBase loadOsu(GameHost host)
         {
             var osu = new OsuGameBase();
