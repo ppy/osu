@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             typeof(TaikoHitTarget),
             typeof(TaikoLegacyHitTarget),
             typeof(PlayfieldBackgroundRight),
+            typeof(LegacyTaikoScroller),
         }).ToList();
 
         [Cached(typeof(IScrollingInfo))]
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
+                Height = 0.6f,
             }));
 
             AddRepeatStep("change height", () => this.ChildrenOfType<TaikoPlayfield>().ForEach(p => p.Height = Math.Max(0.2f, (p.Height + 0.2f) % 1f)), 50);
