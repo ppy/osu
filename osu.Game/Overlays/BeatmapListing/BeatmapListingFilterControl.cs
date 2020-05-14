@@ -122,6 +122,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             if (beatmapListingPager == null || !beatmapListingPager.CanFetchNextPage)
                 return;
+
             if (queryPagingDebounce != null)
                 return;
 
@@ -132,14 +133,15 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             SearchStarted?.Invoke();
 
-            beatmapListingPager?.Reset();
+            cancelSearch();
 
-            queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
         }
 
         private void updateSearch()
         {
+            cancelSearch();
+
             beatmapListingPager = new BeatmapListingPager(
                 api,
                 rulesets,
@@ -150,11 +152,18 @@ namespace osu.Game.Overlays.BeatmapListing
                 sortControl.SortDirection.Value
             );
 
-            queryPagingDebounce?.Cancel();
-            queryPagingDebounce = null;
             beatmapListingPager.PageFetched += onSearchFinished;
 
             ShowMore();
+        }
+
+        private void cancelSearch()
+        {
+            beatmapListingPager?.Reset();
+            queryChangedDebounce?.Cancel();
+
+            queryPagingDebounce?.Cancel();
+            queryPagingDebounce = null;
         }
 
         private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
@@ -171,9 +180,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override void Dispose(bool isDisposing)
         {
-            beatmapListingPager?.Reset();
-            queryChangedDebounce?.Cancel();
-            queryPagingDebounce?.Cancel();
+            cancelSearch();
 
             base.Dispose(isDisposing);
         }
