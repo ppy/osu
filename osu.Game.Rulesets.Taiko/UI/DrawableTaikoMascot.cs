@@ -96,9 +96,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private TaikoMascotAnimationState getNextState()
         {
-            // don't change state if current animation is playing
-            // (used for clear state - others are manually animated on new beats)
-            if (currentAnimation != null && !currentAnimation.Completed)
+            // don't change state if current animation is still playing (and we haven't rewound before it).
+            // used for clear state - others are manually animated on new beats.
+            if (currentAnimation?.Completed == false && currentAnimation.DisplayTime <= Time.Current)
                 return State.Value;
 
             if (!lastObjectHit)

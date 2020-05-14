@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private int currentFrame;
 
+        public double DisplayTime;
+
         public TaikoMascotAnimation(TaikoMascotAnimationState state)
         {
             InternalChild = textureAnimation = createTextureAnimation(state).With(animation =>
@@ -40,6 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         public override void Show()
         {
             base.Show();
+            DisplayTime = Time.Current;
             textureAnimation.Seek(0);
         }
 
