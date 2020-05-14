@@ -9,12 +9,12 @@ using Newtonsoft.Json.Linq;
 namespace osu.Game.IO.Serialization.Converters
 {
     /// <summary>
-    /// A type of <see cref="JsonConverter"/> that serializes a <see cref="List{T}"/> alongside
+    /// A type of <see cref="JsonConverter"/> that serializes an <see cref="IReadOnlyList{T}"/> alongside
     /// a lookup table for the types contained. The lookup table is used in deserialization to
     /// reconstruct the objects with their original types.
     /// </summary>
-    /// <typeparam name="T">The type of objects contained in the <see cref="List{T}"/> this attribute is attached to.</typeparam>
-    public class TypedListConverter<T> : JsonConverter
+    /// <typeparam name="T">The type of objects contained in the <see cref="IReadOnlyList{T}"/> this attribute is attached to.</typeparam>
+    public class TypedListConverter<T> : JsonConverter<IReadOnlyList<T>>
     {
         private readonly bool requiresTypeVersion;
 
@@ -36,9 +36,7 @@ namespace osu.Game.IO.Serialization.Converters
             this.requiresTypeVersion = requiresTypeVersion;
         }
 
-        public override bool CanConvert(Type objectType) => objectType == typeof(List<T>);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IReadOnlyList<T> ReadJson(JsonReader reader, Type objectType, IReadOnlyList<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var list = new List<T>();
 
@@ -59,14 +57,12 @@ namespace osu.Game.IO.Serialization.Converters
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IReadOnlyList<T> value, JsonSerializer serializer)
         {
-            var list = (IEnumerable<T>)value;
-
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
 
-            foreach (var item in list)
+            foreach (var item in value)
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
