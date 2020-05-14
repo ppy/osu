@@ -109,6 +109,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             if (migrationTask?.IsCompleted == false)
                 return true;
 
+            this.FadeOut(250);
+
             return base.OnExiting(next);
         }
     }

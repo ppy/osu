@@ -15,13 +15,18 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class MigrationSelectScreen : OsuScreen
     {
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg2");
+
         private DirectorySelector directorySelector;
+        private Container contentContainer;
+        private DialogOverlay dialogOverlay;
 
         public override bool AllowExternalScreenChange => false;
 
@@ -30,14 +35,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         public override bool HideOverlaysOnEnter => true;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, Storage storage, OsuColour colours)
+        private void load(OsuGame game, Storage storage, OsuColour colours, DialogOverlay dialogOverlay)
         {
             game?.Toolbar.Hide();
+            this.dialogOverlay = dialogOverlay;
 
             // begin selection in the parent directory of the current storage location
             var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
 
-            InternalChild = new Container
+            InternalChild = contentContainer = new Container
             {
                 Masking = true,
                 CornerRadius = 10,
@@ -97,6 +103,21 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             };
         }
 
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            contentContainer.ScaleTo(0.8f).Then().FadeOut().Then()
+                            .ScaleTo(1f, 1000, Easing.OutElastic).FadeIn(1000, Easing.OutExpo);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            this.FadeOut(1000, Easing.OutExpo);
+
+            return base.OnExiting(next);
+        }
+
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
@@ -108,19 +129,23 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             var target = directorySelector.CurrentDirectory.Value;
 
-            try
+            dialogOverlay?.Push(new MigrateConfirmDialog(() =>
             {
-                if (target.GetDirectories().Length > 0 || target.GetFiles().Length > 0)
-                    target = target.CreateSubdirectory("osu-lazer");
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
-                return;
-            }
+                try
+                {
+                    if (target.GetDirectories().Length > 0 || target.GetFiles().Length > 0)
+                        target = target.CreateSubdirectory("osu-lazer");
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
+                    return;
+                }
 
-            ValidForResume = false;
-            BeginMigration(target);
+                ValidForResume = false;
+                BeginMigration(target);
+            }, $"{target}"));
+
         }
 
         protected virtual void BeginMigration(DirectoryInfo target) => this.Push(new MigrationRunScreen(target));
