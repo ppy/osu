@@ -453,7 +453,7 @@ namespace osu.Game.Screens
                     return true;
 
                 case GlobalAction.MvisTogglePause:
-                    musicController.TogglePause();
+                    TogglePause();
                     return true;
 
                 case GlobalAction.MvisTogglePlayList:
