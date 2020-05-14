@@ -119,7 +119,15 @@ namespace osu.Game.Rulesets.Mania.Edit
             return (new Vector2(position.X, minDistLinePosition.Y + noteOffset), minDistLine.HitObject.StartTime);
         }
 
-        public void SetRange(double minTime, double maxTime) => Schedule(() =>
+        public void SetRange(double minTime, double maxTime)
+        {
+            if (LoadState >= LoadState.Ready)
+                setRange(minTime, maxTime);
+            else
+                Schedule(() => setRange(minTime, maxTime));
+        }
+
+        private void setRange(double minTime, double maxTime)
         {
             var linesBefore = new List<DrawableGridLine>();
             var linesDuring = new List<DrawableGridLine>();
@@ -156,7 +164,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     linesAfter[i].Colour = OsuColour.Gray(0.5f / (offset + 1));
                 }
             }
-        });
+        }
 
         private class Grid : ScrollingHitObjectContainer
         {

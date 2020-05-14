@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             if (BlueprintContainer.CurrentTool is SelectTool)
             {
