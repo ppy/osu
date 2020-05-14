@@ -36,6 +36,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private BeatmapListingPager beatmapListingPager;
 
+        private ScheduledDelegate queryChangedDebounce;
+        private ScheduledDelegate queryPagingDebounce;
+
         public BeatmapListingFilterControl()
         {
             RelativeSizeAxes = Axes.X;
@@ -113,8 +116,17 @@ namespace osu.Game.Overlays.BeatmapListing
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
         }
 
-        private ScheduledDelegate queryChangedDebounce;
-        private ScheduledDelegate queryPagingDebounce;
+        public void TakeFocus() => searchControl.TakeFocus();
+
+        public void ShowMore()
+        {
+            if (beatmapListingPager == null || !beatmapListingPager.CanFetchNextPage)
+                return;
+            if (queryPagingDebounce != null)
+                return;
+
+            beatmapListingPager.FetchNextPage();
+        }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
@@ -142,7 +154,7 @@ namespace osu.Game.Overlays.BeatmapListing
             queryPagingDebounce = null;
             beatmapListingPager.PageFetched += onSearchFinished;
 
-            AddPageToResult();
+            ShowMore();
         }
 
         private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
@@ -164,18 +176,6 @@ namespace osu.Game.Overlays.BeatmapListing
             queryPagingDebounce?.Cancel();
 
             base.Dispose(isDisposing);
-        }
-
-        public void TakeFocus() => searchControl.TakeFocus();
-
-        public void AddPageToResult()
-        {
-            if (beatmapListingPager == null || !beatmapListingPager.CanFetchNextPage)
-                return;
-            if (queryPagingDebounce != null)
-                return;
-
-            beatmapListingPager.FetchNextPage();
         }
     }
 }
