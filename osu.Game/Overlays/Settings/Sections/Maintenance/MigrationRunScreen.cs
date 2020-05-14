@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         private readonly DirectoryInfo destination;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
         public override bool AllowBackButton => false;
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Beatmap.Value = Beatmap.Default;
 
-            migrationTask = Task.Run(() => game.Migrate(destination.FullName))
+            migrationTask = Task.Run(PerformMigration)
                                 .ContinueWith(t =>
                                 {
                                     if (t.IsFaulted)
@@ -93,6 +93,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Schedule(this.Exit);
                                 });
         }
+
+        protected virtual void PerformMigration() => game?.Migrate(destination.FullName);
 
         public override void OnEntering(IScreen last)
         {
