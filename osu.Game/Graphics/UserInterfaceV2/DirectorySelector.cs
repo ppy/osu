@@ -16,6 +16,7 @@ using osu.Framework.Platform;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -74,22 +75,31 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             directoryFlow.Clear();
 
-            if (directory.NewValue == null)
+            try
             {
-                var drives = DriveInfo.GetDrives();
-
-                foreach (var drive in drives)
-                    directoryFlow.Add(new DirectoryPiece(drive.RootDirectory));
-            }
-            else
-            {
-                directoryFlow.Add(new ParentDirectoryPiece(currentDirectory.Value.Parent));
-
-                foreach (var dir in currentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
+                if (directory.NewValue == null)
                 {
-                    if ((dir.Attributes & FileAttributes.Hidden) == 0)
-                        directoryFlow.Add(new DirectoryPiece(dir));
+                    var drives = DriveInfo.GetDrives();
+
+                    foreach (var drive in drives)
+                        directoryFlow.Add(new DirectoryPiece(drive.RootDirectory));
                 }
+                else
+                {
+                    directoryFlow.Add(new ParentDirectoryPiece(currentDirectory.Value.Parent));
+
+                    foreach (var dir in currentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
+                    {
+                        if ((dir.Attributes & FileAttributes.Hidden) == 0)
+                            directoryFlow.Add(new DirectoryPiece(dir));
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                currentDirectory.Value = directory.OldValue;
+
+                this.FlashColour(Color4.Red, 300);
             }
         }
 
