@@ -4,7 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -34,8 +36,6 @@ namespace osu.Game.Overlays
         private NotFoundDrawable notFoundContent;
 
         private OverlayScrollContainer resultScrollContainer;
-        private const int pagination_scroll_distance = 500;
-        private bool shouldAddNextPage => resultScrollContainer.ScrollableExtent > 0 && resultScrollContainer.IsScrolledToEnd(pagination_scroll_distance);
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
@@ -121,51 +121,45 @@ namespace osu.Game.Overlays
                 loadingLayer.Show();
         }
 
+        private Task panelLoadDelegate;
+
         private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
         {
-            //No matches case
-            if (!beatmaps.Any())
+            var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
-                LoadComponentAsync(notFoundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
-                return;
-            }
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
 
-            //New query case
-            if (!shouldAddNextPage)
+            if (filterControl.CurrentPage == 0)
             {
-                //Spawn new child
-                var newPanels = new FillFlowContainer<BeatmapPanel>
+                //No matches case
+                if (!newPanels.Any())
+                {
+                    LoadComponentAsync(notFoundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                    return;
+                }
+
+                // spawn new children with the contained so we only clear old content at the last moment.
+                var content = new FillFlowContainer<BeatmapPanel>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(10),
                     Alpha = 0,
                     Margin = new MarginPadding { Vertical = 15 },
-                    ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                    })
+                    ChildrenEnumerable = newPanels
                 };
 
-                foundContent = newPanels;
-                LoadComponentAsync(foundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                panelLoadDelegate = LoadComponentAsync(foundContent = content, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
             }
-
-            //Pagination case
             else
             {
-                beatmaps.ForEach(x =>
+                panelLoadDelegate = LoadComponentsAsync(newPanels, loaded =>
                 {
-                    LoadComponentAsync(new GridBeatmapPanel(x)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                    }, loaded =>
-                    {
-                        foundContent.Add(loaded);
-                        loaded.FadeIn(200, Easing.OutQuint);
-                    });
+                    lastFetchDisplayedTime = Time.Current;
+                    foundContent.AddRange(loaded);
+                    loaded.ForEach(p => p.FadeIn(200, Easing.OutQuint));
                 });
             }
         }
@@ -173,6 +167,7 @@ namespace osu.Game.Overlays
         private void addContentToPlaceholder(Drawable content)
         {
             loadingLayer.Hide();
+            lastFetchDisplayedTime = Time.Current;
 
             var lastContent = currentContent;
 
@@ -242,12 +237,22 @@ namespace osu.Game.Overlays
             }
         }
 
+        private const double time_between_fetches = 500;
+
+        private double lastFetchDisplayedTime;
+
         protected override void Update()
         {
             base.Update();
 
-            if (shouldAddNextPage)
-                filterControl.ShowMore();
+            const int pagination_scroll_distance = 500;
+
+            bool shouldShowMore = panelLoadDelegate?.IsCompleted != false
+                                  && Time.Current - lastFetchDisplayedTime > time_between_fetches
+                                  && (resultScrollContainer.ScrollableExtent > 0 && resultScrollContainer.IsScrolledToEnd(pagination_scroll_distance));
+
+            if (shouldShowMore)
+                filterControl.FetchNextPage();
         }
     }
 }

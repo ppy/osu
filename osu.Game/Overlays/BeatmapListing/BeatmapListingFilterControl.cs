@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -20,9 +22,34 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapListingFilterControl : CompositeDrawable
     {
+        /// <summary>
+        /// Fired when a search finishes. Contains only new items in the case of pagination.
+        /// </summary>
         public Action<List<BeatmapSetInfo>> SearchFinished;
+
+        /// <summary>
+        /// Fired when search criteria change.
+        /// </summary>
         public Action SearchStarted;
-        private List<BeatmapSetInfo> currentBeatmaps;
+
+        /// <summary>
+        /// True when pagination has reached the end of available results.
+        /// </summary>
+        private bool noMoreResults;
+
+        /// <summary>
+        /// The current page fetched of results (zero index).
+        /// </summary>
+        public int CurrentPage { get; private set; }
+
+        private readonly BeatmapListingSearchControl searchControl;
+        private readonly BeatmapListingSortTabControl sortControl;
+        private readonly Box sortControlBackground;
+
+        private ScheduledDelegate queryChangedDebounce;
+
+        private SearchBeatmapSetsRequest getSetsRequest;
+        private SearchBeatmapSetsResponse lastResponse;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -30,19 +57,11 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private readonly BeatmapListingSearchControl searchControl;
-        private readonly BeatmapListingSortTabControl sortControl;
-        private readonly Box sortControlBackground;
-
-        private BeatmapListingPager beatmapListingPager;
-
-        private ScheduledDelegate queryChangedDebounce;
-        private ScheduledDelegate queryPagingDebounce;
-
         public BeatmapListingFilterControl()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -118,69 +137,80 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void TakeFocus() => searchControl.TakeFocus();
 
-        public void ShowMore()
+        /// <summary>
+        /// Fetch the next page of results. May result in a no-op if a fetch is already in progress, or if there are no results left.
+        /// </summary>
+        public void FetchNextPage()
         {
-            if (beatmapListingPager == null || !beatmapListingPager.CanFetchNextPage)
+            // there may be no results left.
+            if (noMoreResults)
                 return;
 
-            if (queryPagingDebounce != null)
+            // there may already be an active request.
+            if (getSetsRequest != null)
                 return;
 
-            beatmapListingPager.FetchNextPage();
+            if (lastResponse != null)
+                CurrentPage++;
+
+            performRequest();
         }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
             SearchStarted?.Invoke();
 
-            cancelSearch();
+            resetSearch();
 
-            queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+            queryChangedDebounce = Scheduler.AddDelayed(() =>
+            {
+                resetSearch();
+                FetchNextPage();
+            }, queryTextChanged ? 500 : 100);
         }
 
-        private void updateSearch()
+        private void performRequest()
         {
-            cancelSearch();
-
-            beatmapListingPager = new BeatmapListingPager(
-                api,
-                rulesets,
+            getSetsRequest = new SearchBeatmapSetsRequest(
                 searchControl.Query.Value,
                 searchControl.Ruleset.Value,
+                lastResponse?.Cursor,
                 searchControl.Category.Value,
                 sortControl.Current.Value,
-                sortControl.SortDirection.Value
-            );
+                sortControl.SortDirection.Value);
 
-            beatmapListingPager.PageFetched += onSearchFinished;
+            getSetsRequest.Success += response =>
+            {
+                var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
 
-            ShowMore();
+                if (sets.Count == 0)
+                    noMoreResults = true;
+
+                lastResponse = response;
+                getSetsRequest = null;
+
+                SearchFinished?.Invoke(sets);
+            };
+
+            api.Queue(getSetsRequest);
         }
 
-        private void cancelSearch()
+        private void resetSearch()
         {
-            beatmapListingPager?.Reset();
+            noMoreResults = false;
+            CurrentPage = 0;
+
+            lastResponse = null;
+
+            getSetsRequest?.Cancel();
+            getSetsRequest = null;
+
             queryChangedDebounce?.Cancel();
-
-            queryPagingDebounce?.Cancel();
-            queryPagingDebounce = null;
-        }
-
-        private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
-        {
-            queryPagingDebounce = Scheduler.AddDelayed(() => queryPagingDebounce = null, 1000);
-
-            if (currentBeatmaps == null || !beatmapListingPager.IsPastFirstPage)
-                currentBeatmaps = beatmaps;
-            else
-                currentBeatmaps.AddRange(beatmaps);
-
-            SearchFinished?.Invoke(beatmaps);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            cancelSearch();
+            resetSearch();
 
             base.Dispose(isDisposing);
         }
