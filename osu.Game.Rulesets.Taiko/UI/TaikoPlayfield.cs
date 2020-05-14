@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                     }
                 },
-                mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.TaikoDon), _ => Empty())
+                mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.TopLeft,
