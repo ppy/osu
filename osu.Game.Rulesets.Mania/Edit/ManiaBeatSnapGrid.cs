@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 linesDuring.Clear();
                 linesAfter.Clear();
 
-                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
+                foreach (var line in grid.AliveObjects.OfType<DrawableGridLine>())
                 {
                     if (line.HitObject.StartTime < minTime)
                         linesBefore.Add(line);
