@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -20,7 +21,8 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly SortCriteria sortCriteria;
         private readonly SortDirection sortDirection;
 
-        public event PageFetchHandler PageFetched;
+        public event Action<List<BeatmapSetInfo>> PageFetched;
+
         private SearchBeatmapSetsRequest getSetsRequest;
         private SearchBeatmapSetsResponse lastResponse;
 
@@ -82,7 +84,5 @@ namespace osu.Game.Overlays.BeatmapListing
             getSetsRequest?.Cancel();
             getSetsRequest = null;
         }
-
-        public delegate void PageFetchHandler(List<BeatmapSetInfo> sets);
     }
 }
