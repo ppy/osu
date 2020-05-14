@@ -16,13 +16,12 @@ namespace osu.Game.IO
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
 
-        internal static readonly string[] IGNORE_DIRECTORIES = { "cache" };
+        internal static readonly string[] IGNORE_DIRECTORIES = { "cache", "osu-lazer" };
 
         internal static readonly string[] IGNORE_FILES =
         {
             "framework.ini",
-            "storage.ini",
-            "mf.ini"
+            "storage.ini"
         };
 
         public OsuStorage(GameHost host)
@@ -49,11 +48,14 @@ namespace osu.Game.IO
             var source = new DirectoryInfo(GetFullPath("."));
             var destination = new DirectoryInfo(newLocation);
 
+            if (source.FullName == destination.FullName)
+                throw new ArgumentException("Destination provided is already the current location", nameof(newLocation));
+
             // ensure the new location has no files present, else hard abort
             if (destination.Exists)
             {
                 if (destination.GetFiles().Length > 0 || destination.GetDirectories().Length > 0)
-                    throw new InvalidOperationException("Migration destination already has files present");
+                    throw new ArgumentException("Destination provided already has files or directories present", nameof(newLocation));
 
                 deleteRecursive(destination);
             }
@@ -85,6 +87,9 @@ namespace osu.Game.IO
 
                 dir.Delete(true);
             }
+
+            if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
+                target.Delete();
         }
 
         private static void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)

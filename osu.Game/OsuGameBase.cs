@@ -364,6 +364,7 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
+            Logger.Log("调起迁移...");
             contextFactory.FlushConnections();
             (Storage as OsuStorage)?.Migrate(path);
         }

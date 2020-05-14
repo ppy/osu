@@ -652,3 +652,4 @@
     *   [m] [Add support for custom hyper-dash catcher colouring #8448]
     *   [m] [Add taiko mascot display for legacy skins #8857]
     *   [m] [Add a basic directory chooser component #9011]
+    *   [o] [Add ability to change data folder path #9020]

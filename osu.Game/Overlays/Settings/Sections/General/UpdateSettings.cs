@@ -4,7 +4,9 @@
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -13,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override string Header => "更新";
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage, OsuConfigManager config)
+        private void load(Storage storage, OsuConfigManager config, OsuGame game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
@@ -25,8 +27,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Add(new SettingsButton
                 {
-                    Text = "打开osu!目录",
+                    Text = "打开osu!文件夹",
                     Action = storage.OpenInNativeExplorer,
+                });
+
+                Add(new SettingsButton
+                {
+                    Text = "数据迁移",
+                    Action = () => game.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
         }
