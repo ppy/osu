@@ -71,6 +71,8 @@ namespace osu.Game
         private DashboardOverlay dashboard;
 
         private MfMenuOverlay mfmenu;
+        
+        private OnlinePictureOverlay picture;
 
         private UserProfileOverlay userProfile;
 
@@ -248,12 +250,16 @@ namespace osu.Game
                     ShowChannel(link.Argument);
                     break;
 
+                case LinkAction.OpenPictureURL:
+                    picture.UpdateImage(link.Argument, true);
+                    break;
+
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"This link type is not yet supported!",
+                        Text = @"暂不支持打开该链接!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -621,6 +627,7 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(picture = new OnlinePictureOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
