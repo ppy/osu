@@ -93,7 +93,7 @@ namespace osu.Game
 
         protected BackButton BackButton;
 
-        protected SettingsPanel Settings;
+        protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
@@ -771,13 +771,20 @@ namespace osu.Game
 
         private Task asyncLoadStream;
 
-        private T loadComponentSingleFile<T>(T d, Action<T> add, bool cache = false)
+        /// <summary>
+        /// Queues loading the provided component in sequential fashion.
+        /// This operation is limited to a single thread to avoid saturating all cores.
+        /// </summary>
+        /// <param name="component">The component to load.</param>
+        /// <param name="loadCompleteAction">An action to invoke on load completion (generally to add the component to the hierarchy).</param>
+        /// <param name="cache">Whether to cache the component as type <typeparamref name="T"/> into the game dependencies before any scheduling.</param>
+        private T loadComponentSingleFile<T>(T component, Action<T> loadCompleteAction, bool cache = false)
             where T : Drawable
         {
             if (cache)
-                dependencies.Cache(d);
+                dependencies.CacheAs(component);
 
-            if (d is OverlayContainer overlay)
+            if (component is OverlayContainer overlay)
                 overlays.Add(overlay);
 
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
@@ -795,12 +802,12 @@ namespace osu.Game
 
                     try
                     {
-                        Logger.Log($"Loading {d}...", level: LogLevel.Debug);
+                        Logger.Log($"Loading {component}...", level: LogLevel.Debug);
 
                         // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
                         // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
                         Task task = null;
-                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(d, add));
+                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(component, loadCompleteAction));
                         Scheduler.Add(del);
 
                         // The delegate won't complete if OsuGame has been disposed in the meantime
@@ -815,7 +822,7 @@ namespace osu.Game
 
                         await task;
 
-                        Logger.Log($"Loaded {d}!", level: LogLevel.Debug);
+                        Logger.Log($"Loaded {component}!", level: LogLevel.Debug);
                     }
                     catch (OperationCanceledException)
                     {
@@ -823,7 +830,7 @@ namespace osu.Game
                 });
             });
 
-            return d;
+            return component;
         }
 
         protected override bool OnScroll(ScrollEvent e)

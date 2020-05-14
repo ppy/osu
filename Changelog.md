@@ -642,3 +642,10 @@
     *   [m] [Implement midi keybindings #8986]
     *   [m] [Fix version-dependent skin elements looking incorrect when beatmap skins are enabled #9000]
     *   [m] [Fix null reference in difficulty recommender #9001]
+
+### 2020/5/14
+*   合并上游pr
+    *   [m] [Use strongly-typed JsonConverter #8981]
+    *   [m] [Use CacheAs for caching game-wide components #9002]
+    *   [m] [Fix crashes when pressing right-click while placing hold notes #9009]
+    *   [m] [Storage directory migration support #8962]
