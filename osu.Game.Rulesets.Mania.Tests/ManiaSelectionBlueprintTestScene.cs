@@ -33,6 +33,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         public Column ColumnAt(Vector2 screenSpacePosition) => column;
 
-        public int TotalColumns => 1;
+        public ManiaPlayfield Playfield => null;
     }
 }

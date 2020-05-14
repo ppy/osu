@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     maxColumn = obj.Column;
             }
 
-            columnDelta = Math.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
+            columnDelta = Math.Clamp(columnDelta, -minColumn, composer.Playfield.TotalColumns - 1 - maxColumn);
 
             foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
                 obj.Column += columnDelta;
