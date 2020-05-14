@@ -40,19 +40,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             Padding = new MarginPadding(10);
 
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.Both,
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    new Dimension(GridSizeMode.Absolute, 50),
+                    new Dimension(),
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
                         new CurrentDirectoryDisplay
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 50,
+                            RelativeSizeAxes = Axes.Both,
                         },
+                    },
+                    new Drawable[]
+                    {
                         new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -65,7 +71,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             }
                         }
                     }
-                },
+                }
             };
 
             CurrentDirectory.BindValueChanged(updateDisplay, true);
