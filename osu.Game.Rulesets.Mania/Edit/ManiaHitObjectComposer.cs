@@ -6,9 +6,12 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -20,10 +23,25 @@ namespace osu.Game.Rulesets.Mania.Edit
     public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>, IManiaHitObjectComposer
     {
         private DrawableManiaEditRuleset drawableRuleset;
+        private ManiaBeatSnapGrid beatSnapGrid;
+        private InputManager inputManager;
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(beatSnapGrid = new ManiaBeatSnapGrid());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
         }
 
         /// <summary>
@@ -42,11 +60,43 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (BlueprintContainer.CurrentTool is SelectTool)
+            {
+                if (EditorBeatmap.SelectedHitObjects.Any())
+                {
+                    beatSnapGrid.SetRange(EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                    beatSnapGrid.Show();
+                }
+                else
+                    beatSnapGrid.Hide();
+            }
+            else
+            {
+                var placementTime = GetSnappedPosition(ToLocalSpace(inputManager.CurrentState.Mouse.Position), 0).time;
+                beatSnapGrid.SetRange(placementTime, placementTime);
+
+                beatSnapGrid.Show();
+            }
+        }
+
         public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
         {
-            var hoc = Playfield.GetColumn(0).HitObjectContainer;
+            var beatSnapped = beatSnapGrid.GetSnappedPosition(position);
 
-            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
+            if (beatSnapped != null)
+                return beatSnapped.Value;
+
+            return base.GetSnappedPosition(position, getTimeFromPosition(ToScreenSpace(position)));
+        }
+
+        private double getTimeFromPosition(Vector2 screenSpacePosition)
+        {
+            var hoc = Playfield.Stages[0].HitObjectContainer;
+            float targetPosition = hoc.ToLocalSpace(screenSpacePosition).Y;
 
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
@@ -56,12 +106,10 @@ namespace osu.Game.Rulesets.Mania.Edit
                 targetPosition = hoc.DrawHeight - targetPosition;
             }
 
-            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
+            return drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
                 EditorClock.CurrentTime,
                 drawableRuleset.ScrollingInfo.TimeRange.Value,
                 hoc.DrawHeight);
-
-            return base.GetSnappedPosition(position, targetTime);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
