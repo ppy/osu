@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     bool raw = !handler.NewValue.Contains("Raw");
                     rawInputToggle.Value = raw;
-                    sensitivity.Bindable.Disabled = !raw;
+                    sensitivityBindable.Disabled = !raw;
                 };
 
                 ignoredInputHandler.TriggerChange();
