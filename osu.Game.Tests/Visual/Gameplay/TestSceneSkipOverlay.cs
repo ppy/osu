@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public Drawable OverlayContents => (Child as Container).Child;
+            public Drawable OverlayContents => (Child as Container)?.Child;
         }
     }
 }
