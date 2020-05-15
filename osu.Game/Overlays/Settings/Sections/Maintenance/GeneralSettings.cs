@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton undeleteButton;
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, DialogOverlay dialogOverlay, OsuGame game)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, DialogOverlay dialogOverlay)
         {
             if (beatmaps.SupportsImportFromStable)
             {

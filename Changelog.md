@@ -661,3 +661,9 @@
     *   [m] [Fix taiko scroller not correctly adhering to gameplay time movement #9003]
     *   [m] [Reposition taiko playfield closer to top of screen #9005]
     *   [m] [Fix mod failure checks executing actual game logic #9007]
+    *   [m] [Use unique video in map pool scene of tournament client #9024]
+    *   [m] [Fix mute button falling off the screen when UI scaling is used #9029]
+    *   [m] [Add more safeties to storage migration #9027]
+
+*   更新上游pr
+    *   [o] [Add ability to change data folder path #9020]

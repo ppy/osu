@@ -16,7 +16,7 @@ namespace osu.Game.IO
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
 
-        internal static readonly string[] IGNORE_DIRECTORIES = { "cache", "osu-lazer" };
+        internal static readonly string[] IGNORE_DIRECTORIES = { "cache" };
 
         internal static readonly string[] IGNORE_FILES =
         {
@@ -48,8 +48,15 @@ namespace osu.Game.IO
             var source = new DirectoryInfo(GetFullPath("."));
             var destination = new DirectoryInfo(newLocation);
 
-            if (source.FullName == destination.FullName)
+            // using Uri is the easiest way to check equality and contains (https://stackoverflow.com/a/7710620)
+            var sourceUri = new Uri(source.FullName + Path.DirectorySeparatorChar);
+            var destinationUri = new Uri(destination.FullName + Path.DirectorySeparatorChar);
+
+            if (sourceUri == destinationUri)
                 throw new ArgumentException("Destination provided is already the current location", nameof(newLocation));
+
+            if (sourceUri.IsBaseOf(destinationUri))
+                throw new ArgumentException("Destination provided is inside the source", nameof(newLocation));
 
             // ensure the new location has no files present, else hard abort
             if (destination.Exists)
@@ -77,7 +84,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                fi.Delete();
+                attemptOperation(() => fi.Delete());
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
@@ -85,11 +92,11 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
                     continue;
 
-                dir.Delete(true);
+                attemptOperation(() => dir.Delete(true));
             }
 
             if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
-                target.Delete();
+                attemptOperation(target.Delete);
         }
 
         private static void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
@@ -102,7 +109,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                attemptCopy(fi, Path.Combine(destination.FullName, fi.Name));
+                attemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
@@ -114,24 +121,27 @@ namespace osu.Game.IO
             }
         }
 
-        private static void attemptCopy(System.IO.FileInfo fileInfo, string destination)
+        /// <summary>
+        /// Attempt an IO operation multiple times and only throw if none of the attempts succeed.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        /// <param name="attempts">The number of attempts (250ms wait between each).</param>
+        private static void attemptOperation(Action action, int attempts = 10)
         {
-            int tries = 5;
-
             while (true)
             {
                 try
                 {
-                    fileInfo.CopyTo(destination, true);
+                    action();
                     return;
                 }
                 catch (Exception)
                 {
-                    if (tries-- == 0)
+                    if (attempts-- == 0)
                         throw;
                 }
 
-                Thread.Sleep(50);
+                Thread.Sleep(250);
             }
         }
     }
