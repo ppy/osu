@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "再拖拽时旋转光标",
+                    LabelText = "在拖拽时旋转光标",
                     Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
                 new SettingsCheckbox

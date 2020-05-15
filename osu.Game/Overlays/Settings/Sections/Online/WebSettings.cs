@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "再打开外部链接前确认",
+                    LabelText = "在打开外部链接前确认",
                     Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
                 new SettingsCheckbox
