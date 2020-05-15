@@ -233,6 +233,9 @@ namespace osu.Game.Tests.NonVisual
 
                     string subFolder = Path.Combine(customPath, "sub");
 
+                    if (Directory.Exists(subFolder))
+                        Directory.Delete(subFolder, true);
+
                     Directory.CreateDirectory(subFolder);
 
                     Assert.Throws<ArgumentException>(() => osu.Migrate(subFolder));
@@ -255,11 +258,14 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
 
-                    string subFolder = customPath + "sub";
+                    string seeminglySubFolder = customPath + "sub";
 
-                    Directory.CreateDirectory(subFolder);
+                    if (Directory.Exists(seeminglySubFolder))
+                        Directory.Delete(seeminglySubFolder, true);
 
-                    osu.Migrate(subFolder);
+                    Directory.CreateDirectory(seeminglySubFolder);
+
+                    osu.Migrate(seeminglySubFolder);
                 }
                 finally
                 {
