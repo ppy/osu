@@ -134,7 +134,7 @@ namespace osu.Game.Beatmaps
                     if (cancellationSource.IsCancellationRequested)
                         throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                    obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+                    obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty, cancellationSource.Token);
                 }
 
                 foreach (var mod in mods.OfType<IApplicableToHitObject>())
