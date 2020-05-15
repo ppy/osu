@@ -191,7 +191,6 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
                 BreakOverlay.Hide();
-                skipOverlay.Disabled = true;
                 skipOverlay.Hide();
             }
 

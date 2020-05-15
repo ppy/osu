@@ -24,13 +24,14 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
         public Action RequestSkip;
 
         private Button button;
+        private ButtonContainer buttonContainer;
         private Box remainingTimeBox;
 
         private FadeContainer fadeContainer;
@@ -38,8 +39,6 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
-
-        public bool Disabled { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -63,9 +62,10 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            Child = buttonContainer = new ButtonContainer
             {
-                fadeContainer = new FadeContainer
+                RelativeSizeAxes = Axes.Both,
+                Child = fadeContainer = new FadeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -106,14 +106,7 @@ namespace osu.Game.Screens.Play
 
             button.Action = () => RequestSkip?.Invoke();
             displayTime = gameplayClock.CurrentTime;
-
-            if (!Disabled)
-                Show();
         }
-
-        protected override void PopIn() => this.FadeIn(fade_time);
-
-        protected override void PopOut() => this.FadeOut(fade_time);
 
         protected override void Update()
         {
@@ -124,13 +117,14 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             button.Enabled.Value = progress > 0;
-            State.Value = progress > 0 && !Disabled ? Visibility.Visible : Visibility.Hidden;
+            buttonContainer.State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (!e.HasAnyButtonPressed)
                 fadeContainer.Show();
+
             return base.OnMouseMove(e);
         }
 
@@ -215,6 +209,13 @@ namespace osu.Game.Screens.Play
             public override void Hide() => State = Visibility.Hidden;
 
             public override void Show() => State = Visibility.Visible;
+        }
+
+        private class ButtonContainer : VisibilityContainer
+        {
+            protected override void PopIn() => this.FadeIn(fade_time);
+
+            protected override void PopOut() => this.FadeOut(fade_time);
         }
 
         private class Button : OsuClickableContainer
