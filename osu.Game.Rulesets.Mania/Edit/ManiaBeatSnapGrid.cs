@@ -24,6 +24,11 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaBeatSnapGrid : CompositeDrawable
     {
+        /// <summary>
+        /// The brightness of bar lines one beat around the time range from <see cref="SetRange"/>.
+        /// </summary>
+        private const float first_beat_brightness = 0.5f;
+
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
 
@@ -174,18 +179,18 @@ namespace osu.Game.Rulesets.Mania.Edit
                 }
 
                 foreach (var l in linesDuring)
-                    l.Colour = OsuColour.Gray(0.5f);
+                    l.Colour = OsuColour.Gray(first_beat_brightness);
 
                 for (int i = 0; i < linesBefore.Count; i++)
                 {
                     int offset = (linesBefore.Count - i - 1) / beatDivisor.Value;
-                    linesBefore[i].Colour = OsuColour.Gray(0.5f / (offset + 1));
+                    linesBefore[i].Colour = OsuColour.Gray(first_beat_brightness / (offset + 1));
                 }
 
                 for (int i = 0; i < linesAfter.Count; i++)
                 {
                     int offset = i / beatDivisor.Value;
-                    linesAfter[i].Colour = OsuColour.Gray(0.5f / (offset + 1));
+                    linesAfter[i].Colour = OsuColour.Gray(first_beat_brightness / (offset + 1));
                 }
             }
         }
