@@ -57,7 +57,7 @@ namespace osu.Desktop.Updater
 
                 if (notification == null)
                 {
-                    notification = new UpdateProgressNotification(this) { State = ProgressNotificationState.Active };
+                    notification = new UpdateProgressNotification(this) { State = ProgressNotificationState.Active, Cancellable = false };
                     Schedule(() => notificationOverlay.Post(notification));
                 }
 
