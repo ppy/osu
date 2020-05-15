@@ -48,11 +48,21 @@ namespace osu.Game.IO
             var source = new DirectoryInfo(GetFullPath("."));
             var destination = new DirectoryInfo(newLocation);
 
+            // using Uri is the easiest way to check equality and contains (https://stackoverflow.com/a/7710620)
+            var sourceUri = new Uri(source.FullName + Path.DirectorySeparatorChar);
+            var destinationUri = new Uri(destination.FullName + Path.DirectorySeparatorChar);
+
+            if (sourceUri == destinationUri)
+                throw new ArgumentException("Destination provided is already the current location", nameof(newLocation));
+
+            if (sourceUri.IsBaseOf(destinationUri))
+                throw new ArgumentException("Destination provided is inside the source", nameof(newLocation));
+
             // ensure the new location has no files present, else hard abort
             if (destination.Exists)
             {
                 if (destination.GetFiles().Length > 0 || destination.GetDirectories().Length > 0)
-                    throw new InvalidOperationException("Migration destination already has files present");
+                    throw new ArgumentException("Destination provided already has files or directories present", nameof(newLocation));
 
                 deleteRecursive(destination);
             }
