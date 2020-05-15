@@ -28,11 +28,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private GameHost host { get; set; }
 
         [Cached]
-        private readonly Bindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
+        public readonly Bindable<DirectoryInfo> CurrentDirectory = new Bindable<DirectoryInfo>();
 
         public DirectorySelector(string initialPath = null)
         {
-            currentDirectory.Value = new DirectoryInfo(initialPath ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            CurrentDirectory.Value = new DirectoryInfo(initialPath ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
 
         [BackgroundDependencyLoader]
@@ -40,19 +40,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             Padding = new MarginPadding(10);
 
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                new FillFlowContainer
+                RelativeSizeAxes = Axes.Both,
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    new Dimension(GridSizeMode.Absolute, 50),
+                    new Dimension(),
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
                         new CurrentDirectoryDisplay
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 50,
+                            RelativeSizeAxes = Axes.Both,
                         },
+                    },
+                    new Drawable[]
+                    {
                         new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -65,10 +71,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             }
                         }
                     }
-                },
+                }
             };
 
-            currentDirectory.BindValueChanged(updateDisplay, true);
+            CurrentDirectory.BindValueChanged(updateDisplay, true);
         }
 
         private void updateDisplay(ValueChangedEvent<DirectoryInfo> directory)
@@ -86,9 +92,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
                 else
                 {
-                    directoryFlow.Add(new ParentDirectoryPiece(currentDirectory.Value.Parent));
+                    directoryFlow.Add(new ParentDirectoryPiece(CurrentDirectory.Value.Parent));
 
-                    foreach (var dir in currentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
+                    foreach (var dir in CurrentDirectory.Value.GetDirectories().OrderBy(d => d.Name))
                     {
                         if ((dir.Attributes & FileAttributes.Hidden) == 0)
                             directoryFlow.Add(new DirectoryPiece(dir));
@@ -97,8 +103,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
             catch (Exception)
             {
-                currentDirectory.Value = directory.OldValue;
-
+                CurrentDirectory.Value = directory.OldValue;
                 this.FlashColour(Color4.Red, 300);
             }
         }
