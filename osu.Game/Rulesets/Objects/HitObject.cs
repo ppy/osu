@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -99,7 +100,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
-        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -108,7 +110,7 @@ namespace osu.Game.Rulesets.Objects
 
             nestedHitObjects.Clear();
 
-            CreateNestedHitObjects();
+            CreateNestedHitObjects(cancellationToken);
 
             if (this is IHasComboInformation hasCombo)
             {
@@ -122,7 +124,7 @@ namespace osu.Game.Rulesets.Objects
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
-                h.ApplyDefaults(controlPointInfo, difficulty);
+                h.ApplyDefaults(controlPointInfo, difficulty, cancellationToken);
 
             DefaultsApplied?.Invoke(this);
         }
@@ -136,6 +138,15 @@ namespace osu.Game.Rulesets.Objects
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
+        protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
+        {
+            // ReSharper disable once MethodSupportsCancellation (https://youtrack.jetbrains.com/issue/RIDER-44520)
+#pragma warning disable 618
+            CreateNestedHitObjects();
+#pragma warning restore 618
+        }
+
+        [Obsolete("Use the overload with cancellation support instead.")] // can be removed 20201115
         protected virtual void CreateNestedHitObjects()
         {
         }
