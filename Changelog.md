@@ -653,3 +653,10 @@
     *   [m] [Add taiko mascot display for legacy skins #8857]
     *   [m] [Add a basic directory chooser component #9011]
     *   [o] [Add ability to change data folder path #9020]
+
+### 2020/5/15
+*   合并上游pr
+    *   [m] [不完全合并] [Add test for osu!catch skin configuration colour decoding #8622]
+    *   [m] [BeatmapListingOverlay auto-pagination reimplementation #8999]
+    *   [m] [Fix taiko scroller not correctly adhering to gameplay time movement #9003]
+    *   [m] [Reposition taiko playfield closer to top of screen #9005]

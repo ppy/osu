@@ -13,18 +13,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
         private const float default_aspect = 16f / 9f;
 
-        public TaikoPlayfieldAdjustmentContainer()
-        {
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.CentreLeft;
-        }
-
         protected override void Update()
         {
             base.Update();
 
             float aspectAdjust = Math.Clamp(Parent.ChildSize.X / Parent.ChildSize.Y, 0.4f, 4) / default_aspect;
             Size = new Vector2(1, default_relative_height * aspectAdjust);
+
+            // Position the taiko playfield exactly one playfield from the top of the screen.
+            RelativePositionAxes = Axes.Y;
+            Y = Size.Y;
         }
     }
 }
