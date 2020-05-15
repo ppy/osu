@@ -4,6 +4,7 @@
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -73,14 +74,14 @@ namespace osu.Game.Rulesets.Taiko.Objects
             overallDifficulty = difficulty.OverallDifficulty;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             createTicks();
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
 
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
         }
 
         private void createTicks()
