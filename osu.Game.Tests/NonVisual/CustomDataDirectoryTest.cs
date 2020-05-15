@@ -223,7 +223,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToNestedTargetFails()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSameTargetFails)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToNestedTargetFails)))
             {
                 try
                 {
@@ -233,9 +233,39 @@ namespace osu.Game.Tests.NonVisual
 
                     string subFolder = Path.Combine(customPath, "sub");
 
+                    if (Directory.Exists(subFolder))
+                        Directory.Delete(subFolder, true);
+
                     Directory.CreateDirectory(subFolder);
 
                     Assert.Throws<ArgumentException>(() => osu.Migrate(subFolder));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestMigrationToSeeminglyNestedTarget()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSeeminglyNestedTarget)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
+
+                    string seeminglySubFolder = customPath + "sub";
+
+                    if (Directory.Exists(seeminglySubFolder))
+                        Directory.Delete(seeminglySubFolder, true);
+
+                    Directory.CreateDirectory(seeminglySubFolder);
+
+                    osu.Migrate(seeminglySubFolder);
                 }
                 finally
                 {
