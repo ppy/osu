@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider snapProvider { get; set; }
 
         protected ManiaPlacementBlueprint(T hitObject)
