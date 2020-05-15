@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -147,6 +148,29 @@ namespace osu.Game.Rulesets.Mania.Edit
                         linesDuring.Add(line);
                     else
                         linesAfter.Add(line);
+                }
+
+                // Snapping will always happen on one of the two lines around minTime (the "target" line).
+                // One of those lines may exist in linesBefore and the other may exist in linesAfter, depending on whether such a line exists, and the target changes when the mid-point is crossed.
+                // For display purposes, one complete beat is shown at the maximum brightness such that the target line should always be bright.
+                bool targetLineIsLastLineBefore = false;
+
+                if (linesBefore.Count > 0 && linesAfter.Count > 0)
+                    targetLineIsLastLineBefore = Math.Abs(linesBefore[^1].HitObject.StartTime - minTime) <= Math.Abs(linesAfter[0].HitObject.StartTime - minTime);
+                else if (linesBefore.Count > 0)
+                    targetLineIsLastLineBefore = true;
+
+                if (targetLineIsLastLineBefore)
+                {
+                    // Move the last line before to linesDuring
+                    linesDuring.Insert(0, linesBefore[^1]);
+                    linesBefore.RemoveAt(linesBefore.Count - 1);
+                }
+                else if (linesAfter.Count > 0) // = false does not guarantee that a line after exists (maybe at the bottom of the screen)
+                {
+                    // Move the first line after to linesDuring
+                    linesDuring.Insert(0, linesAfter[0]);
+                    linesAfter.RemoveAt(0);
                 }
 
                 foreach (var l in linesDuring)
