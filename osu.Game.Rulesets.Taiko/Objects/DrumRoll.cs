@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            createTicks();
+            createTicks(cancellationToken);
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects(cancellationToken);
         }
 
-        private void createTicks()
+        private void createTicks(CancellationToken cancellationToken)
         {
             if (tickSpacing == 0)
                 return;
@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new DrumRollTick
                 {
                     FirstTick = first,
