@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.CreateNestedHitObjects(cancellationToken);
 
             foreach (var e in
-                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
             {
                 switch (e.Type)
                 {
