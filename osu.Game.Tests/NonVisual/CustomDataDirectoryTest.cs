@@ -223,7 +223,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToNestedTargetFails()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSameTargetFails)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToNestedTargetFails)))
             {
                 try
                 {
