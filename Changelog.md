@@ -664,6 +664,7 @@
     *   [m] [Use unique video in map pool scene of tournament client #9024]
     *   [m] [Fix mute button falling off the screen when UI scaling is used #9029]
     *   [m] [Add more safeties to storage migration #9027]
+    *   [m] [Fix applied platform/user offsets being incorrect when rate adjust mods are active #9036]
 
 *   更新上游pr
-    *   [o] [Add ability to change data folder path #9020]
+    *   [m] [Add ability to change data folder path #9020]
