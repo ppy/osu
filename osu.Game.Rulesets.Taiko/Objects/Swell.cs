@@ -35,7 +35,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects(cancellationToken);
 
             for (int i = 0; i < RequiredHits; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
                 AddNested(new SwellTick());
+            }
         }
 
         public override Judgement CreateJudgement() => new TaikoSwellJudgement();
