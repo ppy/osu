@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
-        public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{Retries.Value}条生命";
+                public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{Retries.Value}条生命";
 
         private int retries;
 
@@ -48,17 +48,14 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool AllowFail
+        public bool PerformFail()
         {
-            get
-            {
-                if (retries == 0) return true;
+            if (retries == 0) return true;
 
-                health.Value = health.MaxValue;
-                retries--;
+            health.Value = health.MaxValue;
+            retries--;
 
-                return false;
-            }
+            return false;
         }
 
         public bool RestartOnFail => false;

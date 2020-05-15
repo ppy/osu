@@ -660,3 +660,4 @@
     *   [m] [BeatmapListingOverlay auto-pagination reimplementation #8999]
     *   [m] [Fix taiko scroller not correctly adhering to gameplay time movement #9003]
     *   [m] [Reposition taiko playfield closer to top of screen #9005]
+    *   [m] [Fix mod failure checks executing actual game logic #9007]
