@@ -27,7 +27,8 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "来观看精彩绝伦的自动表演";
         public override double ScoreMultiplier => 1;
 
-        public bool AllowFail => false;
+        public bool PerformFail() => false;
+
         public bool RestartOnFail => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };

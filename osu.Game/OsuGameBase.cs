@@ -133,6 +133,8 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.CacheAs(Storage);
+
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
@@ -301,8 +303,8 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null)
-                Storage = host.Storage;
+            if (Storage == null) // may be non-null for certain tests
+                Storage = new OsuStorage(host);
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
@@ -330,6 +332,8 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+
+            contextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
@@ -356,6 +360,13 @@ namespace osu.Game
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
+        }
+
+        public void Migrate(string path)
+        {
+            Logger.Log("调起迁移...");
+            contextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(path);
         }
     }
 }

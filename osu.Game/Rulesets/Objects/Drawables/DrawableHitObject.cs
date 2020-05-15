@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
     [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
+        public event Action<DrawableHitObject> DefaultsApplied;
+
         public readonly HitObject HitObject;
 
         /// <summary>
@@ -99,6 +101,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
         private Bindable<bool> userPositionalHitSounds;
+        private Bindable<float> PositionGain;
         private Bindable<int> comboIndexBindable;
 
         public override bool RemoveWhenNotAlive => false;
@@ -117,9 +120,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, MfConfigManager mfConfig)
         {
             userPositionalHitSounds = config.GetBindable<bool>(OsuSetting.PositionalHitSounds);
+            PositionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
             var judgement = HitObject.CreateJudgement();
 
             Result = CreateResult(judgement);
@@ -148,7 +152,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
-            onDefaultsApplied();
+            apply(HitObject);
         }
 
         private void loadSamples()
@@ -175,7 +179,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             AddInternal(Samples);
         }
 
-        private void onDefaultsApplied() => apply(HitObject);
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            apply(hitObject);
+            DefaultsApplied?.Invoke(this);
+        }
 
         private void apply(HitObject hitObject)
         {
@@ -354,7 +362,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             const float balance_adjust_amount = 0.4f;
 
-            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0);
+            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? (SamplePlaybackPosition - 0.5f) : 0) * PositionGain.Value;
             Samples?.Play();
         }
 

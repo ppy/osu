@@ -4,7 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -30,6 +32,10 @@ namespace osu.Game.Overlays
         private Drawable currentContent;
         private LoadingLayer loadingLayer;
         private Container panelTarget;
+        private FillFlowContainer<BeatmapPanel> foundContent;
+        private NotFoundDrawable notFoundContent;
+
+        private OverlayScrollContainer resultScrollContainer;
 
         public BeatmapListingOverlay()
             : base(OverlayColourScheme.Blue)
@@ -48,7 +54,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourProvider.Background6
                 },
-                new OverlayScrollContainer
+                resultScrollContainer = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -80,9 +86,14 @@ namespace osu.Game.Overlays
                                     {
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
-                                        Padding = new MarginPadding { Horizontal = 20 }
-                                    },
-                                    loadingLayer = new LoadingLayer(panelTarget)
+                                        Padding = new MarginPadding { Horizontal = 20 },
+                                        Children = new Drawable[]
+                                        {
+                                            foundContent = new FillFlowContainer<BeatmapPanel>(),
+                                            notFoundContent = new NotFoundDrawable(),
+                                            loadingLayer = new LoadingLayer(panelTarget)
+                                        }
+                                    }
                                 }
                             },
                         }
@@ -110,34 +121,53 @@ namespace osu.Game.Overlays
                 loadingLayer.Show();
         }
 
+        private Task panelLoadDelegate;
+
         private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
         {
-            if (!beatmaps.Any())
+            var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
-                LoadComponentAsync(new NotFoundDrawable(), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
-                return;
-            }
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
 
-            var newPanels = new FillFlowContainer<BeatmapPanel>
+            if (filterControl.CurrentPage == 0)
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(10),
-                Alpha = 0,
-                Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
+                //No matches case
+                if (!newPanels.Any())
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                })
-            };
+                    LoadComponentAsync(notFoundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                    return;
+                }
 
-            LoadComponentAsync(newPanels, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                // spawn new children with the contained so we only clear old content at the last moment.
+                var content = new FillFlowContainer<BeatmapPanel>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(10),
+                    Alpha = 0,
+                    Margin = new MarginPadding { Vertical = 15 },
+                    ChildrenEnumerable = newPanels
+                };
+
+                panelLoadDelegate = LoadComponentAsync(foundContent = content, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+            }
+            else
+            {
+                panelLoadDelegate = LoadComponentsAsync(newPanels, loaded =>
+                {
+                    lastFetchDisplayedTime = Time.Current;
+                    foundContent.AddRange(loaded);
+                    loaded.ForEach(p => p.FadeIn(200, Easing.OutQuint));
+                });
+            }
         }
 
         private void addContentToPlaceholder(Drawable content)
         {
             loadingLayer.Hide();
+            lastFetchDisplayedTime = Time.Current;
 
             var lastContent = currentContent;
 
@@ -149,11 +179,14 @@ namespace osu.Game.Overlays
                 // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
                 // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
                 // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
-                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
+                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y).Then().Schedule(() => panelTarget.Remove(lastContent));
             }
 
-            panelTarget.Add(currentContent = content);
-            currentContent.FadeIn(200, Easing.OutQuint);
+            if (!content.IsAlive)
+                panelTarget.Add(content);
+            content.FadeIn(200, Easing.OutQuint);
+
+            currentContent = content;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -197,11 +230,29 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = @"呃...什么都没有",
+                            Text = @"... nope, nothing found.",
                         }
                     }
                 });
             }
+        }
+
+        private const double time_between_fetches = 500;
+
+        private double lastFetchDisplayedTime;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            const int pagination_scroll_distance = 500;
+
+            bool shouldShowMore = panelLoadDelegate?.IsCompleted != false
+                                  && Time.Current - lastFetchDisplayedTime > time_between_fetches
+                                  && (resultScrollContainer.ScrollableExtent > 0 && resultScrollContainer.IsScrolledToEnd(pagination_scroll_distance));
+
+            if (shouldShowMore)
+                filterControl.FetchNextPage();
         }
     }
 }

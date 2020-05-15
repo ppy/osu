@@ -132,6 +132,9 @@ namespace osu.Game.Online.Chat
                             case "d":
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
 
+                            case "ss":
+                                return new LinkDetails(LinkAction.OpenPictureURL, url );
+
                             case "u":
                             case "users":
                                 return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
@@ -279,7 +282,8 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
-        Custom
+        Custom,
+        OpenPictureURL
     }
 
     public class Link : IComparable<Link>

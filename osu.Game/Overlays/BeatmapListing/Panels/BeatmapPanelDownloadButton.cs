@@ -48,15 +48,8 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig)
+        private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig, MfConfigManager mfconfig)
         {
-            if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
-            {
-                button.Enabled.Value = false;
-                button.TooltipText = "this beatmap is currently not available for download.";
-                return;
-            }
-
             noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             button.Action = () =>
@@ -77,10 +70,30 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
 
                     default:
-                        beatmaps.Download(BeatmapSet.Value, noVideoSetting.Value);
+                        beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MfSetting.UseSayobot), noVideoSetting.Value);
                         break;
                 }
             };
+
+            State.BindValueChanged(state =>
+            {
+                switch (state.NewValue)
+                {
+                    case DownloadState.LocallyAvailable:
+                        button.Enabled.Value = true;
+                        button.TooltipText = string.Empty;
+                        break;
+
+                    default:
+                        if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
+                        {
+                            button.Enabled.Value = false;
+                            button.TooltipText = "该谱面暂时无法下载...";
+                        }
+
+                        break;
+                }
+            }, true);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace osu.Game.Overlays
         private void load()
         {
             AddSection(new MfMainSection());
+            AddSection(new MfMvisSection());
         }
     }
 }

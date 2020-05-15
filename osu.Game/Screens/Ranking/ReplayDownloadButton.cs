@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Ranking
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scores.Download(Model.Value);
+                        scores.Download(Model.Value, false);
                         break;
 
                     case DownloadState.Downloaded:

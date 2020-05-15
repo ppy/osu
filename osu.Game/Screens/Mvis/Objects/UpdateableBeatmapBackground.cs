@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
-                            Text = getShortTitle(new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title))),
+                            Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
                             Shadow = false,
                         }
                     }
@@ -156,39 +156,6 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                     Sigma = new Vector2(5)
                 }));
             }
-
-            /// <summary>
-            /// Trims additional info in brackets in beatmap title (if exists).
-            /// </summary>
-            /// <param name="longTitle">The title to trim.</param>
-            /// <returns></returns>
-            private string getShortTitle(string longTitle)
-            {
-                var newTitle = longTitle;
-
-                for (int i = 0; i < title_chars.Length; i++)
-                {
-                    if (newTitle.Contains(title_chars[i]))
-                    {
-                        var charIndex = newTitle.IndexOf(title_chars[i]);
-
-                        if (charIndex != 0)
-                            newTitle = newTitle.Substring(0, charIndex);
-                    }
-                }
-
-                if (newTitle.EndsWith(" "))
-                    newTitle = newTitle.Substring(0, newTitle.Length - 1);
-
-                return newTitle;
-            }
-
-            private static readonly char[] title_chars = new[]
-            {
-                '(',
-                '-',
-                '~'
-            };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class MvisVisualSettings : SettingsSubsection
     {
-        protected override string Header => "Mvis播放器 - 特效";
+        protected override string Header => "特效";
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -51,9 +52,11 @@ namespace osu.Game.Overlays.BeatmapSet
         [Cached(typeof(IBindable<RulesetInfo>))]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
+        private BindableBool UseSayobot = new BindableBool();
+        private ExternalLinkButton externalLink;
+
         public Header()
         {
-            ExternalLinkButton externalLink;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -213,13 +216,33 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
-                externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+                externalLink.Link = SelectServer(Details.Beatmap);
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        protected virtual string SelectServer(Beatmaps.BeatmapInfo b)
         {
+            switch ( mfConfig.Get<bool>(MfSetting.UseSayobot) )
+            {
+                case true:
+                    return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
+
+                case false:
+                    return $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
+            }
+        }
+
+        private MfConfigManager mfConfig;
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MfConfigManager mfconfig)
+        {
+            this.mfConfig = mfconfig;
+            mfconfig.BindWith(MfSetting.UseSayobot, UseSayobot);
+            UseSayobot.ValueChanged += _ =>
+            {
+                externalLink.Link = SelectServer(Details.Beatmap);
+            };
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
             onlineStatusPill.BackgroundColour = colourProvider.Background6;
 
@@ -264,7 +287,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
+            if ((BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false) && State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;
@@ -289,9 +312,11 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
+                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false ,true);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true));
+                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true, false));
+                    if (BeatmapSet.Value.OnlineInfo.HasStoryboard || BeatmapSet.Value.OnlineInfo.HasVideo)
+                        downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, false, true)); //Mini
                     break;
             }
         }

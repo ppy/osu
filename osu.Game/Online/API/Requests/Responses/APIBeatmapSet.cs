@@ -89,7 +89,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Covers = covers,
-                    Preview = preview,
+                    Preview = $"https://a.sayobot.cn/preview/{OnlineBeatmapSetID}.mp3",
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
                     BPM = bpm,

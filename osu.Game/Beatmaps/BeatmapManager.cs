@@ -81,8 +81,8 @@ namespace osu.Game.Beatmaps
             exportStorage = storage.GetStorageForDirectory("exports");
         }
 
-        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
-            new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
+        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool UseSayobot, bool noVideo, bool IsMini) =>
+            new DownloadBeatmapSetRequest(set, UseSayobot, noVideo, IsMini);
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 

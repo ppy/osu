@@ -21,9 +21,16 @@ namespace osu.Game.Screens.Mvis
         private CancellationTokenSource ChangeSB;
         private ScheduledDelegate scheduledDisplaySB;
         private DimmableStoryboard dimmableStoryboard;
-        private Bindable<bool> EnableSB = new Bindable<bool>();
-        public readonly Bindable<bool> IsReady = new Bindable<bool>();
-        public readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
+        private BindableBool EnableSB = new BindableBool();
+        ///<summary>
+        ///用于内部确定故事版是否已加载
+        ///</summary>
+        private BindableBool SBLoaded = new BindableBool();
+        ///<summary>
+        ///用于对外提供该BindableBool用于检测故事版功能是否已经准备好了
+        ///</summary>
+        public readonly BindableBool IsReady = new BindableBool();
+        public readonly BindableBool storyboardReplacesBackground = new BindableBool();
 
         /// <summary>
         /// This will log which beatmap's storyboard we are loading
@@ -74,13 +81,19 @@ namespace osu.Game.Screens.Mvis
         {
             if ( EnableSB.Value )
             {
-                storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;;
+                if ( !SBLoaded.Value )
+                    UpdateStoryBoardAsync();
+                else
+                    storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;;
+
                 sbClock?.FadeIn(DURATION, Easing.OutQuint);
             }
             else
             {
                 storyboardReplacesBackground.Value = false;
                 sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                IsReady.Value = true;
+                CancelAllTasks();
             }
         }
 
@@ -115,6 +128,7 @@ namespace osu.Game.Screens.Mvis
 
                     sbClock.Seek(b.Value.Track.CurrentTime);
 
+                    SBLoaded.Value = true;
                     IsReady.Value = true;
                 }, (ChangeSB = new CancellationTokenSource()).Token);
             }
@@ -167,11 +181,12 @@ namespace osu.Game.Screens.Mvis
             if ( b == null )
                 return;
 
+            IsReady.Value = false;
+            SBLoaded.Value = false;
+
             Schedule(() =>
             {
                 CancelAllTasks();
-
-                IsReady.Value = false;
 
                 var lastdimmableSB = dimmableStoryboard;
 
@@ -180,6 +195,12 @@ namespace osu.Game.Screens.Mvis
 
                 lastdimmableSB?.Expire();
                 sbClock?.Expire();
+
+                if ( !EnableSB.Value )
+                {
+                    IsReady.Value = true;
+                    return;
+                }
 
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
