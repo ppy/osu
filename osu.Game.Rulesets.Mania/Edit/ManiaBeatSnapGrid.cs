@@ -178,6 +178,8 @@ namespace osu.Game.Rulesets.Mania.Edit
                     linesAfter.RemoveAt(0);
                 }
 
+                // Grays are used rather than transparency since the lines appear on a coloured mania playfield.
+
                 foreach (var l in linesDuring)
                     l.Colour = OsuColour.Gray(first_beat_brightness);
 
