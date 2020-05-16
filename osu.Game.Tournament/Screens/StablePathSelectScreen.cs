@@ -1,0 +1,149 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.IO;
+using Newtonsoft.Json;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Tournament.Models;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
+using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Components;
+using osuTK;
+
+namespace osu.Game.Tournament.Screens
+{
+    public class StablePathSelectScreen : TournamentScreen
+    {
+        private DirectorySelector directorySelector;
+
+        private const string stable_config = "tournament/stable.json";
+
+        [Resolved]
+        private StableInfo stableInfo { get; set; }
+
+        [Resolved]
+        private MatchIPCInfo ipc { get; set; }
+
+        private DialogOverlay overlay;
+
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(Storage storage, OsuColour colours)
+        {
+            // begin selection in the parent directory of the current storage location
+            var initialPath = new DirectoryInfo(stableInfo.StablePath.Value).FullName;
+
+            AddInternal(new Container
+            {
+                Masking = true,
+                CornerRadius = 10,
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(0.5f, 0.8f),
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colours.GreySeafoamDark,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Relative, 0.8f),
+                            new Dimension(),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = "Please select a new location",
+                                    Font = OsuFont.Default.With(size: 40)
+                                },
+                            },
+                            new Drawable[]
+                            {
+                                directorySelector = new DirectorySelector(initialPath)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                new TriangleButton
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Width = 300,
+                                    Text = "Select stable path",
+                                    Action = () => { start(storage); }
+                                },
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        private static bool checkExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
+
+        private void start(Storage storage)
+        {
+            var target = directorySelector.CurrentDirectory.Value.FullName;
+
+            if (checkExists(target))
+            {
+                stableInfo.StablePath.Value = target;
+
+                try
+                {
+                    using (var stream = storage.GetStream(stable_config, FileAccess.Write, FileMode.Create))
+                    using (var sw = new StreamWriter(stream))
+                    {
+                        sw.Write(JsonConvert.SerializeObject(stableInfo,
+                            new JsonSerializerSettings
+                            {
+                                Formatting = Formatting.Indented,
+                                NullValueHandling = NullValueHandling.Ignore,
+                                DefaultValueHandling = DefaultValueHandling.Ignore,
+                            }));
+                    }
+
+                    sceneManager?.SetScreen(typeof(SetupScreen));
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
+                }
+            }
+            else
+            {
+                overlay = new DialogOverlay();
+                overlay.Push(new IPCNotFoundDialog());
+                AddInternal(overlay);
+                Logger.Log("Folder is not an osu! stable CE directory");
+                // Return an error in the picker that the directory does not contain ipc.txt
+            }
+        }
+    }
+}
