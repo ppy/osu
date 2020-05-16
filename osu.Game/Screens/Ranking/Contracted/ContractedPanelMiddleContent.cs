@@ -53,22 +53,22 @@ namespace osu.Game.Screens.Ranking.Contracted
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerExponent = 2.5f,
+                            CornerRadius = 20,
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Colour = Color4.Black.Opacity(0.25f),
+                                Type = EdgeEffectType.Shadow,
+                                Radius = 1,
+                                Offset = new Vector2(0, 4)
+                            },
                             Children = new Drawable[]
                             {
-                                new Container
+                                // Buffered container is used to prevent 1px bleed outside the masking region
+                                new BufferedContainer
                                 {
-                                    Name = "Background",
                                     RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    CornerExponent = 2.5f,
-                                    CornerRadius = 20,
-                                    EdgeEffect = new EdgeEffectParameters
-                                    {
-                                        Colour = Color4.Black.Opacity(0.25f),
-                                        Type = EdgeEffectType.Shadow,
-                                        Radius = 1,
-                                        Offset = new Vector2(0, 4)
-                                    },
                                     Children = new Drawable[]
                                     {
                                         new Box
@@ -81,95 +81,74 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             RelativeSizeAxes = Axes.Both,
                                             User = score.User,
                                         },
-                                    }
-                                },
-                                new Container
-                                {
-                                    Name = "Background overlay",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Bottom = -1 },
-                                    Child = new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Masking = true,
-                                        CornerExponent = 2.5f,
-                                        CornerRadius = 20,
-                                        Child = new Box
+                                        new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.5f), Color4Extensions.FromHex("#444"))
-                                        }
+                                        },
                                     }
                                 },
-                                new Container
+                                new FillFlowContainer
                                 {
-                                    Name = "Foreground",
                                     RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding(10),
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 10),
                                     Children = new Drawable[]
                                     {
+                                        new UpdateableAvatar(score.User)
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Size = new Vector2(140),
+                                            Masking = true,
+                                            CornerExponent = 2.5f,
+                                            CornerRadius = 20,
+                                            EdgeEffect = new EdgeEffectParameters
+                                            {
+                                                Colour = Color4.Black.Opacity(0.25f),
+                                                Type = EdgeEffectType.Shadow,
+                                                Radius = 8,
+                                                Offset = new Vector2(0, 4),
+                                            }
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Text = score.UserString,
+                                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold)
+                                        },
                                         new FillFlowContainer
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding(10),
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(0, 10),
-                                            Children = new Drawable[]
+                                            Spacing = new Vector2(0, 5),
+                                            ChildrenEnumerable = score.SortedStatistics.Select(s => createStatistic(s.Key.GetDescription(), s.Value.ToString()))
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Margin = new MarginPadding { Top = 10 },
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 5),
+                                            Children = new[]
                                             {
-                                                new UpdateableAvatar(score.User)
-                                                {
-                                                    Anchor = Anchor.TopCentre,
-                                                    Origin = Anchor.TopCentre,
-                                                    Size = new Vector2(140),
-                                                    Masking = true,
-                                                    CornerExponent = 2.5f,
-                                                    CornerRadius = 20,
-                                                    EdgeEffect = new EdgeEffectParameters
-                                                    {
-                                                        Colour = Color4.Black.Opacity(0.25f),
-                                                        Type = EdgeEffectType.Shadow,
-                                                        Radius = 8,
-                                                        Offset = new Vector2(0, 4),
-                                                    }
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Anchor = Anchor.TopCentre,
-                                                    Origin = Anchor.TopCentre,
-                                                    Text = score.UserString,
-                                                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold)
-                                                },
-                                                new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Direction = FillDirection.Vertical,
-                                                    Spacing = new Vector2(0, 5),
-                                                    ChildrenEnumerable = score.SortedStatistics.Select(s => createStatistic(s.Key.GetDescription(), s.Value.ToString()))
-                                                },
-                                                new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Margin = new MarginPadding { Top = 10 },
-                                                    Direction = FillDirection.Vertical,
-                                                    Spacing = new Vector2(0, 5),
-                                                    Children = new[]
-                                                    {
-                                                        createStatistic("Max Combo", $"x{score.MaxCombo}"),
-                                                        createStatistic("Accuracy", $"{score.Accuracy.FormatAccuracy()}"),
-                                                    }
-                                                },
-                                                new ModDisplay
-                                                {
-                                                    Anchor = Anchor.TopCentre,
-                                                    Origin = Anchor.TopCentre,
-                                                    AutoSizeAxes = Axes.Both,
-                                                    ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                                    DisplayUnrankedText = false,
-                                                    Current = { Value = score.Mods },
-                                                    Scale = new Vector2(0.5f),
-                                                }
+                                                createStatistic("Max Combo", $"x{score.MaxCombo}"),
+                                                createStatistic("Accuracy", $"{score.Accuracy.FormatAccuracy()}"),
                                             }
+                                        },
+                                        new ModDisplay
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            AutoSizeAxes = Axes.Both,
+                                            ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                            DisplayUnrankedText = false,
+                                            Current = { Value = score.Mods },
+                                            Scale = new Vector2(0.5f),
                                         }
                                     }
                                 }
