@@ -72,6 +72,7 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 Id = 2,
                 Username = "peppy",
+                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             },
             Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
             Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
