@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -29,11 +27,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public class TestSceneManiaHitObjectComposer : EditorClockTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ManiaBlueprintContainer)
-        };
-
         private TestComposer composer;
 
         [SetUp]
