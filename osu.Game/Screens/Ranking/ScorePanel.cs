@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 using osuTK.Graphics;
@@ -21,12 +22,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Width of the panel when contracted.
         /// </summary>
-        private const float contracted_width = 160;
+        public const float CONTRACTED_WIDTH = 160;
 
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 320;
+        private const float contracted_height = 385;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -71,7 +72,7 @@ namespace osu.Game.Screens.Ranking
         private static readonly ColourInfo expanded_top_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#444"), Color4Extensions.FromHex("#333"));
         private static readonly ColourInfo expanded_middle_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"));
         private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
-        private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#444");
+        private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
 
@@ -193,10 +194,12 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case PanelState.Contracted:
-                    this.ResizeTo(new Vector2(contracted_width, contracted_height), resize_duration, Easing.OutQuint);
+                    this.ResizeTo(new Vector2(CONTRACTED_WIDTH, contracted_height), resize_duration, Easing.OutQuint);
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
+
+                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(score).With(d => d.Alpha = 0));
                     break;
             }
 
