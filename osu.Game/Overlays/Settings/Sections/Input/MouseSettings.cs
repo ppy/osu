@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableBool rawInputToggle = new BindableBool();
         private Bindable<double> sensitivityBindable = new BindableDouble();
         private Bindable<string> ignoredInputHandler;
-        private SensitivitySetting sensitivity;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Raw input",
                     Bindable = rawInputToggle
                 },
-                sensitivity = new SensitivitySetting
+                new SensitivitySetting
                 {
                     LabelText = "Cursor sensitivity",
                     Bindable = sensitivityBindable
