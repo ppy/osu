@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 
@@ -18,7 +17,6 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneScorePanel : OsuTestScene
     {
-
         [Test]
         public void TestDRank()
         {
