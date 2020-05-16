@@ -9,6 +9,9 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Settings;
@@ -17,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
+    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo, IKeyBindingHandler<GlobalAction>
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {
@@ -25,7 +28,18 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private FillFlowContainer<TDrawable> flow;
 
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
         protected ControlPanel ControlPanel;
+
+        protected virtual bool IsSubScreen => false;
+
+        protected virtual System.Type ParentScreen { get; set; }
+
+        private BackButton backButton;
+
+        private System.Action backAction => () => sceneManager?.SetScreen(ParentScreen);
 
         [BackgroundDependencyLoader]
         private void load()
@@ -70,6 +84,19 @@ namespace osu.Game.Tournament.Screens.Editors
                 }
             });
 
+            if (IsSubScreen)
+            {
+                BackButton.Receptor receptor = new BackButton.Receptor();
+                backButton = new BackButton(receptor)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Action = () => { backAction.Invoke(); }
+                };
+                AddInternal(backButton);
+                backButton.Show();
+            }
+
             Storage.CollectionChanged += (_, args) =>
             {
                 switch (args.Action)
@@ -86,6 +113,22 @@ namespace osu.Game.Tournament.Screens.Editors
 
             foreach (var model in Storage)
                 flow.Add(CreateDrawable(model));
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
+                    backAction.Invoke();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected abstract TDrawable CreateDrawable(TModel model);
