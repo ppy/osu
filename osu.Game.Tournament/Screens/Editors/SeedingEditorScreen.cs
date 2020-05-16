@@ -28,11 +28,8 @@ namespace osu.Game.Tournament.Screens.Editors
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
-        protected override bool IsSubScreen => true;
-
-        protected override System.Type ParentScreen => typeof(TeamEditorScreen);
-
-        public SeedingEditorScreen(TournamentTeam team)
+        public SeedingEditorScreen(TournamentTeam team, TournamentScreen parentScreen)
+            : base(parentScreen)
         {
             this.team = team;
         }

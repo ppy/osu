@@ -33,13 +33,15 @@ namespace osu.Game.Tournament.Screens.Editors
 
         protected ControlPanel ControlPanel;
 
-        protected virtual bool IsSubScreen => false;
-
-        protected virtual System.Type ParentScreen { get; set; }
-
+        private readonly TournamentScreen parentScreen;
         private BackButton backButton;
 
-        private System.Action backAction => () => sceneManager?.SetScreen(ParentScreen);
+        private System.Action backAction => () => sceneManager?.SetScreen(parentScreen.GetType());
+
+        protected TournamentEditorScreen(TournamentScreen parentScreen = null)
+        {
+            this.parentScreen = parentScreen;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -51,7 +53,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 Origin = Anchor.BottomLeft,
                 Action = () =>
                 {
-                    if (IsSubScreen)
+                    if (parentScreen != null)
                         backAction.Invoke();
                 }
             };
@@ -98,7 +100,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 }
             });
 
-            if (IsSubScreen)
+            if (parentScreen != null)
                 backButton.Show();
 
             Storage.CollectionChanged += (_, args) =>
