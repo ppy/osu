@@ -33,7 +33,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
-            public new bool AllowFail => base.AllowFail;
+
+            public bool AllowFail => base.CheckModsAllowFailure();
 
             protected override bool PauseOnFocusLost => false;
 
