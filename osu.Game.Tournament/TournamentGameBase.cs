@@ -33,6 +33,8 @@ namespace osu.Game.Tournament
     {
         private const string bracket_filename = "bracket.json";
 
+        private const string stable_config = "tournament/stable.json";
+
         private LadderInfo ladder;
 
         private Storage storage;
@@ -43,6 +45,7 @@ namespace osu.Game.Tournament
 
         private Bindable<Size> windowSize;
         private FileBasedIPC ipc;
+        private StableInfo stableInfo;
 
         private Drawable heightWarning;
 
@@ -71,6 +74,7 @@ namespace osu.Game.Tournament
             }), true);
 
             readBracket();
+            readStableConfig();
 
             ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
@@ -139,6 +143,23 @@ namespace osu.Game.Tournament
                     }
                 },
             });
+        }
+
+        private void readStableConfig()
+        {
+            if (storage.Exists(stable_config))
+            {
+                using (Stream stream = storage.GetStream(stable_config, FileAccess.Read, FileMode.Open))
+                using (var sr = new StreamReader(stream))
+                {
+                    stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
+                }
+            }
+
+            if (stableInfo == null)
+                stableInfo = new StableInfo();
+
+            dependencies.Cache(stableInfo);
         }
 
         private void readBracket()
