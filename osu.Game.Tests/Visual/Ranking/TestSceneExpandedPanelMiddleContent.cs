@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -22,8 +21,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
-using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK;
@@ -34,18 +31,6 @@ namespace osu.Game.Tests.Visual.Ranking
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ExpandedPanelMiddleContent),
-            typeof(AccuracyCircle),
-            typeof(AccuracyStatistic),
-            typeof(ComboStatistic),
-            typeof(CounterStatistic),
-            typeof(StarRatingDisplay),
-            typeof(StatisticDisplay),
-            typeof(TotalScoreCounter)
-        };
 
         [Test]
         public void TestMapWithKnownMapper()

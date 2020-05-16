@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Utils;
 using osu.Framework.Graphics;
@@ -22,13 +20,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHitErrorMeter : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(HitErrorMeter),
-            typeof(BarHitErrorMeter),
-            typeof(ColourHitErrorMeter)
-        };
-
         private BarHitErrorMeter barMeter;
         private BarHitErrorMeter barMeter2;
         private ColourHitErrorMeter colourMeter;

@@ -3,8 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Profile.Header.Components;
-using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -18,12 +16,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneProfileRulesetSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ProfileRulesetSelector),
-            typeof(ProfileRulesetTabItem),
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
