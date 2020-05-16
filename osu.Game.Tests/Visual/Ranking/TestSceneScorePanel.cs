@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -19,13 +18,6 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneScorePanel : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ScorePanel),
-            typeof(PanelState),
-            typeof(ExpandedPanelMiddleContent),
-            typeof(ExpandedPanelTopContent),
-        };
 
         [Test]
         public void TestDRank()
