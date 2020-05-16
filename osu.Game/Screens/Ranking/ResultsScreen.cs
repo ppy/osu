@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,6 +11,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
@@ -31,11 +35,18 @@ namespace osu.Game.Screens.Ranking
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         public readonly ScoreInfo Score;
 
         private readonly bool allowRetry;
 
         private Drawable bottomPanel;
+        private Container<ScorePanel> contractedPanels;
 
         public ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
@@ -52,12 +63,29 @@ namespace osu.Game.Screens.Ranking
             {
                 new ResultsScrollContainer
                 {
-                    Child = new ScorePanel(Score)
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        State = PanelState.Expanded
-                    },
+                        new ScorePanel(Score)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            State = PanelState.Expanded
+                        },
+                        new OsuScrollContainer(Direction.Horizontal)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            ScrollbarVisible = false,
+                            Child = contractedPanels = new FillFlowContainer<ScorePanel>
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Direction = FillDirection.Horizontal,
+                                AutoSizeAxes = Axes.Both
+                            }
+                        }
+                    }
                 },
                 bottomPanel = new Container
                 {
@@ -103,6 +131,25 @@ namespace osu.Game.Screens.Ranking
                     },
                 });
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var req = new GetScoresRequest(Score.Beatmap, Score.Ruleset);
+
+            req.Success += r =>
+            {
+                contractedPanels.ChildrenEnumerable = r.Scores.Select(s => s.CreateScoreInfo(rulesets)).Select(s => new ScorePanel(s)
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    State = PanelState.Contracted
+                });
+            };
+
+            api.Queue(req);
         }
 
         public override void OnEntering(IScreen last)
