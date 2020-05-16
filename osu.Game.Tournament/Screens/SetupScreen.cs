@@ -15,6 +15,8 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
+using osu.Framework.Platform;
+using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,6 +28,7 @@ namespace osu.Game.Tournament.Screens
 
         private LoginOverlay loginOverlay;
         private ActionableInfo resolution;
+        private const string stable_config = "tournament/stable.json";
 
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
@@ -36,7 +39,16 @@ namespace osu.Game.Tournament.Screens
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
         private Bindable<Size> windowSize;
+
+        [Resolved]
+        private Storage storage { get; set; }
+
+        [Resolved]
+        private StableInfo stableInfo { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -62,7 +74,6 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
@@ -74,9 +85,26 @@ namespace osu.Game.Tournament.Screens
                         fileBasedIpc?.LocateStableStorage();
                         reload();
                     },
-                    Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "Not found",
-                    Failing = fileBasedIpc?.Storage == null,
+                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
+                    Failing = fileBasedIpc?.IPCStorage == null,
                     Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation, and that it is registered as the default osu! install."
+                },
+                new ActionableInfo
+                {
+                    Label = "Custom IPC source",
+                    ButtonText = "Change path",
+                    Action = () =>
+                    {
+                        stableInfo.StablePath.BindValueChanged(_ =>
+                        {
+                            fileBasedIpc?.LocateStableStorage();
+                            Schedule(reload);
+                        });
+                        sceneManager.SetScreen(new StablePathSelectScreen());
+                    },
+                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
+                    Failing = fileBasedIpc?.IPCStorage == null,
+                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, you can manually select the desired osu! installation that you want to use."
                 },
                 new ActionableInfo
                 {
