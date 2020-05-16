@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -17,13 +16,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             SelectedMods.Value = Array.Empty<Mod>();
             return new FailPlayer();
         }
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(TestSceneAllRulesetPlayers),
-            typeof(TestPlayer),
-            typeof(Player),
-        };
 
         protected override void AddCheckSteps()
         {

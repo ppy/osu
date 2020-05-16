@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,11 +17,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchSettingsOverlay : MultiplayerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(MatchSettingsOverlay)
-        };
-
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
 
