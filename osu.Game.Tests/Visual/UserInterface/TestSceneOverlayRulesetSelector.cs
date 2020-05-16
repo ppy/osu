@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -20,12 +18,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneOverlayRulesetSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OverlayRulesetSelector),
-            typeof(OverlayRulesetTabItem),
-        };
-
         private readonly OverlayRulesetSelector selector;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 

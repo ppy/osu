@@ -26,11 +26,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private readonly NowPlayingOverlay np;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(BeatSyncedContainer)
-        };
-
         [Cached]
         private MusicController musicController = new MusicController();
 
