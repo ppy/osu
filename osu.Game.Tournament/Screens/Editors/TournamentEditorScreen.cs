@@ -44,6 +44,18 @@ namespace osu.Game.Tournament.Screens.Editors
         [BackgroundDependencyLoader]
         private void load()
         {
+            BackButton.Receptor receptor = new BackButton.Receptor();
+            backButton = new BackButton(receptor)
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Action = () =>
+                {
+                    if (IsSubScreen)
+                        backAction.Invoke();
+                }
+            };
+
             AddRangeInternal(new Drawable[]
             {
                 new Box
@@ -56,6 +68,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding { Bottom = backButton.Height },
                     Child = flow = new FillFlowContainer<TDrawable>
                     {
                         Direction = FillDirection.Vertical,
@@ -64,6 +77,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         Spacing = new Vector2(20)
                     },
                 },
+                backButton,
                 ControlPanel = new ControlPanel
                 {
                     Children = new Drawable[]
@@ -85,17 +99,7 @@ namespace osu.Game.Tournament.Screens.Editors
             });
 
             if (IsSubScreen)
-            {
-                BackButton.Receptor receptor = new BackButton.Receptor();
-                backButton = new BackButton(receptor)
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = () => { backAction.Invoke(); }
-                };
-                AddInternal(backButton);
                 backButton.Show();
-            }
 
             Storage.CollectionChanged += (_, args) =>
             {
