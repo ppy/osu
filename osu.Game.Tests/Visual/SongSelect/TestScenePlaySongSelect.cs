@@ -45,24 +45,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private WorkingBeatmap defaultBeatmap;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Screens.Select.SongSelect),
-            typeof(BeatmapCarousel),
-
-            typeof(CarouselItem),
-            typeof(CarouselGroup),
-            typeof(CarouselGroupEagerSelect),
-            typeof(CarouselBeatmap),
-            typeof(CarouselBeatmapSet),
-
-            typeof(DrawableCarouselItem),
-            typeof(CarouselItemState),
-
-            typeof(DrawableCarouselBeatmap),
-            typeof(DrawableCarouselBeatmapSet),
-        };
-
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]

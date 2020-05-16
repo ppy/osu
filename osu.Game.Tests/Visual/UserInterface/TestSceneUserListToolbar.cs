@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,14 +13,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneUserListToolbar : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(UserSortTabControl),
-            typeof(OverlaySortTabControl<>),
-            typeof(OverlayPanelDisplayStyleControl),
-            typeof(UserListToolbar),
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
