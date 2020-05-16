@@ -107,13 +107,23 @@ namespace osu.Game.Tests.Visual.Ranking
             addPanelStep(score);
         }
 
-        private void addPanelStep(ScoreInfo score) => AddStep("add panel", () =>
+        [Test]
+        public void TestContractedPanel()
+        {
+            var score = createScore();
+            score.Accuracy = 0.925;
+            score.Rank = ScoreRank.A;
+
+            addPanelStep(score, PanelState.Contracted);
+        }
+
+        private void addPanelStep(ScoreInfo score, PanelState state = PanelState.Expanded) => AddStep("add panel", () =>
         {
             Child = new ScorePanel(score)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                State = PanelState.Expanded
+                State = state
             };
         });
 
