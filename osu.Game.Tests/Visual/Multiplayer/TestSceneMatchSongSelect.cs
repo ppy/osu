@@ -23,12 +23,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchSongSelect : MultiplayerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(MatchSongSelect),
-            typeof(MatchBeatmapDetailArea),
-        };
-
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 

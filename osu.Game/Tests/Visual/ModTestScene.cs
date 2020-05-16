@@ -14,11 +14,6 @@ namespace osu.Game.Tests.Visual
     {
         protected sealed override bool HasCustomSteps => true;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ModTestScene)
-        };
-
         protected ModTestScene(Ruleset ruleset)
             : base(ruleset)
         {
