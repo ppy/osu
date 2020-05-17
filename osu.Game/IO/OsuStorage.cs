@@ -84,7 +84,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                fi.Delete();
+                attemptOperation(() => fi.Delete());
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
@@ -92,8 +92,11 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
                     continue;
 
-                dir.Delete(true);
+                attemptOperation(() => dir.Delete(true));
             }
+
+            if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
+                attemptOperation(target.Delete);
         }
 
         private static void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
@@ -106,7 +109,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                attemptCopy(fi, Path.Combine(destination.FullName, fi.Name));
+                attemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
@@ -118,24 +121,27 @@ namespace osu.Game.IO
             }
         }
 
-        private static void attemptCopy(System.IO.FileInfo fileInfo, string destination)
+        /// <summary>
+        /// Attempt an IO operation multiple times and only throw if none of the attempts succeed.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        /// <param name="attempts">The number of attempts (250ms wait between each).</param>
+        private static void attemptOperation(Action action, int attempts = 10)
         {
-            int tries = 5;
-
             while (true)
             {
                 try
                 {
-                    fileInfo.CopyTo(destination, true);
+                    action();
                     return;
                 }
                 catch (Exception)
                 {
-                    if (tries-- == 0)
+                    if (attempts-- == 0)
                         throw;
                 }
 
-                Thread.Sleep(50);
+                Thread.Sleep(250);
             }
         }
     }
