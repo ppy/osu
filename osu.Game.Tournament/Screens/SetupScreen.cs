@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens
                 new ActionableInfo
                 {
                     Label = "Current IPC source",
-                    ButtonText = "Refresh",
+                    ButtonText = "Change source",
                     Action = () =>
                     {
                         stableInfo.StablePath.BindValueChanged(_ =>
