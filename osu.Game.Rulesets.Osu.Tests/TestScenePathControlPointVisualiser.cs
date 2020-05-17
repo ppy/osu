@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -19,13 +16,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestScenePathControlPointVisualiser : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(StringHumanizeExtensions),
-            typeof(PathControlPointPiece),
-            typeof(PathControlPointConnectionPiece)
-        };
-
         private Slider slider;
         private PathControlPointVisualiser visualiser;
 

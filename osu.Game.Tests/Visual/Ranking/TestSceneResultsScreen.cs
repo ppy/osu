@@ -26,14 +26,6 @@ namespace osu.Game.Tests.Visual.Ranking
     {
         private BeatmapManager beatmaps;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ResultsScreen),
-            typeof(RetryButton),
-            typeof(ReplayDownloadButton),
-            typeof(TestPlayer)
-        };
-
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps)
         {

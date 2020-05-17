@@ -2,13 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osu.Game.Rulesets.Catch.Objects.Drawables.Pieces;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -16,22 +13,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneFruitObjects : CatchSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
-        {
-            typeof(CatchHitObject),
-            typeof(Fruit),
-            typeof(FruitPiece),
-            typeof(Droplet),
-            typeof(Banana),
-            typeof(BananaShower),
-            typeof(DrawableCatchHitObject),
-            typeof(DrawableFruit),
-            typeof(DrawableDroplet),
-            typeof(DrawableBanana),
-            typeof(DrawableBananaShower),
-            typeof(Pulp),
-        }).ToList();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
