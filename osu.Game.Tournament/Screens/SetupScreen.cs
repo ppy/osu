@@ -82,7 +82,7 @@ namespace osu.Game.Tournament.Screens
                     ButtonText = "Refresh",
                     Action = () =>
                     {
-                         stableInfo.StablePath.BindValueChanged(_ =>
+                        stableInfo.StablePath.BindValueChanged(_ =>
                         {
                             fileBasedIpc?.LocateStableStorage();
                             Schedule(reload);

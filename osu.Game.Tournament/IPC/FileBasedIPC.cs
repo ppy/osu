@@ -233,6 +233,7 @@ namespace osu.Game.Tournament.IPC
         private string findFromJsonConfig()
         {
             Logger.Log("Trying to find stable through the json config");
+
             if (tournamentStorage.Exists(stable_config))
             {
                 using (Stream stream = tournamentStorage.GetStream(stable_config, FileAccess.Read, FileMode.Open))
@@ -242,7 +243,7 @@ namespace osu.Game.Tournament.IPC
                     return stableInfo.StablePath.Value;
                 }
             }
-            
+
             return null;
         }
 

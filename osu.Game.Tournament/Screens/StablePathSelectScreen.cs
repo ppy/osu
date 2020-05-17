@@ -171,7 +171,7 @@ namespace osu.Game.Tournament.Screens
             else
             {
                 overlay = new DialogOverlay();
-                overlay.Push(new IPCNotFoundDialog());
+                overlay.Push(new IPCErrorDialog("This is an invalid IPC Directory", "Select a directory that contains an osu! stable cutting edge installation and make sure it has an empty ipc.txt file in it."));
                 AddInternal(overlay);
                 Logger.Log("Folder is not an osu! stable CE directory");
                 // Return an error in the picker that the directory does not contain ipc.txt
@@ -182,11 +182,12 @@ namespace osu.Game.Tournament.Screens
         {
             var fileBasedIpc = ipc as FileBasedIPC;
             fileBasedIpc?.LocateStableStorage();
+
             if (fileBasedIpc?.IPCStorage == null)
             {
                 // Could not auto detect
                 overlay = new DialogOverlay();
-                overlay.Push(new IPCNotFoundDialog());
+                overlay.Push(new IPCErrorDialog("Failed to auto detect", "An osu! stable cutting-edge installation could not be auto detected.\nPlease try and manually point to the directory."));
                 AddInternal(overlay);
             }
             else
