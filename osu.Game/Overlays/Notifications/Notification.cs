@@ -162,30 +162,26 @@ namespace osu.Game.Overlays.Notifications
 
         public class NotificationCloseButton : OsuClickableContainer
         {
-            private readonly ShakeContainer shakeContainer;
-
             private Color4 hoverColour;
 
             public NotificationCloseButton()
             {
                 Colour = OsuColour.Gray(0.2f);
 
-                Children = new[]
+                SpriteIcon icon;
+                Child = icon = new SpriteIcon
                 {
-                    shakeContainer = new ShakeContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Icon = FontAwesome.Solid.TimesCircle,
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Icon = FontAwesome.Solid.TimesCircle,
+                    RelativeSizeAxes = Axes.Both,
                 };
 
-                Enabled.ValueChanged += _ => updateState();
+                Enabled.ValueChanged += e =>
+                {
+                    // Hide the button internally to avoid conflicting with notification hovering logic.
+                    icon.FadeTo(e.NewValue ? 1 : 0, 120);
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -194,49 +190,16 @@ namespace osu.Game.Overlays.Notifications
                 hoverColour = colours.Yellow;
             }
 
-            /// <summary>
-            /// Fades the button in (if not visible), shakes it, then fades it back to its original alpha.
-            /// </summary>
-            public void FadeAndShake()
-            {
-                FinishTransforms(true);
-
-                var original = Alpha;
-
-                this.FadeIn(250, Easing.OutExpo)
-                    .Schedule(() => shakeContainer.Shake()).Then()
-                    .FadeTo(original, 250, Easing.InExpo);
-            }
-
             protected override bool OnHover(HoverEvent e)
             {
-                updateState();
+                this.FadeColour(hoverColour, 200);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                updateState();
+                this.FadeColour(OsuColour.Gray(0.2f), 200);
                 base.OnHoverLost(e);
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (!Enabled.Value)
-                    shakeContainer.Shake();
-
-                return base.OnClick(e);
-            }
-
-            private void updateState()
-            {
-                if (!Enabled.Value)
-                {
-                    this.FadeColour(OsuColour.Gray(0.8f), 200);
-                    return;
-                }
-
-                this.FadeColour(IsHovered ? hoverColour : OsuColour.Gray(0.2f), 200);
             }
         }
 

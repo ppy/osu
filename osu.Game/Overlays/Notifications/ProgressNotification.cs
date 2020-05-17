@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -188,13 +187,11 @@ namespace osu.Game.Overlays.Notifications
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
                     if (!cancellable)
-                    {
-                        CloseButton.FadeAndShake();
                         return;
-                    }
 
                     if (CancelRequested?.Invoke() != false)
                         State = ProgressNotificationState.Cancelled;
+
                     break;
             }
         }
