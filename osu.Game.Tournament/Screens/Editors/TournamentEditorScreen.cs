@@ -10,8 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input.Bindings;
-using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Settings;
@@ -20,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
-    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo, IKeyBindingHandler<GlobalAction>
+    public abstract class TournamentEditorScreen<TDrawable, TModel> : TournamentScreen, IProvideVideo
         where TDrawable : Drawable, IModelBacked<TModel>
         where TModel : class, new()
     {
@@ -35,8 +33,6 @@ namespace osu.Game.Tournament.Screens.Editors
 
         private readonly TournamentScreen parentScreen;
         private BackButton backButton;
-
-        private System.Action backAction => () => sceneManager?.SetScreen(parentScreen.GetType());
 
         protected TournamentEditorScreen(TournamentScreen parentScreen = null)
         {
@@ -88,16 +84,12 @@ namespace osu.Game.Tournament.Screens.Editors
 
             if (parentScreen != null)
             {
-                AddInternal(backButton = new BackButton(new BackButton.Receptor())
+                AddInternal(backButton = new BackButton
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     State = { Value = Visibility.Visible },
-                    Action = () =>
-                    {
-                        if (parentScreen != null)
-                            backAction.Invoke();
-                    }
+                    Action = () => sceneManager?.SetScreen(parentScreen.GetType())
                 });
 
                 flow.Padding = new MarginPadding { Bottom = backButton.Height * 2 };
@@ -119,22 +111,6 @@ namespace osu.Game.Tournament.Screens.Editors
 
             foreach (var model in Storage)
                 flow.Add(CreateDrawable(model));
-        }
-
-        public bool OnPressed(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                    backAction?.Invoke();
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(GlobalAction action)
-        {
         }
 
         protected abstract TDrawable CreateDrawable(TModel model);
