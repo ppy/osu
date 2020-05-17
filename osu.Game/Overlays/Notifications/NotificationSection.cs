@@ -24,6 +24,11 @@ namespace osu.Game.Overlays.Notifications
         public int DisplayedCount => notifications.Count(n => !n.WasClosed);
         public int UnreadCount => notifications.Count(n => !n.WasClosed && !n.Read);
 
+        /// <summary>
+        /// The list of notifications added to this section.
+        /// </summary>
+        public IEnumerable<Notification> Notifications => notifications;
+
         public void Add(Notification notification, float position)
         {
             notifications.Insert((int)position, notification);

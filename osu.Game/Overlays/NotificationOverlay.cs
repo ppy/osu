@@ -29,6 +29,13 @@ namespace osu.Game.Overlays
         /// </summary>
         public Func<float> GetToolbarHeight;
 
+        /// <summary>
+        /// Whether there are un-cancellable progress notifications posted in here.
+        /// </summary>
+        public bool HasUnCancellableWork => sections.SelectMany(s => s.Notifications)
+                                                    .OfType<ProgressNotification>()
+                                                    .Any(p => !p.Cancellable);
+
         [BackgroundDependencyLoader]
         private void load()
         {
