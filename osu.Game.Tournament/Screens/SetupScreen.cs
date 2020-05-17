@@ -86,7 +86,7 @@ namespace osu.Game.Tournament.Screens
                         {
                             Schedule(reload);
                         });
-                        sceneManager.SetScreen(new StablePathSelectScreen());
+                        sceneManager?.SetScreen(new StablePathSelectScreen());
                     },
                     Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.IPCStorage == null,
