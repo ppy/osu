@@ -6,8 +6,6 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Overlays.BeatmapSet.Buttons;
-using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System;
@@ -20,30 +18,6 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Header),
-            typeof(ScoreTable),
-            typeof(ScoreTableRowBackground),
-            typeof(DrawableTopScore),
-            typeof(ScoresContainer),
-            typeof(AuthorInfo),
-            typeof(BasicStats),
-            typeof(BeatmapPicker),
-            typeof(Details),
-            typeof(HeaderDownloadButton),
-            typeof(FavouriteButton),
-            typeof(Header),
-            typeof(HeaderButton),
-            typeof(Info),
-            typeof(PreviewButton),
-            typeof(SuccessRate),
-            typeof(BeatmapAvailability),
-            typeof(BeatmapRulesetSelector),
-            typeof(BeatmapRulesetTabItem),
-            typeof(NotSupporterPlaceholder)
-        };
 
         protected override bool UseOnlineAPI => true;
 

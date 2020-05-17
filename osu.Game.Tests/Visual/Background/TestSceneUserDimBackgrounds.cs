@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -39,15 +37,6 @@ namespace osu.Game.Tests.Visual.Background
     [TestFixture]
     public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ScreenWithBeatmapBackground),
-            typeof(PlayerLoader),
-            typeof(Player),
-            typeof(UserDimContainer),
-            typeof(OsuScreen)
-        };
-
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
         private LoadBlockingTestPlayer player;
