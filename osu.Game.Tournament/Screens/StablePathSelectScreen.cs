@@ -43,75 +43,107 @@ namespace osu.Game.Tournament.Screens
         private void load(Storage storage, OsuColour colours)
         {
             // begin selection in the parent directory of the current storage location
-            var initialPath = new DirectoryInfo(stableInfo.StablePath.Value).FullName;
+            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
 
-            AddInternal(new Container
+            if (!string.IsNullOrEmpty(stableInfo.StablePath.Value))
             {
-                Masking = true,
-                CornerRadius = 10,
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(0.5f, 0.8f),
-                Children = new Drawable[]
+                // If the original path info for osu! stable is not empty, set it to the parent directory of that location
+                initialPath = new DirectoryInfo(stableInfo.StablePath.Value).Parent?.FullName;
+            }
+
+            AddRangeInternal(new Drawable[]
+            {
+                new Container
                 {
-                    new Box
+                    Masking = true,
+                    CornerRadius = 10,
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(0.5f, 0.8f),
+                    Children = new Drawable[]
                     {
-                        Colour = colours.GreySeafoamDark,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
+                        new Box
                         {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Relative, 0.8f),
-                            new Dimension(),
+                            Colour = colours.GreySeafoamDark,
+                            RelativeSizeAxes = Axes.Both,
                         },
-                        Content = new[]
+                        new GridContainer
                         {
-                            new Drawable[]
+                            RelativeSizeAxes = Axes.Both,
+                            RowDimensions = new[]
                             {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = "Please select a new location",
-                                    Font = OsuFont.Default.With(size: 40)
-                                },
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Relative, 0.8f),
+                                new Dimension(),
                             },
-                            new Drawable[]
+                            Content = new[]
                             {
-                                directorySelector = new DirectorySelector(initialPath)
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = "Please select a new location",
+                                        Font = OsuFont.Default.With(size: 40)
+                                    },
+                                },
+                                new Drawable[]
+                                {
+                                    directorySelector = new DirectorySelector(initialPath)
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    }
+                                },
+                                new Drawable[]
+                                {
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(20),
+                                        Children = new Drawable[]
+                                        {
+                                            new TriangleButton
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Width = 300,
+                                                Text = "Select stable path",
+                                                Action = () => changePath(storage)
+                                            },
+                                            new TriangleButton
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Width = 300,
+                                                Text = "Auto detect",
+                                                Action = autoDetect
+                                            },
+                                        }
+                                    }
                                 }
-                            },
-                            new Drawable[]
-                            {
-                                new TriangleButton
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Width = 300,
-                                    Text = "Select stable path",
-                                    Action = () => { start(storage); }
-                                },
                             }
                         }
-                    }
+                    },
+                },
+                new BackButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    State = { Value = Visibility.Visible },
+                    Action = () => sceneManager?.SetScreen(typeof(SetupScreen))
                 }
             });
         }
 
-        private static bool checkExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
-
-        private void start(Storage storage)
+        private void changePath(Storage storage)
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
 
-            if (checkExists(target))
+            if (File.Exists(Path.Combine(target, "ipc.txt")))
             {
                 stableInfo.StablePath.Value = target;
 
@@ -143,6 +175,23 @@ namespace osu.Game.Tournament.Screens
                 AddInternal(overlay);
                 Logger.Log("Folder is not an osu! stable CE directory");
                 // Return an error in the picker that the directory does not contain ipc.txt
+            }
+        }
+
+        private void autoDetect()
+        {
+            var fileBasedIpc = ipc as FileBasedIPC;
+            fileBasedIpc?.LocateStableStorage();
+            if (fileBasedIpc?.IPCStorage == null)
+            {
+                // Could not auto detect
+                overlay = new DialogOverlay();
+                overlay.Push(new IPCNotFoundDialog());
+                AddInternal(overlay);
+            }
+            else
+            {
+                sceneManager?.SetScreen(typeof(SetupScreen));
             }
         }
     }
