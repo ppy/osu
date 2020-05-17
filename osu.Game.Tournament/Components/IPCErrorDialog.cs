@@ -6,14 +6,13 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Tournament.Components
 {
-    public class IPCNotFoundDialog : PopupDialog
+    public class IPCErrorDialog : PopupDialog
     {
-        public IPCNotFoundDialog()
+        public IPCErrorDialog(string headerText, string bodyText)
         {
-            BodyText = "Select a directory that contains an osu! Cutting Edge installation";
-
-            Icon = FontAwesome.Regular.Angry;
-            HeaderText = @"This is an invalid IPC Directory!";
+            Icon = FontAwesome.Regular.SadTear;
+            HeaderText = headerText;
+            BodyText = bodyText;
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
