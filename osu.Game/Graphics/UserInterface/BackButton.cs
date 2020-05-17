@@ -29,7 +29,11 @@ namespace osu.Game.Graphics.UserInterface
                 Action = () => Action?.Invoke()
             };
 
-            Add(receptor ??= new Receptor());
+            if (receptor == null)
+            {
+                // if a receptor wasn't provided, create our own locally.
+                Add(receptor = new Receptor());
+            }
 
             receptor.OnBackPressed = () => button.Click();
         }
