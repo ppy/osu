@@ -142,6 +142,7 @@ namespace osu.Game.Tournament.Screens
         private void changePath(Storage storage)
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
+            Logger.Log($"Changing Stable CE location to {target}");
 
             if (File.Exists(Path.Combine(target, "ipc.txt")))
             {
@@ -161,6 +162,8 @@ namespace osu.Game.Tournament.Screens
                             }));
                     }
 
+                    var fileBasedIpc = ipc as FileBasedIPC;
+                    fileBasedIpc?.LocateStableStorage();
                     sceneManager?.SetScreen(typeof(SetupScreen));
                 }
                 catch (Exception e)
@@ -180,6 +183,7 @@ namespace osu.Game.Tournament.Screens
 
         private void autoDetect()
         {
+            stableInfo.StablePath.Value = string.Empty; // This forces findStablePath() to look elsewhere.
             var fileBasedIpc = ipc as FileBasedIPC;
             fileBasedIpc?.LocateStableStorage();
 
