@@ -232,16 +232,15 @@ namespace osu.Game.Tournament.IPC
 
         private string findFromJsonConfig()
         {
-            Logger.Log("Trying to find stable through the json config");
-
-            if (tournamentStorage.Exists(stable_config))
+            try
             {
-                using (Stream stream = tournamentStorage.GetStream(stable_config, FileAccess.Read, FileMode.Open))
-                using (var sr = new StreamReader(stream))
-                {
-                    stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
+                Logger.Log("Trying to find stable through the json config");
+
+                if (!string.IsNullOrEmpty(stableInfo.StablePath.Value))
                     return stableInfo.StablePath.Value;
-                }
+            }
+            catch
+            {
             }
 
             return null;

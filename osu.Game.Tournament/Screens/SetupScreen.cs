@@ -84,7 +84,6 @@ namespace osu.Game.Tournament.Screens
                     {
                         stableInfo.StablePath.BindValueChanged(_ =>
                         {
-                            fileBasedIpc?.LocateStableStorage();
                             Schedule(reload);
                         });
                         sceneManager.SetScreen(new StablePathSelectScreen());
