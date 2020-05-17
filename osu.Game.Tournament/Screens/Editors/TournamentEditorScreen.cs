@@ -70,13 +70,13 @@ namespace osu.Game.Tournament.Screens.Editors
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Bottom = backButton.Height },
                     Child = flow = new FillFlowContainer<TDrawable>
                     {
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(20)
+                        Spacing = new Vector2(20),
+                        Padding = new MarginPadding { Bottom = backButton.Height * 2 },
                     },
                 },
                 backButton,
