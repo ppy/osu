@@ -82,20 +82,7 @@ namespace osu.Game.Tournament.Screens
                     ButtonText = "Refresh",
                     Action = () =>
                     {
-                        fileBasedIpc?.LocateStableStorage();
-                        reload();
-                    },
-                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
-                    Failing = fileBasedIpc?.IPCStorage == null,
-                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation, and that it is registered as the default osu! install."
-                },
-                new ActionableInfo
-                {
-                    Label = "Custom IPC source",
-                    ButtonText = "Change path",
-                    Action = () =>
-                    {
-                        stableInfo.StablePath.BindValueChanged(_ =>
+                         stableInfo.StablePath.BindValueChanged(_ =>
                         {
                             fileBasedIpc?.LocateStableStorage();
                             Schedule(reload);
@@ -104,7 +91,7 @@ namespace osu.Game.Tournament.Screens
                     },
                     Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.IPCStorage == null,
-                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, you can manually select the desired osu! installation that you want to use."
+                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
                 },
                 new ActionableInfo
                 {
