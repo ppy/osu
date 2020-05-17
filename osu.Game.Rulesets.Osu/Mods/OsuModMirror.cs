@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
-            slider.NestedHitObjects.OfType<RepeatPoint>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
 
             foreach (var point in slider.Path.ControlPoints)
                 point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
