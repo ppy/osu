@@ -7,7 +7,7 @@ using osu.Framework.Bindables;
 namespace osu.Game.Tournament.Models
 {
     /// <summary>
-    /// Holds the complete data required to operate the tournament system.
+    /// Holds the path to locate the osu! stable cutting-edge installation.
     /// </summary>
     [Serializable]
     public class StableInfo
