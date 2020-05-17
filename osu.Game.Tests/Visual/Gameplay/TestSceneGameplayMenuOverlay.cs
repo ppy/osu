@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,8 +19,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [Description("player pause/fail screens")]
     public class TestSceneGameplayMenuOverlay : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseOverlay) };
-
         private FailOverlay failOverlay;
         private PauseOverlay pauseOverlay;
 

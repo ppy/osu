@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
@@ -27,8 +26,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneScrollingHitObjects : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
-
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
