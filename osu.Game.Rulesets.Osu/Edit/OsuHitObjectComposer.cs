@@ -9,12 +9,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -37,27 +32,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
-        public override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
-
-        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case DrawableHitCircle circle:
-                    return new HitCircleSelectionBlueprint(circle);
-
-                case DrawableSlider slider:
-                    return new SliderSelectionBlueprint(slider);
-
-                case DrawableSpinner spinner:
-                    return new SpinnerSelectionBlueprint(spinner);
-            }
-
-            return base.CreateBlueprintFor(hitObject);
-        }
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer(HitObjects);
 
         protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
         {
+            if (BlueprintContainer.CurrentTool is SpinnerCompositionTool)
+                return null;
+
             var objects = selectedHitObjects.ToList();
 
             if (objects.Count == 0)
@@ -91,10 +72,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (sourceIndex == -1)
                 return null;
 
-            OsuHitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
+            HitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
 
             int targetIndex = sourceIndex + targetOffset;
-            OsuHitObject targetObject = null;
+            HitObject targetObject = null;
 
             // Keep advancing the target object while its start time falls before the end time of the source object
             while (true)
@@ -111,7 +92,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 targetIndex++;
             }
 
-            return new OsuDistanceSnapGrid(sourceObject, targetObject);
+            if (sourceObject is Spinner)
+                return null;
+
+            return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject);
         }
     }
 }

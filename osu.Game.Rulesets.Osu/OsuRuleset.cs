@@ -32,13 +32,13 @@ using System;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuRuleset : Ruleset
+    public class OsuRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new OsuScoreProcessor(beatmap);
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
@@ -113,7 +113,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
-                        new OsuModSpunOut(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -140,6 +139,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
+                        new OsuModSpunOut(),
                     };
 
                 case ModType.Fun:
@@ -176,11 +176,13 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Clicking circles";
+
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
 
-        public override int? LegacyID => 0;
+        public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 

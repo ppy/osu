@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Objects.Legacy
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (split.Length > 7)
                 {
-                    length = Math.Max(0, Parsing.ParseDouble(split[7]));
+                    length = Math.Max(0, Parsing.ParseDouble(split[7], Parsing.MAX_COORDINATE_VALUE));
                     if (length == 0)
                         length = null;
                 }
@@ -409,21 +409,33 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        private class LegacyHitSampleInfo : HitSampleInfo
+        internal class LegacyHitSampleInfo : HitSampleInfo
         {
+            private int customSampleBank;
+
             public int CustomSampleBank
             {
+                get => customSampleBank;
                 set
                 {
-                    if (value > 1)
+                    customSampleBank = value;
+
+                    if (value >= 2)
                         Suffix = value.ToString();
                 }
             }
         }
 
-        private class FileHitSampleInfo : HitSampleInfo
+        private class FileHitSampleInfo : LegacyHitSampleInfo
         {
             public string Filename;
+
+            public FileHitSampleInfo()
+            {
+                // Make sure that the LegacyBeatmapSkin does not fall back to the user skin.
+                // Note that this does not change the lookup names, as they are overridden locally.
+                CustomSampleBank = 1;
+            }
 
             public override IEnumerable<string> LookupNames => new[]
             {

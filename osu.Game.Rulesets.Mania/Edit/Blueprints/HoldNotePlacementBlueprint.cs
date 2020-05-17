@@ -3,9 +3,11 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -46,13 +48,22 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             bodyPiece.Height = (bottomPosition - topPosition).Y;
         }
 
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return;
+
+            base.OnMouseUp(e);
+            EndPlacement(true);
+        }
+
         private double originalStartTime;
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
             base.UpdatePosition(screenSpacePosition);
 
-            if (PlacementBegun)
+            if (PlacementActive)
             {
                 var endTime = TimeAt(screenSpacePosition);
 

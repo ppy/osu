@@ -19,18 +19,20 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override string Header => "Skin";
 
-        public override IconUsage Icon => FontAwesome.Solid.PaintBrush;
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.PaintBrush
+        };
 
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
-        private SkinManager skins;
+        [Resolved]
+        private SkinManager skins { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skins)
+        private void load(OsuConfigManager config)
         {
-            this.skins = skins;
-
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {

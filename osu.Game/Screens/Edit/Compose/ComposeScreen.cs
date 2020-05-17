@@ -25,13 +25,13 @@ namespace osu.Game.Screens.Edit.Compose
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, EditorBeatmap.PlayableBeatmap));
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(composer));
         }
 
-        protected override Drawable CreateTimelineContent() => composer == null ? base.CreateTimelineContent() : new TimelineHitObjectDisplay(composer.EditorBeatmap);
+        protected override Drawable CreateTimelineContent() => composer == null ? base.CreateTimelineContent() : new TimelineBlueprintContainer();
     }
 }

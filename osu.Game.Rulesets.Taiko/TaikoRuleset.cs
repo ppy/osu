@@ -21,16 +21,22 @@ using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
+using osu.Game.Rulesets.Taiko.Skinning;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    public class TaikoRuleset : Ruleset
+    public class TaikoRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new TaikoScoreProcessor(beatmap);
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
 
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TaikoHealthProcessor();
+
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new TaikoLegacySkinTransformer(source);
 
         public const string SHORT_NAME = "taiko";
 
@@ -44,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new TaikoModNightcore();
@@ -108,6 +114,7 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Conversion:
                     return new Mod[]
                     {
+                        new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
                     };
 
@@ -133,13 +140,15 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Bashing drums";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new TaikoPerformanceCalculator(this, beatmap, score);
 
-        public override int? LegacyID => 1;
+        public int LegacyID => 1;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
     }

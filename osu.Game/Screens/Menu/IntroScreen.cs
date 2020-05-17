@@ -7,7 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Menu
 
             if (!MenuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
+                var sets = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
                 if (sets.Count > 0)
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
             }
@@ -96,14 +96,12 @@ namespace osu.Game.Screens.Menu
             Track = introBeatmap.Track;
         }
 
-        public override bool OnExiting(IScreen next) => !DidLoadMenu;
-
         public override void OnResuming(IScreen last)
         {
             this.FadeIn(300);
 
             double fadeOutTime = exit_delay;
-            //we also handle the exit transition.
+            // we also handle the exit transition.
             if (MenuVoice.Value)
                 seeya.Play();
             else

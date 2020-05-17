@@ -30,13 +30,14 @@ namespace osu.Game.Overlays
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ChannelManager channelManager;
+        [Resolved]
+        private ChannelManager channelManager { get; set; }
 
         private Container<DrawableChannel> currentChannelContainer;
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
-        private LoadingAnimation loading;
+        private LoadingSpinner loading;
 
         private FocusedTextBox textbox;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             const float padding = 5;
 
@@ -145,7 +146,7 @@ namespace osu.Game.Overlays
                                         }
                                     }
                                 },
-                                loading = new LoadingAnimation(),
+                                loading = new LoadingSpinner(),
                             }
                         },
                         tabsArea = new TabsArea
@@ -171,6 +172,7 @@ namespace osu.Game.Overlays
                                     d.Origin = Anchor.BottomLeft;
                                     d.RelativeSizeAxes = Axes.Both;
                                     d.OnRequestLeave = channelManager.LeaveChannel;
+                                    d.IsSwitchable = true;
                                 }),
                             }
                         },
@@ -207,8 +209,6 @@ namespace osu.Game.Overlays
             }, true);
 
             chatBackground.Colour = colours.ChatBlue;
-
-            this.channelManager = channelManager;
 
             loading.Show();
 
@@ -278,6 +278,10 @@ namespace osu.Game.Overlays
                 currentChannelContainer.Clear(false);
                 currentChannelContainer.Add(loaded);
             }
+
+            // mark channel as read when channel switched
+            if (e.NewValue.Messages.Any())
+                channelManager.MarkChannelAsRead(e.NewValue);
         }
 
         private float startDragChatHeight;
@@ -294,7 +298,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (isDragging)
             {
@@ -306,20 +310,20 @@ namespace osu.Game.Overlays
 
                 ChatHeight.Value = targetChatHeight;
             }
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         private void selectTab(int index)
         {
-            var channel = ChannelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            var channel = ChannelTabControl.Items
+                                           .Where(tab => !(tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                                           .ElementAtOrDefault(index);
+            if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
 
@@ -354,7 +358,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            //this is necessary as textbox is masked away and therefore can't get focus :(
+            // this is necessary as textbox is masked away and therefore can't get focus :(
             textbox.TakeFocus();
             base.OnFocus(e);
         }

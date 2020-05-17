@@ -14,7 +14,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        public Storyboard Storyboard { get; private set; }
+        public Storyboard Storyboard { get; }
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Storyboards.Drawables
 
             AddInternal(Content = new Container<DrawableStoryboardLayer>
             {
-                Size = new Vector2(640, 480),
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
@@ -75,7 +75,7 @@ namespace osu.Game.Storyboards.Drawables
         private void updateLayerVisibility()
         {
             foreach (var layer in Children)
-                layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
+                layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
     }
 }

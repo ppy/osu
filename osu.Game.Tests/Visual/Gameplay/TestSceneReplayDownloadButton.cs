@@ -7,11 +7,9 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Users;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Ranking.Pages;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -20,11 +18,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         [Resolved]
         private RulesetStore rulesets { get; set; }
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ReplayDownloadButton)
-        };
 
         private TestReplayDownloadButton downloadButton;
 

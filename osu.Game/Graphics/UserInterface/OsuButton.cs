@@ -129,10 +129,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected virtual SpriteText CreateText() => new OsuSpriteText

@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public PassThroughInputManager KeyBindingInputManager;
 
-        public override double GameplayStartTime => Objects.First().StartTime - 2000;
+        public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
         private readonly Lazy<Playfield> playfield;
 
@@ -72,10 +72,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
-        /// <summary>
-        /// Place to put drawables above hit objects but below UI.
-        /// </summary>
-        public Container Overlays { get; private set; }
+        public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
@@ -108,7 +107,7 @@ namespace osu.Game.Rulesets.UI
         /// The mods which are to be applied.
         /// </summary>
         [Cached(typeof(IReadOnlyList<Mod>))]
-        private readonly IReadOnlyList<Mod> mods;
+        protected readonly IReadOnlyList<Mod> Mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -130,7 +129,7 @@ namespace osu.Game.Rulesets.UI
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
 
             Beatmap = tBeatmap;
-            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
+            Mods = mods?.ToArray() ?? Array.Empty<Mod>();
 
             RelativeSizeAxes = Axes.Both;
 
@@ -159,7 +158,8 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(textureStore);
 
                 localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
-                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
+                localSampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+                dependencies.CacheAs<ISampleStore>(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
             }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
@@ -185,12 +185,16 @@ namespace osu.Game.Rulesets.UI
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
                     FrameStablePlayback = FrameStablePlayback,
-                    Child = KeyBindingInputManager
-                        .WithChild(CreatePlayfieldAdjustmentContainer()
-                            .WithChild(Playfield)
-                        )
+                    Children = new Drawable[]
+                    {
+                        FrameStableComponents,
+                        KeyBindingInputManager
+                            .WithChild(CreatePlayfieldAdjustmentContainer()
+                                .WithChild(Playfield)
+                            ),
+                        Overlays,
+                    }
                 },
-                Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
@@ -200,7 +204,7 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(mods, config);
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken);
         }
@@ -220,7 +224,7 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
         }
 
@@ -257,6 +261,21 @@ namespace osu.Game.Rulesets.UI
             drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
 
             Playfield.Add(drawableObject);
+        }
+
+        public override void SetRecordTarget(Replay recordingReplay)
+        {
+            if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
+
+            var recorder = CreateReplayRecorder(recordingReplay);
+
+            if (recorder == null)
+                return;
+
+            recorder.ScreenSpaceToGamefield = Playfield.ScreenSpaceToGamefield;
+
+            recordingInputManager.Recorder = recorder;
         }
 
         public override void SetReplayScore(Score replayScore)
@@ -298,6 +317,8 @@ namespace osu.Game.Rulesets.UI
         protected abstract PassThroughInputManager CreateInputManager();
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
+
+        protected virtual ReplayRecorder CreateReplayRecorder(Replay replay) => null;
 
         /// <summary>
         /// Creates a Playfield.
@@ -386,6 +407,16 @@ namespace osu.Game.Rulesets.UI
         public abstract Playfield Playfield { get; }
 
         /// <summary>
+        /// Content to be placed above hitobjects. Will be affected by frame stability.
+        /// </summary>
+        public abstract Container Overlays { get; }
+
+        /// <summary>
+        /// Components to be run potentially multiple times in line with frame-stable gameplay.
+        /// </summary>
+        public abstract Container FrameStableComponents { get; }
+
+        /// <summary>
         /// The frame-stable clock which is being used for playfield display.
         /// </summary>
         public abstract GameplayClock FrameStableClock { get; }
@@ -457,10 +488,21 @@ namespace osu.Game.Rulesets.UI
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
+        /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
+        /// </summary>
+        public virtual bool AllowGameplayOverlays => true;
+
+        /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
         public abstract void SetReplayScore(Score replayScore);
+
+        /// <summary>
+        /// Sets a replay to be used to record gameplay.
+        /// </summary>
+        /// <param name="recordingReplay">The target to be recorded to.</param>
+        public abstract void SetRecordTarget(Replay recordingReplay);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.

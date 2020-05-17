@@ -5,7 +5,9 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using System;
+using System.Collections.Generic;
 using osu.Game.Configuration;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -19,13 +21,19 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override IconUsage Icon => FontAwesome.Solid.Hammer;
+        public override IconUsage? Icon => FontAwesome.Solid.Hammer;
 
         public override double ScoreMultiplier => 1.0;
 
+        public override bool RequiresConfiguration => true;
+
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
-        [SettingSource("Drain Rate", "Override a beatmap's set HP.")]
+        protected const int FIRST_SETTING_ORDER = 1;
+
+        protected const int LAST_SETTING_ORDER = 2;
+
+        [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER)]
         public BindableNumber<float> DrainRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -35,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        [SettingSource("Overall Difficulty", "Override a beatmap's set OD.")]
+        [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -45,18 +53,33 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
+        public override string SettingDescription
+        {
+            get
+            {
+                string drainRate = DrainRate.IsDefault ? string.Empty : $"HP {DrainRate.Value:N1}";
+                string overallDifficulty = OverallDifficulty.IsDefault ? string.Empty : $"OD {OverallDifficulty.Value:N1}";
+
+                return string.Join(", ", new[]
+                {
+                    drainRate,
+                    overallDifficulty
+                }.Where(s => !string.IsNullOrEmpty(s)));
+            }
+        }
+
         private BeatmapDifficulty difficulty;
 
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
         {
             if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
             {
-                this.difficulty = difficulty;
                 TransferSettings(difficulty);
+                this.difficulty = difficulty;
             }
-            else
-                ApplySettings(difficulty);
         }
+
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty) => ApplySettings(difficulty);
 
         /// <summary>
         /// Transfer initial settings from the beatmap to settings.
@@ -64,8 +87,31 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="difficulty">The beatmap's initial values.</param>
         protected virtual void TransferSettings(BeatmapDifficulty difficulty)
         {
-            DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
-            OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
+            TransferSetting(DrainRate, difficulty.DrainRate);
+            TransferSetting(OverallDifficulty, difficulty.OverallDifficulty);
+        }
+
+        private readonly Dictionary<IBindable, bool> userChangedSettings = new Dictionary<IBindable, bool>();
+
+        /// <summary>
+        /// Transfer a setting from <see cref="BeatmapDifficulty"/> to a configuration bindable.
+        /// Only performs the transfer if the user is not currently overriding.
+        /// </summary>
+        protected void TransferSetting<T>(BindableNumber<T> bindable, T beatmapDefault)
+            where T : struct, IComparable<T>, IConvertible, IEquatable<T>
+        {
+            bindable.UnbindEvents();
+
+            userChangedSettings.TryAdd(bindable, false);
+
+            bindable.Default = beatmapDefault;
+
+            // users generally choose a difficulty setting and want it to stick across multiple beatmap changes.
+            // we only want to value transfer if the user hasn't changed the value previously.
+            if (!userChangedSettings[bindable])
+                bindable.Value = beatmapDefault;
+
+            bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
         }
 
         /// <summary>

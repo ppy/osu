@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
 
-        private readonly Lazy<Storage> localStorage;
+        private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
         private readonly Lazy<DatabaseContextFactory> contextFactory;
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual
 
         protected OsuTestScene()
         {
-            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            RecycleLocalStorage();
             contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {
                 var factory = new DatabaseContextFactory(LocalStorage);
@@ -104,8 +104,25 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
+        public virtual void RecycleLocalStorage()
+        {
+            if (localStorage?.IsValueCreated == true)
+            {
+                try
+                {
+                    localStorage.Value.DeleteDirectory(".");
+                }
+                catch
+                {
+                    // we don't really care if this fails; it will just leave folders lying around from test runs.
+                }
+            }
+
+            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+        }
+
         [Resolved]
-        private AudioManager audio { get; set; }
+        protected AudioManager Audio { get; private set; }
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
@@ -113,7 +130,7 @@ namespace osu.Game.Tests.Visual
             CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
-            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, audio);
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -131,17 +148,7 @@ namespace osu.Game.Tests.Visual
             if (contextFactory.IsValueCreated)
                 contextFactory.Value.ResetDatabase();
 
-            if (localStorage.IsValueCreated)
-            {
-                try
-                {
-                    localStorage.Value.DeleteDirectory(".");
-                }
-                catch
-                {
-                    // we don't really care if this fails; it will just leave folders lying around from test runs.
-                }
-            }
+            RecycleLocalStorage();
         }
 
         protected override ITestSceneTestRunner CreateRunner() => new OsuTestSceneTestRunner();
@@ -172,7 +179,7 @@ namespace osu.Game.Tests.Visual
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
             /// <param name="length">The length of the returned virtual track.</param>
             public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
-                : base(beatmap, storyboard)
+                : base(beatmap, storyboard, audio)
             {
                 if (referenceClock != null)
                 {
@@ -184,9 +191,9 @@ namespace osu.Game.Tests.Visual
                     track = audio?.Tracks.GetVirtual(length);
             }
 
-            protected override void Dispose(bool isDisposing)
+            ~ClockBackedTestWorkingBeatmap()
             {
-                base.Dispose(isDisposing);
+                // Remove the track store from the audio manager
                 store?.Dispose();
             }
 
@@ -224,14 +231,7 @@ namespace osu.Game.Tests.Visual
             {
                 private readonly IFrameBasedClock referenceClock;
 
-                private readonly ManualClock clock = new ManualClock();
-
                 private bool running;
-
-                /// <summary>
-                /// Local offset added to the reference clock to resolve correct time.
-                /// </summary>
-                private double offset;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock)
                 {
@@ -241,10 +241,10 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = Math.Clamp(seek, 0, Length);
+                    accumulated = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
-                    return offset == seek;
+                    return accumulated == seek;
                 }
 
                 public override void Start()
@@ -263,9 +263,6 @@ namespace osu.Game.Tests.Visual
                     if (running)
                     {
                         running = false;
-                        // on stopping, the current value should be transferred out of the clock, as we can no longer rely on
-                        // the referenceClock (which will still be counting time).
-                        offset = clock.CurrentTime;
                         lastReferenceTime = null;
                     }
                 }
@@ -274,7 +271,9 @@ namespace osu.Game.Tests.Visual
 
                 private double? lastReferenceTime;
 
-                public override double CurrentTime => clock.CurrentTime;
+                private double accumulated;
+
+                public override double CurrentTime => Math.Min(accumulated, Length);
 
                 protected override void UpdateState()
                 {
@@ -284,17 +283,11 @@ namespace osu.Game.Tests.Visual
                     {
                         double refTime = referenceClock.CurrentTime;
 
-                        if (!lastReferenceTime.HasValue)
-                        {
-                            // if the clock just started running, the current value should be transferred to the offset
-                            // (to zero the progression of time).
-                            offset -= refTime;
-                        }
+                        if (lastReferenceTime.HasValue)
+                            accumulated += (refTime - lastReferenceTime.Value) * Rate;
 
                         lastReferenceTime = refTime;
                     }
-
-                    clock.CurrentTime = Math.Min((lastReferenceTime ?? 0) + offset, Length);
 
                     if (CurrentTime >= Length)
                     {

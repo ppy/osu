@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osuTK.Input;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -55,7 +56,7 @@ namespace osu.Game.Graphics.Cursor
                 if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {
                     Vector2 offset = e.MousePosition - positionMouseDown;
-                    float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
+                    float degrees = MathUtils.RadiansToDegrees(MathF.Atan2(-offset.X, offset.Y)) + 24.3f;
 
                     // Always rotate in the direction of least distance
                     float diff = (degrees - activeCursor.Rotation) % 360;
@@ -91,7 +92,7 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
             {
@@ -106,7 +107,7 @@ namespace osu.Game.Graphics.Cursor
                 dragRotationState = DragRotationState.NotDragging;
             }
 
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void PopIn()

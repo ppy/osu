@@ -26,34 +26,34 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 Assert.IsTrue(storyboard.HasDrawable);
-                Assert.AreEqual(4, storyboard.Layers.Count());
+                Assert.AreEqual(5, storyboard.Layers.Count());
 
                 StoryboardLayer background = storyboard.Layers.FirstOrDefault(l => l.Depth == 3);
                 Assert.IsNotNull(background);
                 Assert.AreEqual(16, background.Elements.Count);
-                Assert.IsTrue(background.EnabledWhenFailing);
-                Assert.IsTrue(background.EnabledWhenPassing);
+                Assert.IsTrue(background.VisibleWhenFailing);
+                Assert.IsTrue(background.VisibleWhenPassing);
                 Assert.AreEqual("Background", background.Name);
 
                 StoryboardLayer fail = storyboard.Layers.FirstOrDefault(l => l.Depth == 2);
                 Assert.IsNotNull(fail);
                 Assert.AreEqual(0, fail.Elements.Count);
-                Assert.IsTrue(fail.EnabledWhenFailing);
-                Assert.IsFalse(fail.EnabledWhenPassing);
+                Assert.IsTrue(fail.VisibleWhenFailing);
+                Assert.IsFalse(fail.VisibleWhenPassing);
                 Assert.AreEqual("Fail", fail.Name);
 
                 StoryboardLayer pass = storyboard.Layers.FirstOrDefault(l => l.Depth == 1);
                 Assert.IsNotNull(pass);
                 Assert.AreEqual(0, pass.Elements.Count);
-                Assert.IsFalse(pass.EnabledWhenFailing);
-                Assert.IsTrue(pass.EnabledWhenPassing);
+                Assert.IsFalse(pass.VisibleWhenFailing);
+                Assert.IsTrue(pass.VisibleWhenPassing);
                 Assert.AreEqual("Pass", pass.Name);
 
                 StoryboardLayer foreground = storyboard.Layers.FirstOrDefault(l => l.Depth == 0);
                 Assert.IsNotNull(foreground);
                 Assert.AreEqual(151, foreground.Elements.Count);
-                Assert.IsTrue(foreground.EnabledWhenFailing);
-                Assert.IsTrue(foreground.EnabledWhenPassing);
+                Assert.IsTrue(foreground.VisibleWhenFailing);
+                Assert.IsTrue(foreground.VisibleWhenPassing);
                 Assert.AreEqual("Foreground", foreground.Name);
 
                 int spriteCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSprite));
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(123456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+                Assert.AreEqual(3456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
             }
         }
     }

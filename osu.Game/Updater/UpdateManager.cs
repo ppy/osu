@@ -34,12 +34,14 @@ namespace osu.Game.Updater
 
             if (game.IsDeployedBuild && version != lastVersion)
             {
-                config.Set(OsuSetting.Version, version);
-
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
                     Notifications.Post(new UpdateCompleteNotification(version));
             }
+
+            // debug / local compilations will reset to a non-release string.
+            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
+            config.Set(OsuSetting.Version, version);
         }
 
         private class UpdateCompleteNotification : SimpleNotification

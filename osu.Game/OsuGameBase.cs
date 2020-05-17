@@ -29,6 +29,7 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -45,6 +46,8 @@ namespace osu.Game
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
         public const string CLIENT_STREAM_NAME = "lazer";
+
+        public const int SAMPLE_CONCURRENCY = 6;
 
         protected OsuConfigManager LocalConfig;
 
@@ -96,7 +99,7 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
-        public string Version
+        public virtual string Version
         {
             get
             {
@@ -125,9 +128,11 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
+            Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+
+            dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
@@ -137,28 +142,22 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
-            AddFont(Resources, @"Fonts/Exo2.0-Medium");
-            AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
+
+            AddFont(Resources, @"Fonts/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Bold");
 
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
 
-            AddFont(Resources, @"Fonts/Exo2.0-Regular");
-            AddFont(Resources, @"Fonts/Exo2.0-RegularItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-SemiBold");
-            AddFont(Resources, @"Fonts/Exo2.0-SemiBoldItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Bold");
-            AddFont(Resources, @"Fonts/Exo2.0-BoldItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Light");
-            AddFont(Resources, @"Fonts/Exo2.0-LightItalic");
-            AddFont(Resources, @"Fonts/Exo2.0-Black");
-            AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
-
-            AddFont(Resources, @"Fonts/Venera");
             AddFont(Resources, @"Fonts/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera-Medium");
+            AddFont(Resources, @"Fonts/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera-Black");
+
+            Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             runMigrations();
 
@@ -171,7 +170,7 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
@@ -205,6 +204,10 @@ namespace osu.Game
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+
+            // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
+            // and potentially causing a reload of it after just unloading.
+            // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
             Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
@@ -299,8 +302,8 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null)
-                Storage = host.Storage;
+            if (Storage == null) // may be non-null for certain tests
+                Storage = new OsuStorage(host);
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
@@ -325,11 +328,13 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+
+            contextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
         {
-            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {
                 switch (button)
                 {
@@ -337,7 +342,7 @@ namespace osu.Game
                         return new RightMouseManager(button);
                 }
 
-                return base.CreateButtonManagerFor(button);
+                return base.CreateButtonEventManagerFor(button);
             }
 
             private class RightMouseManager : MouseButtonEventManager
@@ -351,6 +356,12 @@ namespace osu.Game
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
+        }
+
+        public void Migrate(string path)
+        {
+            contextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(path);
         }
     }
 }

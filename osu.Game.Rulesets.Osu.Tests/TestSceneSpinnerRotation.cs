@@ -4,14 +4,13 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Tests.Visual;
 using osuTK;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             base.SetUpSteps();
 
             AddUntilStep("wait for track to start running", () => track.IsRunning);
-            AddStep("retrieve spinner", () => drawableSpinner = (DrawableSpinner)((TestPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.First());
+            AddStep("retrieve spinner", () => drawableSpinner = (DrawableSpinner)Player.DrawableRuleset.Playfield.AllHitObjects.First());
         }
 
         [Test]
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep($"seek to {time}", () => track.Seek(time));
 
-            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, ((TestPlayer)Player).DrawableRuleset.FrameStableClock.CurrentTime, 100));
+            AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
@@ -102,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     EndTime = 6000,
                 },
                 // placeholder object to avoid hitting the results screen
-                new HitObject
+                new HitCircle
                 {
                     StartTime = 99999,
                 }

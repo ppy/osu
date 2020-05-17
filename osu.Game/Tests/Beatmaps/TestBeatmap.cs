@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Beatmaps
     {
         public TestBeatmap(RulesetInfo ruleset)
         {
-            var baseBeatmap = createTestBeatmap();
+            var baseBeatmap = CreateBeatmap();
 
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Beatmaps
             HitObjects = baseBeatmap.HitObjects;
 
             BeatmapInfo.Ruleset = ruleset;
+            BeatmapInfo.RulesetID = ruleset.ID ?? 0;
             BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
             BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
             BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
@@ -36,6 +37,8 @@ namespace osu.Game.Tests.Beatmaps
                 }
             };
         }
+
+        protected virtual Beatmap CreateBeatmap() => createTestBeatmap();
 
         private static Beatmap createTestBeatmap()
         {

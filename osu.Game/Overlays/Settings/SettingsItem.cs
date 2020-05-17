@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem
     {
         protected abstract Drawable CreateControl();
 
@@ -32,24 +33,24 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
-        private SpriteText text;
-
-        private readonly RestoreDefaultValueButton restoreDefaultButton;
+        private SpriteText labelText;
 
         public bool ShowsDefaultIndicator = true;
 
         public virtual string LabelText
         {
-            get => text?.Text ?? string.Empty;
+            get => labelText?.Text ?? string.Empty;
             set
             {
-                if (text == null)
+                if (labelText == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Insert(-1, text = new OsuSpriteText());
+                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
+
+                    updateDisabled();
                 }
 
-                text.Text = value;
+                labelText.Text = value;
             }
         }
 
@@ -70,8 +71,12 @@ namespace osu.Game.Overlays.Settings
 
         public bool FilteringActive { get; set; }
 
+        public event Action SettingChanged;
+
         protected SettingsItem()
         {
+            RestoreDefaultValueButton restoreDefaultButton;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
@@ -87,18 +92,23 @@ namespace osu.Game.Overlays.Settings
                     Child = Control = CreateControl()
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
+            // all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
+            // never loaded, but requires bindable storage.
             if (controlWithCurrent != null)
             {
-                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+                controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
+                controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
 
                 if (ShowsDefaultIndicator)
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
+        }
+
+        private void updateDisabled()
+        {
+            if (labelText != null)
+                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
         private class RestoreDefaultValueButton : Container, IHasTooltip
@@ -159,11 +169,7 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public string TooltipText => "Revert to default";
-
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnMouseUp(MouseUpEvent e) => true;
+            public string TooltipText => "revert to default";
 
             protected override bool OnClick(ClickEvent e)
             {

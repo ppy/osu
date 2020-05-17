@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -38,7 +40,6 @@ namespace osu.Game.Tournament.Screens.Editors
                 new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.9f,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Child = flow = new FillFlowContainer<TDrawable>
@@ -46,8 +47,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         Spacing = new Vector2(20)
                     },
                 },
@@ -71,8 +70,19 @@ namespace osu.Game.Tournament.Screens.Editors
                 }
             });
 
-            Storage.ItemsAdded += items => items.ForEach(i => flow.Add(CreateDrawable(i)));
-            Storage.ItemsRemoved += items => items.ForEach(i => flow.RemoveAll(d => d.Model == i));
+            Storage.CollectionChanged += (_, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        args.NewItems.Cast<TModel>().ForEach(i => flow.Add(CreateDrawable(i)));
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        args.OldItems.Cast<TModel>().ForEach(i => flow.RemoveAll(d => d.Model == i));
+                        break;
+                }
+            };
 
             foreach (var model in Storage)
                 flow.Add(CreateDrawable(model));

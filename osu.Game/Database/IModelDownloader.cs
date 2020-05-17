@@ -15,11 +15,13 @@ namespace osu.Game.Database
     {
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download begins.
+        /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
         event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download is interrupted, either due to user cancellation or failure.
+        /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
         event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
 

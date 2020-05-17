@@ -8,6 +8,7 @@ namespace osu.Game.Beatmaps.Legacy
         Background = 0,
         Fail = 1,
         Pass = 2,
-        Foreground = 3
+        Foreground = 3,
+        Video = 4
     }
 }

@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -51,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             return beatmap;
         }
 
-        protected override Player CreatePlayer(Ruleset ruleset)
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
             return base.CreatePlayer(ruleset);

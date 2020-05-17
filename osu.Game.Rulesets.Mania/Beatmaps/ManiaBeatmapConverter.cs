@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osuTK;
-using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -23,8 +22,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Maximum number of previous notes to consider for density calculation.
         /// </summary>
         private const int max_notes_for_density = 7;
-
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
         public bool Dual;
@@ -37,10 +34,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public ManiaBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
-            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -49,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
 
-                if (TargetColumns >= 10)
+                if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
                 {
                     TargetColumns /= 2;
                     Dual = true;
@@ -68,6 +65,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
         }
+
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
@@ -239,8 +238,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         StartTime = HitObject.StartTime,
                         Duration = endTimeData.Duration,
                         Column = column,
-                        Head = { Samples = sampleInfoListAt(HitObject.StartTime) },
-                        Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
+                        Samples = HitObject.Samples,
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
                     });
                 }
                 else if (HitObject is IHasXPosition)
@@ -254,22 +253,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
 
                 return pattern;
-            }
-
-            /// <summary>
-            /// Retrieves the sample info list at a point in time.
-            /// </summary>
-            /// <param name="time">The time to retrieve the sample info list from.</param>
-            /// <returns></returns>
-            private IList<HitSampleInfo> sampleInfoListAt(double time)
-            {
-                if (!(HitObject is IHasCurve curveData))
-                    return HitObject.Samples;
-
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
-
-                int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                return curveData.NodeSamples[index];
             }
         }
     }

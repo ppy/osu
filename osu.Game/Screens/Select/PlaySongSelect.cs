@@ -4,9 +4,12 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osuTK.Input;
 
@@ -29,10 +32,19 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Edit();
             }, Key.Number4);
+
+            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
+
+        protected void PresentScore(ScoreInfo score) =>
+            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new ResultsScreen(score)));
+
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
+
             player = null;
 
             if (removeAutoModOnResume)
@@ -41,8 +53,21 @@ namespace osu.Game.Screens.Select
                 ModSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
+        }
 
-            base.OnResuming(last);
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                case Key.KeypadEnter:
+                    // this is a special hard-coded case; we can't rely on OnPressed (of SongSelect) as GlobalActionContainer is
+                    // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
+                    FinaliseSelection();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override bool OnStart()
@@ -64,14 +89,9 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            Beatmap.Value.Track.Looping = false;
-
             SampleConfirm?.Play();
 
-            LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
-            {
-                if (this.IsCurrentScreen()) this.Push(player);
-            });
+            this.Push(player = new PlayerLoader(() => new Player()));
 
             return true;
         }

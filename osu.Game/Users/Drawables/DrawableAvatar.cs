@@ -68,13 +68,13 @@ namespace osu.Game.Users.Drawables
             if (!OpenOnClick.Value)
                 return;
 
-            if (user != null)
+            if (user?.Id > 1)
                 game?.ShowUser(user.Id);
         }
 
         private class ClickableArea : OsuClickableContainer
         {
-            public override string TooltipText => Enabled.Value ? @"View Profile" : null;
+            public override string TooltipText => Enabled.Value ? @"view profile" : null;
 
             protected override bool OnClick(ClickEvent e)
             {

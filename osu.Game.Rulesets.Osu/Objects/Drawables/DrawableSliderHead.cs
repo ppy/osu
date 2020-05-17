@@ -14,9 +14,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
+        protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
+
         private readonly Slider slider;
 
-        public DrawableSliderHead(Slider slider, HitCircle h)
+        public DrawableSliderHead(Slider slider, SliderHeadCircle h)
             : base(h)
         {
             this.slider = slider;

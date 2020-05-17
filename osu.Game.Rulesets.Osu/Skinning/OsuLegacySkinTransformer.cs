@@ -46,36 +46,35 @@ namespace osu.Game.Rulesets.Osu.Skinning
             switch (osuComponent.Component)
             {
                 case OsuSkinComponents.FollowPoint:
-                    return this.GetAnimation(component.LookupName, true, false);
+                    return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
 
                 case OsuSkinComponents.SliderFollowCircle:
-                    var followCircle = this.GetAnimation("sliderfollowcircle", true, true);
+                    var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
                     if (followCircle != null)
                         // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
                         followCircle.Scale *= 0.5f;
                     return followCircle;
 
                 case OsuSkinComponents.SliderBall:
-                    var sliderBallContent = this.GetAnimation("sliderb", true, true, "");
+                    var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
+
+                    // todo: slider ball has a custom frame delay based on velocity
+                    // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                     if (sliderBallContent != null)
-                    {
-                        var size = sliderBallContent.Size;
-
-                        sliderBallContent.RelativeSizeAxes = Axes.Both;
-                        sliderBallContent.Size = Vector2.One;
-
-                        return new LegacySliderBall(sliderBallContent)
-                        {
-                            Size = size
-                        };
-                    }
+                        return new LegacySliderBall(sliderBallContent);
 
                     return null;
 
                 case OsuSkinComponents.SliderBody:
                     if (hasHitCircle.Value)
                         return new LegacySliderBody();
+
+                    return null;
+
+                case OsuSkinComponents.SliderHeadHitCircle:
+                    if (hasHitCircle.Value)
+                        return new LegacyMainCirclePiece("sliderstartcircle");
 
                     return null;
 
@@ -133,6 +132,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                                 return SkinUtils.As<TValue>(new BindableFloat(LEGACY_CIRCLE_RADIUS));
 
                             break;
+
+                        case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
+                            // See https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
+                            // HitCircleOverlayAboveNumer (with typo) should still be supported for now.
+                            return source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
+                                   source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
                     }
 
                     break;

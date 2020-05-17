@@ -8,13 +8,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListOverlay : FullscreenOverlay
     {
         public const float WIDTH_PADDING = 80;
+
+        protected SearchableListOverlay(OverlayColourScheme colourScheme)
+            : base(colourScheme)
+        {
+        }
     }
 
     public abstract class SearchableListOverlay<THeader, TTab, TCategory> : SearchableListOverlay
@@ -34,7 +39,8 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract SearchableListHeader<THeader> CreateHeader();
         protected abstract SearchableListFilterControl<TTab, TCategory> CreateFilterControl();
 
-        protected SearchableListOverlay()
+        protected SearchableListOverlay(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             Children = new Drawable[]
             {
@@ -61,21 +67,20 @@ namespace osu.Game.Overlays.SearchableList
                 scrollContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    Child = new OsuContextMenuContainer
                     {
-                        new OsuScrollContainer
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Child = new OverlayScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
-                            Children = new[]
+                            Child = ScrollFlow = new FillFlowContainer
                             {
-                                ScrollFlow = new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = WIDTH_PADDING, Bottom = 50 },
-                                    Direction = FillDirection.Vertical,
-                                },
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding { Horizontal = 10, Bottom = 50 },
+                                Direction = FillDirection.Vertical,
                             },
                         },
                     },

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -27,6 +25,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -36,20 +35,11 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : ManualInputManagerTestScene
+    public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ScreenWithBeatmapBackground),
-            typeof(PlayerLoader),
-            typeof(Player),
-            typeof(UserDimContainer),
-            typeof(OsuScreen)
-        };
-
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
-        private TestPlayer player;
+        private LoadBlockingTestPlayer player;
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
@@ -68,10 +58,10 @@ namespace osu.Game.Tests.Visual.Background
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
         {
-            Child = new OsuScreenStack(songSelect = new DummySongSelect())
-            {
-                RelativeSizeAxes = Axes.Both
-            };
+            var stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            Child = stack;
+
+            stack.Push(songSelect = new DummySongSelect());
         });
 
         /// <summary>
@@ -81,7 +71,7 @@ namespace osu.Game.Tests.Visual.Background
         public void PlayerLoaderSettingsHoverTest()
         {
             setupUserSettings();
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer { BlockLoad = true })));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true })));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
@@ -203,7 +193,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if the visual settings container removes user dim when suspending <see cref="Player"/> for <see cref="SoloResults"/>
+        /// Check if the visual settings container removes user dim when suspending <see cref="Player"/> for <see cref="ResultsScreen"/>
         /// </summary>
         [Test]
         public void TransitionTest()
@@ -268,7 +258,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             setupUserSettings();
 
-            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new TestPlayer(allowPause))));
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer(allowPause))));
 
             AddUntilStep("Wait for Player Loader to load", () => playerLoader.IsLoaded);
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
@@ -277,7 +267,8 @@ namespace osu.Game.Tests.Visual.Background
 
         private void setupUserSettings()
         {
-            AddUntilStep("Song select has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
                 SelectedMods.Value = SelectedMods.Value.Concat(new[] { new OsuModNoFail() }).ToArray();
@@ -302,8 +293,8 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
-            public readonly Bindable<double> DimLevel = new Bindable<double>();
-            public readonly Bindable<double> BlurLevel = new Bindable<double>();
+            public readonly Bindable<double> DimLevel = new BindableDouble();
+            public readonly Bindable<double> BlurLevel = new BindableDouble();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
@@ -335,7 +326,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBackgroundCurrent() => ((FadeAccessibleBackground)Background).IsCurrentScreen();
         }
 
-        private class FadeAccessibleResults : SoloResults
+        private class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score)
@@ -347,7 +338,7 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
         }
 
-        private class TestPlayer : Visual.TestPlayer
+        private class LoadBlockingTestPlayer : TestPlayer
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
@@ -360,7 +351,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
-            public TestPlayer(bool allowPause = true)
+            public LoadBlockingTestPlayer(bool allowPause = true)
                 : base(allowPause)
             {
             }

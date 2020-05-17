@@ -18,7 +18,12 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Slider : OsuHitObject, IHasCurve
     {
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime
+        {
+            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
+
         public double Duration => EndTime - StartTime;
 
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
@@ -81,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 repeatCount = value;
-                endPositionCache.Invalidate();
+                updateNestedPositions();
             }
         }
 
@@ -111,8 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.ItemsAdded += _ => updateNestedSamples();
-            SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
@@ -151,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Head:
-                        AddNested(HeadCircle = new SliderCircle
+                        AddNested(HeadCircle = new SliderHeadCircle
                         {
                             StartTime = e.Time,
                             Position = Position,
@@ -173,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new RepeatPoint
+                        AddNested(new SliderRepeat
                         {
                             RepeatIndex = e.SpanIndex,
                             SpanDuration = SpanDuration,
@@ -219,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;
 
-            foreach (var repeat in NestedHitObjects.OfType<RepeatPoint>())
+            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
                 repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
@@ -229,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
-        public override Judgement CreateJudgement() => new OsuJudgement();
+        public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

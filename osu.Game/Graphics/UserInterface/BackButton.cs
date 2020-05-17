@@ -67,7 +67,9 @@ namespace osu.Game.Graphics.UserInterface
                 return false;
             }
 
-            public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+            public void OnReleased(GlobalAction action)
+            {
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -72,6 +73,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
+        /// <summary>
+        /// Whether currently in the correct time range to allow spinning.
+        /// </summary>
+        private bool isSpinnableTime => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
@@ -92,27 +98,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override void Update()
         {
             base.Update();
+            var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            var thisAngle = -(float)MathHelper.RadiansToDegrees(Math.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
+            var delta = thisAngle - lastAngle;
 
-            bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
-
-            if (validAndTracking)
-            {
-                if (!rotationTransferred)
-                {
-                    currentRotation = Rotation * 2;
-                    rotationTransferred = true;
-                }
-
-                if (thisAngle - lastAngle > 180)
-                    lastAngle += 360;
-                else if (lastAngle - thisAngle > 180)
-                    lastAngle -= 360;
-
-                currentRotation += thisAngle - lastAngle;
-                RotationAbsolute += Math.Abs(thisAngle - lastAngle) * Math.Sign(Clock.ElapsedFrameTime);
-            }
+            if (tracking)
+                Rotate(delta);
 
             lastAngle = thisAngle;
 
@@ -125,7 +116,40 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
+            Rotation = (float)Interpolation.Lerp(Rotation, currentRotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
+        }
+
+        /// <summary>
+        /// Rotate the disc by the provided angle (in addition to any existing rotation).
+        /// </summary>
+        /// <remarks>
+        /// Will be a no-op if not a valid time to spin.
+        /// </remarks>
+        /// <param name="angle">The delta angle.</param>
+        public void Rotate(float angle)
+        {
+            if (!isSpinnableTime)
+                return;
+
+            if (!rotationTransferred)
+            {
+                currentRotation = Rotation * 2;
+                rotationTransferred = true;
+            }
+
+            if (angle > 180)
+            {
+                lastAngle += 360;
+                angle -= 360;
+            }
+            else if (-angle > 180)
+            {
+                lastAngle -= 360;
+                angle += 360;
+            }
+
+            currentRotation += angle;
+            RotationAbsolute += Math.Abs(angle) * Math.Sign(Clock.ElapsedFrameTime);
         }
     }
 }

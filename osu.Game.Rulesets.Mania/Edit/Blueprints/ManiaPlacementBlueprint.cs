@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -46,23 +47,20 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return false;
+
             if (Column == null)
                 return base.OnMouseDown(e);
 
             HitObject.Column = Column.Index;
-            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition));
+            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition), true);
             return true;
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            EndPlacement();
-            return base.OnMouseUp(e);
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
-            if (!PlacementBegun)
+            if (!PlacementActive)
                 Column = ColumnAt(screenSpacePosition);
 
             if (Column == null) return;
@@ -122,11 +120,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             switch (scrollingInfo.Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    mousePosition.Y -= NotePiece.NOTE_HEIGHT / 2;
+                    mousePosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
 
                 case ScrollingDirection.Down:
-                    mousePosition.Y += NotePiece.NOTE_HEIGHT / 2;
+                    mousePosition.Y += DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
             }
 
@@ -143,11 +141,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             switch (scrollingInfo.Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObjectPosition.Y += NotePiece.NOTE_HEIGHT / 2;
+                    hitObjectPosition.Y += DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
 
                 case ScrollingDirection.Down:
-                    hitObjectPosition.Y -= NotePiece.NOTE_HEIGHT / 2;
+                    hitObjectPosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
                     break;
             }
 
