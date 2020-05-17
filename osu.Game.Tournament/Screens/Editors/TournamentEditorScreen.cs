@@ -46,18 +46,6 @@ namespace osu.Game.Tournament.Screens.Editors
         [BackgroundDependencyLoader]
         private void load()
         {
-            BackButton.Receptor receptor = new BackButton.Receptor();
-            backButton = new BackButton(receptor)
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                Action = () =>
-                {
-                    if (parentScreen != null)
-                        backAction.Invoke();
-                }
-            };
-
             AddRangeInternal(new Drawable[]
             {
                 new Box
@@ -76,10 +64,8 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(20),
-                        Padding = new MarginPadding { Bottom = backButton.Height * 2 },
                     },
                 },
-                backButton,
                 ControlPanel = new ControlPanel
                 {
                     Children = new Drawable[]
@@ -101,7 +87,21 @@ namespace osu.Game.Tournament.Screens.Editors
             });
 
             if (parentScreen != null)
-                backButton.Show();
+            {
+                AddInternal(backButton = new BackButton(new BackButton.Receptor())
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    State = { Value = Visibility.Visible },
+                    Action = () =>
+                    {
+                        if (parentScreen != null)
+                            backAction.Invoke();
+                    }
+                });
+
+                flow.Padding = new MarginPadding { Bottom = backButton.Height * 2 };
+            }
 
             Storage.CollectionChanged += (_, args) =>
             {
@@ -126,7 +126,7 @@ namespace osu.Game.Tournament.Screens.Editors
             switch (action)
             {
                 case GlobalAction.Back:
-                    backAction.Invoke();
+                    backAction?.Invoke();
                     return true;
             }
 
