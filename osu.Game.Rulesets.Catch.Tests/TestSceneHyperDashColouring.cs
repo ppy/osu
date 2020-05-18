@@ -27,6 +27,48 @@ namespace osu.Game.Rulesets.Catch.Tests
         private SkinManager skins { get; set; }
 
         [Test]
+        public void TestDefaultCatcherColour()
+        {
+            var skin = new TestSkin();
+
+            checkHyperDashCatcherColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR);
+        }
+
+        [Test]
+        public void TestCustomCatcherColour()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashColour = Color4.Goldenrod
+            };
+
+            checkHyperDashCatcherColour(skin, skin.HyperDashColour);
+        }
+
+        [Test]
+        public void TestCustomEndGlowColour()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashAfterImageColour = Color4.Lime
+            };
+
+            checkHyperDashCatcherColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR, skin.HyperDashAfterImageColour);
+        }
+
+        [Test]
+        public void TestCustomEndGlowColourPriority()
+        {
+            var skin = new TestSkin
+            {
+                HyperDashColour = Color4.Goldenrod,
+                HyperDashAfterImageColour = Color4.Lime
+            };
+
+            checkHyperDashCatcherColour(skin, skin.HyperDashColour, skin.HyperDashAfterImageColour);
+        }
+
+        [Test]
         public void TestDefaultFruitColour()
         {
             var skin = new TestSkin();
@@ -66,6 +108,38 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashColour);
+        }
+
+        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
+        {
+            CatcherArea catcherArea = null;
+            CatcherTrailDisplay trails = null;
+
+            AddStep("create hyper-dashing catcher", () =>
+            {
+                Child = setupSkinHierarchy(catcherArea = new CatcherArea
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(4f),
+                }, skin);
+
+                trails = catcherArea.OfType<CatcherTrailDisplay>().Single();
+                catcherArea.MovableCatcher.SetHyperDashState(2);
+            });
+
+            AddUntilStep("catcher colour is correct", () => catcherArea.MovableCatcher.Colour == expectedCatcherColour);
+
+            AddAssert("catcher trails colours are correct", () => trails.HyperDashTrailsColour == expectedCatcherColour);
+            AddAssert("catcher end-glow colours are correct", () => trails.EndGlowSpritesColour == (expectedEndGlowColour ?? expectedCatcherColour));
+
+            AddStep("finish hyper-dashing", () =>
+            {
+                catcherArea.MovableCatcher.SetHyperDashState(1);
+                catcherArea.MovableCatcher.FinishTransforms();
+            });
+
+            AddAssert("catcher colour returned to white", () => catcherArea.MovableCatcher.Colour == Color4.White);
         }
 
         private void checkHyperDashFruitColour(ISkin skin, Color4 expectedColour)

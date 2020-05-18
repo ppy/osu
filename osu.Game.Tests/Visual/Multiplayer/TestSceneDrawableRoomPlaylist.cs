@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -22,12 +21,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneDrawableRoomPlaylist : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableRoomPlaylist),
-            typeof(DrawableRoomPlaylistItem)
-        };
-
         private TestPlaylist playlist;
 
         [Test]

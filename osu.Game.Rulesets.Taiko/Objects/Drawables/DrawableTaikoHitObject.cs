@@ -165,8 +165,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        // Normal and clap samples are handled by the drum
-        protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
+        // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
+        protected override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
 
         protected abstract SkinnableDrawable CreateMainPiece();
 
