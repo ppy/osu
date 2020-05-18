@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double totalHits => countGreat + countGood + countMeh + countMiss;
-        private double totalSuccessfulHits => countGreat + countGood + countMeh;
+        private int totalHits => countGreat + countGood + countMeh + countMiss;
+        private int totalSuccessfulHits => countGreat + countGood + countMeh;
     }
 }
