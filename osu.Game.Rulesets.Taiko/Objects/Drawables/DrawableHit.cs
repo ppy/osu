@@ -52,7 +52,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override IEnumerable<HitSampleInfo> GetSamples()
         {
             // normal and claps are always handled by the drum (see DrumSampleMapping).
-            var samples = HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
+            // in addition, whistles are excluded as they are an alternative rim marker.
+
+            var samples = HitObject.Samples.Where(s =>
+                s.Name != HitSampleInfo.HIT_NORMAL
+                && s.Name != HitSampleInfo.HIT_CLAP
+                && s.Name != HitSampleInfo.HIT_WHISTLE);
 
             if (HitObject.Type == HitType.Rim && HitObject.IsStrong)
             {
