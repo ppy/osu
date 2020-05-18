@@ -17,14 +17,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         protected new CatchDifficultyAttributes Attributes => (CatchDifficultyAttributes)base.Attributes;
 
-        private Mod[] mods;
-
-        private int fruitsHit;
-        private int ticksHit;
-        private int tinyTicksHit;
-        private int tinyTicksMissed;
-        private int misses;
-
         public CatchPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
@@ -32,13 +24,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            mods = Score.Mods;
+            var mods = Score.Mods;
+            int fruitsHit = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            int ticksHit = Score.Statistics.GetOrDefault(HitResult.LargeTickHit);
+            int tinyTicksHit = Score.Statistics.GetOrDefault(HitResult.SmallTickHit);
+            int tinyTicksMissed = Score.Statistics.GetOrDefault(HitResult.SmallTickMiss);
+            int misses = Score.Statistics.GetOrDefault(HitResult.Miss);
 
-            fruitsHit = Score.Statistics.GetOrDefault(HitResult.Perfect);
-            ticksHit = Score.Statistics.GetOrDefault(HitResult.LargeTickHit);
-            tinyTicksHit = Score.Statistics.GetOrDefault(HitResult.SmallTickHit);
-            tinyTicksMissed = Score.Statistics.GetOrDefault(HitResult.SmallTickMiss);
-            misses = Score.Statistics.GetOrDefault(HitResult.Miss);
+            int totalHits = tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
+            int totalSuccessfulHits = tinyTicksHit + ticksHit + fruitsHit;
+            int totalComboHits = misses + ticksHit + fruitsHit;
+            double accuracy = totalHits == 0 ? 0 : Math.Clamp((double)totalSuccessfulHits / totalHits, 0, 1);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -48,12 +44,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double value = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
-            int numTotalHits = totalComboHits();
-
-            // Longer maps are worth more
             double lengthBonus =
-                0.95f + 0.3f * Math.Min(1.0f, numTotalHits / 2500.0f) +
-                (numTotalHits > 2500 ? (float)Math.Log10(numTotalHits / 2500.0f) * 0.475f : 0.0f);
+                0.95 + 0.3 * Math.Min(1.0, totalComboHits / 2500.0) +
+                (totalComboHits > 2500 ? Math.Log10(totalComboHits / 2500.0) * 0.475 : 0.0);
 
             // Longer maps are worth more
             value *= lengthBonus;
@@ -65,14 +58,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (Attributes.MaxCombo > 0)
                 value *= Math.Min(Math.Pow(Score.MaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
-            float approachRate = (float)Attributes.ApproachRate;
-            float approachRateFactor = 1.0f;
-            if (approachRate > 9.0f)
-                approachRateFactor += 0.1f * (approachRate - 9.0f); // 10% for each AR above 9
-            if (approachRate > 10.0f)
-                approachRateFactor += 0.1f * (approachRate - 10.0f); // Additional 10% at AR 11, 30% total
-            else if (approachRate < 8.0f)
-                approachRateFactor += 0.025f * (8.0f - approachRate); // 2.5% for each AR below 8
+            double approachRate = Attributes.ApproachRate;
+            double approachRateFactor = 1.0;
+            if (approachRate > 9.0)
+                approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
+            if (approachRate > 10.0)
+                approachRateFactor += 0.1 * (approachRate - 10.0); // Additional 10% at AR 11, 30% total
+            else if (approachRate < 8.0)
+                approachRateFactor += 0.025 * (8.0 - approachRate); // 2.5% for each AR below 8
 
             value *= approachRateFactor;
 
@@ -80,10 +73,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 value *= 1.05 + 0.075 * (10.0 - Math.Min(10.0, Attributes.ApproachRate)); // 7.5% for each AR below 10
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
-                if (approachRate <= 10.0f)
-                    value *= 1.05f + 0.075f * (10.0f - approachRate); // 7.5% for each AR below 10
-                else if (approachRate > 10.0f)
-                    value *= 1.01f + 0.04f * (11.0f - Math.Min(11.0f, approachRate)); // 5% at AR 10, 1% at AR 11
+                if (approachRate <= 10.0)
+                    value *= 1.05 + 0.075 * (10.0 - approachRate); // 7.5% for each AR below 10
+                else if (approachRate > 10.0)
+                    value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
             }
 
             if (mods.Any(m => m is ModFlashlight))
@@ -91,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 value *= 1.35 * lengthBonus;
 
             // Scale the aim value with accuracy _slightly_
-            value *= Math.Pow(accuracy(), 5.5);
+            value *= Math.Pow(accuracy, 5.5);
 
             // Custom multipliers for NoFail. SpunOut is not applicable.
             if (mods.Any(m => m is ModNoFail))
@@ -99,10 +92,5 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return value;
         }
-
-        private float accuracy() => totalHits() == 0 ? 0 : Math.Clamp((float)totalSuccessfulHits() / totalHits(), 0, 1);
-        private int totalHits() => tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
-        private int totalSuccessfulHits() => tinyTicksHit + ticksHit + fruitsHit;
-        private int totalComboHits() => misses + ticksHit + fruitsHit;
     }
 }
