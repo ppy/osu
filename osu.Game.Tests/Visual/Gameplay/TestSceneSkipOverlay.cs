@@ -56,19 +56,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestFadeOnIdle()
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(Vector2.Zero));
-            AddUntilStep("fully visible", () => skip.OverlayContents.Alpha == 1);
-            AddUntilStep("wait for fade", () => skip.OverlayContents.Alpha < 1);
+            AddUntilStep("fully visible", () => skip.FadingContent.Alpha == 1);
+            AddUntilStep("wait for fade", () => skip.FadingContent.Alpha < 1);
 
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("fully visible", () => skip.OverlayContents.Alpha == 1);
-            AddUntilStep("wait for fade", () => skip.OverlayContents.Alpha < 1);
+            AddUntilStep("fully visible", () => skip.FadingContent.Alpha == 1);
+            AddUntilStep("wait for fade", () => skip.FadingContent.Alpha < 1);
         }
 
         [Test]
         public void TestClickableAfterFade()
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for fade", () => skip.OverlayContents.Alpha == 0);
+            AddUntilStep("wait for fade", () => skip.FadingContent.Alpha == 0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkRequestCount(1);
         }
@@ -105,8 +105,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("button down", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep("wait for overlay disappear", () => !skip.OverlayContents.IsPresent);
-            AddAssert("ensure button didn't disappear", () => skip.OverlayContents.Alpha > 0);
+            AddUntilStep("wait for overlay disappear", () => !skip.OverlayContent.IsPresent);
+            AddAssert("ensure button didn't disappear", () => skip.FadingContent.Alpha > 0);
             AddStep("button up", () => InputManager.ReleaseButton(MouseButton.Left));
             checkRequestCount(0);
         }
@@ -121,7 +121,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public Drawable OverlayContents => (InternalChild as Container)?.Child;
+            public Drawable OverlayContent => InternalChild;
+
+            public Drawable FadingContent => (OverlayContent as Container)?.Child;
         }
     }
 }
