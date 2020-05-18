@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -37,12 +38,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
-            countPerfect = Score.Statistics[HitResult.Perfect];
-            countGreat = Score.Statistics[HitResult.Great];
-            countGood = Score.Statistics[HitResult.Good];
-            countOk = Score.Statistics[HitResult.Ok];
-            countMeh = Score.Statistics[HitResult.Meh];
-            countMiss = Score.Statistics[HitResult.Miss];
+            countPerfect = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
+            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             if (mods.Any(m => !m.Ranked))
                 return 0;

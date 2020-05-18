@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -22,15 +21,6 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneDrawableHitObjects : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Catcher),
-            typeof(DrawableCatchRuleset),
-            typeof(DrawableFruit),
-            typeof(DrawableJuiceStream),
-            typeof(DrawableBanana)
-        };
-
         private DrawableCatchRuleset drawableRuleset;
         private double playfieldTime => drawableRuleset.Playfield.Time.Current;
 
