@@ -4,12 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -34,11 +34,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             mods = Score.Mods;
 
-            fruitsHit = Score?.GetCount300() ?? Score.Statistics[HitResult.Perfect];
-            ticksHit = Score?.GetCount100() ?? 0;
-            tinyTicksHit = Score?.GetCount50() ?? 0;
-            tinyTicksMissed = Score?.GetCountKatu() ?? 0;
-            misses = Score.Statistics[HitResult.Miss];
+            fruitsHit = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            ticksHit = Score.Statistics.GetOrDefault(HitResult.LargeTickHit);
+            tinyTicksHit = Score.Statistics.GetOrDefault(HitResult.SmallTickHit);
+            tinyTicksMissed = Score.Statistics.GetOrDefault(HitResult.SmallTickMiss);
+            misses = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
