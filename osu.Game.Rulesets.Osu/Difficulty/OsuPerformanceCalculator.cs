@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int amountHitObjectsWithAccuracy = countHitCircles;
 
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double totalHits => countGreat + countGood + countMeh + countMiss;
-        private double totalSuccessfulHits => countGreat + countGood + countMeh;
+        private int totalHits => countGreat + countGood + countMeh + countMiss;
+        private int totalSuccessfulHits => countGreat + countGood + countMeh;
     }
 }
