@@ -129,6 +129,9 @@ namespace osu.Game.Screens.Select
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
 
+        // Stores all the items ever created for disposal purposes.
+        private readonly HashSet<DrawableCarouselItem> allItems = new HashSet<DrawableCarouselItem>();
+
         private CarouselRoot root;
 
         public BeatmapCarousel()
@@ -571,7 +574,7 @@ namespace osu.Game.Screens.Select
             }
 
             // aggressively dispose "off-screen" items to reduce GC pressure.
-            foreach (var i in Items)
+            foreach (var i in allItems)
                 i.Dispose();
         }
 
@@ -625,6 +628,8 @@ namespace osu.Game.Screens.Select
         private void updateItems()
         {
             Items = root.Drawables.ToList();
+            foreach (var item in Items)
+                allItems.Add(item);
 
             yPositions.Clear();
 
