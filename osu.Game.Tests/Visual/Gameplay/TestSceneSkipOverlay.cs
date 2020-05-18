@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("button down", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep("wait for overlay disappear", () => !skip.Child.IsPresent);
+            AddUntilStep("wait for overlay disappear", () => !skip.OverlayContents.IsPresent);
             AddAssert("ensure button didn't disappear", () => skip.OverlayContents.Alpha > 0);
             AddStep("button up", () => InputManager.ReleaseButton(MouseButton.Left));
             checkRequestCount(0);
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public Drawable OverlayContents => (Child as Container)?.Child;
+            public Drawable OverlayContents => (InternalChild as Container)?.Child;
         }
     }
 }
