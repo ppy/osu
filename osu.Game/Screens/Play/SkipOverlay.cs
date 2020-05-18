@@ -24,7 +24,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : Container, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours)
         {
-            Child = buttonContainer = new ButtonContainer
+            InternalChild = buttonContainer = new ButtonContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = fadeContainer = new FadeContainer
