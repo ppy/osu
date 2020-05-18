@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             float relativePosition = Playfield.Stages[0].HitObjectContainer.ToLocalSpace(e.ScreenSpaceMousePosition).Y / Playfield.Stages[0].HitObjectContainer.DrawHeight;
             double timeValue = scrollingInfo.TimeRange.Value * relativePosition;
 
-            beatSnapGrid.SetRange(timeValue, timeValue);
+            beatSnapGrid.SelectionTimeRange = (timeValue, timeValue);
 
             return true;
         }

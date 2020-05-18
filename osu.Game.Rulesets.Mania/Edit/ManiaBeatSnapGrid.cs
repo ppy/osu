@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaBeatSnapGrid : Component
     {
-        private const double visible_range = 1500;
+        private const double visible_range = 750;
 
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
@@ -44,6 +45,34 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private readonly List<ScrollingHitObjectContainer> grids = new List<ScrollingHitObjectContainer>();
 
+        private readonly Cached lineCache = new Cached();
+
+        private (double start, double end)? selectionTimeRange;
+
+        public (double start, double end)? SelectionTimeRange
+        {
+            get => selectionTimeRange;
+            set
+            {
+                if (value == selectionTimeRange)
+                    return;
+
+                selectionTimeRange = value;
+                lineCache.Invalidate();
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!lineCache.IsValid)
+            {
+                lineCache.Validate();
+                createLines();
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -61,49 +90,65 @@ namespace osu.Game.Rulesets.Mania.Edit
             beatDivisor.BindValueChanged(_ => createLines(), true);
         }
 
-        public override void Hide()
-        {
-            base.Hide();
-            foreach (var grid in grids)
-                grid.Hide();
-        }
-
-        public override void Show()
-        {
-            base.Show();
-            foreach (var grid in grids)
-                grid.Show();
-        }
-
         private void createLines()
         {
             foreach (var grid in grids)
                 grid.Clear();
 
-            for (int i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
+            if (selectionTimeRange == null)
+                return;
+
+            var range = selectionTimeRange.Value;
+
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(range.start - visible_range);
+
+            double time = timingPoint.Time;
+            int beat = 0;
+
+            // progress time until in the visible range.
+            while (time < range.start - visible_range)
             {
-                var point = beatmap.ControlPointInfo.TimingPoints[i];
-                var until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
+                time += timingPoint.BeatLength / beatDivisor.Value;
+                beat++;
+            }
 
-                int beat = 0;
+            while (time < range.end + visible_range)
+            {
+                var nextTimingPoint = beatmap.ControlPointInfo.TimingPointAt(time);
 
-                for (double t = point.Time; t < until; t += point.BeatLength / beatDivisor.Value)
+                // switch to the next timing point if we have reached it.
+                if (nextTimingPoint != timingPoint)
                 {
-                    var indexInBeat = beat % beatDivisor.Value;
-                    Color4 colour;
+                    beat = 0;
+                    timingPoint = nextTimingPoint;
+                }
 
-                    if (indexInBeat == 0)
-                        colour = BindableBeatDivisor.GetColourFor(1, colours);
+                Color4 colour = BindableBeatDivisor.GetColourFor(
+                    BindableBeatDivisor.GetDivisorForBeatIndex(Math.Max(1, beat), beatDivisor.Value), colours);
+
+                foreach (var grid in grids)
+                    grid.Add(new DrawableGridLine(time, colour));
+
+                beat++;
+                time += timingPoint.BeatLength / beatDivisor.Value;
+            }
+
+            foreach (var grid in grids)
+            {
+                // required to update ScrollingHitObjectContainer's cache.
+                grid.UpdateSubTree();
+
+                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
+                {
+                    time = line.HitObject.StartTime;
+
+                    if (time >= range.start && time <= range.end)
+                        line.Alpha = 1;
                     else
                     {
-                        var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
-                        colour = BindableBeatDivisor.GetColourFor(divisor, colours);
+                        double timeSeparation = time < range.start ? range.start - time : time - range.end;
+                        line.Alpha = (float)Math.Max(0, 1 - timeSeparation / visible_range);
                     }
-
-                    foreach (var grid in grids)
-                        grid.Add(new DrawableGridLine(t, colour));
-
-                    beat++;
                 }
             }
         }
@@ -112,6 +157,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             float minDist = float.PositiveInfinity;
             DrawableGridLine minDistLine = null;
+
             Vector2 minDistLinePosition = Vector2.Zero;
 
             foreach (var grid in grids)
@@ -135,33 +181,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             float noteOffset = (scrollingInfo.Direction.Value == ScrollingDirection.Up ? 1 : -1) * DefaultNotePiece.NOTE_HEIGHT / 2;
             return (new Vector2(position.X, minDistLinePosition.Y + noteOffset), minDistLine.HitObject.StartTime);
-        }
-
-        public void SetRange(double minTime, double maxTime)
-        {
-            if (LoadState >= LoadState.Ready)
-                setRange(minTime, maxTime);
-            else
-                Schedule(() => setRange(minTime, maxTime));
-        }
-
-        private void setRange(double minTime, double maxTime)
-        {
-            foreach (var grid in grids)
-            {
-                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
-                {
-                    double lineTime = line.HitObject.StartTime;
-
-                    if (lineTime >= minTime && lineTime <= maxTime)
-                        line.Colour = Color4.White;
-                    else
-                    {
-                        double timeSeparation = lineTime < minTime ? minTime - lineTime : lineTime - maxTime;
-                        line.Colour = OsuColour.Gray((float)Math.Max(0, 1 - timeSeparation / visible_range));
-                    }
-                }
-            }
         }
 
         private class DrawableGridLine : DrawableHitObject
