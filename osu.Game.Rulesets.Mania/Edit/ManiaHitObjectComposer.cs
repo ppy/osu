@@ -68,18 +68,15 @@ namespace osu.Game.Rulesets.Mania.Edit
             {
                 if (EditorBeatmap.SelectedHitObjects.Any())
                 {
-                    beatSnapGrid.SetRange(EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
-                    beatSnapGrid.Show();
+                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
                 }
                 else
-                    beatSnapGrid.Hide();
+                    beatSnapGrid.SelectionTimeRange = null;
             }
             else
             {
                 var placementTime = GetSnappedPosition(ToLocalSpace(inputManager.CurrentState.Mouse.Position), 0).time;
-                beatSnapGrid.SetRange(placementTime, placementTime);
-
-                beatSnapGrid.Show();
+                beatSnapGrid.SelectionTimeRange = (placementTime, placementTime);
             }
         }
 
