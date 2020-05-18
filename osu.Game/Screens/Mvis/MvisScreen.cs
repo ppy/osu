@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.UI;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Mvis.UI.Objects;
 using osu.Game.Screens.Mvis.Buttons;
 using osu.Game.Screens.Mvis.Objects.Helpers;
@@ -26,10 +27,10 @@ using osu.Framework.Audio.Track;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens
 {
@@ -45,6 +46,7 @@ namespace osu.Game.Screens
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
@@ -261,7 +263,6 @@ namespace osu.Game.Screens
                             Children = new Drawable[]
                             {
                                 bgSB = new BackgroundStoryBoard(),
-                                new MfBgTriangles(0.65f, false, 5),
                                 dimBox = new Box
                                 {
                                     Name = "Dim Box",

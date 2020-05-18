@@ -17,14 +17,11 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
-using osu.Game.Beatmaps;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.Backgrounds
 {
     public class Triangles : Drawable
     {
-        private float ExtraY;
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
         public bool IgnoreSettings = false;
         private float alpha_orig = 1;
@@ -104,9 +101,6 @@ namespace osu.Game.Graphics.Backgrounds
             texture = Texture.WhitePixel;
         }
 
-        [Resolved]
-        private Bindable<WorkingBeatmap> b { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, MfConfigManager config)
         {
@@ -116,27 +110,6 @@ namespace osu.Game.Graphics.Backgrounds
             config.BindWith(MfSetting.TrianglesEnabled, TrianglesEnabled);
 
             TrianglesEnabled.ValueChanged += _ => UpdateIcons();
-        }
-
-        private void UpdateFreq(bool IsKiai)
-        {
-            float sum = 0;
-            b.Value.Track.CurrentAmplitudes.FrequencyAmplitudes.ForEach(amp => sum += amp);
-
-            if (IsKiai)
-            {
-                sum *= 1.5f;
-                sum /= 10000;
-            }
-            else
-            {
-                sum /= 15000;
-            }
-
-            if (sum > 0.01f)
-                sum = 0.01f;
-
-            ExtraY = sum;
         }
 
         private void UpdateIcons()
@@ -183,10 +156,6 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            var track = b.Value?.Track;
-            var IsKiai= b.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
-            UpdateFreq(IsKiai);
-
             Invalidate(Invalidation.DrawNode);
 
             if (CreateNewTriangles)
@@ -201,7 +170,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
-            float movedDistance = ( -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale) ) - ExtraY;
+            float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale);
 
             for (int i = 0; i < parts.Count; i++)
             {
