@@ -7,12 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -22,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaBeatSnapGrid : CompositeDrawable
+    public class ManiaBeatSnapGrid : Component
     {
         /// <summary>
         /// The brightness of bar lines one beat around the time range from <see cref="SetRange"/>.
@@ -54,13 +52,30 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             foreach (var stage in composer.Playfield.Stages)
             {
-                var grid = new Grid(stage);
-                grids.Add(grid);
+                foreach (var column in stage.Columns)
+                {
+                    var grid = new Grid();
 
-                AddInternal(grid);
+                    grids.Add(grid);
+                    column.UnderlayElements.Add(grid);
+                }
             }
 
             beatDivisor.BindValueChanged(_ => createLines(), true);
+        }
+
+        public override void Hide()
+        {
+            base.Hide();
+            foreach (var grid in grids)
+                grid.Hide();
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            foreach (var grid in grids)
+                grid.Show();
         }
 
         private void createLines()
@@ -145,7 +160,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 linesDuring.Clear();
                 linesAfter.Clear();
 
-                foreach (var line in grid.AliveObjects.OfType<DrawableGridLine>())
+                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
                 {
                     if (line.HitObject.StartTime < minTime)
                         linesBefore.Add(line);
@@ -202,29 +217,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             [Resolved]
             private IManiaHitObjectComposer composer { get; set; }
 
-            private readonly Stage stage;
-
-            public Grid(Stage stage)
-            {
-                this.stage = stage;
-
-                RelativeSizeAxes = Axes.None;
-            }
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
                 Clock = composer.Playfield.Clock;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                var parentQuad = Parent.ToLocalSpace(stage.HitObjectContainer.ScreenSpaceDrawQuad);
-                Position = parentQuad.TopLeft;
-                Size = parentQuad.Size;
             }
         }
 
