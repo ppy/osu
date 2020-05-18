@@ -672,3 +672,5 @@
 ### 2020/5/18
 *   合并上游pr
     *   [m] [Remove all RequiredTypes usages #9042]
+    *   [m] [Avoid disabling a host-level bindable from osu! code #9031]
+    *   [m] [Add a back button to sub screens in the Tournament Client #9041]
