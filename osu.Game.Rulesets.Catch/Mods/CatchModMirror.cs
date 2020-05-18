@@ -26,8 +26,11 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             if (catchObject is JuiceStream juiceStream)
             {
-                foreach (var point in juiceStream.Path.ControlPoints)
+                var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+                foreach (var point in controlPoints)
                     point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
+
+                juiceStream.Path = new SliderPath(controlPoints, juiceStream.Path.ExpectedDistance.Value);
             }
         }
     }
