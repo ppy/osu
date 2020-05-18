@@ -22,10 +22,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaBeatSnapGrid : Component
     {
-        /// <summary>
-        /// The brightness of bar lines one beat around the time range from <see cref="SetRange"/>.
-        /// </summary>
-        private const float first_beat_brightness = 0.5f;
+        private const double visible_range = 1500;
 
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
@@ -150,64 +147,19 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private void setRange(double minTime, double maxTime)
         {
-            var linesBefore = new List<DrawableGridLine>();
-            var linesDuring = new List<DrawableGridLine>();
-            var linesAfter = new List<DrawableGridLine>();
-
             foreach (var grid in grids)
             {
-                linesBefore.Clear();
-                linesDuring.Clear();
-                linesAfter.Clear();
-
                 foreach (var line in grid.Objects.OfType<DrawableGridLine>())
                 {
-                    if (line.HitObject.StartTime < minTime)
-                        linesBefore.Add(line);
-                    else if (line.HitObject.StartTime <= maxTime)
-                        linesDuring.Add(line);
+                    double lineTime = line.HitObject.StartTime;
+
+                    if (lineTime >= minTime && lineTime <= maxTime)
+                        line.Colour = Color4.White;
                     else
-                        linesAfter.Add(line);
-                }
-
-                // Snapping will always happen on one of the two lines around minTime (the "target" line).
-                // One of those lines may exist in linesBefore and the other may exist in linesAfter, depending on whether such a line exists, and the target changes when the mid-point is crossed.
-                // For display purposes, one complete beat is shown at the maximum brightness such that the target line should always be bright.
-                bool targetLineIsLastLineBefore = false;
-
-                if (linesBefore.Count > 0 && linesAfter.Count > 0)
-                    targetLineIsLastLineBefore = Math.Abs(linesBefore[^1].HitObject.StartTime - minTime) <= Math.Abs(linesAfter[0].HitObject.StartTime - minTime);
-                else if (linesBefore.Count > 0)
-                    targetLineIsLastLineBefore = true;
-
-                if (targetLineIsLastLineBefore)
-                {
-                    // Move the last line before to linesDuring
-                    linesDuring.Insert(0, linesBefore[^1]);
-                    linesBefore.RemoveAt(linesBefore.Count - 1);
-                }
-                else if (linesAfter.Count > 0) // = false does not guarantee that a line after exists (maybe at the bottom of the screen)
-                {
-                    // Move the first line after to linesDuring
-                    linesDuring.Insert(0, linesAfter[0]);
-                    linesAfter.RemoveAt(0);
-                }
-
-                // Grays are used rather than transparency since the lines appear on a coloured mania playfield.
-
-                foreach (var l in linesDuring)
-                    l.Colour = OsuColour.Gray(first_beat_brightness);
-
-                for (int i = 0; i < linesBefore.Count; i++)
-                {
-                    int offset = (linesBefore.Count - i - 1) / beatDivisor.Value;
-                    linesBefore[i].Colour = OsuColour.Gray(first_beat_brightness / (offset + 1));
-                }
-
-                for (int i = 0; i < linesAfter.Count; i++)
-                {
-                    int offset = i / beatDivisor.Value;
-                    linesAfter[i].Colour = OsuColour.Gray(first_beat_brightness / (offset + 1));
+                    {
+                        double timeSeparation = lineTime < minTime ? minTime - lineTime : lineTime - maxTime;
+                        line.Colour = OsuColour.Gray((float)Math.Max(0, 1 - timeSeparation / visible_range));
+                    }
                 }
             }
         }
