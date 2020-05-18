@@ -674,3 +674,5 @@
     *   [m] [Remove all RequiredTypes usages #9042]
     *   [m] [Avoid disabling a host-level bindable from osu! code #9031]
     *   [m] [Add a back button to sub screens in the Tournament Client #9041]
+    *   [m] [Update framework #9052]
+    *   [m] [Disallow catch-specific judgements in mania #9048]
