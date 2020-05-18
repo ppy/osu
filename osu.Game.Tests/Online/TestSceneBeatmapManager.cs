@@ -47,27 +47,5 @@ namespace osu.Game.Tests.Online
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
         }
-
-        [Test]
-        public void TestCancelDownloadFromRequestWithSayobot()
-        {
-            AddStep("download beatmap", () => beatmaps.Download(test_model, true));
-
-            AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_model).Cancel());
-
-            AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_model) == null);
-            AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
-        }
-
-        [Test]
-        public void TestCancelDownloadFromNotificationWithSayobot()
-        {
-            AddStep("download beatmap", () => beatmaps.Download(test_model, true));
-
-            AddStep("cancel download from notification", () => recentNotification.Close());
-
-            AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_model) == null);
-            AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
-        }
     }
 }

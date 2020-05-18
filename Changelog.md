@@ -668,3 +668,7 @@
 
 *   更新上游pr
     *   [m] [Add ability to change data folder path #9020]
+
+### 2020/5/18
+*   合并上游pr
+    *   [m] [Remove all RequiredTypes usages #9042]

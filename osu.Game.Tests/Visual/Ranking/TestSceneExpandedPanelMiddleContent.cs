@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,9 +19,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
-using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK;
@@ -33,18 +31,6 @@ namespace osu.Game.Tests.Visual.Ranking
     {
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ExpandedPanelMiddleContent),
-            typeof(AccuracyCircle),
-            typeof(AccuracyStatistic),
-            typeof(ComboStatistic),
-            typeof(CounterStatistic),
-            typeof(StarRatingDisplay),
-            typeof(StatisticDisplay),
-            typeof(TotalScoreCounter)
-        };
 
         [Test]
         public void TestMapWithKnownMapper()
@@ -74,6 +60,8 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0));
             beatmap.Metadata.Author = author;
+            beatmap.Metadata.Title = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap title";
+            beatmap.Metadata.Artist = "Verrrrrrrrrrrrrrrrrrry looooooooooooooooooooooooong beatmap artist";
 
             return new TestWorkingBeatmap(beatmap);
         }
@@ -114,7 +102,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Size = new Vector2(500, 700);
+                Size = new Vector2(ScorePanel.EXPANDED_WIDTH, 700);
                 Children = new Drawable[]
                 {
                     new Box
