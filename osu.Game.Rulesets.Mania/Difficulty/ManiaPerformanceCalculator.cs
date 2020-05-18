@@ -17,18 +17,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
     {
         protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
 
-        private Mod[] mods;
-
-        // Score after being scaled by non-difficulty-increasing mods
-        private double scaledScore;
-
-        private int countPerfect;
-        private int countGreat;
-        private int countGood;
-        private int countOk;
-        private int countMeh;
-        private int countMiss;
-
         public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
@@ -36,14 +24,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            mods = Score.Mods;
-            scaledScore = Score.TotalScore;
-            countPerfect = Score.Statistics.GetOrDefault(HitResult.Perfect);
-            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
-            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
-            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
-            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
+            var mods = Score.Mods;
+
+            // Score after being scaled by non-difficulty-increasing mods
+            double scaledScore = Score.TotalScore;
+            int countPerfect = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            int countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            int countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            int countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
+            int countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            int countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
+
+            int totalHits = countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
 
             if (mods.Any(m => !m.Ranked))
                 return 0;
@@ -81,49 +73,47 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
 
             return totalValue;
+
+            double computeStrainValue()
+            {
+                // Obtain strain difficulty
+                double strainValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
+
+                // Longer maps are worth more
+                strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
+
+                if (scaledScore <= 500000)
+                    strainValue = 0;
+                else if (scaledScore <= 600000)
+                    strainValue *= (scaledScore - 500000) / 100000 * 0.3;
+                else if (scaledScore <= 700000)
+                    strainValue *= 0.3 + (scaledScore - 600000) / 100000 * 0.25;
+                else if (scaledScore <= 800000)
+                    strainValue *= 0.55 + (scaledScore - 700000) / 100000 * 0.20;
+                else if (scaledScore <= 900000)
+                    strainValue *= 0.75 + (scaledScore - 800000) / 100000 * 0.15;
+                else
+                    strainValue *= 0.90 + (scaledScore - 900000) / 100000 * 0.1;
+
+                return strainValue;
+            }
+
+            double computeAccuracyValue(double strainValue)
+            {
+                if (Attributes.GreatHitWindow <= 0)
+                    return 0;
+
+                // Lots of arbitrary values from testing.
+                // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
+                double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
+                                       * strainValue
+                                       * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
+
+                // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
+                // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
+
+                return accuracyValue;
+            }
         }
-
-        private double computeStrainValue()
-        {
-            // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
-
-            // Longer maps are worth more
-            strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
-
-            if (scaledScore <= 500000)
-                strainValue = 0;
-            else if (scaledScore <= 600000)
-                strainValue *= (scaledScore - 500000) / 100000 * 0.3;
-            else if (scaledScore <= 700000)
-                strainValue *= 0.3 + (scaledScore - 600000) / 100000 * 0.25;
-            else if (scaledScore <= 800000)
-                strainValue *= 0.55 + (scaledScore - 700000) / 100000 * 0.20;
-            else if (scaledScore <= 900000)
-                strainValue *= 0.75 + (scaledScore - 800000) / 100000 * 0.15;
-            else
-                strainValue *= 0.90 + (scaledScore - 900000) / 100000 * 0.1;
-
-            return strainValue;
-        }
-
-        private double computeAccuracyValue(double strainValue)
-        {
-            if (Attributes.GreatHitWindow <= 0)
-                return 0;
-
-            // Lots of arbitrary values from testing.
-            // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
-                                   * strainValue
-                                   * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
-
-            // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
-            // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
-
-            return accuracyValue;
-        }
-
-        private double totalHits => countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
     }
 }
