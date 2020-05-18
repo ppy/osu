@@ -452,10 +452,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * d02, 0) + Math.Max(0.1125 - 0.075 * dMinus22, 0)) *
                                                SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
 
+
+            // Correction #14 - Sudden distance increase buff
+            double distanceIncreaseBuff = 1;
+            if (obj0 != null)
+            {
+                double d01OverlapNerf = Math.Min(1, Math.Pow(d01, 3));
+                double timeDifferenceNerf = Math.Exp(-4 * Math.Pow(1 - Math.Max(t12 / t01, t01 / t12), 2));
+                double distanceRatio = d12 / Math.Max(1, d01);
+                double bpmScaling = Math.Max(1, -16 * t12 + 3.4);
+                distanceIncreaseBuff = 1 + 0.225 * bpmScaling * timeDifferenceNerf * d01OverlapNerf * Math.Max(0, distanceRatio - 2);
+            }
+
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
                                        (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * bigJumpBuffFactor * (1 + correctionHidden) *
-                                       jumpOverlapCorrection;
+                                       jumpOverlapCorrection * distanceIncreaseBuff;
 
             movement.D = d12WithCorrection;
             movement.MT = t12;
