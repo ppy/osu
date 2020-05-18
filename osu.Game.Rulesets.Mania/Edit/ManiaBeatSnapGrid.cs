@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private readonly List<Grid> grids = new List<Grid>();
+        private readonly List<ScrollingHitObjectContainer> grids = new List<ScrollingHitObjectContainer>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -54,10 +54,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             {
                 foreach (var column in stage.Columns)
                 {
-                    var grid = new Grid();
+                    var lineContainer = new ScrollingHitObjectContainer();
 
-                    grids.Add(grid);
-                    column.UnderlayElements.Add(grid);
+                    grids.Add(lineContainer);
+                    column.UnderlayElements.Add(lineContainer);
                 }
             }
 
@@ -209,18 +209,6 @@ namespace osu.Game.Rulesets.Mania.Edit
                     int offset = i / beatDivisor.Value;
                     linesAfter[i].Colour = OsuColour.Gray(first_beat_brightness / (offset + 1));
                 }
-            }
-        }
-
-        private class Grid : ScrollingHitObjectContainer
-        {
-            [Resolved]
-            private IManiaHitObjectComposer composer { get; set; }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                Clock = composer.Playfield.Clock;
             }
         }
 
