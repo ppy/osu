@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private ConvertResult convert(string name, Mod[] mods)
         {
-            var beatmap = getBeatmap(name);
+            var beatmap = GetBeatmap(name);
 
             var rulesetInstance = CreateRuleset();
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
@@ -143,14 +143,19 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private IBeatmap getBeatmap(string name)
+        public IBeatmap GetBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
-                return decoder.Decode(stream);
+                var beatmap = decoder.Decode(stream);
+
+                // not sure but seems to be required.
+                beatmap.BeatmapInfo.Ruleset = CreateRuleset().RulesetInfo;
+
+                return beatmap;
             }
         }
 
