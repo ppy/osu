@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
+                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
 
                 roomManager.CreateRequested = r =>
                 {
@@ -89,6 +90,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("setup", () =>
             {
+                Room.Name.Value = "Test Room";
+                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+
                 fail = true;
                 roomManager.CreateRequested = _ => !fail;
             });
