@@ -133,7 +133,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        OnCommit = (sender, text) => apply(),
                                                                     },
                                                                 },
                                                                 new Section("持续时间")
@@ -196,7 +195,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                                 new Section("密码(可选)")
@@ -207,7 +205,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                             },
@@ -331,6 +328,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private void apply()
             {
+                if (!ApplyButton.Enabled.Value)
+                    return;
+
                 hideError();
 
                 RoomName.Value = NameField.Text;

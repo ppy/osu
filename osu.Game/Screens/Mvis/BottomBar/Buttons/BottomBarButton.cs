@@ -9,13 +9,15 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osu.Framework.Graphics.Containers;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Buttons
+namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
     public class BottomBarButton : OsuAnimatedButton
     {
         protected FillFlowContainer contentFillFlow;
         protected readonly Box bgBox;
+        private Box flashBox;
         public SpriteIcon spriteIcon;
         public IconUsage ButtonIcon;
         public Drawable ExtraDrawable;
@@ -52,6 +54,13 @@ namespace osu.Game.Screens.Mvis.Buttons
                         },
                     }
                 },
+                flashBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Colour = Color4.White,
+                    Alpha = 0,
+                },
             };
         }
 
@@ -68,6 +77,24 @@ namespace osu.Game.Screens.Mvis.Buttons
 
             if ( NoIcon == true )
                 this.contentFillFlow.Remove(spriteIcon);
+        }
+
+        protected override bool OnMouseDown(Framework.Input.Events.MouseDownEvent e)
+        {
+            flashBox.FadeTo(0.8f, 2000, Easing.OutQuint);
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(Framework.Input.Events.MouseUpEvent e)
+        {
+            flashBox.FadeOut(1000, Easing.OutQuint);
+            base.OnMouseUp(e);
+        }
+
+        protected override bool OnClick(Framework.Input.Events.ClickEvent e)
+        {
+            flashBox.FadeTo(1).Then().FadeOut(300); // `this.FlashColour(Color4.White, 300)` 不管用
+            return base.OnClick(e);
         }
     }
 }

@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Mvis.Objects.Helpers
         /// </summary>
         public IBindable<bool> IsIdle => isIdle;
 
+        public readonly Bindable<bool> ScreenHovered = new Bindable<bool>();
+
         private readonly BindableBool isIdle = new BindableBool();
 
         /// <summary>
@@ -66,6 +68,18 @@ namespace osu.Game.Screens.Mvis.Objects.Helpers
                 default:
                     return base.Handle(e);
             }
+        }
+
+        protected override bool OnHover(Framework.Input.Events.HoverEvent e)
+        {
+            this.ScreenHovered.Value = true;
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(Framework.Input.Events.HoverLostEvent e)
+        {
+            this.ScreenHovered.Value = false;
+            base.OnHoverLost(e);
         }
 
         public void Reset()
