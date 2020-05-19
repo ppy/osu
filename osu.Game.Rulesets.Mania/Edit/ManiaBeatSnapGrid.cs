@@ -51,7 +51,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public (double start, double end)? SelectionTimeRange
         {
-            get => selectionTimeRange;
             set
             {
                 if (value == selectionTimeRange)
@@ -59,17 +58,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
                 selectionTimeRange = value;
                 lineCache.Invalidate();
-            }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!lineCache.IsValid)
-            {
-                lineCache.Validate();
-                createLines();
             }
         }
 
@@ -88,6 +76,17 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
 
             beatDivisor.BindValueChanged(_ => createLines(), true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!lineCache.IsValid)
+            {
+                lineCache.Validate();
+                createLines();
+            }
         }
 
         private readonly Stack<DrawableGridLine> availableLines = new Stack<DrawableGridLine>();
