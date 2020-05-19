@@ -5,9 +5,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 
-namespace osu.Game.Screens.Mvis.Buttons
+namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
-    public class ToggleableOverlayLockButton : ToggleableButton
+    public class ToggleableOverlayLockButton : ToggleableBottomBarButton
     {
         public ToggleableOverlayLockButton()
         {
