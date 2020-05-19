@@ -16,6 +16,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Select
 {
@@ -29,48 +30,33 @@ namespace osu.Game.Screens.Select
 
         private readonly TabControl<GroupMode> groupTabs;
 
-        private SortMode sort = SortMode.Title;
+        private Bindable<SortMode> sortMode;
 
-        public SortMode Sort
+        private Bindable<GroupMode> groupMode;
+
+        public FilterCriteria CreateCriteria()
         {
-            get => sort;
-            set
+            var query = searchTextBox.Text;
+
+            var criteria = new FilterCriteria
             {
-                if (sort != value)
-                {
-                    sort = value;
-                    FilterChanged?.Invoke(CreateCriteria());
-                }
-            }
+                Group = groupMode.Value,
+                Sort = sortMode.Value,
+                AllowConvertedBeatmaps = showConverted.Value,
+                Ruleset = ruleset.Value,
+            };
+
+            if (!minimumStars.IsDefault)
+                criteria.UserStarDifficulty.Min = minimumStars.Value;
+
+            if (!maximumStars.IsDefault)
+                criteria.UserStarDifficulty.Max = maximumStars.Value;
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            return criteria;
         }
 
-        private GroupMode group = GroupMode.All;
-
-        public GroupMode Group
-        {
-            get => group;
-            set
-            {
-                if (group != value)
-                {
-                    group = value;
-                    FilterChanged?.Invoke(CreateCriteria());
-                }
-            }
-        }
-
-        public FilterCriteria CreateCriteria() => new FilterCriteria
-        {
-            Group = group,
-            Sort = sort,
-            SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted.Value,
-            Ruleset = ruleset.Value
-        };
-
-        public Action Exit;
-
-        private readonly SearchTextBox searchTextBox;
+        private readonly SeekLimitedSearchTextBox searchTextBox;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -94,11 +80,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Exit = () => Exit?.Invoke(),
-                        },
+                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
                         new Box
                         {
                             RelativeSizeAxes = Axes.X,
@@ -122,7 +104,6 @@ namespace osu.Game.Screens.Select
                                     Height = 24,
                                     Width = 0.5f,
                                     AutoSort = true,
-                                    Current = { Value = GroupMode.Title }
                                 },
                                 //spriteText = new OsuSpriteText
                                 //{
@@ -141,7 +122,6 @@ namespace osu.Game.Screens.Select
                                     Width = 0.5f,
                                     Height = 24,
                                     AutoSort = true,
-                                    Current = { Value = SortMode.Title }
                                 }
                             }
                         },
@@ -153,12 +133,12 @@ namespace osu.Game.Screens.Select
 
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.Current.ValueChanged += group => Group = group.NewValue;
-            sortTabs.Current.ValueChanged += sort => Sort = sort.NewValue;
         }
 
         public void Deactivate()
         {
+            searchTextBox.ReadOnly = true;
+
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
                 GetContainingInputManager().ChangeFocus(searchTextBox);
@@ -166,12 +146,15 @@ namespace osu.Game.Screens.Select
 
         public void Activate()
         {
+            searchTextBox.ReadOnly = false;
             searchTextBox.HoldFocus = true;
         }
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private Bindable<bool> showConverted;
+        private readonly Bindable<bool> showConverted = new Bindable<bool>();
+        private readonly Bindable<double> minimumStars = new BindableDouble();
+        private readonly Bindable<double> maximumStars = new BindableDouble();
 
         public readonly Box Background;
 
@@ -180,13 +163,34 @@ namespace osu.Game.Screens.Select
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
             showConverted.ValueChanged += _ => updateCriteria();
 
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += _ => updateCriteria();
+
             ruleset.BindTo(parentRuleset);
-            ruleset.BindValueChanged(_ => updateCriteria(), true);
+            ruleset.BindValueChanged(_ => updateCriteria());
+
+            sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
+            groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
+
+            sortTabs.Current.BindTo(sortMode);
+            groupTabs.Current.BindTo(groupMode);
+
+            groupMode.BindValueChanged(_ => updateCriteria());
+            sortMode.BindValueChanged(_ => updateCriteria());
+
+            updateCriteria();
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
+
+        protected override bool OnClick(ClickEvent e) => true;
+
+        protected override bool OnHover(HoverEvent e) => true;
     }
 }

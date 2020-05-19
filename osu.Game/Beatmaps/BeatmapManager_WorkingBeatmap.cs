@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -10,6 +9,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -32,16 +32,17 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                         return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Beatmap failed to load");
                     return null;
                 }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             private TextureStore textureStore;
 
@@ -58,8 +59,9 @@ namespace osu.Game.Beatmaps
                 {
                     return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Background failed to load");
                     return null;
                 }
             }
@@ -68,10 +70,11 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return (trackStore ?? (trackStore = AudioManager.GetTrackStore(store))).Get(getPathForFile(Metadata.AudioFile));
+                    return (trackStore ??= AudioManager.GetTrackStore(store)).Get(getPathForFile(Metadata.AudioFile));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Track failed to load");
                     return null;
                 }
             }
@@ -99,8 +102,9 @@ namespace osu.Game.Beatmaps
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new Waveform(trackData);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Waveform failed to load");
                     return null;
                 }
             }
@@ -111,7 +115,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
@@ -120,7 +124,7 @@ namespace osu.Game.Beatmaps
                             storyboard = decoder.Decode(stream);
                         else
                         {
-                            using (var secondaryStream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            using (var secondaryStream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
                                 storyboard = decoder.Decode(stream, secondaryStream);
                         }
                     }
@@ -136,21 +140,17 @@ namespace osu.Game.Beatmaps
                 return storyboard;
             }
 
-            protected override Skin GetSkin()
+            protected override ISkin GetSkin()
             {
-                Skin skin;
-
                 try
                 {
-                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
+                    return new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e, "Skin failed to load");
-                    skin = new DefaultSkin();
+                    return null;
                 }
-
-                return skin;
             }
         }
     }

@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "osu! Desktop": {
+      "commandName": "Project"
+    },
+    "osu! Tournament": {
+      "commandName": "Project",
+      "commandLineArgs": "--tournament"
+    }
+  }
+}

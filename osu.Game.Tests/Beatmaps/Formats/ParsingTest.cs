@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             try
             {
-                var _ = int.Parse(input);
+                _ = int.Parse(input);
             }
             catch (Exception e)
             {

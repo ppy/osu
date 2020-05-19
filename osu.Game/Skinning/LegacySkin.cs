@@ -1,71 +1,95 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Game.Database;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.UI;
-using osuTK;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
+        [CanBeNull]
         protected TextureStore Textures;
 
+        [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
         /// <summary>
-        /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
-        /// Their hittable area is 128px, but the actual circle portion is 118px.
-        /// We must account for some gameplay elements such as slider bodies, where this padding is not present.
+        /// Whether texture for the keys exists.
+        /// Used to determine if the mania ruleset is skinned.
         /// </summary>
-        private const float legacy_circle_radius = 64 - 5;
+        private readonly Lazy<bool> hasKeyTexture;
+
+        protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
+
+        public new LegacySkinConfiguration Configuration
+        {
+            get => base.Configuration as LegacySkinConfiguration;
+            set => base.Configuration = value;
+        }
+
+        private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
         }
 
-        private readonly bool hasHitCircle;
-
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
-            Stream stream = storage.GetStream(filename);
-            if (stream != null)
-                using (StreamReader reader = new StreamReader(stream))
-                    Configuration = new LegacySkinDecoder().Decode(reader);
-            else
-                Configuration = new SkinConfiguration();
-
-            Samples = audioManager.GetSampleStore(storage);
-            Textures = new TextureStore(new TextureLoaderStore(storage));
-
-            using (var testStream = storage.GetStream("hitcircle"))
-                hasHitCircle |= testStream != null;
-
-            if (hasHitCircle)
+            using (var stream = storage?.GetStream(filename))
             {
-                Configuration.SliderPathRadius = legacy_circle_radius;
+                if (stream != null)
+                {
+                    using (LineBufferedReader reader = new LineBufferedReader(stream, true))
+                        Configuration = new LegacySkinDecoder().Decode(reader);
+
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    using (LineBufferedReader reader = new LineBufferedReader(stream))
+                    {
+                        var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
+
+                        foreach (var config in maniaList)
+                            maniaConfigurations[config.Keys] = config;
+                    }
+                }
+                else
+                    Configuration = new LegacySkinConfiguration();
             }
+
+            if (storage != null)
+            {
+                var samples = audioManager?.GetSampleStore(storage);
+                if (samples != null)
+                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                Samples = samples;
+                Textures = new TextureStore(new TextureLoaderStore(storage));
+
+                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
+            }
+
+            // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
+            hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
+                lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
+                true) != null);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -75,309 +99,249 @@ namespace osu.Game.Skinning
             Samples?.Dispose();
         }
 
-        public override Drawable GetDrawableComponent(string componentName)
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            switch (componentName)
+            switch (lookup)
             {
-                case "Play/osu/cursor":
-                    if (GetTexture("cursor") != null)
-                        return new LegacyCursor();
+                case GlobalSkinColours colour:
+                    switch (colour)
+                    {
+                        case GlobalSkinColours.ComboColours:
+                            var comboColours = Configuration.ComboColours;
+                            if (comboColours != null)
+                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
 
-                    return null;
+                            break;
 
-                case "Play/osu/sliderball":
-                    if (GetTexture("sliderb") != null)
-                        return new LegacySliderBall();
+                        default:
+                            return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));
+                    }
 
-                    return null;
-
-                case "Play/osu/hitcircle":
-                    if (hasHitCircle)
-                        return new LegacyMainCirclePiece();
-
-                    return null;
-
-                case "Play/Miss":
-                    componentName = "hit0";
                     break;
 
-                case "Play/Meh":
-                    componentName = "hit50";
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    switch (legacy)
+                    {
+                        case LegacySkinConfiguration.LegacySetting.Version:
+                            return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion ?? LegacySkinConfiguration.LATEST_VERSION));
+                    }
+
                     break;
 
-                case "Play/Good":
-                    componentName = "hit100";
+                case SkinCustomColourLookup customColour:
+                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
+
+                case LegacyManiaSkinConfigurationLookup maniaLookup:
+                    if (!AllowManiaSkin)
+                        return null;
+
+                    var result = lookupForMania<TValue>(maniaLookup);
+                    if (result != null)
+                        return result;
+
                     break;
 
-                case "Play/Great":
-                    componentName = "hit300";
-                    break;
+                default:
+                    // handles lookups like GlobalSkinConfiguration
 
-                case "Play/osu/number-text":
-                    return !hasFont(Configuration.HitCircleFont)
-                        ? null
-                        : new LegacySpriteText(Textures, Configuration.HitCircleFont)
+                    try
+                    {
+                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
                         {
-                            Scale = new Vector2(0.96f),
-                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
-                            Spacing = new Vector2(-Configuration.HitCircleOverlap * 0.89f, 0)
-                        };
+                            // special case for handling skins which use 1 or 0 to signify a boolean state.
+                            if (typeof(TValue) == typeof(bool))
+                                val = val == "1" ? "true" : "false";
+
+                            var bindable = new Bindable<TValue>();
+                            if (val != null)
+                                bindable.Parse(val);
+                            return bindable;
+                        }
+                    }
+                    catch
+                    {
+                    }
+
+                    break;
             }
 
-            // temporary allowance is given for skins the fact that stable handles non-animatable items such as hitcircles (incorrectly)
-            // by (incorrectly) displaying the first frame of animation rather than the non-animated version.
-            // users have used this to "hide" certain elements like hit300.
-            var texture = GetTexture($"{componentName}-0") ?? GetTexture(componentName);
-
-            if (texture == null)
-                return null;
-
-            return new Sprite { Texture = texture };
+            return null;
         }
 
-        public class LegacySliderBall : Sprite
+        private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
         {
-            [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
+            if (!maniaConfigurations.TryGetValue(maniaLookup.Keys, out var existing))
+                maniaConfigurations[maniaLookup.Keys] = existing = new LegacyManiaSkinConfiguration(maniaLookup.Keys);
+
+            switch (maniaLookup.Lookup)
             {
-                Texture = skin.GetTexture("sliderb");
-                Colour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Color4.White;
+                case LegacyManiaSkinConfigurationLookups.ColumnWidth:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.TargetColumn.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.HitPosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
+
+                case LegacyManiaSkinConfigurationLookups.LightPosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.LightPosition));
+
+                case LegacyManiaSkinConfigurationLookups.ShowJudgementLine:
+                    return SkinUtils.As<TValue>(new Bindable<bool>(existing.ShowJudgementLine));
+
+                case LegacyManiaSkinConfigurationLookups.ExplosionScale:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+
+                    if (GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
+
+                    if (existing.ExplosionWidth[maniaLookup.TargetColumn.Value] != 0)
+                        return SkinUtils.As<TValue>(new Bindable<float>(existing.ExplosionWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.TargetColumn.Value] / LegacyManiaSkinConfiguration.DEFAULT_COLUMN_SIZE));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourColumnLine"));
+
+                case LegacyManiaSkinConfigurationLookups.JudgementLineColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourJudgementLine"));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getCustomColour(existing, $"Colour{maniaLookup.TargetColumn + 1}"));
+
+                case LegacyManiaSkinConfigurationLookups.ColumnLightColour:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getCustomColour(existing, $"ColourLight{maniaLookup.TargetColumn + 1}"));
+
+                case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.NoteImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}H"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteTailImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}T"));
+
+                case LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"NoteImage{maniaLookup.TargetColumn}L"));
+
+                case LegacyManiaSkinConfigurationLookups.KeyImage:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}"));
+
+                case LegacyManiaSkinConfigurationLookups.KeyImageDown:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(getManiaImage(existing, $"KeyImage{maniaLookup.TargetColumn}D"));
+
+                case LegacyManiaSkinConfigurationLookups.LeftStageImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageLeft"));
+
+                case LegacyManiaSkinConfigurationLookups.RightStageImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageRight"));
+
+                case LegacyManiaSkinConfigurationLookups.LeftLineWidth:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.TargetColumn.Value]));
+
+                case LegacyManiaSkinConfigurationLookups.RightLineWidth:
+                    Debug.Assert(maniaLookup.TargetColumn != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.TargetColumn.Value + 1]));
             }
+
+            return null;
+        }
+
+        private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
+            => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
+
+        private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
+            => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
+
+        public override Drawable GetDrawableComponent(ISkinComponent component)
+        {
+            switch (component)
+            {
+                case GameplaySkinComponent<HitResult> resultComponent:
+                    switch (resultComponent.Component)
+                    {
+                        case HitResult.Miss:
+                            return this.GetAnimation("hit0", true, false);
+
+                        case HitResult.Meh:
+                            return this.GetAnimation("hit50", true, false);
+
+                        case HitResult.Good:
+                            return this.GetAnimation("hit100", true, false);
+
+                        case HitResult.Great:
+                            return this.GetAnimation("hit300", true, false);
+                    }
+
+                    break;
+            }
+
+            return this.GetAnimation(component.LookupName, false, false);
         }
 
         public override Texture GetTexture(string componentName)
         {
-            float ratio = 2;
-            var texture = Textures.Get($"{componentName}@2x");
-
-            if (texture == null)
+            foreach (var name in getFallbackNames(componentName))
             {
-                ratio = 1;
-                texture = Textures.Get(componentName);
-            }
-
-            if (texture != null)
-                texture.ScaleAdjust = ratio;
-
-            return texture;
-        }
-
-        public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
-
-        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
-
-        protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
-            where T : INamedFileInfo
-        {
-            private readonly IHasFiles<T> source;
-            private readonly IResourceStore<byte[]> underlyingStore;
-
-            private string getPathForFile(string filename)
-            {
-                bool hasExtension = filename.Contains('.');
-
-                string lastPiece = filename.Split('/').Last();
-                var legacyName = filename.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
-
-                var file = source.Files.Find(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), legacyName, StringComparison.InvariantCultureIgnoreCase));
-                return file?.FileInfo.StoragePath;
-            }
-
-            public LegacySkinResourceStore(IHasFiles<T> source, IResourceStore<byte[]> underlyingStore)
-            {
-                this.source = source;
-                this.underlyingStore = underlyingStore;
-            }
-
-            public Stream GetStream(string name)
-            {
-                string path = getPathForFile(name);
-                return path == null ? null : underlyingStore.GetStream(path);
-            }
-
-            public IEnumerable<string> GetAvailableResources() => source.Files.Select(f => f.Filename);
-
-            byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
-
-            public Task<byte[]> GetAsync(string name)
-            {
-                string path = getPathForFile(name);
-                return path == null ? Task.FromResult<byte[]>(null) : underlyingStore.GetAsync(path);
-            }
-
-            #region IDisposable Support
-
-            private bool isDisposed;
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!isDisposed)
-                {
-                    isDisposed = true;
-                }
-            }
-
-            ~LegacySkinResourceStore()
-            {
-                Dispose(false);
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            #endregion
-        }
-
-        private class LegacySpriteText : OsuSpriteText
-        {
-            private readonly TextureStore textures;
-            private readonly string font;
-
-            public LegacySpriteText(TextureStore textures, string font)
-            {
-                this.textures = textures;
-                this.font = font;
-
-                Shadow = false;
-                UseFullGlyphHeight = false;
-            }
-
-            protected override Texture GetTextureForCharacter(char c)
-            {
-                string textureName = $"{font}-{c}";
-
-                // Approximate value that brings character sizing roughly in-line with stable
-                float ratio = 36;
-
-                var texture = textures.Get($"{textureName}@2x");
+                float ratio = 2;
+                var texture = Textures?.Get($"{name}@2x");
 
                 if (texture == null)
                 {
-                    ratio = 18;
-                    texture = textures.Get(textureName);
+                    ratio = 1;
+                    texture = Textures?.Get(name);
                 }
 
-                if (texture != null)
-                    texture.ScaleAdjust = ratio;
+                if (texture == null)
+                    continue;
 
+                texture.ScaleAdjust = ratio;
                 return texture;
             }
+
+            return null;
         }
 
-        public class LegacyCursor : CompositeDrawable
+        public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            public LegacyCursor()
+            foreach (var lookup in sampleInfo.LookupNames)
             {
-                Size = new Vector2(50);
+                var sample = Samples?.Get(lookup);
 
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
+                if (sample != null)
+                    return sample;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new NonPlayfieldSprite
-                    {
-                        Texture = skin.GetTexture("cursormiddle"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new NonPlayfieldSprite
-                    {
-                        Texture = skin.GetTexture("cursor"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
-                };
-            }
+            if (sampleInfo is HitSampleInfo hsi)
+                // Try fallback to non-bank samples.
+                return Samples?.Get(hsi.Name);
+
+            return null;
         }
 
-        public class LegacyMainCirclePiece : CompositeDrawable
+        private IEnumerable<string> getFallbackNames(string componentName)
         {
-            public LegacyMainCirclePiece()
-            {
-                Size = new Vector2(128);
-            }
+            // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
+            yield return componentName;
 
-            private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
-
-            private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
-
-            [BackgroundDependencyLoader]
-            private void load(DrawableHitObject drawableObject, ISkinSource skin)
-            {
-                Sprite hitCircleSprite;
-
-                InternalChildren = new Drawable[]
-                {
-                    hitCircleSprite = new Sprite
-                    {
-                        Texture = skin.GetTexture("hitcircle"),
-                        Colour = drawableObject.AccentColour.Value,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
-                    {
-                        Font = OsuFont.Numeric.With(size: 40),
-                        UseFullGlyphHeight = false,
-                    }, confineMode: ConfineMode.NoScaling)
-                    {
-                        Text = (((IHasComboInformation)drawableObject.HitObject).IndexInCurrentCombo + 1).ToString()
-                    },
-                    new Sprite
-                    {
-                        Texture = skin.GetTexture("hitcircleoverlay"),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
-                };
-
-                state.BindTo(drawableObject.State);
-                state.BindValueChanged(updateState, true);
-
-                accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
-            }
-
-            private void updateState(ValueChangedEvent<ArmedState> state)
-            {
-                const double legacy_fade_duration = 240;
-
-                switch (state.NewValue)
-                {
-                    case ArmedState.Hit:
-                        this.FadeOut(legacy_fade_duration, Easing.Out);
-                        this.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// A sprite which is displayed within the playfield, but historically was not considered part of the playfield.
-        /// Performs scale adjustment to undo the scale applied by <see cref="PlayfieldAdjustmentContainer"/> (osu! ruleset specifically).
-        /// </summary>
-        private class NonPlayfieldSprite : Sprite
-        {
-            public override Texture Texture
-            {
-                get => base.Texture;
-                set
-                {
-                    if (value != null)
-                        // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
-                        value.ScaleAdjust *= 1.6f;
-                    base.Texture = value;
-                }
-            }
+            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
+            string lastPiece = componentName.Split('/').Last();
+            yield return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
         }
     }
 }

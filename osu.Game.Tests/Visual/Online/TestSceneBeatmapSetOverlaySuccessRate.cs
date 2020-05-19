@@ -1,15 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
 using osuTK;
@@ -19,12 +19,10 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneBeatmapSetOverlaySuccessRate : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Details)
-        };
-
         private GraphExposingSuccessRate successRate;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -64,7 +62,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set second set", () => successRate.Beatmap = secondBeatmap);
             AddAssert("ratings set", () => successRate.Graph.Metrics == secondBeatmap.Metrics);
 
-            BeatmapInfo createBeatmap() => new BeatmapInfo
+            static BeatmapInfo createBeatmap() => new BeatmapInfo
             {
                 Metrics = new BeatmapMetrics
                 {

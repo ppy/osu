@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osuTK;
-using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -23,8 +22,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Maximum number of previous notes to consider for density calculation.
         /// </summary>
         private const int max_notes_for_density = 7;
-
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
         public bool Dual;
@@ -37,10 +34,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public ManiaBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
-            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -49,9 +46,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
 
-                if (TargetColumns >= 10)
+                if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
                 {
-                    TargetColumns = TargetColumns / 2;
+                    TargetColumns /= 2;
                     Dual = true;
                 }
             }
@@ -69,11 +66,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
+
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
-            int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
+            int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 
             return base.ConvertBeatmap(original);
@@ -116,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[prevNoteTimes.Count - 1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;
@@ -156,37 +155,44 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateConverted(HitObject original, IBeatmap originalBeatmap)
         {
-            var endTimeData = original as IHasEndTime;
-            var distanceData = original as IHasDistance;
-            var positionData = original as IHasPosition;
-
             Patterns.PatternGenerator conversion = null;
 
-            if (distanceData != null)
+            switch (original)
             {
-                var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
-                conversion = generator;
-
-                for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                case IHasDistance _:
                 {
-                    recordNote(time, positionData?.Position ?? Vector2.Zero);
-                    computeDensity(time);
+                    var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    conversion = generator;
+
+                    var positionData = original as IHasPosition;
+
+                    for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                    {
+                        recordNote(time, positionData?.Position ?? Vector2.Zero);
+                        computeDensity(time);
+                    }
+
+                    break;
                 }
-            }
-            else if (endTimeData != null)
-            {
-                conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
-                recordNote(endTimeData.EndTime, new Vector2(256, 192));
-                computeDensity(endTimeData.EndTime);
-            }
-            else if (positionData != null)
-            {
-                computeDensity(original.StartTime);
+                case IHasEndTime endTimeData:
+                {
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
-                conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+                    recordNote(endTimeData.EndTime, new Vector2(256, 192));
+                    computeDensity(endTimeData.EndTime);
+                    break;
+                }
 
-                recordNote(original.StartTime, positionData.Position);
+                case IHasPosition positionData:
+                {
+                    computeDensity(original.StartTime);
+
+                    conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+
+                    recordNote(original.StartTime, positionData.Position);
+                    break;
+                }
             }
 
             if (conversion == null)
@@ -219,25 +225,24 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             private Pattern generate()
             {
-                var endTimeData = HitObject as IHasEndTime;
                 var positionData = HitObject as IHasXPosition;
 
                 int column = GetColumn(positionData?.X ?? 0);
 
                 var pattern = new Pattern();
 
-                if (endTimeData != null)
+                if (HitObject is IHasEndTime endTimeData)
                 {
                     pattern.Add(new HoldNote
                     {
                         StartTime = HitObject.StartTime,
                         Duration = endTimeData.Duration,
                         Column = column,
-                        Head = { Samples = sampleInfoListAt(HitObject.StartTime) },
-                        Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
+                        Samples = HitObject.Samples,
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
                     });
                 }
-                else if (positionData != null)
+                else if (HitObject is IHasXPosition)
                 {
                     pattern.Add(new Note
                     {
@@ -248,24 +253,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
 
                 return pattern;
-            }
-
-            /// <summary>
-            /// Retrieves the sample info list at a point in time.
-            /// </summary>
-            /// <param name="time">The time to retrieve the sample info list from.</param>
-            /// <returns></returns>
-            private List<HitSampleInfo> sampleInfoListAt(double time)
-            {
-                var curveData = HitObject as IHasCurve;
-
-                if (curveData == null)
-                    return HitObject.Samples;
-
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
-
-                int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                return curveData.NodeSamples[index];
             }
         }
     }

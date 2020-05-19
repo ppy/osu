@@ -19,21 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Audio
         {
             this.controlPoints = controlPoints;
 
-            IEnumerable<SampleControlPoint> samplePoints;
-            if (controlPoints.SamplePoints.Count == 0)
-                // Get the default sample point
-                samplePoints = new[] { controlPoints.SamplePointAt(double.MinValue) };
-            else
-                samplePoints = controlPoints.SamplePoints;
+            IEnumerable<SampleControlPoint> samplePoints = controlPoints.SamplePoints.Count == 0 ? new[] { controlPoints.SamplePointAt(double.MinValue) } : controlPoints.SamplePoints;
 
             foreach (var s in samplePoints)
             {
                 var centre = s.GetSampleInfo();
                 var rim = s.GetSampleInfo(HitSampleInfo.HIT_CLAP);
-
-                // todo: this is ugly
-                centre.Namespace = "taiko";
-                rim.Namespace = "taiko";
 
                 mappings[s.Time] = new DrumSample
                 {

@@ -6,23 +6,28 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
+        /// <summary>
+        /// The hit type corresponding to the <see cref="TaikoAction"/> that the user pressed to hit this <see cref="DrawableDrumRollTick"/>.
+        /// </summary>
+        public HitType JudgementType;
+
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
             FillMode = FillMode.Fit;
         }
 
-        public override bool DisplayResult => false;
-
-        protected override TaikoPiece CreateMainPiece() => new TickPiece
-        {
-            Filled = HitObject.FirstTick
-        };
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollTick),
+            _ => new TickPiece
+            {
+                Filled = HitObject.FirstTick
+            });
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -39,17 +44,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ApplyResult(r => r.Type = HitResult.Great);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {
                 case ArmedState.Hit:
-                    this.ScaleTo(0, 100, Easing.OutQuint).Expire();
+                    this.ScaleTo(0, 100, Easing.OutQuint);
                     break;
             }
         }
 
-        public override bool OnPressed(TaikoAction action) => UpdateResult(true);
+        public override bool OnPressed(TaikoAction action)
+        {
+            JudgementType = action == TaikoAction.LeftRim || action == TaikoAction.RightRim ? HitType.Rim : HitType.Centre;
+            return UpdateResult(true);
+        }
 
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 

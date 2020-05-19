@@ -8,9 +8,10 @@ using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -126,6 +127,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 .Assert();
         }
 
+        [Test]
+        public void TestGetJsonDecoder()
+        {
+            Decoder<Beatmap> decoder;
+
+            using (var stream = TestResources.OpenResource(normal))
+            using (var sr = new LineBufferedReader(stream))
+            {
+                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+
+                using (var memStream = new MemoryStream())
+                using (var memWriter = new StreamWriter(memStream))
+                using (var memReader = new LineBufferedReader(memStream))
+                {
+                    memWriter.Write(legacyDecoded.Serialize());
+                    memWriter.Flush();
+
+                    memStream.Position = 0;
+                    decoder = Decoder.GetDecoder<Beatmap>(memReader);
+                }
+            }
+
+            Assert.IsInstanceOf(typeof(JsonBeatmapDecoder), decoder);
+        }
+
         /// <summary>
         /// Reads a .osu file first with a <see cref="LegacyBeatmapDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
         /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="JsonBeatmapDecoder"/>.
@@ -148,13 +174,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
             using (var stream = TestResources.OpenResource(filename))
-            using (var sr = new StreamReader(stream))
+            using (var sr = new LineBufferedReader(stream))
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
 
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
-                using (var sr2 = new StreamReader(ms))
+                using (var sr2 = new LineBufferedReader(ms))
                 {
                     sw.Write(legacyDecoded.Serialize());
                     sw.Flush();

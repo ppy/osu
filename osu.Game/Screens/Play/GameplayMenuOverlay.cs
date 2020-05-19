@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Input;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Bindings;
@@ -163,8 +162,6 @@ namespace osu.Game.Screens.Play
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnMouseUp(MouseUpEvent e) => true;
-
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
         protected void AddButton(string text, Color4 colour, Action action)
@@ -188,57 +185,42 @@ namespace osu.Game.Screens.Play
             InternalButtons.Add(button);
         }
 
-        private int _selectionIndex = -1;
+        private int selectionIndex = -1;
 
-        private int selectionIndex
+        private void setSelected(int value)
         {
-            get => _selectionIndex;
-            set
-            {
-                if (_selectionIndex == value)
-                    return;
+            if (selectionIndex == value)
+                return;
 
-                // Deselect the previously-selected button
-                if (_selectionIndex != -1)
-                    InternalButtons[_selectionIndex].Selected.Value = false;
+            // Deselect the previously-selected button
+            if (selectionIndex != -1)
+                InternalButtons[selectionIndex].Selected.Value = false;
 
-                _selectionIndex = value;
+            selectionIndex = value;
 
-                // Select the newly-selected button
-                if (_selectionIndex != -1)
-                    InternalButtons[_selectionIndex].Selected.Value = true;
-            }
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat)
-            {
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        if (selectionIndex == -1 || selectionIndex == 0)
-                            selectionIndex = InternalButtons.Count - 1;
-                        else
-                            selectionIndex--;
-                        return true;
-
-                    case Key.Down:
-                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                            selectionIndex = 0;
-                        else
-                            selectionIndex++;
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
+            // Select the newly-selected button
+            if (selectionIndex != -1)
+                InternalButtons[selectionIndex].Selected.Value = true;
         }
 
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
+                case GlobalAction.SelectPrevious:
+                    if (selectionIndex == -1 || selectionIndex == 0)
+                        setSelected(InternalButtons.Count - 1);
+                    else
+                        setSelected(selectionIndex - 1);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
+                        setSelected(0);
+                    else
+                        setSelected(selectionIndex + 1);
+                    return true;
+
                 case GlobalAction.Back:
                     BackAction.Invoke();
                     return true;
@@ -251,24 +233,16 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public bool OnReleased(GlobalAction action)
+        public void OnReleased(GlobalAction action)
         {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                case GlobalAction.Select:
-                    return true;
-            }
-
-            return false;
         }
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {
             if (!isSelected)
-                selectionIndex = -1;
+                setSelected(-1);
             else
-                selectionIndex = InternalButtons.IndexOf(button);
+                setSelected(InternalButtons.IndexOf(button));
         }
 
         private void updateRetryCount()
@@ -304,6 +278,7 @@ namespace osu.Game.Screens.Play
 
         private class Button : DialogButton
         {
+            // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
             protected override bool OnHover(HoverEvent e) => true;
 
             protected override bool OnMouseMove(MouseMoveEvent e)
@@ -311,6 +286,23 @@ namespace osu.Game.Screens.Play
                 Selected.Value = true;
                 return base.OnMouseMove(e);
             }
+        }
+
+        [Resolved]
+        private GlobalActionContainer globalAction { get; set; }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case ScrollEvent _:
+                    if (ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                        return globalAction.TriggerEvent(e);
+
+                    break;
+            }
+
+            return base.Handle(e);
         }
     }
 }

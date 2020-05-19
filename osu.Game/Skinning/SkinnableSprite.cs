@@ -19,11 +19,21 @@ namespace osu.Game.Skinning
         [Resolved]
         private TextureStore textures { get; set; }
 
-        public SkinnableSprite(string name, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
-            : base(name, allowFallback, confineMode)
+        public SkinnableSprite(string textureName, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : base(new SpriteComponent(textureName), allowFallback, confineMode)
         {
         }
 
-        protected override Drawable CreateDefault(string name) => new Sprite { Texture = textures.Get(name) };
+        protected override Drawable CreateDefault(ISkinComponent component) => new Sprite { Texture = textures.Get(component.LookupName) };
+
+        private class SpriteComponent : ISkinComponent
+        {
+            public SpriteComponent(string textureName)
+            {
+                LookupName = textureName;
+            }
+
+            public string LookupName { get; }
+        }
     }
 }

@@ -33,18 +33,17 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => ShowStoryboard.Value && DimLevel < 1;
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && DimLevel < 1);
 
         private void initializeStoryboard(bool async)
         {
             if (drawableStoryboard != null)
                 return;
 
-            if (!ShowStoryboard.Value)
+            if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
             drawableStoryboard = storyboard.CreateDrawable();
-            drawableStoryboard.Masking = true;
 
             if (async)
                 LoadComponentAsync(drawableStoryboard, Add);

@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -88,15 +89,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         public override IEnumerable<Pattern> Generate()
         {
-            yield return generate();
-        }
-
-        private Pattern generate()
-        {
-            var pattern = new Pattern();
-
-            try
+            Pattern generateCore()
             {
+                var pattern = new Pattern();
+
                 if (TotalColumns == 1)
                 {
                     addToPattern(pattern, 0);
@@ -109,8 +105,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     // Generate a new pattern by copying the last hit objects in reverse-column order
                     for (int i = RandomStart; i < TotalColumns; i++)
+                    {
                         if (PreviousPattern.ColumnHasObject(i))
                             addToPattern(pattern, RandomStart + TotalColumns - i - 1);
+                    }
 
                     return pattern;
                 }
@@ -132,8 +130,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     // Generate a new pattern by placing on the already filled columns
                     for (int i = RandomStart; i < TotalColumns; i++)
+                    {
                         if (PreviousPattern.ColumnHasObject(i))
                             addToPattern(pattern, i);
+                    }
 
                     return pattern;
                 }
@@ -164,54 +164,56 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 }
 
                 if (convertType.HasFlag(PatternType.KeepSingle))
-                    return pattern = generateRandomNotes(1);
+                    return generateRandomNotes(1);
 
                 if (convertType.HasFlag(PatternType.Mirror))
                 {
                     if (ConversionDifficulty > 6.5)
-                        return pattern = generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
+                        return generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
                     if (ConversionDifficulty > 4)
-                        return pattern = generateRandomPatternWithMirrored(0.12, 0.17, 0);
+                        return generateRandomPatternWithMirrored(0.12, 0.17, 0);
 
-                    return pattern = generateRandomPatternWithMirrored(0.12, 0, 0);
+                    return generateRandomPatternWithMirrored(0.12, 0, 0);
                 }
 
                 if (ConversionDifficulty > 6.5)
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
-                        return pattern = generateRandomPattern(0.78, 0.42, 0, 0);
+                        return generateRandomPattern(0.78, 0.42, 0, 0);
 
-                    return pattern = generateRandomPattern(1, 0.62, 0, 0);
+                    return generateRandomPattern(1, 0.62, 0, 0);
                 }
 
                 if (ConversionDifficulty > 4)
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
-                        return pattern = generateRandomPattern(0.35, 0.08, 0, 0);
+                        return generateRandomPattern(0.35, 0.08, 0, 0);
 
-                    return pattern = generateRandomPattern(0.52, 0.15, 0, 0);
+                    return generateRandomPattern(0.52, 0.15, 0, 0);
                 }
 
                 if (ConversionDifficulty > 2)
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
-                        return pattern = generateRandomPattern(0.18, 0, 0, 0);
+                        return generateRandomPattern(0.18, 0, 0, 0);
 
-                    return pattern = generateRandomPattern(0.45, 0, 0, 0);
+                    return generateRandomPattern(0.45, 0, 0, 0);
                 }
 
-                return pattern = generateRandomPattern(0, 0, 0, 0);
+                return generateRandomPattern(0, 0, 0, 0);
             }
-            finally
+
+            var p = generateCore();
+
+            foreach (var obj in p.HitObjects)
             {
-                foreach (var obj in pattern.HitObjects)
-                {
-                    if (convertType.HasFlag(PatternType.Stair) && obj.Column == TotalColumns - 1)
-                        StairType = PatternType.ReverseStair;
-                    if (convertType.HasFlag(PatternType.ReverseStair) && obj.Column == RandomStart)
-                        StairType = PatternType.Stair;
-                }
+                if (convertType.HasFlag(PatternType.Stair) && obj.Column == TotalColumns - 1)
+                    StairType = PatternType.ReverseStair;
+                if (convertType.HasFlag(PatternType.ReverseStair) && obj.Column == RandomStart)
+                    StairType = PatternType.Stair;
             }
+
+            return p.Yield();
         }
 
         /// <summary>
@@ -299,8 +301,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             var pattern = new Pattern();
 
-            bool addToCentre;
-            int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out addToCentre);
+            int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out var addToCentre);
 
             int columnLimit = (TotalColumns % 2 == 0 ? TotalColumns : TotalColumns - 1) / 2;
             int nextColumn = GetRandomColumn(upperBound: columnLimit);
@@ -380,8 +381,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>The amount of notes to be generated. The note to be added to the centre column will NOT be part of this count.</returns>
         private int getRandomNoteCountMirrored(double centreProbability, double p2, double p3, out bool addToCentre)
         {
-            addToCentre = false;
-
             switch (TotalColumns)
             {
                 case 2:

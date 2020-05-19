@@ -2,13 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Graphics.Sprites;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi
@@ -30,7 +34,7 @@ namespace osu.Game.Screens.Multi
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"2f2043"),
+                    Colour = Color4Extensions.FromHex(@"2f2043"),
                 },
                 new Container
                 {
@@ -42,7 +46,7 @@ namespace osu.Game.Screens.Multi
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            X = -ScreenTitle.ICON_WIDTH,
+                            X = -MultiHeaderTitle.ICON_WIDTH,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
@@ -69,18 +73,78 @@ namespace osu.Game.Screens.Multi
             breadcrumbs.StripColour = colours.Green;
         }
 
-        private class MultiHeaderTitle : ScreenTitle
+        private class MultiHeaderTitle : CompositeDrawable, IHasAccentColour
         {
+            public const float ICON_WIDTH = icon_size + spacing;
+
+            private const float icon_size = 25;
+            private const float spacing = 6;
+            private const int text_offset = 2;
+
+            private readonly SpriteIcon iconSprite;
+            private readonly OsuSpriteText title, pageText;
+
             public IMultiplayerSubScreen Screen
             {
-                set => Section = value.ShortTitle.ToLowerInvariant();
+                set => pageText.Text = value.ShortTitle.ToLowerInvariant();
+            }
+
+            public Color4 AccentColour
+            {
+                get => pageText.Colour;
+                set => pageText.Colour = value;
+            }
+
+            public MultiHeaderTitle()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(spacing, 0),
+                        Direction = FillDirection.Horizontal,
+                        Children = new Drawable[]
+                        {
+                            iconSprite = new SpriteIcon
+                            {
+                                Size = new Vector2(icon_size),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre
+                            },
+                            title = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                Margin = new MarginPadding { Bottom = text_offset }
+                            },
+                            new Circle
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(4),
+                                Colour = Color4.Gray,
+                            },
+                            pageText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = OsuFont.GetFont(size: 20),
+                                Margin = new MarginPadding { Bottom = text_offset }
+                            }
+                        }
+                    },
+                };
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Title = "multi";
-                Icon = OsuIcon.Multi;
+                title.Text = "multi";
+                iconSprite.Icon = OsuIcon.Multi;
                 AccentColour = colours.Yellow;
             }
         }

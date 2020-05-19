@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,8 +14,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
-        private readonly SpinnerSpmCounter spmCounter;
+        public readonly SpinnerSpmCounter SpmCounter;
 
         private readonly Container mainContainer;
 
@@ -35,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly SpriteIcon symbol;
 
-        private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
-        private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
+        private readonly Color4 baseColour = Color4Extensions.FromHex(@"002c3c");
+        private readonly Color4 fillColour = Color4Extensions.FromHex(@"005b7c");
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         },
                     }
                 },
-                spmCounter = new SpinnerSpmCounter
+                SpmCounter = new SpinnerSpmCounter
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -136,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
-        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress => Math.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -175,20 +176,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void Update()
         {
-            Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
-            if (!spmCounter.IsPresent && Disc.Tracking)
-                spmCounter.FadeIn(HitObject.TimeFadeIn);
-
             base.Update();
+            if (HandleUserInput)
+                Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
+            if (!SpmCounter.IsPresent && Disc.Tracking)
+                SpmCounter.FadeIn(HitObject.TimeFadeIn);
+
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
-            spmCounter.SetRotation(Disc.RotationAbsolute);
+            SpmCounter.SetRotation(Disc.RotationAbsolute);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
@@ -215,14 +217,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {
-                case ArmedState.Idle:
-                    Expire(true);
-                    break;
-
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
@@ -231,8 +231,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
-
-            Expire();
         }
     }
 }

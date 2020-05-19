@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,20 +16,12 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public abstract class IntroTestScene : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(StartupScreen),
-            typeof(IntroScreen),
-            typeof(OsuScreen),
-            typeof(IntroTestScene),
-        };
-
         [Cached]
         private OsuLogo logo;
 
         protected IntroTestScene()
         {
-            Drawable introStack = null;
+            OsuScreenStack introStack = null;
 
             Children = new Drawable[]
             {
@@ -57,11 +47,15 @@ namespace osu.Game.Tests.Visual.Menus
 
                 introStack?.Expire();
 
-                Add(introStack = new OsuScreenStack(CreateScreen())
+                Add(introStack = new OsuScreenStack
                 {
                     RelativeSizeAxes = Axes.Both,
                 });
+
+                introStack.Push(CreateScreen());
             });
+
+            AddUntilStep("wait for menu", () => introStack.CurrentScreen is MainMenu);
         }
 
         protected abstract IScreen CreateScreen();

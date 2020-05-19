@@ -3,23 +3,38 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
+using System.Collections.Generic;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Judgements;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasEndTime
+    public class DrumRoll : TaikoHitObject, IHasCurve
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
         private const float base_distance = 100;
 
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
+
+        /// <summary>
+        /// Velocity of this <see cref="DrumRoll"/>.
+        /// </summary>
+        public double Velocity { get; private set; }
 
         /// <summary>
         /// Numer of ticks per beat length.
@@ -49,6 +64,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
+
+            double scoringDistance = base_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
             overallDifficulty = difficulty.OverallDifficulty;
@@ -86,5 +105,20 @@ namespace osu.Game.Rulesets.Taiko.Objects
         }
 
         public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        #region LegacyBeatmapEncoder
+
+        double IHasDistance.Distance => Duration * Velocity;
+
+        int IHasRepeats.RepeatCount { get => 0; set { } }
+
+        List<IList<HitSampleInfo>> IHasRepeats.NodeSamples => new List<IList<HitSampleInfo>>();
+
+        SliderPath IHasCurve.Path
+            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER);
+
+        #endregion
     }
 }

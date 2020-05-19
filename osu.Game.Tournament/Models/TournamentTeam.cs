@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Users;
@@ -28,6 +29,32 @@ namespace osu.Game.Tournament.Models
         /// Short acronym which appears in the group boxes post-selection.
         /// </summary>
         public Bindable<string> Acronym = new Bindable<string>(string.Empty);
+
+        public BindableList<SeedingResult> SeedingResults = new BindableList<SeedingResult>();
+
+        public double AverageRank
+        {
+            get
+            {
+                var ranks = Players.Select(p => p.Statistics?.Ranks.Global)
+                                   .Where(i => i.HasValue)
+                                   .Select(i => i.Value)
+                                   .ToArray();
+
+                if (ranks.Length == 0)
+                    return 0;
+
+                return ranks.Average();
+            }
+        }
+
+        public Bindable<string> Seed = new Bindable<string>(string.Empty);
+
+        public Bindable<int> LastYearPlacing = new BindableInt
+        {
+            MinValue = 1,
+            MaxValue = 64
+        };
 
         [JsonProperty]
         public BindableList<User> Players { get; set; } = new BindableList<User>();

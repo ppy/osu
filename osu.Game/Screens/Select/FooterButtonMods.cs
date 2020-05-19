@@ -3,15 +3,17 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
@@ -24,22 +26,26 @@ namespace osu.Game.Screens.Select
             set => modDisplay.Current = value;
         }
 
-        private readonly FooterModDisplay modDisplay;
+        protected readonly OsuSpriteText MultiplierText;
+        private readonly ModDisplay modDisplay;
+        private Color4 lowMultiplierColour;
+        private Color4 highMultiplierColour;
 
         public FooterButtonMods()
         {
-            Add(new Container
+            ButtonContentContainer.Add(modDisplay = new ModDisplay
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Shear = -SHEAR,
-                Child = modDisplay = new FooterModDisplay
-                {
-                    DisplayUnrankedText = false,
-                    Scale = new Vector2(0.8f)
-                },
-                AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 70 }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                DisplayUnrankedText = false,
+                Scale = new Vector2(0.8f),
+                ExpansionMode = ExpansionMode.AlwaysContracted,
+            });
+            ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.GetFont(weight: FontWeight.Bold),
             });
         }
 
@@ -48,18 +54,36 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
+            lowMultiplierColour = colours.Red;
+            highMultiplierColour = colours.Green;
             Text = @"mods";
             Hotkey = Key.F1;
         }
 
-        private class FooterModDisplay : ModDisplay
+        protected override void LoadComplete()
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
+            base.LoadComplete();
 
-            public FooterModDisplay()
-            {
-                AllowExpand = false;
-            }
+            Current.BindValueChanged(_ => updateMultiplierText(), true);
+        }
+
+        private void updateMultiplierText()
+        {
+            double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
+
+            MultiplierText.Text = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
+
+            if (multiplier > 1.0)
+                MultiplierText.FadeColour(highMultiplierColour, 200);
+            else if (multiplier < 1.0)
+                MultiplierText.FadeColour(lowMultiplierColour, 200);
+            else
+                MultiplierText.FadeColour(Color4.White, 200);
+
+            if (Current.Value?.Count > 0)
+                modDisplay.FadeIn();
+            else
+                modDisplay.FadeOut();
         }
     }
 }

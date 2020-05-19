@@ -24,7 +24,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Url { get; set; }
 
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public ChangelogEntryType Type { get; set; }
 
         [JsonProperty("category")]
         public string Category { get; set; }
@@ -43,5 +43,11 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("github_user")]
         public APIChangelogUser GithubUser { get; set; }
+    }
+
+    public enum ChangelogEntryType
+    {
+        Add,
+        Fix
     }
 }

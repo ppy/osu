@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Users;
@@ -19,7 +21,7 @@ namespace osu.Game.Online.API
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
-        public bool IsLoggedIn => true;
+        public bool IsLoggedIn => State == APIState.Online;
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
@@ -29,10 +31,15 @@ namespace osu.Game.Online.API
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
+        /// <summary>
+        /// Provide handling logic for an arbitrary API request.
+        /// </summary>
+        public Action<APIRequest> HandleRequest;
+
         public APIState State
         {
             get => state;
-            private set
+            set
             {
                 if (state == value)
                     return;
@@ -54,6 +61,15 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
+            HandleRequest?.Invoke(request);
+        }
+
+        public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
+
+        public Task PerformAsync(APIRequest request)
+        {
+            HandleRequest?.Invoke(request);
+            return Task.CompletedTask;
         }
 
         public void Register(IOnlineComponent component)

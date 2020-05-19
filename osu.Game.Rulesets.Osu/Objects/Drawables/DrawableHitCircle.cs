@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,25 +10,27 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osuTK;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        public ApproachCircle ApproachCircle;
+        public ApproachCircle ApproachCircle { get; }
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<float> scaleBindable = new BindableFloat();
 
-        public OsuAction? HitAction => hitArea.HitAction;
+        public OsuAction? HitAction => HitArea.HitAction;
 
+        public readonly HitReceptor HitArea;
+        public readonly SkinnableDrawable CirclePiece;
         private readonly Container scaleContainer;
 
-        private readonly HitArea hitArea;
+        protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
@@ -45,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        hitArea = new HitArea
+                        HitArea = new HitReceptor
                         {
                             Hit = () =>
                             {
@@ -56,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        new SkinnableDrawable("Play/osu/hitcircle", _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -66,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
             };
 
-            Size = hitArea.DrawSize;
+            Size = HitArea.DrawSize;
         }
 
         [BackgroundDependencyLoader]
@@ -83,8 +86,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue, true);
         }
 
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                base.LifetimeStart = value;
+                ApproachCircle.LifetimeStart = value;
+            }
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                base.LifetimeEnd = value;
+                ApproachCircle.LifetimeEnd = value;
+            }
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -95,9 +120,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
 
-            if (result == HitResult.None)
+            if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
-                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
+                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;
             }
 
@@ -108,6 +133,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
+            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
+
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
             ApproachCircle.Expire(true);
@@ -115,6 +142,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
+            Debug.Assert(HitObject.HitWindows != null);
+
             switch (state)
             {
                 case ArmedState.Idle:
@@ -122,30 +153,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                     Expire(true);
 
-                    hitArea.HitAction = null;
-
-                    // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
+                    HitArea.HitAction = null;
                     break;
 
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
                     this.FadeOut(100);
-                    Expire();
                     break;
 
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
                     // todo: temporary / arbitrary
-                    this.Delay(800).Expire();
+                    this.Delay(800).FadeOut();
                     break;
             }
         }
 
         public Drawable ProxiedLayer => ApproachCircle;
 
-        private class HitArea : Drawable, IKeyBindingHandler<OsuAction>
+        public class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
         {
             // IsHovered is used
             public override bool HandlePositionalInput => true;
@@ -154,12 +181,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public OsuAction? HitAction;
 
-            public HitArea()
+            public HitReceptor()
             {
                 Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
+
+                CornerRadius = OsuHitObject.OBJECT_RADIUS;
+                CornerExponent = 2;
             }
 
             public bool OnPressed(OsuAction action)
@@ -180,7 +210,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
         }
     }
 }

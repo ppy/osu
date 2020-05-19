@@ -7,22 +7,32 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     public abstract class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
     {
         /// <summary>
-        /// Whether this <see cref="DrawableManiaHitObject"/> should always remain alive.
-        /// </summary>
-        internal bool AlwaysAlive;
-
-        /// <summary>
         /// The <see cref="ManiaAction"/> which causes this <see cref="DrawableManiaHitObject{TObject}"/> to be hit.
         /// </summary>
         protected readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+
+        [Resolved(canBeNull: true)]
+        private ManiaPlayfield playfield { get; set; }
+
+        protected override float SamplePlaybackPosition
+        {
+            get
+            {
+                if (playfield == null)
+                    return base.SamplePlaybackPosition;
+
+                return (float)HitObject.Column / playfield.TotalColumns;
+            }
+        }
 
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
@@ -39,11 +49,80 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
 
-        protected override bool ShouldBeAlive => AlwaysAlive || base.ShouldBeAlive;
+        private double computedLifetimeStart;
+
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                computedLifetimeStart = value;
+
+                if (!AlwaysAlive)
+                    base.LifetimeStart = value;
+            }
+        }
+
+        private double computedLifetimeEnd;
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                computedLifetimeEnd = value;
+
+                if (!AlwaysAlive)
+                    base.LifetimeEnd = value;
+            }
+        }
+
+        private bool alwaysAlive;
+
+        /// <summary>
+        /// Whether this <see cref="DrawableManiaHitObject"/> should always remain alive.
+        /// </summary>
+        internal bool AlwaysAlive
+        {
+            get => alwaysAlive;
+            set
+            {
+                if (alwaysAlive == value)
+                    return;
+
+                alwaysAlive = value;
+
+                if (value)
+                {
+                    // Set the base lifetimes directly, to avoid mangling the computed lifetimes
+                    base.LifetimeStart = double.MinValue;
+                    base.LifetimeEnd = double.MaxValue;
+                }
+                else
+                {
+                    LifetimeStart = computedLifetimeStart;
+                    LifetimeEnd = computedLifetimeEnd;
+                }
+            }
+        }
 
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    this.FadeOut(150, Easing.In);
+                    break;
+
+                case ArmedState.Hit:
+                    this.FadeOut(150, Easing.OutQuint);
+                    break;
+            }
         }
     }
 
@@ -56,23 +135,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(hitObject)
         {
             HitObject = hitObject;
-        }
-
-        protected override bool UseTransformStateManagement => false;
-
-        protected override void UpdateState(ArmedState state)
-        {
-            // TODO: update to use new state management.
-            switch (state)
-            {
-                case ArmedState.Miss:
-                    this.FadeOut(150, Easing.In).Expire();
-                    break;
-
-                case ArmedState.Hit:
-                    this.FadeOut(150, Easing.OutQuint).Expire();
-                    break;
-            }
         }
     }
 }

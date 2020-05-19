@@ -16,6 +16,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.MedalSplash
 {
+    [LongRunningLoad]
     public class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.MedalSplash
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Scale = new Vector2(0.81f),
+                            Scale = new Vector2(0.41f),
                         },
                         medalGlow = new Sprite
                         {

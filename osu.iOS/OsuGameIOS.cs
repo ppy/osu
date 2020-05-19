@@ -4,6 +4,7 @@
 using System;
 using Foundation;
 using osu.Game;
+using osu.Game.Updater;
 
 namespace osu.iOS
 {

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -12,7 +10,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -20,13 +17,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class TestSceneSpinner : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(SpinnerDisc),
-            typeof(DrawableSpinner),
-            typeof(DrawableOsuHitObject)
-        };
-
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
@@ -56,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Depth = depthIndex++
             };
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             Add(drawable);

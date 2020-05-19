@@ -11,9 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -25,14 +23,14 @@ namespace osu.Game.Tournament.Screens.Editors
     public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
         [Resolved]
-        private Framework.Game game { get; set; }
+        private TournamentGameBase game { get; set; }
 
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ControlPanel.Add(new OsuButton
+            ControlPanel.Add(new TourneyButton
             {
                 RelativeSizeAxes = Axes.X,
                 Text = "Add all countries",
@@ -40,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Editors
             });
         }
 
-        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model);
+        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model, this);
 
         private void addAllCountries()
         {
@@ -59,10 +57,13 @@ namespace osu.Game.Tournament.Screens.Editors
 
             private readonly Container drawableContainer;
 
+            [Resolved(canBeNull: true)]
+            private TournamentSceneManager sceneManager { get; set; }
+
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
-            public TeamRow(TournamentTeam team)
+            public TeamRow(TournamentTeam team, TournamentScreen parent)
             {
                 Model = team;
 
@@ -115,6 +116,18 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.2f,
                                 Bindable = Model.FlagName
                             },
+                            new SettingsTextBox
+                            {
+                                LabelText = "Seed",
+                                Width = 0.2f,
+                                Bindable = Model.Seed
+                            },
+                            new SettingsSlider<int>
+                            {
+                                LabelText = "Last Year Placement",
+                                Width = 0.33f,
+                                Bindable = Model.LastYearPlacing
+                            },
                             new SettingsButton
                             {
                                 Width = 0.11f,
@@ -133,7 +146,17 @@ namespace osu.Game.Tournament.Screens.Editors
                                     ladderInfo.Teams.Remove(Model);
                                 },
                             },
-                            playerEditor
+                            playerEditor,
+                            new SettingsButton
+                            {
+                                Width = 0.2f,
+                                Margin = new MarginPadding(10),
+                                Text = "Edit seeding results",
+                                Action = () =>
+                                {
+                                    sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
+                                }
+                            },
                         }
                     },
                 };
@@ -147,19 +170,6 @@ namespace osu.Game.Tournament.Screens.Editors
             private void updateDrawable(ValueChangedEvent<string> flag)
             {
                 drawableContainer.Child = new DrawableTeamFlag(Model);
-            }
-
-            private class DrawableTeamFlag : DrawableTournamentTeam
-            {
-                public DrawableTeamFlag(TournamentTeam team)
-                    : base(team)
-                {
-                    InternalChild = Flag;
-                    RelativeSizeAxes = Axes.Both;
-
-                    Flag.Anchor = Anchor.Centre;
-                    Flag.Origin = Anchor.Centre;
-                }
             }
 
             public class PlayerEditor : CompositeDrawable
@@ -179,8 +189,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
                     };
                 }
@@ -198,6 +206,9 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
+
+                    [Resolved]
+                    private TournamentGameBase game { get; set; }
 
                     private readonly Bindable<string> userId = new Bindable<string>();
 
@@ -266,9 +277,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         userId.Value = user.Id.ToString();
                         userId.BindValueChanged(idString =>
                         {
-                            long parsed;
-
-                            long.TryParse(idString.NewValue, out parsed);
+                            long.TryParse(idString.NewValue, out var parsed);
 
                             user.Id = parsed;
 
@@ -281,31 +290,13 @@ namespace osu.Game.Tournament.Screens.Editors
                                 return;
                             }
 
-                            var req = new GetUserRequest(user.Id);
-
-                            req.Success += res =>
-                            {
-                                // TODO: this should be done in a better way.
-                                user.Username = res.Username;
-                                user.Country = res.Country;
-                                user.Cover = res.Cover;
-
-                                updatePanel();
-                            };
-
-                            req.Failure += _ =>
-                            {
-                                user.Id = 1;
-                                updatePanel();
-                            };
-
-                            API.Queue(req);
+                            game.PopulateUser(user, updatePanel, updatePanel);
                         }, true);
                     }
 
                     private void updatePanel()
                     {
-                        drawableContainer.Child = new UserPanel(user) { Width = 300 };
+                        drawableContainer.Child = new UserGridPanel(user) { Width = 300 };
                     }
                 }
             }

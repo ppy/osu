@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -19,19 +15,12 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfileOverlay : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         private readonly TestUserProfileOverlay profile;
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ProfileHeader),
-            typeof(RankGraph),
-            typeof(LineGraph),
-            typeof(SectionsContainer<>),
-            typeof(SupporterIcon)
-        };
 
         public static readonly User TEST_USER = new User
         {
@@ -68,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
-            Achievements = new User.UserAchievement[0],
+            Achievements = Array.Empty<User.UserAchievement>(),
         };
 
         public TestSceneUserProfileOverlay()
@@ -103,6 +92,15 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+            }, api.IsLoggedIn));
+
+            AddStep("Show bancho", () => profile.ShowUser(new User
+            {
+                Username = @"BanchoBot",
+                Id = 3,
+                IsBot = true,
+                Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
             }, api.IsLoggedIn));
 
             AddStep("Hide", profile.Hide);

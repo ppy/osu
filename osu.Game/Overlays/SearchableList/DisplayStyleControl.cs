@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -11,6 +12,7 @@ using osu.Game.Graphics.Containers;
 namespace osu.Game.Overlays.SearchableList
 {
     public class DisplayStyleControl<T> : Container
+        where T : struct, Enum
     {
         public readonly SlimEnumDropdown<T> Dropdown;
         public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
@@ -89,6 +91,8 @@ namespace osu.Game.Overlays.SearchableList
 
             protected override void Dispose(bool isDisposing)
             {
+                base.Dispose(isDisposing);
+
                 bindable.ValueChanged -= Bindable_ValueChanged;
             }
         }

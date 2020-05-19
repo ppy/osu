@@ -1,8 +1,6 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -11,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -29,17 +28,12 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestSceneNotes : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableNote),
-            typeof(DrawableHoldNote)
-        };
-
         [BackgroundDependencyLoader]
         private void load()
         {
             Child = new FillFlowContainer
             {
+                Clock = new FramedClock(new ManualClock()),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
@@ -62,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createNoteDisplay(ScrollingDirection direction, int identifier, out DrawableNote hitObject)
         {
-            var note = new Note { StartTime = 999999999 };
+            var note = new Note { StartTime = 0 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
@@ -77,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createHoldNoteDisplay(ScrollingDirection direction, int identifier, out DrawableHoldNote hitObject)
         {
-            var note = new HoldNote { StartTime = 999999999, Duration = 5000 };
+            var note = new HoldNote { StartTime = 0, Duration = 5000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
@@ -133,7 +127,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 1.25f,
-                                    Colour = Color4.Black.Opacity(0.5f)
+                                    Colour = Color4.Green.Opacity(0.5f)
                                 },
                                 content = new Container { RelativeSizeAxes = Axes.Both }
                             }

@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -19,10 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            InternalChild = new SkinnableDrawable("Play/osu/hitcircleoverlay", _ => new Container
+            InternalChild = new CircularContainer
             {
                 Masking = true,
-                CornerRadius = Size.X / 2,
                 BorderThickness = 10,
                 BorderColour = Color4.White,
                 RelativeSizeAxes = Axes.Both,
@@ -35,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         RelativeSizeAxes = Axes.Both
                     }
                 }
-            });
+            };
         }
     }
 }

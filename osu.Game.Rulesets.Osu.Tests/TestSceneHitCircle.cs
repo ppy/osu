@@ -8,8 +8,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
-using System.Collections.Generic;
-using System;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
@@ -18,13 +16,8 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneHitCircle : SkinnableTestScene
+    public class TestSceneHitCircle : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableHitCircle)
-        };
-
         private int depthIndex;
 
         public TestSceneHitCircle()
@@ -45,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
         {
-            positionOffset = positionOffset ?? Vector2.Zero;
+            positionOffset ??= Vector2.Zero;
 
             var circle = new HitCircle
             {
@@ -57,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableHitCircle(circle, auto);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             return drawable;

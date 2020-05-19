@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;

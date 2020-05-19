@@ -12,6 +12,12 @@ namespace osu.Game.Rulesets.Judgements
     public class Judgement
     {
         /// <summary>
+        /// The default health increase for a maximum judgement, as a proportion of total health.
+        /// By default, each maximum judgement restores 5% of total health.
+        /// </summary>
+        protected const double DEFAULT_MAX_HEALTH_INCREASE = 0.05;
+
+        /// <summary>
         /// The maximum <see cref="HitResult"/> that can be achieved.
         /// </summary>
         public virtual HitResult MaxResult => HitResult.Perfect;
@@ -55,7 +61,32 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
         /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
-        protected virtual double HealthIncreaseFor(HitResult result) => 0;
+        protected virtual double HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return -DEFAULT_MAX_HEALTH_INCREASE;
+
+                case HitResult.Meh:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
+
+                case HitResult.Ok:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.01;
+
+                case HitResult.Good:
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
+
+                case HitResult.Great:
+                    return DEFAULT_MAX_HEALTH_INCREASE;
+
+                case HitResult.Perfect:
+                    return DEFAULT_MAX_HEALTH_INCREASE * 1.05;
+
+                default:
+                    return 0;
+            }
+        }
 
         /// <summary>
         /// Retrieves the numeric health increase of a <see cref="JudgementResult"/>.

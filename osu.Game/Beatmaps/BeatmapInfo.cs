@@ -51,6 +51,9 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
+        [NotMapped]
+        public int? MaxCombo { get; set; }
+
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
         /// </summary>
@@ -76,7 +79,7 @@ namespace osu.Game.Beatmaps
         public string MD5Hash { get; set; }
 
         // General
-        public int AudioLeadIn { get; set; }
+        public double AudioLeadIn { get; set; }
         public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
@@ -98,7 +101,7 @@ namespace osu.Game.Beatmaps
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    Bookmarks = new int[0];
+                    Bookmarks = Array.Empty<int>();
                     return;
                 }
 
@@ -111,7 +114,7 @@ namespace osu.Game.Beatmaps
         }
 
         [NotMapped]
-        public int[] Bookmarks { get; set; } = new int[0];
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }
@@ -129,7 +132,34 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public List<ScoreInfo> Scores { get; set; }
 
-        public override string ToString() => $"{Metadata} [{Version}]".Trim();
+        [JsonIgnore]
+        public DifficultyRating DifficultyRating
+        {
+            get
+            {
+                var rating = StarDifficulty;
+
+                if (rating < 2.0) return DifficultyRating.Easy;
+                if (rating < 2.7) return DifficultyRating.Normal;
+                if (rating < 4.0) return DifficultyRating.Hard;
+                if (rating < 5.3) return DifficultyRating.Insane;
+                if (rating < 6.5) return DifficultyRating.Expert;
+
+                return DifficultyRating.ExpertPlus;
+            }
+        }
+
+        public string[] SearchableTerms => new[]
+        {
+            Version
+        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public override string ToString()
+        {
+            string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+
+            return $"{Metadata} {version}".Trim();
+        }
 
         public bool Equals(BeatmapInfo other)
         {

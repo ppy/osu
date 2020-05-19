@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<Size> sizeFullscreen;
         private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
-        private OsuGameBase game;
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         private SettingsDropdown<Size> resolutionDropdown;
         private SettingsDropdown<WindowMode> windowModeDropdown;
 
@@ -41,10 +43,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, OsuGameBase game, GameHost host)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, GameHost host)
         {
-            this.game = game;
-
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
@@ -75,12 +75,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
                     Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    Keywords = new[] { "scale", "letterbox" },
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
                     LabelText = "Screen Scaling",
                     Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
+                    Keywords = new[] { "scale", "letterbox" },
                 },
                 scalingSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
@@ -96,25 +98,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         {
                             LabelText = "Horizontal position",
                             Bindable = scalingPositionX,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical position",
                             Bindable = scalingPositionY,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal scale",
                             Bindable = scalingSizeX,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical scale",
                             Bindable = scalingSizeY,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                     }
                 },
@@ -203,15 +209,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private IReadOnlyList<Size> getResolutions()
         {
             var resolutions = new List<Size> { new Size(9999, 9999) };
+            var currentDisplay = game.Window?.CurrentDisplay.Value;
 
-            if (game.Window != null)
+            if (currentDisplay != null)
             {
-                resolutions.AddRange(game.Window.AvailableResolutions
-                                         .Where(r => r.Width >= 800 && r.Height >= 600)
-                                         .OrderByDescending(r => r.Width)
-                                         .ThenByDescending(r => r.Height)
-                                         .Select(res => new Size(res.Width, res.Height))
-                                         .Distinct());
+                resolutions.AddRange(currentDisplay.DisplayModes
+                                                   .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                   .OrderByDescending(m => m.Size.Width)
+                                                   .ThenByDescending(m => m.Size.Height)
+                                                   .Select(m => m.Size)
+                                                   .Distinct());
             }
 
             return resolutions;

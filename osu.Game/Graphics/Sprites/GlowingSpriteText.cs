@@ -43,6 +43,18 @@ namespace osu.Game.Graphics.Sprites
             set => blurredText.Colour = value;
         }
 
+        public Vector2 Spacing
+        {
+            get => spriteText.Spacing;
+            set => spriteText.Spacing = blurredText.Spacing = value;
+        }
+
+        public bool UseFullGlyphHeight
+        {
+            get => spriteText.UseFullGlyphHeight;
+            set => spriteText.UseFullGlyphHeight = blurredText.UseFullGlyphHeight = value;
+        }
+
         public GlowingSpriteText()
         {
             AutoSizeAxes = Axes.Both;
@@ -55,8 +67,9 @@ namespace osu.Game.Graphics.Sprites
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(4),
                     CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
                     RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Size = new Vector2(3f),
                     Children = new[]
                     {
