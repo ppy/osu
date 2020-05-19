@@ -56,20 +56,19 @@ namespace osu.Game.Graphics
                 Masking = true;
                 this.highLight = highLight;
                 this.scale = triangleScaleValue;
+                Child = triangles = new Triangles
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    TriangleScale = scale,
+                    Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
+                };
             }
 
             protected override void LoadComplete()
             {
-                this.Add(
-                    triangles = new Triangles
-                    {
-                        EnableBeatSync = beatSync,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        TriangleScale = scale,
-                        Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
-                    });
+                triangles.EnableBeatSync.Value = beatSync;
             }
         }
 

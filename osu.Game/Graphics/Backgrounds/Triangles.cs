@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Backgrounds
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
         private float ExtraY;
         public bool IgnoreSettings = false;
-        public bool EnableBeatSync = false;
+        public BindableBool EnableBeatSync = new BindableBool();
         private float alpha_orig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
@@ -181,7 +181,7 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            if ( EnableBeatSync )
+            if ( EnableBeatSync.Value )
             {
                 var track = b.Value?.Track;
                 var IsKiai= b.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
