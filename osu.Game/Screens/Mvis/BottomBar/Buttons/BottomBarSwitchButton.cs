@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
-    public class ToggleableBottomBarButton : BottomBarButton
+    public class BottomBarSwitchButton : BottomBarButton
     {
         public BindableBool ToggleableValue = new BindableBool();
 

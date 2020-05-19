@@ -76,10 +76,10 @@ namespace osu.Game.Screens
         private BottomBarButton soloButton;
         private BottomBarButton prevButton;
         private BottomBarButton nextButton;
-        private ToggleableBottomBarButton loopToggleButton;
-        private ToggleableBottomBarButton sidebarToggleButton;
-        private ToggleableOverlayLockButton lockButton;
-        private ToggleableBottomBarButton songProgressButton;
+        private BottomBarSwitchButton loopToggleButton;
+        private BottomBarSwitchButton sidebarToggleButton;
+        private BottomBarOverlayLockSwitchButton lockButton;
+        private BottomBarSwitchButton songProgressButton;
         private Track Track;
         private BackgroundStoryBoard bgSB;
         private MfBgTriangles bgTriangles;
@@ -173,7 +173,7 @@ namespace osu.Game.Screens
                                                                     Action = () => musicController?.PreviousTrack(),
                                                                     TooltipText = "上一首/从头开始",
                                                                 },
-                                                                songProgressButton = new ToggleableBottomBarButton()
+                                                                songProgressButton = new BottomBarSwitchButton()
                                                                 {
                                                                     TooltipText = "切换暂停",
                                                                     AutoSizeAxes = Axes.X,
@@ -209,7 +209,7 @@ namespace osu.Game.Screens
                                                             Margin = new MarginPadding { Right = 5 },
                                                             Children = new Drawable[]
                                                             {
-                                                                loopToggleButton = new ToggleableBottomBarButton()
+                                                                loopToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
                                                                     Action = () => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value,
@@ -221,7 +221,7 @@ namespace osu.Game.Screens
                                                                     Action = () => InvokeSolo(),
                                                                     TooltipText = "在选歌界面中查看",
                                                                 },
-                                                                sidebarToggleButton = new ToggleableBottomBarButton()
+                                                                sidebarToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Atom,
                                                                     Action = () => ToggleSideBar(),
@@ -242,7 +242,7 @@ namespace osu.Game.Screens
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
                                     Margin = new MarginPadding{ Bottom = 5 },
-                                    Child = lockButton = new ToggleableOverlayLockButton
+                                    Child = lockButton = new BottomBarOverlayLockSwitchButton
                                     {
                                         TooltipText = "切换悬浮锁",
                                         Action = () => UpdateLockButton(),

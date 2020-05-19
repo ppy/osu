@@ -7,9 +7,9 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
-    public class ToggleableOverlayLockButton : ToggleableBottomBarButton
+    public class BottomBarOverlayLockSwitchButton : BottomBarSwitchButton
     {
-        public ToggleableOverlayLockButton()
+        public BottomBarOverlayLockSwitchButton()
         {
             ButtonIcon = FontAwesome.Solid.Lock;
         }
