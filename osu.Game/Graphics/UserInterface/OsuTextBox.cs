@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundCommit = BorderColour = colour.Yellow;
         }
 
-        protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
+        protected override Colour4 SelectionColour => new Colour4(249, 90, 255, 255);
 
         protected override void OnFocus(FocusEvent e)
         {

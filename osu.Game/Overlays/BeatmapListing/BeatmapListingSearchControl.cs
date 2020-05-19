@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private class BeatmapSearchTextBox : SearchTextBox
         {
-            protected override Color4 SelectionColour => Color4.Gray;
+            protected override Colour4 SelectionColour => Colour4.Gray;
 
             public BeatmapSearchTextBox()
             {
