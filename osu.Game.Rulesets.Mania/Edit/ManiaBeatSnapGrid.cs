@@ -127,6 +127,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (nextTimingPoint != timingPoint)
                 {
                     beat = 0;
+                    time = nextTimingPoint.Time;
                     timingPoint = nextTimingPoint;
                 }
 
