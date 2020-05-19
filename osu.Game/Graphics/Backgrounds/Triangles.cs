@@ -18,15 +18,18 @@ using osu.Framework.Lists;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Beatmaps;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.Backgrounds
 {
     public class Triangles : Drawable
     {
-        private float ExtraY;
+        [Resolved]
+        private Bindable<WorkingBeatmap> b { get; set; }
+
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
+        private float ExtraY;
         public bool IgnoreSettings = false;
+        public bool EnableBeatSync = false;
         private float alpha_orig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
@@ -104,9 +107,6 @@ namespace osu.Game.Graphics.Backgrounds
             texture = Texture.WhitePixel;
         }
 
-        [Resolved]
-        private Bindable<WorkingBeatmap> b { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, MfConfigManager config)
         {
@@ -120,17 +120,15 @@ namespace osu.Game.Graphics.Backgrounds
 
         private void UpdateFreq(bool IsKiai)
         {
-            float sum = 0;
-            b.Value.Track.CurrentAmplitudes.FrequencyAmplitudes.ForEach(amp => sum += amp);
+            float sum = b.Value?.Track.CurrentAmplitudes.Maximum ?? 0;
 
             if (IsKiai)
             {
-                sum *= 1.5f;
-                sum /= 10000;
+                sum /= 1500;
             }
             else
             {
-                sum /= 15000;
+                sum /= 3000;
             }
 
             if (sum > 0.01f)
@@ -183,9 +181,12 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            var track = b.Value?.Track;
-            var IsKiai= b.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
-            UpdateFreq(IsKiai);
+            if ( EnableBeatSync )
+            {
+                var track = b.Value?.Track;
+                var IsKiai= b.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
+                UpdateFreq(IsKiai);
+            }
 
             Invalidate(Invalidation.DrawNode);
 

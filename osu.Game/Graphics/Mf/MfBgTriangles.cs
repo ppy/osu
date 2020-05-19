@@ -15,7 +15,8 @@ namespace osu.Game.Graphics
     {
         private readonly Bindable<bool> Optui = new Bindable<bool>();
         private BackgroundTriangles BackgroundTriangle;
-        
+        public bool EnableBeatSync { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config, OsuColour colour)
         {
@@ -25,7 +26,7 @@ namespace osu.Game.Graphics
             UpdateIcons();
         }
 
-        public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f)
+        public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f, bool sync = false)
         {
             this.Alpha = alpha;
             RelativeSizeAxes = Axes.Both;
@@ -35,31 +36,40 @@ namespace osu.Game.Graphics
             {
                 BackgroundTriangle = new BackgroundTriangles(highLight, triangleScale)
                 {
+                    beatSync = sync,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
             };
         }
 
-        public class BackgroundTriangles : Container
+        private class BackgroundTriangles : Container
         {
-            private readonly Triangles triangles;
+            private Triangles triangles;
+            public bool beatSync;
+            public bool highLight;
+            public float scale;
 
             public BackgroundTriangles(bool highLight = false, float triangleScaleValue = 2f)
             {
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
-                Children = new Drawable[]
-                {
+                this.highLight = highLight;
+                this.scale = triangleScaleValue;
+            }
+
+            protected override void LoadComplete()
+            {
+                this.Add(
                     triangles = new Triangles
                     {
+                        EnableBeatSync = beatSync,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.Both,
-                        TriangleScale = triangleScaleValue,
+                        TriangleScale = scale,
                         Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
-                    },
-                };
+                    });
             }
         }
 

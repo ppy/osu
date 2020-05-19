@@ -260,8 +260,11 @@ namespace osu.Game.Screens
                             Name = "Background Elements Container",
                             Children = new Drawable[]
                             {
+                                new MfBgTriangles(0.65f, false, 5, true)
+                                {
+                                    EnableBeatSync = true,
+                                },
                                 bgSB = new BackgroundStoryBoard(),
-                                new MfBgTriangles(0.65f, false, 5),
                                 dimBox = new Box
                                 {
                                     Name = "Dim Box",
