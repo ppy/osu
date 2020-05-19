@@ -90,10 +90,17 @@ namespace osu.Game.Rulesets.Mania.Edit
             beatDivisor.BindValueChanged(_ => createLines(), true);
         }
 
+        private readonly Stack<DrawableGridLine> availableLines = new Stack<DrawableGridLine>();
+
         private void createLines()
         {
             foreach (var grid in grids)
-                grid.Clear();
+            {
+                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
+                    availableLines.Push(line);
+
+                grid.Clear(false);
+            }
 
             if (selectionTimeRange == null)
                 return;
@@ -127,7 +134,15 @@ namespace osu.Game.Rulesets.Mania.Edit
                     BindableBeatDivisor.GetDivisorForBeatIndex(Math.Max(1, beat), beatDivisor.Value), colours);
 
                 foreach (var grid in grids)
-                    grid.Add(new DrawableGridLine(time, colour));
+                {
+                    if (!availableLines.TryPop(out var line))
+                        line = new DrawableGridLine();
+
+                    line.HitObject.StartTime = time;
+                    line.Colour = colour;
+
+                    grid.Add(line);
+                }
 
                 beat++;
                 time += timingPoint.BeatLength / beatDivisor.Value;
@@ -190,17 +205,13 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-            public DrawableGridLine(double startTime, Color4 colour)
-                : base(new HitObject { StartTime = startTime })
+            public DrawableGridLine()
+                : base(new HitObject())
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 2;
 
-                AddInternal(new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colour
-                });
+                AddInternal(new Box { RelativeSizeAxes = Axes.Both });
             }
 
             [BackgroundDependencyLoader]
