@@ -21,12 +21,27 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
+    /// <summary>
+    /// A grid which displays coloured beat divisor lines in proximity to the selection or placement cursor.
+    /// </summary>
     public class ManiaBeatSnapGrid : Component
     {
         private const double visible_range = 750;
 
-        [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
+        /// <summary>
+        /// The range of time values of the current selection.
+        /// </summary>
+        public (double start, double end)? SelectionTimeRange
+        {
+            set
+            {
+                if (value == selectionTimeRange)
+                    return;
+
+                selectionTimeRange = value;
+                lineCache.Invalidate();
+            }
+        }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -49,20 +64,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private (double start, double end)? selectionTimeRange;
 
-        public (double start, double end)? SelectionTimeRange
-        {
-            set
-            {
-                if (value == selectionTimeRange)
-                    return;
-
-                selectionTimeRange = value;
-                lineCache.Invalidate();
-            }
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IManiaHitObjectComposer composer)
         {
             foreach (var stage in composer.Playfield.Stages)
             {
