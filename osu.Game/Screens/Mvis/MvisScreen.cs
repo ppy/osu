@@ -82,6 +82,7 @@ namespace osu.Game.Screens
         private ToggleableBottomBarButton songProgressButton;
         private Track Track;
         private BackgroundStoryBoard bgSB;
+        private MfBgTriangles bgTriangles;
         private LoadingSpinner loadingSpinner;
         private BottomBarSongProgressInfo progressInfo;
         private BindableBool TrackRunning = new BindableBool();
@@ -265,7 +266,7 @@ namespace osu.Game.Screens
                             Name = "Background Elements Container",
                             Children = new Drawable[]
                             {
-                                new MfBgTriangles(0.65f, false, 5, true)
+                                bgTriangles = new MfBgTriangles(0.65f, false, 5, true)
                                 {
                                     EnableBeatSync = true,
                                 },
@@ -366,6 +367,7 @@ namespace osu.Game.Screens
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
             idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
             idleTracker.ScreenHovered.ValueChanged += _ => UpdateVisuals();
+            bgSB.NeedToHideTriangles.BindValueChanged(UpdateBgTriangles, true);
             bgSB.IsReady.ValueChanged += _ =>
             {
                 switch (bgSB.IsReady.Value)
@@ -397,6 +399,20 @@ namespace osu.Game.Screens
             ShowOverlays();
 
             base.LoadComplete();
+        }
+
+        private void UpdateBgTriangles(ValueChangedEvent<bool> value)
+        {
+            switch ( value.NewValue )
+            {
+                case true:
+                    bgTriangles.Hide();
+                    break;
+
+                case false:
+                    bgTriangles.Show();
+                    break;
+            }
         }
 
         private void SeekTo(double position)

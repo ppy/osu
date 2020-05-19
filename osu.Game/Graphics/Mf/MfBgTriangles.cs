@@ -11,11 +11,12 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Graphics
 {
-    public class MfBgTriangles : Container
+    public class MfBgTriangles : VisibilityContainer
     {
         private readonly Bindable<bool> Optui = new Bindable<bool>();
         private BackgroundTriangles BackgroundTriangle;
         public bool EnableBeatSync { get; set; }
+        public bool IgnoreSettings { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config, OsuColour colour)
@@ -84,6 +85,16 @@ namespace osu.Game.Graphics
                     BackgroundTriangle.FadeOut(250);
                     break;
             }
+        }
+
+        protected override void PopIn()
+        {
+            BackgroundTriangle.FadeIn(250);
+        }
+
+        protected override void PopOut()
+        {
+            BackgroundTriangle.FadeOut(250);
         }
     }
 }

@@ -30,6 +30,7 @@ namespace osu.Game.Screens.Mvis
         ///用于对外提供该BindableBool用于检测故事版功能是否已经准备好了
         ///</summary>
         public readonly BindableBool IsReady = new BindableBool();
+        public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool storyboardReplacesBackground = new BindableBool();
 
         /// <summary>
@@ -84,13 +85,17 @@ namespace osu.Game.Screens.Mvis
                 if ( !SBLoaded.Value )
                     UpdateStoryBoardAsync();
                 else
-                    storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;;
+                {
+                    storyboardReplacesBackground.Value = b.Value.Storyboard.ReplacesBackground && b.Value.Storyboard.HasDrawable;
+                    NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
+                }
 
                 sbClock?.FadeIn(DURATION, Easing.OutQuint);
             }
             else
             {
                 storyboardReplacesBackground.Value = false;
+                NeedToHideTriangles.Value = false;
                 sbClock?.FadeOut(DURATION, Easing.OutQuint);
                 IsReady.Value = true;
                 CancelAllTasks();
@@ -118,6 +123,7 @@ namespace osu.Game.Screens.Mvis
                     sbClock = newsbClock;
 
                     dimmableStoryboard.IgnoreUserSettings.Value = true;
+                    dimmableStoryboard.EnableUserDim.Value = false;
 
                     sbContainer.Add(sbClock);
 
@@ -130,6 +136,7 @@ namespace osu.Game.Screens.Mvis
 
                     SBLoaded.Value = true;
                     IsReady.Value = true;
+                    NeedToHideTriangles.Value = b.Value.Storyboard.HasDrawable;
                 }, (ChangeSB = new CancellationTokenSource()).Token);
             }
             catch (Exception e)
@@ -183,6 +190,7 @@ namespace osu.Game.Screens.Mvis
 
             IsReady.Value = false;
             SBLoaded.Value = false;
+            NeedToHideTriangles.Value = false;
 
             Schedule(() =>
             {
