@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
             public OsuDropdownMenu()
             {
                 CornerRadius = 4;
-                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColour = Colour4.Black.Opacity(0.5f);
 
                 // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
                 ItemsContainer.Padding = new MarginPadding(5);
@@ -144,7 +144,7 @@ namespace osu.Game.Graphics.UserInterface
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    BackgroundColour = Color4.Transparent;
+                    BackgroundColour = Colour4.Transparent;
 
                     nonAccentHoverColour = colours.PinkDarker;
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
@@ -263,7 +263,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColour = Colour4.Black.Opacity(0.5f);
                 BackgroundColourHover = colours.PinkDarker;
             }
         }

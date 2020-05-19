@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            BackgroundUnfocused = Color4.Black.Opacity(0.5f);
+            BackgroundUnfocused = Colour4.Black.Opacity(0.5f);
             BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
             BackgroundCommit = BorderColour = colour.Yellow;
         }

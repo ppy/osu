@@ -190,8 +190,8 @@ namespace osu.Game.Overlays.Chat.Selection
             [BackgroundDependencyLoader]
             private void load()
             {
-                BackgroundFocused = Color4.Black.Opacity(0.2f);
-                BackgroundUnfocused = Color4.Black.Opacity(0.2f);
+                BackgroundFocused = Colour4.Black.Opacity(0.2f);
+                BackgroundUnfocused = Colour4.Black.Opacity(0.2f);
             }
         }
     }

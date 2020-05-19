@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.TopCentre,
                                     Colour = colours.Yellow,
                                     Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    ShadowColour = new Colour4(0, 0, 0, 0.25f)
                                 },
                                 new OsuSpriteText
                                 {
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    ShadowColour = new Colour4(0, 0, 0, 0.25f)
                                 }
                             }
                         },
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Play
                 {
                     Text = "You've retried ",
                     Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    ShadowColour = new Colour4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),
                 },
                 new OsuSpriteText
@@ -264,13 +264,13 @@ namespace osu.Game.Screens.Play
                     Text = "time".ToQuantity(retries),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    ShadowColour = new Colour4(0, 0, 0, 0.25f),
                 },
                 new OsuSpriteText
                 {
                     Text = " in this session",
                     Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    ShadowColour = new Colour4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),
                 }
             };

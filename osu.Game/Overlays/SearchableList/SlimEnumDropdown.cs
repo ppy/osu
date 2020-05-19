@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.SearchableList
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                BackgroundColour = Color4.Black.Opacity(0.25f);
+                BackgroundColour = Colour4.Black.Opacity(0.25f);
             }
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.SearchableList
         {
             public SlimMenu()
             {
-                BackgroundColour = Color4.Black.Opacity(0.7f);
+                BackgroundColour = Colour4.Black.Opacity(0.7f);
             }
         }
     }

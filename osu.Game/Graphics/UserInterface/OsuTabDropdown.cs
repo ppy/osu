@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;
 
-                BackgroundColour = Color4.Black.Opacity(0.7f);
+                BackgroundColour = Colour4.Black.Opacity(0.7f);
                 MaxHeight = 400;
             }
 
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
                 public DrawableOsuTabDropdownMenuItem(MenuItem item)
                     : base(item)
                 {
-                    ForegroundColourHover = Color4.Black;
+                    ForegroundColourHover = Colour4.Black;
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
                 RelativeSizeAxes = Axes.None;
                 AutoSizeAxes = Axes.X;
 
-                BackgroundColour = Color4.Black.Opacity(0.5f);
+                BackgroundColour = Colour4.Black.Opacity(0.5f);
 
                 Background.Height = 0.5f;
                 Background.CornerRadius = 5;

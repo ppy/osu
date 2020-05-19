@@ -3,6 +3,7 @@
 
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Input.Bindings;
@@ -42,8 +43,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
-            BackgroundUnfocused = new Color4(10, 10, 10, 255);
-            BackgroundFocused = new Color4(10, 10, 10, 255);
+            BackgroundUnfocused = new Colour4(10, 10, 10, 255);
+            BackgroundFocused = new Colour4(10, 10, 10, 255);
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus

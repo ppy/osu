@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             sampleHover = audio.Samples.Get(@"UI/generic-hover");
             sampleClick = audio.Samples.Get(@"UI/generic-select");
 
-            BackgroundColour = Color4.Transparent;
+            BackgroundColour = Colour4.Transparent;
             BackgroundColourHover = Color4Extensions.FromHex(@"172023");
 
             updateTextColour();

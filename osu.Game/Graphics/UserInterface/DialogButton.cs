@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 28, weight: FontWeight.Bold),
                     Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.1f),
+                    ShadowColour = new Colour4(0, 0, 0, 0.1f),
                     Colour = Color4.White,
                 },
             };

@@ -367,8 +367,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
+                BackgroundUnfocused = Colour4.Black;
+                BackgroundFocused = Colour4.Black;
             }
         }
 
@@ -382,8 +382,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                BackgroundUnfocused = Color4.Black;
-                BackgroundFocused = Color4.Black;
+                BackgroundUnfocused = Colour4.Black;
+                BackgroundFocused = Colour4.Black;
             }
         }
 

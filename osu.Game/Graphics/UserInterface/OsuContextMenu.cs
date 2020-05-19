@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
             MaskingContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(0.1f),
+                Colour = Colour4.Black.Opacity(0.1f),
                 Radius = 4,
             };
 

@@ -60,7 +60,7 @@ namespace osu.Game.Online.Leaderboards
                             Colour = getRankNameColour(),
                             Font = OsuFont.Numeric.With(size: 25),
                             Text = GetRankName(rank),
-                            ShadowColour = Color4.Black.Opacity(0.3f),
+                            ShadowColour = Colour4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
                         },

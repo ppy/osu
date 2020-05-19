@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.Centre,
                         Text = value.Name,
                         Font = OsuFont.GetFont(size: 14),
-                        ShadowColour = Color4.Black.Opacity(0.75f)
+                        ShadowColour = Colour4.Black.Opacity(0.75f)
                     }
                 },
                 new HoverClickSounds()

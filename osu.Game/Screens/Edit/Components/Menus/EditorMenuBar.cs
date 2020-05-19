@@ -70,8 +70,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
             private void load(OsuColour colours)
             {
                 ForegroundColour = colours.BlueLight;
-                BackgroundColour = Color4.Transparent;
-                ForegroundColourHover = Color4.White;
+                BackgroundColour = Colour4.Transparent;
+                ForegroundColourHover = Colour4.White;
                 BackgroundColourHover = colours.Gray3;
             }
 
