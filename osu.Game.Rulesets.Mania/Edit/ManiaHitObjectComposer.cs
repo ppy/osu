@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -45,12 +44,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public int TotalColumns => Playfield.TotalColumns;
 
-        public override (Vector2 position, double time) SnapPositionToValidTime(Vector2 position)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override (Vector2 position, double time) SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
             var hoc = Playfield.GetColumn(0).HitObjectContainer;
 
@@ -69,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 drawableRuleset.ScrollingInfo.TimeRange.Value,
                 hoc.DrawHeight);
 
-            return (targetPosition, targetTime);
+            return new SnapResult(targetPosition, targetTime);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)

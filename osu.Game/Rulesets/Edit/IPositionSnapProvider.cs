@@ -8,13 +8,11 @@ namespace osu.Game.Rulesets.Edit
     public interface IPositionSnapProvider
     {
         /// <summary>
-        /// Given a position (local to the provider), find a valid time snap
+        /// Given a position, find a valid time snap.
         /// </summary>
-        /// <param name="position">The local position to be snapped.</param>
+        /// <param name="screenSpacePosition">The screen-space position to be snapped.</param>
         /// <returns>The time and position post-snapping.</returns>
-        (Vector2 position, double time) SnapPositionToValidTime(Vector2 position);
-
-        (Vector2 position, double time) SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
+        SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
         /// <summary>
         /// Retrieves the distance between two points within a timing point that are one beat length apart.
@@ -54,5 +52,24 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="distance">The distance to convert.</param>
         /// <returns>A value that represents <paramref name="distance"/> snapped to the closest beat of the timing point.</returns>
         float GetSnappedDistanceFromDistance(double referenceTime, float distance);
+    }
+
+    public class SnapResult
+    {
+        /// <summary>
+        /// The screen space position, potentially altered for snapping.
+        /// </summary>
+        public Vector2 ScreenSpacePosition;
+
+        /// <summary>
+        /// The resultant time for snapping, if a value could be attained.
+        /// </summary>
+        public double? Time;
+
+        public SnapResult(Vector2 screenSpacePosition, double? time)
+        {
+            ScreenSpacePosition = screenSpacePosition;
+            Time = time;
+        }
     }
 }

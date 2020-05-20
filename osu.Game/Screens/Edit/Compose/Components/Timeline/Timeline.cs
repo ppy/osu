@@ -181,11 +181,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        public (Vector2 position, double time) SnapPositionToValidTime(Vector2 position) =>
-            (position, beatSnapProvider.SnapTime(getTimeFromPosition(position)));
-
-        public (Vector2 position, double time) SnapScreenSpacePositionToValidTime(Vector2 position) =>
-            (position, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(position))));
+        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 position) =>
+            new SnapResult(position, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(position))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;
