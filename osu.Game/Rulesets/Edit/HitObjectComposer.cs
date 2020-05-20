@@ -245,8 +245,7 @@ namespace osu.Game.Rulesets.Edit
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
 
-            if (distanceSnapGrid != null)
-                hitObject.StartTime = GetSnappedPosition(distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position), hitObject.StartTime).time;
+            hitObject.StartTime = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position).time;
         }
 
         public void EndPlacement(HitObject hitObject, bool commit)
@@ -265,7 +264,11 @@ namespace osu.Game.Rulesets.Edit
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => distanceSnapGrid?.GetSnappedPosition(position) ?? (position, time);
+        public override (Vector2 position, double time) SnapPositionToValidTime(Vector2 position) =>
+            distanceSnapGrid?.GetSnappedPosition(position) ?? (position, 0);
+
+        public override (Vector2 position, double time) SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+            => SnapPositionToValidTime(drawableRulesetWrapper.Playfield.ToLocalSpace(screenSpacePosition));
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
@@ -297,8 +300,8 @@ namespace osu.Game.Rulesets.Edit
     }
 
     [Cached(typeof(HitObjectComposer))]
-    [Cached(typeof(IDistanceSnapProvider))]
-    public abstract class HitObjectComposer : CompositeDrawable, IDistanceSnapProvider
+    [Cached(typeof(IPositionSnapProvider))]
+    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         internal HitObjectComposer()
         {
@@ -323,7 +326,9 @@ namespace osu.Game.Rulesets.Edit
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
-        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
+        public abstract (Vector2 position, double time) SnapPositionToValidTime(Vector2 position);
+
+        public abstract (Vector2 position, double time) SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
 
