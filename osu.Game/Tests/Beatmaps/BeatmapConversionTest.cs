@@ -101,9 +101,6 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = GetBeatmap(name);
 
-            var rulesetInstance = CreateRuleset();
-            beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
-
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
             var working = new ConversionWorkingBeatmap(beatmap)
@@ -115,7 +112,7 @@ namespace osu.Game.Tests.Beatmaps
                 }
             };
 
-            working.GetPlayableBeatmap(rulesetInstance.RulesetInfo, mods);
+            working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
 
             return new ConvertResult
             {
@@ -152,8 +149,8 @@ namespace osu.Game.Tests.Beatmaps
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
                 var beatmap = decoder.Decode(stream);
 
-                // not sure but seems to be required.
-                beatmap.BeatmapInfo.Ruleset = CreateRuleset().RulesetInfo;
+                var rulesetInstance = CreateRuleset();
+                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
                 return beatmap;
             }
