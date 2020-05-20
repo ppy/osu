@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Screens.Mvis.UI.Objects.Helpers;
 using osu.Framework.Localisation;
+using System.Threading;
+
 namespace osu.Game.Screens.Mvis.UI.Objects
 {
     public class UpdateableBeatmapBackground : CurrentBeatmapProvider
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
         private readonly Container backgroundContainer;
         private readonly Container nameContainer;
         private readonly MusicIntensityController intensityController;
+
+        private CancellationTokenSource ChangeBeatmapBackground;
+        private CancellationTokenSource ChangeBeatmapName;
 
         private BeatmapBackground background;
         private BeatmapName name;
@@ -79,6 +84,9 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
         protected override void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
+            ChangeBeatmapBackground?.Cancel();
+            ChangeBeatmapName?.Cancel();
+
             LoadComponentAsync(new BeatmapBackground(beatmap.NewValue)
             {
                 Anchor = Anchor.Centre,
@@ -94,7 +102,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 backgroundContainer.Add(newBackground);
                 newBackground.RotateTo(360, animation_duration, Easing.OutQuint);
                 newBackground.FadeIn(animation_duration, Easing.OutQuint);
-            });
+            }, (ChangeBeatmapBackground = new CancellationTokenSource()).Token);
 
             LoadComponentAsync(new BeatmapName(beatmap.NewValue)
             {
@@ -110,7 +118,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
                 name = newName;
                 nameContainer.Add(newName);
                 newName.MoveToY(0, animation_duration, Easing.OutQuint);
-            });
+            }, (ChangeBeatmapName = new CancellationTokenSource()).Token);
         }
 
         private class BeatmapName : CompositeDrawable
