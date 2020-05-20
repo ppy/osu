@@ -184,7 +184,7 @@ namespace osu.Game.Tournament.IPC
                     }
                 }
 
-                return stableInstallPath;
+                return null;
             }
             finally
             {
