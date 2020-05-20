@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples { get; private set; }
 
-        protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
+        public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
