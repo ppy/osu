@@ -46,19 +46,22 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            var hoc = Playfield.GetColumn(0).HitObjectContainer;
+            var hoc = ColumnAt(screenSpacePosition)?.HitObjectContainer;
 
-            Vector2 targetPosition = hoc.ToLocalSpace(screenSpacePosition);
+            if (hoc == null)
+                return new SnapResult(screenSpacePosition, null);
+
+            Vector2 localPosition = hoc.ToLocalSpace(screenSpacePosition);
 
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
                 // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
                 // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
                 // so when scrolling downwards the coordinates need to be flipped.
-                targetPosition.Y = hoc.DrawHeight - targetPosition.Y;
+                localPosition.Y = hoc.DrawHeight - localPosition.Y;
             }
 
-            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition.Y,
+            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(localPosition.Y,
                 EditorClock.CurrentTime,
                 drawableRuleset.ScrollingInfo.TimeRange.Value,
                 hoc.DrawHeight);
