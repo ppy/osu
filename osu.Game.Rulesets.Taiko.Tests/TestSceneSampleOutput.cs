@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -12,6 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
     /// <summary>
     /// Taiko has some interesting rules for legacy mappings.
     /// </summary>
+    [HeadlessTest]
     public class TestSceneSampleOutput : PlayerTestScene
     {
         public TestSceneSampleOutput()
