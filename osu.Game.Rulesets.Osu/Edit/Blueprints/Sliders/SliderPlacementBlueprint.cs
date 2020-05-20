@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             inputManager = GetContainingInputManager();
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        public override void UpdatePosition(SnapResult result)
         {
             switch (state)
             {
                 case PlacementState.Initial:
                     BeginPlacement();
-                    HitObject.Position = ToLocalSpace(screenSpacePosition);
+                    HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
                     break;
 
                 case PlacementState.Body:

@@ -86,8 +86,8 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
         /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        public abstract void UpdatePosition(Vector2 screenSpacePosition);
+        /// <param name="snapResult">The snap result information.</param>
+        public abstract void UpdatePosition(SnapResult snapResult);
 
         /// <summary>
         /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,

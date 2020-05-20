@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var snapResult = composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
 
-            currentPlacement.UpdatePosition(snapResult.ScreenSpacePosition);
+            currentPlacement.UpdatePosition(snapResult);
         }
 
         #endregion
