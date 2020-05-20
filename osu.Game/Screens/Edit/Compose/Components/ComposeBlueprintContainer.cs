@@ -67,9 +67,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition(Vector2 screenSpacePosition)
         {
-            Vector2 snappedPlayfieldPosition = composer.SnapScreenSpacePositionToValidTime(screenSpacePosition).ScreenSpacePosition;
+            var snapResult = composer.SnapScreenSpacePositionToValidTime(screenSpacePosition);
 
-            currentPlacement.UpdatePosition(ToScreenSpace(snappedPlayfieldPosition));
+            currentPlacement.UpdatePosition(snapResult.ScreenSpacePosition);
         }
 
         #endregion

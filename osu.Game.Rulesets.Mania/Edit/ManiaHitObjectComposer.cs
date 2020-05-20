@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 drawableRuleset.ScrollingInfo.TimeRange.Value,
                 hoc.DrawHeight);
 
-            return new SnapResult(targetPosition, targetTime);
+            return new SnapResult(screenSpacePosition, targetTime);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
