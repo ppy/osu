@@ -46,10 +46,12 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            var hoc = ColumnAt(screenSpacePosition)?.HitObjectContainer;
+            var column = ColumnAt(screenSpacePosition);
 
-            if (hoc == null)
+            if (column == null)
                 return new SnapResult(screenSpacePosition, null);
+
+            var hoc = column.HitObjectContainer;
 
             Vector2 localPosition = hoc.ToLocalSpace(screenSpacePosition);
 
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     hoc.DrawHeight))
             ).Y;
 
-            return new SnapResult(screenSpacePosition, BeatSnapProvider.SnapTime(targetTime));
+            return new ManiaSnapResult(screenSpacePosition, BeatSnapProvider.SnapTime(targetTime), column);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
@@ -93,5 +95,16 @@ namespace osu.Game.Rulesets.Mania.Edit
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
         };
+    }
+
+    public class ManiaSnapResult : SnapResult
+    {
+        public readonly Column Column;
+
+        public ManiaSnapResult(Vector2 screenSpacePosition, double time, Column column)
+            : base(screenSpacePosition, time)
+        {
+            Column = column;
+        }
     }
 }
