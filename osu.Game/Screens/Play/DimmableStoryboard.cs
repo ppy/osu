@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class DimmableStoryboard : UserDimContainer
     {
-        public Container OverlayLayerContainer;
+        public Container OverlayLayerContainer { get; private set; }
 
         private readonly Storyboard storyboard;
         private DrawableStoryboard drawableStoryboard;
