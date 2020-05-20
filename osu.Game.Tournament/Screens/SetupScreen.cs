@@ -28,7 +28,6 @@ namespace osu.Game.Tournament.Screens
 
         private LoginOverlay loginOverlay;
         private ActionableInfo resolution;
-        private const string stable_config = "tournament/stable.json";
 
         [Resolved]
         private MatchIPCInfo ipc { get; set; }

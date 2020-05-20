@@ -26,8 +26,6 @@ namespace osu.Game.Tournament.Screens
     {
         private DirectorySelector directorySelector;
 
-        private const string stable_config = "tournament/stable.json";
-
         [Resolved]
         private StableInfo stableInfo { get; set; }
 
@@ -150,7 +148,7 @@ namespace osu.Game.Tournament.Screens
 
                 try
                 {
-                    using (var stream = storage.GetStream(stable_config, FileAccess.Write, FileMode.Create))
+                    using (var stream = storage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Write, FileMode.Create))
                     using (var sw = new StreamWriter(stream))
                     {
                         sw.Write(JsonConvert.SerializeObject(stableInfo,

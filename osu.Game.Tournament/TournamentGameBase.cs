@@ -147,7 +147,10 @@ namespace osu.Game.Tournament
 
         private void readStableConfig()
         {
-            if (storage.Exists(stable_config))
+            if (stableInfo == null)
+                stableInfo = new StableInfo();
+
+            if (storage.Exists(StableInfo.STABLE_CONFIG))
             {
                 using (Stream stream = storage.GetStream(stable_config, FileAccess.Read, FileMode.Open))
                 using (var sr = new StreamReader(stream))
@@ -155,9 +158,6 @@ namespace osu.Game.Tournament
                     stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
                 }
             }
-
-            if (stableInfo == null)
-                stableInfo = new StableInfo();
 
             dependencies.Cache(stableInfo);
         }
