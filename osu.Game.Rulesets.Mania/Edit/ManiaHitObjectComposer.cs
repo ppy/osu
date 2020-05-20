@@ -55,7 +55,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             Vector2 localPosition = hoc.ToLocalSpace(screenSpacePosition);
 
-            if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
+            var scrollInfo = drawableRuleset.ScrollingInfo;
+
+            if (scrollInfo.Direction.Value == ScrollingDirection.Down)
             {
                 // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
                 // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
@@ -63,19 +65,18 @@ namespace osu.Game.Rulesets.Mania.Edit
                 localPosition.Y = hoc.DrawHeight - localPosition.Y;
             }
 
-            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(localPosition.Y,
+            double targetTime = scrollInfo.Algorithm.TimeAt(localPosition.Y,
                 EditorClock.CurrentTime,
-                drawableRuleset.ScrollingInfo.TimeRange.Value,
+                scrollInfo.TimeRange.Value,
                 hoc.DrawHeight);
 
             targetTime = BeatSnapProvider.SnapTime(targetTime);
 
-            screenSpacePosition.Y = hoc.ToScreenSpace(
-                new Vector2(0, drawableRuleset.ScrollingInfo.Algorithm.PositionAt(targetTime, EditorClock.CurrentTime, drawableRuleset.ScrollingInfo.TimeRange.Value,
-                    hoc.DrawHeight))
-            ).Y;
+            var localPos = new Vector2(
+                hoc.DrawWidth / 2,
+                scrollInfo.Algorithm.PositionAt(targetTime, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight));
 
-            return new ManiaSnapResult(screenSpacePosition, BeatSnapProvider.SnapTime(targetTime), column);
+            return new ManiaSnapResult(hoc.ToScreenSpace(localPos), BeatSnapProvider.SnapTime(targetTime), column);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
