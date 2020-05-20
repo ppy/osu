@@ -58,10 +58,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return true;
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        public override void UpdatePosition(SnapResult result)
         {
             if (!PlacementActive)
-                Column = ColumnAt(screenSpacePosition);
+                Column = ColumnAt(result.ScreenSpacePosition);
 
             if (Column == null) return;
 
@@ -69,26 +69,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             // Snap to the column
             var parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
-            SnappedMousePosition = new Vector2(parentPos.X, Parent.ToLocalSpace(screenSpacePosition).Y);
-        }
-
-        protected double TimeAt(Vector2 screenSpacePosition)
-        {
-            if (Column == null)
-                return 0;
-
-            var hitObjectContainer = Column.HitObjectContainer;
-
-            // If we're scrolling downwards, a position of 0 is actually further away from the hit target
-            // so we need to flip the vertical coordinate in the hitobject container's space
-            var hitObjectPos = mouseToHitObjectPosition(Column.HitObjectContainer.ToLocalSpace(screenSpacePosition)).Y;
-            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
-
-            return scrollingInfo.Algorithm.TimeAt(hitObjectPos,
-                EditorClock.CurrentTime,
-                scrollingInfo.TimeRange.Value,
-                hitObjectContainer.DrawHeight);
+            SnappedMousePosition = new Vector2(parentPos.X, Parent.ToLocalSpace(result.ScreenSpacePosition).Y);
         }
 
         protected float PositionAt(double time)
