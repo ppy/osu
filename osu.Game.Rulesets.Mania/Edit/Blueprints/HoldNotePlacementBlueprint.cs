@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Input;
 
@@ -37,8 +39,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (Column != null)
             {
-                headPiece.Y = PositionAt(HitObject.StartTime);
-                tailPiece.Y = PositionAt(HitObject.EndTime);
+                headPiece.Y = positionAt(HitObject.StartTime);
+                tailPiece.Y = positionAt(HitObject.EndTime);
             }
 
             var topPosition = new Vector2(headPiece.DrawPosition.X, Math.Min(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
@@ -83,6 +85,22 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 if (result.Time is double startTime)
                     originalStartTime = HitObject.StartTime = startTime;
             }
+        }
+
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
+
+        private float positionAt(double time)
+        {
+            var pos = scrollingInfo.Algorithm.PositionAt(time,
+                EditorClock.CurrentTime,
+                scrollingInfo.TimeRange.Value,
+                Column.HitObjectContainer.DrawHeight);
+
+            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
+                pos = Column.HitObjectContainer.DrawHeight - pos;
+
+            return Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent).Y;
         }
     }
 }
