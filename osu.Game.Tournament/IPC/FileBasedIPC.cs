@@ -167,7 +167,7 @@ namespace osu.Game.Tournament.IPC
             {
                 List<Func<string>> stableFindMethods = new List<Func<string>>
                 {
-                    findFromJsonConfig,
+                    readFromStableInfo,
                     findFromEnvVar,
                     findFromRegistry,
                     findFromLocalAppData,
@@ -180,6 +180,7 @@ namespace osu.Game.Tournament.IPC
 
                     if (stableInstallPath != null)
                     {
+                        saveStablePath(stableInstallPath);
                         return stableInstallPath;
                     }
                 }
@@ -192,8 +193,10 @@ namespace osu.Game.Tournament.IPC
             }
         }
 
-        private void saveStablePath()
+        private void saveStablePath(string path)
         {
+            stableInfo.StablePath.Value = path;
+
             using (var stream = tournamentStorage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
@@ -215,11 +218,7 @@ namespace osu.Game.Tournament.IPC
                 string stableInstallPath = Environment.GetEnvironmentVariable("OSU_STABLE_PATH");
 
                 if (checkExists(stableInstallPath))
-                {
-                    stableInfo.StablePath.Value = stableInstallPath;
-                    saveStablePath();
                     return stableInstallPath;
-                }
             }
             catch
             {
@@ -228,7 +227,7 @@ namespace osu.Game.Tournament.IPC
             return null;
         }
 
-        private string findFromJsonConfig()
+        private string readFromStableInfo()
         {
             try
             {
@@ -250,11 +249,7 @@ namespace osu.Game.Tournament.IPC
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
 
             if (checkExists(stableInstallPath))
-            {
-                stableInfo.StablePath.Value = stableInstallPath;
-                saveStablePath();
                 return stableInstallPath;
-            }
 
             return null;
         }
@@ -265,11 +260,7 @@ namespace osu.Game.Tournament.IPC
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
 
             if (checkExists(stableInstallPath))
-            {
-                stableInfo.StablePath.Value = stableInstallPath;
-                saveStablePath();
                 return stableInstallPath;
-            }
 
             return null;
         }
@@ -284,11 +275,7 @@ namespace osu.Game.Tournament.IPC
                 stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
             if (checkExists(stableInstallPath))
-            {
-                stableInfo.StablePath.Value = stableInstallPath;
-                saveStablePath();
                 return stableInstallPath;
-            }
 
             return null;
         }
