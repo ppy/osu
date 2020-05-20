@@ -269,7 +269,9 @@ namespace osu.Game.Rulesets.Edit
         {
             if (distanceSnapGrid == null) return new SnapResult(screenSpacePosition, null);
 
+            // TODO: move distance snap grid to OsuHitObjectComposer.
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
+
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
         }
 
