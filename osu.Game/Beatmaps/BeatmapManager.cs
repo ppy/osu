@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Lists;
@@ -38,12 +39,16 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public event Action<BeatmapInfo> BeatmapHidden;
+        public IBindable<WeakReference<BeatmapInfo>> BeatmapHidden => beatmapHidden;
+
+        private readonly Bindable<WeakReference<BeatmapInfo>> beatmapHidden = new Bindable<WeakReference<BeatmapInfo>>();
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public event Action<BeatmapInfo> BeatmapRestored;
+        public IBindable<WeakReference<BeatmapInfo>> BeatmapRestored => beatmapRestored;
+
+        private readonly Bindable<WeakReference<BeatmapInfo>> beatmapRestored = new Bindable<WeakReference<BeatmapInfo>>();
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -74,8 +79,8 @@ namespace osu.Game.Beatmaps
             DefaultBeatmap = defaultBeatmap;
 
             beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
+            beatmaps.BeatmapHidden += b => beatmapHidden.Value = new WeakReference<BeatmapInfo>(b);
+            beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
             exportStorage = storage.GetStorageForDirectory("exports");
