@@ -157,7 +157,7 @@ namespace osu.Game.Tournament.IPC
             return IPCStorage;
         }
 
-        private static bool checkExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
+        public bool checkExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
         private string findStablePath()
         {

@@ -140,42 +140,42 @@ namespace osu.Game.Tournament.Screens
         private void changePath(Storage storage)
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
+            var fileBasedIpc = ipc as FileBasedIPC;
             Logger.Log($"Changing Stable CE location to {target}");
 
-            if (File.Exists(Path.Combine(target, "ipc.txt")))
-            {
-                stableInfo.StablePath.Value = target;
-
-                try
-                {
-                    using (var stream = storage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Write, FileMode.Create))
-                    using (var sw = new StreamWriter(stream))
-                    {
-                        sw.Write(JsonConvert.SerializeObject(stableInfo,
-                            new JsonSerializerSettings
-                            {
-                                Formatting = Formatting.Indented,
-                                NullValueHandling = NullValueHandling.Ignore,
-                                DefaultValueHandling = DefaultValueHandling.Ignore,
-                            }));
-                    }
-
-                    var fileBasedIpc = ipc as FileBasedIPC;
-                    fileBasedIpc?.LocateStableStorage();
-                    sceneManager?.SetScreen(typeof(SetupScreen));
-                }
-                catch (Exception e)
-                {
-                    Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
-                }
-            }
-            else
+            if (!fileBasedIpc.checkExists(target))
             {
                 overlay = new DialogOverlay();
                 overlay.Push(new IPCErrorDialog("This is an invalid IPC Directory", "Select a directory that contains an osu! stable cutting edge installation and make sure it has an empty ipc.txt file in it."));
                 AddInternal(overlay);
                 Logger.Log("Folder is not an osu! stable CE directory");
+                return;
                 // Return an error in the picker that the directory does not contain ipc.txt
+            }
+
+            stableInfo.StablePath.Value = target;
+
+            try
+            {
+                using (var stream = storage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Write, FileMode.Create))
+                using (var sw = new StreamWriter(stream))
+                {
+                    sw.Write(JsonConvert.SerializeObject(stableInfo,
+                        new JsonSerializerSettings
+                        {
+                            Formatting = Formatting.Indented,
+                            NullValueHandling = NullValueHandling.Ignore,
+                            DefaultValueHandling = DefaultValueHandling.Ignore,
+                        }));
+                }
+
+             
+                fileBasedIpc?.LocateStableStorage();
+                sceneManager?.SetScreen(typeof(SetupScreen));
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
             }
         }
 
