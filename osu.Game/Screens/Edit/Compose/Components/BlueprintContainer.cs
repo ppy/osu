@@ -405,16 +405,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPosition.Value + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
 
             // Retrieve a snapped position.
-            (Vector2 snappedPosition, double snappedTime) = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
+            var result = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
 
             // Move the hitobjects.
-            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, ToScreenSpace(snappedPosition))))
+            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, result.ScreenSpacePosition)))
                 return true;
 
-            // Apply the start time at the newly snapped-to position
-            double offset = snappedTime - draggedObject.StartTime;
-            foreach (HitObject obj in selectionHandler.SelectedHitObjects)
-                obj.StartTime += offset;
+            if (result.Time.HasValue)
+            {
+                // Apply the start time at the newly snapped-to position
+                double offset = result.Time.Value - draggedObject.StartTime;
+                foreach (HitObject obj in selectionHandler.SelectedHitObjects)
+                    obj.StartTime += offset;
+            }
 
             return true;
         }
