@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         public Column ColumnAt(Vector2 screenSpacePosition) => column;
 
+        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null) => Vector2.Zero;
+
         public int TotalColumns => 1;
     }
 }

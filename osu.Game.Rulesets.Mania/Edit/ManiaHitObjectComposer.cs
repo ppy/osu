@@ -53,6 +53,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             var hoc = column.HitObjectContainer;
 
+            // convert to local space of column so we can snap and fetch correct location.
             Vector2 localPosition = hoc.ToLocalSpace(screenSpacePosition);
 
             var scrollInfo = drawableRuleset.ScrollingInfo;
@@ -65,24 +66,31 @@ namespace osu.Game.Rulesets.Mania.Edit
                 localPosition.Y = hoc.DrawHeight - localPosition.Y;
             }
 
-            double targetTime = scrollInfo.Algorithm.TimeAt(localPosition.Y,
-                EditorClock.CurrentTime,
-                scrollInfo.TimeRange.Value,
-                hoc.DrawHeight);
+            double targetTime = scrollInfo.Algorithm.TimeAt(localPosition.Y, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight);
 
+            // apply beat snapping
             targetTime = BeatSnapProvider.SnapTime(targetTime);
 
-            localPosition = new Vector2(
-                hoc.DrawWidth / 2,
-                scrollInfo.Algorithm.PositionAt(targetTime, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight));
+            // convert back to screen space
+            screenSpacePosition = ScreenSpacePositionAtTime(targetTime, column);
+
+            return new ManiaSnapResult(screenSpacePosition, targetTime, column);
+        }
+
+        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null)
+        {
+            var hoc = (column ?? Playfield.GetColumn(0)).HitObjectContainer;
+            var scrollInfo = drawableRuleset.ScrollingInfo;
+
+            var pos = scrollInfo.Algorithm.PositionAt(time, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight);
 
             if (scrollInfo.Direction.Value == ScrollingDirection.Down)
             {
-                // reapply the above.
-                localPosition.Y = hoc.DrawHeight - localPosition.Y;
+                // as explained above
+                pos = hoc.DrawHeight - pos;
             }
 
-            return new ManiaSnapResult(hoc.ToScreenSpace(localPosition), BeatSnapProvider.SnapTime(targetTime), column);
+            return hoc.ToScreenSpace(new Vector2(hoc.DrawWidth / 2, pos));
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)

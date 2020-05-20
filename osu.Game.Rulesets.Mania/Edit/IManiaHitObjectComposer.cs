@@ -10,6 +10,8 @@ namespace osu.Game.Rulesets.Mania.Edit
     {
         Column ColumnAt(Vector2 screenSpacePosition);
 
+        Vector2 ScreenSpacePositionAtTime(double time, Column column = null);
+
         int TotalColumns { get; }
     }
 }

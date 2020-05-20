@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private readonly EditNotePiece headPiece;
         private readonly EditNotePiece tailPiece;
 
+        [Resolved]
+        private IManiaHitObjectComposer composer { get; set; }
+
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
         {
@@ -39,8 +42,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (Column != null)
             {
-                headPiece.Y = positionAt(HitObject.StartTime);
-                tailPiece.Y = positionAt(HitObject.EndTime);
+                headPiece.Y = Parent.ToLocalSpace(composer.ScreenSpacePositionAtTime(HitObject.StartTime, Column)).Y;
+                tailPiece.Y = Parent.ToLocalSpace(composer.ScreenSpacePositionAtTime(HitObject.EndTime, Column)).Y;
             }
 
             var topPosition = new Vector2(headPiece.DrawPosition.X, Math.Min(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
@@ -85,22 +88,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 if (result.Time is double startTime)
                     originalStartTime = HitObject.StartTime = startTime;
             }
-        }
-
-        [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
-
-        private float positionAt(double time)
-        {
-            var pos = scrollingInfo.Algorithm.PositionAt(time,
-                EditorClock.CurrentTime,
-                scrollingInfo.TimeRange.Value,
-                Column.HitObjectContainer.DrawHeight);
-
-            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                pos = Column.HitObjectContainer.DrawHeight - pos;
-
-            return Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent).Y;
         }
     }
 }
