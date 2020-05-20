@@ -245,8 +245,7 @@ namespace osu.Game.Rulesets.Edit
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
 
-            if (SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position).Time is double time)
-                hitObject.StartTime = time;
+            hitObject.StartTime = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position).Time ?? EditorClock.CurrentTime;
         }
 
         public void EndPlacement(HitObject hitObject, bool commit)
