@@ -103,15 +103,4 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HoldNoteCompositionTool()
         };
     }
-
-    public class ManiaSnapResult : SnapResult
-    {
-        public readonly Column Column;
-
-        public ManiaSnapResult(Vector2 screenSpacePosition, double time, Column column)
-            : base(screenSpacePosition, time)
-        {
-            Column = column;
-        }
-    }
 }
