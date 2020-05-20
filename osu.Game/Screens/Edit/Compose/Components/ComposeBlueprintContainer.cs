@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -65,9 +64,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             createPlacement();
         }
 
-        private void updatePlacementPosition(Vector2 screenSpacePosition)
+        private void updatePlacementPosition()
         {
-            var snapResult = composer.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+            var snapResult = composer.SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
 
             currentPlacement.UpdatePosition(snapResult.ScreenSpacePosition);
         }
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 removePlacement();
 
             if (currentPlacement != null)
-                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
+                updatePlacementPosition();
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
@@ -116,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
+                updatePlacementPosition();
             }
         }
 

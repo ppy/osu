@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Edit
         private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
@@ -278,27 +278,27 @@ namespace osu.Game.Rulesets.Edit
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
             DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / BeatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(double referenceTime, double duration)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
         }
 
         public override double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
+            => BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
         {
-            var snappedEndTime = beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+            var snappedEndTime = BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
