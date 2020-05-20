@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
-        protected override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
+        public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
 
         protected abstract SkinnableDrawable CreateMainPiece();
 
