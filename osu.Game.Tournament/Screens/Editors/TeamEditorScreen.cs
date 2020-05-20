@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Editors
             });
         }
 
-        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model);
+        protected override TeamRow CreateDrawable(TournamentTeam model) => new TeamRow(model, this);
 
         private void addAllCountries()
         {
@@ -63,7 +63,7 @@ namespace osu.Game.Tournament.Screens.Editors
             [Resolved]
             private LadderInfo ladderInfo { get; set; }
 
-            public TeamRow(TournamentTeam team)
+            public TeamRow(TournamentTeam team, TournamentScreen parent)
             {
                 Model = team;
 
@@ -154,7 +154,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Text = "Edit seeding results",
                                 Action = () =>
                                 {
-                                    sceneManager?.SetScreen(new SeedingEditorScreen(team));
+                                    sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
                                 }
                             },
                         }
