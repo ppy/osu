@@ -34,9 +34,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         protected float SnappedWidth { get; private set; }
 
         [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
-
-        [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
         protected ManiaPlacementBlueprint(T hitObject)
@@ -61,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public override void UpdatePosition(SnapResult result)
         {
             if (!PlacementActive)
-                Column = ColumnAt(result.ScreenSpacePosition);
+                Column = (result as ManiaSnapResult)?.Column;
 
             if (Column == null) return;
 
@@ -84,9 +81,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             return hitObjectToMousePosition(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent)).Y;
         }
-
-        protected Column ColumnAt(Vector2 screenSpacePosition)
-            => composer.ColumnAt(screenSpacePosition);
 
         /// <summary>
         /// Converts a mouse position to a hitobject position.
