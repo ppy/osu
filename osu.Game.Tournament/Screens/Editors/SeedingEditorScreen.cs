@@ -25,7 +25,11 @@ namespace osu.Game.Tournament.Screens.Editors
 
         protected override BindableList<SeedingResult> Storage => team.SeedingResults;
 
-        public SeedingEditorScreen(TournamentTeam team)
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
+
+        public SeedingEditorScreen(TournamentTeam team, TournamentScreen parentScreen)
+            : base(parentScreen)
         {
             this.team = team;
         }
