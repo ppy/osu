@@ -72,11 +72,17 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             targetTime = BeatSnapProvider.SnapTime(targetTime);
 
-            var localPos = new Vector2(
+            localPosition = new Vector2(
                 hoc.DrawWidth / 2,
                 scrollInfo.Algorithm.PositionAt(targetTime, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight));
 
-            return new ManiaSnapResult(hoc.ToScreenSpace(localPos), BeatSnapProvider.SnapTime(targetTime), column);
+            if (scrollInfo.Direction.Value == ScrollingDirection.Down)
+            {
+                // reapply the above.
+                localPosition.Y = hoc.DrawHeight - localPosition.Y;
+            }
+
+            return new ManiaSnapResult(hoc.ToScreenSpace(localPosition), BeatSnapProvider.SnapTime(targetTime), column);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
