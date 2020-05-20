@@ -157,7 +157,7 @@ namespace osu.Game.Tournament.IPC
             return IPCStorage;
         }
 
-        public bool checkExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
+        public static bool CheckExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
         private string findStablePath()
         {
@@ -217,7 +217,7 @@ namespace osu.Game.Tournament.IPC
                 Logger.Log("Trying to find stable with environment variables");
                 string stableInstallPath = Environment.GetEnvironmentVariable("OSU_STABLE_PATH");
 
-                if (checkExists(stableInstallPath))
+                if (CheckExists(stableInstallPath))
                     return stableInstallPath;
             }
             catch
@@ -248,7 +248,7 @@ namespace osu.Game.Tournament.IPC
             Logger.Log("Trying to find stable in %LOCALAPPDATA%");
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
 
-            if (checkExists(stableInstallPath))
+            if (CheckExists(stableInstallPath))
                 return stableInstallPath;
 
             return null;
@@ -259,7 +259,7 @@ namespace osu.Game.Tournament.IPC
             Logger.Log("Trying to find stable in dotfolders");
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
 
-            if (checkExists(stableInstallPath))
+            if (CheckExists(stableInstallPath))
                 return stableInstallPath;
 
             return null;
@@ -274,7 +274,7 @@ namespace osu.Game.Tournament.IPC
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
                 stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
-            if (checkExists(stableInstallPath))
+            if (CheckExists(stableInstallPath))
                 return stableInstallPath;
 
             return null;

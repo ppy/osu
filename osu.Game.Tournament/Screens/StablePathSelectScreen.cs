@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.IO;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -139,31 +137,23 @@ namespace osu.Game.Tournament.Screens
 
         private void changePath(Storage storage)
         {
-            try
+            var target = directorySelector.CurrentDirectory.Value.FullName;
+            stableInfo.StablePath.Value = target;
+            Logger.Log($"Changing Stable CE location to {target}");
+
+            if (!FileBasedIPC.CheckExists(target))
             {
-                var target = directorySelector.CurrentDirectory.Value.FullName;
-                stableInfo.StablePath.Value = target;
-                var fileBasedIpc = ipc as FileBasedIPC;
-                Logger.Log($"Changing Stable CE location to {target}");
-
-                if (!fileBasedIpc.checkExists(target))
-                {
-                    overlay = new DialogOverlay();
-                    overlay.Push(new IPCErrorDialog("This is an invalid IPC Directory", "Select a directory that contains an osu! stable cutting edge installation and make sure it has an empty ipc.txt file in it."));
-                    AddInternal(overlay);
-                    Logger.Log("Folder is not an osu! stable CE directory");
-                    return;
-                    // Return an error in the picker that the directory does not contain ipc.txt
-                }
-
-
-                fileBasedIpc.LocateStableStorage();
-                sceneManager.SetScreen(typeof(SetupScreen));
+                overlay = new DialogOverlay();
+                overlay.Push(new IPCErrorDialog("This is an invalid IPC Directory", "Select a directory that contains an osu! stable cutting edge installation and make sure it has an empty ipc.txt file in it."));
+                AddInternal(overlay);
+                Logger.Log("Folder is not an osu! stable CE directory");
+                return;
+                // Return an error in the picker that the directory does not contain ipc.txt
             }
-            catch (Exception e)
-            {
-                Logger.Log($"Error during migration: {e.Message}", level: LogLevel.Error);
-            }
+
+            var fileBasedIpc = ipc as FileBasedIPC;
+            fileBasedIpc?.LocateStableStorage();
+            sceneManager?.SetScreen(typeof(SetupScreen));
         }
 
         private void autoDetect()
