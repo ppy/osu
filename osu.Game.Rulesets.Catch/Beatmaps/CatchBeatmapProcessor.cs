@@ -75,7 +75,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
                     case JuiceStream juiceStream:
                         // Todo: BUG!! Stable used the last control point as the final position of the path, but it should use the computed path instead.
-                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X / CatchPlayfield.BASE_WIDTH;
+                        lastPosition =
+                            juiceStream.X +
+                            (juiceStream.Mirrored
+                                ? -juiceStream.Path.ControlPoints[^1].Position.Value.X
+                                : juiceStream.Path.ControlPoints[^1].Position.Value.X)
+                            / CatchPlayfield.BASE_WIDTH;
 
                         // Todo: BUG!! Stable attempted to use the end time of the stream, but referenced it too early in execution and used the start time instead.
                         lastStartTime = juiceStream.StartTime;
