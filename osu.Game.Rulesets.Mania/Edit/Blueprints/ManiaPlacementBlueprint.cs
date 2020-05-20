@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
@@ -11,8 +10,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract class ManiaPlacementBlueprint<T> : PlacementBlueprint,
-                                                       IRequireHighFrequencyMousePosition // the playfield could be moving behind us
+    public abstract class ManiaPlacementBlueprint<T> : PlacementBlueprint
         where T : ManiaHitObject
     {
         protected new T HitObject => (T)base.HitObject;
