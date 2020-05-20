@@ -53,23 +53,4 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>A value that represents <paramref name="distance"/> snapped to the closest beat of the timing point.</returns>
         float GetSnappedDistanceFromDistance(double referenceTime, float distance);
     }
-
-    public class SnapResult
-    {
-        /// <summary>
-        /// The screen space position, potentially altered for snapping.
-        /// </summary>
-        public Vector2 ScreenSpacePosition;
-
-        /// <summary>
-        /// The resultant time for snapping, if a value could be attained.
-        /// </summary>
-        public double? Time;
-
-        public SnapResult(Vector2 screenSpacePosition, double? time)
-        {
-            ScreenSpacePosition = screenSpacePosition;
-            Time = time;
-        }
-    }
 }
