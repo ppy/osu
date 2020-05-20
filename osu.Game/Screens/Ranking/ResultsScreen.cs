@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Ranking
         private readonly bool allowRetry;
 
         private Drawable bottomPanel;
-        private Container<ScorePanel> contractedPanels;
+        private ScorePanelList panels;
 
         public ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
@@ -63,28 +63,9 @@ namespace osu.Game.Screens.Ranking
             {
                 new ResultsScrollContainer
                 {
-                    Children = new Drawable[]
+                    Child = panels = new ScorePanelList
                     {
-                        new ScorePanel(Score)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            State = PanelState.Expanded
-                        },
-                        new OsuScrollContainer(Direction.Horizontal)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            ScrollbarVisible = false,
-                            Child = contractedPanels = new FillFlowContainer<ScorePanel>
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Direction = FillDirection.Horizontal,
-                                AutoSizeAxes = Axes.Both
-                            }
-                        }
+                        RelativeSizeAxes = Axes.Both,
                     }
                 },
                 bottomPanel = new Container
@@ -117,6 +98,8 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
+            panels.AddScore(Score);
+
             if (player != null && allowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
@@ -141,12 +124,13 @@ namespace osu.Game.Screens.Ranking
 
             req.Success += r =>
             {
-                contractedPanels.ChildrenEnumerable = r.Scores.Select(s => s.CreateScoreInfo(rulesets)).Select(s => new ScorePanel(s)
+                foreach (var s in r.Scores.Select(s => s.CreateScoreInfo(rulesets)))
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    State = PanelState.Contracted
-                });
+                    if (s.OnlineScoreID == Score.OnlineScoreID)
+                        continue;
+
+                    panels.AddScore(s);
+                }
             };
 
             api.Queue(req);
