@@ -361,11 +361,14 @@ namespace osu.Game.Screens
         protected override void LoadComplete()
         {
             BgBlur.ValueChanged += _ => Background.BlurAmount.Value = BgBlur.Value * 100;
-            ContentAlpha.ValueChanged += _ => UpdateIdleVisuals();
-            IdleBgDim.ValueChanged += _ => UpdateIdleVisuals();
+            ContentAlpha.BindValueChanged(_ => UpdateIdleVisuals());
+            IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
+
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
-            idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
-            idleTracker.ScreenHovered.ValueChanged += _ => UpdateVisuals();
+
+            idleTracker.IsIdle.BindValueChanged(_ => UpdateVisuals());
+            idleTracker.ScreenHovered.BindValueChanged(_ => UpdateVisuals());
+
             bgSB.NeedToHideTriangles.BindValueChanged(UpdateBgTriangles, true);
             bgSB.IsReady.ValueChanged += _ =>
             {
