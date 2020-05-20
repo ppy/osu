@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 var nextTimingPoint = beatmap.ControlPointInfo.TimingPointAt(time);
 
                 // switch to the next timing point if we have reached it.
-                if (nextTimingPoint != timingPoint)
+                if (nextTimingPoint.Time > timingPoint.Time)
                 {
                     beat = 0;
                     time = nextTimingPoint.Time;
