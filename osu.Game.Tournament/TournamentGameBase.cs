@@ -33,8 +33,6 @@ namespace osu.Game.Tournament
     {
         private const string bracket_filename = "bracket.json";
 
-        private const string stable_config = "tournament/stable.json";
-
         private LadderInfo ladder;
 
         private Storage storage;
@@ -152,7 +150,7 @@ namespace osu.Game.Tournament
 
             if (storage.Exists(StableInfo.STABLE_CONFIG))
             {
-                using (Stream stream = storage.GetStream(stable_config, FileAccess.Read, FileMode.Open))
+                using (Stream stream = storage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
                 using (var sr = new StreamReader(stream))
                 {
                     stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
