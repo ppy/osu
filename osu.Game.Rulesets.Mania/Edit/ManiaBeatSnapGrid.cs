@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             foreach (var grid in grids)
             {
-                foreach (var line in grid.AliveObjects.OfType<DrawableGridLine>())
+                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
                 {
                     Vector2 linePos = line.ToSpaceOfOtherDrawable(line.OriginPosition, this);
                     float d = Vector2.Distance(position, linePos);
