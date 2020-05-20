@@ -23,16 +23,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected Column Column;
 
-        /// <summary>
-        /// The current mouse position, snapped to the closest column.
-        /// </summary>
-        protected Vector2 SnappedMousePosition { get; private set; }
-
-        /// <summary>
-        /// The width of the closest column to the current mouse position.
-        /// </summary>
-        protected float SnappedWidth { get; private set; }
-
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
@@ -59,14 +49,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             if (!PlacementActive)
                 Column = (result as ManiaSnapResult)?.Column;
-
-            if (Column == null) return;
-
-            SnappedWidth = Column.DrawWidth;
-
-            // Snap to the column
-            var parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
-            SnappedMousePosition = new Vector2(parentPos.X, Parent.ToLocalSpace(result.ScreenSpacePosition).Y);
         }
 
         protected float PositionAt(double time)
@@ -80,30 +62,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 pos = Column.HitObjectContainer.DrawHeight - pos;
 
             return hitObjectToMousePosition(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent)).Y;
-        }
-
-        /// <summary>
-        /// Converts a mouse position to a hitobject position.
-        /// </summary>
-        /// <remarks>
-        /// Blueprints are centred on the mouse position, such that the hitobject position is anchored at the top or bottom of the blueprint depending on the scroll direction.
-        /// </remarks>
-        /// <param name="mousePosition">The mouse position.</param>
-        /// <returns>The resulting hitobject position, acnhored at the top or bottom of the blueprint depending on the scroll direction.</returns>
-        private Vector2 mouseToHitObjectPosition(Vector2 mousePosition)
-        {
-            switch (scrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                    mousePosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
-                    break;
-
-                case ScrollingDirection.Down:
-                    mousePosition.Y += DefaultNotePiece.NOTE_HEIGHT / 2;
-                    break;
-            }
-
-            return mousePosition;
         }
 
         /// <summary>

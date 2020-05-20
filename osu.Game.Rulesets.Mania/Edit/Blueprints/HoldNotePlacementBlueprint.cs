@@ -74,8 +74,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             }
             else
             {
-                headPiece.Width = tailPiece.Width = SnappedWidth;
-                headPiece.X = tailPiece.X = SnappedMousePosition.X;
+                if (result is ManiaSnapResult maniaResult)
+                {
+                    headPiece.Width = tailPiece.Width = maniaResult.Column.DrawWidth;
+                    headPiece.X = tailPiece.X = ToLocalSpace(result.ScreenSpacePosition).X;
+                }
 
                 if (result.Time is double startTime)
                     originalStartTime = HitObject.StartTime = startTime;
