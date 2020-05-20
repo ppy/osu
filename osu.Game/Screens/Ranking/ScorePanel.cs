@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
@@ -75,8 +76,7 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
-
-        private readonly ScoreInfo score;
+        public readonly ScoreInfo Score;
 
         private Container topLayerContainer;
         private Drawable topLayerBackground;
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Ranking
 
         public ScorePanel(ScoreInfo score)
         {
-            this.score = score;
+            Score = score;
         }
 
         [BackgroundDependencyLoader]
@@ -189,8 +189,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
 
                 case PanelState.Contracted:
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(score).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 
@@ -221,6 +221,14 @@ namespace osu.Game.Screens.Ranking
                 topLayerContent?.FadeIn(content_fade_duration);
                 middleLayerContent?.FadeIn(content_fade_duration);
             }
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (State == PanelState.Contracted)
+                State = PanelState.Expanded;
+
+            return true;
         }
     }
 }
