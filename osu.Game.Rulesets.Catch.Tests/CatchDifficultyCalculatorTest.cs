@@ -14,11 +14,14 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
+        // Due to precision issue in difficulty calculator,
+        // the SR with MR on is not exactly the same with MR off.
+
         [TestCase(4.050601681491468d, "diffcalc-test")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        [TestCase(4.050601681491468d, "diffcalc-test")]
+        [TestCase(4.0506016929676321d, "diffcalc-test")]
         public void TestMirror(double expected, string name)
             => Test(expected, name, new CatchModMirror());
 
@@ -26,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestHardRock(double expected, string name)
             => Test(expected, name, new CatchModHardRock());
 
-        [TestCase(4.4882724679198711d, "diffcalc-test")]
+        [TestCase(4.4882724606861499d, "diffcalc-test")]
         public void TestHardRockMirror(double expected, string name)
             => Test(expected, name, new CatchModHardRock(), new CatchModMirror());
 
