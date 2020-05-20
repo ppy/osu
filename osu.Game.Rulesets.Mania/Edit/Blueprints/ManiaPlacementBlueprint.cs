@@ -17,7 +17,20 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
     {
         protected new T HitObject => (T)base.HitObject;
 
-        protected Column Column;
+        private Column column;
+
+        public Column Column
+        {
+            get => column;
+            set
+            {
+                if (value == column)
+                    return;
+
+                column = value;
+                HitObject.Column = column.Index;
+            }
+        }
 
         protected ManiaPlacementBlueprint(T hitObject)
             : base(hitObject)
@@ -31,9 +44,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 return false;
 
             if (Column == null)
-                return base.OnMouseDown(e);
+                return false;
 
-            HitObject.Column = Column.Index;
             BeginPlacement(true);
             return true;
         }
