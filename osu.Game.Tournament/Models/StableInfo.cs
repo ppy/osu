@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Tournament.Models
@@ -13,5 +14,8 @@ namespace osu.Game.Tournament.Models
     public class StableInfo
     {
         public Bindable<string> StablePath = new Bindable<string>(string.Empty);
+
+        [JsonIgnore]
+        public const string STABLE_CONFIG = "tournament/stable.json";
     }
 }

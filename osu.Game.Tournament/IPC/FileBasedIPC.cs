@@ -40,8 +40,6 @@ namespace osu.Game.Tournament.IPC
         [Resolved]
         private StableInfo stableInfo { get; set; }
 
-        private const string stable_config = "tournament/stable.json";
-
         public Storage IPCStorage { get; private set; }
 
         [Resolved]
@@ -196,7 +194,7 @@ namespace osu.Game.Tournament.IPC
 
         private void saveStablePath()
         {
-            using (var stream = tournamentStorage.GetStream(stable_config, FileAccess.Write, FileMode.Create))
+            using (var stream = tournamentStorage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(stableInfo,
