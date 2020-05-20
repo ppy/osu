@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        public override Vector2 SelectionPoint => ScreenSpaceDrawQuad.TopLeft;
+        public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
         public class DragBar : Container
         {
@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 OnDragHandled?.Invoke(e);
 
-                var time = timeline.GetTimeFromScreenSpacePosition(e.ScreenSpaceMousePosition);
+                var time = timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).time;
 
                 switch (hitObject)
                 {

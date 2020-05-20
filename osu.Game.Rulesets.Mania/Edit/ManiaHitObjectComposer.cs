@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -44,26 +45,31 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public int TotalColumns => Playfield.TotalColumns;
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
+        public override (Vector2 position, double time) SnapPositionToValidTime(Vector2 position)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override (Vector2 position, double time) SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
             var hoc = Playfield.GetColumn(0).HitObjectContainer;
 
-            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
+            Vector2 targetPosition = hoc.ToLocalSpace(screenSpacePosition);
 
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
                 // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
                 // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
                 // so when scrolling downwards the coordinates need to be flipped.
-                targetPosition = hoc.DrawHeight - targetPosition;
+                targetPosition.Y = hoc.DrawHeight - targetPosition.Y;
             }
 
-            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
+            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition.Y,
                 EditorClock.CurrentTime,
                 drawableRuleset.ScrollingInfo.TimeRange.Value,
                 hoc.DrawHeight);
 
-            return base.GetSnappedPosition(position, targetTime);
+            return (targetPosition, targetTime);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)

@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
 
         [Resolved(canBeNull: true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IPositionSnapProvider snapProvider { get; set; }
 
         protected BlueprintContainer()
         {
@@ -326,7 +326,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             foreach (var blueprint in SelectionBlueprints)
             {
-                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
+                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint))
                     blueprint.Select();
                 else
                     blueprint.Deselect();
@@ -384,7 +384,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
             movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
-            movementBlueprintOriginalPosition = movementBlueprint.SelectionPoint; // todo: unsure if correct
+            movementBlueprintOriginalPosition = movementBlueprint.ScreenSpaceSelectionPoint; // todo: unsure if correct
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPosition.Value + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
 
             // Retrieve a snapped position.
-            (Vector2 snappedPosition, double snappedTime) = snapProvider.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
+            (Vector2 snappedPosition, double snappedTime) = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
 
             // Move the hitobjects.
             if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, ToScreenSpace(snappedPosition))))

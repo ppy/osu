@@ -66,7 +66,10 @@ namespace osu.Game.Rulesets.Edit
         protected void BeginPlacement(double? startTime = null, bool commitStart = false)
         {
             HitObject.StartTime = startTime ?? EditorClock.CurrentTime;
+
+            // applies snapping to above time
             placementHandler.BeginPlacement(HitObject);
+
             PlacementActive |= commitStart;
         }
 
