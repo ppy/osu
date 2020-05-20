@@ -16,15 +16,15 @@ namespace osu.Game.Graphics
         private readonly Bindable<bool> Optui = new Bindable<bool>();
         private BackgroundTriangles BackgroundTriangle;
         public bool EnableBeatSync { get; set; }
-        public bool IgnoreSettings { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config, OsuColour colour)
         {
             config.BindWith(MfSetting.OptUI, Optui);
 
-            Optui.ValueChanged += _ => UpdateIcons();
-            UpdateIcons();
+            this.Show();
+
+            Optui.BindValueChanged(UpdateIcons, true);
         }
 
         public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f, bool sync = false)
@@ -69,13 +69,13 @@ namespace osu.Game.Graphics
 
             protected override void LoadComplete()
             {
-                triangles.EnableBeatSync.Value = beatSync;
+                triangles.EnableBeatSync = beatSync;
             }
         }
 
-        private void UpdateIcons()
+        private void UpdateIcons(ValueChangedEvent<bool> value)
         {
-            switch (Optui.Value)
+            switch (value.NewValue)
             {
                 case true:
                     BackgroundTriangle.FadeIn(250);

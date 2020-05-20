@@ -36,6 +36,7 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisBarCount, 120, 20, 120);
             Set(MfSetting.MvisBarRGBLighting, false);
             Set(MfSetting.MvisEnableBrick, false);
+            Set(MfSetting.MvisEnableBgTriangles, true);
             Set(MfSetting.UseSayobot, true);
         }
     }
@@ -54,6 +55,7 @@ namespace osu.Game.Configuration
         MvisBarCount,
         MvisBarRGBLighting,
         MvisEnableBrick,
+        MvisEnableBgTriangles,
         SamplePlaybackGain
     }
 }

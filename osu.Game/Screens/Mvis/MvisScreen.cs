@@ -31,6 +31,7 @@ using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens
 {
@@ -82,7 +83,7 @@ namespace osu.Game.Screens
         private BottomBarSwitchButton songProgressButton;
         private Track Track;
         private BackgroundStoryBoard bgSB;
-        private MfBgTriangles bgTriangles;
+        private BgTrianglesContainer bgTriangles;
         private LoadingSpinner loadingSpinner;
         private BottomBarSongProgressInfo progressInfo;
         private BindableBool TrackRunning = new BindableBool();
@@ -258,6 +259,7 @@ namespace osu.Game.Screens
                 {
                     Depth = 1,
                     GetBottombarHeight = () => BottombarHeight,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Container()
@@ -266,10 +268,7 @@ namespace osu.Game.Screens
                             Name = "Background Elements Container",
                             Children = new Drawable[]
                             {
-                                bgTriangles = new MfBgTriangles(0.65f, false, 5, true)
-                                {
-                                    EnableBeatSync = true,
-                                },
+                                bgTriangles = new BgTrianglesContainer(),
                                 bgSB = new BackgroundStoryBoard(),
                                 dimBox = new Box
                                 {
@@ -401,6 +400,9 @@ namespace osu.Game.Screens
             base.LoadComplete();
         }
 
+        ///<summary>
+        ///是否需要隐藏背景三角形粒子
+        ///</summary>
         private void UpdateBgTriangles(ValueChangedEvent<bool> value)
         {
             switch ( value.NewValue )
@@ -433,7 +435,7 @@ namespace osu.Game.Screens
             }
             else
             {
-                TrackRunning.Value = Track.IsRunning;
+                TrackRunning.Value = false;
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
             }

@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 bgBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
                     Colour = Color4Extensions.FromHex("#5a5a5a"),
                 },
                 contentFillFlow = new FillFlowContainer
@@ -57,7 +56,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 flashBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
                     Colour = Color4.White,
                     Alpha = 0,
                 },
