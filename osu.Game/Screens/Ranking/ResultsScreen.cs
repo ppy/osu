@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Ranking
             {
                 new ResultsScrollContainer
                 {
-                    Child = panels = new ScorePanelList
+                    Child = panels = new ScorePanelList(Score)
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
@@ -97,8 +97,6 @@ namespace osu.Game.Screens.Ranking
                     }
                 }
             };
-
-            panels.AddScore(Score);
 
             if (player != null && allowRetry)
             {

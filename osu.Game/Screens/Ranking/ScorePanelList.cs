@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Ranking
 
         private ScorePanel expandedPanel;
 
-        public ScorePanelList()
+        public ScorePanelList(ScoreInfo initialScore)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -44,48 +44,48 @@ namespace osu.Game.Screens.Ranking
                     AutoSizeAxes = Axes.Both,
                 }
             };
+
+            AddScore(initialScore);
+            ShowScore(initialScore);
         }
 
         public void AddScore(ScoreInfo score)
         {
-            var panel = new ScorePanel(score)
+            flow.Add(new ScorePanel(score)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            };
+            }.With(p =>
+            {
+                p.StateChanged += s =>
+                {
+                    if (s == PanelState.Expanded)
+                        ShowScore(score);
+                };
+            }));
+        }
 
-            panel.StateChanged += s => onPanelStateChanged(panel, s);
+        public void ShowScore(ScoreInfo score)
+        {
+            foreach (var p in flow.Where(p => p.Score != score))
+                p.State = PanelState.Contracted;
 
-            // Todo: Temporary
-            panel.State = expandedPanel == null ? PanelState.Expanded : PanelState.Contracted;
+            if (expandedPanel != null)
+                expandedPanel.Margin = new MarginPadding(0);
 
-            flow.Add(panel);
+            expandedPanel = flow.Single(p => p.Score == score);
+            expandedPanel.State = PanelState.Expanded;
+            expandedPanel.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
+
+            float scrollOffset = flow.IndexOf(expandedPanel) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
+            scroll.ScrollTo(scrollOffset);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            flow.Padding = new MarginPadding { Horizontal = DrawWidth / 2f - ScorePanel.EXPANDED_WIDTH / 2f - expanded_panel_spacing };
-        }
-
-        private void onPanelStateChanged(ScorePanel panel, PanelState state)
-        {
-            if (state == PanelState.Contracted)
-                return;
-
-            if (expandedPanel != null)
-            {
-                expandedPanel.Margin = new MarginPadding(0);
-                expandedPanel.State = PanelState.Contracted;
-            }
-
-            expandedPanel = panel;
-            expandedPanel.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
-
-            float panelOffset = flow.IndexOf(expandedPanel) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
-
-            scroll.ScrollTo(panelOffset);
+            flow.Padding = new MarginPadding { Horizontal = DrawWidth / 2f - expandedPanel.DrawWidth / 2f - expanded_panel_spacing };
         }
 
         private class Flow : FillFlowContainer<ScorePanel>
