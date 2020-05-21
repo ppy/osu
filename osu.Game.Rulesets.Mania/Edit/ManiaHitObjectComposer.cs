@@ -51,22 +51,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             if (column == null)
                 return new SnapResult(screenSpacePosition, null);
 
-            var hoc = column.HitObjectContainer;
-
-            // convert to local space of column so we can snap and fetch correct location.
-            Vector2 localPosition = hoc.ToLocalSpace(screenSpacePosition);
-
-            var scrollInfo = drawableRuleset.ScrollingInfo;
-
-            if (scrollInfo.Direction.Value == ScrollingDirection.Down)
-            {
-                // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
-                // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
-                // so when scrolling downwards the coordinates need to be flipped.
-                localPosition.Y = hoc.DrawHeight - localPosition.Y;
-            }
-
-            double targetTime = scrollInfo.Algorithm.TimeAt(localPosition.Y, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight);
+            double targetTime = column.TimeAtScreenSpacePosition(screenSpacePosition);
 
             // apply beat snapping
             targetTime = BeatSnapProvider.SnapTime(targetTime);
