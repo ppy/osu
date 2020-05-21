@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -80,23 +79,23 @@ namespace osu.Game.Online.Leaderboards
             {
                 case ScoreRank.XH:
                 case ScoreRank.SH:
-                    return ColourInfo.GradientVertical(Colour4.White, Color4Extensions.FromHex("afdff0"));
+                    return ColourInfo.GradientVertical(Colour4.White, Colour4.FromHex("afdff0"));
 
                 case ScoreRank.X:
                 case ScoreRank.S:
-                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ffe7a8"), Color4Extensions.FromHex(@"ffb800"));
+                    return ColourInfo.GradientVertical(Colour4.FromHex(@"ffe7a8"), Colour4.FromHex(@"ffb800"));
 
                 case ScoreRank.A:
-                    return Color4Extensions.FromHex(@"275227");
+                    return Colour4.FromHex(@"275227");
 
                 case ScoreRank.B:
-                    return Color4Extensions.FromHex(@"553a2b");
+                    return Colour4.FromHex(@"553a2b");
 
                 case ScoreRank.C:
-                    return Color4Extensions.FromHex(@"473625");
+                    return Colour4.FromHex(@"473625");
 
                 default:
-                    return Color4Extensions.FromHex(@"512525");
+                    return Colour4.FromHex(@"512525");
             }
         }
     }

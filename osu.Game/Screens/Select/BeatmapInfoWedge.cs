@@ -9,7 +9,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -392,7 +391,7 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4Extensions.FromHex(@"441288"),
+                                    Colour = Colour4.FromHex(@"441288"),
                                     Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
@@ -402,7 +401,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Scale = new Vector2(0.8f),
-                                    Colour = Color4Extensions.FromHex(@"f7dd55"),
+                                    Colour = Colour4.FromHex(@"f7dd55"),
                                     Icon = statistic.Icon,
                                 },
                             }

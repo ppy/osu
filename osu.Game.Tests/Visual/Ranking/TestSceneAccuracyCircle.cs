@@ -3,7 +3,6 @@
 
 using System;
 using NUnit.Framework;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -116,7 +115,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"))
+                            Colour = ColourInfo.GradientVertical(Colour4.FromHex("#555"), Colour4.FromHex("#333"))
                         }
                     }
                 },

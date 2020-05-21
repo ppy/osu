@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -134,7 +133,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"212121"),
+                                Colour = Colour4.FromHex(@"212121"),
                             },
                             new StatusColouredContainer(transition_duration)
                             {

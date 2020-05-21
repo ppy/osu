@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;

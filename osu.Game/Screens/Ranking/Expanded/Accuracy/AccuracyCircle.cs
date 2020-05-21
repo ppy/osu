@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -103,7 +102,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#7CF6FF"), Color4Extensions.FromHex("#BAFFA9")),
+                    Colour = ColourInfo.GradientVertical(Colour4.FromHex("#7CF6FF"), Colour4.FromHex("#BAFFA9")),
                     InnerRadius = accuracy_circle_radius,
                 },
                 new BufferedContainer

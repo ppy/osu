@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -64,10 +63,10 @@ namespace osu.Game.Overlays.Mods
 
         public ModSelectOverlay()
         {
-            Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
-            Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
-            Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
-            Waves.FourthWaveColour = Color4Extensions.FromHex(@"003a4e");
+            Waves.FirstWaveColour = Colour4.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = Colour4.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = Colour4.FromHex(@"005774");
+            Waves.FourthWaveColour = Colour4.FromHex(@"003a4e");
 
             RelativeSizeAxes = Axes.Both;
 

@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -53,7 +52,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex(@"3d3943"),
+                        Colour = Colour4.FromHex(@"3d3943"),
                     },
                     selection = new Box
                     {

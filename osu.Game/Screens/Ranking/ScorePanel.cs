@@ -4,7 +4,6 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -68,10 +67,10 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const double content_fade_duration = 50;
 
-        private static readonly ColourInfo expanded_top_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#444"), Color4Extensions.FromHex("#333"));
-        private static readonly ColourInfo expanded_middle_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"));
-        private static readonly Colour4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
-        private static readonly Colour4 contracted_middle_layer_colour = Color4Extensions.FromHex("#444");
+        private static readonly ColourInfo expanded_top_layer_colour = ColourInfo.GradientVertical(Colour4.FromHex("#444"), Colour4.FromHex("#333"));
+        private static readonly ColourInfo expanded_middle_layer_colour = ColourInfo.GradientVertical(Colour4.FromHex("#555"), Colour4.FromHex("#333"));
+        private static readonly Colour4 contracted_top_layer_colour = Colour4.FromHex("#353535");
+        private static readonly Colour4 contracted_middle_layer_colour = Colour4.FromHex("#444");
 
         public event Action<PanelState> StateChanged;
 

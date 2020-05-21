@@ -3,7 +3,6 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
@@ -126,14 +125,14 @@ namespace osu.Game.Overlays
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"05262f"),
+                                Colour = Colour4.FromHex(@"05262f"),
                             },
                             new Triangles
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 TriangleScale = 2,
-                                ColourDark = Color4Extensions.FromHex(@"04222b"),
-                                ColourLight = Color4Extensions.FromHex(@"052933"),
+                                ColourDark = Colour4.FromHex(@"04222b"),
+                                ColourLight = Colour4.FromHex(@"052933"),
                             },
                             innerSpin = new Sprite
                             {

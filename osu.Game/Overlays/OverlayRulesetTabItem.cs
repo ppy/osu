@@ -12,7 +12,6 @@ using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
 {

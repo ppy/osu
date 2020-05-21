@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -123,7 +122,7 @@ namespace osu.Game.Overlays.Chat
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Radius = 1,
-                            Colour = Color4Extensions.FromHex(message.Sender.Colour),
+                            Colour = Colour4.FromHex(message.Sender.Colour),
                             Type = EdgeEffectType.Shadow,
                         },
                         Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 },
@@ -172,7 +171,7 @@ namespace osu.Game.Overlays.Chat
                                 t.Font = OsuFont.GetFont(italics: true);
 
                                 if (senderHasBackground)
-                                    t.Colour = Color4Extensions.FromHex(message.Sender.Colour);
+                                    t.Colour = Colour4.FromHex(message.Sender.Colour);
                             }
 
                             t.Font = t.Font.With(size: TextSize);
@@ -249,41 +248,41 @@ namespace osu.Game.Overlays.Chat
 
         private static readonly Colour4[] username_colours =
         {
-            Color4Extensions.FromHex("588c7e"),
-            Color4Extensions.FromHex("b2a367"),
-            Color4Extensions.FromHex("c98f65"),
-            Color4Extensions.FromHex("bc5151"),
-            Color4Extensions.FromHex("5c8bd6"),
-            Color4Extensions.FromHex("7f6ab7"),
-            Color4Extensions.FromHex("a368ad"),
-            Color4Extensions.FromHex("aa6880"),
+            Colour4.FromHex("588c7e"),
+            Colour4.FromHex("b2a367"),
+            Colour4.FromHex("c98f65"),
+            Colour4.FromHex("bc5151"),
+            Colour4.FromHex("5c8bd6"),
+            Colour4.FromHex("7f6ab7"),
+            Colour4.FromHex("a368ad"),
+            Colour4.FromHex("aa6880"),
 
-            Color4Extensions.FromHex("6fad9b"),
-            Color4Extensions.FromHex("f2e394"),
-            Color4Extensions.FromHex("f2ae72"),
-            Color4Extensions.FromHex("f98f8a"),
-            Color4Extensions.FromHex("7daef4"),
-            Color4Extensions.FromHex("a691f2"),
-            Color4Extensions.FromHex("c894d3"),
-            Color4Extensions.FromHex("d895b0"),
+            Colour4.FromHex("6fad9b"),
+            Colour4.FromHex("f2e394"),
+            Colour4.FromHex("f2ae72"),
+            Colour4.FromHex("f98f8a"),
+            Colour4.FromHex("7daef4"),
+            Colour4.FromHex("a691f2"),
+            Colour4.FromHex("c894d3"),
+            Colour4.FromHex("d895b0"),
 
-            Color4Extensions.FromHex("53c4a1"),
-            Color4Extensions.FromHex("eace5c"),
-            Color4Extensions.FromHex("ea8c47"),
-            Color4Extensions.FromHex("fc4f4f"),
-            Color4Extensions.FromHex("3d94ea"),
-            Color4Extensions.FromHex("7760ea"),
-            Color4Extensions.FromHex("af52c6"),
-            Color4Extensions.FromHex("e25696"),
+            Colour4.FromHex("53c4a1"),
+            Colour4.FromHex("eace5c"),
+            Colour4.FromHex("ea8c47"),
+            Colour4.FromHex("fc4f4f"),
+            Colour4.FromHex("3d94ea"),
+            Colour4.FromHex("7760ea"),
+            Colour4.FromHex("af52c6"),
+            Colour4.FromHex("e25696"),
 
-            Color4Extensions.FromHex("677c66"),
-            Color4Extensions.FromHex("9b8732"),
-            Color4Extensions.FromHex("8c5129"),
-            Color4Extensions.FromHex("8c3030"),
-            Color4Extensions.FromHex("1f5d91"),
-            Color4Extensions.FromHex("4335a5"),
-            Color4Extensions.FromHex("812a96"),
-            Color4Extensions.FromHex("992861"),
+            Colour4.FromHex("677c66"),
+            Colour4.FromHex("9b8732"),
+            Colour4.FromHex("8c5129"),
+            Colour4.FromHex("8c3030"),
+            Colour4.FromHex("1f5d91"),
+            Colour4.FromHex("4335a5"),
+            Colour4.FromHex("812a96"),
+            Colour4.FromHex("992861"),
         };
     }
 }

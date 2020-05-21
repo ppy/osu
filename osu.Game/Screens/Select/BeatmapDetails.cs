@@ -11,7 +11,6 @@ using System.Linq;
 using osu.Game.Online.API;
 using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;

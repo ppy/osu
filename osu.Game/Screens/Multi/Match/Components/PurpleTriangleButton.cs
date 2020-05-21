@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multi.Match.Components
@@ -12,9 +12,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            BackgroundColour = Color4Extensions.FromHex(@"593790");
-            Triangles.ColourLight = Color4Extensions.FromHex(@"7247b6");
-            Triangles.ColourDark = Color4Extensions.FromHex(@"593790");
+            BackgroundColour = Colour4.FromHex(@"593790");
+            Triangles.ColourLight = Colour4.FromHex(@"7247b6");
+            Triangles.ColourDark = Colour4.FromHex(@"593790");
         }
     }
 }

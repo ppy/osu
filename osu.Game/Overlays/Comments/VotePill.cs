@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;

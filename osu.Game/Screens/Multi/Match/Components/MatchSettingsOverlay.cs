@@ -5,7 +5,6 @@ using System;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -91,7 +90,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"28242d"),
+                                Colour = Colour4.FromHex(@"28242d"),
                             },
                             new GridContainer
                             {
@@ -270,7 +269,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                                    Colour = Colour4.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
                                                 },
                                                 new FillFlowContainer
                                                 {

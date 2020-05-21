@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -46,7 +45,7 @@ namespace osu.Game.Overlays.Profile
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("222").Opacity(0.8f), Color4Extensions.FromHex("222").Opacity(0.2f))
+                        Colour = ColourInfo.GradientVertical(Colour4.FromHex("222").Opacity(0.8f), Colour4.FromHex("222").Opacity(0.2f))
                     },
                 }
             };

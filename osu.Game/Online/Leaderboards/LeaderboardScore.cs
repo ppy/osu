@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -200,7 +199,7 @@ namespace osu.Game.Online.Leaderboards
                                         scoreLabel = new GlowingSpriteText
                                         {
                                             TextColour = Colour4.White,
-                                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
+                                            GlowColour = Colour4.FromHex(@"83ccfa"),
                                             Text = score.TotalScore.ToString(@"N0"),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
@@ -325,7 +324,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
-                                    Colour = Color4Extensions.FromHex(@"3087ac"),
+                                    Colour = Colour4.FromHex(@"3087ac"),
                                     Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
@@ -334,7 +333,7 @@ namespace osu.Game.Online.Leaderboards
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size - 6),
-                                    Colour = Color4Extensions.FromHex(@"a4edff"),
+                                    Colour = Colour4.FromHex(@"a4edff"),
                                     Icon = statistic.Icon,
                                 },
                             },
@@ -344,7 +343,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TextColour = Colour4.White,
-                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
+                            GlowColour = Colour4.FromHex(@"83ccfa"),
                             Text = statistic.Value,
                             Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
                         },

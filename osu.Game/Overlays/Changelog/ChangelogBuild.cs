@@ -16,7 +16,6 @@ using osuTK.Graphics;
 using osu.Framework.Allocation;
 using System.Net;
 using osuTK;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays.Changelog
 {

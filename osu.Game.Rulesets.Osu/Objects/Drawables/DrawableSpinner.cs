@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
@@ -36,8 +35,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly SpriteIcon symbol;
 
-        private readonly Colour4 baseColour = Color4Extensions.FromHex(@"002c3c");
-        private readonly Colour4 fillColour = Color4Extensions.FromHex(@"005b7c");
+        private readonly Colour4 baseColour = Colour4.FromHex(@"002c3c");
+        private readonly Colour4 fillColour = Colour4.FromHex(@"005b7c");
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 

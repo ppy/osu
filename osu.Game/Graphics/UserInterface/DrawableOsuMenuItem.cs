@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -39,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             sampleClick = audio.Samples.Get(@"UI/generic-select");
 
             BackgroundColour = Colour4.Transparent;
-            BackgroundColourHover = Color4Extensions.FromHex(@"172023");
+            BackgroundColourHover = Colour4.FromHex(@"172023");
 
             updateTextColour();
 
@@ -60,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                     break;
 
                 case MenuItemType.Highlighted:
-                    text.Colour = Color4Extensions.FromHex(@"ffcc22");
+                    text.Colour = Colour4.FromHex(@"ffcc22");
                     break;
             }
         }

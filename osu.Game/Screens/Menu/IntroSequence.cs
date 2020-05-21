@@ -5,7 +5,6 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -94,7 +93,7 @@ namespace osu.Game.Screens.Menu
                         },
                     }
                 },
-                bigRing = new Ring(Color4Extensions.FromHex(@"B6C5E9"), 0.85f),
+                bigRing = new Ring(Colour4.FromHex(@"B6C5E9"), 0.85f),
                 mediumRing = new Ring(Colour4.White.Opacity(130), 0.7f),
                 smallRing = new Ring(Colour4.White, 0.6f),
                 welcomeText = new OsuSpriteText
@@ -121,7 +120,7 @@ namespace osu.Game.Screens.Menu
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             Height = 0,
-                            Colour = Color4Extensions.FromHex(@"C6D8FF").Opacity(160),
+                            Colour = Colour4.FromHex(@"C6D8FF").Opacity(160),
                         },
                         foregroundFill = new Box
                         {
@@ -139,28 +138,28 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Position = new Vector2(0, circle_offset),
-                    Colour = Color4Extensions.FromHex(@"AA92FF"),
+                    Colour = Colour4.FromHex(@"AA92FF"),
                 },
                 blueCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Position = new Vector2(-circle_offset, 0),
-                    Colour = Color4Extensions.FromHex(@"8FE5FE"),
+                    Colour = Colour4.FromHex(@"8FE5FE"),
                 },
                 yellowCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     Position = new Vector2(0, -circle_offset),
-                    Colour = Color4Extensions.FromHex(@"FFD64C"),
+                    Colour = Colour4.FromHex(@"FFD64C"),
                 },
                 pinkCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     Position = new Vector2(circle_offset, 0),
-                    Colour = Color4Extensions.FromHex(@"e967a1"),
+                    Colour = Colour4.FromHex(@"e967a1"),
                 },
             };
 

@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
         public Colour4 Background5 => getColour(0.1f, 0.15f);
         public Colour4 Background6 => getColour(0.1f, 0.1f);
 
-        private Colour4 getColour(float saturation, float lightness) => Colour4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, 1));
+        private Colour4 getColour(float saturation, float lightness) => Colour4.FromHSL(getBaseHue(colourScheme), saturation, lightness);
 
         // See https://github.com/ppy/osu-web/blob/4218c288292d7c810b619075471eaea8bbb8f9d8/app/helpers.php#L1463
         private static float getBaseHue(OverlayColourScheme colourScheme)

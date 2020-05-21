@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -28,7 +27,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class OsuLogo : BeatSyncedContainer
     {
-        public readonly Colour4 OsuPink = Color4Extensions.FromHex(@"e967a1");
+        public readonly Colour4 OsuPink = Colour4.FromHex(@"e967a1");
 
         private const double transition_length = 300;
 
@@ -176,8 +175,8 @@ namespace osu.Game.Screens.Menu
                                                                         triangles = new Triangles
                                                                         {
                                                                             TriangleScale = 4,
-                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
-                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
+                                                                            ColourLight = Colour4.FromHex(@"ff7db7"),
+                                                                            ColourDark = Colour4.FromHex(@"de5b95"),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }

@@ -95,7 +95,7 @@ namespace osu.Game.Tournament.Components
                 // else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
                 //     SenderText.Colour = TournamentGame.COLOUR_BLUE;
                 // else if (Message.Sender.Colour != null)
-                //     SenderText.Colour = ColourBox.Colour = Color4Extensions.FromHex(Message.Sender.Colour);
+                //     SenderText.Colour = ColourBox.Colour = Colour4.FromHex(Message.Sender.Colour);
             }
         }
     }
