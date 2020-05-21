@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osuTK;
 using osuTK.Graphics;

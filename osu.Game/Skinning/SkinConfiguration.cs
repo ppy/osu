@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
 

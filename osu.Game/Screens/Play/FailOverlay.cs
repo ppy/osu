@@ -4,6 +4,7 @@
 using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Play
 {

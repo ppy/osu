@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Humanizer;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;

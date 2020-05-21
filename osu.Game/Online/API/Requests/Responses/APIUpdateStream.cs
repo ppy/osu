@@ -3,6 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osuTK.Graphics;
 
