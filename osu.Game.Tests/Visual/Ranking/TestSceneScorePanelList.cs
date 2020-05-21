@@ -4,13 +4,11 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -27,15 +25,6 @@ namespace osu.Game.Tests.Visual.Ranking
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
-
-            Add(new Box
-            {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                RelativeSizeAxes = Axes.Y,
-                Width = 1,
-                Colour = Color4.Red
-            });
         });
 
         [Test]
