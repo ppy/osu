@@ -153,5 +153,21 @@ namespace osu.Game.Rulesets.Mania.UI
 
             return HitObjectContainer.ToScreenSpace(new Vector2(HitObjectContainer.DrawWidth / 2, pos));
         }
+
+        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
+        {
+            // convert to local space of column so we can snap and fetch correct location.
+            Vector2 localPosition = HitObjectContainer.ToLocalSpace(screenSpacePosition);
+
+            if (ScrollingInfo.Direction.Value == ScrollingDirection.Down)
+            {
+                // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+                // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
+                // so when scrolling downwards the coordinates need to be flipped.
+                localPosition.Y = HitObjectContainer.DrawHeight - localPosition.Y;
+            }
+
+            return ScrollingInfo.Algorithm.TimeAt(localPosition.Y, Time.Current, ScrollingInfo.TimeRange.Value, HitObjectContainer.DrawHeight);
+        }
     }
 }
