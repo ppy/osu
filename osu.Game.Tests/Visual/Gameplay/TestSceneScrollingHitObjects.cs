@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -221,7 +222,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>
         {
             public TestDrawableControlPoint(ScrollingDirection direction, double time)
-                : base(new HitObject { StartTime = time })
+                : base(new HitObject { StartTime = time, HitWindows = HitWindows.Empty })
             {
                 Origin = Anchor.Centre;
 
@@ -252,7 +253,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestDrawableHitObject : DrawableHitObject<HitObject>
         {
             public TestDrawableHitObject(double time)
-                : base(new HitObject { StartTime = time })
+                : base(new HitObject { StartTime = time, HitWindows = HitWindows.Empty })
             {
                 Origin = Anchor.Custom;
                 OriginPosition = new Vector2(75 / 4.0f);
