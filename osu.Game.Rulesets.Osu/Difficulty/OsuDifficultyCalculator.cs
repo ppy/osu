@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double aimMultiplier = 0.515;
-        private const double tapMultiplier = 0.515;
-        private const double fingerControlMultiplier = 1;
+        private const double aimMultiplier = 0.641;
+        private const double tapMultiplier = 0.641;
+        private const double fingerControlMultiplier = 1.245;
         
-        private const double srExponent = 0.9;
+        private const double srExponent = 0.83;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
