@@ -59,9 +59,5 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 
             return true;
         }
-
-        public override void UpdatePosition(SnapResult result)
-        {
-        }
     }
 }

@@ -10,6 +10,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
 
@@ -83,11 +84,18 @@ namespace osu.Game.Rulesets.Edit
             PlacementActive = false;
         }
 
+        [Resolved(canBeNull: true)]
+        private IFrameBasedClock editorClock { get; set; }
+
         /// <summary>
         /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
         /// </summary>
         /// <param name="snapResult">The snap result information.</param>
-        public abstract void UpdatePosition(SnapResult snapResult);
+        public virtual void UpdatePosition(SnapResult snapResult)
+        {
+            if (!PlacementActive)
+                HitObject.StartTime = snapResult.Time ?? editorClock?.CurrentTime ?? Time.Current;
+        }
 
         /// <summary>
         /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,

@@ -69,6 +69,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override void UpdatePosition(SnapResult result)
         {
+            base.UpdatePosition(result);
+
             switch (state)
             {
                 case PlacementState.Initial:
