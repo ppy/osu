@@ -39,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             return base.OnMouseDown(e);
         }
 
-        public override void UpdatePosition(SnapResult result) => HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
+        public override void UpdatePosition(SnapResult result)
+        {
+            base.UpdatePosition(result);
+            HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
+        }
     }
 }
