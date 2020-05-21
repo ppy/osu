@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            currentBlueprint.UpdatePosition(InputManager.CurrentState.Mouse.Position);
+            currentBlueprint.UpdatePosition(new SnapResult(InputManager.CurrentState.Mouse.Position, null));
         }
 
         public override void Add(Drawable drawable)
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is PlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdatePosition(InputManager.CurrentState.Mouse.Position);
+                blueprint.UpdatePosition(new SnapResult(InputManager.CurrentState.Mouse.Position, null));
             }
         }
 

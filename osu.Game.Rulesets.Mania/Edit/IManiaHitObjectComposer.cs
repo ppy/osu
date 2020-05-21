@@ -11,5 +11,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         Column ColumnAt(Vector2 screenSpacePosition);
 
         ManiaPlayfield Playfield { get; }
+
+        Vector2 ScreenSpacePositionAtTime(double time, Column column = null);
     }
 }

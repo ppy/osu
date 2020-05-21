@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        public override Vector2 SelectionPoint => ScreenSpaceDrawQuad.TopLeft;
+        public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
         public class DragBar : Container
         {
@@ -275,32 +275,33 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 OnDragHandled?.Invoke(e);
 
-                var time = timeline.GetTimeFromScreenSpacePosition(e.ScreenSpaceMousePosition);
-
-                switch (hitObject)
+                if (timeline.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition).Time is double time)
                 {
-                    case IHasRepeats repeatHitObject:
-                        // find the number of repeats which can fit in the requested time.
-                        var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                        var proposedCount = Math.Max(0, (int)((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
+                    switch (hitObject)
+                    {
+                        case IHasRepeats repeatHitObject:
+                            // find the number of repeats which can fit in the requested time.
+                            var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                            var proposedCount = Math.Max(0, (int)((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
 
-                        if (proposedCount == repeatHitObject.RepeatCount)
-                            return;
+                            if (proposedCount == repeatHitObject.RepeatCount)
+                                return;
 
-                        repeatHitObject.RepeatCount = proposedCount;
-                        break;
+                            repeatHitObject.RepeatCount = proposedCount;
+                            break;
 
-                    case IHasEndTime endTimeHitObject:
-                        var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
+                        case IHasEndTime endTimeHitObject:
+                            var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
-                        if (endTimeHitObject.EndTime == snappedTime)
-                            return;
+                            if (endTimeHitObject.EndTime == snappedTime)
+                                return;
 
-                        endTimeHitObject.EndTime = snappedTime;
-                        break;
+                            endTimeHitObject.EndTime = snappedTime;
+                            break;
+                    }
+
+                    beatmap.UpdateHitObject(hitObject);
                 }
-
-                beatmap.UpdateHitObject(hitObject);
             }
 
             protected override void OnDragEnd(DragEndEvent e)
