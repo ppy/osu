@@ -24,14 +24,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         protected Column Column;
 
         /// <summary>
-        /// The current beat-snapped mouse position, snapped to the closest column.
+        /// The current mouse position, snapped to the closest column.
         /// </summary>
         protected Vector2 SnappedMousePosition { get; private set; }
-
-        /// <summary>
-        /// The gameplay time at the current beat-snapped mouse position (<see cref="SnappedMousePosition"/>).
-        /// </summary>
-        protected double SnappedTime { get; private set; }
 
         /// <summary>
         /// The width of the closest column to the current mouse position.
@@ -43,9 +38,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
 
         protected ManiaPlacementBlueprint(T hitObject)
             : base(hitObject)
@@ -62,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 return base.OnMouseDown(e);
 
             HitObject.Column = Column.Index;
-            BeginPlacement(SnappedTime, true);
+            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition), true);
             return true;
         }
 
@@ -78,10 +70,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             // Snap to the column
             var parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
             SnappedMousePosition = new Vector2(parentPos.X, Parent.ToLocalSpace(screenSpacePosition).Y);
-
-            SnappedTime = TimeAt(screenSpacePosition);
-            if (snapProvider != null)
-                (SnappedMousePosition, SnappedTime) = snapProvider.GetSnappedPosition(SnappedMousePosition, SnappedTime);
         }
 
         protected double TimeAt(Vector2 screenSpacePosition)

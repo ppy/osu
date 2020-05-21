@@ -82,18 +82,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
         {
-            var beatSnapped = beatSnapGrid.GetSnappedPosition(position);
+            var hoc = Playfield.GetColumn(0).HitObjectContainer;
 
-            if (beatSnapped != null)
-                return beatSnapped.Value;
-
-            return base.GetSnappedPosition(position, getTimeFromPosition(ToScreenSpace(position)));
-        }
-
-        private double getTimeFromPosition(Vector2 screenSpacePosition)
-        {
-            var hoc = Playfield.Stages[0].HitObjectContainer;
-            float targetPosition = hoc.ToLocalSpace(screenSpacePosition).Y;
+            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
 
             if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
             {
@@ -103,10 +94,12 @@ namespace osu.Game.Rulesets.Mania.Edit
                 targetPosition = hoc.DrawHeight - targetPosition;
             }
 
-            return drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
+            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
                 EditorClock.CurrentTime,
                 drawableRuleset.ScrollingInfo.TimeRange.Value,
                 hoc.DrawHeight);
+
+            return base.GetSnappedPosition(position, targetTime);
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
