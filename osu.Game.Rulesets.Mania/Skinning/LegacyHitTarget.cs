@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
                                      ?? true;
 
             Colour4 lineColour = GetManiaSkinConfig<Colour4>(skin, LegacyManiaSkinConfigurationLookups.JudgementLineColour)?.Value
-                                ?? Colour4.White;
+                                 ?? Colour4.White;
 
             InternalChild = directionContainer = new Container
             {

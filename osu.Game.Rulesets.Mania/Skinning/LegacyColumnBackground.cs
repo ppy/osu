@@ -47,13 +47,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
                                   ?? 0;
 
             Colour4 lineColour = GetManiaSkinConfig<Colour4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
-                                ?? Colour4.White;
+                                 ?? Colour4.White;
 
             Colour4 backgroundColour = GetManiaSkinConfig<Colour4>(skin, LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour)?.Value
-                                      ?? Colour4.Black;
+                                       ?? Colour4.Black;
 
             Colour4 lightColour = GetManiaSkinConfig<Colour4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
-                                 ?? Colour4.White;
+                                  ?? Colour4.White;
 
             InternalChildren = new Drawable[]
             {
