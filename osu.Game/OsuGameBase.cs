@@ -187,8 +187,17 @@ namespace osu.Game
                 return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
             }
 
-            BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
-            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
+            BeatmapManager.ItemRemoved.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Delete(getBeatmapScores(item), true);
+            });
+
+            BeatmapManager.ItemAdded.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Undelete(getBeatmapScores(item), true);
+            });
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));

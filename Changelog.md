@@ -684,3 +684,8 @@
     *   [m] [Unify number types in performance calculators #9055]
     *   [m] [Fix being able to press enter to create matches #9061]
     *   [m] [Allow disabling SkipOverlay through AllowGameplayOverlays. #9018]
+
+
+### 2020/5/21
+*   合并上游pr
+    *   [m] [Convert dangerous events to IBindables #9062]

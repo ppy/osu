@@ -11,6 +11,7 @@ using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -56,13 +57,17 @@ namespace osu.Game.Database
         /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemAdded;
+        public IBindable<WeakReference<TModel>> ItemAdded => itemAdded;
+
+        private readonly Bindable<WeakReference<TModel>> itemAdded = new Bindable<WeakReference<TModel>>();
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemRemoved;
+        public IBindable<WeakReference<TModel>> ItemRemoved => itemRemoved;
+
+        private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
 
@@ -82,8 +87,8 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
-            ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
+            ModelStore.ItemAdded += item => handleEvent(() => itemAdded.Value = new WeakReference<TModel>(item));
+            ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
 
             Files = new FileStore(contextFactory, storage);
 
