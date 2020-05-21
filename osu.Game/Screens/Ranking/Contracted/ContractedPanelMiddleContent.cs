@@ -65,28 +65,16 @@ namespace osu.Game.Screens.Ranking.Contracted
                             },
                             Children = new Drawable[]
                             {
-                                // Buffered container is used to prevent 1px bleed outside the masking region
-                                new BufferedContainer
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex("444")
-                                        },
-                                        new UserCoverBackground
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            User = score.User,
-                                        },
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.5f), Color4Extensions.FromHex("#444"))
-                                        },
-                                    }
+                                    Colour = Color4Extensions.FromHex("444")
+                                },
+                                new UserCoverBackground
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    User = score.User,
+                                    Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
                                 },
                                 new FillFlowContainer
                                 {
@@ -100,7 +88,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            Size = new Vector2(140),
+                                            Size = new Vector2(110),
                                             Masking = true,
                                             CornerExponent = 2.5f,
                                             CornerRadius = 20,
