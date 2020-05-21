@@ -17,9 +17,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    [Cached(typeof(IDistanceSnapProvider))]
+    [Cached(typeof(IPositionSnapProvider))]
     [Cached]
-    public class Timeline : ZoomableScrollContainer, IDistanceSnapProvider
+    public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
@@ -181,11 +181,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        public double GetTimeFromScreenSpacePosition(Vector2 position)
-            => getTimeFromPosition(Content.ToLocalSpace(position));
-
-        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) =>
-            (position, beatSnapProvider.SnapTime(getTimeFromPosition(position)));
+        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 position) =>
+            new SnapResult(position, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(position))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;

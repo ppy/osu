@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osuTK.Input;
@@ -11,22 +12,25 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class NotePlacementBlueprint : ManiaPlacementBlueprint<Note>
     {
+        private readonly EditNotePiece piece;
+
         public NotePlacementBlueprint()
             : base(new Note())
         {
-            Origin = Anchor.Centre;
+            RelativeSizeAxes = Axes.Both;
 
-            AutoSizeAxes = Axes.Y;
-
-            InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
+            InternalChild = piece = new EditNotePiece { Origin = Anchor.Centre };
         }
 
-        protected override void Update()
+        public override void UpdatePosition(SnapResult result)
         {
-            base.Update();
+            base.UpdatePosition(result);
 
-            Width = SnappedWidth;
-            Position = SnappedMousePosition;
+            if (result is ManiaSnapResult maniaResult)
+            {
+                piece.Width = maniaResult.Column.DrawWidth;
+                piece.Position = ToLocalSpace(result.ScreenSpacePosition);
+            }
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

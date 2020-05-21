@@ -75,31 +75,61 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
             else
             {
-                var placementTime = GetSnappedPosition(ToLocalSpace(inputManager.CurrentState.Mouse.Position), 0).time;
-                beatSnapGrid.SelectionTimeRange = (placementTime, placementTime);
+                var result = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+                if (result.Time is double time)
+                    beatSnapGrid.SelectionTimeRange = (time, time);
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
             }
         }
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            var hoc = Playfield.GetColumn(0).HitObjectContainer;
+            var column = ColumnAt(screenSpacePosition);
 
-            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
+            if (column == null)
+                return new SnapResult(screenSpacePosition, null);
 
-            if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
+            var hoc = column.HitObjectContainer;
+
+            // convert to local space of column so we can snap and fetch correct location.
+            Vector2 localPosition = hoc.ToLocalSpace(screenSpacePosition);
+
+            var scrollInfo = drawableRuleset.ScrollingInfo;
+
+            if (scrollInfo.Direction.Value == ScrollingDirection.Down)
             {
                 // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
                 // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
                 // so when scrolling downwards the coordinates need to be flipped.
-                targetPosition = hoc.DrawHeight - targetPosition;
+                localPosition.Y = hoc.DrawHeight - localPosition.Y;
             }
 
-            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
-                EditorClock.CurrentTime,
-                drawableRuleset.ScrollingInfo.TimeRange.Value,
-                hoc.DrawHeight);
+            double targetTime = scrollInfo.Algorithm.TimeAt(localPosition.Y, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight);
 
-            return base.GetSnappedPosition(position, targetTime);
+            // apply beat snapping
+            targetTime = BeatSnapProvider.SnapTime(targetTime);
+
+            // convert back to screen space
+            screenSpacePosition = ScreenSpacePositionAtTime(targetTime, column);
+
+            return new ManiaSnapResult(screenSpacePosition, targetTime, column);
+        }
+
+        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null)
+        {
+            var hoc = (column ?? Playfield.GetColumn(0)).HitObjectContainer;
+            var scrollInfo = drawableRuleset.ScrollingInfo;
+
+            var pos = scrollInfo.Algorithm.PositionAt(time, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight);
+
+            if (scrollInfo.Direction.Value == ScrollingDirection.Down)
+            {
+                // as explained above
+                pos = hoc.DrawHeight - pos;
+            }
+
+            return hoc.ToScreenSpace(new Vector2(hoc.DrawWidth / 2, pos));
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
