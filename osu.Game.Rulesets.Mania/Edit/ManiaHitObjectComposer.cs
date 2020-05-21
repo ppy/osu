@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             targetTime = BeatSnapProvider.SnapTime(targetTime);
 
             // convert back to screen space
-            screenSpacePosition = column.ScreenSpacePositionAtTime(targetTime, column);
+            screenSpacePosition = column.ScreenSpacePositionAtTime(targetTime);
 
             return new ManiaSnapResult(screenSpacePosition, targetTime, column);
         }
