@@ -78,6 +78,8 @@ namespace osu.Game.Screens.Ranking
         public event Action<PanelState> StateChanged;
         public readonly ScoreInfo Score;
 
+        private Container content;
+
         private Container topLayerContainer;
         private Drawable topLayerBackground;
         private Container topLayerContentContainer;
@@ -96,41 +98,46 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = content = new Container
             {
-                topLayerContainer = new Container
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new Drawable[]
                 {
-                    Name = "Top layer",
-                    RelativeSizeAxes = Axes.X,
-                    Height = 120,
-                    Children = new Drawable[]
+                    topLayerContainer = new Container
                     {
-                        new Container
+                        Name = "Top layer",
+                        RelativeSizeAxes = Axes.X,
+                        Height = 120,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            Masking = true,
-                            Child = topLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
-                        },
-                        topLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
-                    }
-                },
-                middleLayerContainer = new Container
-                {
-                    Name = "Middle layer",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                CornerRadius = 20,
+                                CornerExponent = 2.5f,
+                                Masking = true,
+                                Child = topLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                            },
+                            topLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                        }
+                    },
+                    middleLayerContainer = new Container
                     {
-                        new Container
+                        Name = "Middle layer",
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            Masking = true,
-                            Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
-                        },
-                        middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                CornerRadius = 20,
+                                CornerExponent = 2.5f,
+                                Masking = true,
+                                Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                            },
+                            middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                        }
                     }
                 }
             };
@@ -181,7 +188,7 @@ namespace osu.Game.Screens.Ranking
             switch (state)
             {
                 case PanelState.Expanded:
-                    this.ResizeTo(new Vector2(EXPANDED_WIDTH, expanded_height), resize_duration, Easing.OutQuint);
+                    Size = new Vector2(EXPANDED_WIDTH, expanded_height);
 
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
@@ -191,7 +198,7 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case PanelState.Contracted:
-                    this.ResizeTo(new Vector2(CONTRACTED_WIDTH, contracted_height), resize_duration, Easing.OutQuint);
+                    Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
@@ -199,6 +206,8 @@ namespace osu.Game.Screens.Ranking
                     middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
+
+            content.ResizeTo(Size, resize_duration, Easing.OutQuint);
 
             bool topLayerExpanded = topLayerContainer.Y < 0;
 

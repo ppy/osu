@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Ranking
         private const float expanded_panel_spacing = 15;
 
         private readonly Flow flow;
-        private readonly ScrollContainer<Drawable> scroll;
+        private readonly Scroll scroll;
 
         private ScorePanel expandedPanel;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Ranking
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = scroll = new OsuScrollContainer(Direction.Horizontal)
+            InternalChild = scroll = new Scroll
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = flow = new Flow
@@ -46,9 +46,13 @@ namespace osu.Game.Screens.Ranking
             };
 
             AddScore(initialScore);
-            ShowScore(initialScore);
+            presentScore(initialScore);
         }
 
+        /// <summary>
+        /// Adds a <see cref="ScoreInfo"/> to this list.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to add.</param>
         public void AddScore(ScoreInfo score)
         {
             flow.Add(new ScorePanel(score)
@@ -60,24 +64,45 @@ namespace osu.Game.Screens.Ranking
                 p.StateChanged += s =>
                 {
                     if (s == PanelState.Expanded)
-                        ShowScore(score);
+                        presentScore(score);
                 };
             }));
+
+            // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+            // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+            if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+            {
+                // A somewhat hacky property is used here because we need to:
+                // 1) Scroll after the scroll container's visible range is updated.
+                // 2) Scroll before the scroll container's scroll position is updated.
+                // Without this, we would have a 1-frame positioning error which looks very jarring.
+                scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+            }
         }
 
-        public void ShowScore(ScoreInfo score)
+        /// <summary>
+        /// Brings a <see cref="ScoreInfo"/> to the centre of the screen and expands it.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to present.</param>
+        private void presentScore(ScoreInfo score)
         {
+            // Contract the old panel.
             foreach (var p in flow.Where(p => p.Score != score))
+            {
                 p.State = PanelState.Contracted;
+                p.Margin = new MarginPadding();
+            }
 
-            if (expandedPanel != null)
-                expandedPanel.Margin = new MarginPadding(0);
-
+            // Expand the new panel.
             expandedPanel = flow.Single(p => p.Score == score);
             expandedPanel.State = PanelState.Expanded;
             expandedPanel.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
 
-            float scrollOffset = flow.IndexOf(expandedPanel) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
+            // Scroll to the new panel. This is done manually since we need:
+            // 1) To scroll after the scroll container's visible range is updated.
+            // 2) To account for the centre anchor/origins of panels.
+            // In the end, it's easier to compute the scroll position manually.
+            float scrollOffset = flow.GetPanelIndex(expandedPanel.Score) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
             scroll.ScrollTo(scrollOffset);
         }
 
@@ -85,12 +110,45 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            flow.Padding = new MarginPadding { Horizontal = DrawWidth / 2f - expandedPanel.DrawWidth / 2f - expanded_panel_spacing };
+            // Add padding to both sides such that the centre of an expanded panel on either side is in the middle of the screen.
+            flow.Padding = new MarginPadding { Horizontal = DrawWidth / 2f - ScorePanel.EXPANDED_WIDTH / 2f - expanded_panel_spacing };
         }
 
         private class Flow : FillFlowContainer<ScorePanel>
         {
-            public override IEnumerable<Drawable> FlowingChildren => AliveInternalChildren.OfType<ScorePanel>().OrderByDescending(s => s.Score.TotalScore).ThenByDescending(s => s.Score.OnlineScoreID);
+            public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
+
+            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).OfType<ScorePanel>().TakeWhile(s => s.Score != score).Count();
+
+            private IEnumerable<Drawable> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanel>()
+                                                                                                    .OrderByDescending(s => s.Score.TotalScore)
+                                                                                                    .ThenByDescending(s => s.Score.OnlineScoreID);
+        }
+
+        private class Scroll : OsuScrollContainer
+        {
+            public new float Target => base.Target;
+
+            public Scroll()
+                : base(Direction.Horizontal)
+            {
+            }
+
+            /// <summary>
+            /// The target that will be scrolled to instantaneously next frame.
+            /// </summary>
+            public float? InstantScrollTarget;
+
+            protected override void UpdateAfterChildren()
+            {
+                if (InstantScrollTarget != null)
+                {
+                    ScrollTo(InstantScrollTarget.Value, false);
+                    InstantScrollTarget = null;
+                }
+
+                base.UpdateAfterChildren();
+            }
         }
     }
 }
