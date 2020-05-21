@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Ranking
 
             private IEnumerable<Drawable> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanel>()
                                                                                                     .OrderByDescending(s => s.Score.TotalScore)
-                                                                                                    .ThenByDescending(s => s.Score.OnlineScoreID);
+                                                                                                    .ThenBy(s => s.Score.OnlineScoreID);
         }
 
         private class Scroll : OsuScrollContainer
