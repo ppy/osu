@@ -23,12 +23,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Width of the panel when contracted.
         /// </summary>
-        public const float CONTRACTED_WIDTH = 160;
+        public const float CONTRACTED_WIDTH = 130;
 
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 385;
+        private const float contracted_height = 355;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the top layer when the panel is contracted.
         /// </summary>
-        private const float contracted_top_layer_height = 40;
+        private const float contracted_top_layer_height = 30;
 
         /// <summary>
         /// Duration for the panel to resize into its expanded/contracted size.
