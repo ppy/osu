@@ -140,5 +140,18 @@ namespace osu.Game.Rulesets.Mania.UI
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+
+        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null)
+        {
+            var pos = ScrollingInfo.Algorithm.PositionAt(time, Time.Current, ScrollingInfo.TimeRange.Value, HitObjectContainer.DrawHeight);
+
+            if (ScrollingInfo.Direction.Value == ScrollingDirection.Down)
+            {
+                // as explained above
+                pos = HitObjectContainer.DrawHeight - pos;
+            }
+
+            return HitObjectContainer.ToScreenSpace(new Vector2(HitObjectContainer.DrawWidth / 2, pos));
+        }
     }
 }
