@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -14,19 +13,36 @@ namespace osu.Game.Screens.Ranking
 {
     public class ScorePanelList : CompositeDrawable
     {
-        private readonly Flow panels;
+        /// <summary>
+        /// Normal spacing between all panels.
+        /// </summary>
+        private const float panel_spacing = 5;
+
+        /// <summary>
+        /// Spacing around both sides of the expanded panel. This is added on top of <see cref="panel_spacing"/>.
+        /// </summary>
+        private const float expanded_panel_spacing = 15;
+
+        private readonly Flow flow;
+        private readonly ScrollContainer<Drawable> scroll;
+
         private ScorePanel expandedPanel;
 
         public ScorePanelList()
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = panels = new Flow
+            InternalChild = scroll = new OsuScrollContainer(Direction.Horizontal)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Custom,
-                Direction = FillDirection.Horizontal,
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.Both,
+                Child = flow = new Flow
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(panel_spacing, 0),
+                    AutoSizeAxes = Axes.Both,
+                }
             };
         }
 
@@ -34,8 +50,8 @@ namespace osu.Game.Screens.Ranking
         {
             var panel = new ScorePanel(score)
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             };
 
             panel.StateChanged += s => onPanelStateChanged(panel, s);
@@ -43,22 +59,14 @@ namespace osu.Game.Screens.Ranking
             // Todo: Temporary
             panel.State = expandedPanel == null ? PanelState.Expanded : PanelState.Contracted;
 
-            panels.Add(panel);
+            flow.Add(panel);
         }
 
-        public void RemoveScore(ScoreInfo score) => panels.RemoveAll(p => p.Score == score);
-
-        protected override void UpdateAfterChildren()
+        protected override void Update()
         {
-            base.UpdateAfterChildren();
+            base.Update();
 
-            if (expandedPanel != null)
-            {
-                var firstPanel = panels.FlowingChildren.First();
-                var target = expandedPanel.DrawPosition.X - firstPanel.DrawPosition.X + expandedPanel.DrawSize.X / 2;
-
-                panels.OriginPosition = new Vector2((float)Interpolation.Lerp(panels.OriginPosition.X, target, Math.Clamp(Math.Abs(Time.Elapsed) / 80, 0, 1)), panels.DrawHeight / 2);
-            }
+            flow.Padding = new MarginPadding { Horizontal = DrawWidth / 2f - ScorePanel.EXPANDED_WIDTH / 2f - expanded_panel_spacing };
         }
 
         private void onPanelStateChanged(ScorePanel panel, PanelState state)
@@ -67,9 +75,17 @@ namespace osu.Game.Screens.Ranking
                 return;
 
             if (expandedPanel != null)
+            {
+                expandedPanel.Margin = new MarginPadding(0);
                 expandedPanel.State = PanelState.Contracted;
+            }
 
             expandedPanel = panel;
+            expandedPanel.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
+
+            float panelOffset = flow.IndexOf(expandedPanel) * (ScorePanel.CONTRACTED_WIDTH + panel_spacing);
+
+            scroll.ScrollTo(panelOffset);
         }
 
         private class Flow : FillFlowContainer<ScorePanel>
