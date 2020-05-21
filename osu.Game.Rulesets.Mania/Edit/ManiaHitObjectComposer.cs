@@ -72,25 +72,9 @@ namespace osu.Game.Rulesets.Mania.Edit
             targetTime = BeatSnapProvider.SnapTime(targetTime);
 
             // convert back to screen space
-            screenSpacePosition = ScreenSpacePositionAtTime(targetTime, column);
+            screenSpacePosition = column.ScreenSpacePositionAtTime(targetTime, column);
 
             return new ManiaSnapResult(screenSpacePosition, targetTime, column);
-        }
-
-        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null)
-        {
-            var hoc = (column ?? Playfield.GetColumn(0)).HitObjectContainer;
-            var scrollInfo = drawableRuleset.ScrollingInfo;
-
-            var pos = scrollInfo.Algorithm.PositionAt(time, EditorClock.CurrentTime, scrollInfo.TimeRange.Value, hoc.DrawHeight);
-
-            if (scrollInfo.Direction.Value == ScrollingDirection.Down)
-            {
-                // as explained above
-                pos = hoc.DrawHeight - pos;
-            }
-
-            return hoc.ToScreenSpace(new Vector2(hoc.DrawWidth / 2, pos));
         }
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
