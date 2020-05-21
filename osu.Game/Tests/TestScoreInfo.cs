@@ -23,6 +23,8 @@ namespace osu.Game.Tests
             };
 
             Beatmap = new TestBeatmap(ruleset).BeatmapInfo;
+            Ruleset = ruleset;
+            RulesetID = ruleset.ID ?? 0;
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() };
 
             TotalScore = 2845370;
