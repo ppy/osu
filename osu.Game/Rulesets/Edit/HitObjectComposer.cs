@@ -254,7 +254,8 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                adjustableClock.Seek(hitObject.GetEndTime());
+                if (adjustableClock.CurrentTime < hitObject.StartTime)
+                    adjustableClock.Seek(hitObject.StartTime);
             }
 
             showGridFor(Enumerable.Empty<HitObject>());
