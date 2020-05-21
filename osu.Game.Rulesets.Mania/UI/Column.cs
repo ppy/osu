@@ -190,29 +190,5 @@ namespace osu.Game.Rulesets.Mania.UI
 
             return ScrollingInfo.Algorithm.TimeAt(localPosition.Y, Time.Current, ScrollingInfo.TimeRange.Value, HitObjectContainer.DrawHeight);
         }
-
-        /// <summary>
-        /// Converts a mouse position to a hitobject position.
-        /// </summary>
-        /// <remarks>
-        /// Blueprints are centred on the mouse position, such that the hitobject position is anchored at the top or bottom of the blueprint depending on the scroll direction.
-        /// </remarks>
-        /// <param name="mousePosition">The mouse position.</param>
-        /// <returns>The resulting hitobject position, acnhored at the top or bottom of the blueprint depending on the scroll direction.</returns>
-        private Vector2 mouseToHitObjectPosition(Vector2 mousePosition)
-        {
-            switch (ScrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                    mousePosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
-                    break;
-
-                case ScrollingDirection.Down:
-                    mousePosition.Y += DefaultNotePiece.NOTE_HEIGHT / 2;
-                    break;
-            }
-
-            return mousePosition;
-        }
     }
 }
