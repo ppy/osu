@@ -18,10 +18,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
-            createBananas();
+            createBananas(cancellationToken);
         }
 
-        private void createBananas()
+        private void createBananas(CancellationToken cancellationToken)
         {
             double spacing = Duration;
             while (spacing > 100)
@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             for (double i = StartTime; i <= EndTime; i += spacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new Banana
                 {
                     Samples = Samples,
