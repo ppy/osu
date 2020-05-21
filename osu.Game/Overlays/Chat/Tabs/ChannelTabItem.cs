@@ -22,9 +22,9 @@ namespace osu.Game.Overlays.Chat.Tabs
 {
     public class ChannelTabItem : TabItem<Channel>
     {
-        protected Color4 BackgroundInactive;
-        private Color4 backgroundHover;
-        protected Color4 BackgroundActive;
+        protected Colour4 BackgroundInactive;
+        private Colour4 backgroundHover;
+        protected Colour4 BackgroundActive;
 
         public override bool IsRemovable => !Pinned;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Icon = DisplayIcon,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Colour = Color4.Black,
+                            Colour = Colour4.Black,
                             X = -10,
                             Alpha = 0.2f,
                             Size = new Vector2(ChatOverlay.TAB_AREA_HEIGHT),
@@ -183,14 +183,14 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             Type = EdgeEffectType.Shadow,
             Radius = 15,
-            Colour = Color4.Black.Opacity(0.4f),
+            Colour = Colour4.Black.Opacity(0.4f),
         };
 
         private readonly EdgeEffectParameters deactivateEdgeEffect = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
             Radius = 10,
-            Colour = Color4.Black.Opacity(0.2f),
+            Colour = Colour4.Black.Opacity(0.2f),
         };
 
         protected virtual void FadeActive()

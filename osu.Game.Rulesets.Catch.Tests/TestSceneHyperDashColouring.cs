@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashColour = Color4.Goldenrod
+                HyperDashColour = Colour4.Goldenrod
             };
 
             checkHyperDashCatcherColour(skin, skin.HyperDashColour);
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashAfterImageColour = Color4.Lime
+                HyperDashAfterImageColour = Colour4.Lime
             };
 
             checkHyperDashCatcherColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR, skin.HyperDashAfterImageColour);
@@ -61,8 +61,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashColour = Color4.Goldenrod,
-                HyperDashAfterImageColour = Color4.Lime
+                HyperDashColour = Colour4.Goldenrod,
+                HyperDashAfterImageColour = Colour4.Lime
             };
 
             checkHyperDashCatcherColour(skin, skin.HyperDashColour, skin.HyperDashAfterImageColour);
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashFruitColour = Color4.Cyan
+                HyperDashFruitColour = Colour4.Cyan
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashFruitColour);
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashColour = Color4.Goldenrod,
-                HyperDashFruitColour = Color4.Cyan
+                HyperDashColour = Colour4.Goldenrod,
+                HyperDashFruitColour = Colour4.Cyan
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashFruitColour);
@@ -104,13 +104,13 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashColour = Color4.Goldenrod
+                HyperDashColour = Colour4.Goldenrod
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashColour);
         }
 
-        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
+        private void checkHyperDashCatcherColour(ISkin skin, Colour4 expectedCatcherColour, Colour4? expectedEndGlowColour = null)
         {
             CatcherArea catcherArea = null;
             CatcherTrailDisplay trails = null;
@@ -139,10 +139,10 @@ namespace osu.Game.Rulesets.Catch.Tests
                 catcherArea.MovableCatcher.FinishTransforms();
             });
 
-            AddAssert("catcher colour returned to white", () => catcherArea.MovableCatcher.Colour == Color4.White);
+            AddAssert("catcher colour returned to white", () => catcherArea.MovableCatcher.Colour == Colour4.White);
         }
 
-        private void checkHyperDashFruitColour(ISkin skin, Color4 expectedColour)
+        private void checkHyperDashFruitColour(ISkin skin, Colour4 expectedColour)
         {
             DrawableFruit drawableFruit = null;
 
@@ -174,24 +174,24 @@ namespace osu.Game.Rulesets.Catch.Tests
                         .WithChild(child)));
         }
 
-        private bool checkLegacyFruitHyperDashColour(DrawableFruit fruit, Color4 expectedColour) =>
+        private bool checkLegacyFruitHyperDashColour(DrawableFruit fruit, Colour4 expectedColour) =>
             fruit.ChildrenOfType<SkinnableDrawable>().First().Drawable.ChildrenOfType<Sprite>().Any(c => c.Colour == expectedColour);
 
         private class TestSkin : LegacySkin
         {
-            public Color4 HyperDashColour
+            public Colour4 HyperDashColour
             {
                 get => Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()];
                 set => Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()] = value;
             }
 
-            public Color4 HyperDashAfterImageColour
+            public Colour4 HyperDashAfterImageColour
             {
                 get => Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()];
                 set => Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()] = value;
             }
 
-            public Color4 HyperDashFruitColour
+            public Colour4 HyperDashFruitColour
             {
                 get => Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()];
                 set => Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()] = value;

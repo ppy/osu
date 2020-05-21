@@ -205,7 +205,7 @@ namespace osu.Game.Tournament.Components
                                         {
                                             new Box
                                             {
-                                                Colour = Color4.Black,
+                                                Colour = Colour4.Black,
                                                 RelativeSizeAxes = Axes.Both,
                                                 Alpha = 0.1f,
                                             },

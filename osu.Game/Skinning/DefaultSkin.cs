@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinColours.ComboColours:
-                            return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(Configuration.ComboColours));
+                            return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Colour4>>(Configuration.ComboColours));
                     }
 
                     break;

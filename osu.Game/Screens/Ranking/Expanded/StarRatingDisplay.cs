@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(7),
                             Icon = FontAwesome.Solid.Star,
-                            Colour = Color4.Black
+                            Colour = Colour4.Black
                         },
                         new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
                         {
@@ -88,14 +88,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                         {
                             t.AddText($"{wholePart}", s =>
                             {
-                                s.Colour = Color4.Black;
+                                s.Colour = Colour4.Black;
                                 s.Font = s.Font.With(size: 14);
                                 s.UseFullGlyphHeight = false;
                             });
 
                             t.AddText($"{separator}{fractionPart}", s =>
                             {
-                                s.Colour = Color4.Black;
+                                s.Colour = Colour4.Black;
                                 s.Font = s.Font.With(size: 7);
                                 s.UseFullGlyphHeight = false;
                             });

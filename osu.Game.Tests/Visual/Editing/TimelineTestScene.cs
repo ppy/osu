@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             public StartStopButton()
             {
-                BackgroundColour = Color4.SlateGray;
+                BackgroundColour = Colour4.SlateGray;
                 Size = new Vector2(100, 50);
                 Text = "Start";
 

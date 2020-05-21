@@ -393,7 +393,7 @@ namespace osu.Game.Overlays.Comments
             public LoadMoreCommentsButton()
             {
                 IdleColour = OsuColour.Gray(0.7f);
-                HoverColour = Color4.White;
+                HoverColour = Colour4.White;
             }
 
             protected override string GetText() => @"[+] load replies";

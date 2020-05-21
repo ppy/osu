@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class OsuLogo : BeatSyncedContainer
     {
-        public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
+        public readonly Colour4 OsuPink = Color4Extensions.FromHex(@"e967a1");
 
         private const double transition_length = 300;
 
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Menu
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
                                                                     Blending = BlendingParameters.Additive,
-                                                                    Colour = Color4.White,
+                                                                    Colour = Colour4.White,
                                                                     Alpha = 0,
                                                                 },
                                                             },
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Menu
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Alpha = 0,
-                                                    BorderColour = Color4.White,
+                                                    BorderColour = Colour4.White,
                                                     RelativeSizeAxes = Axes.Both,
                                                     BorderThickness = 10,
                                                     Masking = true,

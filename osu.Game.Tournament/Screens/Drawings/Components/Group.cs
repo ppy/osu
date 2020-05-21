@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(54, 54, 54, 255)
+                    Colour = new Colour4(54, 54, 54, 255)
                 },
                 // Group name
                 new TournamentSpriteText
@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                     Text = $"GROUP {name.ToUpperInvariant()}",
                     Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 8),
-                    Colour = new Color4(255, 204, 34, 255),
+                    Colour = new Colour4(255, 204, 34, 255),
                 },
                 teams = new FillFlowContainer<GroupTeam>
                 {

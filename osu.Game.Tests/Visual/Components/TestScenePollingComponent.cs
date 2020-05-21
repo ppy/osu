@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Components
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Scale = new Vector2(0.4f),
-                            Colour = Color4.LimeGreen,
+                            Colour = Colour4.LimeGreen,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new OsuSpriteText

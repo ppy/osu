@@ -94,7 +94,7 @@ namespace osu.Game.Overlays
 
         protected virtual string InfoText => string.Empty;
 
-        protected abstract Color4 GetBarColour(OsuColour colours);
+        protected abstract Colour4 GetBarColour(OsuColour colours);
 
         protected override void OnActivated() => updateState();
 

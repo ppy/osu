@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 300,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
+                    Colour = ColourInfo.GradientHorizontal(Colour4.Black.Opacity(0.75f), Colour4.Black.Opacity(0))
                 },
                 muteButton = new MuteButton
                 {

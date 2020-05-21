@@ -44,13 +44,13 @@ namespace osu.Game.Screens.Select
         {
             Shear = wedged_container_shear;
             Masking = true;
-            BorderColour = new Color4(221, 255, 255, 255);
+            BorderColour = new Colour4(221, 255, 255, 255);
             BorderThickness = 2.5f;
             Alpha = 0;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
+                Colour = new Colour4(130, 204, 255, 150),
                 Radius = 20,
                 Roundness = 15,
             };
@@ -170,14 +170,14 @@ namespace osu.Game.Screens.Select
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                     },
                     // We use a container, such that we can set the colour gradient to go across the
                     // vertices of the masked container instead of the vertices of the (larger) sprite.
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
+                        Colour = ColourInfo.GradientVertical(Colour4.White, Colour4.White.Opacity(0.3f)),
                         Children = new[]
                         {
                             // Zoomed-in and cropped beatmap background
@@ -411,7 +411,7 @@ namespace osu.Game.Screens.Select
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Colour = new Color4(255, 221, 85, 255),
+                            Colour = new Colour4(255, 221, 85, 255),
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                             Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,

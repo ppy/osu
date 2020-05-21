@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 BorderThickness = tick_border_width,
-                BorderColour = Color4.White,
+                BorderColour = Colour4.White,
                 Children = new[]
                 {
                     fillBox = new Box

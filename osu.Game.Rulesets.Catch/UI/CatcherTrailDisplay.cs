@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly Container<CatcherTrailSprite> hyperDashTrails;
         private readonly Container<CatcherTrailSprite> endGlowSprites;
 
-        private Color4 hyperDashTrailsColour;
+        private Colour4 hyperDashTrailsColour;
 
-        public Color4 HyperDashTrailsColour
+        public Colour4 HyperDashTrailsColour
         {
             get => hyperDashTrailsColour;
             set
@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private Color4 endGlowSpritesColour;
+        private Colour4 endGlowSpritesColour;
 
-        public Color4 EndGlowSpritesColour
+        public Colour4 EndGlowSpritesColour
         {
             get => endGlowSpritesColour;
             set

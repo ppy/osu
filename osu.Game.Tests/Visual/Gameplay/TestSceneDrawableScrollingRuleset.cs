@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.X,
                                     Height = 2,
-                                    Colour = Color4.Green
+                                    Colour = Colour4.Green
                                 },
                                 HitObjectContainer
                             }
@@ -312,14 +312,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.LightPink
+                        Colour = Colour4.LightPink
                     },
                     new Box
                     {
                         Origin = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
-                        Colour = Color4.Red
+                        Colour = Colour4.Red
                     }
                 });
             }

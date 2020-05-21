@@ -34,25 +34,25 @@ namespace osu.Game.Online.API.Requests.Responses
                 switch (Name)
                 {
                     case "stable40":
-                        return new Color4(102, 204, 255, 255);
+                        return new Colour4(102, 204, 255, 255);
 
                     case "stable":
-                        return new Color4(34, 153, 187, 255);
+                        return new Colour4(34, 153, 187, 255);
 
                     case "beta40":
-                        return new Color4(255, 221, 85, 255);
+                        return new Colour4(255, 221, 85, 255);
 
                     case "cuttingedge":
-                        return new Color4(238, 170, 0, 255);
+                        return new Colour4(238, 170, 0, 255);
 
                     case OsuGameBase.CLIENT_STREAM_NAME:
-                        return new Color4(237, 18, 33, 255);
+                        return new Colour4(237, 18, 33, 255);
 
                     case "web":
-                        return new Color4(136, 102, 238, 255);
+                        return new Colour4(136, 102, 238, 255);
 
                     default:
-                        return new Color4(0, 0, 0, 255);
+                        return new Colour4(0, 0, 0, 255);
                 }
             }
         }

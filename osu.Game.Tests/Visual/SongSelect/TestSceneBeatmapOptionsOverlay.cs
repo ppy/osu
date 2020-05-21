@@ -16,10 +16,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var overlay = new BeatmapOptionsOverlay();
 
-            overlay.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, Color4.Purple, null, Key.Number1);
-            overlay.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, Color4.Purple, null, Key.Number2);
-            overlay.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, Color4.Pink, null, Key.Number3);
-            overlay.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, Color4.Yellow, null, Key.Number4);
+            overlay.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, Colour4.Purple, null, Key.Number1);
+            overlay.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, Colour4.Purple, null, Key.Number2);
+            overlay.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, Colour4.Pink, null, Key.Number3);
+            overlay.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, Colour4.Yellow, null, Key.Number4);
 
             Add(overlay);
 

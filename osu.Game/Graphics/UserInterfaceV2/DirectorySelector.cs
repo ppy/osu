@@ -104,7 +104,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             catch (Exception)
             {
                 CurrentDirectory.Value = directory.OldValue;
-                this.FlashColour(Color4.Red, 300);
+                this.FlashColour(Colour4.Red, 300);
             }
         }
 

@@ -43,7 +43,7 @@ namespace osu.Game.Users
                     InternalChild = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
+                        Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.1f), Colour4.Black.Opacity(0.75f))
                     };
                 }
                 else

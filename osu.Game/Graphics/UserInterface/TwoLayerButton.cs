@@ -37,11 +37,11 @@ namespace osu.Game.Graphics.UserInterface
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
         private readonly SpriteText text;
 
-        public Color4 HoverColour;
+        public Colour4 HoverColour;
         private readonly Container c1;
         private readonly Container c2;
 
-        public Color4 BackgroundColour
+        public Colour4 BackgroundColour
         {
             set
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
+                                Colour = Colour4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
@@ -128,7 +128,7 @@ namespace osu.Game.Graphics.UserInterface
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
+                                Colour = Colour4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
@@ -192,7 +192,7 @@ namespace osu.Game.Graphics.UserInterface
             var flash = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.White.Opacity(0.5f),
+                Colour = Colour4.White.Opacity(0.5f),
             };
             Add(flash);
 

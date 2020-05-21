@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select.Carousel
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = 10,
-                BorderColour = new Color4(221, 255, 255, 255),
+                BorderColour = new Colour4(221, 255, 255, 255),
                 Children = new Drawable[]
                 {
                     nestedContainer = new Container
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select.Carousel
             borderContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = new Color4(130, 204, 255, 150),
+                Colour = new Colour4(130, 204, 255, 150),
                 Radius = 20,
                 Roundness = 10,
             };
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select.Carousel
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
                 Radius = 10,
-                Colour = Color4.Black.Opacity(100),
+                Colour = Colour4.Black.Opacity(100),
             };
         }
 

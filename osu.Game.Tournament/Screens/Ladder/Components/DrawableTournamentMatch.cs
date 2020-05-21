@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0,
-                    Colour = Color4.YellowGreen,
+                    Colour = Colour4.YellowGreen,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 CurrentMatchSelectionBox = new Container
@@ -60,7 +60,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0,
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 Flow = new FillFlowContainer<DrawableMatchTeam>

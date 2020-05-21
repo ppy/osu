@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 new Box
                 {
-                    Colour = Color4.Teal,
+                    Colour = Colour4.Teal,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuScrollContainer

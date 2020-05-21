@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private readonly Spinner spinner;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => background.AccentColour;
             set => background.AccentColour = value;

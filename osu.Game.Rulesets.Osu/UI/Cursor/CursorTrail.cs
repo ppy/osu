@@ -285,7 +285,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public Vector2 Position;
 
             [VertexMember(4, VertexAttribPointerType.Float)]
-            public Color4 Colour;
+            public Colour4 Colour;
 
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;

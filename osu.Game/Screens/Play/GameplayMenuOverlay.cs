@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = background_alpha,
                 },
                 new FillFlowContainer
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.6f),
+                                Colour = Colour4.Black.Opacity(0.6f),
                                 Radius = 50
                             },
                         },
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected void AddButton(string text, Color4 colour, Action action)
+        protected void AddButton(string text, Colour4 colour, Action action)
         {
             var button = new Button
             {

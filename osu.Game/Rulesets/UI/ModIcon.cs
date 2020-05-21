@@ -99,8 +99,8 @@ namespace osu.Game.Rulesets.UI
             modAcronym.FadeOut();
         }
 
-        private Color4 backgroundColour;
-        private Color4 highlightedColour;
+        private Colour4 backgroundColour;
+        private Colour4 highlightedColour;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

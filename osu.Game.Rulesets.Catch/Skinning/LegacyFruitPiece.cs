@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
     {
         private readonly string lookupName;
 
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<Colour4> accentColour = new Bindable<Colour4>();
         private Sprite colouredSprite;
 
         public LegacyFruitPiece(string lookupName)
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Catch.Skinning
                     Alpha = 0.7f,
                     Scale = new Vector2(1.2f),
                     Texture = skin.GetTexture(lookupName),
-                    Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
-                             skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
+                    Colour = skin.GetConfig<CatchSkinColour, Colour4>(CatchSkinColour.HyperDashFruit)?.Value ??
+                             skin.GetConfig<CatchSkinColour, Colour4>(CatchSkinColour.HyperDash)?.Value ??
                              Catcher.DEFAULT_HYPER_DASH_COLOUR,
                 };
 

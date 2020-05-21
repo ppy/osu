@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         new Box
                         {
-                            Colour = Color4.White,
+                            Colour = Colour4.White,
                             Size = new Vector2(150),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

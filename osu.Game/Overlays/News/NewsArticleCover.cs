@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.News
                 gradient = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.7f)),
+                    Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.1f), Colour4.Black.Opacity(0.7f)),
                     Alpha = 0
                 },
                 new DateContainer(info.Time)
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.News
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
+                        Colour = Colour4.Black.Opacity(0.5f),
                     },
                     new OsuSpriteText
                     {

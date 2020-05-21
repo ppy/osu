@@ -106,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
+                                Colour = Colour4.Black.Opacity(0.2f),
                                 Radius = 5,
                             },
                             Colour = ButtonColour,
@@ -146,7 +146,7 @@ namespace osu.Game.Graphics.UserInterface
                     Font = OsuFont.GetFont(size: 28, weight: FontWeight.Bold),
                     Shadow = true,
                     ShadowColour = new Colour4(0, 0, 0, 0.1f),
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                 },
             };
 
@@ -155,9 +155,9 @@ namespace osu.Game.Graphics.UserInterface
             Selected.ValueChanged += selectionChanged;
         }
 
-        private Color4 buttonColour;
+        private Colour4 buttonColour;
 
-        public Color4 ButtonColour
+        public Colour4 ButtonColour
         {
             get => buttonColour;
             set
@@ -168,9 +168,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4 backgroundColour = OsuColour.Gray(34);
+        private Colour4 backgroundColour = OsuColour.Gray(34);
 
-        public Color4 BackgroundColour
+        public Colour4 BackgroundColour
         {
             get => backgroundColour;
             set
@@ -274,9 +274,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
+            leftGlow.Colour = ColourInfo.GradientHorizontal(new Colour4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
             centerGlow.Colour = ButtonColour;
-            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
+            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Colour4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
         }
     }
 }

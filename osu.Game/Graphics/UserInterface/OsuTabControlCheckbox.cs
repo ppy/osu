@@ -23,9 +23,9 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteText text;
         private readonly SpriteIcon icon;
 
-        private Color4? accentColour;
+        private Colour4? accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour.GetValueOrDefault();
             set
@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
                     Alpha = 0,
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                 },
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
         private void updateFade()
         {
             box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
-            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
+            text.FadeColour(IsHovered ? Colour4.White : AccentColour, transition_length, Easing.OutQuint);
         }
     }
 }

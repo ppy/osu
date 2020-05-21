@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// </remarks>
     public class GroupedDifficultyIcon : DifficultyIcon
     {
-        public GroupedDifficultyIcon(List<BeatmapInfo> beatmaps, RulesetInfo ruleset, Color4 counterColour)
+        public GroupedDifficultyIcon(List<BeatmapInfo> beatmaps, RulesetInfo ruleset, Colour4 counterColour)
             : base(beatmaps.OrderBy(b => b.StarDifficulty).Last(), ruleset, false)
         {
             AddInternal(new OsuSpriteText

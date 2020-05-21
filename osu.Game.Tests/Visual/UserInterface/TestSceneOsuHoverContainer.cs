@@ -181,8 +181,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private sealed class OsuHoverTestContainer : OsuHoverContainer
         {
-            public static readonly Color4 HOVER_COLOUR = Color4.Red;
-            public static readonly Color4 IDLE_COLOUR = Color4.Green;
+            public static readonly Colour4 HOVER_COLOUR = Colour4.Red;
+            public static readonly Colour4 IDLE_COLOUR = Colour4.Green;
 
             public OsuHoverTestContainer()
             {

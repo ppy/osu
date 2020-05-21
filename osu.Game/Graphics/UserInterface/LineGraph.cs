@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public Color4 LineColour
+        public Colour4 LineColour
         {
             get => maskingContainer.Colour;
             set => maskingContainer.Colour = value;

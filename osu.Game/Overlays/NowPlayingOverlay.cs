@@ -94,7 +94,7 @@ namespace osu.Game.Overlays
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(40),
+                                Colour = Colour4.Black.Opacity(40),
                                 Radius = 5,
                             },
                             Children = new[]
@@ -106,7 +106,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 40),
                                     Font = OsuFont.GetFont(size: 25, italics: true),
-                                    Colour = Color4.White,
+                                    Colour = Colour4.White,
                                     Text = @"Nothing to play",
                                 },
                                 artist = new OsuSpriteText
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 45),
                                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
-                                    Colour = Color4.White,
+                                    Colour = Colour4.White,
                                     Text = @"Nothing to play",
                                 },
                                 new Container
@@ -192,7 +192,7 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
-            playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
+            playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Colour4.White, 200, Easing.OutQuint), true);
 
             beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
 
@@ -370,7 +370,7 @@ namespace osu.Game.Overlays
                         Height = bottom_black_area_height,
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
-                        Colour = Color4.Black.Opacity(0.5f)
+                        Colour = Colour4.Black.Opacity(0.5f)
                     }
                 };
             }

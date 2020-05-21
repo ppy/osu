@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
+                        Colour = Colour4.Black.Opacity(0.5f),
                     },
                     new OsuSpriteText
                     {

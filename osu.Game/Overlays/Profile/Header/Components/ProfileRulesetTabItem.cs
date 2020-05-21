@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        protected override Color4 AccentColour
+        protected override Colour4 AccentColour
         {
             get => base.AccentColour;
             set

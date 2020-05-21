@@ -186,15 +186,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("check for no selection", () => !modSelect.SelectedMods.Value.Any());
         }
 
-        private void testMultiplierTextColour(Mod mod, Func<Color4> getCorrectColour)
+        private void testMultiplierTextColour(Mod mod, Func<Colour4> getCorrectColour)
         {
-            checkLabelColor(() => Color4.White);
+            checkLabelColor(() => Colour4.White);
             selectNext(mod);
             AddWaitStep("wait for changing colour", 1);
             checkLabelColor(getCorrectColour);
             selectPrevious(mod);
             AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(() => Color4.White);
+            checkLabelColor(() => Colour4.White);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
+        private void checkLabelColor(Func<Colour4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
         private class TestModSelectOverlay : ModSelectOverlay
         {
@@ -245,8 +245,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
-            public new Color4 LowMultiplierColour => base.LowMultiplierColour;
-            public new Color4 HighMultiplierColour => base.HighMultiplierColour;
+            public new Colour4 LowMultiplierColour => base.LowMultiplierColour;
+            public new Colour4 HighMultiplierColour => base.HighMultiplierColour;
         }
     }
 }

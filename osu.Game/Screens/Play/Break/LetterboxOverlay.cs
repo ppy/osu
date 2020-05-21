@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play.Break
     {
         private const int height = 350;
 
-        private static readonly Color4 transparent_black = new Color4(0, 0, 0, 0);
+        private static readonly Colour4 transparent_black = new Colour4(0, 0, 0, 0);
 
         public LetterboxOverlay()
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.Break
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.Black, transparent_black),
+                        Colour = ColourInfo.GradientVertical(Colour4.Black, transparent_black),
                     }
                 },
                 new Container
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.Break
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(transparent_black, Color4.Black),
+                        Colour = ColourInfo.GradientVertical(transparent_black, Colour4.Black),
                     }
                 }
             };

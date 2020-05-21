@@ -59,7 +59,7 @@ namespace osu.Game.Tournament.Components
                 {
                     Text = p.Username,
                     Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                 };
         }
     }

@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly CircularContainer largeFaint;
         private readonly CircularContainer mainGlow1;
 
-        public DefaultHitExplosion(Color4 objectColour, bool isSmall = false)
+        public DefaultHitExplosion(Colour4 objectColour, bool isSmall = false)
         {
             Origin = Anchor.Centre;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             const float initial_height = 10;
 
-            var colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1);
+            var colour = Interpolation.ValueAt(0.4f, objectColour, Colour4.White, 0, 1);
 
             InternalChildren = new Drawable[]
             {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.1f, objectColour, Color4.White, 0, 1).Opacity(0.3f),
+                        Colour = Interpolation.ValueAt(0.1f, objectColour, Colour4.White, 0, 1).Opacity(0.3f),
                         Roundness = 160,
                         Radius = 200,
                     },
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.6f, objectColour, Color4.White, 0, 1),
+                        Colour = Interpolation.ValueAt(0.6f, objectColour, Colour4.White, 0, 1),
                         Roundness = 20,
                         Radius = 50,
                     },

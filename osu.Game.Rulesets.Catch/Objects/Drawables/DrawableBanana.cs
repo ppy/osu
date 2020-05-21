@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
         }
 
-        private Color4? colour;
+        private Colour4? colour;
 
-        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
+        protected override Colour4 GetComboColour(IReadOnlyList<Colour4> comboColours)
         {
             // override any external colour changes with banananana
             return colour ??= getBananaColour();
@@ -40,18 +40,18 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             float getRandomAngle() => 180 * (RNG.NextSingle() * 2 - 1);
         }
 
-        private Color4 getBananaColour()
+        private Colour4 getBananaColour()
         {
             switch (RNG.Next(0, 3))
             {
                 default:
-                    return new Color4(255, 240, 0, 255);
+                    return new Colour4(255, 240, 0, 255);
 
                 case 1:
-                    return new Color4(255, 192, 0, 255);
+                    return new Colour4(255, 192, 0, 255);
 
                 case 2:
-                    return new Color4(214, 221, 28, 255);
+                    return new Colour4(214, 221, 28, 255);
             }
         }
     }

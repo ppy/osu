@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Size = new Vector2(COLLAPSED_SIZE, 12);
 
-            BorderColour = Color4.White;
+            BorderColour = Colour4.White;
             BorderThickness = border_width;
 
             Masking = true;
@@ -114,9 +114,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set
@@ -127,9 +127,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4 glowingAccentColour;
+        private Colour4 glowingAccentColour;
 
-        public Color4 GlowingAccentColour
+        public Colour4 GlowingAccentColour
         {
             get => glowingAccentColour;
             set
@@ -140,9 +140,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4 glowColour;
+        private Colour4 glowColour;
 
-        public Color4 GlowColour
+        public Colour4 GlowColour
         {
             get => glowColour;
             set

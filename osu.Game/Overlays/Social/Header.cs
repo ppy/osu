@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Social
     {
         private OsuSpriteText browser;
 
-        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"38202e");
+        protected override Colour4 BackgroundColour => Color4Extensions.FromHex(@"38202e");
 
         protected override SocialTab DefaultTab => SocialTab.AllPlayers;
         protected override IconUsage Icon => FontAwesome.Solid.Users;

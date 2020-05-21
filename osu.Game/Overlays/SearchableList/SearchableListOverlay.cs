@@ -33,9 +33,9 @@ namespace osu.Game.Overlays.SearchableList
         protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
         protected readonly FillFlowContainer ScrollFlow;
 
-        protected abstract Color4 BackgroundColour { get; }
-        protected abstract Color4 TrianglesColourLight { get; }
-        protected abstract Color4 TrianglesColourDark { get; }
+        protected abstract Colour4 BackgroundColour { get; }
+        protected abstract Colour4 TrianglesColourLight { get; }
+        protected abstract Colour4 TrianglesColourDark { get; }
         protected abstract SearchableListHeader<THeader> CreateHeader();
         protected abstract SearchableListFilterControl<TTab, TCategory> CreateFilterControl();
 

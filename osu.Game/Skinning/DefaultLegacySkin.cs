@@ -12,12 +12,12 @@ namespace osu.Game.Skinning
         public DefaultLegacySkin(IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(Info, storage, audioManager, string.Empty)
         {
-            Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
+            Configuration.CustomColours["SliderBall"] = new Colour4(2, 170, 255, 255);
             Configuration.AddComboColours(
-                new Color4(255, 192, 0, 255),
-                new Color4(0, 202, 0, 255),
-                new Color4(18, 124, 255, 255),
-                new Color4(242, 24, 57, 255)
+                new Colour4(255, 192, 0, 255),
+                new Colour4(0, 202, 0, 255),
+                new Colour4(18, 124, 255, 255),
+                new Colour4(242, 24, 57, 255)
             );
 
             Configuration.LegacyVersion = 2.7m;

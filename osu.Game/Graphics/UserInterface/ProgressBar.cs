@@ -16,12 +16,12 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box fill;
         private readonly Box background;
 
-        public Color4 FillColour
+        public Colour4 FillColour
         {
             set => fill.FadeColour(value, 150, Easing.OutQuint);
         }
 
-        public Color4 BackgroundColour
+        public Colour4 BackgroundColour
         {
             set
             {

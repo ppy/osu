@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             updateColours();
         }
 
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set

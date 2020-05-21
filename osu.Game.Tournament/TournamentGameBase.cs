@@ -126,14 +126,14 @@ namespace osu.Game.Tournament
                     {
                         new Box
                         {
-                            Colour = Color4.Red,
+                            Colour = Colour4.Red,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new TournamentSpriteText
                         {
                             Text = "Please make the window wider",
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
-                            Colour = Color4.White,
+                            Colour = Colour4.White,
                             Padding = new MarginPadding(20)
                         }
                     }

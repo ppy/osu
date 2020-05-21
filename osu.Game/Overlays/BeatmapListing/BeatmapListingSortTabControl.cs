@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
 
-            protected override Color4 ContentColour
+            protected override Colour4 ContentColour
             {
                 set
                 {

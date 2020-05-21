@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Play
             prepareNewPlayer();
 
             content.ScaleTo(0.7f);
-            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
+            Background?.FadeColour(Colour4.White, 800, Easing.OutQuint);
 
             contentIn();
 

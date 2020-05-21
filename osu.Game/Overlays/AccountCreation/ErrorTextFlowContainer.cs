@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.AccountCreation
             if (errors == null) return;
 
             foreach (var error in errors)
-                errorDrawables.AddRange(AddParagraph(error, cp => cp.Colour = Color4.Red));
+                errorDrawables.AddRange(AddParagraph(error, cp => cp.Colour = Colour4.Red));
         }
     }
 }

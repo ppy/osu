@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Rankings
             private void load(OverlayColourProvider colourProvider)
             {
                 IdleColour = colourProvider.Light2;
-                HoverColour = Color4.White;
+                HoverColour = Colour4.White;
             }
         }
     }

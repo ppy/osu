@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuColour colours)
         {
             AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            AddButton("Quit", new Colour4(170, 27, 39, 255), () => OnQuit?.Invoke());
         }
     }
 }

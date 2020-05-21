@@ -17,9 +17,9 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set
@@ -83,9 +83,9 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            private Color4 accentColour;
+            private Colour4 accentColour;
 
-            public Color4 AccentColour
+            public Colour4 AccentColour
             {
                 get => accentColour;
                 set
@@ -109,9 +109,9 @@ namespace osu.Game.Graphics.UserInterface
                 // IsHovered is used
                 public override bool HandlePositionalInput => true;
 
-                private Color4? accentColour;
+                private Colour4? accentColour;
 
-                public Color4 AccentColour
+                public Colour4 AccentColour
                 {
                     get => accentColour ?? nonAccentSelectedColour;
                     set
@@ -129,8 +129,8 @@ namespace osu.Game.Graphics.UserInterface
                     UpdateForegroundColour();
                 }
 
-                private Color4 nonAccentHoverColour;
-                private Color4 nonAccentSelectedColour;
+                private Colour4 nonAccentHoverColour;
+                private Colour4 nonAccentSelectedColour;
 
                 public DrawableOsuDropdownMenuItem(MenuItem item)
                     : base(item)
@@ -147,7 +147,7 @@ namespace osu.Game.Graphics.UserInterface
                     BackgroundColour = Colour4.Transparent;
 
                     nonAccentHoverColour = colours.PinkDarker;
-                    nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
+                    nonAccentSelectedColour = Colour4.Black.Opacity(0.5f);
                     updateColours();
 
                     AddInternal(new HoverClickSounds(HoverSampleSet.Soft));
@@ -185,7 +185,7 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 AlwaysPresent = true,
                                 Icon = FontAwesome.Solid.ChevronRight,
-                                Colour = Color4.Black,
+                                Colour = Colour4.Black,
                                 Alpha = 0.5f,
                                 Size = new Vector2(8),
                                 Margin = new MarginPadding { Left = 3, Right = 3 },
@@ -219,9 +219,9 @@ namespace osu.Game.Graphics.UserInterface
 
             protected readonly SpriteIcon Icon;
 
-            private Color4 accentColour;
+            private Colour4 accentColour;
 
-            public virtual Color4 AccentColour
+            public virtual Colour4 AccentColour
             {
                 get => accentColour;
                 set

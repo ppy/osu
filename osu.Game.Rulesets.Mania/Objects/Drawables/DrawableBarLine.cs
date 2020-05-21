@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.Both,
-                Colour = new Color4(255, 204, 33, 255),
+                Colour = new Colour4(255, 204, 33, 255),
             });
 
             if (barLine.Major)

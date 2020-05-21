@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.5f,
                 },
                 iconContainer = new Container

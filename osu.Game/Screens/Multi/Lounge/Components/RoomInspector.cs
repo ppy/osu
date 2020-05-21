@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.25f
                 },
                 new Container

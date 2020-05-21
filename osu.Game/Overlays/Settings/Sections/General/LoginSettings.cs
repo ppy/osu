@@ -294,7 +294,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             protected override DropdownMenu CreateMenu() => new UserDropdownMenu();
 
-            public Color4 StatusColour
+            public Colour4 StatusColour
             {
                 set
                 {
@@ -321,7 +321,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.25f),
+                        Colour = Colour4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
                 }
@@ -356,7 +356,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 private readonly SpriteIcon statusIcon;
 
-                public Color4 StatusColour
+                public Colour4 StatusColour
                 {
                     set => statusIcon.FadeColour(value, 500, Easing.OutQuint);
                 }
@@ -370,7 +370,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.25f),
+                        Colour = Colour4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
 

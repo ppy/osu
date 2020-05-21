@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public abstract void OnNewJudgement(JudgementResult judgement);
 
-        protected Color4 GetColourForHitResult(HitResult result)
+        protected Colour4 GetColourForHitResult(HitResult result)
         {
             switch (result)
             {

@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Skins
                 var configs = decoder.Decode(stream);
 
                 Assert.That(configs.Count, Is.EqualTo(1));
-                Assert.That(configs[0].CustomColours, Contains.Key("ColourBarline").And.ContainValue(new Color4(50, 50, 50, 50)));
+                Assert.That(configs[0].CustomColours, Contains.Key("ColourBarline").And.ContainValue(new Colour4(50, 50, 50, 50)));
             }
         }
 

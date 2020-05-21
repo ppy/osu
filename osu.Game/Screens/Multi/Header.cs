@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Multi
                 set => pageText.Text = value.ShortTitle.ToLowerInvariant();
             }
 
-            public Color4 AccentColour
+            public Colour4 AccentColour
             {
                 get => pageText.Colour;
                 set => pageText.Colour = value;
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Multi
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(4),
-                                Colour = Color4.Gray,
+                                Colour = Colour4.Gray,
                             },
                             pageText = new OsuSpriteText
                             {
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Multi
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                AccentColour = Color4.White;
+                AccentColour = Colour4.White;
             }
         }
     }

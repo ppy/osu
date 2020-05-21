@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class OsuTabDropdownHeader : OsuDropdownHeader
         {
-            public override Color4 AccentColour
+            public override Colour4 AccentColour
             {
                 get => base.AccentColour;
                 set

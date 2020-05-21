@@ -21,9 +21,9 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public virtual Color4 AccentColour
+        public virtual Colour4 AccentColour
         {
             get => accentColour;
             set
@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
                 Height = 1,
-                Colour = Color4.White.Opacity(0),
+                Colour = Colour4.White.Opacity(0),
             });
 
             if (isEnumType && AddEnumEntriesAutomatically)
@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.Blue;
         }
 
-        public Color4 StripColour
+        public Colour4 StripColour
         {
             get => strip.Colour;
             set => strip.Colour = value;
@@ -98,9 +98,9 @@ namespace osu.Game.Graphics.UserInterface
             protected readonly SpriteText Text;
             protected readonly Box Bar;
 
-            private Color4 accentColour;
+            private Colour4 accentColour;
 
-            public Color4 AccentColour
+            public Colour4 AccentColour
             {
                 get => accentColour;
                 set
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterface
             protected void FadeHovered()
             {
                 Bar.FadeIn(transition_length, Easing.OutQuint);
-                Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
+                Text.FadeColour(Colour4.White, transition_length, Easing.OutQuint);
             }
 
             protected void FadeUnhovered()
@@ -166,7 +166,7 @@ namespace osu.Game.Graphics.UserInterface
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
                         Alpha = 0,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },

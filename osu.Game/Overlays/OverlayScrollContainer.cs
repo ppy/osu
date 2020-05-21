@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-            private Color4 flashColour;
+            private Colour4 flashColour;
 
             private readonly Container content;
             private readonly Box background;
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                         Type = EdgeEffectType.Shadow,
                         Offset = new Vector2(0f, 1f),
                         Radius = 3f,
-                        Colour = Color4.Black.Opacity(0.25f),
+                        Colour = Colour4.Black.Opacity(0.25f),
                     },
                     Children = new Drawable[]
                     {

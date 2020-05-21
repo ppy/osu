@@ -31,9 +31,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4? backgroundColour;
+        private Colour4? backgroundColour;
 
-        public Color4 BackgroundColour
+        public Colour4 BackgroundColour
         {
             set
             {
@@ -73,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White.Opacity(.1f),
+                        Colour = Colour4.White.Opacity(.1f),
                         Blending = BlendingParameters.Additive,
                         Depth = float.MinValue
                     },
@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void enabledChanged(ValueChangedEvent<bool> e)
         {
-            this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+            this.FadeColour(e.NewValue ? Colour4.White : Colour4.Gray, 200, Easing.OutQuint);
         }
     }
 }

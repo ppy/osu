@@ -149,9 +149,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 protected override void OnDeactivated() => updateState();
 
-                private void updateState() => text.FadeColour(Active.Value ? Color4.White : getStateColour(), 200, Easing.OutQuint);
+                private void updateState() => text.FadeColour(Active.Value ? Colour4.White : getStateColour(), 200, Easing.OutQuint);
 
-                private Color4 getStateColour() => IsHovered ? colourProvider.Light1 : colourProvider.Light3;
+                private Colour4 getStateColour() => IsHovered ? colourProvider.Light1 : colourProvider.Light3;
             }
 
             private class FilterDropdown : OsuTabDropdown<T>

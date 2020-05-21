@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Gray,
+                    Colour = Colour4.Gray,
                 },
                 new FillFlowContainer
                 {

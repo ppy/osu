@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.6f),
+                    Colour = Colour4.Black.Opacity(0.6f),
                 },
                 textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                 {
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
             textContainer.Clear();
             textContainer.AddParagraph(downloadDisabled
                 ? "This beatmap is currently not available for download."
-                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Color4.Orange);
+                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Colour4.Orange);
 
             if (hasExternalLink)
             {

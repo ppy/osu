@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 base.OnHoverLost(e);
 
-                Text.FadeColour(Color4.White);
+                Text.FadeColour(Colour4.White);
             }
         }
     }

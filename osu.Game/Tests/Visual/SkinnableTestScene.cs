@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual
             return new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                BorderColour = Color4.White,
+                BorderColour = Colour4.White,
                 BorderThickness = 5,
                 Masking = true,
 
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual
         {
             public OutlineBox()
             {
-                BorderColour = Color4.IndianRed;
+                BorderColour = Colour4.IndianRed;
                 BorderThickness = 5;
                 Masking = true;
                 RelativeSizeAxes = Axes.Both;
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Colour = Color4.Brown,
+                    Colour = Colour4.Brown,
                     AlwaysPresent = true
                 };
             }

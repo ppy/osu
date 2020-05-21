@@ -882,7 +882,7 @@ private void load()
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CC879477D8841A4CBD724C2DCD249435/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CC879477D8841A4CBD724C2DCD249435/Text/@EntryValue">new Box
 {
-	Colour = Color4.Black,
+	Colour = Colour4.Black,
 	RelativeSizeAxes = Axes.Both,
 },</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F5B3CB743153774F99FB9FCA0FC744EE/@KeyIndexDefined">True</s:Boolean>

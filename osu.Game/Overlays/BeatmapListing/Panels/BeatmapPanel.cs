@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             Type = EdgeEffectType.Shadow,
             Offset = new Vector2(0f, 1f),
             Radius = 2f,
-            Colour = Color4.Black.Opacity(0.25f),
+            Colour = Colour4.Black.Opacity(0.25f),
         };
 
         private readonly EdgeEffectParameters edgeEffectHovered = new EdgeEffectParameters
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             Type = EdgeEffectType.Shadow,
             Offset = new Vector2(0f, 5f),
             Radius = 10f,
-            Colour = Color4.Black.Opacity(0.3f),
+            Colour = Colour4.Black.Opacity(0.3f),
         };
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
             {
                 foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
-                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is ListBeatmapPanel ? Color4.White : colours.Gray5));
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is ListBeatmapPanel ? Colour4.White : colours.Gray5));
             }
             else
             {

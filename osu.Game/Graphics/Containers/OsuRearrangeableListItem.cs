@@ -21,12 +21,12 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public readonly BindableBool PlaylistDragActive = new BindableBool();
 
-        private Color4 handleColour = Color4.White;
+        private Colour4 handleColour = Colour4.White;
 
         /// <summary>
         /// The colour of the drag handle.
         /// </summary>
-        protected Color4 HandleColour
+        protected Colour4 HandleColour
         {
             get => handleColour;
             set

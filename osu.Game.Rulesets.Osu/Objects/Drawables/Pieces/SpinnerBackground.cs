@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         protected Box Disc;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => Disc.Colour;
             set

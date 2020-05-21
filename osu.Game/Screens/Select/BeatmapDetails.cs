@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = Colour4.Black.Opacity(0.5f),
                 },
                 content = new Container
                 {
@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Select
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
+                        Colour = Colour4.Black.Opacity(0.5f),
                     },
                     content = new Container
                     {
@@ -347,7 +347,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Colour = Color4.White.Opacity(0.75f),
+                    Colour = Colour4.White.Opacity(0.75f),
                     Text = text
                 }, loaded =>
                 {

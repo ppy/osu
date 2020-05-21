@@ -230,7 +230,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 Child = new Box
                 {
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.5f,
                 };

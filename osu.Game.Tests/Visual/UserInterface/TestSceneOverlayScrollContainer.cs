@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Gray
+                        Colour = Colour4.Gray
                     }
                 }
             };

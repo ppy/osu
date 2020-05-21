@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
-                    Colour = Color4.White.Opacity(0.2f),
+                    Colour = Colour4.White.Opacity(0.2f),
                 },
                 tabsContainer = new Container
                 {

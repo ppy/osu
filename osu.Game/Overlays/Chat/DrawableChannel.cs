@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed)
         {
-            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Colour4.Red, 400).FadeOut(600).Expire();
         }
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();

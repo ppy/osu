@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// The default colour used to tint hyper-dash fruit, along with the moving catcher, its trail
         /// and end glow/after-image during a hyper-dash.
         /// </summary>
-        public static readonly Color4 DEFAULT_HYPER_DASH_COLOUR = Color4.Red;
+        public static readonly Colour4 DEFAULT_HYPER_DASH_COLOUR = Colour4.Red;
 
         /// <summary>
         /// The duration between transitioning to hyper-dash state.
@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CatcherSprite currentCatcher;
 
-        private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
-        private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
+        private Colour4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
+        private Colour4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
 
         private int currentDirection;
 
@@ -284,7 +284,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
             else
             {
-                this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
+                this.FadeColour(Colour4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
                 this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
             }
         }
@@ -384,11 +384,11 @@ namespace osu.Game.Rulesets.Catch.UI
             base.SkinChanged(skin, allowFallback);
 
             hyperDashColour =
-                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
+                skin.GetConfig<CatchSkinColour, Colour4>(CatchSkinColour.HyperDash)?.Value ??
                 DEFAULT_HYPER_DASH_COLOUR;
 
             hyperDashEndGlowColour =
-                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
+                skin.GetConfig<CatchSkinColour, Colour4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
                 hyperDashColour;
 
             runHyperDashStateTransition(HyperDashing);

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class PulpFormation : CompositeDrawable
     {
-        protected readonly IBindable<Color4> AccentColour = new Bindable<Color4>();
+        protected readonly IBindable<Colour4> AccentColour = new Bindable<Colour4>();
 
         protected const float LARGE_PULP_3 = 16f * FruitPiece.RADIUS_ADJUST;
         protected const float DISTANCE_FROM_CENTRE_3 = 0.15f;

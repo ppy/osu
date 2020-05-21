@@ -61,12 +61,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Origin = Anchor.Centre,
                 RelativePositionAxes = Axes.X,
                 AlwaysPresent = true,
-                Colour = Color4.White,
+                Colour = Colour4.White,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = shadow_radius,
-                    Colour = Color4.Black
+                    Colour = Colour4.Black
                 },
             };
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         {
                             Type = EdgeEffectType.Shadow,
                             Radius = shadow_radius,
-                            Colour = Color4.Black
+                            Colour = Colour4.Black
                         },
                         Child = new Box
                         {
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = shadow_radius / 2,
-                        Colour = Color4.Orange,
+                        Colour = Colour4.Orange,
                     };
                 }
                 else
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = shadow_radius,
-                        Colour = State == SelectionState.Selected ? Color4.Orange : Color4.Black
+                        Colour = State == SelectionState.Selected ? Colour4.Orange : Colour4.Black
                     };
                 }
             }
@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateState()
             {
-                Colour = IsHovered || hasMouseDown ? Color4.OrangeRed : Color4.White;
+                Colour = IsHovered || hasMouseDown ? Colour4.OrangeRed : Colour4.White;
             }
 
             [Resolved]

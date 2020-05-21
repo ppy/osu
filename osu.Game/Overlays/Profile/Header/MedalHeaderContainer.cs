@@ -44,10 +44,10 @@ namespace osu.Game.Overlays.Profile.Header
                         RelativeSizeAxes = Axes.Both,
                         Colour = new ColourInfo
                         {
-                            TopLeft = Color4.Black.Opacity(0.2f),
-                            TopRight = Color4.Black.Opacity(0.2f),
-                            BottomLeft = Color4.Black.Opacity(0),
-                            BottomRight = Color4.Black.Opacity(0)
+                            TopLeft = Colour4.Black.Opacity(0.2f),
+                            TopRight = Colour4.Black.Opacity(0.2f),
+                            BottomLeft = Colour4.Black.Opacity(0),
+                            BottomRight = Colour4.Black.Opacity(0)
                         }
                     },
                 },

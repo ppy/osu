@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public abstract class GradientLineTabControl<TModel> : PageTabControl<TModel>
     {
-        protected Color4 LineColour
+        protected Colour4 LineColour
         {
             get => line.Colour;
             set => line.Colour = value;
@@ -58,12 +58,12 @@ namespace osu.Game.Graphics.UserInterface
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Colour)
+                            Colour = ColourInfo.GradientHorizontal(Colour4.Transparent, Colour)
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Colour, Color4.Transparent)
+                            Colour = ColourInfo.GradientHorizontal(Colour, Colour4.Transparent)
                         },
                     }
                 };

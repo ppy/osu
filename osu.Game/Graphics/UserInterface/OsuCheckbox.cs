@@ -14,8 +14,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuCheckbox : Checkbox
     {
-        public Color4 CheckedColor { get; set; } = Color4.Cyan;
-        public Color4 UncheckedColor { get; set; } = Color4.White;
+        public Colour4 CheckedColor { get; set; } = Colour4.Cyan;
+        public Colour4 UncheckedColor { get; set; } = Colour4.White;
         public int FadeDuration { get; set; }
 
         public string LabelText

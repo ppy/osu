@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Color4.White.Opacity(0.2f),
+                    Colour = Colour4.White.Opacity(0.2f),
                     Radius = 4,
                 },
                 Child = new Box

@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             }
         }
 
-        private Color4 hoverColour;
+        private Colour4 hoverColour;
         private readonly SpriteIcon icon;
         private readonly LoadingSpinner loadingSpinner;
 
@@ -109,14 +109,14 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!Playing.Value)
-                icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
+                icon.FadeColour(Colour4.White, 120, Easing.InOutQuint);
             base.OnHoverLost(e);
         }
 
         private void playingStateChanged(ValueChangedEvent<bool> e)
         {
             icon.Icon = e.NewValue ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
-            icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+            icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Colour4.White, 120, Easing.InOutQuint);
 
             if (e.NewValue)
             {

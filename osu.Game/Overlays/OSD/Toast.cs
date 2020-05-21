@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.OSD
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.7f
                 },
                 content = new Container

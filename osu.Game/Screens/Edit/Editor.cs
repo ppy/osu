@@ -313,7 +313,7 @@ namespace osu.Game.Screens.Edit
             base.OnEntering(last);
 
             // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
-            Background.FadeColour(Color4.DarkGray, 500);
+            Background.FadeColour(Colour4.DarkGray, 500);
 
             Background.EnableUserDim.Value = false;
             Background.BlurAmount.Value = 0;
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            Background.FadeColour(Color4.White, 500);
+            Background.FadeColour(Colour4.White, 500);
             resetTrack();
 
             return base.OnExiting(next);

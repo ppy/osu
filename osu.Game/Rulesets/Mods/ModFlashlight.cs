@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mods
             var flashlight = CreateFlashlight();
             flashlight.Combo = Combo;
             flashlight.RelativeSizeAxes = Axes.Both;
-            flashlight.Colour = Color4.Black;
+            flashlight.Colour = Colour4.Black;
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
             flashlight.Breaks = drawableRuleset.Beatmap.Breaks;

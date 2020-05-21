@@ -154,7 +154,7 @@ namespace osu.Desktop.Updater
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.Upload,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         Size = new Vector2(20),
                     }
                 });

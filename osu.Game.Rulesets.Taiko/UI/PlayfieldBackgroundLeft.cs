@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = 10,
-                    Colour = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
+                    Colour = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Colour4.Black.Opacity(0.6f), Colour4.Black.Opacity(0)),
                 },
             };
         }

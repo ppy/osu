@@ -120,7 +120,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 AddInternal(path = new ProgressionPath(matchesContainer.First(c => c.Match == Source), found)
                 {
-                    Colour = Color4.Yellow,
+                    Colour = Colour4.Yellow,
                 });
 
                 return base.OnMouseMove(e);

@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Changelog
 
                 foreach (var entry in categoryEntries)
                 {
-                    var entryColour = entry.Major ? colours.YellowLight : Color4.White;
+                    var entryColour = entry.Major ? colours.YellowLight : Colour4.White;
 
                     LinkFlowContainer title;
 

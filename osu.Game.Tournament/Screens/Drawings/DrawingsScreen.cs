@@ -80,7 +80,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                             RelativeSizeAxes = Axes.X,
                             Size = new Vector2(1, 10),
 
-                            Colour = new Color4(255, 204, 34, 255),
+                            Colour = new Colour4(255, 204, 34, 255),
 
                             Lines = 6
                         },

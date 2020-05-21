@@ -189,8 +189,8 @@ namespace osu.Game.Screens.Edit.Timing
                 Action = () => selectedGroup.Value = controlGroup;
             }
 
-            private Color4 colourHover;
-            private Color4 colourSelected;
+            private Colour4 colourHover;
+            private Colour4 colourSelected;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

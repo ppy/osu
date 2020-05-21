@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                     },
                     scoresContainer = new TestScoresContainer(),
                 }

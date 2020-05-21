@@ -16,9 +16,9 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const int duration = 200;
 
-        private Color4 chevronIconColour;
+        private Colour4 chevronIconColour;
 
-        protected Color4 ChevronIconColour
+        protected Colour4 ChevronIconColour
         {
             get => chevronIconColour;
             set => chevronIconColour = leftChevron.Colour = rightChevron.Colour = value;

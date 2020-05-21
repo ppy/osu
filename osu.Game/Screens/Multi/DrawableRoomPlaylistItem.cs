@@ -260,26 +260,26 @@ namespace osu.Game.Screens.Multi
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
+                                Colour = Colour4.Black,
                                 Width = 0.4f,
                             },
                             // Piecewise-linear gradient with 3 segments to make it appear smoother
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                Colour = ColourInfo.GradientHorizontal(Colour4.Black, new Colour4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                Colour = ColourInfo.GradientHorizontal(new Colour4(0f, 0f, 0f, 0.9f), new Colour4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                Colour = ColourInfo.GradientHorizontal(new Colour4(0f, 0f, 0f, 0.1f), new Colour4(0, 0, 0, 0)),
                                 Width = 0.05f,
                             },
                         }

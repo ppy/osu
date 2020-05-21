@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black.Opacity(150),
+                                Colour = Colour4.Black.Opacity(150),
                             },
                             new FillFlowContainer
                             {
@@ -123,12 +123,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
+                                Colour = Colour4.Black,
                             },
                             flashLayer = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White,
+                                Colour = Colour4.White,
                                 Alpha = 0,
                             }
                         }

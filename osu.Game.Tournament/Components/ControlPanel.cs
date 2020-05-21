@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(54, 54, 54, 255)
+                    Colour = new Colour4(54, 54, 54, 255)
                 },
                 new TournamentSpriteText
                 {

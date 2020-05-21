@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
     {
-        protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
+        protected override Colour4 BackgroundColour => Colour4.Black.Opacity(0.5f);
         protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
         protected override SecondaryFilter DefaultCategory => SecondaryFilter.Public;
 

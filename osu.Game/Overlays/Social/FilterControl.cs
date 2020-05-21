@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Social
 {
     public class FilterControl : SearchableListFilterControl<SocialSortCriteria, SortDirection>
     {
-        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"47253a");
+        protected override Colour4 BackgroundColour => Color4Extensions.FromHex(@"47253a");
         protected override SocialSortCriteria DefaultTab => SocialSortCriteria.Rank;
         protected override SortDirection DefaultCategory => SortDirection.Ascending;
 

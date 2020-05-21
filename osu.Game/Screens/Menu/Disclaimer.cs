@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
     public class Disclaimer : StartupScreen
     {
         private SpriteIcon icon;
-        private Color4 iconColour;
+        private Colour4 iconColour;
         private LinkFlowContainer textFlow;
         private LinkFlowContainer supportFlow;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Menu
                     .RotateTo(-360, 520, Easing.OutQuint)
                     .Then()
                     .MoveToY(icon_y, 160, Easing.InQuart)
-                    .FadeColour(Color4.White, 160);
+                    .FadeColour(Colour4.White, 160);
 
                 fill.Delay(520 + 160).MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
             }
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Menu
 
         private void animateHeart()
         {
-            heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+            heart.FlashColour(Colour4.White, 750, Easing.OutQuint).Loop();
         }
     }
 }

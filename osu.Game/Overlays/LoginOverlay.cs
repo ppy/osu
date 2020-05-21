@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
+                            Colour = Colour4.Black,
                             Alpha = 0.6f,
                         },
                         new Container

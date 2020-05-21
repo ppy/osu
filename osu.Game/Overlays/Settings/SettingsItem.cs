@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Settings
                 }
             }
 
-            private Color4 buttonColour;
+            private Colour4 buttonColour;
 
             private bool hovering;
 
@@ -191,7 +191,7 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void SetButtonColour(Color4 buttonColour)
+            public void SetButtonColour(Colour4 buttonColour)
             {
                 this.buttonColour = buttonColour;
                 UpdateState();
@@ -204,7 +204,7 @@ namespace osu.Game.Overlays.Settings
 
                 this.FadeTo(bindable.IsDefault ? 0f :
                     hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-                this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
+                this.FadeColour(bindable.Disabled ? Colour4.Gray : buttonColour, 200, Easing.OutQuint);
             }
         }
     }

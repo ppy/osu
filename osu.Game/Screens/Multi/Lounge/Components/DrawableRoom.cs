@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,
-                            Colour = Color4.Black.Opacity(40),
+                            Colour = Colour4.Black.Opacity(40),
                             Radius = 5,
                         },
                         Children = new Drawable[]

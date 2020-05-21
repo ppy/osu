@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Colour4.SlateGray
                     },
                     button = new BackButton(receptor)
                     {

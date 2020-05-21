@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual Drawable CreateBox() => new Container
         {
             Masking = true,
-            BorderColour = Color4.White,
+            BorderColour = Colour4.White,
             BorderThickness = SelectionHandler.BORDER_RADIUS,
             Child = new Box
             {

@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public string Link { get; set; }
 
-        private Color4 hoverColour;
+        private Colour4 hoverColour;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            InternalChild.FadeColour(Color4.White, 500, Easing.OutQuint);
+            InternalChild.FadeColour(Colour4.White, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 

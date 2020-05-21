@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         Alpha = 0.6f,
                     },
                     SectionsContainer = new SettingsSectionsContainer
@@ -204,7 +204,7 @@ namespace osu.Game.Overlays
             {
                 HeaderBackground = new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     RelativeSizeAxes = Axes.Both
                 };
             }

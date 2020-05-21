@@ -109,9 +109,9 @@ namespace osu.Game.Overlays.Notifications
         public override bool DisplayOnTop => false;
 
         private readonly ProgressBar progressBar;
-        private Color4 colourQueued;
-        private Color4 colourActive;
-        private Color4 colourCancelled;
+        private Colour4 colourQueued;
+        private Colour4 colourActive;
+        private Colour4 colourCancelled;
 
         private readonly TextFlowContainer textDrawable;
 
@@ -182,8 +182,8 @@ namespace osu.Game.Overlays.Notifications
         {
             private readonly Box box;
 
-            private Color4 colourActive;
-            private Color4 colourInactive;
+            private Colour4 colourActive;
+            private Colour4 colourInactive;
 
             private float progress;
 

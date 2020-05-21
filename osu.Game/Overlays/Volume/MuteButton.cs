@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Volume
             }
         }
 
-        private Color4 hoveredColour, unhoveredColour;
+        private Colour4 hoveredColour, unhoveredColour;
 
         private const float width = 100;
         public const float HEIGHT = 35;

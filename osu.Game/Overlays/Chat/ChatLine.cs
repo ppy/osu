@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float TextSize => 20;
 
-        private Color4 customUsernameColour;
+        private Colour4 customUsernameColour;
 
         private OsuSpriteText timestamp;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Chat
                         Roundness = 1,
                         Offset = new Vector2(0, 3),
                         Radius = 3,
-                        Colour = Color4.Black.Opacity(0.3f),
+                        Colour = Colour4.Black.Opacity(0.3f),
                         Type = EdgeEffectType.Shadow,
                     },
                     // Drop shadow effect
@@ -247,7 +247,7 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        private static readonly Color4[] username_colours =
+        private static readonly Colour4[] username_colours =
         {
             Color4Extensions.FromHex("588c7e"),
             Color4Extensions.FromHex("b2a367"),

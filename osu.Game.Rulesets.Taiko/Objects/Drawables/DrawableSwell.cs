@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
                                 BorderThickness = target_ring_thin_border,
-                                BorderColour = Color4.White,
+                                BorderColour = Colour4.White,
                                 Children = new[]
                                 {
                                     new Box

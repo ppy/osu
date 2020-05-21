@@ -82,11 +82,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         BorderThickness = size / 6,
-                        BorderColour = Color4.White,
+                        BorderColour = Colour4.White,
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,
-                            Colour = Color4.Pink.Opacity(0.5f),
+                            Colour = Colour4.Pink.Opacity(0.5f),
                             Radius = 5,
                         },
                         Children = new Drawable[]
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
                                 BorderThickness = size / 3,
-                                BorderColour = Color4.White.Opacity(0.5f),
+                                BorderColour = Colour4.White.Opacity(0.5f),
                                 Children = new Drawable[]
                                 {
                                     new Box
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White,
+                                        Colour = Colour4.White,
                                     },
                                 },
                             },

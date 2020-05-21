@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select.Options
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Scale = new Vector2(1, 0),
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = Colour4.Black.Opacity(0.5f),
                 },
                 buttonsContainer = new ReverseChildIDFillFlowContainer<BeatmapOptionsButton>
                 {
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="icon">Icon of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
         /// <param name="action">Binding the button does.</param>
-        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action, Key? hotkey = null)
+        public void AddButton(string firstLine, string secondLine, IconUsage icon, Colour4 colour, Action action, Key? hotkey = null)
         {
             var button = new BeatmapOptionsButton
             {

@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private void load(OsuColour colours)
         {
             progressBar.FillColour = colours.Blue;
-            progressBar.BackgroundColour = Color4.Black.Opacity(0.7f);
+            progressBar.BackgroundColour = Colour4.Black.Opacity(0.7f);
             progressBar.Current = Progress;
 
             State.BindValueChanged(state =>

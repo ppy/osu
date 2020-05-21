@@ -26,13 +26,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 Add(new Container
                 {
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.4f,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Radius = 10,
-                        Colour = Color4.Gray.Opacity(0.2f),
+                        Colour = Colour4.Gray.Opacity(0.2f),
                     },
                     RelativePositionAxes = Axes.Both,
                     Masking = true,

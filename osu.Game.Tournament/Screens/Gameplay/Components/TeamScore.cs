@@ -68,7 +68,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                             {
                                 new Box
                                 {
-                                    Colour = Color4.Transparent,
+                                    Colour = Colour4.Transparent,
                                     RelativeSizeAxes = Axes.Both,
                                     AlwaysPresent = true,
                                 },

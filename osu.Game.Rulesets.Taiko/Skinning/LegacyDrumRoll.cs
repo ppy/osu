@@ -57,9 +57,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             updateAccentColour();
         }
 
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set

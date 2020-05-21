@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void PopOut()
         {
-            dimTarget?.FadeColour(Color4.White, TRANSITION_DURATION, Easing.OutQuint);
+            dimTarget?.FadeColour(Colour4.White, TRANSITION_DURATION, Easing.OutQuint);
             base.PopOut();
         }
 
@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
             if (State.Value == Visibility.Visible)
             {
                 // ensure we don't leave the target in a bad state.
-                dimTarget?.FadeColour(Color4.White, TRANSITION_DURATION, Easing.OutQuint);
+                dimTarget?.FadeColour(Colour4.White, TRANSITION_DURATION, Easing.OutQuint);
             }
         }
     }

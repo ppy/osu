@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<Colour4> accentColour = new Bindable<Colour4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
         [BackgroundDependencyLoader]

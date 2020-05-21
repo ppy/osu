@@ -152,8 +152,8 @@ namespace osu.Game.Screens.Edit.Components
                     };
                 }
 
-                private Color4 hoveredColour;
-                private Color4 normalColour;
+                private Colour4 hoveredColour;
+                private Colour4 normalColour;
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)

@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 c.Scale = new Vector2(DrawHeight / 128);
         }
 
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set

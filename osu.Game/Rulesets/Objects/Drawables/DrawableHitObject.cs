@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
-        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
+        public readonly Bindable<Colour4> AccentColour = new Bindable<Colour4>(Colour4.Gray);
 
         protected SkinnableSound Samples { get; private set; }
 
@@ -322,7 +322,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (!(HitObject is IHasComboInformation)) return;
 
-            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Colour4>>(GlobalSkinColours.ComboColours)?.Value;
 
             AccentColour.Value = GetComboColour(comboColours);
         }
@@ -335,12 +335,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
         /// </remarks>
         /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
-        protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
+        protected virtual Colour4 GetComboColour(IReadOnlyList<Colour4> comboColours)
         {
             if (!(HitObject is IHasComboInformation combo))
                 throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
 
-            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Colour4.White;
         }
 
         /// <summary>

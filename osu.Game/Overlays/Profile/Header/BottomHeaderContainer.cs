@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Profile.Header
         private LinkFlowContainer topLinkContainer;
         private LinkFlowContainer bottomLinkContainer;
 
-        private Color4 iconColour;
+        private Colour4 iconColour;
 
         public BottomHeaderContainer()
         {

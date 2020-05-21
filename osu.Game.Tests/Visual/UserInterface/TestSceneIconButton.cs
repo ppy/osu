@@ -29,8 +29,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new NamedIconButton("Full-width", new IconButton { Size = new Vector2(200, 30) }),
                     new NamedIconButton("Icon colours", new IconButton
                     {
-                        IconColour = Color4.Green,
-                        IconHoverColour = Color4.Red
+                        IconColour = Colour4.Green,
+                        IconHoverColour = Colour4.Red
                     })
                 }
             };
@@ -40,8 +40,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public ColouredIconButton()
             {
-                FlashColour = Color4.DarkGreen;
-                HoverColour = Color4.Green;
+                FlashColour = Colour4.DarkGreen;
+                HoverColour = Colour4.Green;
             }
         }
 
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         Alpha = 0.5f,
                     },
                     new FillFlowContainer

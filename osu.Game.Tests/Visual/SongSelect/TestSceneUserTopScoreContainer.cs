@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.DarkGreen,
+                        Colour = Colour4.DarkGreen,
                     },
                     topScoreContainer = new UserTopScoreContainer
                     {

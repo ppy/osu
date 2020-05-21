@@ -109,7 +109,7 @@ namespace osu.Game.Overlays
 
             protected override Container<Drawable> Content => content;
 
-            protected virtual Color4 ContentColour
+            protected virtual Colour4 ContentColour
             {
                 set => text.Colour = value;
             }
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
                 else
                     HideBackground();
 
-                ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
+                ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Colour4.White;
 
                 text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
             }

@@ -50,7 +50,7 @@ namespace osu.Desktop.Overlays
                                 },
                                 new OsuSpriteText
                                 {
-                                    Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
+                                    Colour = DebugUtils.IsDebugBuild ? colours.Red : Colour4.White,
                                     Text = game.Version
                                 },
                             }

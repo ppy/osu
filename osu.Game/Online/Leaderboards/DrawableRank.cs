@@ -80,7 +80,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 case ScoreRank.XH:
                 case ScoreRank.SH:
-                    return ColourInfo.GradientVertical(Color4.White, Color4Extensions.FromHex("afdff0"));
+                    return ColourInfo.GradientVertical(Colour4.White, Color4Extensions.FromHex("afdff0"));
 
                 case ScoreRank.X:
                 case ScoreRank.S:

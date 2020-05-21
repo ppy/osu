@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        private Color4 expandedColour;
+        private Colour4 expandedColour;
 
         protected PlayerSettingsGroup()
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Width = container_width;
             Masking = true;
             CornerRadius = corner_radius;
-            BorderColour = Color4.Black;
+            BorderColour = Colour4.Black;
             BorderThickness = border_thickness;
 
             InternalChildren = new Drawable[]
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.5f,
                 },
                 new FillFlowContainer
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             updateExpanded();
         }
 
-        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
+        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Colour4.White, 200, Easing.InOutQuint);
 
         protected override Container<Drawable> Content => content;
 

@@ -107,7 +107,7 @@ namespace osu.Game.Tournament
                     {
                         new Box
                         {
-                            Colour = Color4.Black,
+                            Colour = Colour4.Black,
                             RelativeSizeAxes = Axes.Both,
                         },
                         buttons = new FillFlowContainer
@@ -254,8 +254,8 @@ namespace osu.Game.Tournament
                         return;
 
                     isSelected = value;
-                    BackgroundColour = isSelected ? Color4.SkyBlue : OsuColour.Gray(0.2f);
-                    SpriteText.Colour = isSelected ? Color4.Black : Color4.White;
+                    BackgroundColour = isSelected ? Colour4.SkyBlue : OsuColour.Gray(0.2f);
+                    SpriteText.Colour = isSelected ? Colour4.Black : Colour4.White;
                 }
             }
         }

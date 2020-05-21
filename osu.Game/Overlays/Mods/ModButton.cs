@@ -104,9 +104,9 @@ namespace osu.Game.Overlays.Mods
 
         public bool Selected => selectedIndex != -1;
 
-        private Color4 selectedColour;
+        private Colour4 selectedColour;
 
-        public Color4 SelectedColour
+        public Colour4 SelectedColour
         {
             get => selectedColour;
             set
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Mods
                 backgroundIcon.Mod = foregroundIcon.Mod;
             foregroundIcon.Mod = mod;
             text.Text = mod.Name;
-            Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
+            Colour = mod.HasImplementation ? Colour4.White : Colour4.Gray;
         }
 
         private void createIcons()

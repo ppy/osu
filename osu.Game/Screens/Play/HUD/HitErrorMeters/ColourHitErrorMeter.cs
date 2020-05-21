@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 LayoutEasing = Easing.OutQuint;
             }
 
-            public void Push(Color4 colour)
+            public void Push(Colour4 colour)
             {
                 Add(new HitErrorCircle(colour, drawable_judgement_size));
 
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             private readonly Circle circle;
 
-            public HitErrorCircle(Color4 colour, int size)
+            public HitErrorCircle(Colour4 colour, int size)
             {
                 Size = new Vector2(size);
                 Child = circle = new Circle

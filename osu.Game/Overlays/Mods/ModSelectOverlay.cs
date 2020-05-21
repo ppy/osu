@@ -52,8 +52,8 @@ namespace osu.Game.Overlays.Mods
 
         private Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods;
 
-        protected Color4 LowMultiplierColour;
-        protected Color4 HighMultiplierColour;
+        protected Colour4 LowMultiplierColour;
+        protected Colour4 HighMultiplierColour;
 
         private const float content_width = 0.8f;
         private const float footer_button_spacing = 20;
@@ -84,14 +84,14 @@ namespace osu.Game.Overlays.Mods
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(36, 50, 68, 255)
+                            Colour = new Colour4(36, 50, 68, 255)
                         },
                         new Triangles
                         {
                             TriangleScale = 5,
                             RelativeSizeAxes = Axes.Both,
-                            ColourLight = new Color4(53, 66, 82, 255),
-                            ColourDark = new Color4(41, 54, 70, 255),
+                            ColourLight = new Colour4(53, 66, 82, 255),
+                            ColourDark = new Colour4(41, 54, 70, 255),
                         },
                     },
                 },
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.Mods
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = new Color4(172, 20, 116, 255),
+                                        Colour = new Colour4(172, 20, 116, 255),
                                         Alpha = 0.5f,
                                     },
                                     footerContainer = new FillFlowContainer
@@ -296,7 +296,7 @@ namespace osu.Game.Overlays.Mods
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(0, 0, 0, 192)
+                            Colour = new Colour4(0, 0, 0, 192)
                         },
                         new OsuScrollContainer
                         {
@@ -436,7 +436,7 @@ namespace osu.Game.Overlays.Mods
             else if (multiplier < 1.0)
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
-                MultiplierLabel.FadeColour(Color4.White, 200);
+                MultiplierLabel.FadeColour(Colour4.White, 200);
         }
 
         private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)

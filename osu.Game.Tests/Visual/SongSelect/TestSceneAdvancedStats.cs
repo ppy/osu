@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("approach rate bar is red", () => barIsRed(advancedStats.ApproachRate));
         }
 
-        private bool barIsWhite(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == Color4.White;
+        private bool barIsWhite(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == Colour4.White;
         private bool barIsBlue(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.BlueDark;
         private bool barIsRed(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.Red;
 

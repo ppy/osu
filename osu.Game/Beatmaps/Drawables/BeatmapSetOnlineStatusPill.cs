@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables
             set => statusText.Padding = value;
         }
 
-        public Color4 BackgroundColour
+        public Colour4 BackgroundColour
         {
             get => background.Colour;
             set => background.Colour = value;
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps.Drawables
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.5f,
                 },
                 statusText = new OsuSpriteText

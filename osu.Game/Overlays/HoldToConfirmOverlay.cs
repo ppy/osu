@@ -35,7 +35,7 @@ namespace osu.Game.Overlays
                 overlay = new Box
                 {
                     Alpha = 0,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     RelativeSizeAxes = Axes.Both,
                 }
             };

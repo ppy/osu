@@ -639,7 +639,7 @@ namespace osu.Game.Screens.Select
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
-                backgroundModeBeatmap.FadeColour(Color4.White, 250);
+                backgroundModeBeatmap.FadeColour(Colour4.White, 250);
             }
 
             beatmapInfoWedge.Beatmap = beatmap;

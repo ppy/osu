@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Origin = Anchor.Centre,
                 Size = new Vector2(default_tick_size),
                 BorderThickness = default_tick_size / 4,
-                BorderColour = Color4.White,
+                BorderColour = Colour4.White,
                 Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case ArmedState.Miss:
                     this.FadeOut(ANIM_DURATION);
-                    this.FadeColour(Color4.Red, ANIM_DURATION / 2);
+                    this.FadeColour(Colour4.Red, ANIM_DURATION / 2);
                     break;
 
                 case ArmedState.Hit:

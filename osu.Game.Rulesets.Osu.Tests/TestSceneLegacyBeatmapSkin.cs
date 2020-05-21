@@ -86,10 +86,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 return dependencies;
             }
 
-            public IReadOnlyList<Color4> UsableComboColours =>
+            public IReadOnlyList<Colour4> UsableComboColours =>
                 GameplayClockContainer.ChildrenOfType<BeatmapSkinProvidingContainer>()
                                       .First()
-                                      .GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+                                      .GetConfig<GlobalSkinColours, IReadOnlyList<Colour4>>(GlobalSkinColours.ComboColours)?.Value;
         }
 
         private class CustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
@@ -115,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestBeatmapSkin : LegacyBeatmapSkin
         {
-            public static Color4[] Colours { get; } =
+            public static Colour4[] Colours { get; } =
             {
-                new Color4(50, 100, 150, 255),
-                new Color4(40, 80, 120, 255),
+                new Colour4(50, 100, 150, 255),
+                new Colour4(40, 80, 120, 255),
             };
 
             public TestBeatmapSkin(BeatmapInfo beatmap, bool hasColours)
@@ -131,10 +131,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestSkin : LegacySkin, ISkinSource
         {
-            public static Color4[] Colours { get; } =
+            public static Colour4[] Colours { get; } =
             {
-                new Color4(150, 100, 50, 255),
-                new Color4(20, 20, 20, 255),
+                new Colour4(150, 100, 50, 255),
+                new Colour4(20, 20, 20, 255),
             };
 
             public TestSkin(bool hasCustomColours)

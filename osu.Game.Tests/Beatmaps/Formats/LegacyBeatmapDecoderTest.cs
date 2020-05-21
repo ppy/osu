@@ -293,15 +293,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var comboColors = decoder.Decode(stream).ComboColours;
 
-                Color4[] expectedColors =
+                Colour4[] expectedColors =
                 {
-                    new Color4(142, 199, 255, 255),
-                    new Color4(255, 128, 128, 255),
-                    new Color4(128, 255, 255, 255),
-                    new Color4(128, 255, 128, 255),
-                    new Color4(255, 187, 255, 255),
-                    new Color4(255, 177, 140, 255),
-                    new Color4(100, 100, 100, 100),
+                    new Colour4(142, 199, 255, 255),
+                    new Colour4(255, 128, 128, 255),
+                    new Colour4(128, 255, 255, 255),
+                    new Colour4(128, 255, 128, 255),
+                    new Colour4(255, 187, 255, 255),
+                    new Colour4(255, 177, 140, 255),
+                    new Colour4(100, 100, 100, 100),
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)

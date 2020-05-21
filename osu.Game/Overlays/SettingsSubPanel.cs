@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
             {
                 Size = new Vector2(Sidebar.DEFAULT_WIDTH);
 
-                BackgroundColour = Color4.Black;
+                BackgroundColour = Colour4.Black;
 
                 AddRange(new Drawable[]
                 {

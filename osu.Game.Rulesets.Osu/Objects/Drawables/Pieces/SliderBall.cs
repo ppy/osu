@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public Func<OsuAction?> GetInitialHitAction;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => ball.Colour;
             set => ball.Colour = value;
@@ -208,11 +208,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     BorderThickness = 5,
-                    BorderColour = Color4.Orange,
+                    BorderColour = Colour4.Orange,
                     Blending = BlendingParameters.Additive,
                     Child = new Box
                     {
-                        Colour = Color4.Orange,
+                        Colour = Colour4.Orange,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.2f,
                     }
@@ -242,13 +242,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Origin = Anchor.Centre,
                     Blending = BlendingParameters.Additive,
                     BorderThickness = 10,
-                    BorderColour = Color4.White,
+                    BorderColour = Colour4.White,
                     Alpha = 1,
                     Child = box = new Box
                     {
                         Blending = BlendingParameters.Additive,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         AlwaysPresent = true,
                         Alpha = 0
                     }

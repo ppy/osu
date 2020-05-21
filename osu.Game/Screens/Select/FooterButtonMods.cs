@@ -28,8 +28,8 @@ namespace osu.Game.Screens.Select
 
         protected readonly OsuSpriteText MultiplierText;
         private readonly ModDisplay modDisplay;
-        private Color4 lowMultiplierColour;
-        private Color4 highMultiplierColour;
+        private Colour4 lowMultiplierColour;
+        private Colour4 highMultiplierColour;
 
         public FooterButtonMods()
         {
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Select
             else if (multiplier < 1.0)
                 MultiplierText.FadeColour(lowMultiplierColour, 200);
             else
-                MultiplierText.FadeColour(Color4.White, 200);
+                MultiplierText.FadeColour(Colour4.White, 200);
 
             if (Current.Value?.Count > 0)
                 modDisplay.FadeIn();

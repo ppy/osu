@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Notifications
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.White,
+                            Colour = Colour4.White,
                         },
                         new Container
                         {
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Notifications
 
         private class CloseButton : OsuClickableContainer
         {
-            private Color4 hoverColour;
+            private Colour4 hoverColour;
 
             public CloseButton()
             {
@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.Notifications
                     base.Colour = value;
                     pulsateLayer.EdgeEffect = new EdgeEffectParameters
                     {
-                        Colour = ((Color4)value).Opacity(0.5f), //todo: avoid cast
+                        Colour = ((Colour4)value).Opacity(0.5f), //todo: avoid cast
                         Type = EdgeEffectType.Glow,
                         Radius = 12,
                         Roundness = 12,

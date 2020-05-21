@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                     }
                 };
             }

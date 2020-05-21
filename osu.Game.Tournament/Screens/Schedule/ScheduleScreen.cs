@@ -71,7 +71,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                                 {
                                                     new Box
                                                     {
-                                                        Colour = Color4.White,
+                                                        Colour = Colour4.White,
                                                         Size = new Vector2(50, 10),
                                                     },
                                                     new TournamentSpriteTextWithBackground("Schedule")

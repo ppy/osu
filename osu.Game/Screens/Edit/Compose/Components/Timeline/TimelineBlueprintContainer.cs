@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             AddInternal(new Box
             {
-                Colour = Color4.Black,
+                Colour = Colour4.Black,
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0.1f,
             });
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 placementBlueprint = CreateBlueprintFor(obj.NewValue);
 
-                placementBlueprint.Colour = Color4.MediumPurple;
+                placementBlueprint.Colour = Colour4.MediumPurple;
 
                 SelectionBlueprints.Add(placementBlueprint);
             }

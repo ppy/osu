@@ -154,17 +154,17 @@ namespace osu.Game.Screens.Select.Carousel
             base.Selected();
 
             background.Colour = ColourInfo.GradientVertical(
-                new Color4(20, 43, 51, 255),
-                new Color4(40, 86, 102, 255));
+                new Colour4(20, 43, 51, 255),
+                new Colour4(40, 86, 102, 255));
 
-            triangles.Colour = Color4.White;
+            triangles.Colour = Colour4.White;
         }
 
         protected override void Deselected()
         {
             base.Deselected();
 
-            background.Colour = new Color4(20, 43, 51, 255);
+            background.Colour = new Colour4(20, 43, 51, 255);
             triangles.Colour = OsuColour.Gray(0.5f);
         }
 

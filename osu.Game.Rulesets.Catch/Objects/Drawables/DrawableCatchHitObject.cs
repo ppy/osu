@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             ScaleContainer.Scale = new Vector2(HitObject.Scale);
         }
 
-        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours) =>
+        protected override Colour4 GetComboColour(IReadOnlyList<Colour4> comboColours) =>
             comboColours[(HitObject.IndexInBeatmap + 1) % comboColours.Count];
     }
 

@@ -344,22 +344,22 @@ namespace osu.Game.Online.Leaderboards
                 bool requireBottomFade = FadeBottom && bottomY >= fadeBottom;
 
                 if (!requireTopFade && !requireBottomFade)
-                    c.Colour = Color4.White;
+                    c.Colour = Colour4.White;
                 else if (topY > fadeBottom + LeaderboardScore.HEIGHT || bottomY < fadeTop - LeaderboardScore.HEIGHT)
-                    c.Colour = Color4.Transparent;
+                    c.Colour = Colour4.Transparent;
                 else
                 {
                     if (bottomY - fadeBottom > 0 && FadeBottom)
                     {
                         c.Colour = ColourInfo.GradientVertical(
-                            Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
-                            Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
+                            Colour4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
+                            Colour4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
                     }
                     else if (FadeTop)
                     {
                         c.Colour = ColourInfo.GradientVertical(
-                            Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
-                            Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / LeaderboardScore.HEIGHT, 1)));
+                            Colour4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
+                            Colour4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / LeaderboardScore.HEIGHT, 1)));
                     }
                 }
             }

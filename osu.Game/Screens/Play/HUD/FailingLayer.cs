@@ -52,14 +52,14 @@ namespace osu.Game.Screens.Play.HUD
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0)),
+                            Colour = ColourInfo.GradientVertical(Colour4.White, Colour4.White.Opacity(0)),
                             Height = gradient_size,
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Height = gradient_size,
-                            Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0), Color4.White),
+                            Colour = ColourInfo.GradientVertical(Colour4.White.Opacity(0), Colour4.White),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                         },

@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Comments
     {
         private const int duration = 200;
 
-        public Color4 AccentColour { get; set; }
+        public Colour4 AccentColour { get; set; }
 
         protected override IEnumerable<Drawable> EffectTargets => null;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Comments
         private void load(OsuColour colours)
         {
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
-            hoverLayer.Colour = Color4.Black.Opacity(0.5f);
+            hoverLayer.Colour = Colour4.Black.Opacity(0.5f);
 
             if (api.IsLoggedIn && api.LocalUser.Value.Id != comment.UserId)
                 Action = onAction;

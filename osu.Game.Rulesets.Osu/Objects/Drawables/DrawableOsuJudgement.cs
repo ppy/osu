@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableOsuJudgement : DrawableJudgement
     {
         private SkinnableSprite lighting;
-        private Bindable<Color4> lightingColour;
+        private Bindable<Colour4> lightingColour;
 
         public DrawableOsuJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : base(result, judgedObject)
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
                 else
                 {
-                    lighting.Colour = Color4.White;
+                    lighting.Colour = Colour4.White;
                 }
             }
         }

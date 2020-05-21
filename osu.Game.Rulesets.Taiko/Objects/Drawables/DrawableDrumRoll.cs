@@ -33,8 +33,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private Container tickContainer;
 
-        private Color4 colourIdle;
-        private Color4 colourEngaged;
+        private Colour4 colourIdle;
+        private Colour4 colourEngaged;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private void updateColour()
         {
-            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
+            Colour4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
             (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, 100);
         }
 

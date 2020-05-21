@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
+                                    Colour = Colour4.Black,
                                     Alpha = 0.75f
                                 },
                                 new OsuSpriteText

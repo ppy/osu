@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
             {
                 Background = new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both,
                 },

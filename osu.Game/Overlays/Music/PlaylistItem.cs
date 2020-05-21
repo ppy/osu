@@ -30,8 +30,8 @@ namespace osu.Game.Overlays.Music
         private ILocalisedBindableString title;
         private ILocalisedBindableString artist;
 
-        private Color4 selectedColour;
-        private Color4 artistColour;
+        private Colour4 selectedColour;
+        private Colour4 artistColour;
 
         public PlaylistItem(BeatmapSetInfo item)
             : base(item)
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Music
                     return;
 
                 foreach (Drawable s in titleSprites)
-                    s.FadeColour(set.NewValue.Equals(Model) ? selectedColour : Color4.White, FADE_DURATION);
+                    s.FadeColour(set.NewValue.Equals(Model) ? selectedColour : Colour4.White, FADE_DURATION);
             }, true);
         }
 

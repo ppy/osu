@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool IsSpecial => ColumnType == ColumnType.Special;
 
-        public Color4 AccentColour { get; set; }
+        public Colour4 AccentColour { get; set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {

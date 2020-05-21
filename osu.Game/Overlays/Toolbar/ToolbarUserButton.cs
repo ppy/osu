@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 4,
-                    Colour = Color4.Black.Opacity(0.1f),
+                    Colour = Colour4.Black.Opacity(0.1f),
                 }
             });
         }

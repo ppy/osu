@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             private void updateColour()
             {
-                this.FadeColour(IsHovered ? Color4.White : Color4.Orange, 400, Easing.OutQuint);
+                this.FadeColour(IsHovered ? Colour4.White : Colour4.Orange, 400, Easing.OutQuint);
             }
         }
     }

@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             InternalChild = body = new ManualSliderBody
             {
-                AccentColour = Color4.Transparent
+                AccentColour = Colour4.Transparent
             };
         }
 

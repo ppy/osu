@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             Size = new Vector2(14),
                             Masking = true,
                             BorderThickness = 2,
-                            BorderColour = Color4.White,
+                            BorderColour = Colour4.White,
                             Alpha = 0,
                             Child = new Box
                             {
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
-            Color4 colour = ControlPoint.Type.Value != null ? colours.Red : colours.Yellow;
+            Colour4 colour = ControlPoint.Type.Value != null ? colours.Red : colours.Yellow;
 
             if (IsHovered || IsSelected.Value)
                 colour = colour.Lighten(1);

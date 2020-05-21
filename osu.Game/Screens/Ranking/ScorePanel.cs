@@ -70,8 +70,8 @@ namespace osu.Game.Screens.Ranking
 
         private static readonly ColourInfo expanded_top_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#444"), Color4Extensions.FromHex("#333"));
         private static readonly ColourInfo expanded_middle_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"));
-        private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
-        private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#444");
+        private static readonly Colour4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
+        private static readonly Colour4 contracted_middle_layer_colour = Color4Extensions.FromHex("#444");
 
         public event Action<PanelState> StateChanged;
 

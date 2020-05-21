@@ -11,7 +11,7 @@ namespace osu.Game.Online.Multiplayer.GameTypes
 {
     public class VersusRow : FillFlowContainer
     {
-        public VersusRow(Color4 first, Color4 second, float size)
+        public VersusRow(Colour4 first, Colour4 second, float size)
         {
             var triangleSize = new Vector2(size);
             AutoSizeAxes = Axes.Both;

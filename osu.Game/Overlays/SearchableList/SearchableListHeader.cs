@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.SearchableList
     {
         public readonly HeaderTabControl<T> Tabs;
 
-        protected abstract Color4 BackgroundColour { get; }
+        protected abstract Colour4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
         protected abstract IconUsage Icon { get; }

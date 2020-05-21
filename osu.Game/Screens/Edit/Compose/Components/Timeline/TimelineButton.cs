@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 IconColour = OsuColour.Gray(0.35f);
-                IconHoverColour = Color4.White;
+                IconHoverColour = Colour4.White;
                 HoverColour = OsuColour.Gray(0.25f);
                 FlashColour = OsuColour.Gray(0.5f);
             }

@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         new Box
                         {
-                            Colour = Color4.SlateGray,
+                            Colour = Colour4.SlateGray,
                             RelativeSizeAxes = Axes.Both,
                         },
                         dimContent = new FillFlowContainer
@@ -64,11 +64,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show", () => overlay.Show());
 
-            AddUntilStep("wait for content dim", () => dimContent.Colour != Color4.White);
+            AddUntilStep("wait for content dim", () => dimContent.Colour != Colour4.White);
 
             AddStep("hide", () => overlay.Hide());
 
-            AddUntilStep("wait for content restore", () => dimContent.Colour == Color4.White);
+            AddUntilStep("wait for content restore", () => dimContent.Colour == Colour4.White);
         }
 
         [Test]
@@ -78,11 +78,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show", () => overlay.Show());
 
-            AddUntilStep("wait for content dim", () => dimContent.Colour != Color4.White);
+            AddUntilStep("wait for content dim", () => dimContent.Colour != Colour4.White);
 
             AddStep("expire", () => overlay.Expire());
 
-            AddUntilStep("wait for content restore", () => dimContent.Colour == Color4.White);
+            AddUntilStep("wait for content restore", () => dimContent.Colour == Colour4.White);
         }
 
         [Test]

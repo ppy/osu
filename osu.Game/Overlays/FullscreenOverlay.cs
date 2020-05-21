@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
 
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = Color4.Black.Opacity(0),
+                Colour = Colour4.Black.Opacity(0),
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };

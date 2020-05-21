@@ -13,14 +13,14 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const float DEFAULT_BUTTON_SIZE = 30;
 
-        private Color4? iconColour;
+        private Colour4? iconColour;
 
         /// <summary>
         /// The icon colour. This does not affect <see cref="Drawable.Colour">Colour</see>.
         /// </summary>
-        public Color4 IconColour
+        public Colour4 IconColour
         {
-            get => iconColour ?? Color4.White;
+            get => iconColour ?? Colour4.White;
             set
             {
                 iconColour = value;
@@ -28,12 +28,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4? iconHoverColour;
+        private Colour4? iconHoverColour;
 
         /// <summary>
         /// The icon colour while the <see cref="IconButton"/> is hovered.
         /// </summary>
-        public Color4 IconHoverColour
+        public Colour4 IconHoverColour
         {
             get => iconHoverColour ?? IconColour;
             set => iconHoverColour = value;

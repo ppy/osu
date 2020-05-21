@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public Color4 FillColour
+        public Colour4 FillColour
         {
             set => fill.Colour = value;
         }
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = barHeight,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.5f,
                     Depth = 1,
                 },
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     Width = 2,
                     Alpha = 0,
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     Position = new Vector2(2, 0),
                     Children = new Drawable[]
                     {
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     Name = "Handle box",
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White
+                                    Colour = Colour4.White
                                 }
                             }
                         }

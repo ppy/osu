@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     new Box
                     {
-                        Colour = inverted ? Color4.White : Color4.Black,
+                        Colour = inverted ? Colour4.White : Colour4.Black,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = withBox ? 0.7f : 0
                     },
@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = inverted ? Color4.Black : Color4.White,
+                        Colour = inverted ? Colour4.Black : Colour4.White,
                         Scale = new Vector2(withBox ? 0.6f : 1),
                         RelativeSizeAxes = Axes.Both,
                         Icon = FontAwesome.Solid.CircleNotch

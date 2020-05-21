@@ -42,13 +42,13 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         protected override bool OnHover(HoverEvent e)
         {
-            icon.FadeColour(Color4.Red, 200, Easing.OutQuint);
+            icon.FadeColour(Colour4.Red, 200, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            icon.FadeColour(Color4.White, 200, Easing.OutQuint);
+            icon.FadeColour(Colour4.White, 200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
     }

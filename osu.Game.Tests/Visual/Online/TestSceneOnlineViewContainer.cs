@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Online
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Blue.Opacity(0.8f),
+                        Colour = Colour4.Blue.Opacity(0.8f),
                     },
                     new OsuSpriteText
                     {

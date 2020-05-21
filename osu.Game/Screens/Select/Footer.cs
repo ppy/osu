@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
+        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Colour4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
 
         public Footer()
         {
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = Colour4.Black.Opacity(0.5f),
                 },
                 modeLight = new Box
                 {

@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f)
+                            Colour = Colour4.Black.Opacity(0.5f)
                         },
                         new Container
                         {

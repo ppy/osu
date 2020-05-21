@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             RelativeSizeAxes = Axes.Both;
 
-            BorderColour = Color4.White;
+            BorderColour = Colour4.White;
             BorderThickness = 1;
 
             Blending = BlendingParameters.Additive;

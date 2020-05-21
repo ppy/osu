@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private readonly TestChatLineContainer textContainer;
         private readonly DialogOverlay dialogOverlay;
-        private Color4 linkColour;
+        private Colour4 linkColour;
 
         public TestSceneChatLink()
         {
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
 
-                Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
+                Colour4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Colour4.White;
 
                 var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
                 var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);

@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 {
                                     new Box
                                     {
-                                        Colour = Color4.Brown,
+                                        Colour = Colour4.Brown,
                                         RelativeSizeAxes = Axes.Both,
                                     },
                                     new OsuSpriteText
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 {
                                     new Box
                                     {
-                                        Colour = Color4.DarkBlue,
+                                        Colour = Colour4.DarkBlue,
                                         RelativeSizeAxes = Axes.Both,
                                     },
                                     new OsuSpriteText
@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     box = new Box
                     {
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
@@ -219,13 +219,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool OnPressed(TestAction action)
             {
-                box.Colour = Color4.White;
+                box.Colour = Colour4.White;
                 return true;
             }
 
             public void OnReleased(TestAction action)
             {
-                box.Colour = Color4.Black;
+                box.Colour = Colour4.Black;
             }
         }
 

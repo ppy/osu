@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual
                 AddInternal(new OsuSpriteText
                 {
                     Text = screenText,
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 });

@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
-        private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+        private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Colour4.White : Colour4.Gray, 200, Easing.OutQuint);
 
         private string getVideoSuffixText()
         {

@@ -110,7 +110,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
+                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Colour4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -131,7 +131,7 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             Type = EdgeEffectType.Shadow,
                                             Radius = 1,
-                                            Colour = Color4.Black.Opacity(0.2f),
+                                            Colour = Colour4.Black.Opacity(0.2f),
                                         },
                                     })
                                 {
@@ -199,7 +199,7 @@ namespace osu.Game.Online.Leaderboards
                                     {
                                         scoreLabel = new GlowingSpriteText
                                         {
-                                            TextColour = Color4.White,
+                                            TextColour = Colour4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                                             Text = score.TotalScore.ToString(@"N0"),
                                             Font = OsuFont.Numeric.With(size: 23),
@@ -343,7 +343,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextColour = Color4.White,
+                            TextColour = Colour4.White,
                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
                             Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),

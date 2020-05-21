@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 Masking = true,
                 BorderThickness = 10,
-                BorderColour = Color4.White,
+                BorderColour = Colour4.White,
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {

@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Dialog
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.5f),
+                                Colour = Colour4.Black.Opacity(0.5f),
                                 Radius = 8,
                             },
                             Children = new Drawable[]
@@ -147,14 +147,14 @@ namespace osu.Game.Overlays.Dialog
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.Centre,
                                             Masking = true,
-                                            BorderColour = Color4.White,
+                                            BorderColour = Colour4.White,
                                             BorderThickness = 5f,
                                             Children = new Drawable[]
                                             {
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = Color4.Black.Opacity(0),
+                                                    Colour = Colour4.Black.Opacity(0),
                                                 },
                                                 icon = new SpriteIcon
                                                 {

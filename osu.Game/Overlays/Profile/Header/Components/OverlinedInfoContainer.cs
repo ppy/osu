@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             set => content.Text = value;
         }
 
-        public Color4 LineColour
+        public Colour4 LineColour
         {
             set => line.Colour = value;
         }

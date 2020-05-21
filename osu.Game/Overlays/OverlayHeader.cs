@@ -48,7 +48,7 @@ namespace osu.Game.Overlays
                                     titleBackground = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Gray,
+                                        Colour = Colour4.Gray,
                                     },
                                     new Container
                                     {

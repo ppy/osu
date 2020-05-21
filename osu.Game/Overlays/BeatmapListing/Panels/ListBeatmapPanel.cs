@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
+                    Colour = ColourInfo.GradientHorizontal(Colour4.Black.Opacity(0.25f), Colour4.Black.Opacity(0.75f)),
                 },
                 new Container
                 {

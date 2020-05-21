@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.TopCentre;
             Origin = Anchor.BottomCentre;
 
-            Color4 objectColour = fruit.AccentColour.Value;
+            Colour4 objectColour = fruit.AccentColour.Value;
 
             // scale roughly in-line with visual appearance of notes
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             const float initial_height = 10;
 
-            var colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1);
+            var colour = Interpolation.ValueAt(0.4f, objectColour, Colour4.White, 0, 1);
 
             InternalChildren = new Drawable[]
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.1f, objectColour, Color4.White, 0, 1).Opacity(0.3f),
+                        Colour = Interpolation.ValueAt(0.1f, objectColour, Colour4.White, 0, 1).Opacity(0.3f),
                         Roundness = 160,
                         Radius = 200,
                     },
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = Interpolation.ValueAt(0.6f, objectColour, Color4.White, 0, 1),
+                        Colour = Interpolation.ValueAt(0.6f, objectColour, Colour4.White, 0, 1),
                         Roundness = 20,
                         Radius = 50,
                     },

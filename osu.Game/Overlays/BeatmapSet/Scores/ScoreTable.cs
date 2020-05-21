@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly FillFlowContainer backgroundFlow;
 
-        private Color4 highAccuracyColour;
+        private Colour4 highAccuracyColour;
 
         public ScoreTable()
         {
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Right = horizontal_inset },
                     Text = score.DisplayAccuracy,
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
+                    Colour = score.Accuracy == 1 ? highAccuracyColour : Colour4.White
                 },
                 new UpdateableFlag(score.User.Country)
                 {
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = $@"{score.MaxCombo:N0}x",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.MaxCombo == score.Beatmap?.MaxCombo ? highAccuracyColour : Color4.White
+                    Colour = score.MaxCombo == score.Beatmap?.MaxCombo ? highAccuracyColour : Colour4.White
                 }
             };
 
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = $"{kvp.Value}",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = kvp.Value == 0 ? Color4.Gray : Color4.White
+                    Colour = kvp.Value == 0 ? Colour4.Gray : Colour4.White
                 });
             }
 

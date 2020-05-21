@@ -27,9 +27,9 @@ namespace osu.Game.Overlays
         private readonly LoadingSpinner loading;
         private FillFlowContainer<UserPanel> panels;
 
-        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"60284b");
-        protected override Color4 TrianglesColourLight => Color4Extensions.FromHex(@"672b51");
-        protected override Color4 TrianglesColourDark => Color4Extensions.FromHex(@"5c2648");
+        protected override Colour4 BackgroundColour => Color4Extensions.FromHex(@"60284b");
+        protected override Colour4 TrianglesColourLight => Color4Extensions.FromHex(@"672b51");
+        protected override Colour4 TrianglesColourDark => Color4Extensions.FromHex(@"5c2648");
 
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();

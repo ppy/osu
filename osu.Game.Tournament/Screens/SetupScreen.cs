@@ -168,7 +168,7 @@ namespace osu.Game.Tournament.Screens
 
             public bool Failing
             {
-                set => valueText.Colour = value ? Color4.Red : Color4.White;
+                set => valueText.Colour = value ? Colour4.Red : Colour4.White;
             }
 
             public Action Action;

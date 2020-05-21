@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
                     },
                     new Box
                     {
-                        Colour = Color4.Black.Opacity(0.1f),
+                        Colour = Colour4.Black.Opacity(0.1f),
                         RelativeSizeAxes = Axes.X,
                         Height = 50,
                         Depth = -1,

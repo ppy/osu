@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(italics: true),
-            Colour = new Color4(180, 180, 180, 255),
+            Colour = new Colour4(180, 180, 180, 255),
             Margin = new MarginPadding { Left = 2 },
         };
 
@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.UserInterface
                 RelativeSizeAxes = Axes.Y;
                 Size = new Vector2(1, 0.9f);
 
-                Colour = Color4.Transparent;
+                Colour = Colour4.Transparent;
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public float CaretWidth { get; set; }
 
-            public Color4 SelectionColour { get; set; }
+            public Colour4 SelectionColour { get; set; }
 
             public override void DisplayAt(Vector2 position, float? selectionWidth)
             {
@@ -118,7 +118,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     this.MoveTo(new Vector2(position.X - CaretWidth / 2, position.Y), 60, Easing.Out);
                     this.ResizeWidthTo(CaretWidth, caret_move_time, Easing.Out);
-                    this.FadeColour(Color4.White, 200, Easing.Out);
+                    this.FadeColour(Colour4.White, 200, Easing.Out);
                 }
             }
 
@@ -143,7 +143,7 @@ namespace osu.Game.Graphics.UserInterface
                     InternalChild = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                     };
                 }
 

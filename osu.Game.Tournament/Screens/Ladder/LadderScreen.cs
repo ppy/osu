@@ -109,8 +109,8 @@ namespace osu.Game.Tournament.Screens.Ladder
                 UpdateLayout();
         }
 
-        private Color4 normalPathColour;
-        private Color4 losersPathColour;
+        private Colour4 normalPathColour;
+        private Colour4 losersPathColour;
 
         protected virtual bool DrawLoserPaths => false;
 

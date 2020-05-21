@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         private CatchHitObject hitObject;
 
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<Colour4> accentColour = new Bindable<Colour4>();
 
         public FruitPiece()
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    BorderColour = Color4.White,
+                    BorderColour = Colour4.White,
                     BorderThickness = 6f * RADIUS_ADJUST,
                     Children = new Drawable[]
                     {

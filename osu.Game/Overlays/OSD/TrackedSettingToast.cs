@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.OSD
 
         private class OptionLight : Container
         {
-            private Color4 glowingColour, idleColour;
+            private Colour4 glowingColour, idleColour;
 
             private const float transition_speed = 300;
 
@@ -107,8 +107,8 @@ namespace osu.Game.Overlays.OSD
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                fill.Colour = idleColour = Color4.White.Opacity(0.4f);
-                glowingColour = Color4.White;
+                fill.Colour = idleColour = Colour4.White.Opacity(0.4f);
+                glowingColour = Colour4.White;
 
                 Size = new Vector2(25, 5);
 

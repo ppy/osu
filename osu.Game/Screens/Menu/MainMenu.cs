@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
                 {
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
-                        Background.FadeColour(Color4.White, 500, Easing.OutSine);
+                        Background.FadeColour(Colour4.White, 500, Easing.OutSine);
                         break;
 
                     default:
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Menu
 
             buttons.SetOsuLogo(logo);
 
-            logo.FadeColour(Color4.White, 100, Easing.OutQuint);
+            logo.FadeColour(Colour4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
             if (resuming)

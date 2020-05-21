@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Music
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.3f),
+                    Colour = Colour4.Black.Opacity(0.3f),
                     Radius = 3,
                     Offset = new Vector2(0f, 1f),
                 };

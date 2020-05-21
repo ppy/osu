@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// </summary>
     public class DefaultBodyPiece : CompositeDrawable
     {
-        protected readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
+        protected readonly Bindable<Colour4> AccentColour = new Bindable<Colour4>();
 
         private readonly LayoutValue subtractionCache = new LayoutValue(Invalidation.DrawSize);
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                         {
                             RelativeSizeAxes = Axes.Both,
                             // This is needed because we're blending with another object
-                            BackgroundColour = Color4.White.Opacity(0),
+                            BackgroundColour = Colour4.White.Opacity(0),
                             CacheDrawnFrameBuffer = true,
                             // The 'hole' is achieved by subtracting the result of this container with the parent
                             Blending = new BlendingParameters { AlphaEquation = BlendingEquation.ReverseSubtract },
@@ -89,10 +89,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             }
 
             AccentColour.BindValueChanged(onAccentChanged, true);
-            isHitting.BindValueChanged(_ => onAccentChanged(new ValueChangedEvent<Color4>(AccentColour.Value, AccentColour.Value)), true);
+            isHitting.BindValueChanged(_ => onAccentChanged(new ValueChangedEvent<Colour4>(AccentColour.Value, AccentColour.Value)), true);
         }
 
-        private void onAccentChanged(ValueChangedEvent<Color4> accent)
+        private void onAccentChanged(ValueChangedEvent<Colour4> accent)
         {
             Foreground.Colour = accent.NewValue.Opacity(0.5f);
             Background.Colour = accent.NewValue.Opacity(0.7f);
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 subtractionLayer.Height = Math.Max(0, DrawHeight - DrawWidth);
                 subtractionLayer.EdgeEffect = new EdgeEffectParameters
                 {
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     Type = EdgeEffectType.Glow,
                     Radius = DrawWidth
                 };

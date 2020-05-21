@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.AccountCreation
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Colour = Color4.Red,
+                            Colour = Colour4.Red,
                             Font = OsuFont.GetFont(size: 28, weight: FontWeight.Light),
                             Text = "Warning! 注意！",
                         },

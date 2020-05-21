@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AccentColour = Color4.OrangeRed,
+                AccentColour = Colour4.OrangeRed,
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
         }

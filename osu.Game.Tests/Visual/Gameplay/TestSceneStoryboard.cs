@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
+                            Colour = Colour4.Black,
                         },
                         storyboardContainer = new Container<DrawableStoryboard>
                         {

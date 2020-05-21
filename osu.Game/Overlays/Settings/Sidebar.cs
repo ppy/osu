@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings
             {
                 new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new SidebarScrollContainer

@@ -82,9 +82,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private Color4 keyDownTextColor = Color4.DarkGray;
+        private Colour4 keyDownTextColor = Colour4.DarkGray;
 
-        public Color4 KeyDownTextColor
+        public Colour4 KeyDownTextColor
         {
             get => keyDownTextColor;
             set
@@ -98,9 +98,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private Color4 keyUpTextColor = Color4.White;
+        private Colour4 keyUpTextColor = Colour4.White;
 
-        public Color4 KeyUpTextColor
+        public Colour4 KeyUpTextColor
         {
             get => keyUpTextColor;
             set

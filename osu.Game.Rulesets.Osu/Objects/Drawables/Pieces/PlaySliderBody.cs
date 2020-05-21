@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private IBindable<float> scaleBindable;
         private IBindable<int> pathVersion;
-        private IBindable<Color4> accentColour;
+        private IBindable<Colour4> accentColour;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
@@ -43,10 +43,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, SnakingOut);
 
             BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? 1;
-            BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+            BorderColour = skin.GetConfig<OsuSkinColour, Colour4>(OsuSkinColour.SliderBorder)?.Value ?? Colour4.White;
         }
 
-        private void updateAccentColour(ISkinSource skin, Color4 defaultAccentColour)
-            => AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? defaultAccentColour;
+        private void updateAccentColour(ISkinSource skin, Colour4 defaultAccentColour)
+            => AccentColour = skin.GetConfig<OsuSkinColour, Colour4>(OsuSkinColour.SliderTrackOverride)?.Value ?? defaultAccentColour;
     }
 }

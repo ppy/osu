@@ -41,9 +41,9 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public bool DisplayAsPercentage { get; set; }
 
-        private Color4 accentColour;
+        private Colour4 accentColour;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set

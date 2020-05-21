@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Background
                 RelativeSizeAxes = Axes.Both,
                 Child = new Box
                 {
-                    Colour = Color4.White,
+                    Colour = Colour4.White,
                     RelativeSizeAxes = Axes.Both,
                 },
             };

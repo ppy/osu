@@ -43,18 +43,18 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     if (value)
                     {
-                        IconContainer.Colour = Color4.White;
+                        IconContainer.Colour = Colour4.White;
                         IconContainer.EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Glow,
-                            Colour = new Color4(255, 194, 224, 100),
+                            Colour = new Colour4(255, 194, 224, 100),
                             Radius = 15,
                             Roundness = 15,
                         };
                     }
                     else
                     {
-                        IconContainer.Colour = new Color4(255, 194, 224, 255);
+                        IconContainer.Colour = new Colour4(255, 194, 224, 255);
                         IconContainer.EdgeEffect = new EdgeEffectParameters();
                     }
                 }

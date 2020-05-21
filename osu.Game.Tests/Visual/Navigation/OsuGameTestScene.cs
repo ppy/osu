@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Navigation
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black,
+                Colour = Colour4.Black,
             };
         }
 

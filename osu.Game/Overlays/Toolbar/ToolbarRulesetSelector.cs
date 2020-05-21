@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Toolbar
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Colour = new Color4(255, 194, 224, 100),
+                        Colour = new Colour4(255, 194, 224, 100),
                         Radius = 15,
                         Roundness = 15,
                     },
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.LoadComplete();
 
-            Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
+            Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Colour4.Gray : Colour4.White, 300), true);
             Current.BindValueChanged(_ => moveLineToCurrent(), true);
         }
 

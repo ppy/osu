@@ -24,10 +24,10 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// </summary>
         public Action<RadioButton> Selected;
 
-        private Color4 defaultBackgroundColour;
-        private Color4 defaultBubbleColour;
-        private Color4 selectedBackgroundColour;
-        private Color4 selectedBubbleColour;
+        private Colour4 defaultBackgroundColour;
+        private Colour4 defaultBubbleColour;
+        private Colour4 selectedBackgroundColour;
+        private Colour4 selectedBubbleColour;
 
         private readonly Drawable bubble;
         private readonly RadioButton button;
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 Type = EdgeEffectType.Shadow,
                 Radius = 2,
                 Offset = new Vector2(0, 1),
-                Colour = Color4.Black.Opacity(0.5f)
+                Colour = Colour4.Black.Opacity(0.5f)
             };
 
             Add(bubble);

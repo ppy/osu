@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
             set => DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: value);
         }
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => DisplayedCountSpriteText.Colour;
             set => DisplayedCountSpriteText.Colour = value;

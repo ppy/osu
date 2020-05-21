@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
         private void load()
         {
             AccentColour = component == TaikoSkinComponents.CentreHit
-                ? new Color4(235, 69, 44, 255)
-                : new Color4(67, 142, 172, 255);
+                ? new Colour4(235, 69, 44, 255)
+                : new Colour4(67, 142, 172, 255);
         }
     }
 }

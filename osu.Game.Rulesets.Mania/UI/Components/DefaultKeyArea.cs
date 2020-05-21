@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                         Masking = true,
                         CornerRadius = key_icon_corner_radius,
                         BorderThickness = 2,
-                        BorderColour = Color4.White, // Not true
+                        BorderColour = Colour4.White, // Not true
                         Children = new[]
                         {
                             new Box
@@ -90,14 +90,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 keyIcon.Anchor = Anchor.BottomCentre;
                 keyIcon.Y = -20;
                 directionContainer.Anchor = directionContainer.Origin = Anchor.TopLeft;
-                gradient.Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0));
+                gradient.Colour = ColourInfo.GradientVertical(Colour4.Black, Colour4.Black.Opacity(0));
             }
             else
             {
                 keyIcon.Anchor = Anchor.TopCentre;
                 keyIcon.Y = 20;
                 directionContainer.Anchor = directionContainer.Origin = Anchor.BottomLeft;
-                gradient.Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black);
+                gradient.Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0), Colour4.Black);
             }
         }
 

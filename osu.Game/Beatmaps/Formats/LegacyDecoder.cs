@@ -99,11 +99,11 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length != 3 && split.Length != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
-            Color4 colour;
+            Colour4 colour;
 
             try
             {
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
+                colour = new Colour4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
             }
             catch
             {

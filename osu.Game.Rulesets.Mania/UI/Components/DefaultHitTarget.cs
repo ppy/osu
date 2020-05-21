@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     RelativeSizeAxes = Axes.X,
                     Height = DefaultNotePiece.NOTE_HEIGHT,
                     Alpha = 0.6f,
-                    Colour = Color4.Black
+                    Colour = Colour4.Black
                 },
                 hitTargetLine = new Container
                 {

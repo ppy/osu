@@ -14,10 +14,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             VolumeMeter meter;
             MuteButton mute;
-            Add(meter = new VolumeMeter("MASTER", 125, Color4.Blue) { Position = new Vector2(10) });
+            Add(meter = new VolumeMeter("MASTER", 125, Colour4.Blue) { Position = new Vector2(10) });
             AddSliderStep("master volume", 0, 10, 0, i => meter.Bindable.Value = i * 0.1);
 
-            Add(new VolumeMeter("BIG", 250, Color4.Red)
+            Add(new VolumeMeter("BIG", 250, Colour4.Red)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

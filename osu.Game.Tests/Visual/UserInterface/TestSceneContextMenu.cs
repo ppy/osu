@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Green,
+                            Colour = Colour4.Green,
                         }
                     },
                     new AnotherContextMenuContainer
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Red,
+                            Colour = Colour4.Red,
                         }
                     }
                 }

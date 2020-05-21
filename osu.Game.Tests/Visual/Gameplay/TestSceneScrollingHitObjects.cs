@@ -262,7 +262,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddInternal(new Box
                 {
                     Size = new Vector2(75),
-                    Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
+                    Colour = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
                 });
             }
         }

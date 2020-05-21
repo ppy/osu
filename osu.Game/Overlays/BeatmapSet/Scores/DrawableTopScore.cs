@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(0.2f),
+                Colour = Colour4.Black.Opacity(0.2f),
                 Radius = 1,
                 Offset = new Vector2(0, 1),
             };

@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             this.column = new Column(column)
             {
                 Action = { Value = action },
-                AccentColour = Color4.Orange,
+                AccentColour = Colour4.Orange,
                 ColumnType = column % 2 == 0 ? ColumnType.Even : ColumnType.Odd
             };
 

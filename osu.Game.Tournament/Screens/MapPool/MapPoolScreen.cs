@@ -125,7 +125,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             pickColour = colour;
             pickType = choiceType;
 
-            static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
+            static Colour4 setColour(bool active) => active ? Colour4.White : Colour4.Gray;
 
             buttonRedBan.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Ban);
             buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);

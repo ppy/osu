@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
             set => bar.Height = value;
         }
 
-        public override Color4 AccentColour
+        public override Colour4 AccentColour
         {
             get => base.AccentColour;
             set
@@ -61,9 +61,9 @@ namespace osu.Game.Overlays
             protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;
 
-            private Color4 accentColour;
+            private Colour4 accentColour;
 
-            public Color4 AccentColour
+            public Colour4 AccentColour
             {
                 get => accentColour;
                 set
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays
             {
                 HoverAction();
                 Text.Font = Text.Font.With(weight: FontWeight.Bold);
-                Text.FadeColour(Color4.White, 120, Easing.InQuad);
+                Text.FadeColour(Colour4.White, 120, Easing.InQuad);
             }
 
             protected override void OnDeactivated()

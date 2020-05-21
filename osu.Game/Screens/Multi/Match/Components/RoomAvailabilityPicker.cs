@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     hover = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         Alpha = 0,
                     },
                     new OsuSpriteText

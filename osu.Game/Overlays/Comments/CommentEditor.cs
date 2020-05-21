@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Comments
 
             private void onBlockedStateChanged(ValueChangedEvent<bool> isBlocked)
             {
-                drawableText.FadeColour(isBlocked.NewValue ? colourProvider.Foreground1 : Color4.White, duration, Easing.OutQuint);
+                drawableText.FadeColour(isBlocked.NewValue ? colourProvider.Foreground1 : Colour4.White, duration, Easing.OutQuint);
                 background.FadeTo(isBlocked.NewValue ? 0 : 1, duration, Easing.OutQuint);
             }
 

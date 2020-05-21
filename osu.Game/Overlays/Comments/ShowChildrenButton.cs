@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Comments
         {
             AutoSizeAxes = Axes.Both;
             IdleColour = OsuColour.Gray(0.7f);
-            HoverColour = Color4.White;
+            HoverColour = Colour4.White;
         }
 
         protected override void LoadComplete()

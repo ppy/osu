@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnClick(ClickEvent e)
         {
-            HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
+            HoverBackground.FlashColour(Colour4.White.Opacity(100), 500, Easing.OutQuint);
             tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Toolbar
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
+                Colour = Colour4.Black.Opacity(40),
                 Radius = 5,
             };
 

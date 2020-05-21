@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Select.Details
                     ModBar.Length = (value.adjustedValue ?? 0) / maxValue;
 
                     if (Precision.AlmostEquals(value.baseValue, value.adjustedValue ?? value.baseValue, 0.05f))
-                        ModBar.AccentColour = valueText.Colour = Color4.White;
+                        ModBar.AccentColour = valueText.Colour = Colour4.White;
                     else if (value.adjustedValue > value.baseValue)
                         ModBar.AccentColour = valueText.Colour = colours.Red;
                     else if (value.adjustedValue < value.baseValue)
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Select.Details
                 }
             }
 
-            public Color4 AccentColour
+            public Colour4 AccentColour
             {
                 get => bar.AccentColour;
                 set => bar.AccentColour = value;
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Select.Details
                         Anchor = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 5,
-                        BackgroundColour = Color4.White.Opacity(0.5f),
+                        BackgroundColour = Colour4.White.Opacity(0.5f),
                         Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
                     },
                     ModBar = new Bar

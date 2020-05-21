@@ -121,7 +121,7 @@ namespace osu.Game
         }
 
         private void updateBlockingOverlayFade() =>
-            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Colour4.White, 500, Easing.OutQuint);
 
         public void AddBlockingOverlay(OverlayContainer overlay)
         {

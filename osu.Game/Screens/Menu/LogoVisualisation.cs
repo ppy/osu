@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Menu
 
         private int indexOffset;
 
-        public Color4 AccentColour { get; set; }
+        public Colour4 AccentColour { get; set; }
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
@@ -120,10 +120,10 @@ namespace osu.Game.Screens.Menu
 
         private void updateColour()
         {
-            Color4 defaultColour = Color4.White.Opacity(0.2f);
+            Colour4 defaultColour = Colour4.White.Opacity(0.2f);
 
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
+                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Colour4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
             else
                 AccentColour = defaultColour;
         }
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Menu
             // Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
-            private Color4 colour;
+            private Colour4 colour;
             private float[] audioData;
 
             private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);

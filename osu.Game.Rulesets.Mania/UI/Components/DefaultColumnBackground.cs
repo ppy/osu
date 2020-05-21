@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private Color4 brightColour;
-        private Color4 dimColour;
+        private Colour4 brightColour;
+        private Colour4 dimColour;
 
         private Box background;
         private Box backgroundOverlay;

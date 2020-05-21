@@ -109,7 +109,7 @@ namespace osu.Game.Skinning
                         case GlobalSkinColours.ComboColours:
                             var comboColours = Configuration.ComboColours;
                             if (comboColours != null)
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
+                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Colour4>>(comboColours));
 
                             break;
 
@@ -262,8 +262,8 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
-            => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
+        private IBindable<Colour4> getCustomColour(IHasCustomColours source, string lookup)
+            => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Colour4>(col) : null;
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;

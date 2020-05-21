@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.SlateGray.Opacity(0.2f),
+                Colour = Colour4.SlateGray.Opacity(0.2f),
                 Depth = 1
             });
         }

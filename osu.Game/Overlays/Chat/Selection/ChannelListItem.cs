@@ -32,9 +32,9 @@ namespace osu.Game.Overlays.Chat.Selection
         private readonly OsuSpriteText topic;
         private readonly SpriteIcon joinedCheckmark;
 
-        private Color4 joinedColour;
-        private Color4 topicColour;
-        private Color4 hoverColour;
+        private Colour4 joinedColour;
+        private Colour4 topicColour;
+        private Colour4 hoverColour;
 
         public IEnumerable<string> FilterTerms => new[] { Channel.Name, Channel.Topic ?? string.Empty };
 
@@ -165,17 +165,17 @@ namespace osu.Game.Overlays.Chat.Selection
         protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!Channel.Joined.Value)
-                name.FadeColour(Color4.White, transition_duration);
+                name.FadeColour(Colour4.White, transition_duration);
         }
 
         private void updateColour(bool joined)
         {
             if (joined)
             {
-                name.FadeColour(Color4.White, transition_duration);
+                name.FadeColour(Colour4.White, transition_duration);
                 joinedCheckmark.FadeTo(1f, transition_duration);
                 topic.FadeTo(0.8f, transition_duration);
-                topic.FadeColour(Color4.White, transition_duration);
+                topic.FadeColour(Colour4.White, transition_duration);
                 this.FadeColour(joinedColour, transition_duration);
             }
             else
@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 joinedCheckmark.FadeTo(0f, transition_duration);
                 topic.FadeTo(1f, transition_duration);
                 topic.FadeColour(topicColour, transition_duration);
-                this.FadeColour(Color4.White, transition_duration);
+                this.FadeColour(Colour4.White, transition_duration);
             }
         }
     }

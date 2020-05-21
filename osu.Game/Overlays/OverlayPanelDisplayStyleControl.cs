@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
                 base.OnHoverLost(e);
             }
 
-            private void updateState() => icon.Colour = Active.Value || IsHovered ? colourProvider.Light1 : Color4.White;
+            private void updateState() => icon.Colour = Active.Value || IsHovered ? colourProvider.Light1 : Colour4.White;
         }
     }
 

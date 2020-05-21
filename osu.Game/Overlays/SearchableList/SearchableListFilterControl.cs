@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.SearchableList
         public readonly PageTabControl<TTab> Tabs;
         public readonly DisplayStyleControl<TCategory> DisplayStyleControl;
 
-        protected abstract Color4 BackgroundColour { get; }
+        protected abstract Colour4 BackgroundColour { get; }
         protected abstract TTab DefaultTab { get; }
         protected abstract TCategory DefaultCategory { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.SearchableList
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = 1,
-                                    Colour = Color4.White.Opacity(0),
+                                    Colour = Colour4.White.Opacity(0),
                                 },
                             },
                         },

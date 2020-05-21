@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings
                 var icon = new ConstrainedIconContainer
                 {
                     Icon = ruleset.CreateInstance().CreateIcon(),
-                    Colour = Color4.Gray,
+                    Colour = Colour4.Gray,
                     Size = new Vector2(20),
                 };
 
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Padding = new MarginPadding(5),
-                    Colour = isDebug ? colours.Red : Color4.White,
+                    Colour = isDebug ? colours.Red : Colour4.White,
                 });
             }
         }

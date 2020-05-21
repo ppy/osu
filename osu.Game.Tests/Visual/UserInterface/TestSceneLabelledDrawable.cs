@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.Red,
+                Colour = Colour4.Red,
                 Text = @"(( Component ))"
             };
         }
@@ -73,13 +73,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Colour4.SlateGray
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = Color4.Red,
+                        Colour = Colour4.Red,
                         Text = @"(( Component ))"
                     }
                 }

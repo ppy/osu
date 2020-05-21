@@ -99,23 +99,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         RelativeSizeAxes = Axes.Y,
                     },
                     blackBoxRight = new Box
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         RelativeSizeAxes = Axes.Y,
                     },
                     bgPanelLeft = new ModBlindsPanel
                     {
                         Origin = Anchor.TopRight,
-                        Colour = Color4.Gray,
+                        Colour = Colour4.Gray,
                     },
                     panelLeft = new ModBlindsPanel { Origin = Anchor.TopRight, },
-                    bgPanelRight = new ModBlindsPanel { Colour = Color4.Gray },
+                    bgPanelRight = new ModBlindsPanel { Colour = Colour4.Gray },
                     panelRight = new ModBlindsPanel()
                 };
             }

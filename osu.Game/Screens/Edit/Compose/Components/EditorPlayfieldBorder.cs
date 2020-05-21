@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             RelativeSizeAxes = Axes.Both;
 
             Masking = true;
-            BorderColour = Color4.White;
+            BorderColour = Colour4.White;
             BorderThickness = 2;
 
             InternalChild = new Box

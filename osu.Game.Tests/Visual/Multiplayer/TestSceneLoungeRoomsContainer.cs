@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             public override string Message => "Joined";
 
-            public override Color4 GetAppropriateColour(OsuColour colours) => colours.Yellow;
+            public override Colour4 GetAppropriateColour(OsuColour colours) => colours.Yellow;
         }
     }
 }

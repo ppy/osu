@@ -99,9 +99,9 @@ namespace osu.Game.Graphics.Containers
 
         protected class OsuScrollbar : ScrollbarContainer
         {
-            private Color4 hoverColour;
-            private Color4 defaultColour;
-            private Color4 highlightColour;
+            private Colour4 hoverColour;
+            private Colour4 defaultColour;
+            private Colour4 highlightColour;
 
             private readonly Box box;
 
@@ -167,7 +167,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (e.Button != MouseButton.Left) return;
 
-                box.FadeColour(Color4.White, 100);
+                box.FadeColour(Colour4.White, 100);
 
                 base.OnMouseUp(e);
             }

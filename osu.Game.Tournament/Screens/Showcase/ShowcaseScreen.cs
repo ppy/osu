@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new Color4(0, 255, 0, 255),
+                        Colour = new Colour4(0, 255, 0, 255),
                     }
                 }
             });

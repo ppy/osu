@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.SearchableList
         public HeaderTabControl()
         {
             Height = 26;
-            AccentColour = Color4.White;
+            AccentColour = Colour4.White;
         }
 
         private class HeaderTabItem : OsuTabItem

@@ -329,7 +329,7 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         Name = "Background",
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(85f)
+                        Colour = Colour4.Black.Opacity(85f)
                     },
                     new Container
                     {
@@ -346,7 +346,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 RelativeSizeAxes = Axes.Y,
                                 RelativePositionAxes = Axes.X,
                                 Width = 2,
-                                Colour = Color4.Red,
+                                Colour = Colour4.Red,
                             },
                             timelineContainer = new FillFlowContainer
                             {
@@ -399,7 +399,7 @@ namespace osu.Game.Tests.Visual.Editing
                         X = (float)(time / fullDuration),
                         Height = 5,
                         Width = 2,
-                        Colour = time > endTime ? Color4.Gray : Color4.Yellow
+                        Colour = time > endTime ? Colour4.Gray : Colour4.Yellow
                     };
 
                     AddInternal(createMainTick(timingPoint.Time));

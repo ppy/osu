@@ -52,11 +52,11 @@ namespace osu.Game.Graphics.UserInterface
             {
                 default:
                 case MenuItemType.Standard:
-                    text.Colour = Color4.White;
+                    text.Colour = Colour4.White;
                     break;
 
                 case MenuItemType.Destructive:
-                    text.Colour = Color4.Red;
+                    text.Colour = Colour4.Red;
                     break;
 
                 case MenuItemType.Highlighted:

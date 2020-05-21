@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                     Scale = new Vector2(TaikoHitObject.DEFAULT_STRONG_SIZE),
                     Masking = true,
-                    BorderColour = Color4.White,
+                    BorderColour = Colour4.White,
                     BorderThickness = border_thickness,
                     Alpha = 0.1f,
                     Children = new[]
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                     Scale = new Vector2(TaikoHitObject.DEFAULT_SIZE),
                     Masking = true,
-                    BorderColour = Color4.White,
+                    BorderColour = Colour4.White,
                     BorderThickness = border_thickness,
                     Alpha = 0.5f,
                     Children = new[]

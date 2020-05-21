@@ -92,20 +92,20 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestColourLookup()
         {
-            AddStep("Add config colour", () => userSource.Configuration.CustomColours["Lookup"] = Color4.Red);
-            AddAssert("Check colour lookup", () => requester.GetConfig<SkinCustomColourLookup, Color4>(new SkinCustomColourLookup("Lookup"))?.Value == Color4.Red);
+            AddStep("Add config colour", () => userSource.Configuration.CustomColours["Lookup"] = Colour4.Red);
+            AddAssert("Check colour lookup", () => requester.GetConfig<SkinCustomColourLookup, Colour4>(new SkinCustomColourLookup("Lookup"))?.Value == Colour4.Red);
         }
 
         [Test]
         public void TestGlobalLookup()
         {
-            AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.Count > 0);
+            AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinColours, IReadOnlyList<Colour4>>(GlobalSkinColours.ComboColours)?.Value?.Count > 0);
         }
 
         [Test]
         public void TestWrongColourType()
         {
-            AddStep("Add config colour", () => userSource.Configuration.CustomColours["Lookup"] = Color4.Red);
+            AddStep("Add config colour", () => userSource.Configuration.CustomColours["Lookup"] = Colour4.Red);
 
             AddAssert("perform incorrect lookup", () =>
             {
@@ -125,22 +125,22 @@ namespace osu.Game.Tests.Skins
         public void TestEmptyComboColours()
         {
             AddAssert("Check retrieved combo colours is skin default colours", () =>
-                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DefaultComboColours) ?? false);
+                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Colour4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DefaultComboColours) ?? false);
         }
 
         [Test]
         public void TestEmptyComboColoursNoFallback()
         {
             AddStep("Add custom combo colours to user skin", () => userSource.Configuration.AddComboColours(
-                new Color4(100, 150, 200, 255),
-                new Color4(55, 110, 166, 255),
-                new Color4(75, 125, 175, 255)
+                new Colour4(100, 150, 200, 255),
+                new Colour4(55, 110, 166, 255),
+                new Colour4(75, 125, 175, 255)
             ));
 
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 
             AddAssert("Check retrieved combo colours from user skin", () =>
-                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false);
+                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Colour4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(userSource.Configuration.ComboColours) ?? false);
         }
 
         [Test]

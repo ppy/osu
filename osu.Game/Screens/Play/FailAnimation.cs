@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
 
             applyToPlayfield(drawableRuleset.Playfield);
-            drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
+            drawableRuleset.Playfield.HitObjectContainer.FlashColour(Colour4.Red, 500);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
         }
 

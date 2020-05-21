@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     {
                         Type = EdgeEffectType.Glow,
                         Radius = 60,
-                        Colour = Color4.White.Opacity(0.5f),
+                        Colour = Colour4.White.Opacity(0.5f),
                     },
                 },
                 number = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText

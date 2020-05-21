@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                 Size = new Vector2(SYMBOL_SIZE);
 
                 BorderThickness = SYMBOL_BORDER;
-                BorderColour = Color4.White;
+                BorderColour = Colour4.White;
                 Masking = true;
                 Children = new[]
                 {

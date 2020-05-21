@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Menus
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                 },
                 logo = new OsuLogo
                 {

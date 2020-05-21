@@ -25,14 +25,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableObject)
         {
-            animationContent.Colour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
+            animationContent.Colour = skin.GetConfig<OsuSkinColour, Colour4>(OsuSkinColour.SliderBall)?.Value ?? Colour4.White;
 
             InternalChildren = new[]
             {
                 new Sprite
                 {
                     Texture = skin.GetTexture("sliderb-nd"),
-                    Colour = new Color4(5, 5, 5, 255),
+                    Colour = new Colour4(5, 5, 5, 255),
                 },
                 animationContent,
                 new Sprite

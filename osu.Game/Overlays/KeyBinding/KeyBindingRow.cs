@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.KeyBinding
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.6f,
                 },
                 text = new OsuSpriteText
@@ -358,7 +358,7 @@ namespace osu.Game.Overlays.KeyBinding
             private readonly Box box;
             public readonly OsuSpriteText Text;
 
-            private Color4 hoverColour;
+            private Colour4 hoverColour;
 
             private bool isBinding;
 
@@ -401,7 +401,7 @@ namespace osu.Game.Overlays.KeyBinding
                     box = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black
+                        Colour = Colour4.Black
                     },
                     Text = new OsuSpriteText
                     {
@@ -436,13 +436,13 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 if (isBinding)
                 {
-                    box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
-                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
+                    box.FadeColour(Colour4.White, transition_time, Easing.OutQuint);
+                    Text.FadeColour(Colour4.Black, transition_time, Easing.OutQuint);
                 }
                 else
                 {
-                    box.FadeColour(IsHovered ? hoverColour : Color4.Black, transition_time, Easing.OutQuint);
-                    Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
+                    box.FadeColour(IsHovered ? hoverColour : Colour4.Black, transition_time, Easing.OutQuint);
+                    Text.FadeColour(IsHovered ? Colour4.Black : Colour4.White, transition_time, Easing.OutQuint);
                 }
             }
 

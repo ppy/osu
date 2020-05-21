@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Editing
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.SlateGray
+                    Colour = Colour4.SlateGray
                 },
                 new TestDistanceSnapGrid()
             };
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Editing
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Colour4.SlateGray
                     },
                     new TestDistanceSnapGrid(100)
                 };

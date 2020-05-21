@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float border_max_size = 8f;
         private const float border_min_size = 0f;
 
-        private Color4 borderColour = Color4.White;
+        private Colour4 borderColour = Colour4.White;
 
-        public Color4 BorderColour
+        public Colour4 BorderColour
         {
             get => borderColour;
             set
@@ -30,9 +30,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private Color4 accentColour = Color4.White;
+        private Colour4 accentColour = Colour4.White;
 
-        public Color4 AccentColour
+        public Colour4 AccentColour
         {
             get => accentColour;
             set

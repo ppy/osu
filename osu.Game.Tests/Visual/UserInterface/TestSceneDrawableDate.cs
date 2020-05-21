@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     flash = new Box
                     {
-                        Colour = Color4.Yellow,
+                        Colour = Colour4.Yellow,
                         Size = new Vector2(box_size),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,

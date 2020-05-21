@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings
                 if (selected)
                 {
                     selectionIndicator.FadeIn(50);
-                    text.FadeColour(Color4.White, 50);
+                    text.FadeColour(Colour4.White, 50);
                 }
                 else
                 {
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings
             Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
 
-            BackgroundColour = Color4.Black;
+            BackgroundColour = Colour4.Black;
 
             AddRange(new Drawable[]
             {

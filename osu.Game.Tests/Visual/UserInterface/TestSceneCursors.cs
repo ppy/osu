@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Children = new[]
                 {
                     // Middle user
-                    cursorBoxes[0] = new CustomCursorBox(Color4.Green)
+                    cursorBoxes[0] = new CustomCursorBox(Colour4.Green)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -38,13 +38,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Size = new Vector2(0.5f),
                     },
                     // Top-left user
-                    cursorBoxes[1] = new CustomCursorBox(Color4.Blue)
+                    cursorBoxes[1] = new CustomCursorBox(Colour4.Blue)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.4f)
                     },
                     // Bottom-right user
-                    cursorBoxes[2] = new CustomCursorBox(Color4.Red)
+                    cursorBoxes[2] = new CustomCursorBox(Colour4.Red)
                     {
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Size = new Vector2(0.4f)
                     },
                     // Bottom-left local
-                    cursorBoxes[3] = new CustomCursorBox(Color4.Magenta, false)
+                    cursorBoxes[3] = new CustomCursorBox(Colour4.Magenta, false)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Size = new Vector2(0.4f)
                     },
                     // Top-right local
-                    cursorBoxes[4] = new CustomCursorBox(Color4.Cyan, false)
+                    cursorBoxes[4] = new CustomCursorBox(Colour4.Cyan, false)
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Size = new Vector2(0.4f)
                     },
                     // Left-local
-                    cursorBoxes[5] = new CustomCursorBox(Color4.Yellow, false)
+                    cursorBoxes[5] = new CustomCursorBox(Colour4.Yellow, false)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private readonly Box background;
 
-            public CustomCursorBox(Color4 cursorColour, bool providesUserCursor = true)
+            public CustomCursorBox(Colour4 cursorColour, bool providesUserCursor = true)
             {
                 ProvidingUserCursor = providesUserCursor;
 

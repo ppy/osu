@@ -14,9 +14,9 @@ namespace osu.Game.Graphics.Containers
     {
         protected const float FADE_DURATION = 500;
 
-        protected Color4 HoverColour;
+        protected Colour4 HoverColour;
 
-        protected Color4 IdleColour = Color4.White;
+        protected Colour4 IdleColour = Colour4.White;
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 

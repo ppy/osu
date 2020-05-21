@@ -57,7 +57,7 @@ namespace osu.Game.Overlays
                     background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(60),
+                        Colour = Colour4.Black.Opacity(60),
                     },
                     outerSpin = new Sprite
                     {
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays
                         Alpha = 0f,
                         Masking = true,
                         AlwaysPresent = true,
-                        BorderColour = Color4.White,
+                        BorderColour = Colour4.White,
                         BorderThickness = border_width,
                         Size = new Vector2(DISC_SIZE),
                         Scale = new Vector2(0.8f),
@@ -206,7 +206,7 @@ namespace osu.Game.Overlays
         {
             content.Show();
 
-            background.FlashColour(Color4.White.Opacity(0.25f), 400);
+            background.FlashColour(Colour4.White.Opacity(0.25f), 400);
 
             getSample.Play();
 
@@ -270,7 +270,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both;
                 Width = 0f;
-                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
+                Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(start), Colour4.White.Opacity(end));
                 Masking = true;
 
                 Children = new[]
@@ -278,7 +278,7 @@ namespace osu.Game.Overlays
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                     }
                 };
             }

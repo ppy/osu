@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             Origin = Anchor.Centre;
 
             Blending = BlendingParameters.Additive;
-            Colour = Color4.White.Opacity(0.9f);
+            Colour = Colour4.White.Opacity(0.9f);
         }
 
-        public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
+        public readonly Bindable<Colour4> AccentColour = new Bindable<Colour4>();
 
         protected override void LoadComplete()
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables.Pieces
             AccentColour.BindValueChanged(updateAccentColour, true);
         }
 
-        private void updateAccentColour(ValueChangedEvent<Color4> colour)
+        private void updateAccentColour(ValueChangedEvent<Colour4> colour)
         {
             EdgeEffect = new EdgeEffectParameters
             {

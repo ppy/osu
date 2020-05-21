@@ -46,7 +46,7 @@ namespace osu.Game.Online.Chat
             {
                 new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     Alpha = 0.8f,
                     RelativeSizeAxes = Axes.Both
                 },
