@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {

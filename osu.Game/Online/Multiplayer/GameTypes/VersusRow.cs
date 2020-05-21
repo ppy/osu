@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Online.Multiplayer.GameTypes
 {

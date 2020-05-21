@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {

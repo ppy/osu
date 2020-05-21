@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osuTK.Graphics;
 
 namespace osu.Game.Online.Multiplayer.RoomStatuses
 {

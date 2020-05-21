@@ -9,7 +9,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using System;

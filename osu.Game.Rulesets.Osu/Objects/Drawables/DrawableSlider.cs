@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
-using osuTK.Graphics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables

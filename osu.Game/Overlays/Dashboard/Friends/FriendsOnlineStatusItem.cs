@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {

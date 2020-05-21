@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
-using osuTK.Graphics;
 
 namespace osu.Game.Users
 {

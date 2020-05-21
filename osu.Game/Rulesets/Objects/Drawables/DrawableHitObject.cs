@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {

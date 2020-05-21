@@ -16,7 +16,6 @@ using osu.Framework.Platform;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {

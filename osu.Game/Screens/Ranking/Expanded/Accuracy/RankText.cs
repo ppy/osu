@@ -10,7 +10,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {

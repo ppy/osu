@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Scoring;

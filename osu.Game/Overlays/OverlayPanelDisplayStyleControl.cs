@@ -9,7 +9,6 @@ using osuTK;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays

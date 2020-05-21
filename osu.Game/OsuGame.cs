@@ -39,7 +39,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
 using osu.Game.Skinning;
-using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;

@@ -8,7 +8,6 @@ using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {

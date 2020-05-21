@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;

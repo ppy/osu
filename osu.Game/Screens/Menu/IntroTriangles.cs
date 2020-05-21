@@ -21,7 +21,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {

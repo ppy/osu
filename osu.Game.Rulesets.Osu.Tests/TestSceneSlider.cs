@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;

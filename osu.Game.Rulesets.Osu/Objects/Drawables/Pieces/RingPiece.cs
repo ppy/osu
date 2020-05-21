@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces

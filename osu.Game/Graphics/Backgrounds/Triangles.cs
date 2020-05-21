@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osuTK;
-using osuTK.Graphics;
 using System;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;

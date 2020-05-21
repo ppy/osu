@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {

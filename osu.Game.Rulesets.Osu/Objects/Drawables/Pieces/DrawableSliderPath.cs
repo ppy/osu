@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Lines;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {

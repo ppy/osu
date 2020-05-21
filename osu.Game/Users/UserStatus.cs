@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osuTK.Graphics;
 using osu.Game.Graphics;
 
 namespace osu.Game.Users

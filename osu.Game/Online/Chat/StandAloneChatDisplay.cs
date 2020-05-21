@@ -11,7 +11,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
-using osuTK.Graphics;
 
 namespace osu.Game.Online.Chat
 {

@@ -19,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {

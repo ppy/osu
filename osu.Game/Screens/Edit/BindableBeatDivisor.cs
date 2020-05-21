@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {

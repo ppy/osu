@@ -10,7 +10,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {

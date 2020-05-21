@@ -15,7 +15,6 @@ using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
-using osuTK.Graphics;
 using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Editors

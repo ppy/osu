@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {

@@ -10,7 +10,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
-using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {

@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {

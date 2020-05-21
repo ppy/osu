@@ -7,7 +7,6 @@ using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;

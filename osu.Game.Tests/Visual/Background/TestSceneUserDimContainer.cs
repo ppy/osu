@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {

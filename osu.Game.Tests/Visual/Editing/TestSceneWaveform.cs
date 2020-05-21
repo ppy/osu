@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {

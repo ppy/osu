@@ -27,7 +27,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {

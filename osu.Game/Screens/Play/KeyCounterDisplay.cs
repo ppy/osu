@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {

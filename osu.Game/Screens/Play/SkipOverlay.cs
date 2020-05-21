@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;

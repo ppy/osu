@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {

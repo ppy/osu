@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {

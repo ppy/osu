@@ -3,7 +3,6 @@
 
 using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;

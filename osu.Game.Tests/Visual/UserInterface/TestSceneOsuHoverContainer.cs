@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

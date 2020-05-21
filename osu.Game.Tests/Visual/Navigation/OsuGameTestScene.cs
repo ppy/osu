@@ -19,7 +19,6 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osuTK.Graphics;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Tests.Visual.Navigation

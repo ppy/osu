@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {

@@ -14,7 +14,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {

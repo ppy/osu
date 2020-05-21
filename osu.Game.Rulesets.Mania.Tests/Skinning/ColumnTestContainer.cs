@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {

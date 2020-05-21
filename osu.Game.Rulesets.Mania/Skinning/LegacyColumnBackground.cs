@@ -11,7 +11,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {

@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces

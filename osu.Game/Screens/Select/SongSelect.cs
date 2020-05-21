@@ -26,7 +26,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 using System;
 using System.Collections.Generic;

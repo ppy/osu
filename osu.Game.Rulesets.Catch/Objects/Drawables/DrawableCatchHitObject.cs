@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {

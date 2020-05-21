@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {

@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {

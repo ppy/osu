@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Multi.Components;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {

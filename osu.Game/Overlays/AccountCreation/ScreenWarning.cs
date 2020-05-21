@@ -14,7 +14,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Menu;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {

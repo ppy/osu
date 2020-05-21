@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {

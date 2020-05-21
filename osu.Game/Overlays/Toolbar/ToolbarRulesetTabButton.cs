@@ -4,7 +4,6 @@
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 

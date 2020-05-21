@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning;
-using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Graphics;

@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

@@ -3,7 +3,6 @@
 
 using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;

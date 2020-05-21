@@ -4,7 +4,6 @@
 using System;
 using System.Globalization;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;

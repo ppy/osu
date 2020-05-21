@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;

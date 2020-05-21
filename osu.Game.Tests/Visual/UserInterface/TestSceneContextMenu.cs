@@ -10,7 +10,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

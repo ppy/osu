@@ -15,7 +15,6 @@ using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {

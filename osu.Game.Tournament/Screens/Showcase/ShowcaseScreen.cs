@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tournament.Components;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {

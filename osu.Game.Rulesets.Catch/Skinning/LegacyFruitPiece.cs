@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {

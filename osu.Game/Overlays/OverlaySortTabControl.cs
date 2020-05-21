@@ -12,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
 using osu.Game.Overlays.Comments;
 using JetBrains.Annotations;
 using System;

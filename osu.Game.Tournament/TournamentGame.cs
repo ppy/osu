@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Models;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament
 {

@@ -13,7 +13,6 @@ using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {

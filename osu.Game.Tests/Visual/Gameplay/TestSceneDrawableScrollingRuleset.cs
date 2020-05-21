@@ -26,7 +26,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {

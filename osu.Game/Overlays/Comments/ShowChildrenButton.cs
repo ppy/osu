@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Bindables;
-using osuTK.Graphics;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Comments

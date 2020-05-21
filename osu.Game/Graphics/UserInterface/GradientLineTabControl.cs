@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Graphics.UserInterface

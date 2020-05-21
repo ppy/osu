@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {

@@ -5,7 +5,6 @@ using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Select.Options;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect

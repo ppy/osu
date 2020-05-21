@@ -30,7 +30,6 @@ using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {

@@ -9,7 +9,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {

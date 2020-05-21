@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header
 {

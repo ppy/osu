@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {

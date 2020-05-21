@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Skins
 {

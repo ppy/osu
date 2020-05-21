@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {

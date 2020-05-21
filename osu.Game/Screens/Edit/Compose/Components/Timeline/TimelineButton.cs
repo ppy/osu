@@ -11,7 +11,6 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline

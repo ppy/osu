@@ -5,7 +5,6 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {

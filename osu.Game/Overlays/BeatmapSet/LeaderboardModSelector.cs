@@ -10,7 +10,6 @@ using osuTK;
 using osu.Game.Rulesets.UI;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osuTK.Graphics;
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;

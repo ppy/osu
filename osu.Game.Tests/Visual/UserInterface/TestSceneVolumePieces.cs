@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Volume;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

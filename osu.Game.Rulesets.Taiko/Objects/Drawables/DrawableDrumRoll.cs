@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;

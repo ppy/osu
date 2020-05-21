@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {

@@ -9,7 +9,6 @@ using osu.Framework.Screens;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Menus
 {

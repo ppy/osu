@@ -16,7 +16,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor

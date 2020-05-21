@@ -22,7 +22,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {

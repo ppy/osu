@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Tournament.Models;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 using SixLabors.Primitives;
 

@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {

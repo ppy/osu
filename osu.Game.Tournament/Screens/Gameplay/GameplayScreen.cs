@@ -16,7 +16,6 @@ using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.TeamWin;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {

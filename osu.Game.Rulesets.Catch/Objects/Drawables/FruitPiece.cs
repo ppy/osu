@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {

@@ -11,7 +11,6 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Components
 {

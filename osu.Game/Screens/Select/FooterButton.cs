@@ -3,7 +3,6 @@
 
 using System;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;

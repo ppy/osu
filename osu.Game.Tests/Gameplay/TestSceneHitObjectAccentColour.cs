@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Gameplay
 {

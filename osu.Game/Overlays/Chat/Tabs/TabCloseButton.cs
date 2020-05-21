@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {

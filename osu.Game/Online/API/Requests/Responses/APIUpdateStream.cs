@@ -5,7 +5,6 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osuTK.Graphics;
 
 namespace osu.Game.Online.API.Requests.Responses
 {

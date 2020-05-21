@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {

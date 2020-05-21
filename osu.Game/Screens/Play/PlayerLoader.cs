@@ -23,7 +23,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {

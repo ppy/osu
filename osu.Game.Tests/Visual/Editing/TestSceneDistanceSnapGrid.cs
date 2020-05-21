@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {

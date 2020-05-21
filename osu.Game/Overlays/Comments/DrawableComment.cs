@@ -16,7 +16,6 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Framework.Allocation;
-using osuTK.Graphics;
 using System.Collections.Generic;
 using System;
 using osu.Framework.Graphics.Shapes;

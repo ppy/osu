@@ -5,7 +5,6 @@ using Humanizer;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
 {

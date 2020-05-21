@@ -15,7 +15,6 @@ using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {

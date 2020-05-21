@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {

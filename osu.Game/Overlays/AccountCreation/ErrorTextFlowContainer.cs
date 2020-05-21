@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.AccountCreation
 {

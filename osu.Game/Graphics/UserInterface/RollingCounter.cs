@@ -8,7 +8,6 @@ using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {

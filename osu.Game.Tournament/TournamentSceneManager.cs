@@ -23,7 +23,6 @@ using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
 using osu.Game.Tournament.Screens.TeamWin;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tournament
 {

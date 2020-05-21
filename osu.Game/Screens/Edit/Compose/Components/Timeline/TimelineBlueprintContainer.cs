@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {

@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {

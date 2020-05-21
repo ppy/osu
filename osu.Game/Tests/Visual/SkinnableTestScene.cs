@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {

@@ -17,7 +17,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {

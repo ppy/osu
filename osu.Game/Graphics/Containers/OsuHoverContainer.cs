@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osuTK.Graphics;
 using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Containers

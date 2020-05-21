@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {

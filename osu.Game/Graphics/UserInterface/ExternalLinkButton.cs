@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {

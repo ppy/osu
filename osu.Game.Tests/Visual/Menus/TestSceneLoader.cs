@@ -12,7 +12,6 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Menus
 {

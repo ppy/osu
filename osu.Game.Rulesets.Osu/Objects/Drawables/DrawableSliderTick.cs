@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Containers;

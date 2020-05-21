@@ -11,7 +11,6 @@ using osu.Game;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Desktop.Overlays
 {

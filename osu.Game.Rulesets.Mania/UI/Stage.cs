@@ -17,7 +17,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

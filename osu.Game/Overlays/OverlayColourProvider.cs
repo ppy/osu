@@ -3,8 +3,6 @@
 
 using System;
 using osu.Framework.Graphics;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {

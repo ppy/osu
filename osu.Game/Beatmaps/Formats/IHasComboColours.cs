@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {

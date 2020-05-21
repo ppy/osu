@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {

@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using NUnit.Framework;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Framework.Graphics;

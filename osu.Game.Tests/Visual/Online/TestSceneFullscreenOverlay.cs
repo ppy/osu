@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {

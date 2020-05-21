@@ -12,7 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {

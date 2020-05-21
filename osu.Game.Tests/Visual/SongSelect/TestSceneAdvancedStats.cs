@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Details;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {

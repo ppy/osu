@@ -12,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI
 {

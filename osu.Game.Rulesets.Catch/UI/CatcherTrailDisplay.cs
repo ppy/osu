@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {

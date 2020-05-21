@@ -16,7 +16,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Users;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {

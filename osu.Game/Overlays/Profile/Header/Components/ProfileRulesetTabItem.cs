@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {

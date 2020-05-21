@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
