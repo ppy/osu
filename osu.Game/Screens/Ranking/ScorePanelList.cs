@@ -90,8 +90,7 @@ namespace osu.Game.Screens.Ranking
 
         private class Flow : FillFlowContainer<ScorePanel>
         {
-            // Todo: Order is wrong.
-            public override IEnumerable<Drawable> FlowingChildren => AliveInternalChildren.OfType<ScorePanel>().OrderBy(s => s.Score.TotalScore);
+            public override IEnumerable<Drawable> FlowingChildren => AliveInternalChildren.OfType<ScorePanel>().OrderByDescending(s => s.Score.TotalScore).ThenByDescending(s => s.Score.OnlineScoreID);
         }
     }
 }
