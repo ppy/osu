@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -29,8 +28,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public abstract class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
-        public event Action<IEnumerable<HitObject>> SelectionChanged;
-
         protected DragBox DragBox { get; private set; }
 
         protected Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
@@ -88,8 +85,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
                         break;
                 }
-
-                SelectionChanged?.Invoke(selectedHitObjects);
             };
         }
 
