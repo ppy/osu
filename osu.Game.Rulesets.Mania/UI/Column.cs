@@ -142,7 +142,10 @@ namespace osu.Game.Rulesets.Mania.UI
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
 
-        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null)
+        /// <summary>
+        /// Given a time, return the screen space position within this column.
+        /// </summary>
+        public Vector2 ScreenSpacePositionAtTime(double time)
         {
             var pos = ScrollingInfo.Algorithm.PositionAt(time, Time.Current, ScrollingInfo.TimeRange.Value, HitObjectContainer.DrawHeight);
 
@@ -166,6 +169,9 @@ namespace osu.Game.Rulesets.Mania.UI
             return HitObjectContainer.ToScreenSpace(new Vector2(HitObjectContainer.DrawWidth / 2, pos));
         }
 
+        /// <summary>
+        /// Given a position in screen space, return the time within this column.
+        /// </summary>
         public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
             // convert to local space of column so we can snap and fetch correct location.
