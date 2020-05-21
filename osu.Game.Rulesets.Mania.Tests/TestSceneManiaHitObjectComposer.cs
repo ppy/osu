@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("move mouse downwards", () =>
             {
-                InputManager.MoveMouseTo(lastObject, new Vector2(0, lastObject.ScreenSpaceDrawQuad.Height * 2));
+                InputManager.MoveMouseTo(lastObject, new Vector2(0, lastObject.ScreenSpaceDrawQuad.Height * 4));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("move mouse upwards", () =>
             {
-                InputManager.MoveMouseTo(lastObject, new Vector2(0, -lastObject.ScreenSpaceDrawQuad.Height * 2));
+                InputManager.MoveMouseTo(lastObject, new Vector2(0, -lastObject.ScreenSpaceDrawQuad.Height * 4));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
