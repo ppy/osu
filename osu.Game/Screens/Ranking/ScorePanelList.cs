@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Ranking
 
             if (expandedPanel != null)
                 expandedPanel.State = PanelState.Contracted;
+
             expandedPanel = panel;
         }
 

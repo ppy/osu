@@ -175,9 +175,6 @@ namespace osu.Game.Screens.Ranking
 
         private void updateState()
         {
-            topLayerContainer.MoveToY(0, resize_duration, Easing.OutQuint);
-            middleLayerContainer.MoveToY(0, resize_duration, Easing.OutQuint);
-
             topLayerContent?.FadeOut(content_fade_duration).Expire();
             middleLayerContent?.FadeOut(content_fade_duration).Expire();
 
@@ -203,7 +200,10 @@ namespace osu.Game.Screens.Ranking
                     break;
             }
 
-            using (BeginDelayedSequence(resize_duration + top_layer_expand_delay, true))
+            bool topLayerExpanded = topLayerContainer.Y < 0;
+
+            // If the top layer was already expanded, then we don't need to wait for the resize and can instead transform immediately. This looks better when changing the panel state.
+            using (BeginDelayedSequence(topLayerExpanded ? 0 : resize_duration + top_layer_expand_delay, true))
             {
                 switch (state)
                 {
