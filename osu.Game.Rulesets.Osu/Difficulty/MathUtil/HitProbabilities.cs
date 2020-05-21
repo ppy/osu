@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 
         public double ExpectedFcTime(double tp, int start, int sectionCount)
         {
-            double fcTime = 5;
+            double fcTime = 15;
             for (int i = start; i != start + sectionCount; i++)
             {
                 if (sections[i].Movements.Count != 0)
