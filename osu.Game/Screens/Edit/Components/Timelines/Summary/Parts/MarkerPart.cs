@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     return;
 
                 float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-                editorClock.Seek(markerPos / DrawWidth * editorClock.TrackLength);
+                editorClock.SeekTo(markerPos / DrawWidth * editorClock.TrackLength);
             });
         }
 
