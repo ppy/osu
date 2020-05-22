@@ -340,6 +340,7 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+            BeatmapManager?.Dispose();
 
             contextFactory.FlushConnections();
         }
