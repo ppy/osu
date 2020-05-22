@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Ranking
 
             var req = new GetScoresRequest(Score.Beatmap, Score.Ruleset);
 
-            req.Success += r =>
+            req.Success += r => Schedule(() =>
             {
                 foreach (var s in r.Scores.Select(s => s.CreateScoreInfo(rulesets)))
                 {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Ranking
 
                     panels.AddScore(s);
                 }
-            };
+            });
 
             api.Queue(req);
         }
