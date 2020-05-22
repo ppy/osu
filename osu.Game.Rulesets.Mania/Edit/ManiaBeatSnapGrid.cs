@@ -11,12 +11,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -169,36 +167,6 @@ namespace osu.Game.Rulesets.Mania.Edit
                     }
                 }
             }
-        }
-
-        public (Vector2 position, double time)? GetSnappedPosition(Vector2 position)
-        {
-            float minDist = float.PositiveInfinity;
-            DrawableGridLine minDistLine = null;
-
-            Vector2 minDistLinePosition = Vector2.Zero;
-
-            foreach (var grid in grids)
-            {
-                foreach (var line in grid.Objects.OfType<DrawableGridLine>())
-                {
-                    Vector2 linePos = line.ToSpaceOfOtherDrawable(line.OriginPosition, this);
-                    float d = Vector2.Distance(position, linePos);
-
-                    if (d < minDist)
-                    {
-                        minDist = d;
-                        minDistLine = line;
-                        minDistLinePosition = linePos;
-                    }
-                }
-            }
-
-            if (minDistLine == null)
-                return null;
-
-            float noteOffset = (scrollingInfo.Direction.Value == ScrollingDirection.Up ? 1 : -1) * DefaultNotePiece.NOTE_HEIGHT / 2;
-            return (new Vector2(position.X, minDistLinePosition.Y + noteOffset), minDistLine.HitObject.StartTime);
         }
 
         private class DrawableGridLine : DrawableHitObject
