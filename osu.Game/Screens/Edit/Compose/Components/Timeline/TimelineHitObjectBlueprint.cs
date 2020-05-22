@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         case IHasRepeats repeatHitObject:
                             // find the number of repeats which can fit in the requested time.
                             var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                            var proposedCount = Math.Max(0, (int)((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
+                            var proposedCount = Math.Max(0, (int)Math.Round((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
 
                             if (proposedCount == repeatHitObject.RepeatCount)
                                 return;
