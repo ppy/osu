@@ -102,7 +102,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         private class StartStopButton : OsuButton
         {
-            private IAdjustableClock adjustableClock;
+            [Resolved]
+            private EditorClock editorClock { get; set; }
+
             private bool started;
 
             public StartStopButton()
@@ -114,22 +116,16 @@ namespace osu.Game.Tests.Visual.Editing
                 Action = onClick;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(IAdjustableClock adjustableClock)
-            {
-                this.adjustableClock = adjustableClock;
-            }
-
             private void onClick()
             {
                 if (started)
                 {
-                    adjustableClock.Stop();
+                    editorClock.Stop();
                     Text = "Start";
                 }
                 else
                 {
-                    adjustableClock.Start();
+                    editorClock.Start();
                     Text = "Stop";
                 }
 
