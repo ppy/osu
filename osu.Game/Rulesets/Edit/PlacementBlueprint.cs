@@ -6,10 +6,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
 
@@ -30,7 +30,8 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected readonly HitObject HitObject;
 
-        protected IClock EditorClock { get; private set; }
+        [Resolved]
+        protected EditorClock EditorClock { get; private set; }
 
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -49,11 +50,9 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock clock)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
-
-            EditorClock = clock;
 
             ApplyDefaultsToHitObject();
         }
@@ -84,7 +83,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [Resolved(canBeNull: true)]
-        private IFrameBasedClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; }
 
         /// <summary>
         /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
