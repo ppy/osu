@@ -59,42 +59,57 @@ namespace osu.Game.Screens.Ranking
         {
             FillFlowContainer buttons;
 
-            InternalChildren = new[]
+            InternalChild = new GridContainer
             {
-                new ResultsScrollContainer
+                RelativeSizeAxes = Axes.Both,
+                Content = new[]
                 {
-                    Child = panels = new ScorePanelList(Score)
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                },
-                bottomPanel = new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = TwoLayerButton.SIZE_EXTENDED.Y,
-                    Alpha = 0,
-                    Children = new Drawable[]
+                        new ResultsScrollContainer
+                        {
+                            Child = panels = new ScorePanelList(Score)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            }
+                        }
+                    },
+                    new[]
                     {
-                        new Box
+                        bottomPanel = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#333")
-                        },
-                        buttons = new FillFlowContainer
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5),
-                            Direction = FillDirection.Horizontal,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = TwoLayerButton.SIZE_EXTENDED.Y,
+                            Alpha = 0,
                             Children = new Drawable[]
                             {
-                                new ReplayDownloadButton(Score) { Width = 300 },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#333")
+                                },
+                                buttons = new FillFlowContainer
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(5),
+                                    Direction = FillDirection.Horizontal,
+                                    Children = new Drawable[]
+                                    {
+                                        new ReplayDownloadButton(Score) { Width = 300 },
+                                    }
+                                }
                             }
                         }
                     }
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize)
                 }
             };
 
@@ -171,7 +186,7 @@ namespace osu.Game.Screens.Ranking
             protected override void Update()
             {
                 base.Update();
-                content.Height = Math.Max(768, DrawHeight);
+                content.Height = Math.Max(768 - TwoLayerButton.SIZE_EXTENDED.Y, DrawHeight);
             }
         }
     }

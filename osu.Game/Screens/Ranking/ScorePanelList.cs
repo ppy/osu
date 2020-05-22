@@ -149,6 +149,10 @@ namespace osu.Game.Screens.Ranking
 
                 base.UpdateAfterChildren();
             }
+
+            public override bool HandlePositionalInput => false;
+
+            public override bool HandleNonPositionalInput => false;
         }
     }
 }
