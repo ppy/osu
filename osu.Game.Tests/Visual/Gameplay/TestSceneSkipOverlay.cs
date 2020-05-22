@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneSkipOverlay : OsuManualInputManagerTestScene
     {
-        private SkipOverlay skip;
+        private TestSkipOverlay skip;
         private int requestCount;
 
         private double increment;
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    skip = new SkipOverlay(skip_time)
+                    skip = new TestSkipOverlay(skip_time)
                     {
                         RequestSkip = () =>
                         {
@@ -56,19 +56,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestFadeOnIdle()
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(Vector2.Zero));
-            AddUntilStep("fully visible", () => skip.Children.First().Alpha == 1);
-            AddUntilStep("wait for fade", () => skip.Children.First().Alpha < 1);
+            AddUntilStep("fully visible", () => skip.FadingContent.Alpha == 1);
+            AddUntilStep("wait for fade", () => skip.FadingContent.Alpha < 1);
 
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("fully visible", () => skip.Children.First().Alpha == 1);
-            AddUntilStep("wait for fade", () => skip.Children.First().Alpha < 1);
+            AddUntilStep("fully visible", () => skip.FadingContent.Alpha == 1);
+            AddUntilStep("wait for fade", () => skip.FadingContent.Alpha < 1);
         }
 
         [Test]
         public void TestClickableAfterFade()
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for fade", () => skip.Children.First().Alpha == 0);
+            AddUntilStep("wait for fade", () => skip.FadingContent.Alpha == 0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkRequestCount(1);
         }
@@ -105,13 +105,25 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("button down", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep("wait for overlay disappear", () => !skip.IsPresent);
-            AddAssert("ensure button didn't disappear", () => skip.Children.First().Alpha > 0);
+            AddUntilStep("wait for overlay disappear", () => !skip.OverlayContent.IsPresent);
+            AddAssert("ensure button didn't disappear", () => skip.FadingContent.Alpha > 0);
             AddStep("button up", () => InputManager.ReleaseButton(MouseButton.Left));
             checkRequestCount(0);
         }
 
         private void checkRequestCount(int expected) =>
             AddAssert($"request count is {expected}", () => requestCount == expected);
+
+        private class TestSkipOverlay : SkipOverlay
+        {
+            public TestSkipOverlay(double startTime)
+                : base(startTime)
+            {
+            }
+
+            public Drawable OverlayContent => InternalChild;
+
+            public Drawable FadingContent => (OverlayContent as Container)?.Child;
+        }
     }
 }
