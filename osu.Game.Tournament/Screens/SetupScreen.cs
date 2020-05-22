@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Screens
         private FillFlowContainer fillFlow;
 
         private LoginOverlay loginOverlay;
-        private ActionableInfo resolution;
+        private ActionableInfoWithNumberBox resolution;
 
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
@@ -108,17 +108,21 @@ namespace osu.Game.Tournament.Screens
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },
-                resolution = new ActionableInfo
+                resolution = new ActionableInfoWithNumberBox
                 {
                     Label = "Stream area resolution",
-                    ButtonText = "Set to 1080p",
-                    Action = () =>
+                    ButtonText = "Set size",
+                    Action = i =>
                     {
-                        windowSize.Value = new Size((int)(1920 / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), 1080);
+                        i = Math.Clamp(i, 480, 2160);
+                        windowSize.Value = new Size((int)(i * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), i);
+                        resolution.NumberValue = i;
                     }
                 },
             };
         }
+
+        private const float aspect_ratio = 16f / 9f;
 
         protected override void Update()
         {
@@ -149,7 +153,7 @@ namespace osu.Game.Tournament.Screens
 
         private class ActionableInfo : LabelledDrawable<Drawable>
         {
-            private OsuButton button;
+            protected OsuButton Button;
 
             public ActionableInfo()
                 : base(true)
@@ -158,22 +162,22 @@ namespace osu.Game.Tournament.Screens
 
             public string ButtonText
             {
-                set => button.Text = value;
+                set => Button.Text = value;
             }
 
             public string Value
             {
-                set => valueText.Text = value;
+                set => ValueText.Text = value;
             }
 
             public bool Failing
             {
-                set => valueText.Colour = value ? Color4.Red : Color4.White;
+                set => ValueText.Colour = value ? Color4.Red : Color4.White;
             }
 
             public Action Action;
 
-            private TournamentSpriteText valueText;
+            protected TournamentSpriteText ValueText;
 
             protected override Drawable CreateComponent() => new Container
             {
@@ -181,17 +185,68 @@ namespace osu.Game.Tournament.Screens
                 RelativeSizeAxes = Axes.X,
                 Children = new Drawable[]
                 {
-                    valueText = new TournamentSpriteText
+                    ValueText = new TournamentSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
-                    button = new TriangleButton
+                    Button = new TriangleButton
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Size = new Vector2(100, 30),
                         Action = () => Action?.Invoke()
+                    },
+                }
+            };
+        }
+
+        private class ActionableInfoWithNumberBox : ActionableInfo
+        {
+            public new Action<int> Action;
+
+            private OsuNumberBox numberBox;
+
+            public int NumberValue
+            {
+                get
+                {
+                    int.TryParse(numberBox.Text, out var val);
+                    return val;
+                }
+                set => numberBox.Text = value.ToString();
+            }
+
+            protected override Drawable CreateComponent() => new Container
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Children = new Drawable[]
+                {
+                    ValueText = new TournamentSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    numberBox = new OsuNumberBox
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Width = 100,
+                        Margin = new MarginPadding
+                        {
+                            Right = 110
+                        }
+                    },
+                    Button = new TriangleButton
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Size = new Vector2(100, 30),
+                        Action = () =>
+                        {
+                            if (numberBox.Text.Length > 0) Action?.Invoke(NumberValue);
+                        }
                     },
                 }
             };
