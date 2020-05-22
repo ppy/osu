@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
-        private class BeatmapOnlineLookupQueue
+        private class BeatmapOnlineLookupQueue : IDisposable
         {
             private readonly IAPIProvider api;
             private readonly Storage storage;
@@ -178,6 +178,11 @@ namespace osu.Game.Beatmaps
                 }
 
                 return false;
+            }
+
+            public void Dispose()
+            {
+                cacheDownloadRequest?.Dispose();
             }
 
             [Serializable]
