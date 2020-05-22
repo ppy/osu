@@ -14,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Components;
 using osuTK;
@@ -109,7 +108,7 @@ namespace osu.Game.Tournament.Screens
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
                                                 Text = "Select stable path",
-                                                Action = () => changePath(storage)
+                                                Action = () => ChangePath(storage)
                                             },
                                             new TriangleButton
                                             {
@@ -117,7 +116,7 @@ namespace osu.Game.Tournament.Screens
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
                                                 Text = "Auto detect",
-                                                Action = autoDetect
+                                                Action = AutoDetect
                                             },
                                         }
                                     }
@@ -136,7 +135,7 @@ namespace osu.Game.Tournament.Screens
             });
         }
 
-        protected virtual void changePath(Storage storage)
+        protected virtual void ChangePath(Storage storage)
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
             stableInfo.StablePath.Value = target;
@@ -157,7 +156,7 @@ namespace osu.Game.Tournament.Screens
             sceneManager?.SetScreen(typeof(SetupScreen));
         }
 
-        protected virtual void autoDetect()
+        protected virtual void AutoDetect()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
             fileBasedIpc?.LocateStableStorage();

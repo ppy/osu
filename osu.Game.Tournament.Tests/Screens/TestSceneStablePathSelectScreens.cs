@@ -8,7 +8,6 @@ namespace osu.Game.Tournament.Tests.Screens
 {
     public class TestSceneStablePathSelectScreens : TournamentTestScene
     {
-
         public TestSceneStablePathSelectScreens()
         {
             AddStep("Add screen", () => Add(new TestSceneStablePathSelectScreen()));
@@ -16,12 +15,12 @@ namespace osu.Game.Tournament.Tests.Screens
 
         private class TestSceneStablePathSelectScreen : StablePathSelectScreen
         {
-            protected override void changePath(Storage storage)
+            protected override void ChangePath(Storage storage)
             {
                 Expire();
             }
 
-            protected override void autoDetect()
+            protected override void AutoDetect()
             {
                 Expire();
             }
