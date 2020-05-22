@@ -244,8 +244,6 @@ namespace osu.Game.Rulesets.Edit
         public void BeginPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
-
-            hitObject.StartTime = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position).Time ?? EditorClock.CurrentTime;
         }
 
         public void EndPlacement(HitObject hitObject, bool commit)
@@ -256,7 +254,8 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                adjustableClock.Seek(hitObject.GetEndTime());
+                if (adjustableClock.CurrentTime < hitObject.StartTime)
+                    adjustableClock.Seek(hitObject.StartTime);
             }
 
             showGridFor(Enumerable.Empty<HitObject>());

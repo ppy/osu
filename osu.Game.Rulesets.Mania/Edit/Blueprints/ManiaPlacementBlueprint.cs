@@ -50,6 +50,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         public override void UpdatePosition(SnapResult result)
         {
+            base.UpdatePosition(result);
+
             if (!PlacementActive)
                 Column = (result as ManiaSnapResult)?.Column;
         }

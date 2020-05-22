@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
@@ -43,11 +44,17 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
         }
 
+        protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
+        {
+            var time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
+            var pos = column.ScreenSpacePositionAtTime(time);
+
+            return new ManiaSnapResult(pos, time, column);
+        }
+
         protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };
 
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
-
-        public Column ColumnAt(Vector2 screenSpacePosition) => column;
 
         public ManiaPlayfield Playfield => null;
 
