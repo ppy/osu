@@ -7,20 +7,25 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.Mvis.Buttons
+namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
-    public class ToggleableButton : BottomBarButton
+    public class BottomBarSwitchButton : BottomBarButton
     {
-        public Bindable<bool> ToggleableValue = new Bindable<bool>();
-        protected readonly bool defaultValue;
+        public BindableBool ToggleableValue = new BindableBool();
+
+        public bool DefaultValue { get; set; }
 
         [Resolved]
         private OsuColour colour { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            ToggleableValue.Value = defaultValue;
+            ToggleableValue.Value = DefaultValue;
+            ToggleableValue.ValueChanged += _ => UpdateVisuals();
+
+            UpdateVisuals();
+
+            base.LoadComplete();
         }
 
         protected override bool OnClick(Framework.Input.Events.ClickEvent e)
@@ -31,28 +36,21 @@ namespace osu.Game.Screens.Mvis.Buttons
 
         public void Toggle()
         {
+            ToggleableValue.Toggle();
+        }
+
+        private void UpdateVisuals()
+        {
             switch ( ToggleableValue.Value )
             {
                 case true:
-                    OnToggledOn();
+                    bgBox.FadeColour( colour.Green, 500, Easing.OutQuint );
                     break;
 
                 case false:
-                    OnToggledOff();
+                    bgBox.FadeColour( Color4Extensions.FromHex("#5a5a5a"), 500, Easing.OutQuint );
                     break;
             }
-        }
-
-        protected virtual void OnToggledOn()
-        {
-            ToggleableValue.Value = false;
-            bgBox.FadeColour( Color4Extensions.FromHex("#5a5a5a"), 500, Easing.OutQuint );
-        }
-
-        protected virtual void OnToggledOff()
-        {
-            ToggleableValue.Value = true;
-            bgBox.FadeColour( colour.Green, 500, Easing.OutQuint );
         }
     }
 }

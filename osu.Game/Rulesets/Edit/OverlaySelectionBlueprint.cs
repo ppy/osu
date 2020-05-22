@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
 
-        public override Vector2 SelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
+        public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
 

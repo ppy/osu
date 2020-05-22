@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// The playing verb to be shown in the <see cref="UserActivity.SoloGame.Status"/>.
         /// </summary>
-        public virtual string PlayingVerb => "单人游戏中";
+        public virtual string PlayingVerb => "游戏中";
 
         /// <summary>
         /// A list of available variant ids.

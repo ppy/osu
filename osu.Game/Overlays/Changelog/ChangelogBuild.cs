@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Changelog
                 ChangelogEntries.Add(new OsuSpriteText
                 {
                     Text = categoryEntries.Key,
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 24),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
 

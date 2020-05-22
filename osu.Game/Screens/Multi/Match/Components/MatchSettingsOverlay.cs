@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             public OsuSpriteText ErrorText;
 
             private OsuSpriteText typeLabel;
-            private LoadingLayer  LoadingLayer ;
+            private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
 
             [Resolved(CanBeNull = true)]
@@ -133,7 +133,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        OnCommit = (sender, text) => apply(),
                                                                     },
                                                                 },
                                                                 new Section("持续时间")
@@ -196,7 +195,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                                 new Section("密码(可选)")
@@ -207,7 +205,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                             },
@@ -307,7 +304,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             },
                         }
                     },
-                    LoadingLayer  = new LoadingLayer (dimContent)
+                    loadingLayer = new LoadingLayer(dimContent)
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
@@ -331,6 +328,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private void apply()
             {
+                if (!ApplyButton.Enabled.Value)
+                    return;
+
                 hideError();
 
                 RoomName.Value = NameField.Text;
@@ -346,19 +346,19 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 manager?.CreateRoom(currentRoom.Value, onSuccess, onError);
 
-                LoadingLayer .Show();
+                loadingLayer.Show();
             }
 
             private void hideError() => ErrorText.FadeOut(50);
 
-            private void onSuccess(Room room) => LoadingLayer .Hide();
+            private void onSuccess(Room room) => loadingLayer.Hide();
 
             private void onError(string text)
             {
                 ErrorText.Text = text;
                 ErrorText.FadeIn(50);
 
-                LoadingLayer .Hide();
+                loadingLayer.Hide();
             }
         }
 

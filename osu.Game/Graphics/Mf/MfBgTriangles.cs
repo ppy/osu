@@ -11,21 +11,23 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Graphics
 {
-    public class MfBgTriangles : Container
+    public class MfBgTriangles : VisibilityContainer
     {
         private readonly Bindable<bool> Optui = new Bindable<bool>();
         private BackgroundTriangles BackgroundTriangle;
-        
+        public bool EnableBeatSync { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config, OsuColour colour)
         {
             config.BindWith(MfSetting.OptUI, Optui);
 
-            Optui.ValueChanged += _ => UpdateIcons();
-            UpdateIcons();
+            this.Show();
+
+            Optui.BindValueChanged(UpdateIcons, true);
         }
 
-        public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f)
+        public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f, bool sync = false)
         {
             this.Alpha = alpha;
             RelativeSizeAxes = Axes.Both;
@@ -35,37 +37,45 @@ namespace osu.Game.Graphics
             {
                 BackgroundTriangle = new BackgroundTriangles(highLight, triangleScale)
                 {
+                    beatSync = sync,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
             };
         }
 
-        public class BackgroundTriangles : Container
+        private class BackgroundTriangles : Container
         {
-            private readonly Triangles triangles;
+            private Triangles triangles;
+            public bool beatSync;
+            public bool highLight;
+            public float scale;
 
             public BackgroundTriangles(bool highLight = false, float triangleScaleValue = 2f)
             {
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
-                Children = new Drawable[]
+                this.highLight = highLight;
+                this.scale = triangleScaleValue;
+                Child = triangles = new Triangles
                 {
-                    triangles = new Triangles
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        TriangleScale = triangleScaleValue,
-                        Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
-                    },
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    TriangleScale = scale,
+                    Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                triangles.EnableBeatSync = beatSync;
             }
         }
 
-        private void UpdateIcons()
+        private void UpdateIcons(ValueChangedEvent<bool> value)
         {
-            switch (Optui.Value)
+            switch (value.NewValue)
             {
                 case true:
                     BackgroundTriangle.FadeIn(250);
@@ -75,6 +85,16 @@ namespace osu.Game.Graphics
                     BackgroundTriangle.FadeOut(250);
                     break;
             }
+        }
+
+        protected override void PopIn()
+        {
+            BackgroundTriangle.FadeIn(250);
+        }
+
+        protected override void PopOut()
+        {
+            BackgroundTriangle.FadeOut(250);
         }
     }
 }

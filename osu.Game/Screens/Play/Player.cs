@@ -83,6 +83,8 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
+        private SkipOverlay skipOverlay;
+
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -189,6 +191,7 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
                 BreakOverlay.Hide();
+                skipOverlay.Hide();
             }
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
@@ -200,13 +203,13 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
+                gameplayBeatmap.ApplyResult(r);
             };
 
             DrawableRuleset.OnRevertResult += r =>
             {
                 HealthProcessor.RevertResult(r);
                 ScoreProcessor.RevertResult(r);
-                gameplayBeatmap.ApplyResult(r);
             };
 
             // Bind the judgement processors to ourselves
@@ -264,6 +267,7 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
+                DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
                 BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor, DrawableRuleset)
                 {
                     BreakSettingsOverlay = { },
@@ -291,7 +295,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                skipOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
                     RequestSkip = GameplayClockContainer.Skip
                 },
@@ -328,6 +332,7 @@ namespace osu.Game.Screens.Play
                         performImmediateExit();
                     },
                 },
+                failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
             });
         }
 
@@ -661,6 +666,7 @@ namespace osu.Game.Screens.Play
             fadeOut();
             return base.OnExiting(next);
         }
+
         protected virtual void GotoRanking()
         {
             if (DrawableRuleset.ReplayScore != null)

@@ -325,7 +325,6 @@ namespace osu.Game
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
-        
         /// <param name="difficultyCriteria">
         /// Optional predicate used to try and find a difficulty to select.
         /// If omitted, this will try to present the first beatmap from the current ruleset.
@@ -801,7 +800,7 @@ namespace osu.Game
             {
                 var previousLoadStream = asyncLoadStream;
 
-                //chain with existing load stream
+                // chain with existing load stream
                 asyncLoadStream = Task.Run(async () =>
                 {
                     if (previousLoadStream != null)

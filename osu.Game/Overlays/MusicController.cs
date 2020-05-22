@@ -60,11 +60,16 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        private IBindable<WeakReference<BeatmapSetInfo>> managerAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmaps.ItemAdded += handleBeatmapAdded;
-            beatmaps.ItemRemoved += handleBeatmapRemoved;
+            managerAdded = beatmaps.ItemAdded.GetBoundCopy();
+            managerAdded.BindValueChanged(beatmapAdded);
+            managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
+            managerRemoved.BindValueChanged(beatmapRemoved);
 
             beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal).OrderBy(_ => RNG.Next()));
         }
@@ -93,16 +98,28 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool IsPlaying => current?.Track.IsRunning ?? false;
 
-        private void handleBeatmapAdded(BeatmapSetInfo set) => Schedule(() =>
+        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
-            if (!beatmapSets.Contains(set))
-                beatmapSets.Add(set);
-        });
+            if (weakSet.NewValue.TryGetTarget(out var set))
+            {
+                Schedule(() =>
+                {
+                    if (!beatmapSets.Contains(set))
+                        beatmapSets.Add(set);
+                });
+            }
+        }
 
-        private void handleBeatmapRemoved(BeatmapSetInfo set) => Schedule(() =>
+        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
-            beatmapSets.RemoveAll(s => s.ID == set.ID);
-        });
+            if (weakSet.NewValue.TryGetTarget(out var set))
+            {
+                Schedule(() =>
+                {
+                    beatmapSets.RemoveAll(s => s.ID == set.ID);
+                });
+            }
+        }
 
         private ScheduledDelegate seekDelegate;
 
@@ -250,7 +267,7 @@ namespace osu.Game.Overlays
                 }
                 else
                 {
-                    //figure out the best direction based on order in playlist.
+                    // figure out the best direction based on order in playlist.
                     var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
                     var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
 
@@ -296,17 +313,6 @@ namespace osu.Game.Overlays
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(track);
-            }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= handleBeatmapAdded;
-                beatmaps.ItemRemoved -= handleBeatmapRemoved;
             }
         }
 

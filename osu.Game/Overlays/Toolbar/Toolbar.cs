@@ -44,7 +44,6 @@ namespace osu.Game.Overlays.Toolbar
         // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
         public override bool PropagateNonPositionalInputSubTree => true;
 
-
         public Toolbar()
         {
             RelativeSizeAxes = Axes.X;

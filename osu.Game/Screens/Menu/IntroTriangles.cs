@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Menu
                 {
                     InternalChild = new Video(videoStream)
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     };
                 }
             }

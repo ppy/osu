@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
-                                Font = OsuFont.GetFont(size: 13),
+                                Font = OsuFont.GetFont(size: 12),
                             },
                         },
                         new OsuSpriteText

@@ -255,7 +255,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public void OnReleased(GlobalAction action) { }
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private bool goBack()
         {
@@ -351,15 +353,15 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.Initial:
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                        {
-                            logoTrackingContainer.StopTracking();
+                    {
+                        logoTrackingContainer.StopTracking();
 
-                            game?.Toolbar.Hide();
+                        game?.Toolbar.Hide();
 
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                            logo.ScaleTo(1, 800, Easing.OutExpo);
-                        }, buttonArea.Alpha * 150);
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, buttonArea.Alpha * 150);
                     break;
 
                 case ButtonSystemState.TopLevel:

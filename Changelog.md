@@ -668,3 +668,24 @@
 
 *   更新上游pr
     *   [m] [Add ability to change data folder path #9020]
+
+### 2020/5/18
+*   合并上游pr
+    *   [m] [Remove all RequiredTypes usages #9042]
+    *   [m] [Avoid disabling a host-level bindable from osu! code #9031]
+    *   [m] [Add a back button to sub screens in the Tournament Client #9041]
+    *   [m] [Update framework #9052]
+    *   [m] [Disallow catch-specific judgements in mania #9048]
+
+### 2020/5/19
+*   合并上游pr
+    *   [m] [Fix possible exceptions in performance calculators #9053]
+    *   [m] [Fix overlay section display highlighting wrong section #9023]
+    *   [m] [Unify number types in performance calculators #9055]
+    *   [m] [Fix being able to press enter to create matches #9061]
+    *   [m] [Allow disabling SkipOverlay through AllowGameplayOverlays. #9018]
+
+
+### 2020/5/21
+*   合并上游pr
+    *   [m] [Convert dangerous events to IBindables #9062]

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -45,10 +46,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            countGreat = Score.Statistics[HitResult.Great];
-            countGood = Score.Statistics[HitResult.Good];
-            countMeh = Score.Statistics[HitResult.Meh];
-            countMiss = Score.Statistics[HitResult.Miss];
+            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -180,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int amountHitObjectsWithAccuracy = countHitCircles;
 
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -203,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double totalHits => countGreat + countGood + countMeh + countMiss;
-        private double totalSuccessfulHits => countGreat + countGood + countMeh;
+        private int totalHits => countGreat + countGood + countMeh + countMiss;
+        private int totalSuccessfulHits => countGreat + countGood + countMeh;
     }
 }

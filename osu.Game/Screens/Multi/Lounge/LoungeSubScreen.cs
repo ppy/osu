@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly LoadingLayer  LoadingLayer ;
+        private readonly LoadingLayer loadingLayer;
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Lounge
                                         Child = new RoomsContainer { JoinRequested = joinRequested }
                                     },
                                 },
-                                LoadingLayer  = new LoadingLayer (searchContainer),
+                                loadingLayer = new LoadingLayer(searchContainer),
                             }
                         },
                         new RoomInspector
@@ -126,12 +126,12 @@ namespace osu.Game.Screens.Multi.Lounge
 
         private void joinRequested(Room room)
         {
-            LoadingLayer .Show();
+            loadingLayer.Show();
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                LoadingLayer .Hide();
-            }, _ => LoadingLayer .Hide());
+                loadingLayer.Hide();
+            }, _ => loadingLayer.Hide());
         }
 
         /// <summary>

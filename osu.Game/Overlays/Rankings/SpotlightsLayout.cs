@@ -12,10 +12,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using System.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.BeatmapListing.Panels;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Rankings
                                 AutoSizeAxes = Axes.Y,
                                 Margin = new MarginPadding { Vertical = 10 }
                             },
-                            loading = new LoadingLayer ()
+                            loading = new LoadingLayer(content)
                         }
                     }
                 }

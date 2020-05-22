@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Mvis.UI.Objects;
-using osu.Game.Screens.Mvis.Buttons;
+using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osu.Game.Screens.Mvis.Objects.Helpers;
 using osuTK;
 using osuTK.Graphics;
@@ -27,10 +27,11 @@ using osu.Framework.Audio.Track;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings.Sections.General;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens
 {
@@ -72,19 +73,23 @@ namespace osu.Game.Screens
         private Container gameplayContent;
         private SideBarSettingsPanel sidebarContainer;
         private BeatmapLogo beatmapLogo;
-        private HoverCheckContainer hoverCheckContainer;
         private HoverableProgressBarContainer progressBarContainer;
-        private ToggleableButton loopToggleButton;
-        private ToggleableButton sidebarToggleButton;
-        private ToggleableOverlayLockButton lockButton;
-        private BottomBarButton songProgressButton;
+        private BottomBarButton soloButton;
+        private BottomBarButton prevButton;
+        private BottomBarButton nextButton;
+        private BottomBarSwitchButton loopToggleButton;
+        private BottomBarSwitchButton sidebarToggleButton;
+        private BottomBarOverlayLockSwitchButton lockButton;
+        private BottomBarSwitchButton songProgressButton;
         private Track Track;
         private BackgroundStoryBoard bgSB;
+        private BgTrianglesContainer bgTriangles;
         private LoadingSpinner loadingSpinner;
         private BottomBarSongProgressInfo progressInfo;
-        private Bindable<float> BgBlur = new Bindable<float>();
-        private Bindable<float> IdleBgDim = new Bindable<float>();
-        private Bindable<float> ContentAlpha = new Bindable<float>();
+        private BindableBool TrackRunning = new BindableBool();
+        private BindableFloat BgBlur = new BindableFloat();
+        private BindableFloat IdleBgDim = new BindableFloat();
+        private BindableFloat ContentAlpha = new BindableFloat();
         private bool OverlaysHidden = false;
         public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
         public MvisScreen()
@@ -160,7 +165,7 @@ namespace osu.Game.Screens
                                                             Spacing = new Vector2(5),
                                                             Children = new Drawable[]
                                                             {
-                                                                new BottomBarButton()
+                                                                prevButton = new BottomBarButton()
                                                                 {
                                                                     Size = new Vector2(50, 30),
                                                                     Anchor = Anchor.Centre,
@@ -169,7 +174,7 @@ namespace osu.Game.Screens
                                                                     Action = () => musicController?.PreviousTrack(),
                                                                     TooltipText = "上一首/从头开始",
                                                                 },
-                                                                songProgressButton = new BottomBarButton()
+                                                                songProgressButton = new BottomBarSwitchButton()
                                                                 {
                                                                     TooltipText = "切换暂停",
                                                                     AutoSizeAxes = Axes.X,
@@ -184,7 +189,7 @@ namespace osu.Game.Screens
                                                                         Origin = Anchor.Centre,
                                                                     }
                                                                 },
-                                                                new BottomBarButton()
+                                                                nextButton = new BottomBarButton()
                                                                 {
                                                                     Size = new Vector2(50, 30),
                                                                     Anchor = Anchor.Centre,
@@ -205,19 +210,19 @@ namespace osu.Game.Screens
                                                             Margin = new MarginPadding { Right = 5 },
                                                             Children = new Drawable[]
                                                             {
-                                                                loopToggleButton = new ToggleableButton()
+                                                                loopToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
                                                                     Action = () => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value,
                                                                     TooltipText = "单曲循环",
                                                                 },
-                                                                new BottomBarButton()
+                                                                soloButton = new BottomBarButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.User,
                                                                     Action = () => InvokeSolo(),
                                                                     TooltipText = "在选歌界面中查看",
                                                                 },
-                                                                sidebarToggleButton = new ToggleableButton()
+                                                                sidebarToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Atom,
                                                                     Action = () => ToggleSideBar(),
@@ -238,7 +243,7 @@ namespace osu.Game.Screens
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
                                     Margin = new MarginPadding{ Bottom = 5 },
-                                    Child = lockButton = new ToggleableOverlayLockButton
+                                    Child = lockButton = new BottomBarOverlayLockSwitchButton
                                     {
                                         TooltipText = "切换悬浮锁",
                                         Action = () => UpdateLockButton(),
@@ -254,6 +259,7 @@ namespace osu.Game.Screens
                 {
                     Depth = 1,
                     GetBottombarHeight = () => BottombarHeight,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Container()
@@ -262,6 +268,7 @@ namespace osu.Game.Screens
                             Name = "Background Elements Container",
                             Children = new Drawable[]
                             {
+                                bgTriangles = new BgTrianglesContainer(),
                                 bgSB = new BackgroundStoryBoard(),
                                 dimBox = new Box
                                 {
@@ -274,7 +281,7 @@ namespace osu.Game.Screens
                         },
                         gameplayContent = new Container
                         {
-                            Name = "Mvis Gameplay Item Container",
+                            Name = "Mvis Gameplay Elements Container",
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -340,12 +347,6 @@ namespace osu.Game.Screens
                     }
                 },
                 idleTracker = new MouseIdleTracker(3000),
-                hoverCheckContainer = new HoverCheckContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
             };
         }
 
@@ -360,11 +361,15 @@ namespace osu.Game.Screens
         protected override void LoadComplete()
         {
             BgBlur.ValueChanged += _ => Background.BlurAmount.Value = BgBlur.Value * 100;
-            ContentAlpha.ValueChanged += _ => UpdateIdleVisuals();
-            IdleBgDim.ValueChanged += _ => UpdateIdleVisuals();
+            ContentAlpha.BindValueChanged(_ => UpdateIdleVisuals());
+            IdleBgDim.BindValueChanged(_ => UpdateIdleVisuals());
+
             Beatmap.ValueChanged += _ => updateComponentFromBeatmap(Beatmap.Value);
-            idleTracker.IsIdle.ValueChanged += _ => UpdateVisuals();
-            hoverCheckContainer.ScreenHovered.ValueChanged += _ => UpdateVisuals();
+
+            idleTracker.IsIdle.BindValueChanged(_ => UpdateVisuals());
+            idleTracker.ScreenHovered.BindValueChanged(_ => UpdateVisuals());
+
+            bgSB.NeedToHideTriangles.BindValueChanged(UpdateBgTriangles, true);
             bgSB.IsReady.ValueChanged += _ =>
             {
                 switch (bgSB.IsReady.Value)
@@ -391,9 +396,28 @@ namespace osu.Game.Screens
 
             progressBarContainer.progressBar.OnSeek = SeekTo;
 
+            songProgressButton.ToggleableValue.BindTo(TrackRunning);
+
             ShowOverlays();
 
             base.LoadComplete();
+        }
+
+        ///<summary>
+        ///是否需要隐藏背景三角形粒子
+        ///</summary>
+        private void UpdateBgTriangles(ValueChangedEvent<bool> value)
+        {
+            switch ( value.NewValue )
+            {
+                case true:
+                    bgTriangles.Hide();
+                    break;
+
+                case false:
+                    bgTriangles.Show();
+                    break;
+            }
         }
 
         private void SeekTo(double position)
@@ -409,10 +433,12 @@ namespace osu.Game.Screens
             Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             if (Track?.IsDummyDevice == false)
             {
+                TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
             }
             else
             {
+                TrackRunning.Value = false;
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
             }
@@ -445,15 +471,15 @@ namespace osu.Game.Screens
             switch (action)
             {
                 case GlobalAction.MvisMusicPrev:
-                    musicController?.PreviousTrack();
+                    prevButton.Click();
                     return true;
 
                 case GlobalAction.MvisMusicNext:
-                    musicController?.NextTrack();
+                     nextButton.Click();
                     return true;
 
                 case GlobalAction.MvisTogglePause:
-                    TogglePause();
+                    songProgressButton.Click();
                     return true;
 
                 case GlobalAction.MvisTogglePlayList:
@@ -461,7 +487,7 @@ namespace osu.Game.Screens
                     return true;
 
                 case GlobalAction.MvisOpenInSongSelect:
-                    InvokeSolo();
+                    soloButton.Click();
                     return true;
 
                 case GlobalAction.MvisToggleOverlayLock:
@@ -509,7 +535,7 @@ namespace osu.Game.Screens
             var mouseIdle = idleTracker.IsIdle.Value;
 
             //如果有其他弹窗显示在播放器上方，解锁切换并显示界面
-            if (!hoverCheckContainer.ScreenHovered.Value)
+            if (!idleTracker.ScreenHovered.Value)
             {
                 if (lockButton.ToggleableValue.Value && OverlaysHidden)
                     lockButton.Toggle();
@@ -558,7 +584,7 @@ namespace osu.Game.Screens
 
         private void TryHideOverlays()
         {
-            if (!canReallyHide || !idleTracker.IsIdle.Value || !hoverCheckContainer.ScreenHovered.Value
+            if (!canReallyHide || !idleTracker.IsIdle.Value || !idleTracker.ScreenHovered.Value
                  || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value)
                 return;
 

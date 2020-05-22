@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.UsernameChange:
-                    addText($"{activity.User?.PreviousUsername}的用户名现以改为");
+                    addText($"{activity.User?.PreviousUsername}更改了用户名");
                     addUserLink();
                     break;
             }

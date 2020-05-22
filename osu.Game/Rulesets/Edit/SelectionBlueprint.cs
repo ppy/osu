@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected.
         /// </summary>
-        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
+        public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="OverlaySelectionBlueprint"/> for selections.

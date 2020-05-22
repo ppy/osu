@@ -100,7 +100,6 @@ namespace osu.Game.Users
         {
             base.LoadComplete();
             Status.TriggerChange();
-            
             // Colour should be applied immediately on first load.
             statusIcon.FinishTransforms();
         }

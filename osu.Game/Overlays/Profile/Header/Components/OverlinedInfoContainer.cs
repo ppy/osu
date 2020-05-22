@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         Font = OsuFont.GetFont(size: big ? 44 : 18, weight: FontWeight.Light)
                     },
-                    new Container //Add a minimum size to the FillFlowContainer
+                    new Container // Add a minimum size to the FillFlowContainer
                     {
                         Width = minimumWidth,
                     }

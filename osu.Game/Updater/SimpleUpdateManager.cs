@@ -81,7 +81,7 @@ namespace osu.Game.Updater
                     break;
 
                 case RuntimeInfo.Platform.Linux:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".tar.xz"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage"));
                     break;
 
                 case RuntimeInfo.Platform.Android:

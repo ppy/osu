@@ -17,13 +17,19 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Graphics.Backgrounds
 {
     public class Triangles : Drawable
     {
+        [Resolved]
+        private Bindable<WorkingBeatmap> b { get; set; }
+
         private readonly Bindable<bool> TrianglesEnabled = new Bindable<bool>();
+        private float ExtraY;
         public bool IgnoreSettings = false;
+        public bool EnableBeatSync;
         private float alpha_orig = 1;
         private const float triangle_size = 100;
         private const float base_velocity = 50;
@@ -112,6 +118,25 @@ namespace osu.Game.Graphics.Backgrounds
             TrianglesEnabled.ValueChanged += _ => UpdateIcons();
         }
 
+        private void UpdateFreq(bool IsKiai)
+        {
+            float sum = b.Value?.Track.CurrentAmplitudes.Maximum ?? 0;
+
+            if (IsKiai)
+            {
+                sum /= 1500;
+            }
+            else
+            {
+                sum /= 3000;
+            }
+
+            if (sum > 0.01f)
+                sum = 0.01f;
+
+            ExtraY = sum;
+        }
+
         private void UpdateIcons()
         {
             if (!IgnoreSettings)
@@ -156,6 +181,13 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
+            if ( EnableBeatSync )
+            {
+                var track = b.Value?.Track;
+                var IsKiai= b.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
+                UpdateFreq(IsKiai);
+            }
+
             Invalidate(Invalidation.DrawNode);
 
             if (CreateNewTriangles)
@@ -170,7 +202,7 @@ namespace osu.Game.Graphics.Backgrounds
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
-            float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale);
+            float movedDistance = ( -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale) ) - ExtraY;
 
             for (int i = 0; i < parts.Count; i++)
             {
@@ -220,8 +252,8 @@ namespace osu.Game.Graphics.Backgrounds
 
             float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
             float u2 = 1 - RNG.NextSingle();
-            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
-            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
+            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
 
             return new TriangleParticle { Scale = scale };
         }

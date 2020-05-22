@@ -26,21 +26,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CarouselItem),
-            typeof(CarouselGroup),
-            typeof(CarouselGroupEagerSelect),
-            typeof(CarouselBeatmap),
-            typeof(CarouselBeatmapSet),
-
-            typeof(DrawableCarouselItem),
-            typeof(CarouselItemState),
-
-            typeof(DrawableCarouselBeatmap),
-            typeof(DrawableCarouselBeatmapSet),
-        };
-
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
         private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
 

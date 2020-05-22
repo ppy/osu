@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Online.API;
 using osu.Framework.Threading;
@@ -17,6 +16,7 @@ using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 
@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     var b = res.ToBeatmap(rulesets);
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     updateMetrics();
