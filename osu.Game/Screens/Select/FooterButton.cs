@@ -92,15 +92,16 @@ namespace osu.Game.Screens.Select
                             Origin = Anchor.CentreLeft,
                             Direction = FillDirection.Horizontal,
                             Shear = -SHEAR,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Horizontal = SHEAR_WIDTH / 4 },
+                            AutoSizeAxes = Axes.X,
+                            Height = 50,
+                            Spacing = new Vector2(15, 0),
                             Children = new Drawable[]
                             {
                                 TextContainer = new Container
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                                    AutoSizeAxes = Axes.Both,
                                     Child = SpriteText = new OsuSpriteText
                                     {
                                         Anchor = Anchor.Centre,

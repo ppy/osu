@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
         public readonly BindableBool IsSelected = new BindableBool();
-
         public readonly PathControlPoint ControlPoint;
 
         private readonly Slider slider;

@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         protected override string Header => "更新";
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuConfigManager config, OsuGame game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = "数据迁移",
-                    Action = () => game.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
+                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
         }

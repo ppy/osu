@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.VolumeUp
         };
 
-
         public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "sound" });
 
         public AudioSection()

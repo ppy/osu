@@ -62,7 +62,6 @@ namespace osu.Game.Input.Bindings
                 store.KeyBindingChanged -= ReloadMappings;
         }
 
-        
         protected override void ReloadMappings()
         {
             if (ruleset != null && !ruleset.ID.HasValue)

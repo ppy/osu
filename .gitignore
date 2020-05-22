@@ -332,5 +332,5 @@ fastlane/report.xml
 inspectcodereport.xml
 inspectcode
 
-#BenchmarkDotNet
+# BenchmarkDotNet
 /BenchmarkDotNet.Artifacts

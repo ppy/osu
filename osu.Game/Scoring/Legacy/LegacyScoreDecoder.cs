@@ -118,7 +118,6 @@ namespace osu.Game.Scoring.Legacy
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.Beatmap = workingBeatmap.BeatmapInfo;
 
-
             return score;
         }
 

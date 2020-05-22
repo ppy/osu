@@ -150,6 +150,7 @@ namespace osu.Game.Overlays
             beatmapSet.Value = set;
             Show();
         }
+
         private class CommentsSection : BeatmapSetLayoutSection
         {
             public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();

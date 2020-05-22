@@ -98,7 +98,7 @@ namespace osu.Game.Online.API
             if (checkAndScheduleFailure())
                 return;
 
-            if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
+            if (!WebRequest.Aborted) // could have been aborted by a Cancel() call
             {
                 Logger.Log($@"Performing request {this}", LoggingTarget.Network);
                 WebRequest.Perform();

@@ -214,7 +214,6 @@ namespace osu.Game
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
-            
             // ScheduleAfterChildren is safety against something in the current frame accessing the previous beatmap's track
             // and potentially causing a reload of it after just unloading.
             // Note that the reason for this being added *has* been resolved, so it may be feasible to removed this if required.
@@ -373,7 +372,6 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
-            Logger.Log("调起迁移...");
             contextFactory.FlushConnections();
             (Storage as OsuStorage)?.Migrate(path);
         }

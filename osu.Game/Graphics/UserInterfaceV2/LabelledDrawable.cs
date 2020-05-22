@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         },
-                        descriptionText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true))
+                        descriptionText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

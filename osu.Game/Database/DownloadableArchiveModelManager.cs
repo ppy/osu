@@ -32,7 +32,6 @@ namespace osu.Game.Database
 
         private readonly Bindable<WeakReference<ArchiveDownloadRequest<TModel>>> downloadFailed = new Bindable<WeakReference<ArchiveDownloadRequest<TModel>>>();
 
-
         private readonly IAPIProvider api;
 
         private readonly List<ArchiveDownloadRequest<TModel>> currentDownloads = new List<ArchiveDownloadRequest<TModel>>();
@@ -116,6 +115,8 @@ namespace osu.Game.Database
             void triggerFailure(Exception error)
             {
                 currentDownloads.Remove(request);
+
+                downloadFailed.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
 
                 downloadBegan.Value = new WeakReference<ArchiveDownloadRequest<TModel>>(request);
                 

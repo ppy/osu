@@ -61,7 +61,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public event Action<Message> MessageRemoved;
 
-        public bool ReadOnly => false; //todo not yet used.
+        public bool ReadOnly => false; // todo: not yet used.
 
         public override string ToString() => Name;
 

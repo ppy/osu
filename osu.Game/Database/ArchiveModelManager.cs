@@ -368,6 +368,7 @@ namespace osu.Game.Database
             flushEvents(true);
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
+
         public void UpdateFile(TModel model, TFileModel file, Stream contents)
         {
             using (var usage = ContextFactory.GetForWrite())

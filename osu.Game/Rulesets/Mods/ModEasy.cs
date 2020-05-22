@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
-                public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{Retries.Value}条生命";
+        public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{Retries.Value}条生命";
 
         private int retries;
 

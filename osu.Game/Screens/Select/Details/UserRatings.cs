@@ -78,7 +78,6 @@ namespace osu.Game.Screens.Select.Details
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 5,
-                            Margin = new MarginPadding { Top = 5 },
                         },
                         new Container
                         {
@@ -90,14 +89,14 @@ namespace osu.Game.Screens.Select.Details
                                 negativeRatings = new OsuSpriteText
                                 {
                                     Text = "0",
-                                    Font = OsuFont.GetFont(size: 13)
+                                    Font = OsuFont.GetFont(size: 12)
                                 },
                                 positiveRatings = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Text = @"0",
-                                    Font = OsuFont.GetFont(size: 13)
+                                    Font = OsuFont.GetFont(size: 12)
                                 },
                             },
                         },

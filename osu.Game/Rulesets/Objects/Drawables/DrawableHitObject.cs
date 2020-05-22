@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples { get; private set; }
 
-        protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
+        public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
@@ -175,7 +176,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
-            Samples.AddAdjustment(AdjustableProperty.Balance, balanceAdjust);
             AddInternal(Samples);
         }
 
@@ -354,6 +354,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
         }
 
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
@@ -362,8 +365,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             const float balance_adjust_amount = 0.4f;
 
-            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? (SamplePlaybackPosition - 0.5f) : 0) * PositionGain.Value;
-            Samples?.Play();
+            if (Samples != null && gameplayClock?.IsSeeking != true)
+            {
+                Samples.Balance.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0) * PositionGain.Value;
+                Samples.Play();
+            }
         }
 
         protected override void Update()
