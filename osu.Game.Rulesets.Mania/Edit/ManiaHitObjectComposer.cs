@@ -53,29 +53,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            if (BlueprintContainer.CurrentTool is SelectTool)
-            {
-                if (EditorBeatmap.SelectedHitObjects.Any())
-                {
-                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
-                }
-                else
-                    beatSnapGrid.SelectionTimeRange = null;
-            }
-            else
-            {
-                var result = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
-                if (result.Time is double time)
-                    beatSnapGrid.SelectionTimeRange = (time, time);
-                else
-                    beatSnapGrid.SelectionTimeRange = null;
-            }
-        }
-
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
             var column = Playfield.GetColumnByPosition(screenSpacePosition);
@@ -111,5 +88,28 @@ namespace osu.Game.Rulesets.Mania.Edit
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
         };
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (BlueprintContainer.CurrentTool is SelectTool)
+            {
+                if (EditorBeatmap.SelectedHitObjects.Any())
+                {
+                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                }
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+            else
+            {
+                var result = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+                if (result.Time is double time)
+                    beatSnapGrid.SelectionTimeRange = (time, time);
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+        }
     }
 }
