@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -66,10 +65,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             return true;
         }
 
-        public Column ColumnAt(Vector2 screenSpacePosition) => null;
-
         public ManiaPlayfield Playfield { get; }
-
-        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null) => Vector2.Zero;
     }
 }
