@@ -41,6 +41,9 @@ namespace osu.Game.Tests.Visual
 
         private readonly Lazy<DatabaseContextFactory> contextFactory;
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         protected IAPIProvider API
         {
             get
@@ -118,7 +121,8 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            localStorage = new Lazy<Storage>(() => new NativeStorage(
+                Path.Combine(Path.GetDirectoryName(host.FullPath), $"{GetType().Name}-{Guid.NewGuid()}")));
         }
 
         [Resolved]
