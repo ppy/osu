@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Multi.Match
         private LeaderboardChatDisplay leaderboardChatDisplay;
         private MatchSettingsOverlay settingsOverlay;
 
+        private IBindable<WeakReference<BeatmapSetInfo>> managerAdded;
+
         public MatchSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
@@ -181,7 +183,8 @@ namespace osu.Game.Screens.Multi.Match
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
             SelectedItem.Value = playlist.FirstOrDefault();
 
-            beatmapManager.ItemAdded += beatmapAdded;
+            managerAdded = beatmapManager.ItemAdded.GetBoundCopy();
+            managerAdded.BindValueChanged(beatmapAdded);
         }
 
         public override bool OnExiting(IScreen next)
@@ -214,13 +217,16 @@ namespace osu.Game.Screens.Multi.Match
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
-        private void beatmapAdded(BeatmapSetInfo model) => Schedule(() =>
+        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
-            if (Beatmap.Value != beatmapManager.DefaultBeatmap)
-                return;
+            Schedule(() =>
+            {
+                if (Beatmap.Value != beatmapManager.DefaultBeatmap)
+                    return;
 
-            updateWorkingBeatmap();
-        });
+                updateWorkingBeatmap();
+            });
+        }
 
         private void onStart()
         {
@@ -234,14 +240,6 @@ namespace osu.Game.Screens.Multi.Match
                     });
                     break;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmapManager != null)
-                beatmapManager.ItemAdded -= beatmapAdded;
         }
     }
 }
