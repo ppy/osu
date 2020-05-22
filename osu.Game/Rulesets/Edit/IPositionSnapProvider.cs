@@ -5,9 +5,14 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public interface IDistanceSnapProvider
+    public interface IPositionSnapProvider
     {
-        (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
+        /// <summary>
+        /// Given a position, find a valid time snap.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position to be snapped.</param>
+        /// <returns>The time and position post-snapping.</returns>
+        SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
         /// <summary>
         /// Retrieves the distance between two points within a timing point that are one beat length apart.

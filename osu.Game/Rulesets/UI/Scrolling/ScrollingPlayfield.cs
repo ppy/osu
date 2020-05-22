@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
+        protected IScrollingInfo ScrollingInfo { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Direction.BindTo(scrollingInfo.Direction);
+            Direction.BindTo(ScrollingInfo.Direction);
         }
 
         protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer();
