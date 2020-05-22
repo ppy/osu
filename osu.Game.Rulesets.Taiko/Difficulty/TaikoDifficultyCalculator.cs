@@ -29,10 +29,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        private double readingPenalty(double staminaDifficulty)
+        private double simpleColourPenalty(double staminaDifficulty, double colorDifficulty)
         {
-            return Math.Max(0, 1 - staminaDifficulty / 14);
-            // return 1;
+            return 0.79 - Math.Atan(staminaDifficulty / colorDifficulty - 12) / Math.PI / 2;
         }
 
         private double norm(double p, double v1, double v2, double v3)
@@ -48,15 +47,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             if (sr <= 1) return sr;
             sr -= 1;
-            sr = 1.5 * Math.Pow(sr, 0.76);
+            sr = 1.6 * Math.Pow(sr, 0.7);
             sr += 1;
             return sr;
         }
 
-        private double combinedDifficulty(Skill colour, Skill rhythm, Skill stamina1, Skill stamina2)
+        private double combinedDifficulty(double staminaPenalty, Skill colour, Skill rhythm, Skill stamina1, Skill stamina2)
         {
-            double staminaRating = (stamina1.DifficultyValue() + stamina2.DifficultyValue()) * staminaSkillMultiplier;
-            double readingPenalty = this.readingPenalty(staminaRating);
 
             double difficulty = 0;
             double weight = 1;
@@ -64,9 +61,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 0; i < colour.StrainPeaks.Count; i++)
             {
-                double colourPeak = colour.StrainPeaks[i] * colourSkillMultiplier * readingPenalty;
+                double colourPeak = colour.StrainPeaks[i] * colourSkillMultiplier;
                 double rhythmPeak = rhythm.StrainPeaks[i] * rhythmSkillMultiplier;
-                double staminaPeak = (stamina1.StrainPeaks[i] + stamina2.StrainPeaks[i]) * staminaSkillMultiplier;
+                double staminaPeak = (stamina1.StrainPeaks[i] + stamina2.StrainPeaks[i]) * staminaSkillMultiplier * staminaPenalty;
                 peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
             }
 
@@ -85,11 +82,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
 
             double staminaRating = (skills[2].DifficultyValue() + skills[3].DifficultyValue()) * staminaSkillMultiplier;
-            double readingPenalty = this.readingPenalty(staminaRating);
-
-            double colourRating = skills[0].DifficultyValue() * colourSkillMultiplier * readingPenalty;
+            double colourRating = skills[0].DifficultyValue() * colourSkillMultiplier;
             double rhythmRating = skills[1].DifficultyValue() * rhythmSkillMultiplier;
-            double combinedRating = combinedDifficulty(skills[0], skills[1], skills[2], skills[3]);
+
+            double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
+            staminaRating *= staminaPenalty;
+
+            double combinedRating = combinedDifficulty(staminaPenalty, skills[0], skills[1], skills[2], skills[3]);
 
             // Console.WriteLine("colour\t" + colourRating);
             // Console.WriteLine("rhythm\t" + rhythmRating);
@@ -107,6 +106,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
+                StaminaStrain = staminaRating,
+                RhythmStrain = rhythmRating,
+                ColourStrain = colourRating,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
                 GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
