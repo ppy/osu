@@ -64,9 +64,7 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
         protected void BeginPlacement(bool commitStart = false)
         {
-            // applies snapping to above time
             placementHandler.BeginPlacement(HitObject);
-
             PlacementActive |= commitStart;
         }
 
