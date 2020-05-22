@@ -87,15 +87,7 @@ namespace osu.Game.Screens.Edit
 
         private void seek(int direction, bool snapped, double amount = 1)
         {
-            double current = CurrentTime;
-
-            // if a seek transform is active, use its end time instead of the reported current time.
-            var existingTransform = Transforms.OfType<TransformSeek>().FirstOrDefault();
-
-            // but only if the requested direction is in the same direction as the transform.
-            // this allows quick pivoting rather than resetting the transform for the first opposite direction movement.
-            if (existingTransform != null && Math.Sign(existingTransform.EndValue - current) == Math.Sign(direction))
-                current = existingTransform.EndValue;
+            double current = CurrentTimeAccurate;
 
             if (amount <= 0) throw new ArgumentException("Value should be greater than zero", nameof(amount));
 
