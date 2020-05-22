@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Edit
         private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
@@ -244,9 +244,6 @@ namespace osu.Game.Rulesets.Edit
         public void BeginPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
-
-            if (distanceSnapGrid != null)
-                hitObject.StartTime = GetSnappedPosition(distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position), hitObject.StartTime).time;
         }
 
         public void EndPlacement(HitObject hitObject, bool commit)
@@ -266,40 +263,48 @@ namespace osu.Game.Rulesets.Edit
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => distanceSnapGrid?.GetSnappedPosition(position) ?? (position, time);
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            if (distanceSnapGrid == null) return new SnapResult(screenSpacePosition, null);
+
+            // TODO: move distance snap grid to OsuHitObjectComposer.
+            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
+
+            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
+        }
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
             DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / BeatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(double referenceTime, double duration)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
         }
 
         public override double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
+            => BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
         {
-            var snappedEndTime = beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+            var snappedEndTime = BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
     }
 
     [Cached(typeof(HitObjectComposer))]
-    [Cached(typeof(IDistanceSnapProvider))]
-    public abstract class HitObjectComposer : CompositeDrawable, IDistanceSnapProvider
+    [Cached(typeof(IPositionSnapProvider))]
+    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         internal HitObjectComposer()
         {
@@ -324,7 +329,7 @@ namespace osu.Game.Rulesets.Edit
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
-        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
+        public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
 
