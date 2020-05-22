@@ -162,8 +162,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
-                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.MousePosition);
-                Vector2 movementDelta = (result?.ScreenSpacePosition ?? e.MousePosition) - slider.Position;
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
 
                 slider.Position += movementDelta;
                 slider.StartTime = result?.Time ?? slider.StartTime;
