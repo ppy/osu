@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Components;
 using osuTK;
@@ -135,7 +136,7 @@ namespace osu.Game.Tournament.Screens
             });
         }
 
-        private void changePath(Storage storage)
+        protected virtual void changePath(Storage storage)
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
             stableInfo.StablePath.Value = target;
@@ -156,7 +157,7 @@ namespace osu.Game.Tournament.Screens
             sceneManager?.SetScreen(typeof(SetupScreen));
         }
 
-        private void autoDetect()
+        protected virtual void autoDetect()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
             fileBasedIpc?.LocateStableStorage();
