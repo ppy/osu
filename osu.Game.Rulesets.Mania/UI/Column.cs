@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal readonly Container TopLevelContainer;
 
+        public Container UnderlayElements => hitObjectArea.UnderlayElements;
+
         public Column(int index)
         {
             Index = index;

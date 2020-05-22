@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 }
             }
 
-            if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue || HitObject.HitWindows == null)
+            if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
                 Expire();
 
             // apply any custom state overrides
