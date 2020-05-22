@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Editing
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [Resolved]
-            private EditorClock adjustableClock { get; set; }
+            private EditorClock editorClock { get; set; }
 
             public AudioVisualiser()
             {
@@ -95,13 +95,15 @@ namespace osu.Game.Tests.Visual.Editing
                 base.Update();
 
                 if (beatmap.Value.Track.IsLoaded)
-                    marker.X = (float)(adjustableClock.CurrentTime / beatmap.Value.Track.Length);
+                    marker.X = (float)(editorClock.CurrentTime / beatmap.Value.Track.Length);
             }
         }
 
         private class StartStopButton : OsuButton
         {
-            private EditorClock editorClock;
+            [Resolved]
+            private EditorClock editorClock { get; set; }
+
             private bool started;
 
             public StartStopButton()
@@ -111,12 +113,6 @@ namespace osu.Game.Tests.Visual.Editing
                 Text = "Start";
 
                 Action = onClick;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(EditorClock editorClock)
-            {
-                this.editorClock = editorClock;
             }
 
             private void onClick()
