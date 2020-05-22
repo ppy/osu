@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -12,130 +14,108 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     public class Colour : Skill
     {
         protected override double SkillMultiplier => 1;
-        protected override double StrainDecayBase => 0.3;
+        protected override double StrainDecayBase => 0.4;
 
-        private ColourSwitch lastColourSwitch = ColourSwitch.None;
-        private int sameColourCount = 1;
+        private bool prevIsKat = false;
 
-        private readonly int[] previousDonLengths = { 0, 0 };
-        private readonly int[] previousKatLengths = { 0, 0 };
+        private int currentMonoLength = 1;
+        private List<int> monoHistory = new List<int>();
+        private readonly int mono_history_max_length = 5;
+        private int monoHistoryLength = 0;
 
-        private int sameTypeCount = 1;
+        private double sameParityPenalty()
+        {
+            return 0.0;
+        }
 
-        // TODO: make this smarter (dont initialise with "Don")
-        private bool previousIsKat;
+        private double repititionPenalty(int notesSince)
+        {
+            double d = notesSince;
+            return Math.Atan(d / 30) / (Math.PI / 2);
+        }
+
+        private double patternLengthPenalty(int patternLength)
+        {
+            double shortPatternPenalty = Math.Min(0.25 * patternLength, 1.0);
+            double longPatternPenalty = Math.Max(Math.Min(2.5 - 0.15 * patternLength, 1.0), 0.0);
+            return Math.Min(shortPatternPenalty, longPatternPenalty);
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            return StrainValueOfNew(current);
-        }
+            double objectDifficulty = 0.0;
 
-        protected double StrainValueOfNew(DifficultyHitObject current)
-        {
-            double returnVal = 0.0;
-            double returnMultiplier = 1.0;
-
-            if (previousIsKat != ((TaikoDifficultyHitObject)current).IsKat)
-            {
-                returnVal = 1.5 - (1.75 / (sameTypeCount + 0.65));
-
-                if (previousIsKat)
-                {
-                    if (sameTypeCount % 2 == previousDonLengths[0] % 2)
-                    {
-                        returnMultiplier *= 0.8;
-                    }
-
-                    if (previousKatLengths[0] == sameTypeCount)
-                    {
-                        returnMultiplier *= 0.525;
-                    }
-
-                    if (previousKatLengths[1] == sameTypeCount)
-                    {
-                        returnMultiplier *= 0.75;
-                    }
-
-                    previousKatLengths[1] = previousKatLengths[0];
-                    previousKatLengths[0] = sameTypeCount;
-                }
-                else
-                {
-                    if (sameTypeCount % 2 == previousKatLengths[0] % 2)
-                    {
-                        returnMultiplier *= 0.8;
-                    }
-
-                    if (previousDonLengths[0] == sameTypeCount)
-                    {
-                        returnMultiplier *= 0.525;
-                    }
-
-                    if (previousDonLengths[1] == sameTypeCount)
-                    {
-                        returnMultiplier *= 0.75;
-                    }
-
-                    previousDonLengths[1] = previousDonLengths[0];
-                    previousDonLengths[0] = sameTypeCount;
-                }
-
-                sameTypeCount = 1;
-                previousIsKat = ((TaikoDifficultyHitObject)current).IsKat;
-            }
-
-            else
-            {
-                sameTypeCount += 1;
-            }
-
-            return Math.Min(1.25, returnVal) * returnMultiplier;
-        }
-
-        protected double StrainValueOfOld(DifficultyHitObject current)
-        {
-            double addition = 0;
-
-            // We get an extra addition if we are not a slider or spinner
             if (current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000)
             {
-                if (hasColourChange(current))
-                    addition = 0.75;
+
+                TaikoDifficultyHitObject currentHO = (TaikoDifficultyHitObject)current;
+
+                if (currentHO.IsKat == prevIsKat)
+                {
+                    currentMonoLength += 1;
+                }
+
+                else
+                {
+
+                    objectDifficulty = 1.0;
+
+                    if (monoHistoryLength > 0 && (monoHistory[monoHistoryLength - 1] + currentMonoLength) % 2 == 0)
+                    {
+                        objectDifficulty *= sameParityPenalty();
+                    }
+
+                    monoHistory.Add(currentMonoLength);
+                    monoHistoryLength += 1;
+
+                    if (monoHistoryLength > mono_history_max_length)
+                    {
+                        monoHistory.RemoveAt(0);
+                        monoHistoryLength -= 1;
+                    }
+
+                    for (int l = 2; l <= mono_history_max_length / 2; l++)
+                    {
+                        for (int start = monoHistoryLength - l - 1; start >= 0; start--)
+                        {
+                            bool samePattern = true;
+
+                            for (int i = 0; i < l; i++)
+                            {
+                                if (monoHistory[start + i] != monoHistory[monoHistoryLength - l + i])
+                                {
+                                    samePattern = false;
+                                }
+                            }
+
+                            if (samePattern) // Repitition found!
+                            {
+                                int notesSince = 0;
+                                for (int i = start; i < monoHistoryLength; i++) notesSince += monoHistory[i];
+                                objectDifficulty *= repititionPenalty(notesSince);
+                                break;
+                            }
+                        }
+                    }
+
+                    currentMonoLength = 1;
+                    prevIsKat = currentHO.IsKat;
+
+                }
+
             }
-            else
+
+            /*
+            string path = @"out.txt";
+            using (StreamWriter sw = File.AppendText(path))
             {
-                lastColourSwitch = ColourSwitch.None;
-                sameColourCount = 1;
+                if (((TaikoDifficultyHitObject)current).IsKat) sw.WriteLine("k    " + Math.Min(1.25, returnVal) * returnMultiplier);
+                else sw.WriteLine("d    " + Math.Min(1.25, returnVal) * returnMultiplier);
             }
+            */
 
-            return addition;
+            return objectDifficulty;
         }
 
-        private bool hasColourChange(DifficultyHitObject current)
-        {
-            var taikoCurrent = (TaikoDifficultyHitObject)current;
-
-            if (!taikoCurrent.HasTypeChange)
-            {
-                sameColourCount++;
-                return false;
-            }
-
-            var oldColourSwitch = lastColourSwitch;
-            var newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
-
-            lastColourSwitch = newColourSwitch;
-            sameColourCount = 1;
-
-            // We only want a bonus if the parity of the color switch changes
-            return oldColourSwitch != ColourSwitch.None && oldColourSwitch != newColourSwitch;
-        }
-
-        private enum ColourSwitch
-        {
-            None,
-            Even,
-            Odd
-        }
     }
 }
