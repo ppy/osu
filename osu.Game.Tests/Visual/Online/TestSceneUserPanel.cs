@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,13 +16,6 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(UserPanel),
-            typeof(UserListPanel),
-            typeof(UserGridPanel),
-        };
-
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
         private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
 

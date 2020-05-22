@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -31,10 +32,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             mods = Score.Mods;
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -28,14 +29,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private static IEnumerable<string> allBeatmaps => TestResources.GetStore().GetAvailableResources().Where(res => res.EndsWith(".osu"));
 
         [TestCaseSource(nameof(allBeatmaps))]
-        public void TestBeatmap(string name)
+        public void TestEncodeDecodeStability(string name)
         {
-            var decoded = decode(name, out var encoded);
+            var decoded = decodeFromLegacy(TestResources.GetStore().GetStream(name));
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded));
 
             sort(decoded);
-            sort(encoded);
+            sort(decodedAfterEncode);
 
-            Assert.That(encoded.Serialize(), Is.EqualTo(decoded.Serialize()));
+            Assert.That(decodedAfterEncode.Serialize(), Is.EqualTo(decoded.Serialize()));
         }
 
         private void sort(IBeatmap beatmap)
@@ -48,27 +50,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private IBeatmap decode(string filename, out IBeatmap encoded)
+        private IBeatmap decodeFromLegacy(Stream stream)
         {
-            using (var stream = TestResources.GetStore().GetStream(filename))
-            using (var sr = new LineBufferedReader(stream))
-            {
-                var legacyDecoded = convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr));
+            using (var reader = new LineBufferedReader(stream))
+                return convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader));
+        }
 
-                using (var ms = new MemoryStream())
-                using (var sw = new StreamWriter(ms))
-                using (var sr2 = new LineBufferedReader(ms, true))
-                {
-                    new LegacyBeatmapEncoder(legacyDecoded).Encode(sw);
+        private Stream encodeToLegacy(IBeatmap beatmap)
+        {
+            var stream = new MemoryStream();
 
-                    sw.Flush();
-                    ms.Position = 0;
+            using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                new LegacyBeatmapEncoder(beatmap).Encode(writer);
 
-                    encoded = convert(new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr2));
+            stream.Position = 0;
 
-                    return legacyDecoded;
-                }
-            }
+            return stream;
         }
 
         private IBeatmap convert(IBeatmap beatmap)
