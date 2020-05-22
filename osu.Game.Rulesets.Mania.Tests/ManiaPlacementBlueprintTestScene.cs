@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -57,7 +56,5 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
 
         public ManiaPlayfield Playfield => null;
-
-        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null) => Vector2.Zero;
     }
 }

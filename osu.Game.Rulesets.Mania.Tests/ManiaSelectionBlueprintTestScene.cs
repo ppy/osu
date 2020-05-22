@@ -7,7 +7,6 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -18,11 +17,9 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Cached(Type = typeof(IAdjustableClock))]
         private readonly IAdjustableClock clock = new StopwatchClock();
 
-        private readonly Column column;
-
         protected ManiaSelectionBlueprintTestScene()
         {
-            Add(column = new Column(0)
+            Add(new Column(0)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -31,10 +28,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
         }
 
-        public Column ColumnAt(Vector2 screenSpacePosition) => column;
-
         public ManiaPlayfield Playfield => null;
-
-        public Vector2 ScreenSpacePositionAtTime(double time, Column column = null) => Vector2.Zero;
     }
 }
