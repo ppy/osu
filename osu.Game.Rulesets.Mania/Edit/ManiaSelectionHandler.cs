@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         private void performColumnMovement(int lastColumn, MoveSelectionEvent moveEvent)
         {
-            var currentColumn = composer.ColumnAt(moveEvent.ScreenSpacePosition);
+            var currentColumn = composer.Playfield.GetColumnByPosition(moveEvent.ScreenSpacePosition);
             if (currentColumn == null)
                 return;
 

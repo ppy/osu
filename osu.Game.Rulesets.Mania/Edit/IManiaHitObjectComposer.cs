@@ -8,8 +8,6 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public interface IManiaHitObjectComposer
     {
-        Column ColumnAt(Vector2 screenSpacePosition);
-
         ManiaPlayfield Playfield { get; }
 
         Vector2 ScreenSpacePositionAtTime(double time, Column column = null);

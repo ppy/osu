@@ -44,13 +44,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             inputManager = GetContainingInputManager();
         }
 
-        /// <summary>
-        /// Retrieves the column that intersects a screen-space position.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public Column ColumnAt(Vector2 screenSpacePosition) => drawableRuleset.GetColumnByPosition(screenSpacePosition);
-
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -85,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            var column = ColumnAt(screenSpacePosition);
+            var column = Playfield.GetColumnByPosition(screenSpacePosition);
 
             if (column == null)
                 return new SnapResult(screenSpacePosition, null);
