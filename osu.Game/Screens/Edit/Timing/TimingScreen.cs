@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Timing
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
 
         [Resolved]
-        private IAdjustableClock clock { get; set; }
+        private EditorClock clock { get; set; }
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
