@@ -199,10 +199,14 @@ namespace osu.Game.Rulesets.Mania.Edit
                     : Anchor.BottomLeft;
             }
 
+            protected override void UpdateInitialTransforms()
+            {
+                // don't perform any fading – we are handling that ourselves.
+            }
+
             protected override void UpdateStateTransforms(ArmedState state)
             {
-                using (BeginAbsoluteSequence(HitObject.StartTime + 1000))
-                    this.FadeOut();
+                LifetimeEnd = HitObject.StartTime + visible_range;
             }
         }
     }
