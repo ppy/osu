@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -69,7 +68,7 @@ namespace osu.Game.Tests.Visual.Editing
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [Resolved]
-            private IAdjustableClock adjustableClock { get; set; }
+            private EditorClock editorClock { get; set; }
 
             public AudioVisualiser()
             {
@@ -96,7 +95,7 @@ namespace osu.Game.Tests.Visual.Editing
                 base.Update();
 
                 if (beatmap.Value.Track.IsLoaded)
-                    marker.X = (float)(adjustableClock.CurrentTime / beatmap.Value.Track.Length);
+                    marker.X = (float)(editorClock.CurrentTime / beatmap.Value.Track.Length);
             }
         }
 

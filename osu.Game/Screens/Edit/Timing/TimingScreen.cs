@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Edit.Timing
             private IBindableList<ControlPointGroup> controlGroups;
 
             [Resolved]
-            private IFrameBasedClock clock { get; set; }
+            private EditorClock clock { get; set; }
 
             [Resolved]
             protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
