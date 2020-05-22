@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -431,6 +431,11 @@ namespace osu.Game.Beatmaps
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
+        }
+
+        public void Dispose()
+        {
+            onlineLookupQueue?.Dispose();
         }
 
         /// <summary>
