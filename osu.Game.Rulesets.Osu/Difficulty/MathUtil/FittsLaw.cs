@@ -4,12 +4,8 @@ using MathNet.Numerics;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 {
-    class FittsLaw
+    public static class FittsLaw
     {
-        public FittsLaw()
-        {
-        }
-
         public static double CalculateIP(double relativeD, double mt)
         {
             return Math.Log(relativeD + 1, 2) / (mt + 1e-10);
@@ -29,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return SpecialFunctions.Erf(2.066 / d * (Power2(mt * tp) - 1) / Math.Sqrt(2));
         }
 
-        private readonly static double[] coeffs = {
+        private static readonly double[] coeffs = {
             1.0000000060371126,
             0.693146840098149,
             0.2402310826131064,

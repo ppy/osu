@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
-    class NoteDensity
+    public static class NoteDensity
     {
 
         public static List<double> CalculateNoteDensities(List<OsuHitObject> hitObjects, double preempt)

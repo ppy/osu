@@ -14,12 +14,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuMovement
     {
-        private static readonly LinearSpline correction0MovingSpline = LinearSpline.InterpolateSorted(
+        private static readonly LinearSpline correction0_moving_spline = LinearSpline.InterpolateSorted(
                                                                            new double[] { -1, 1 },
                                                                            new double[] { 1.1, 0 });
 
         // number of coefficients in the formula
-        private const int numCoeffs = 4;
+        private const int num_coeffs = 4;
 
 
         private static readonly double[] ds0f = { 0, 1, 1.35, 1.7, 2.3, 3 };
@@ -124,8 +124,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static LinearSpline scale3sInterp;
         private static LinearSpline[,] coeffs3sInterps;
 
-        private const double tRatioThreshold = 1.4;
-        private const double correction0Still = 0;
+        private const double t_ratio_threshold = 1.4;
+        private const double correction0_still = 0;
 
         public double RawMT { get; private set; }
         public double D { get; private set; }
@@ -230,22 +230,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 {
                     double tRatio0 = t12 / t01;
 
-                    if (tRatio0 > tRatioThreshold)
+                    if (tRatio0 > t_ratio_threshold)
                     {
                         if (d01 == 0)
                         {
-                            correction0 = correction0Still;
+                            correction0 = correction0_still;
                         }
                         else
                         {
                             double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
-                            double correction0_moving = correction0MovingSpline.Interpolate(cos012);
+                            double correction0_moving = correction0_moving_spline.Interpolate(cos012);
 
                             double movingness = SpecialFunctions.Logistic(d01 * 6 - 5) - SpecialFunctions.Logistic(-5);
-                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0Still) * 1.5;
+                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0_still) * 1.5;
                         }
                     }
-                    else if (tRatio0 < 1 / tRatioThreshold)
+                    else if (tRatio0 < 1 / t_ratio_threshold)
                     {
                         if (d01 == 0)
                         {
@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 {
                     double tRatio3 = t12 / t23;
 
-                    if (tRatio3 > tRatioThreshold)
+                    if (tRatio3 > t_ratio_threshold)
                     {
                         if (d23 == 0)
                         {
@@ -300,14 +300,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         else
                         {
                             double cos123 = Math.Min(Math.Max(-s12.DotProduct(s23) / d12 / d23, -1), 1);
-                            double correction3_moving = correction0MovingSpline.Interpolate(cos123);
+                            double correction3_moving = correction0_moving_spline.Interpolate(cos123);
 
                             double movingness = SpecialFunctions.Logistic(d23 * 6 - 5) - SpecialFunctions.Logistic(-5);
                             correction3 = (movingness * correction3_moving) * 0.5;
 
                         }
                     }
-                    else if (tRatio3 < 1 / tRatioThreshold)
+                    else if (tRatio3 < 1 / t_ratio_threshold)
                     {
                         if (d23 == 0)
                         {
@@ -516,10 +516,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             kInterp = LinearSpline.InterpolateSorted(ds, ks);
             scaleInterp = LinearSpline.InterpolateSorted(ds, scales);
 
-            coeffsInterps = new LinearSpline[coeffs.GetLength(0), numCoeffs];
+            coeffsInterps = new LinearSpline[coeffs.GetLength(0), num_coeffs];
             for (int i = 0; i < coeffs.GetLength(0); i++)
             {
-                for (int j = 0; j < numCoeffs; j++)
+                for (int j = 0; j < num_coeffs; j++)
                 {
                     double[] coeff_ij = new double[coeffs.GetLength(2)];
                     for (int k = 0; k < coeffs.GetLength(2); k++)
@@ -537,8 +537,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double correction_raw = kInterp.Interpolate(d);
             for (int i = 0; i < coeffsInterps.GetLength(0); i++)
             {
-                double[] cs = new double[numCoeffs];
-                for (int j = 0; j < numCoeffs; j++)
+                double[] cs = new double[num_coeffs];
+                for (int j = 0; j < num_coeffs; j++)
                 {
                     cs[j] = coeffsInterps[i, j].Interpolate(d);
                 }

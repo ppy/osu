@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    class FingerControl
+    public static class FingerControl
     {
 
         public static double CalculateFingerControlDiff(List<OsuHitObject> hitObjects, double clockRate)

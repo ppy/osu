@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double aimMultiplier = 0.641;
-        private const double tapMultiplier = 0.641;
-        private const double fingerControlMultiplier = 1.245;
+        private const double aim_multiplier = 0.641;
+        private const double tap_multiplier = 0.641;
+        private const double finger_control_multiplier = 1.245;
         
-        private const double srExponent = 0.83;
+        private const double sr_exponent = 0.83;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -65,9 +65,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}_{string.Join(string.Empty, mods.Select(x => x.Acronym))}.txt");
             File.WriteAllText(graphFilePath, graphText);
 
-            double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
-            double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
-            double fingerControlSR = fingerControlMultiplier * Math.Pow(fingerControlDiff, srExponent);
+            double tapSR = tap_multiplier * Math.Pow(tapDiff, sr_exponent);
+            double aimSR = aim_multiplier * Math.Pow(aimDiff, sr_exponent);
+            double fingerControlSR = finger_control_multiplier * Math.Pow(fingerControlDiff, sr_exponent);
             double sr = Mean.PowerMean(new double[] { tapSR, aimSR, fingerControlSR }, 7) * 1.131;
 
             HitWindows hitWindows = new OsuHitWindows();

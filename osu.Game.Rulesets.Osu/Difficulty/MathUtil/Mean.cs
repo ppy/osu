@@ -4,11 +4,8 @@ using System.Text;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 {
-    class Mean
+    public static class Mean
     {
-        public Mean()
-        {
-        }
 
         public static double PowerMean(double x, double y, double i)
         {
