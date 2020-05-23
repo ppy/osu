@@ -147,6 +147,20 @@ namespace osu.Game
 
             if (hideToolbar) Toolbar.Hide();
         }
+        public void CloseRecentOverlay(bool hideToolbar = true)
+        {
+            if (visibleBlockingOverlays.Any() == true)
+            {
+                var overlay = visibleBlockingOverlays.Last();
+                overlay.Hide();
+                if (hideToolbar) Toolbar.Hide();
+            }
+
+            else
+            {
+                menuScreen?.MakeCurrent();
+            }
+        }
 
         private DependencyContainer dependencies;
 
@@ -593,6 +607,10 @@ namespace osu.Game
                 {
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
+                },
+                OnBackPress = delegate
+                {
+                    CloseRecentOverlay(false);
                 },
             }, topMostOverlayContent.Add);
 

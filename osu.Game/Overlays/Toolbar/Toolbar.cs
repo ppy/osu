@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
+using Microsoft.EntityFrameworkCore.Query.Expressions;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -22,6 +23,7 @@ namespace osu.Game.Overlays.Toolbar
         public const float TOOLTIP_HEIGHT = 30;
 
         public Action OnHome;
+        public Action OnBackPress;
 
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
@@ -56,6 +58,10 @@ namespace osu.Game.Overlays.Toolbar
                     Children = new Drawable[]
                     {
                         new ToolbarSettingsButton(),
+                        new ToolbarBackButton
+                        {
+                            Action = () => OnBackPress.Invoke()
+                        },
                         new ToolbarHomeButton
                         {
                             Action = () => OnHome?.Invoke()
