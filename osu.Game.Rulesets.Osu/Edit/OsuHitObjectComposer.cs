@@ -86,10 +86,24 @@ namespace osu.Game.Rulesets.Osu.Edit
             distanceSnapGridContainer.Clear();
             distanceSnapGridCache.Invalidate();
 
-            if (BlueprintContainer.CurrentTool is SelectTool && !EditorBeatmap.SelectedHitObjects.Any())
-                return;
+            switch (BlueprintContainer.CurrentTool)
+            {
+                case SelectTool _:
+                    if (!EditorBeatmap.SelectedHitObjects.Any())
+                        return;
 
-            if ((distanceSnapGrid = createDistanceSnapGrid(EditorBeatmap.SelectedHitObjects)) != null)
+                    distanceSnapGrid = createDistanceSnapGrid(EditorBeatmap.SelectedHitObjects);
+                    break;
+
+                default:
+                    if (!CursorInPlacementArea)
+                        return;
+
+                    distanceSnapGrid = createDistanceSnapGrid(Enumerable.Empty<HitObject>());
+                    break;
+            }
+
+            if (distanceSnapGrid != null)
             {
                 distanceSnapGridContainer.Add(distanceSnapGrid);
                 distanceSnapGridCache.Validate();
