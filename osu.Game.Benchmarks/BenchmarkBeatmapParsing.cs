@@ -19,7 +19,7 @@ namespace osu.Game.Benchmarks
         public override void SetUp()
         {
             using (var resources = new DllResourceStore(typeof(TestResources).Assembly))
-            using (var archive = resources.GetStream($"Resources/Archives/241526 Soleily - Renatus.osz"))
+            using (var archive = resources.GetStream("Resources/Archives/241526 Soleily - Renatus.osz"))
             using (var reader = new ZipArchiveReader(archive))
                 reader.GetStream("Soleily - Renatus (Gamu) [Insane].osu").CopyTo(beatmapStream);
         }
