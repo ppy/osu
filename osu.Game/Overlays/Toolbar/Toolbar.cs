@@ -13,7 +13,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
 
 namespace osu.Game.Overlays.Toolbar
 {
