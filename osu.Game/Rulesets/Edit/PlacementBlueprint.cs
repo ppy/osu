@@ -61,11 +61,9 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has started.
         /// </summary>
-        /// <param name="startTime">The start time of <see cref="HitObject"/> at the placement point. If null, the current clock time is used.</param>
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
-        protected void BeginPlacement(double? startTime = null, bool commitStart = false)
+        protected void BeginPlacement(bool commitStart = false)
         {
-            HitObject.StartTime = startTime ?? EditorClock.CurrentTime;
             placementHandler.BeginPlacement(HitObject);
             PlacementActive |= commitStart;
         }
@@ -83,11 +81,18 @@ namespace osu.Game.Rulesets.Edit
             PlacementActive = false;
         }
 
+        [Resolved(canBeNull: true)]
+        private IFrameBasedClock editorClock { get; set; }
+
         /// <summary>
         /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
         /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        public abstract void UpdatePosition(Vector2 screenSpacePosition);
+        /// <param name="snapResult">The snap result information.</param>
+        public virtual void UpdatePosition(SnapResult snapResult)
+        {
+            if (!PlacementActive)
+                HitObject.StartTime = snapResult.Time ?? editorClock?.CurrentTime ?? Time.Current;
+        }
 
         /// <summary>
         /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,

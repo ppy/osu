@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -32,6 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
         private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
+        private SkinnableDrawable mascot;
 
         private ProxyContainer topLevelHitContainer;
         private ProxyContainer barlineContainer;
@@ -68,7 +70,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Blending = BlendingParameters.Additive,
                                 },
                                 HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
                                 {
@@ -100,13 +101,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Name = "Kiai hit explosions",
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    Blending = BlendingParameters.Additive
                                 },
                                 judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
                                 {
                                     Name = "Judgements",
                                     RelativeSizeAxes = Axes.Y,
-                                    Blending = BlendingParameters.Additive
                                 },
                             }
                         },
@@ -128,12 +127,20 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                     }
                 },
+                mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.TopLeft,
+                    RelativePositionAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.None,
+                    Y = 0.2f
+                },
                 topLevelHitContainer = new ProxyContainer
                 {
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
                 },
-                drumRollHitContainer.CreateProxy()
+                drumRollHitContainer.CreateProxy(),
             };
         }
 
@@ -145,6 +152,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             // This is basically allowing for correct alignment as relative pieces move around them.
             rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
+
+            mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
 
         public override void Add(DrawableHitObject h)

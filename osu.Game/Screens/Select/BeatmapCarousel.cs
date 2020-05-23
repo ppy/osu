@@ -131,6 +131,11 @@ namespace osu.Game.Screens.Select
 
         private CarouselRoot root;
 
+        private IBindable<WeakReference<BeatmapSetInfo>> itemAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> itemRemoved;
+        private IBindable<WeakReference<BeatmapInfo>> itemHidden;
+        private IBindable<WeakReference<BeatmapInfo>> itemRestored;
+
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
@@ -161,10 +166,14 @@ namespace osu.Game.Screens.Select
             RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
-            beatmaps.ItemAdded += beatmapAdded;
-            beatmaps.ItemRemoved += beatmapRemoved;
-            beatmaps.BeatmapHidden += beatmapHidden;
-            beatmaps.BeatmapRestored += beatmapRestored;
+            itemAdded = beatmaps.ItemAdded.GetBoundCopy();
+            itemAdded.BindValueChanged(beatmapAdded);
+            itemRemoved = beatmaps.ItemRemoved.GetBoundCopy();
+            itemRemoved.BindValueChanged(beatmapRemoved);
+            itemHidden = beatmaps.BeatmapHidden.GetBoundCopy();
+            itemHidden.BindValueChanged(beatmapHidden);
+            itemRestored = beatmaps.BeatmapRestored.GetBoundCopy();
+            itemRestored.BindValueChanged(beatmapRestored);
 
             loadBeatmapSets(GetLoadableBeatmaps());
         }
@@ -208,7 +217,7 @@ namespace osu.Game.Screens.Select
             // without this, during a large beatmap import it is impossible to navigate the carousel.
             applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
-            //check if we can/need to maintain our current selection.
+            // check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
                 select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
 
@@ -562,26 +571,34 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= beatmapAdded;
-                beatmaps.ItemRemoved -= beatmapRemoved;
-                beatmaps.BeatmapHidden -= beatmapHidden;
-                beatmaps.BeatmapRestored -= beatmapRestored;
-            }
-
             // aggressively dispose "off-screen" items to reduce GC pressure.
             foreach (var i in Items)
                 i.Dispose();
         }
 
-        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
+        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var item))
+                RemoveBeatmapSet(item);
+        }
 
-        private void beatmapAdded(BeatmapSetInfo item) => UpdateBeatmapSet(item);
+        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var item))
+                UpdateBeatmapSet(item);
+        }
 
-        private void beatmapRestored(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void beatmapRestored(ValueChangedEvent<WeakReference<BeatmapInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var b))
+                UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        }
 
-        private void beatmapHidden(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void beatmapHidden(ValueChangedEvent<WeakReference<BeatmapInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var b))
+                UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        }
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {

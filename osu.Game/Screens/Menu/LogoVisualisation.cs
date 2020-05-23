@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Menu
             private IShader shader;
             private Texture texture;
 
-            //Assuming the logo is a circle, we don't need a second dimension.
+            // Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
             private Color4 colour;
@@ -209,13 +209,13 @@ namespace osu.Game.Screens.Menu
                             float rotation = MathUtils.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
                             float rotationCos = MathF.Cos(rotation);
                             float rotationSin = MathF.Sin(rotation);
-                            //taking the cos and sin to the 0..1 range
+                            // taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 
                             var barSize = new Vector2(size * MathF.Sqrt(2 * (1 - MathF.Cos(MathUtils.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
-                            //The distance between the position and the sides of the bar.
+                            // The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
-                            //The distance between the bottom side of the bar and the top side.
+                            // The distance between the bottom side of the bar and the top side.
                             var amplitudeOffset = new Vector2(rotationCos * barSize.Y, rotationSin * barSize.Y);
 
                             var rectangle = new Quad(
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Menu
                                 colourInfo,
                                 null,
                                 vertexBatch.AddAction,
-                                //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
+                                // barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }
                     }

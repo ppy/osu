@@ -11,13 +11,13 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
-using osu.Framework.Audio;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
     [Cached(typeof(DrawableHitObject))]
     public abstract class DrawableHitObject : SkinReloadableDrawable
     {
+        public event Action<DrawableHitObject> DefaultsApplied;
+
         public readonly HitObject HitObject;
 
         /// <summary>
@@ -34,7 +36,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples { get; private set; }
 
-        protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
+        public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
@@ -94,8 +96,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual float SamplePlaybackPosition => 0.5f;
 
-        private readonly BindableDouble balanceAdjust = new BindableDouble();
-
         private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
         private Bindable<bool> userPositionalHitSounds;
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
-            onDefaultsApplied();
+            apply(HitObject);
         }
 
         private void loadSamples()
@@ -171,11 +171,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)));
-            Samples.AddAdjustment(AdjustableProperty.Balance, balanceAdjust);
             AddInternal(Samples);
         }
 
-        private void onDefaultsApplied() => apply(HitObject);
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            apply(hitObject);
+            DefaultsApplied?.Invoke(this);
+        }
 
         private void apply(HitObject hitObject)
         {
@@ -254,7 +257,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 }
             }
 
-            if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue || HitObject.HitWindows == null)
+            if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
                 Expire();
 
             // apply any custom state overrides
@@ -346,6 +349,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
         }
 
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
@@ -354,8 +360,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             const float balance_adjust_amount = 0.4f;
 
-            balanceAdjust.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0);
-            Samples?.Play();
+            if (Samples != null && gameplayClock?.IsSeeking != true)
+            {
+                Samples.Balance.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0);
+                Samples.Play();
+            }
         }
 
         protected override void Update()

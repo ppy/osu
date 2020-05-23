@@ -8,6 +8,7 @@ using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.Interpolation;
 
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -61,10 +62,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            countGreat = Score.Statistics[HitResult.Great];
-            countGood = Score.Statistics[HitResult.Good];
-            countMeh = Score.Statistics[HitResult.Meh];
-            countMiss = Score.Statistics[HitResult.Miss];
+            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             greatWindow = 79.5 - 6 * Attributes.OverallDifficulty;
 

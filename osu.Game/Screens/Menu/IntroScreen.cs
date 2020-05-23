@@ -96,14 +96,12 @@ namespace osu.Game.Screens.Menu
             Track = introBeatmap.Track;
         }
 
-        public override bool OnExiting(IScreen next) => !DidLoadMenu;
-
         public override void OnResuming(IScreen last)
         {
             this.FadeIn(300);
 
             double fadeOutTime = exit_delay;
-            //we also handle the exit transition.
+            // we also handle the exit transition.
             if (MenuVoice.Value)
                 seeya.Play();
             else

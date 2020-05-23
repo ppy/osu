@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Menu
 
             (Background as BackgroundScreenDefault)?.Next();
 
-            //we may have consumed our preloaded instance, so let's make another.
+            // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
             if (Beatmap.Value.Track != null && music?.IsUserPaused != true)

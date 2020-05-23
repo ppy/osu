@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 .Then().ScaleTo(1.1f, animation_time * 0.8)
                 .Then().ScaleTo(0.9f, animation_time * 0.4)
                 .Then().ScaleTo(1f, animation_time * 0.2);
+
+            Expire(true);
         }
     }
 }
