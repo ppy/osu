@@ -16,9 +16,6 @@ namespace osu.Game.Overlays.Toolbar
             Icon = FontAwesome.Solid.ChevronLeft;
             TooltipMain = "Back";
             TooltipSub = "Go Back a screen";
-
-        }
-        
         }
     }
-
+}
