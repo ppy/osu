@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
+
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
             EditorBeatmap.PlacementObject.ValueChanged += _ => updateDistanceSnapGrid();
-
-            LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer(HitObjects);
