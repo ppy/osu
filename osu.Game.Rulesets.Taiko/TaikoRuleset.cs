@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Skinning;
 
@@ -143,6 +144,8 @@ namespace osu.Game.Rulesets.Taiko
         public override string PlayingVerb => "Bashing drums";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
+
+        public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 

@@ -1,0 +1,58 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Screens.Edit;
+using osu.Game.Tests.Visual;
+
+namespace osu.Game.Rulesets.Taiko.Tests
+{
+    public class TestSceneTaikoHitObjectComposer : EditorClockTestScene
+    {
+        private TestComposer composer;
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            BeatDivisor.Value = 8;
+            Clock.Seek(0);
+
+            Child = composer = new TestComposer { RelativeSizeAxes = Axes.Both };
+        });
+
+        [Test]
+        public void BasicTest()
+        {
+        }
+
+        private class TestComposer : CompositeDrawable
+        {
+            [Cached(typeof(EditorBeatmap))]
+            [Cached(typeof(IBeatSnapProvider))]
+            public readonly EditorBeatmap EditorBeatmap;
+
+            public readonly TaikoHitObjectComposer Composer;
+
+            public TestComposer()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    EditorBeatmap = new EditorBeatmap(new TaikoBeatmap())
+                    {
+                        BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo }
+                    },
+                    Composer = new TaikoHitObjectComposer(new TaikoRuleset())
+                };
+
+                for (int i = 0; i < 10; i++)
+                    EditorBeatmap.Add(new Hit { StartTime = 125 * i });
+            }
+        }
+    }
+}
