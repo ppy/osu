@@ -3,18 +3,21 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
 {
-    public class MfMenuTextBoxContainer : OsuClickableContainer
+    public class MfMenuTextBoxContainer : Container
     {
         public Drawable d;
-
         public float HoverScale = 1.05f;
+        public string Title { get; set; }
 
         private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.Orange);
-        
+
         private EdgeEffectParameters edgeEffect = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
@@ -24,6 +27,7 @@ namespace osu.Game.Overlays.MfMenu
 
         private Container hover;
         private Container content;
+        private FillFlowContainer textFillFlow;
 
         public MfMenuTextBoxContainer()
         {
@@ -35,7 +39,7 @@ namespace osu.Game.Overlays.MfMenu
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         hover = new Container
                         {
@@ -64,7 +68,14 @@ namespace osu.Game.Overlays.MfMenu
                                     Colour = Colour4.Black,
                                 },
                             }
-                        }
+                        },
+                        textFillFlow = new FillFlowContainer
+                        {
+                            Padding = new MarginPadding(25),
+                            Spacing = new Vector2(15),
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        },
                     }
                 },
             };
@@ -72,9 +83,14 @@ namespace osu.Game.Overlays.MfMenu
 
         protected override void LoadComplete()
         {
+            textFillFlow.Add(new OsuSpriteText
+            {
+                Text = Title,
+                Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold),
+            });
             if ( d != null )
             {
-                content.Add(d);
+                textFillFlow.Add(d);
             }
             base.LoadComplete();
         }

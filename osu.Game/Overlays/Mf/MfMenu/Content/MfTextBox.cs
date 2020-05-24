@@ -11,10 +11,7 @@ namespace osu.Game.Overlays.MfMenu
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             TextAnchor = Anchor.TopLeft;
-            Anchor = Anchor.TopLeft;
-            Origin = Anchor.TopLeft;
             Spacing = new Vector2(0, 2);
-            Padding = new MarginPadding(25);
         }
     }
 }

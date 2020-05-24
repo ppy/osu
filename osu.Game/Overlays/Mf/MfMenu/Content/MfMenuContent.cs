@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuContent : FillFlowContainer
     {
-        public const float HORIZONTAL_PADDING = 30;
+        public const float HORIZONTAL_PADDING = 50;
         private const float transition_time = 400;
 
         public MfMenuContent()
