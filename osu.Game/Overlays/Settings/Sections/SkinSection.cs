@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
@@ -34,13 +35,33 @@ namespace osu.Game.Overlays.Settings.Sections
         private IBindable<WeakReference<SkinInfo>> managerAdded;
         private IBindable<WeakReference<SkinInfo>> managerRemoved;
 
+        private SettingsButton exportButton;
+
+        private Bindable<Skin> currentSkin;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             FlowContent.Spacing = new Vector2(0, 5);
+
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
+                exportButton = new SettingsButton
+                {
+                    Text = "Export selected skin",
+                    Action = () =>
+                    {
+                        try
+                        {
+                            skins.Export(skins.CurrentSkin.Value.SkinInfo);
+                        }
+                        catch (Exception)
+                        {
+                            Logger.Log("Could not export current skin", level: LogLevel.Error);
+                        }
+                    }
+                },
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
@@ -80,6 +101,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Bindable = dropdownBindable;
             skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
+
+            currentSkin = skins.CurrentSkin.GetBoundCopy();
+            currentSkin.BindValueChanged(skin => exportButton.Enabled.Value = skin.NewValue.SkinInfo.ID > 0);
 
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))

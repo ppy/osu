@@ -22,6 +22,7 @@ using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
+using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
@@ -82,6 +83,8 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
+        private readonly Storage exportStorage;
+
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
@@ -89,6 +92,8 @@ namespace osu.Game.Database
             ModelStore = modelStore;
             ModelStore.ItemAdded += item => handleEvent(() => itemAdded.Value = new WeakReference<TModel>(item));
             ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
+
+            exportStorage = storage.GetStorageForDirectory("exports");
 
             Files = new FileStore(contextFactory, storage);
 
@@ -368,6 +373,29 @@ namespace osu.Game.Database
             flushEvents(true);
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
+
+        /// <summary>
+        /// Exports an item to an legacy (.zip based) package.
+        /// </summary>
+        /// <param name="item">The item to export.</param>
+        public void Export(TModel item)
+        {
+            var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
+
+            if (retrievedItem == null)
+                throw new ArgumentException("Specified model count not be found", nameof(item));
+
+            using (var archive = ZipArchive.Create())
+            {
+                foreach (var file in retrievedItem.Files)
+                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
+
+                using (var outputStream = exportStorage.GetStream($"{item}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                    archive.SaveTo(outputStream);
+
+                exportStorage.OpenInNativeExplorer();
+            }
+        }
 
         public void UpdateFile(TModel model, TFileModel file, Stream contents)
         {
