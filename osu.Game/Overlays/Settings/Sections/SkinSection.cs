@@ -35,10 +35,6 @@ namespace osu.Game.Overlays.Settings.Sections
         private IBindable<WeakReference<SkinInfo>> managerAdded;
         private IBindable<WeakReference<SkinInfo>> managerRemoved;
 
-        private SettingsButton exportButton;
-
-        private Bindable<Skin> currentSkin;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -47,21 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
-                exportButton = new SettingsButton
-                {
-                    Text = "Export selected skin",
-                    Action = () =>
-                    {
-                        try
-                        {
-                            skins.Export(skins.CurrentSkin.Value.SkinInfo);
-                        }
-                        catch (Exception)
-                        {
-                            Logger.Log("Could not export current skin", level: LogLevel.Error);
-                        }
-                    }
-                },
+                new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
@@ -102,9 +84,6 @@ namespace osu.Game.Overlays.Settings.Sections
             skinDropdown.Bindable = dropdownBindable;
             skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
 
-            currentSkin = skins.CurrentSkin.GetBoundCopy();
-            currentSkin.BindValueChanged(skin => exportButton.Enabled.Value = skin.NewValue.SkinInfo.ID > 0);
-
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
@@ -139,6 +118,36 @@ namespace osu.Game.Overlays.Settings.Sections
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
 
                 protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+            }
+        }
+
+        private class ExportSkinButton : SettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = "Export selected skin";
+                Action = export;
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.ID > 0, true);
+            }
+
+            private void export()
+            {
+                try
+                {
+                    skins.Export(currentSkin.Value.SkinInfo);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
+                }
             }
         }
     }
