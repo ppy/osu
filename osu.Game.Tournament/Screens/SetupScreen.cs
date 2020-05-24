@@ -151,7 +151,7 @@ namespace osu.Game.Tournament.Screens
 
         private class ActionableInfo : LabelledDrawable<Drawable>
         {
-            protected OsuButton Button;
+            private OsuButton button;
 
             public ActionableInfo()
                 : base(true)
@@ -160,7 +160,7 @@ namespace osu.Game.Tournament.Screens
 
             public string ButtonText
             {
-                set => Button.Text = value;
+                set => button.Text = value;
             }
 
             public string Value
@@ -197,7 +197,7 @@ namespace osu.Game.Tournament.Screens
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {
-                            Button = new TriangleButton
+                            button = new TriangleButton
                             {
                                 Size = new Vector2(100, 30),
                                 Action = () => Action?.Invoke()
@@ -219,11 +219,10 @@ namespace osu.Game.Tournament.Screens
             protected override Drawable CreateComponent()
             {
                 var drawable = base.CreateComponent();
-                FlowContainer.Insert(0, numberBox = new OsuNumberBox
+                FlowContainer.Insert(-1, numberBox = new OsuNumberBox
                 {
                     Width = 100
                 });
-                FlowContainer.SetLayoutPosition(Button, 1);
 
                 base.Action = () =>
                 {
@@ -245,10 +244,6 @@ namespace osu.Game.Tournament.Screens
                         numberBox.Text = number.ToString();
 
                         Action?.Invoke(number);
-                    }
-                    else
-                    {
-                        // TODO: input box was empty, give user feedback? do nothing?
                     }
                 };
                 return drawable;
