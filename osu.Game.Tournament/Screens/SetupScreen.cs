@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Screens
         private FillFlowContainer fillFlow;
 
         private LoginOverlay loginOverlay;
-        private ActionableInfoWithNumberBox resolution;
+        private ResolutionSelector resolution;
 
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
@@ -108,15 +108,13 @@ namespace osu.Game.Tournament.Screens
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },
-                resolution = new ActionableInfoWithNumberBox
+                resolution = new ResolutionSelector
                 {
                     Label = "Stream area resolution",
-                    ButtonText = "Set size",
+                    ButtonText = "Set height",
                     Action = i =>
                     {
-                        i = Math.Clamp(i, 480, 2160);
                         windowSize.Value = new Size((int)(i * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), i);
-                        resolution.NumberValue = i;
                     }
                 },
             };
@@ -167,17 +165,18 @@ namespace osu.Game.Tournament.Screens
 
             public string Value
             {
-                set => ValueText.Text = value;
+                set => valueText.Text = value;
             }
 
             public bool Failing
             {
-                set => ValueText.Colour = value ? Color4.Red : Color4.White;
+                set => valueText.Colour = value ? Color4.Red : Color4.White;
             }
 
             public Action Action;
 
-            protected TournamentSpriteText ValueText;
+            private TournamentSpriteText valueText;
+            protected FillFlowContainer FlowContainer;
 
             protected override Drawable CreateComponent() => new Container
             {
@@ -185,71 +184,75 @@ namespace osu.Game.Tournament.Screens
                 RelativeSizeAxes = Axes.X,
                 Children = new Drawable[]
                 {
-                    ValueText = new TournamentSpriteText
+                    valueText = new TournamentSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
-                    Button = new TriangleButton
+                    FlowContainer = new FillFlowContainer
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Size = new Vector2(100, 30),
-                        Action = () => Action?.Invoke()
-                    },
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(10, 0),
+                        Children = new Drawable[]
+                        {
+                            Button = new TriangleButton
+                            {
+                                Size = new Vector2(100, 30),
+                                Action = () => Action?.Invoke()
+                            }
+                        }
+                    }
                 }
             };
         }
 
-        private class ActionableInfoWithNumberBox : ActionableInfo
+        private class ResolutionSelector : ActionableInfo
         {
+            private const int height_min_allowed_value = 480;
+            private const int height_max_allowed_value = 2160; // 4k
             public new Action<int> Action;
 
             private OsuNumberBox numberBox;
 
-            public int NumberValue
+            protected override Drawable CreateComponent()
             {
-                get
+                var drawable = base.CreateComponent();
+                FlowContainer.Insert(0, numberBox = new OsuNumberBox
                 {
-                    int.TryParse(numberBox.Text, out var val);
-                    return val;
-                }
-                set => numberBox.Text = value.ToString();
-            }
+                    Width = 100
+                });
+                FlowContainer.SetLayoutPosition(Button, 1);
 
-            protected override Drawable CreateComponent() => new Container
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Children = new Drawable[]
+                base.Action = () =>
                 {
-                    ValueText = new TournamentSpriteText
+                    if (numberBox.Text.Length > 0)
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    numberBox = new OsuNumberBox
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Width = 100,
-                        Margin = new MarginPadding
+                        // box contains text
+                        if (!int.TryParse(numberBox.Text, out var number))
                         {
-                            Right = 110
+                            // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
+                            // so clamp to max allowed value
+                            number = height_max_allowed_value;
                         }
-                    },
-                    Button = new TriangleButton
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Size = new Vector2(100, 30),
-                        Action = () =>
+                        else
                         {
-                            if (numberBox.Text.Length > 0) Action?.Invoke(NumberValue);
+                            number = Math.Clamp(number, height_min_allowed_value, height_max_allowed_value);
                         }
-                    },
-                }
-            };
+
+                        // in case number got clamped, reset number in numberBox
+                        numberBox.Text = number.ToString();
+
+                        Action?.Invoke(number);
+                    }
+                    else
+                    {
+                        // TODO: input box was empty, give user feedback? do nothing?
+                    }
+                };
+                return drawable;
+            }
         }
     }
 }
