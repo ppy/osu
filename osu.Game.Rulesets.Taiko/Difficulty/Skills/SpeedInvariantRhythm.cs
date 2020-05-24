@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         // Penalty for notes so slow that alting is not necessary.
         private double speedPenalty(double noteLengthMS)
         {
-
             if (noteLengthMS < 80) return 1;
             // return Math.Max(0, 1.4 - 0.005 * noteLengthMS);
             if (noteLengthMS < 210) return Math.Max(0, 1.4 - 0.005 * noteLengthMS);

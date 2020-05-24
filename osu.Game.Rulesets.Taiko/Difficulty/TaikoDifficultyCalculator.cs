@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double simpleColourPenalty(double staminaDifficulty, double colorDifficulty)
         {
+            if (colorDifficulty <= 0) return 0.79 - 0.25;
             return 0.79 - Math.Atan(staminaDifficulty / colorDifficulty - 12) / Math.PI / 2;
         }
 
@@ -123,7 +124,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
-                taikoDifficultyHitObjects.Add(new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, rhythm));
+                // Check for negative durations
+                if (beatmap.HitObjects[i].StartTime > beatmap.HitObjects[i - 1].StartTime && beatmap.HitObjects[i - 1].StartTime > beatmap.HitObjects[i - 2].StartTime)
+                    taikoDifficultyHitObjects.Add(new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, rhythm));
             }
 
             new StaminaCheeseDetector().FindCheese(taikoDifficultyHitObjects);
