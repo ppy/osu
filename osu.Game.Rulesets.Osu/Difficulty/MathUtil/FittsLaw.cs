@@ -6,11 +6,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 {
     public static class FittsLaw
     {
-        public static double CalculateIP(double relativeD, double mt)
+        /// <summary>
+        /// Calculates the index of performance for the distance and the movement time specified.
+        /// Index of performance is the difficulty of a movement.
+        /// </summary>
+        public static double CalculateIP(double d, double mt)
         {
-            return Math.Log(relativeD + 1, 2) / (mt + 1e-10);
+            return Math.Log(d + 1, 2) / (mt + 1e-10);
         }
 
+        /// <summary>
+        /// Calculates the probability that the target is hit successfully.
+        /// </summary>
         public static double CalculateHitProb(double d, double mt, double tp)
         {
             if (d == 0)

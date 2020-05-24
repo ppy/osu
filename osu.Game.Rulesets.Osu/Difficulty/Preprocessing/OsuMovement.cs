@@ -18,10 +18,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                            new double[] { -1, 1 },
                                                                            new double[] { 1.1, 0 });
 
-        // number of coefficients in the formula
+        // number of coefficients in the formula for correction0/3
         private const int num_coeffs = 4;
 
-
+        // correction0 flow
         private static readonly double[] ds0f = { 0, 1, 1.35, 1.7, 2.3, 3 };
         private static readonly double[] ks0f = { -11.5, -5.9, -5.4, -5.6, -2, -2 };
         private static readonly double[] scales0f = { 1, 1, 1, 1, 1, 1 };
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                         { 0   ,  0   ,  0    ,  0   ,  0   ,  0   },
                                                                         { 0   ,  0.7 ,  0.55 ,  0.4 ,  0   ,  0   }}};
 
-
+        // correction0 snap
         private static readonly double[] ds0s = { 0, 1.5, 2.5, 4, 6, 8 };
         private static readonly double[] ks0s = { -1, -5, -6.7, -6.5, -4.3, -4.3 };
         private static readonly double[] scales0s = { 1, 0.85, 0.6, 0.8, 1, 1 };
@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                         { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
                                                                         {-0.7 , -1   , -0.9 , -0.1 , -0.1 , -0.1 }}};
 
+        // correction3 flow
         private static readonly double[] ds3f = { 0, 1, 2, 3, 4 };
         private static readonly double[] ks3f = { -4, -5.3, -5.2, -2.5, -2.5 };
         private static readonly double[] scales3f = { 1, 1, 1, 1, 1 };
@@ -87,6 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                         {0   ,  0   ,  0   ,  0   ,  0  },
                                                                         {0   ,  0.4 ,  0.4 ,  0   ,  0  }}};
 
+        // correction3 snap
         private static readonly double[] ds3s = { 1, 1.5, 2.5, 4, 6, 8 };
         private static readonly double[] ks3s = { -2, -2, -3, -5.4, -4.9, -4.9 };
         private static readonly double[] scales3s = { 1, 1, 1, 1, 1, 1 };
@@ -155,6 +157,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return movementWithNested;
         }
 
+        /// <summary>
+        /// Calculates the movement time, effective distance and other details for the movement from obj1 to obj2.
+        /// </summary>
         public static List<OsuMovement> ExtractMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
                                                         Vector<double> tapStrain, double clockRate,
                                                         bool hidden = false, double noteDensity = 0, OsuHitObject objMinus2 = null)
@@ -185,13 +190,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (obj2 is Slider)
                 movement.EndsOnSlider = true;
 
+            // calculate basic info (position, displacement, distance...)
+            // explanation of abbreviations:
+            // posx: position of obj x
+            // sxy : displacement (normalized) from obj x to obj y
+            // txy : time difference of obj x and obj y
+            // dxy : distance (normalized) from obj x to obj y
+            // ipxy: index of performance of the movement from obj x to obj y
             var pos1 = Vector<double>.Build.Dense(new[] {(double)obj1.Position.X, (double)obj1.Position.Y});
             var pos2 = Vector<double>.Build.Dense(new[] {(double)obj2.Position.X, (double)obj2.Position.Y});
             var s12 = (pos2 - pos1) / (2 * obj2.Radius);
             double d12 = s12.L2Norm();
-            double IP12 = FittsLaw.CalculateIP(d12, t12);
+            double ip12 = FittsLaw.CalculateIP(d12, t12);
 
-            movement.IP12 = IP12;
+            movement.IP12 = ip12;
 
             var pos0 = Vector<double>.Build.Dense(2);
             var pos3 = Vector<double>.Build.Dense(2);
@@ -215,70 +227,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 dMinus22 = ((pos2 - posMinus2) / (2 * obj2.Radius)).L2Norm();
             }
 
-            // Correction #1 - The Previous Object
-            // Estimate how obj0 affects the difficulty of hitting obj2
-            double correction0 = 0;
             if (obj0 != null)
             {
-                pos0 = Vector<double>.Build.Dense(new[] {(double)obj0.Position.X, (double)obj0.Position.Y});
+                pos0 = Vector<double>.Build.Dense(new[] { (double)obj0.Position.X, (double)obj0.Position.Y });
                 s01 = (pos1 - pos0) / (2 * obj2.Radius);
                 d01 = s01.L2Norm();
                 t01 = (obj1.StartTime - obj0.StartTime) / clockRate / 1000.0;
                 d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
-
-                if (d12 != 0)
-                {
-                    double tRatio0 = t12 / t01;
-
-                    if (tRatio0 > t_ratio_threshold)
-                    {
-                        if (d01 == 0)
-                        {
-                            correction0 = correction0_still;
-                        }
-                        else
-                        {
-                            double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
-                            double correction0_moving = correction0_moving_spline.Interpolate(cos012);
-
-                            double movingness = SpecialFunctions.Logistic(d01 * 6 - 5) - SpecialFunctions.Logistic(-5);
-                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0_still) * 1.5;
-                        }
-                    }
-                    else if (tRatio0 < 1 / t_ratio_threshold)
-                    {
-                        if (d01 == 0)
-                        {
-                            correction0 = 0;
-                        }
-                        else
-                        {
-                            double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
-                            correction0 = (1 - cos012) * SpecialFunctions.Logistic((d01 * tRatio0 - 1.5) * 4) * 0.3;
-                        }
-                    }
-                    else
-                    {
-                        obj1InTheMiddle = true;
-
-                        var normalized_pos0 = -s01 / t01 * t12;
-                        double x0 = normalized_pos0.DotProduct(s12) / d12;
-                        double y0 = (normalized_pos0 - x0 * s12 / d12).L2Norm();
-
-                        double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0fInterp, scale0fInterp, coeffs0fInterps);
-                        double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0sInterp, scale0sInterp, coeffs0sInterps);
-                        double correction0Stop = calcCorrection0Stop(d12, x0, y0);
-
-                        flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
-
-                        correction0 = Mean.PowerMean(new double[] { correction0Flow, correction0Snap, correction0Stop }, -10) * 1.3;
-                    }
-                }
             }
-
-            // Correction #2 - The Next Object
-            // Estimate how obj3 affects the difficulty of hitting obj2
-            double correction3 = 0;
 
             if (obj3 != null)
             {
@@ -286,55 +242,111 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 s23 = (pos3 - pos2) / (2 * obj2.Radius);
                 d23 = s23.L2Norm();
                 t23 = (obj3.StartTime - obj2.StartTime) / clockRate / 1000.0;
+            }
 
-                if (d12 != 0)
+            // Correction #1 - The Previous Object
+            // Estimate how obj0 affects the difficulty of hitting obj2
+            double correction0 = 0;
+
+            if (obj0 != null && d12 != 0)
+            {
+                double tRatio0 = t12 / t01;
+
+                if (tRatio0 > t_ratio_threshold)
                 {
-                    double tRatio3 = t12 / t23;
-
-                    if (tRatio3 > t_ratio_threshold)
+                    if (d01 == 0)
                     {
-                        if (d23 == 0)
-                        {
-                            correction3 = 0;
-                        }
-                        else
-                        {
-                            double cos123 = Math.Min(Math.Max(-s12.DotProduct(s23) / d12 / d23, -1), 1);
-                            double correction3_moving = correction0_moving_spline.Interpolate(cos123);
-
-                            double movingness = SpecialFunctions.Logistic(d23 * 6 - 5) - SpecialFunctions.Logistic(-5);
-                            correction3 = (movingness * correction3_moving) * 0.5;
-
-                        }
-                    }
-                    else if (tRatio3 < 1 / t_ratio_threshold)
-                    {
-                        if (d23 == 0)
-                        {
-                            correction3 = 0;
-                        }
-                        else
-                        {
-                            double cos123 = Math.Min(Math.Max(-s12.DotProduct(s23) / d12 / d23, -1), 1);
-                            correction3 = (1 - cos123) * SpecialFunctions.Logistic((d23 * tRatio3 - 1.5) * 4) * 0.15;
-                        }
+                        correction0 = correction0_still;
                     }
                     else
                     {
-                        obj2InTheMiddle = true;
+                        double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
+                        double correction0_moving = correction0_moving_spline.Interpolate(cos012);
 
-                        var normalizedPos3 = s23 / t23 * t12;
-                        double x3 = normalizedPos3.DotProduct(s12) / d12;
-                        double y3 = (normalizedPos3 - x3 * s12 / d12).L2Norm();
+                        double movingness = SpecialFunctions.Logistic(d01 * 6 - 5) - SpecialFunctions.Logistic(-5);
+                        correction0 = (movingness * correction0_moving + (1 - movingness) * correction0_still) * 1.5;
+                    }
+                }
+                else if (tRatio0 < 1 / t_ratio_threshold)
+                {
+                    if (d01 == 0)
+                    {
+                        correction0 = 0;
+                    }
+                    else
+                    {
+                        double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
+                        correction0 = (1 - cos012) * SpecialFunctions.Logistic((d01 * tRatio0 - 1.5) * 4) * 0.3;
+                    }
+                }
+                else
+                {
+                    obj1InTheMiddle = true;
 
-                        double correction3Flow = calcCorrection0Or3(d12, x3, y3, k3fInterp, scale3fInterp, coeffs3fInterps);
-                        double correction3Snap = calcCorrection0Or3(d12, x3, y3, k3sInterp, scale3sInterp, coeffs3sInterps);
+                    var normalized_pos0 = -s01 / t01 * t12;
+                    double x0 = normalized_pos0.DotProduct(s12) / d12;
+                    double y0 = (normalized_pos0 - x0 * s12 / d12).L2Norm();
 
-                        flowiness123 = SpecialFunctions.Logistic((correction3Snap - correction3Flow - 0.05) * 20);
+                    double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0fInterp, scale0fInterp, coeffs0fInterps);
+                    double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0sInterp, scale0sInterp, coeffs0sInterps);
+                    double correction0Stop = calcCorrection0Stop(d12, x0, y0);
 
-                        correction3 = Math.Max(Mean.PowerMean(correction3Flow, correction3Snap, -10) - 0.1, 0) * 0.5;
+                    flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
+
+                    correction0 = Mean.PowerMean(new double[] { correction0Flow, correction0Snap, correction0Stop }, -10) * 1.3;
+                }
+            }
+
+            // Correction #2 - The Next Object
+            // Estimate how obj3 affects the difficulty of hitting obj2
+            double correction3 = 0;
+
+            if (obj3 != null && d12 != 0)
+            {
+                double tRatio3 = t12 / t23;
+
+                if (tRatio3 > t_ratio_threshold)
+                {
+                    if (d23 == 0)
+                    {
+                        correction3 = 0;
+                    }
+                    else
+                    {
+                        double cos123 = Math.Min(Math.Max(-s12.DotProduct(s23) / d12 / d23, -1), 1);
+                        double correction3_moving = correction0_moving_spline.Interpolate(cos123);
+
+                        double movingness = SpecialFunctions.Logistic(d23 * 6 - 5) - SpecialFunctions.Logistic(-5);
+                        correction3 = (movingness * correction3_moving) * 0.5;
 
                     }
+                }
+                else if (tRatio3 < 1 / t_ratio_threshold)
+                {
+                    if (d23 == 0)
+                    {
+                        correction3 = 0;
+                    }
+                    else
+                    {
+                        double cos123 = Math.Min(Math.Max(-s12.DotProduct(s23) / d12 / d23, -1), 1);
+                        correction3 = (1 - cos123) * SpecialFunctions.Logistic((d23 * tRatio3 - 1.5) * 4) * 0.15;
+                    }
+                }
+                else
+                {
+                    obj2InTheMiddle = true;
+
+                    var normalizedPos3 = s23 / t23 * t12;
+                    double x3 = normalizedPos3.DotProduct(s12) / d12;
+                    double y3 = (normalizedPos3 - x3 * s12 / d12).L2Norm();
+
+                    double correction3Flow = calcCorrection0Or3(d12, x3, y3, k3fInterp, scale3fInterp, coeffs3fInterps);
+                    double correction3Snap = calcCorrection0Or3(d12, x3, y3, k3sInterp, scale3sInterp, coeffs3sInterps);
+
+                    flowiness123 = SpecialFunctions.Logistic((correction3Snap - correction3Flow - 0.05) * 20);
+
+                    correction3 = Math.Max(Mean.PowerMean(correction3Flow, correction3Snap, -10) - 0.1, 0) * 0.5;
                 }
             }
 
@@ -350,7 +362,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 patternCorrection = (SpecialFunctions.Logistic((gap - 1) * 8) - SpecialFunctions.Logistic(-6)) *
                                     SpecialFunctions.Logistic((d01 - 0.7) * 10) * SpecialFunctions.Logistic((d23 - 0.7) * 10) *
                                     Mean.PowerMean(flowiness012, flowiness123, 2) * 0.6;
-                //patternCorrection = 0;
             }
 
             // Correction #4 - Tap Strain
@@ -359,7 +370,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (d12 > 0 && tapStrain != null)
             {
-                tapCorrection = SpecialFunctions.Logistic((Mean.PowerMean(tapStrain, 2) / IP12 - 1.34) / 0.1) * 0.3;
+                tapCorrection = SpecialFunctions.Logistic((Mean.PowerMean(tapStrain, 2) / ip12 - 1.34) / 0.1) * 0.3;
             }
 
             // Correction #5 - Cheesing
@@ -385,7 +396,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     t01Reciprocal = 0;
                     ip01 = 0;
                 }
-                cheesabilityEarly = SpecialFunctions.Logistic((ip01 / IP12 - 0.6) * (-15)) * 0.5;
+                cheesabilityEarly = SpecialFunctions.Logistic((ip01 / ip12 - 0.6) * (-15)) * 0.5;
                 timeEarly = cheesabilityEarly * (1 / (1 / (t12 + 0.07) + t01Reciprocal)) ;
 
                 double t23Reciprocal;
@@ -400,7 +411,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     t23Reciprocal = 0;
                     ip23 = 0;
                 }
-                cheesabilityLate = SpecialFunctions.Logistic((ip23 / IP12 - 0.6) * (-15)) * 0.5;
+                cheesabilityLate = SpecialFunctions.Logistic((ip23 / ip12 - 0.6) * (-15)) * 0.5;
                 timeLate = cheesabilityLate * (1 / (1 / (t12 + 0.07) + t23Reciprocal));
             }
 
@@ -501,6 +512,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             };
         }
 
+        /// <summary>
+        /// Gets the interpolations for correction0/3 ready for use.
+        /// This needs to be called before any ExtractMovement calls.
+        /// </summary>
         public static void Initialize()
         {
             prepareInterp(ds0f, ks0f, scales0f, coeffs0f, ref k0fInterp, ref scale0fInterp, ref coeffs0fInterps);

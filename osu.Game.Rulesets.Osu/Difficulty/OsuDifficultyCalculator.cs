@@ -113,11 +113,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
-            new Aim(),
-            new Speed()
-        };
+            throw new NotImplementedException();
+        }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
