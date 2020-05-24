@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.MfMenu
                 Direction = FillDirection.Vertical,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Spacing = new Vector2(0, 5),
+                Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding{ Top = 20, Bottom = 50 },
                 Children = new Drawable[]
                 {
@@ -71,22 +71,16 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                             new MfMenuTextBoxContainer
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
                                                 Title = "关于Mf-osu",
                                                 d = introduceTextBox()
                                             },
                                             new MfMenuTextBoxContainer
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
                                                 Title = "Bug反馈/提出建议",
                                                 d = reportIssuesTextBox()
                                             },
                                             new MfMenuTextBoxContainer
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
                                                 Title = "项目引用",
                                                 d = projectRefsTextBox(),
                                             }
@@ -108,21 +102,15 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                         new MfMenuTextBoxContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
                                             d = staffTextBox()
                                         },
                                         new MfMenuTextBoxContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
                                             Title = "注意事项",
                                             d = attentionsTextBox()
                                         },
                                         new MfMenuTextBoxContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
                                             Title = "Special Thanks",
                                             d = specialThanksTextBox()
                                         }
@@ -166,14 +154,10 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                         new MfMenuTextBoxContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
                                             d = faqLongCoverLoad()
                                         },
                                         new MfMenuTextBoxContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
                                             d = faqCannotUseOnlineFunction()
                                         }
                                     }
@@ -194,8 +178,6 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                         new MfMenuTextBoxContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
                                             d = faqSayobotFail()
                                         }
                                     }

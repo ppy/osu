@@ -1,10 +1,10 @@
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.MfMenu
     public class MfMenuTextBoxContainer : Container
     {
         public Drawable d;
-        public float HoverScale = 1.05f;
+        public float HoverScale = 1.025f;
         public string Title { get; set; }
 
         private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -22,21 +22,26 @@ namespace osu.Game.Overlays.MfMenu
         {
             Type = EdgeEffectType.Shadow,
             Colour = Colour4.Black.Opacity(0.3f),
-            Radius = 12,
+            Radius = 18,
         };
 
         private Container hover;
         private Container content;
         private FillFlowContainer textFillFlow;
 
-        public MfMenuTextBoxContainer()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 content = new Container
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
@@ -79,10 +84,7 @@ namespace osu.Game.Overlays.MfMenu
                     }
                 },
             };
-        }
 
-        protected override void LoadComplete()
-        {
             textFillFlow.Add(new OsuSpriteText
             {
                 Text = Title,
@@ -92,9 +94,9 @@ namespace osu.Game.Overlays.MfMenu
             {
                 textFillFlow.Add(d);
             }
-            base.LoadComplete();
         }
 
+        //我已经不知道要怎么处理光标悬浮时的动画了就这样吧
         protected override bool OnHover(HoverEvent e)
         {
             content.MoveToY(-5, 500, Easing.OutQuint);
