@@ -375,7 +375,7 @@ namespace osu.Game.Database
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
         /// <summary>
-        /// Exports an item to an legacy (.zip based) package.
+        /// Exports an item to a legacy (.zip based) package.
         /// </summary>
         /// <param name="item">The item to export.</param>
         public void Export(TModel item)
@@ -383,7 +383,7 @@ namespace osu.Game.Database
             var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
 
             if (retrievedItem == null)
-                throw new ArgumentException("Specified model count not be found", nameof(item));
+                throw new ArgumentException("Specified model could not be found", nameof(item));
 
             using (var archive = ZipArchive.Create())
             {
