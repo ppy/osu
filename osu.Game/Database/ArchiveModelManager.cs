@@ -390,7 +390,7 @@ namespace osu.Game.Database
                 foreach (var file in retrievedItem.Files)
                     archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
 
-                using (var outputStream = exportStorage.GetStream($"{item}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
                     archive.SaveTo(outputStream);
 
                 exportStorage.OpenInNativeExplorer();
@@ -738,5 +738,12 @@ namespace osu.Game.Database
         }
 
         #endregion
+
+        private string getValidFilename(string filename)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+                filename = filename.Replace(c, '_');
+            return filename;
+        }
     }
 }
