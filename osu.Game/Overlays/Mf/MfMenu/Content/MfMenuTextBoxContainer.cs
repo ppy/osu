@@ -23,46 +23,48 @@ namespace osu.Game.Overlays.MfMenu
         };
 
         private Container hover;
-        private Container bgContainer;
+        private Container content;
 
         public MfMenuTextBoxContainer()
         {
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
             Children = new Drawable[]
             {
-                bgContainer = new Container
+                content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Children = new[]
                     {
-
-                hover = new Container
-                {
-                    CornerRadius = 25,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    EdgeEffect = edgeEffect,
-                    Alpha = 0
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 25,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Box
+                        hover = new Container
+                        {
+                            CornerRadius = 25,
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            EdgeEffect = edgeEffect,
+                            Alpha = 0
+                        },
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background6,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.3f,
-                            Colour = Colour4.Black,
-                        },
-                    }
-                }
+                            CornerRadius = 25,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background6,
+                                },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0.3f,
+                                    Colour = Colour4.Black,
+                                },
+                            }
+                        }
                     }
                 },
             };
@@ -72,24 +74,21 @@ namespace osu.Game.Overlays.MfMenu
         {
             if ( d != null )
             {
-                this.Add(d);
+                content.Add(d);
             }
             base.LoadComplete();
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            //this.ScaleTo(HoverScale, 500, Easing.OutQuint);
-            bgContainer.MoveToY(-5, 500, Easing.OutQuint);
-            d.MoveToY(-10, 500, Easing.OutQuint);
+            content.MoveToY(-5, 500, Easing.OutQuint);
             hover.FadeIn(500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            //this.ScaleTo(1f, 500, Easing.OutQuint);
-            bgContainer.MoveToY(0, 500, Easing.OutQuint);
+            content.MoveToY(0, 500, Easing.OutQuint);
             d.MoveToY(0, 500, Easing.OutQuint);
             hover.FadeOut(500, Easing.OutQuint);
             base.OnHoverLost(e);

@@ -103,24 +103,18 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                         new MfMenuTextBoxContainer
                                         {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             d = staffTextBox()
                                         },
                                         new MfMenuTextBoxContainer
                                         {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             d = warningsTextBox()
                                         },
                                         new MfMenuTextBoxContainer
                                         {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             d = specialThanksTextBox()
@@ -187,8 +181,6 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                         new MfMenuTextBoxContainer
                                         {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             d = faqSayobotFail()
