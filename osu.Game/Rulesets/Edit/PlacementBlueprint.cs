@@ -30,10 +30,12 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected readonly HitObject HitObject;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         protected EditorClock EditorClock { get; private set; }
 
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private Bindable<double> startTimeBindable;
 
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
@@ -54,7 +56,8 @@ namespace osu.Game.Rulesets.Edit
         {
             this.beatmap.BindTo(beatmap);
 
-            ApplyDefaultsToHitObject();
+            startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
 
         /// <summary>
@@ -80,9 +83,6 @@ namespace osu.Game.Rulesets.Edit
             PlacementActive = false;
         }
 
-        [Resolved(canBeNull: true)]
-        private EditorClock editorClock { get; set; }
-
         /// <summary>
         /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
         /// </summary>
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Edit
         public virtual void UpdatePosition(SnapResult snapResult)
         {
             if (!PlacementActive)
-                HitObject.StartTime = snapResult.Time ?? editorClock?.CurrentTime ?? Time.Current;
+                HitObject.StartTime = snapResult.Time ?? EditorClock?.CurrentTime ?? Time.Current;
         }
 
         /// <summary>
