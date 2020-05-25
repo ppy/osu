@@ -210,8 +210,8 @@ namespace osu.Game.Tournament.Screens
 
         private class ResolutionSelector : ActionableInfo
         {
-            private const int height_min_allowed_value = 480;
-            private const int height_max_allowed_value = 2160; // 4k
+            private const int minimum_window_height = 480;
+            private const int maximum_window_height = 2160; // 4k
             public new Action<int> Action;
 
             private OsuNumberBox numberBox;
@@ -234,11 +234,11 @@ namespace osu.Game.Tournament.Screens
                     {
                         // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
                         // so clamp to max allowed value
-                        number = height_max_allowed_value;
+                        number = maximum_window_height;
                     }
                     else
                     {
-                        number = Math.Clamp(number, height_min_allowed_value, height_max_allowed_value);
+                        number = Math.Clamp(number, minimum_window_height, maximum_window_height);
                     }
 
                     // in case number got clamped, reset number in numberBox
