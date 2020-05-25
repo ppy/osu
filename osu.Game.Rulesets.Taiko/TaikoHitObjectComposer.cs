@@ -61,7 +61,11 @@ namespace osu.Game.Rulesets.Taiko
         {
             RelativeSizeAxes = Axes.None;
 
-            AddInternal(new HitPiece { RelativeSizeAxes = Axes.Both });
+            AddInternal(new HitPiece
+            {
+                RelativeSizeAxes = Axes.Both,
+                Origin = Anchor.TopLeft
+            });
         }
 
         protected override void Update()
