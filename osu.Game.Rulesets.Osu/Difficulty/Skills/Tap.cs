@@ -1,10 +1,12 @@
-﻿using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-using osu.Game.Rulesets.Osu.Objects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra;
+
+using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Objects;
 
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -13,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
 
         private const int mash_level_count = 11;
-        private const double spaced_buff_factor = 0.10f;
+        private const double spaced_buff_factor = 0.10;
 
         private static readonly Vector<double> decay_coeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 2.3, -2.8))
                                                                                  .PointwiseExp();
@@ -44,6 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var strainHistory = new List<Vector<double>> { decay_coeffs * 0, decay_coeffs * 0 };
             var currStrain = decay_coeffs * 1;
 
+            // compute strain at each object and store the results into strainHistory
             if (hitObjects.Count >= 2)
             {
                 double prevPrevTime = hitObjects[0].StartTime / 1000.0;
@@ -52,19 +55,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 for (int i = 2; i < hitObjects.Count; i++)
                 {
                     double currTime = hitObjects[i].StartTime / 1000.0;
+
+                    // compute current strain after decay
                     currStrain = currStrain.PointwiseMultiply((-decay_coeffs * (currTime - prevTime) / clockRate).PointwiseExp());
+
                     strainHistory.Add(currStrain.PointwisePower(1.1 / 3) * 1.5);
 
-                    double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
-                    double spacedBuff = calculateSpacedness(relativeD) * spaced_buff_factor;
+                    double distance = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
+                    double spacedBuff = calculateSpacedness(distance) * spaced_buff_factor;
 
                     double deltaTime = Math.Max((currTime - prevPrevTime) / clockRate, 0.01);
 
                     // for 1/4 notes above 200 bpm the exponent is -2.7, otherwise it's -2
-                    double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.7) * 0.265, Math.Pow(deltaTime, -2));
+                    double strainAddition = Math.Max(Math.Pow(deltaTime, -2.7) * 0.265, Math.Pow(deltaTime, -2));
 
-                    currStrain += decay_coeffs * currStrainBase *
-                                  Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
+                    currStrain += decay_coeffs * strainAddition *
+                                  Math.Pow(calculateMashNerfFactor(distance, mashLevel), 3) *
                                   Math.Pow(1 + spacedBuff, 3);
 
                     prevPrevTime = prevTime;
@@ -72,6 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
+            // compute difficulty by aggregating strainHistory
             var strainResult = decay_coeffs * 0;
 
             for (int j = 0; j < decay_coeffs.Count; j++)

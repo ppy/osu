@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
+using System.IO;
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -18,7 +16,6 @@ using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-using System.IO;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 

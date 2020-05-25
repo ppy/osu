@@ -1,8 +1,7 @@
-﻿using osu.Game.Rulesets.Osu.Objects;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+
+using osu.Game.Rulesets.Osu.Objects;
 
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills

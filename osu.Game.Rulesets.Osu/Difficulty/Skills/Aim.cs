@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
@@ -13,8 +15,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-using System.Linq;
-using System.IO;
+
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
