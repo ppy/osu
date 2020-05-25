@@ -79,6 +79,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             hitObjectInitialStateCache.Clear();
         }
 
+        /// <summary>
+        /// Given a position in screen space, return the time within this column.
+        /// </summary>
         public double TimeAtScreenSpace(Vector2 screenSpacePosition)
         {
             // convert to local space of column so we can snap and fetch correct location.
@@ -104,6 +107,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, getLength());
         }
 
+        /// <summary>
+        /// Given a time, return the screen space position within this column.
+        /// </summary>
         public Vector2 ScreenSpacePositionAtTime(double time)
         {
             var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, getLength());
