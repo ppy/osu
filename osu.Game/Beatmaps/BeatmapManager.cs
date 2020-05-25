@@ -27,14 +27,13 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
-using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -66,7 +65,6 @@ namespace osu.Game.Beatmaps
         private readonly AudioManager audioManager;
         private readonly GameHost host;
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
-        private readonly Storage exportStorage;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
@@ -83,7 +81,6 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
-            exportStorage = storage.GetStorageForDirectory("exports");
         }
 
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
@@ -212,26 +209,6 @@ namespace osu.Game.Beatmaps
             var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
             if (working != null)
                 workingCache.Remove(working);
-        }
-
-        /// <summary>
-        /// Exports a <see cref="BeatmapSetInfo"/> to an .osz package.
-        /// </summary>
-        /// <param name="set">The <see cref="BeatmapSetInfo"/> to export.</param>
-        public void Export(BeatmapSetInfo set)
-        {
-            var localSet = QueryBeatmapSet(s => s.ID == set.ID);
-
-            using (var archive = ZipArchive.Create())
-            {
-                foreach (var file in localSet.Files)
-                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
-
-                using (var outputStream = exportStorage.GetStream($"{set}.osz", FileAccess.Write, FileMode.Create))
-                    archive.SaveTo(outputStream);
-
-                exportStorage.OpenInNativeExplorer();
-            }
         }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
@@ -431,6 +408,11 @@ namespace osu.Game.Beatmaps
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
+        }
+
+        public void Dispose()
+        {
+            onlineLookupQueue?.Dispose();
         }
 
         /// <summary>
