@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Configuration;
@@ -38,13 +37,10 @@ namespace osu.Game.Rulesets.Edit
         protected readonly Ruleset Ruleset;
 
         [Resolved]
-        protected IFrameBasedClock EditorClock { get; private set; }
+        protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
-
-        [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
@@ -68,7 +64,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IFrameBasedClock framedClock)
+        private void load()
         {
             Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -76,7 +72,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
                 {
-                    Clock = framedClock,
+                    Clock = EditorClock,
                     ProcessCustomClock = false
                 };
             }
@@ -221,8 +217,8 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                if (adjustableClock.CurrentTime < hitObject.StartTime)
-                    adjustableClock.Seek(hitObject.StartTime);
+                if (EditorClock.CurrentTime < hitObject.StartTime)
+                    EditorClock.Seek(hitObject.StartTime);
             }
         }
 

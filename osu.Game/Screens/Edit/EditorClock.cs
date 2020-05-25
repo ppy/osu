@@ -37,6 +37,11 @@ namespace osu.Game.Screens.Edit
             TrackLength = trackLength;
         }
 
+        public EditorClock()
+            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
+        {
+        }
+
         /// <summary>
         /// Seek to the closest snappable beat from a time.
         /// </summary>
