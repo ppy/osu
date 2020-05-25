@@ -56,8 +56,6 @@ namespace osu.Game.Rulesets.Edit
         {
             this.beatmap.BindTo(beatmap);
 
-            ApplyDefaultsToHitObject();
-
             startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
             startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
