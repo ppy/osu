@@ -6,14 +6,14 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneStablePathSelectScreens : TournamentTestScene
+    public class TestSceneStablePathSelectScreen : TournamentTestScene
     {
-        public TestSceneStablePathSelectScreens()
+        public TestSceneStablePathSelectScreen()
         {
-            AddStep("Add screen", () => Add(new TestSceneStablePathSelectScreen()));
+            AddStep("Add screen", () => Add(new StablePathSelectTestScreen()));
         }
 
-        private class TestSceneStablePathSelectScreen : StablePathSelectScreen
+        private class StablePathSelectTestScreen : StablePathSelectScreen
         {
             protected override void ChangePath(Storage storage)
             {
