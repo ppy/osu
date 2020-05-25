@@ -146,7 +146,6 @@ namespace osu.Game.Rulesets.Objects
 #pragma warning restore 618
         }
 
-        [Obsolete("Use the overload with cancellation support instead.")] // can be removed 20201115
         protected virtual void CreateNestedHitObjects()
         {
         }
