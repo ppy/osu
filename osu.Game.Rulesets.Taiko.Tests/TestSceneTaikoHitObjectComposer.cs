@@ -15,15 +15,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
 {
     public class TestSceneTaikoHitObjectComposer : EditorClockTestScene
     {
-        private TestComposer composer;
-
         [SetUp]
         public void Setup() => Schedule(() =>
         {
             BeatDivisor.Value = 8;
             Clock.Seek(0);
 
-            Child = composer = new TestComposer { RelativeSizeAxes = Axes.Both };
+            Child = new TestComposer { RelativeSizeAxes = Axes.Both };
         });
 
         [Test]
@@ -37,8 +35,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             [Cached(typeof(IBeatSnapProvider))]
             public readonly EditorBeatmap EditorBeatmap;
 
-            public readonly TaikoHitObjectComposer Composer;
-
             public TestComposer()
             {
                 InternalChildren = new Drawable[]
@@ -47,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     {
                         BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo }
                     },
-                    Composer = new TaikoHitObjectComposer(new TaikoRuleset())
+                    new TaikoHitObjectComposer(new TaikoRuleset())
                 };
 
                 for (int i = 0; i < 10; i++)
