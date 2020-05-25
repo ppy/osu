@@ -226,25 +226,25 @@ namespace osu.Game.Tournament.Screens
 
                 base.Action = () =>
                 {
-                    if (numberBox.Text.Length > 0)
+                    if (string.IsNullOrEmpty(numberBox.Text))
+                        return;
+
+                    // box contains text
+                    if (!int.TryParse(numberBox.Text, out var number))
                     {
-                        // box contains text
-                        if (!int.TryParse(numberBox.Text, out var number))
-                        {
-                            // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
-                            // so clamp to max allowed value
-                            number = height_max_allowed_value;
-                        }
-                        else
-                        {
-                            number = Math.Clamp(number, height_min_allowed_value, height_max_allowed_value);
-                        }
-
-                        // in case number got clamped, reset number in numberBox
-                        numberBox.Text = number.ToString();
-
-                        Action?.Invoke(number);
+                        // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
+                        // so clamp to max allowed value
+                        number = height_max_allowed_value;
                     }
+                    else
+                    {
+                        number = Math.Clamp(number, height_min_allowed_value, height_max_allowed_value);
+                    }
+
+                    // in case number got clamped, reset number in numberBox
+                    numberBox.Text = number.ToString();
+
+                    Action?.Invoke(number);
                 };
                 return drawable;
             }
