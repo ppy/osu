@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -20,21 +19,12 @@ using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK.Input;
-using Header = osu.Game.Screens.Multi.Match.Components.Header;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchSubScreen : MultiplayerTestScene
     {
         protected override bool UseOnlineAPI => true;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Screens.Multi.Multiplayer),
-            typeof(MatchSubScreen),
-            typeof(Header),
-            typeof(Footer)
-        };
 
         [Cached(typeof(IRoomManager))]
         private readonly TestRoomManager roomManager = new TestRoomManager();
