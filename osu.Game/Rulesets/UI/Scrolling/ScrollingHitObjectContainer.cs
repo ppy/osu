@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Layout;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -76,6 +77,92 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             combinedObjCache.Invalidate();
             hitObjectInitialStateCache.Clear();
+        }
+
+        public double TimeAtScreenSpace(Vector2 screenSpacePosition)
+        {
+            // convert to local space of column so we can snap and fetch correct location.
+            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
+
+            float position = 0;
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    position = localPosition.Y;
+                    break;
+
+                case ScrollingDirection.Right:
+                case ScrollingDirection.Left:
+                    position = localPosition.X;
+                    break;
+            }
+
+            flipPositionIfRequired(ref position);
+
+            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+        }
+
+        public Vector2 ScreenSpacePositionAtTime(double time)
+        {
+            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+
+            flipPositionIfRequired(ref pos);
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    return ToScreenSpace(new Vector2(getBredth() / 2, pos));
+
+                default:
+                    return ToScreenSpace(new Vector2(pos, getBredth() / 2));
+            }
+        }
+
+        private float getLength()
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Left:
+                case ScrollingDirection.Right:
+                    return DrawWidth;
+
+                default:
+                    return DrawHeight;
+            }
+        }
+
+        private float getBredth()
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    return DrawWidth;
+
+                default:
+                    return DrawHeight;
+            }
+        }
+
+        private void flipPositionIfRequired(ref float position)
+        {
+            // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+            // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
+            // so when scrolling downwards the coordinates need to be flipped.
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Down:
+                    position = DrawHeight - position;
+                    break;
+
+                case ScrollingDirection.Right:
+                    position = DrawWidth - position;
+                    break;
+            }
         }
 
         private void onDefaultsApplied(DrawableHitObject drawableObject)
