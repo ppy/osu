@@ -8,6 +8,7 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IAdjustableClock>(new StopwatchClock());
+            dependencies.CacheAs(new EditorClock());
 
             return dependencies;
         }
