@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Edit
             clock.ChangeSource(sourceClock);
 
             dependencies.CacheAs(clock);
+            AddInternal(clock);
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
