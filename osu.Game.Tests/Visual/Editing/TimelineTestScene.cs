@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -22,14 +20,6 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public abstract class TimelineTestScene : EditorClockTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(TimelineArea),
-            typeof(Timeline),
-            typeof(TimelineButton),
-            typeof(CentreMarker)
-        };
-
         protected TimelineArea TimelineArea { get; private set; }
 
         [BackgroundDependencyLoader]

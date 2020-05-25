@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo("gameplay")
+                new TourneyVideo("mappool")
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,

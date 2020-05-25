@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -15,12 +14,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneDrawableJudgement : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
-        {
-            typeof(DrawableJudgement),
-            typeof(DrawableOsuJudgement)
-        }).ToList();
-
         public TestSceneDrawableJudgement()
         {
             foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
