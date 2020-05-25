@@ -53,23 +53,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
-        {
-            var column = Playfield.GetColumnByPosition(screenSpacePosition);
-
-            if (column == null)
-                return new SnapResult(screenSpacePosition, null);
-
-            double targetTime = column.TimeAtScreenSpacePosition(screenSpacePosition);
-
-            // apply beat snapping
-            targetTime = BeatSnapProvider.SnapTime(targetTime);
-
-            // convert back to screen space
-            screenSpacePosition = column.ScreenSpacePositionAtTime(targetTime);
-
-            return new ManiaSnapResult(screenSpacePosition, targetTime, column);
-        }
+        protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
+            Playfield.GetColumnByPosition(screenSpacePosition);
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {

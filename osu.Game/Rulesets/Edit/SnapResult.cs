@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
@@ -20,10 +21,13 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public double? Time;
 
-        public SnapResult(Vector2 screenSpacePosition, double? time)
+        public readonly Playfield Playfield;
+
+        public SnapResult(Vector2 screenSpacePosition, double? time, Playfield playfield = null)
         {
             ScreenSpacePosition = screenSpacePosition;
             Time = time;
+            Playfield = playfield;
         }
     }
 }

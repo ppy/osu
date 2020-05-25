@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
@@ -224,7 +225,26 @@ namespace osu.Game.Rulesets.Edit
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, null);
+        protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
+            double? targetTime = null;
+
+            if (playfield is ScrollingPlayfield scrollingPlayfield)
+            {
+                targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+
+                // apply beat snapping
+                targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+
+                // convert back to screen space
+                screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+            }
+
+            return new SnapResult(screenSpacePosition, targetTime, playfield);
+        }
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {

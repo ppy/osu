@@ -78,9 +78,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             }
             else
             {
-                if (result is ManiaSnapResult maniaResult)
+                if (result.Playfield != null)
                 {
-                    headPiece.Width = tailPiece.Width = maniaResult.Column.DrawWidth;
+                    headPiece.Width = tailPiece.Width = result.Playfield.DrawWidth;
                     headPiece.X = tailPiece.X = ToLocalSpace(result.ScreenSpacePosition).X;
                 }
 

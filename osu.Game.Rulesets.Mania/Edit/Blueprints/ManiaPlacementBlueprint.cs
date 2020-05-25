@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             base.UpdatePosition(result);
 
             if (!PlacementActive)
-                Column = (result as ManiaSnapResult)?.Column;
+                Column = result.Playfield as Column;
         }
     }
 }
