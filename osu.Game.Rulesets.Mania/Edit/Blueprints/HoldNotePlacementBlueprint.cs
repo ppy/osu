@@ -8,6 +8,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Input;
 
@@ -21,6 +22,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
+
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
@@ -43,6 +47,19 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             {
                 headPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
                 tailPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
+
+                switch (scrollingInfo.Direction.Value)
+                {
+                    case ScrollingDirection.Down:
+                        headPiece.Y -= headPiece.DrawHeight / 2;
+                        tailPiece.Y -= tailPiece.DrawHeight / 2;
+                        break;
+
+                    case ScrollingDirection.Up:
+                        headPiece.Y += headPiece.DrawHeight / 2;
+                        tailPiece.Y += tailPiece.DrawHeight / 2;
+                        break;
+                }
             }
 
             var topPosition = new Vector2(headPiece.DrawPosition.X, Math.Min(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
