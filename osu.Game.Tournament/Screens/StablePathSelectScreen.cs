@@ -38,14 +38,7 @@ namespace osu.Game.Tournament.Screens
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
-            // begin selection in the parent directory of the current storage location
-            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
-
-            if (!string.IsNullOrEmpty(stableInfo.StablePath.Value))
-            {
-                // If the original path info for osu! stable is not empty, set it to the parent directory of that location
-                initialPath = new DirectoryInfo(stableInfo.StablePath.Value).Parent?.FullName;
-            }
+           var initialPath = new DirectoryInfo(storage.GetFullPath(stableInfo.StablePath.Value ?? string.Empty)).Parent?.FullName;
 
             AddRangeInternal(new Drawable[]
             {
@@ -148,7 +141,6 @@ namespace osu.Game.Tournament.Screens
                 AddInternal(overlay);
                 Logger.Log("Folder is not an osu! stable CE directory");
                 return;
-                // Return an error in the picker that the directory does not contain ipc.txt
             }
 
             var fileBasedIpc = ipc as FileBasedIPC;
@@ -163,7 +155,6 @@ namespace osu.Game.Tournament.Screens
 
             if (fileBasedIpc?.IPCStorage == null)
             {
-                // Could not auto detect
                 overlay = new DialogOverlay();
                 overlay.Push(new IPCErrorDialog("Failed to auto detect", "An osu! stable cutting-edge installation could not be auto detected.\nPlease try and manually point to the directory."));
                 AddInternal(overlay);
