@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -52,8 +52,9 @@ namespace osu.Game.Rulesets.Edit
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private Container distanceSnapGridContainer;
-        private DistanceSnapGrid distanceSnapGrid;
+
+        protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
+
         private readonly List<Container> layerContainers = new List<Container>();
 
         private InputManager inputManager;
@@ -87,7 +88,7 @@ namespace osu.Game.Rulesets.Edit
 
             var layerBelowRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
             {
-                distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both },
+                LayerBelowRuleset,
                 new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
             });
 
@@ -139,7 +140,7 @@ namespace osu.Game.Rulesets.Edit
 
             setSelectTool();
 
-            BlueprintContainer.SelectionChanged += selectionChanged;
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -165,16 +166,6 @@ namespace osu.Game.Rulesets.Edit
             inputManager = GetContainingInputManager();
         }
 
-        private double lastGridUpdateTime;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (EditorClock.CurrentTime != lastGridUpdateTime && !(BlueprintContainer.CurrentTool is SelectTool))
-                showGridFor(Enumerable.Empty<HitObject>());
-        }
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -188,19 +179,13 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void selectionChanged(IEnumerable<HitObject> selectedHitObjects)
+        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
         {
-            var hitObjects = selectedHitObjects.ToArray();
-
-            if (hitObjects.Any())
+            if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
                 setSelectTool();
-
-                showGridFor(hitObjects);
             }
-            else
-                distanceSnapGridContainer.Hide();
         }
 
         private void setSelectTool() => toolboxCollection.Items.First().Select();
@@ -209,30 +194,12 @@ namespace osu.Game.Rulesets.Edit
         {
             BlueprintContainer.CurrentTool = tool;
 
-            if (tool is SelectTool)
-                distanceSnapGridContainer.Hide();
-            else
-            {
+            if (!(tool is SelectTool))
                 EditorBeatmap.SelectedHitObjects.Clear();
-                showGridFor(Enumerable.Empty<HitObject>());
-            }
-        }
-
-        private void showGridFor(IEnumerable<HitObject> selectedHitObjects)
-        {
-            distanceSnapGridContainer.Clear();
-            distanceSnapGrid = CreateDistanceSnapGrid(selectedHitObjects);
-
-            if (distanceSnapGrid != null)
-            {
-                distanceSnapGridContainer.Child = distanceSnapGrid;
-                distanceSnapGridContainer.Show();
-            }
-
-            lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
+
         public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
@@ -257,21 +224,11 @@ namespace osu.Game.Rulesets.Edit
                 if (adjustableClock.CurrentTime < hitObject.StartTime)
                     adjustableClock.Seek(hitObject.StartTime);
             }
-
-            showGridFor(Enumerable.Empty<HitObject>());
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
-        {
-            if (distanceSnapGrid == null) return new SnapResult(screenSpacePosition, null);
-
-            // TODO: move distance snap grid to OsuHitObjectComposer.
-            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
-
-            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
-        }
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, null);
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
@@ -320,14 +277,6 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
-
-        /// <summary>
-        /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
-        /// </summary>
-        /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
-        [CanBeNull]
-        protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 

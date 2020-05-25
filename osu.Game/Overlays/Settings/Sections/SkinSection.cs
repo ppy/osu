@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
@@ -38,9 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections
         private void load(OsuConfigManager config)
         {
             FlowContent.Spacing = new Vector2(0, 5);
+
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
+                new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "菜单光标大小",
@@ -115,6 +118,36 @@ namespace osu.Game.Overlays.Settings.Sections
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
 
                 protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+            }
+        }
+
+        private class ExportSkinButton : SettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = "导出已选中的皮肤";
+                Action = export;
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.ID > 0, true);
+            }
+
+            private void export()
+            {
+                try
+                {
+                    skins.Export(currentSkin.Value.SkinInfo);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
+                }
             }
         }
     }
