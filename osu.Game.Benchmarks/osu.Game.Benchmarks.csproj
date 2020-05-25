@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\osu.Game.Tests\osu.Game.Tests.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
 
