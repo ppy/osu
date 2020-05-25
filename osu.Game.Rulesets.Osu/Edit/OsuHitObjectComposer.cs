@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
+
             EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
             EditorBeatmap.PlacementObject.ValueChanged += _ => updateDistanceSnapGrid();
-
-            LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer(HitObjects);
@@ -86,10 +86,24 @@ namespace osu.Game.Rulesets.Osu.Edit
             distanceSnapGridContainer.Clear();
             distanceSnapGridCache.Invalidate();
 
-            if (BlueprintContainer.CurrentTool is SelectTool && !EditorBeatmap.SelectedHitObjects.Any())
-                return;
+            switch (BlueprintContainer.CurrentTool)
+            {
+                case SelectTool _:
+                    if (!EditorBeatmap.SelectedHitObjects.Any())
+                        return;
 
-            if ((distanceSnapGrid = createDistanceSnapGrid(EditorBeatmap.SelectedHitObjects)) != null)
+                    distanceSnapGrid = createDistanceSnapGrid(EditorBeatmap.SelectedHitObjects);
+                    break;
+
+                default:
+                    if (!CursorInPlacementArea)
+                        return;
+
+                    distanceSnapGrid = createDistanceSnapGrid(Enumerable.Empty<HitObject>());
+                    break;
+            }
+
+            if (distanceSnapGrid != null)
             {
                 distanceSnapGridContainer.Add(distanceSnapGrid);
                 distanceSnapGridCache.Validate();

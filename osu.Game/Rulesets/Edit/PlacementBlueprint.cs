@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        private Bindable<double> startTimeBindable;
+
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
@@ -55,6 +57,9 @@ namespace osu.Game.Rulesets.Edit
             this.beatmap.BindTo(beatmap);
 
             ApplyDefaultsToHitObject();
+
+            startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
 
         /// <summary>
