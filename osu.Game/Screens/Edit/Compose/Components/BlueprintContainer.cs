@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null)
                 return false;
 
-            editorClock?.Seek(clickedBlueprint.HitObject.StartTime);
+            editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 

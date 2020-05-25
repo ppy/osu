@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Edit
                 EditorBeatmap.Add(hitObject);
 
                 if (EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.Seek(hitObject.StartTime);
+                    EditorClock.SeekTo(hitObject.StartTime);
             }
         }
 
