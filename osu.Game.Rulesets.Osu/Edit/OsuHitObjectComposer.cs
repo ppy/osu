@@ -4,6 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Caching;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -12,6 +16,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -32,9 +37,80 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LayerBelowRuleset.Add(distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both });
+
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
+            EditorBeatmap.PlacementObject.ValueChanged += _ => updateDistanceSnapGrid();
+        }
+
         protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer(HitObjects);
 
-        protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
+        private DistanceSnapGrid distanceSnapGrid;
+        private Container distanceSnapGridContainer;
+
+        private readonly Cached distanceSnapGridCache = new Cached();
+        private double? lastDistanceSnapGridTime;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!(BlueprintContainer.CurrentTool is SelectTool))
+            {
+                if (EditorClock.CurrentTime != lastDistanceSnapGridTime)
+                {
+                    distanceSnapGridCache.Invalidate();
+                    lastDistanceSnapGridTime = EditorClock.CurrentTime;
+                }
+
+                if (!distanceSnapGridCache.IsValid)
+                    updateDistanceSnapGrid();
+            }
+        }
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            if (distanceSnapGrid == null)
+                return base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+
+            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
+
+            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
+        }
+
+        private void updateDistanceSnapGrid()
+        {
+            distanceSnapGridContainer.Clear();
+            distanceSnapGridCache.Invalidate();
+
+            switch (BlueprintContainer.CurrentTool)
+            {
+                case SelectTool _:
+                    if (!EditorBeatmap.SelectedHitObjects.Any())
+                        return;
+
+                    distanceSnapGrid = createDistanceSnapGrid(EditorBeatmap.SelectedHitObjects);
+                    break;
+
+                default:
+                    if (!CursorInPlacementArea)
+                        return;
+
+                    distanceSnapGrid = createDistanceSnapGrid(Enumerable.Empty<HitObject>());
+                    break;
+            }
+
+            if (distanceSnapGrid != null)
+            {
+                distanceSnapGridContainer.Add(distanceSnapGrid);
+                distanceSnapGridCache.Validate();
+            }
+        }
+
+        private DistanceSnapGrid createDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
         {
             if (BlueprintContainer.CurrentTool is SpinnerCompositionTool)
                 return null;
