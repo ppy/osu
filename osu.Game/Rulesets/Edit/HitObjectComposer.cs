@@ -51,8 +51,6 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        private readonly List<Container> layerContainers = new List<Container>();
-
         private InputManager inputManager;
 
         private RadioButtonCollection toolboxCollection;
@@ -82,17 +80,6 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            var layerBelowRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
-            {
-                LayerBelowRuleset,
-                new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-            });
-
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
-
-            layerContainers.Add(layerBelowRuleset);
-            layerContainers.Add(layerAboveRuleset);
-
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -116,9 +103,16 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                layerBelowRuleset,
+                                // layers below playfield
+                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
+                                {
+                                    LayerBelowRuleset,
+                                    new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                                }),
                                 drawableRulesetWrapper,
-                                layerAboveRuleset
+                                // layers above playfield
+                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer())
                             }
                         }
                     },
@@ -160,19 +154,6 @@ namespace osu.Game.Rulesets.Edit
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            layerContainers.ForEach(l =>
-            {
-                l.Anchor = drawableRulesetWrapper.Playfield.Anchor;
-                l.Origin = drawableRulesetWrapper.Playfield.Origin;
-                l.Position = drawableRulesetWrapper.Playfield.Position;
-                l.Size = drawableRulesetWrapper.Playfield.Size;
-            });
         }
 
         private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
