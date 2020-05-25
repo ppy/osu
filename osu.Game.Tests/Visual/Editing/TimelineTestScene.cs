@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -69,7 +68,7 @@ namespace osu.Game.Tests.Visual.Editing
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [Resolved]
-            private IAdjustableClock adjustableClock { get; set; }
+            private EditorClock editorClock { get; set; }
 
             public AudioVisualiser()
             {
@@ -96,13 +95,15 @@ namespace osu.Game.Tests.Visual.Editing
                 base.Update();
 
                 if (beatmap.Value.Track.IsLoaded)
-                    marker.X = (float)(adjustableClock.CurrentTime / beatmap.Value.Track.Length);
+                    marker.X = (float)(editorClock.CurrentTime / beatmap.Value.Track.Length);
             }
         }
 
         private class StartStopButton : OsuButton
         {
-            private IAdjustableClock adjustableClock;
+            [Resolved]
+            private EditorClock editorClock { get; set; }
+
             private bool started;
 
             public StartStopButton()
@@ -114,22 +115,16 @@ namespace osu.Game.Tests.Visual.Editing
                 Action = onClick;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(IAdjustableClock adjustableClock)
-            {
-                this.adjustableClock = adjustableClock;
-            }
-
             private void onClick()
             {
                 if (started)
                 {
-                    adjustableClock.Stop();
+                    editorClock.Stop();
                     Text = "Start";
                 }
                 else
                 {
-                    adjustableClock.Start();
+                    editorClock.Start();
                     Text = "Stop";
                 }
 
