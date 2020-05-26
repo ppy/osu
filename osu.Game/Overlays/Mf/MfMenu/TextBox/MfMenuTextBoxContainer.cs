@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
 {
-    public class MfMenuTextBoxContainer : OsuClickableContainer
+    public class MfMenuTextBoxContainer : Container
     {
         private static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
 
