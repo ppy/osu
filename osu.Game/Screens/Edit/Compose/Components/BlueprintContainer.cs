@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -14,7 +13,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -29,8 +27,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public abstract class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
-        public event Action<IEnumerable<HitObject>> SelectionChanged;
-
         protected DragBox DragBox { get; private set; }
 
         protected Container<SelectionBlueprint> SelectionBlueprints { get; private set; }
@@ -41,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IEditorChangeHandler changeHandler { get; set; }
 
         [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
+        private EditorClock editorClock { get; set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -49,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
 
         [Resolved(canBeNull: true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IPositionSnapProvider snapProvider { get; set; }
 
         protected BlueprintContainer()
         {
@@ -88,8 +84,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
                         break;
                 }
-
-                SelectionChanged?.Invoke(selectedHitObjects);
             };
         }
 
@@ -149,7 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null)
                 return false;
 
-            adjustableClock?.Seek(clickedBlueprint.HitObject.StartTime);
+            editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 
@@ -326,7 +320,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             foreach (var blueprint in SelectionBlueprints)
             {
-                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
+                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint))
                     blueprint.Select();
                 else
                     blueprint.Deselect();
@@ -384,7 +378,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
             movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
-            movementBlueprintOriginalPosition = movementBlueprint.SelectionPoint; // todo: unsure if correct
+            movementBlueprintOriginalPosition = movementBlueprint.ScreenSpaceSelectionPoint; // todo: unsure if correct
         }
 
         /// <summary>
@@ -405,16 +399,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 movePosition = movementBlueprintOriginalPosition.Value + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
 
             // Retrieve a snapped position.
-            (Vector2 snappedPosition, double snappedTime) = snapProvider.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
+            var result = snapProvider.SnapScreenSpacePositionToValidTime(movePosition);
 
             // Move the hitobjects.
-            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, ToScreenSpace(snappedPosition))))
+            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, result.ScreenSpacePosition)))
                 return true;
 
-            // Apply the start time at the newly snapped-to position
-            double offset = snappedTime - draggedObject.StartTime;
-            foreach (HitObject obj in selectionHandler.SelectedHitObjects)
-                obj.StartTime += offset;
+            if (result.Time.HasValue)
+            {
+                // Apply the start time at the newly snapped-to position
+                double offset = result.Time.Value - draggedObject.StartTime;
+                foreach (HitObject obj in selectionHandler.SelectedHitObjects)
+                    obj.StartTime += offset;
+            }
 
             return true;
         }

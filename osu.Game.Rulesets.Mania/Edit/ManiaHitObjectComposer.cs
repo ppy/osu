@@ -6,9 +6,13 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Input;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -20,18 +24,26 @@ namespace osu.Game.Rulesets.Mania.Edit
     public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>, IManiaHitObjectComposer
     {
         private DrawableManiaEditRuleset drawableRuleset;
+        private ManiaBeatSnapGrid beatSnapGrid;
+        private InputManager inputManager;
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
-        /// <summary>
-        /// Retrieves the column that intersects a screen-space position.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public Column ColumnAt(Vector2 screenSpacePosition) => drawableRuleset.GetColumnByPosition(screenSpacePosition);
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(beatSnapGrid = new ManiaBeatSnapGrid());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
 
         private DependencyContainer dependencies;
 
@@ -42,29 +54,30 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
-        public int TotalColumns => Playfield.TotalColumns;
+        protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
+            Playfield.GetColumnByPosition(screenSpacePosition);
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            var hoc = Playfield.GetColumn(0).HitObjectContainer;
+            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
 
-            float targetPosition = hoc.ToLocalSpace(ToScreenSpace(position)).Y;
-
-            if (drawableRuleset.ScrollingInfo.Direction.Value == ScrollingDirection.Down)
+            switch (ScrollingInfo.Direction.Value)
             {
-                // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
-                // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
-                // so when scrolling downwards the coordinates need to be flipped.
-                targetPosition = hoc.DrawHeight - targetPosition;
+                case ScrollingDirection.Down:
+                    result.ScreenSpacePosition -= new Vector2(0, getNoteHeight() / 2);
+                    break;
+
+                case ScrollingDirection.Up:
+                    result.ScreenSpacePosition += new Vector2(0, getNoteHeight() / 2);
+                    break;
             }
 
-            double targetTime = drawableRuleset.ScrollingInfo.Algorithm.TimeAt(targetPosition,
-                EditorClock.CurrentTime,
-                drawableRuleset.ScrollingInfo.TimeRange.Value,
-                hoc.DrawHeight);
-
-            return base.GetSnappedPosition(position, targetTime);
+            return result;
         }
+
+        private float getNoteHeight() =>
+            Playfield.GetColumn(0).ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
+            Playfield.GetColumn(0).ToScreenSpace(Vector2.Zero).Y;
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
@@ -83,5 +96,28 @@ namespace osu.Game.Rulesets.Mania.Edit
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
         };
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (BlueprintContainer.CurrentTool is SelectTool)
+            {
+                if (EditorBeatmap.SelectedHitObjects.Any())
+                {
+                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                }
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+            else
+            {
+                var result = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+                if (result.Time is double time)
+                    beatSnapGrid.SelectionTimeRange = (time, time);
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+        }
     }
 }
