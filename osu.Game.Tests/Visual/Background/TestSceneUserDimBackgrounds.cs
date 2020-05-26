@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Check if <see cref="PlayerLoader"/> properly triggers the visual settings preview when a user hovers over the visual settings panel.
         /// </summary>
         [Test]
-        public void PlayerLoaderSettingsHoverTest()
+        public void TestPlayerLoaderSettingsHover()
         {
             setupUserSettings();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true })));
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Background
         /// We need to check that in this scenario, the dim and blur is still properly applied after entering player.
         /// </summary>
         [Test]
-        public void PlayerLoaderTransitionTest()
+        public void TestPlayerLoaderTransition()
         {
             performFullSetup();
             AddStep("Trigger hover event", () => playerLoader.TriggerOnHover());
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Make sure the background is fully invisible (Alpha == 0) when the background should be disabled by the storyboard.
         /// </summary>
         [Test]
-        public void StoryboardBackgroundVisibilityTest()
+        public void TestStoryboardBackgroundVisibility()
         {
             performFullSetup();
             createFakeStoryboard();
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Background
         /// When exiting player, the screen that it suspends/exits to needs to have a fully visible (Alpha == 1) background.
         /// </summary>
         [Test]
-        public void StoryboardTransitionTest()
+        public void TestStoryboardTransition()
         {
             performFullSetup();
             createFakeStoryboard();
@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a background.
         /// </summary>
         [Test]
-        public void DisableUserDimBackgroundTest()
+        public void TestDisableUserDimBackground()
         {
             performFullSetup();
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
@@ -150,7 +150,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a storyboard.
         /// </summary>
         [Test]
-        public void DisableUserDimStoryboardTest()
+        public void TestDisableUserDimStoryboard()
         {
             performFullSetup();
             createFakeStoryboard();
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Check if the visual settings container retains dim and blur when pausing
         /// </summary>
         [Test]
-        public void PauseTest()
+        public void TestPause()
         {
             performFullSetup(true);
             AddStep("Pause", () => player.Pause());
@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Check if the visual settings container removes user dim when suspending <see cref="Player"/> for <see cref="ResultsScreen"/>
         /// </summary>
         [Test]
-        public void TransitionTest()
+        public void TestTransition()
         {
             performFullSetup();
             FadeAccessibleResults results = null;
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Check if background gets undimmed and unblurred when leaving <see cref="Player"/>  for <see cref="PlaySongSelect"/>
         /// </summary>
         [Test]
-        public void TransitionOutTest()
+        public void TestTransitionOut()
         {
             performFullSetup();
             AddStep("Exit to song select", () => player.Exit());
@@ -209,7 +209,7 @@ namespace osu.Game.Tests.Visual.Background
         /// Check if hovering on the visual settings dialogue after resuming from player still previews the background dim.
         /// </summary>
         [Test]
-        public void ResumeFromPlayerTest()
+        public void TestResumeFromPlayer()
         {
             performFullSetup();
             AddStep("Move mouse to Visual Settings", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
