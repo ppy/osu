@@ -12,6 +12,8 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneScorePanel : OsuTestScene
     {
+        private ScorePanel panel;
+
         [Test]
         public void TestDRank()
         {
@@ -84,9 +86,24 @@ namespace osu.Game.Tests.Visual.Ranking
             addPanelStep(score, PanelState.Contracted);
         }
 
+        [Test]
+        public void TestExpandAndContract()
+        {
+            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.925, Rank = ScoreRank.A };
+
+            addPanelStep(score, PanelState.Contracted);
+            AddWaitStep("wait for transition", 10);
+
+            AddStep("expand panel", () => panel.State = PanelState.Expanded);
+            AddWaitStep("wait for transition", 10);
+
+            AddStep("contract panel", () => panel.State = PanelState.Contracted);
+            AddWaitStep("wait for transition", 10);
+        }
+
         private void addPanelStep(ScoreInfo score, PanelState state = PanelState.Expanded) => AddStep("add panel", () =>
         {
-            Child = new ScorePanel(score)
+            Child = panel = new ScorePanel(score)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
