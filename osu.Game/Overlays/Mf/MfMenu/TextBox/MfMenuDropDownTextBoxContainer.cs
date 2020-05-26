@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuDropDownTextBoxContainer : MfMenuTextBoxContainer
     {
+        private const float DURATION = 500;
+
         public Drawable D;
 
         private Container content;
@@ -81,9 +83,9 @@ namespace osu.Game.Overlays.MfMenu
             {
                 case true:
                     CanChangeBorderThickness.Value = false;
-                    backgroundContainer.BorderThickness = 3;
-                    dropDownIcon.RotateTo(0, 500, Easing.OutQuint);
-                    content.FadeIn(500, Easing.OutQuint);
+                    backgroundContainer.BorderThickness = 4;
+                    dropDownIcon.RotateTo(0, DURATION, Easing.OutQuint);
+                    content.FadeIn(DURATION, Easing.OutQuint);
                     break;
 
                 case false:
@@ -92,8 +94,8 @@ namespace osu.Game.Overlays.MfMenu
                     if ( backgroundContainer.BorderThickness != 0 )
                         backgroundContainer.BorderThickness = 2;
 
-                    dropDownIcon.RotateTo(180, 500, Easing.OutQuint);
-                    content.FadeOut(500, Easing.OutQuint);
+                    dropDownIcon.RotateTo(180, DURATION, Easing.OutQuint);
+                    content.FadeOut(DURATION, Easing.OutQuint);
                     break;
             }
         }

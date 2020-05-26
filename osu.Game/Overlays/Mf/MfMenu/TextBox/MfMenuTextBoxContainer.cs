@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.MfMenu
                     }
                 },
             };
-        
+
             CanChangeBorderThickness.Value = true;
         }
 
