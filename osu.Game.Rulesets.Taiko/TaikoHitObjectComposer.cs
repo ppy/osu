@@ -169,8 +169,10 @@ namespace osu.Game.Rulesets.Taiko
     {
         private readonly HitPiece piece;
 
+        private static Hit hit;
+
         public HitPlacementBlueprint()
-            : base(new Hit())
+            : base(hit = new Hit())
         {
             InternalChild = piece = new HitPiece
             {
@@ -180,13 +182,20 @@ namespace osu.Game.Rulesets.Taiko
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button == MouseButton.Left)
+            switch (e.Button)
             {
-                EndPlacement(true);
-                return true;
+                case MouseButton.Left:
+                    hit.Type = HitType.Centre;
+                    EndPlacement(true);
+                    return true;
+
+                case MouseButton.Right:
+                    hit.Type = HitType.Rim;
+                    EndPlacement(true);
+                    return true;
             }
 
-            return base.OnMouseDown(e);
+            return false;
         }
 
         public override void UpdatePosition(SnapResult snapResult)
