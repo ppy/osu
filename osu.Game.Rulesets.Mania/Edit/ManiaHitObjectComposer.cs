@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -53,23 +54,30 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
+        protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
+            Playfield.GetColumnByPosition(screenSpacePosition);
+
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            var column = Playfield.GetColumnByPosition(screenSpacePosition);
+            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
 
-            if (column == null)
-                return new SnapResult(screenSpacePosition, null);
+            switch (ScrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Down:
+                    result.ScreenSpacePosition -= new Vector2(0, getNoteHeight() / 2);
+                    break;
 
-            double targetTime = column.TimeAtScreenSpacePosition(screenSpacePosition);
+                case ScrollingDirection.Up:
+                    result.ScreenSpacePosition += new Vector2(0, getNoteHeight() / 2);
+                    break;
+            }
 
-            // apply beat snapping
-            targetTime = BeatSnapProvider.SnapTime(targetTime);
-
-            // convert back to screen space
-            screenSpacePosition = column.ScreenSpacePositionAtTime(targetTime);
-
-            return new ManiaSnapResult(screenSpacePosition, targetTime, column);
+            return result;
         }
+
+        private float getNoteHeight() =>
+            Playfield.GetColumn(0).ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
+            Playfield.GetColumn(0).ToScreenSpace(Vector2.Zero).Y;
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
