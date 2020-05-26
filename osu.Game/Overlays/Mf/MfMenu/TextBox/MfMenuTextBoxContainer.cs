@@ -24,12 +24,11 @@ namespace osu.Game.Overlays.MfMenu
         private EdgeEffectParameters edgeEffect = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
-            Colour = Colour4.Black.Opacity(0.3f),
+            Colour = Colour4.Black.Opacity(0.35f),
             Radius = 18,
         };
 
         private Container baseContainer;
-        private Container hoverEffectContainer;
         protected Container backgroundContainer;
         private FillFlowContainer contentFillFlow;
 
@@ -51,19 +50,12 @@ namespace osu.Game.Overlays.MfMenu
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        hoverEffectContainer = new Container
-                        {
-                            CornerRadius = 25,
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            EdgeEffect = edgeEffect,
-                            Alpha = 0
-                        },
                         backgroundContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             CornerRadius = 25,
                             Masking = true,
+                            BorderColour = colourProvider.Light1,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -81,10 +73,11 @@ namespace osu.Game.Overlays.MfMenu
                         },
                         contentFillFlow = new FillFlowContainer
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding(25),
                             Spacing = new Vector2(15),
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            Masking = true,
                         },
                     }
                 },
@@ -113,11 +106,10 @@ namespace osu.Game.Overlays.MfMenu
             }
 
             if ( d != null )
-            {
                 contentFillFlow.Add(d);
-                contentFillFlow.LayoutEasing = Easing.OutQuint;
-                contentFillFlow.LayoutDuration = 750;
-            }
+
+            contentFillFlow.LayoutEasing = Easing.OutQuint;
+            contentFillFlow.LayoutDuration = 750;
 
             base.LoadComplete();
         }
@@ -125,15 +117,13 @@ namespace osu.Game.Overlays.MfMenu
         //我已经不知道要怎么处理光标悬浮时的动画了就这样吧
         protected override bool OnHover(HoverEvent e)
         {
-            baseContainer.MoveToY(-5, 500, Easing.OutQuint);
-            hoverEffectContainer.FadeIn(500, Easing.OutQuint);
+            backgroundContainer.BorderThickness = 2;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            baseContainer.MoveToY(0, 500, Easing.OutQuint);
-            hoverEffectContainer.FadeOut(500, Easing.OutQuint);
+            backgroundContainer.BorderThickness = 0;
             base.OnHoverLost(e);
         }
     }

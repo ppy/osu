@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.MfMenu
                                         },
                                         new MfMenuDropDownTextBoxContainer
                                         {
-                                            Title = "为什么我没法查看谱面/在线列表/排名聊天/看板?",
+                                            Title = "为什么我没法查看谱面/在线列表/排名/聊天/看板?",
                                             D = faqCannotUseOnlineFunction()
                                         }
                                     }
@@ -320,7 +320,7 @@ namespace osu.Game.Overlays.MfMenu
         {
             var t = new MfTextBox();
 
-            t.AddParagraph("A: 这与你的系统和当前的网络环境等", AnswerTitlefont);
+            t.AddParagraph("这与你的系统和当前的网络环境等", AnswerTitlefont);
             t.AddText("一系列因素有关, 也可能是你一次性发送了过多的资源请求, 请多等待一会, 你也可以尝试重新进入谱面列表/信息界面", AnswerTitlefont);
 
             return t;
