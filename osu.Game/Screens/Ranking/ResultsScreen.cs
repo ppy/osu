@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Ranking
         private Drawable bottomPanel;
         private ScorePanelList panels;
 
-        public ResultsScreen(ScoreInfo score, bool allowRetry = true)
+        protected ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
             Score = score;
             this.allowRetry = allowRetry;
