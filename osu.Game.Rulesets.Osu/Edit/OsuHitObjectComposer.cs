@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
 
-            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
+            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, PlayfieldAtScreenSpacePosition(screenSpacePosition));
         }
 
         private void updateDistanceSnapGrid()
