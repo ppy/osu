@@ -244,14 +244,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Context Menu
 
-        public virtual MenuItem[] ContextMenuItems
+        public MenuItem[] ContextMenuItems
         {
             get
             {
                 if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
-                var items = new List<MenuItem>
+                var items = new List<MenuItem>();
+
+                items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
+
+                if (selectedBlueprints.Count == 1)
+                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+
+                items.AddRange(new[]
                 {
                     new OsuMenuItem("Sound")
                     {
@@ -263,14 +270,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         }
                     },
                     new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
-                };
-
-                if (selectedBlueprints.Count == 1)
-                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+                });
 
                 return items.ToArray();
             }
         }
+
+        /// <summary>
+        /// Provide context menu items relevant to current selection. Calling base is not required.
+        /// </summary>
+        /// <param name="selection">The current selection.</param>
+        /// <returns>The relevant menu items.</returns>
+        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
+            => Enumerable.Empty<MenuItem>();
 
         private MenuItem createHitSampleMenuItem(string name, string sampleName)
         {
