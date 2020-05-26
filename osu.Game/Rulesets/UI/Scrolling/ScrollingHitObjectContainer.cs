@@ -120,10 +120,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
             {
                 case ScrollingDirection.Up:
                 case ScrollingDirection.Down:
-                    return ToScreenSpace(new Vector2(getBredth() / 2, pos));
+                    return ToScreenSpace(new Vector2(getBreadth() / 2, pos));
 
                 default:
-                    return ToScreenSpace(new Vector2(pos, getBredth() / 2));
+                    return ToScreenSpace(new Vector2(pos, getBreadth() / 2));
             }
         }
 
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private float getBredth()
+        private float getBreadth()
         {
             switch (scrollingInfo.Direction.Value)
             {
