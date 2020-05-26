@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Game.Audio;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Objects;
@@ -119,7 +120,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
-        private Container<DrawableStrongNestedHit> strongHitContainer;
+        private Bindable<bool> isStrong;
+
+        private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
         protected DrawableTaikoHitObject(TObject hitObject)
             : base(hitObject)
@@ -130,20 +133,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
+
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RecreatePieces();
+            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
+            isStrong.BindValueChanged(_ => RecreatePieces(), true);
         }
 
         protected virtual void RecreatePieces()
         {
             Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
-            Content.Clear();
+            MainPiece?.Expire();
             Content.Add(MainPiece = CreateMainPiece());
         }
 
