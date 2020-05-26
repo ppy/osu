@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Mods;
@@ -162,6 +164,9 @@ namespace osu.Game.Screens.Multi.Match
             };
         }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -185,6 +190,17 @@ namespace osu.Game.Screens.Multi.Match
 
             managerAdded = beatmapManager.ItemAdded.GetBoundCopy();
             managerAdded.BindValueChanged(beatmapAdded);
+
+            if (roomId.Value != null)
+            {
+                var req = new GetRoomPlaylistScoresRequest(roomId.Value.Value, playlist[0].ID);
+
+                req.Success += scores =>
+                {
+                };
+
+                api.Queue(req);
+            }
         }
 
         public override bool OnExiting(IScreen next)
