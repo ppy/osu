@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Configuration;
@@ -20,6 +19,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
@@ -38,13 +38,10 @@ namespace osu.Game.Rulesets.Edit
         protected readonly Ruleset Ruleset;
 
         [Resolved]
-        protected IFrameBasedClock EditorClock { get; private set; }
+        protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
-
-        [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
@@ -54,8 +51,6 @@ namespace osu.Game.Rulesets.Edit
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
-
-        private readonly List<Container> layerContainers = new List<Container>();
 
         private InputManager inputManager;
 
@@ -68,7 +63,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IFrameBasedClock framedClock)
+        private void load()
         {
             Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -76,7 +71,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
                 {
-                    Clock = framedClock,
+                    Clock = EditorClock,
                     ProcessCustomClock = false
                 };
             }
@@ -85,17 +80,6 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
-
-            var layerBelowRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
-            {
-                LayerBelowRuleset,
-                new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-            });
-
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
-
-            layerContainers.Add(layerBelowRuleset);
-            layerContainers.Add(layerAboveRuleset);
 
             InternalChild = new GridContainer
             {
@@ -120,9 +104,16 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                layerBelowRuleset,
+                                // layers below playfield
+                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
+                                {
+                                    LayerBelowRuleset,
+                                    new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                                }),
                                 drawableRulesetWrapper,
-                                layerAboveRuleset
+                                // layers above playfield
+                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer())
                             }
                         }
                     },
@@ -164,19 +155,6 @@ namespace osu.Game.Rulesets.Edit
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            layerContainers.ForEach(l =>
-            {
-                l.Anchor = drawableRulesetWrapper.Playfield.Anchor;
-                l.Origin = drawableRulesetWrapper.Playfield.Origin;
-                l.Position = drawableRulesetWrapper.Playfield.Position;
-                l.Size = drawableRulesetWrapper.Playfield.Size;
-            });
         }
 
         private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
@@ -221,14 +199,33 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                if (adjustableClock.CurrentTime < hitObject.StartTime)
-                    adjustableClock.Seek(hitObject.StartTime);
+                if (EditorClock.CurrentTime < hitObject.StartTime)
+                    EditorClock.SeekTo(hitObject.StartTime);
             }
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, null);
+        protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
+            double? targetTime = null;
+
+            if (playfield is ScrollingPlayfield scrollingPlayfield)
+            {
+                targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+
+                // apply beat snapping
+                targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+
+                // convert back to screen space
+                screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+            }
+
+            return new SnapResult(screenSpacePosition, targetTime, playfield);
+        }
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {

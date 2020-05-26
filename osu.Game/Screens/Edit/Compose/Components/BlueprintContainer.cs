@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IEditorChangeHandler changeHandler { get; set; }
 
         [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
+        private EditorClock editorClock { get; set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -144,7 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null)
                 return false;
 
-            adjustableClock?.Seek(clickedBlueprint.HitObject.StartTime);
+            editorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 

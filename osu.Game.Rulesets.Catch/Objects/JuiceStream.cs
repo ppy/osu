@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -45,9 +46,9 @@ namespace osu.Game.Rulesets.Catch.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
             var dropletSamples = Samples.Select(s => new HitSampleInfo
             {
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             SliderEventDescriptor? lastEvent = null;
 
-            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
             {
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
@@ -73,6 +74,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                         for (double t = timeBetweenTiny; t < sinceLastTick; t += timeBetweenTiny)
                         {
+                            cancellationToken.ThrowIfCancellationRequested();
+
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,

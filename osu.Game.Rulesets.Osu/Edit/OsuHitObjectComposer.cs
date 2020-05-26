@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
 
-            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
+            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, PlayfieldAtScreenSpacePosition(screenSpacePosition));
         }
 
         private void updateDistanceSnapGrid()
@@ -118,7 +118,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             var objects = selectedHitObjects.ToList();
 
             if (objects.Count == 0)
-                return createGrid(h => h.StartTime <= EditorClock.CurrentTime);
+                // use accurate time value to give more instantaneous feedback to the user.
+                return createGrid(h => h.StartTime <= EditorClock.CurrentTimeAccurate);
 
             double minTime = objects.Min(h => h.StartTime);
             return createGrid(h => h.StartTime < minTime, objects.Count + 1);

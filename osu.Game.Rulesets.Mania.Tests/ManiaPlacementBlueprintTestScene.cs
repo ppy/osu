@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             var time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
             var pos = column.ScreenSpacePositionAtTime(time);
 
-            return new ManiaSnapResult(pos, time, column);
+            return new SnapResult(pos, time, column);
         }
 
         protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };

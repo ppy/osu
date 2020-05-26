@@ -4,6 +4,7 @@
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -73,17 +74,17 @@ namespace osu.Game.Rulesets.Taiko.Objects
             overallDifficulty = difficulty.OverallDifficulty;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            createTicks();
+            createTicks(cancellationToken);
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
 
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
         }
 
-        private void createTicks()
+        private void createTicks(CancellationToken cancellationToken)
         {
             if (tickSpacing == 0)
                 return;
@@ -92,6 +93,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new DrumRollTick
                 {
                     FirstTick = first,
