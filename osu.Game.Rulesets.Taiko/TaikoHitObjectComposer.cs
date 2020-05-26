@@ -107,6 +107,8 @@ namespace osu.Game.Rulesets.Taiko
                                 h.IsStrong = false;
                                 break;
                         }
+
+                        EditorBeatmap?.UpdateHitObject(h);
                     }
                 })
                 {
