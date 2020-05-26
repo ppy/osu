@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// Given a position in screen space, return the time within this column.
         /// </summary>
         public virtual double TimeAtScreenSpacePosition(Vector2 screenSpacePosition) =>
-            ((ScrollingHitObjectContainer)HitObjectContainer).TimeAtScreenSpace(screenSpacePosition);
+            ((ScrollingHitObjectContainer)HitObjectContainer).TimeAtScreenSpacePosition(screenSpacePosition);
 
         /// <summary>
         /// Given a time, return the screen space position within this column.
