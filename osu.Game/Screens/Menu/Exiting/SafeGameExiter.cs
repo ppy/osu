@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,6 +21,9 @@ namespace osu.Game.Screens.Menu.Exiting
         private readonly Action onExitBlock;
 
         private Bindable<float> holdDelay;
+
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay notificationOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
@@ -62,6 +64,16 @@ namespace osu.Game.Screens.Menu.Exiting
             {
                 onSafeExitPassed();
                 return true;
+            }
+
+            // Block exit when the notification overlay has un-cancellable progress notifications.
+            if (notificationOverlay?.HasUnCancellableWork == true)
+            {
+                notificationOverlay.Show();
+                if (!(dialogOverlay.CurrentDialog is CannotExitDialog))
+                    dialogOverlay.Push(new CannotExitDialog("There are un-cancellable work active currently.", onExitBlock));
+
+                return false;
             }
 
             // No need to push confirmation dialogs if still at the cannot-exit dialog.
