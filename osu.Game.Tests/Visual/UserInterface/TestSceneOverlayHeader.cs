@@ -3,8 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
@@ -15,18 +13,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneOverlayHeader : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OverlayHeader),
-            typeof(TabControlOverlayHeader<>),
-            typeof(BreadcrumbControlOverlayHeader),
-            typeof(TestNoControlHeader),
-            typeof(TestStringTabControlHeader),
-            typeof(TestEnumTabControlHeader),
-            typeof(TestBreadcrumbControlHeader),
-            typeof(OverlayHeaderBackground)
-        };
-
         private readonly FillFlowContainer flow;
 
         public TestSceneOverlayHeader()

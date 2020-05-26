@@ -20,12 +20,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneCommentsPage : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableComment),
-            typeof(CommentsPage),
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
