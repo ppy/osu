@@ -14,7 +14,9 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Play
 {
@@ -86,6 +88,12 @@ namespace osu.Game.Screens.Multi.Play
             Exited?.Invoke();
 
             return false;
+        }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score)
+        {
+            Debug.Assert(roomId.Value != null);
+            return new TimeshiftResultsScreen(score, roomId.Value.Value, playlistItem);
         }
 
         protected override ScoreInfo CreateScore()
