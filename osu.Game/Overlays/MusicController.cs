@@ -325,7 +325,7 @@ namespace osu.Game.Overlays
             {
                 case GlobalAction.MusicPlay:
                     if (TogglePause())
-                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "Play track" : "Pause track"));
+                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "开始播放" : "暂停播放"));
                     return true;
 
                 case GlobalAction.MusicNext:
