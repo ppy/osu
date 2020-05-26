@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,8 +12,6 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
@@ -21,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultsScreen : OsuScreen
+    public abstract class ResultsScreen : OsuScreen
     {
         protected const float BACKGROUND_BLUR = 20;
 
@@ -37,9 +35,6 @@ namespace osu.Game.Screens.Ranking
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         public readonly ScoreInfo Score;
 
@@ -133,21 +128,27 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            var req = new GetScoresRequest(Score.Beatmap, Score.Ruleset);
-
-            req.Success += r => Schedule(() =>
+            var req = FetchScores(scores => Schedule(() =>
             {
-                foreach (var s in r.Scores.Select(s => s.CreateScoreInfo(rulesets)))
+                foreach (var s in scores)
                 {
                     if (s.OnlineScoreID == Score.OnlineScoreID)
                         continue;
 
                     panels.AddScore(s);
                 }
-            });
+            }));
 
-            api.Queue(req);
+            if (req != null)
+                api.Queue(req);
         }
+
+        /// <summary>
+        /// Performs a fetch/refresh of scores to be displayed.
+        /// </summary>
+        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
+        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
+        protected virtual APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
         public override void OnEntering(IScreen last)
         {
