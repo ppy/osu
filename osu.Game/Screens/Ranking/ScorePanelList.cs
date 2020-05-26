@@ -118,11 +118,11 @@ namespace osu.Game.Screens.Ranking
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
-            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).OfType<ScorePanel>().TakeWhile(s => s.Score != score).Count();
+            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Score != score).Count();
 
-            private IEnumerable<Drawable> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanel>()
-                                                                                                    .OrderByDescending(s => s.Score.TotalScore)
-                                                                                                    .ThenBy(s => s.Score.OnlineScoreID);
+            private IEnumerable<ScorePanel> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanel>()
+                                                                                                      .OrderByDescending(s => s.Score.TotalScore)
+                                                                                                      .ThenBy(s => s.Score.OnlineScoreID);
         }
 
         private class Scroll : OsuScrollContainer
