@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(selected =>
             {
                 if (selected.NewValue != null)
-                    clock.Seek(selected.NewValue.Time);
+                    clock.SeekTo(selected.NewValue.Time);
             });
         }
 
