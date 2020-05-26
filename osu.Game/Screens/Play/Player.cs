@@ -472,6 +472,16 @@ namespace osu.Game.Screens.Play
             else
                 score.User = api.LocalUser.Value;
 
+            try
+            {
+                var performanceCalculator = ruleset?.CreatePerformanceCalculator(Beatmap.Value, score);
+                var totalPp = performanceCalculator?.Calculate(new Dictionary<string, double>());
+                score.PP = totalPp;
+            }
+            catch (Exception)
+            {
+            }
+
             ScoreProcessor.PopulateScore(score);
 
             return score;
