@@ -9,7 +9,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : ConvertHitObject, IHasCurve, IHasLegacyLastTickOffset
+    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
