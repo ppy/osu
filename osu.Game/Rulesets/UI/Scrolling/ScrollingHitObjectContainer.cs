@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// Given a position in screen space, return the time within this column.
         /// </summary>
-        public double TimeAtScreenSpace(Vector2 screenSpacePosition)
+        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
             // convert to local space of column so we can snap and fetch correct location.
             Vector2 localPosition = ToLocalSpace(screenSpacePosition);
