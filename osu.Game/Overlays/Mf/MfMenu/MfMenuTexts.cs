@@ -102,6 +102,7 @@ namespace osu.Game.Overlays.MfMenu
                                     {
                                         new MfMenuTextBoxContainer
                                         {
+                                            Title = "参与过完善该分支的人(按首字母排序)",
                                             d = staffTextBox()
                                         },
                                         new MfMenuTextBoxContainer
@@ -152,13 +153,15 @@ namespace osu.Game.Overlays.MfMenu
                                     Spacing = FillFlowSpacing,
                                     Children = new Drawable[]
                                     {
-                                        new MfMenuTextBoxContainer
+                                        new MfMenuDropDownTextBoxContainer
                                         {
-                                            d = faqLongCoverLoad()
+                                            Title = "为什么加载谱面封面/音频预览的时间会那么长?",
+                                            D = faqLongCoverLoad()
                                         },
-                                        new MfMenuTextBoxContainer
+                                        new MfMenuDropDownTextBoxContainer
                                         {
-                                            d = faqCannotUseOnlineFunction()
+                                            Title = "为什么我没法查看谱面/在线列表/排名聊天/看板?",
+                                            D = faqCannotUseOnlineFunction()
                                         }
                                     }
                                 },
@@ -176,10 +179,11 @@ namespace osu.Game.Overlays.MfMenu
                                     Spacing = FillFlowSpacing,
                                     Children = new Drawable[]
                                     {
-                                        new MfMenuTextBoxContainer
+                                        new MfMenuDropDownTextBoxContainer
                                         {
-                                            d = faqSayobotFail()
-                                        }
+                                            Title = "为什么我突然没法从Sayobot下图了?",
+                                            D = faqSayobotFail()
+                                        },
                                     }
                                 },
                             },
@@ -205,12 +209,6 @@ namespace osu.Game.Overlays.MfMenu
         protected Drawable staffTextBox()
         {
             var t = new MfTextBox();
-
-            t.NewParagraph();
-            t.AddParagraph("参与过完善该分支的人", Titlefont );
-            t.AddText("(按首字母排序)", Titlefont );
-            t.NewParagraph();
-            t.NewParagraph();
 
             t.AddUserLink(new User
                         {
@@ -322,9 +320,6 @@ namespace osu.Game.Overlays.MfMenu
         {
             var t = new MfTextBox();
 
-            t.AddParagraph("Q: 为什么加载谱面封面/音频预览", QuestionTitlefont);
-            t.AddText("的时间会那么长?", QuestionTitlefont);
-            t.NewParagraph();
             t.AddParagraph("A: 这与你的系统和当前的网络环境等", AnswerTitlefont);
             t.AddText("一系列因素有关, 也可能是你一次性发送了过多的资源请求, 请多等待一会, 你也可以尝试重新进入谱面列表/信息界面", AnswerTitlefont);
 
@@ -335,10 +330,7 @@ namespace osu.Game.Overlays.MfMenu
         {
             var t = new MfTextBox();
 
-            t.AddParagraph("Q: 为什么我突然没法从", QuestionTitlefont);
-            t.AddText("Sayobot下图了?", QuestionTitlefont);
-            t.NewParagraph();
-            t.AddParagraph("A: 这可能是因为小夜那边出了点状况, 尝试访问一下", AnswerTitlefont);
+            t.AddParagraph("这可能是因为小夜那边出了点状况, 尝试访问一下", AnswerTitlefont);
             t.AddLink("镜像站官网","https://osu.sayobot.cn/", AnswerTitlefont);
             t.AddText(", 如果页面空白, 请通过右上角的 更多>帮助 进行反馈； 如果官网正常, 而游戏内无法下图, 请联系", AnswerTitlefont);
             t.AddLink("MATRIX-feather", "mailto:midnightcarnival@outlook.com" ,AnswerTitlefont);
@@ -349,21 +341,15 @@ namespace osu.Game.Overlays.MfMenu
 
         protected Drawable faqCannotUseOnlineFunction()
         {
-            var t = new MfTextBox();
             var c = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
-                    t,
                     faqCannotUseOnlineFunctionText
                 },
             };
-
-            t.AddParagraph("Q: 为什么我没法查看谱面", QuestionTitlefont);
-            t.AddText("/在线列表/排名聊天/看板?", QuestionTitlefont);
-            t.NewParagraph();
 
             return c;
         }

@@ -3,15 +3,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuTextBoxContainer : Container
     {
+        private static void Titlefont(SpriteText t) => t.Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold);
+
         public Drawable d;
         public float HoverScale = 1.025f;
         public string Title { get; set; }
@@ -25,9 +28,11 @@ namespace osu.Game.Overlays.MfMenu
             Radius = 18,
         };
 
-        private Container hover;
-        private Container content;
-        private FillFlowContainer textFillFlow;
+        private Container baseContainer;
+        private Container hoverEffectContainer;
+        protected Container backgroundContainer;
+        private FillFlowContainer contentFillFlow;
+
 
         [BackgroundDependencyLoader]
         private void load()
@@ -38,7 +43,7 @@ namespace osu.Game.Overlays.MfMenu
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                content = new Container
+                baseContainer = new Container
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -46,7 +51,7 @@ namespace osu.Game.Overlays.MfMenu
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        hover = new Container
+                        hoverEffectContainer = new Container
                         {
                             CornerRadius = 25,
                             RelativeSizeAxes = Axes.Both,
@@ -54,7 +59,7 @@ namespace osu.Game.Overlays.MfMenu
                             EdgeEffect = edgeEffect,
                             Alpha = 0
                         },
-                        new Container
+                        backgroundContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             CornerRadius = 25,
@@ -74,7 +79,7 @@ namespace osu.Game.Overlays.MfMenu
                                 },
                             }
                         },
-                        textFillFlow = new FillFlowContainer
+                        contentFillFlow = new FillFlowContainer
                         {
                             Padding = new MarginPadding(25),
                             Spacing = new Vector2(15),
@@ -84,31 +89,51 @@ namespace osu.Game.Overlays.MfMenu
                     }
                 },
             };
+        }
 
-            textFillFlow.Add(new OsuSpriteText
+        protected override void LoadComplete()
+        {
+            if ( Title != null )
             {
-                Text = Title,
-                Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold),
-            });
+                var titleTextFlow = new LinkFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    TextAnchor = Anchor.TopLeft,
+                };
+
+                var title = Title.ToCharArray();
+
+                foreach(var c in title)
+                {
+                    titleTextFlow.AddText(c.ToString(), Titlefont);
+                }
+
+                contentFillFlow.Add(titleTextFlow);
+            }
+
             if ( d != null )
             {
-                textFillFlow.Add(d);
+                contentFillFlow.Add(d);
+                contentFillFlow.LayoutEasing = Easing.OutQuint;
+                contentFillFlow.LayoutDuration = 750;
             }
+
+            base.LoadComplete();
         }
 
         //我已经不知道要怎么处理光标悬浮时的动画了就这样吧
         protected override bool OnHover(HoverEvent e)
         {
-            content.MoveToY(-5, 500, Easing.OutQuint);
-            hover.FadeIn(500, Easing.OutQuint);
+            baseContainer.MoveToY(-5, 500, Easing.OutQuint);
+            hoverEffectContainer.FadeIn(500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            content.MoveToY(0, 500, Easing.OutQuint);
-            d.MoveToY(0, 500, Easing.OutQuint);
-            hover.FadeOut(500, Easing.OutQuint);
+            baseContainer.MoveToY(0, 500, Easing.OutQuint);
+            hoverEffectContainer.FadeOut(500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
     }
