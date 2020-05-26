@@ -1,4 +1,5 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -7,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
@@ -32,6 +34,8 @@ namespace osu.Game.Overlays.MfMenu
         protected Container backgroundContainer;
         private FillFlowContainer contentFillFlow;
 
+        protected virtual bool Clickable => false;
+        protected BindableBool CanChangeBorderThickness = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -79,9 +83,24 @@ namespace osu.Game.Overlays.MfMenu
                             Spacing = new Vector2(15),
                             Masking = true,
                         },
+                        SelectSounds()
                     }
                 },
             };
+        
+            CanChangeBorderThickness.Value = true;
+        }
+
+        private Drawable SelectSounds()
+        {
+            Drawable s;
+
+            if ( Clickable )
+                s = new HoverClickSounds();
+            else
+                s = new HoverSounds();
+
+            return s;
         }
 
         protected override void LoadComplete()
@@ -117,13 +136,17 @@ namespace osu.Game.Overlays.MfMenu
         //我已经不知道要怎么处理光标悬浮时的动画了就这样吧
         protected override bool OnHover(HoverEvent e)
         {
-            backgroundContainer.BorderThickness = 2;
+            if ( CanChangeBorderThickness.Value )
+                backgroundContainer.BorderThickness = 2;
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            backgroundContainer.BorderThickness = 0;
+            if ( CanChangeBorderThickness.Value )
+                backgroundContainer.BorderThickness = 0;
+
             base.OnHoverLost(e);
         }
     }

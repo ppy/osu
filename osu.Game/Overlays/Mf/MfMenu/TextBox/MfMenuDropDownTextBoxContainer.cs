@@ -17,6 +17,7 @@ namespace osu.Game.Overlays.MfMenu
         private SpriteIcon dropDownIcon;
         private BindableBool ToggleValue = new BindableBool();
 
+        protected override bool Clickable => true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -67,10 +68,10 @@ namespace osu.Game.Overlays.MfMenu
             ToggleValue.BindValueChanged(OnToggleValueChanged, true);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
             ToggleValue.Toggle();
-            return base.OnMouseDown(e);
+            return base.OnClick(e);
         }
 
         private void OnToggleValueChanged(ValueChangedEvent<bool> value)
@@ -79,11 +80,18 @@ namespace osu.Game.Overlays.MfMenu
             switch ( v )
             {
                 case true:
+                    CanChangeBorderThickness.Value = false;
+                    backgroundContainer.BorderThickness = 3;
                     dropDownIcon.RotateTo(0, 500, Easing.OutQuint);
                     content.FadeIn(500, Easing.OutQuint);
                     break;
 
                 case false:
+                    CanChangeBorderThickness.Value = true;
+
+                    if ( backgroundContainer.BorderThickness != 0 )
+                        backgroundContainer.BorderThickness = 2;
+
                     dropDownIcon.RotateTo(180, 500, Easing.OutQuint);
                     content.FadeOut(500, Easing.OutQuint);
                     break;
