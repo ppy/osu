@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = score.TotalScore.ToString(),
+                                            Text = score.TotalScore.ToString("N0"),
                                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, fixedWidth: true),
                                             Spacing = new Vector2(-1, 0)
                                         },
