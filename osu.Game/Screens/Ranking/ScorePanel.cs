@@ -102,12 +102,14 @@ namespace osu.Game.Screens.Ranking
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Size = new Vector2(40),
                 Children = new Drawable[]
                 {
                     topLayerContainer = new Container
                     {
                         Name = "Top layer",
                         RelativeSizeAxes = Axes.X,
+                        Alpha = 0,
                         Height = 120,
                         Children = new Drawable[]
                         {
@@ -214,6 +216,8 @@ namespace osu.Game.Screens.Ranking
             // If the top layer was already expanded, then we don't need to wait for the resize and can instead transform immediately. This looks better when changing the panel state.
             using (BeginDelayedSequence(topLayerExpanded ? 0 : resize_duration + top_layer_expand_delay, true))
             {
+                topLayerContainer.FadeIn();
+
                 switch (state)
                 {
                     case PanelState.Expanded:
