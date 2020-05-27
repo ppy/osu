@@ -281,7 +281,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 yield return new TestHitObject
                 {
                     StartTime = original.StartTime,
-                    EndTime = (original as IHasEndTime)?.EndTime ?? (original.StartTime + 100)
+                    Duration = (original as IHasEndTime)?.Duration ?? 100
                 };
             }
         }
@@ -292,9 +292,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestHitObject : ConvertHitObject, IHasEndTime
         {
-            public double EndTime { get; set; }
+            public double EndTime => StartTime + Duration;
 
-            public double Duration => EndTime - StartTime;
+            public double Duration { get; set; }
         }
 
         private class DrawableTestHitObject : DrawableHitObject<TestHitObject>

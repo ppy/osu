@@ -11,9 +11,9 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// </summary>
     internal sealed class ConvertSpinner : ConvertHitObject, IHasEndTime, IHasPosition, IHasCombo
     {
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
 
         public Vector2 Position { get; set; }
 
