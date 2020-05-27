@@ -10,8 +10,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// </summary>
     internal sealed class ConvertSpinner : ConvertHitObject, IHasEndTime
     {
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
     }
 }

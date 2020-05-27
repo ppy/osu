@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
     {
         public float X { get; set; }
 
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
     }
 }
