@@ -228,8 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4000) / 1000);
             
-            double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
-                              .Interpolate(mashLevel);
+            double tapSkill = mashLevel * Attributes.MashTapDiff + (1 - mashLevel) * Attributes.TapDiff;
 
             double tapValue = tapSkillToPP(tapSkill);
 

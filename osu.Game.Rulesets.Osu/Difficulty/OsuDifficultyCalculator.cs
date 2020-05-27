@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             // Tap
-            (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
+            (var tapDiff, var streamNoteCount, var mashTapDiff, var strainHistory) =
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
 
             // Finger Control
@@ -87,8 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 TapSR = tapSR,
                 TapDiff = tapDiff,
                 StreamNoteCount = streamNoteCount,
-                MashLevels = mashLevels,
-                TapSkills = tapSkills,
+                MashTapDiff = mashTapDiff,
 
                 FingerControlSR = fingerControlSR,
                 FingerControlDiff = fingerControlDiff,

@@ -10,8 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double TapSR;
         public double TapDiff;
         public double StreamNoteCount;
-        public double[] MashLevels;
-        public double[] TapSkills;
+        public double MashTapDiff;
 
         public double FingerControlSR;
         public double FingerControlDiff;
