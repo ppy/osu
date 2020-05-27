@@ -240,7 +240,7 @@ namespace osu.Game.Beatmaps.Formats
             }
             else
             {
-                if (hitObject is IHasEndTime)
+                if (hitObject is IHasDuration)
                     addEndTimeData(writer, hitObject);
 
                 writer.Write(getSampleBank(hitObject.Samples));
@@ -267,7 +267,7 @@ namespace osu.Game.Beatmaps.Formats
                     type |= LegacyHitObjectType.Slider;
                     break;
 
-                case IHasEndTime _:
+                case IHasDuration _:
                     if (beatmap.BeatmapInfo.RulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else
@@ -347,7 +347,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void addEndTimeData(TextWriter writer, HitObject hitObject)
         {
-            var endTimeData = (IHasEndTime)hitObject;
+            var endTimeData = (IHasDuration)hitObject;
             var type = getObjectType(hitObject);
 
             char suffix = ',';

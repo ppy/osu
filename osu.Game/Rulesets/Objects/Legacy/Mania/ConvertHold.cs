@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
-    internal sealed class ConvertHold : ConvertHitObject, IHasXPosition, IHasEndTime
+    internal sealed class ConvertHold : ConvertHitObject, IHasXPosition, IHasDuration
     {
         public float X { get; set; }
 

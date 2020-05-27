@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     break;
                 }
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                 {
                     double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
 
