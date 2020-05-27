@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
+using osu.Desktop.Updating;
 using osu.Game;
-using osuTK.Input;
-using osu.Desktop.Updater;
+using osu.Game.Screens.Menu;
+using osu.Game.Updating;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Screens.Menu;
-using osu.Game.Updater;
+using osuTK.Input;
 
 namespace osu.Desktop
 {
@@ -79,15 +79,15 @@ namespace osu.Desktop
             return null;
         }
 
-        protected override UpdateManager CreateUpdateManager()
+        protected override Updater CreateGameUpdater()
         {
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    return new SquirrelUpdateManager();
+                    return new SquirrelUpdater();
 
                 default:
-                    return new SimpleUpdateManager();
+                    return new SimpleUpdater();
             }
         }
 

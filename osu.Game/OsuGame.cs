@@ -44,7 +44,7 @@ using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
-using osu.Game.Updater;
+using osu.Game.Updating;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 
@@ -400,7 +400,24 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
-        protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
+        /// <summary>
+        /// Creates the updater for use to update the game on new releases.
+        /// Returned value is ignored for non-deployed game builds.
+        /// </summary>
+        /// <returns>The <see cref="Updater"/> to use.</returns>
+        [CanBeNull]
+        protected virtual Updater CreateGameUpdater() => null;
+
+        private UpdateManager createUpdateManager()
+        {
+            var updater = CreateGameUpdater();
+
+            // return no-updater update manager for non-deployed builds.
+            if (!IsDeployedBuild || updater == null)
+                return new UpdateManager();
+
+            return new UpdateManager(updater);
+        }
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
@@ -643,7 +660,7 @@ namespace osu.Game
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
-            Add(CreateUpdateManager()); // dependency on notification overlay
+            Add(createUpdateManager()); // dependency on notification overlay
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };

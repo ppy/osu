@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -9,58 +9,60 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
-namespace osu.Game.Updater
+namespace osu.Game.Updating
 {
     /// <summary>
-    /// An update manager that shows notifications if a newer release is detected.
+    /// An updater that shows notifications if a newer release is detected.
     /// Installation is left up to the user.
     /// </summary>
-    public class SimpleUpdateManager : UpdateManager
+    public class SimpleUpdater : Updater
     {
-        private string version;
-
         [Resolved]
         private GameHost host { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
-        {
-            version = game.Version;
+        [Resolved]
+        private OsuGameBase game { get; set; }
 
-            if (game.IsDeployedBuild)
-                Schedule(() => Task.Run(checkForUpdateAsync));
-        }
+        [Resolved]
+        private NotificationOverlay notifications { get; set; }
 
-        private async void checkForUpdateAsync()
+        public override async Task<bool> CheckAndPrepareAsync()
         {
+            GitHubRelease latestRelease;
+
             try
             {
-                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                var request = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
-                await releases.PerformAsync();
+                await request.PerformAsync();
 
-                var latest = releases.ResponseObject;
+                latestRelease = request.ResponseObject;
 
-                if (latest.TagName != version)
+                if (latestRelease.TagName == game.Version)
+                    // no newer releases found, return.
+                    return false;
+
+                notifications.Post(new SimpleNotification
                 {
-                    Notifications.Post(new SimpleNotification
+                    Text = $"A newer release of osu! has been found ({game.Version} → {latestRelease.TagName}).\n\n"
+                           + "Click here to download the new version, which can be installed over the top of your existing installation",
+                    Icon = FontAwesome.Solid.Upload,
+                    Activated = () =>
                     {
-                        Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
-                               + "Click here to download the new version, which can be installed over the top of your existing installation",
-                        Icon = FontAwesome.Solid.Upload,
-                        Activated = () =>
-                        {
-                            host.OpenUrlExternally(getBestUrl(latest));
-                            return true;
-                        }
-                    });
-                }
+                        host.OpenUrlExternally(getBestUrl(latestRelease));
+                        return true;
+                    }
+                });
+
+                return true;
             }
             catch
             {
                 // we shouldn't crash on a web failure. or any failure for the matter.
+                return false;
             }
         }
 
@@ -91,7 +93,7 @@ namespace osu.Game.Updater
             return bestAsset?.BrowserDownloadUrl ?? release.HtmlUrl;
         }
 
-        public class GitHubRelease
+        private class GitHubRelease
         {
             [JsonProperty("html_url")]
             public string HtmlUrl { get; set; }
@@ -103,7 +105,7 @@ namespace osu.Game.Updater
             public List<GitHubAsset> Assets { get; set; }
         }
 
-        public class GitHubAsset
+        private class GitHubAsset
         {
             [JsonProperty("name")]
             public string Name { get; set; }
