@@ -74,9 +74,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
+        /// <remarks>
+        /// Just returning true is enough to allow <see cref="HitObject.StartTime"/> updates to take place.
+        /// Custom implementation is only required if other attributes are to be considered, like changing columns.
+        /// </remarks>
         /// <param name="moveEvent">The move event.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s were moved.</returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
+        /// <returns>
+        /// Whether any <see cref="DrawableHitObject"/>s could be moved.
+        /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
+        /// </returns>
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => true;
 
         public bool OnPressed(PlatformAction action)
         {
