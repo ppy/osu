@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemAdded.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
+                    manager.ItemUpdated.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
                     manager.ItemRemoved.BindValueChanged(_ => Interlocked.Increment(ref itemAddRemoveFireCount));
 
                     var imported = await LoadOszIntoOsu(osu);
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     imported.Hash += "-changed";
                     manager.Update(imported);
 
-                    Assert.AreEqual(0, itemAddRemoveFireCount -= 2);
+                    Assert.AreEqual(0, itemAddRemoveFireCount -= 1);
 
                     checkBeatmapSetCount(osu, 1);
                     checkBeatmapCount(osu, 12);
