@@ -270,7 +270,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         // Cant use AddOnce() since the delegate is re-constructed every invocation
         private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
         {
-            if (hitObject.HitObject is IHasEndTime e)
+            if (hitObject.HitObject is IHasDuration e)
             {
                 switch (direction.Value)
                 {

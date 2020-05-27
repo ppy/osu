@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSpinner : ConvertHitObject, IHasEndTime, IHasPosition, IHasCombo
+    internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration, IHasPosition, IHasCombo
     {
         public double Duration { get; set; }
 

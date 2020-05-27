@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0
                     }.Yield();
 
-                case IHasEndTime endTime:
+                case IHasDuration endTime:
                     return new BananaShower
                     {
                         StartTime = obj.StartTime,
