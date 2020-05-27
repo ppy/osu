@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The time at which the HitObject ends.
         /// </summary>
-        [JsonIgnore]
-        double EndTime { get; set; }
+        double EndTime { get; }
 
         /// <summary>
         /// The duration of the HitObject.
         /// </summary>
-        double Duration { get; }
+        [JsonIgnore]
+        double Duration { get; set; }
     }
 }

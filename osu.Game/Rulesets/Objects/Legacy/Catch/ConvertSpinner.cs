@@ -10,9 +10,9 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// </summary>
     internal sealed class ConvertSpinner : ConvertHitObject, IHasEndTime, IHasXPosition, IHasCombo
     {
-        public double EndTime { get; set; }
+        public double EndTime => StartTime + Duration;
 
-        public double Duration => EndTime - StartTime;
+        public double Duration { get; set; }
 
         public float X => 256; // Required for CatchBeatmapConverter
 

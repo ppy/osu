@@ -189,9 +189,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
-                double endTime = Math.Max(startTime, Parsing.ParseDouble(split[5]) + Offset);
+                double duration = Math.Max(0, Parsing.ParseDouble(split[5]) + Offset - startTime);
 
-                result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, endTime);
+                result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, duration);
 
                 if (split.Length > 6)
                     readCustomSampleBanks(split[6], bankInfo);
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                 }
 
-                result = CreateHold(pos, combo, comboOffset, endTime + Offset);
+                result = CreateHold(pos, combo, comboOffset, endTime + Offset - startTime);
             }
 
             if (result == null)
@@ -321,9 +321,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
-        /// <param name="endTime">The spinner end time.</param>
+        /// <param name="duration">The spinner duration.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime);
+        protected abstract HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration);
 
         /// <summary>
         /// Creates a legacy Hold-type hit object.
@@ -331,8 +331,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
-        /// <param name="endTime">The hold end time.</param>
-        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime);
+        /// <param name="duration">The hold end time.</param>
+        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration);
 
         private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
