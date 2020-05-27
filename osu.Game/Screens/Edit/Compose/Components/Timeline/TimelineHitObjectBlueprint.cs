@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             shadowComponents.Add(circle);
 
-            if (hitObject is IHasEndTime)
+            if (hitObject is IHasDuration)
             {
                 DragBar dragBarUnderlay;
                 Container extensionBar;
@@ -290,7 +290,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             repeatHitObject.RepeatCount = proposedCount;
                             break;
 
-                        case IHasEndTime endTimeHitObject:
+                        case IHasDuration endTimeHitObject:
                             var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
                             if (endTimeHitObject.EndTime == snappedTime)
