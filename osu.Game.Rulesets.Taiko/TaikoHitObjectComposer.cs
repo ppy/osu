@@ -34,9 +34,10 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
-            new HitCompositionTool()
+            new HitCompositionTool(),
+            new DrumRollCompositionTool()
         };
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer() => new TaikoBlueprintContainer(drawableRuleset.Playfield.AllHitObjects);
@@ -153,6 +154,26 @@ namespace osu.Game.Rulesets.Taiko
 
             Size = bottomRight - topLeft;
             Position = topLeft;
+        }
+    }
+
+    public class DrumRollCompositionTool : HitObjectCompositionTool
+    {
+        public DrumRollCompositionTool()
+            : base(nameof(DrumRoll))
+        {
+        }
+
+        public override PlacementBlueprint CreatePlacementBlueprint() => new DrumRollPlacementBlueprint();
+    }
+
+    public class DrumRollPlacementBlueprint : PlacementBlueprint
+    {
+        private static DrumRoll drumRoll;
+
+        public DrumRollPlacementBlueprint()
+            : base(drumRoll = new DrumRoll())
+        {
         }
     }
 
