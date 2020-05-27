@@ -474,12 +474,13 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                var performanceCalculator = ruleset?.CreatePerformanceCalculator(Beatmap.Value, score);
-                var totalPp = performanceCalculator?.Calculate(new Dictionary<string, double>());
+                var performanceCalculator = ruleset.CreatePerformanceCalculator(Beatmap.Value, score);
+                var totalPp = performanceCalculator?.Calculate(null);
                 score.PP = totalPp;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Log($"Failed to calculate performance points: {e}", LoggingTarget.Runtime, LogLevel.Debug);
             }
 
             ScoreProcessor.PopulateScore(score);
