@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             if (endTimeHitObject.EndTime == snappedTime)
                                 return;
 
-                            endTimeHitObject.EndTime = snappedTime;
+                            endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
                             break;
                     }
 

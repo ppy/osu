@@ -10,9 +10,9 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
     /// </summary>
     internal sealed class ConvertSpinner : ConvertHitObject, IHasEndTime, IHasXPosition
     {
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
 
         public float X { get; set; }
     }
