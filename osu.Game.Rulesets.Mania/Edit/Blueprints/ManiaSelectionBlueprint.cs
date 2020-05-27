@@ -18,9 +18,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
-
         protected ManiaSelectionBlueprint(DrawableHitObject drawableObject)
             : base(drawableObject)
         {
