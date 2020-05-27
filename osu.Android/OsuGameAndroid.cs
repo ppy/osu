@@ -4,7 +4,7 @@
 using System;
 using Android.App;
 using osu.Game;
-using osu.Game.Updater;
+using osu.Game.Updating;
 
 namespace osu.Android
 {
@@ -31,6 +31,6 @@ namespace osu.Android
             }
         }
 
-        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+        protected override Updater CreateGameUpdater() => new SimpleUpdater();
     }
 }
