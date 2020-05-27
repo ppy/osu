@@ -3,7 +3,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osuTK;
 
@@ -16,8 +16,10 @@ namespace osu.Game.Overlays.MfMenu
         public Drawable D;
 
         private Container content;
-        private SpriteIcon dropDownIcon;
-        private BindableBool ToggleValue = new BindableBool();
+        private FillFlowContainer drawableContentContainer;
+        private Circle dropDownBar;
+        private BindableBool IsExpanded = new BindableBool();
+        private BindableFloat ContentWidth = new BindableFloat();
 
         protected override bool Clickable => true;
 
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays.MfMenu
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            var drawableContent = new FillFlowContainer
+            drawableContentContainer = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -39,13 +41,12 @@ namespace osu.Game.Overlays.MfMenu
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Size = new Vector2(15),
-                        Child = dropDownIcon = new SpriteIcon
+                        RelativeSizeAxes = Axes.X,
+                        Height = 7,
+                        Child = dropDownBar = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(15),
-                            Icon = FontAwesome.Solid.AngleDown
                         },
                     },
                     content = new Container
@@ -64,40 +65,58 @@ namespace osu.Game.Overlays.MfMenu
             if ( d != null )
                 throw new InvalidOperationException("\"d\" should not be used here, use \"D\" instead");
 
-            d = drawableContent;
+            d = drawableContentContainer;
 
-            ToggleValue.Value = false;
-            ToggleValue.BindValueChanged(OnToggleValueChanged, true);
+            IsExpanded.Value = false;
+            IsExpanded.BindValueChanged(OnIsExpandedChanged, true);
+
+            ContentWidth.BindValueChanged(OnContentWidthChanged);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            ToggleValue.Toggle();
+            IsExpanded.Toggle();
             return base.OnClick(e);
         }
 
-        private void OnToggleValueChanged(ValueChangedEvent<bool> value)
+        private void OnIsExpandedChanged(ValueChangedEvent<bool> value)
         {
             var v = value.NewValue;
             switch ( v )
             {
+                //点击时
                 case true:
                     CanChangeBorderThickness.Value = false;
                     backgroundContainer.BorderThickness = 4;
-                    dropDownIcon.RotateTo(0, DURATION, Easing.OutQuint);
+                    dropDownBar.ResizeTo(new Vector2(drawableContentContainer.DrawWidth, 3), DURATION, Easing.OutQuint);
                     content.FadeIn(DURATION, Easing.OutQuint);
                     break;
 
+                //其他情况
                 case false:
                     CanChangeBorderThickness.Value = true;
 
                     if ( backgroundContainer.BorderThickness != 0 )
                         backgroundContainer.BorderThickness = 2;
 
-                    dropDownIcon.RotateTo(180, DURATION, Easing.OutQuint);
+                    dropDownBar.ResizeTo(new Vector2(ContentWidth.Value * 0.2f, 7), DURATION, Easing.OutQuint);
                     content.FadeOut(DURATION, Easing.OutQuint);
                     break;
             }
+        }
+
+        private void OnContentWidthChanged(ValueChangedEvent<float> w)
+        {
+            if ( IsExpanded.Value )
+                dropDownBar.ResizeWidthTo(w.NewValue);
+            else
+                dropDownBar.ResizeWidthTo(w.NewValue * 0.2f);
+        }
+
+        protected override void Update()
+        {
+            ContentWidth.Value = drawableContentContainer?.DrawWidth ?? this.DrawWidth;
+            base.Update();
         }
     }
 }
