@@ -14,12 +14,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public static class Tap
     {
         private const double spaced_buff_factor = 0.10;
+        private const int timescale_count = 4;
 
-        private static readonly Vector<double> decay_coeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 2.3, -2.8))
-                                                                                 .PointwiseExp();
-
+        /// <summary>
+        /// Decay coefficient for each timescale. 
+        /// </summary>
+        private static readonly Vector<double> decay_coeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(timescale_count, 2.3, -2.8))
+                                                                                  .PointwiseExp();
+        /// <summary>
+        /// For each timescale, the strain result is multiplied by the corresponding factor in timescale_factors.
+        /// </summary>
         private static readonly double[] timescale_factors = { 1.02, 1.02, 1.05, 1.15 };
 
+        /// <summary>
+        /// Calculates attributes related to tapping difficulty.
+        /// </summary>
         public static (double, double, double, List<Vector<double>>) CalculateTapAttributes
             (List<OsuHitObject> hitObjects, double clockRate)
         {
@@ -41,8 +50,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                                                  double mashLevel,
                                                                                  double clockRate)
         {
-            var strainHistory = new List<Vector<double>> { decay_coeffs * 0, decay_coeffs * 0 };
-            var currStrain = decay_coeffs * 1;
+            var strainHistory = new List<Vector<double>> { Vector<double>.Build.Dense(timescale_count),
+                                                           Vector<double>.Build.Dense(timescale_count) };
+            var currStrain = Vector<double>.Build.Dense(timescale_count);
 
             // compute strain at each object and store the results into strainHistory
             if (hitObjects.Count >= 2)
@@ -77,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             // compute difficulty by aggregating strainHistory
-            var strainResult = decay_coeffs * 0;
+            var strainResult = Vector<double>.Build.Dense(timescale_count);
 
             for (int j = 0; j < decay_coeffs.Count; j++)
             {
