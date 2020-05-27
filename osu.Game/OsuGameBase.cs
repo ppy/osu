@@ -193,7 +193,7 @@ namespace osu.Game
                     ScoreManager.Delete(getBeatmapScores(item), true);
             });
 
-            BeatmapManager.ItemAdded.BindValueChanged(i =>
+            BeatmapManager.ItemUpdated.BindValueChanged(i =>
             {
                 if (i.NewValue.TryGetTarget(out var item))
                     ScoreManager.Undelete(getBeatmapScores(item), true);

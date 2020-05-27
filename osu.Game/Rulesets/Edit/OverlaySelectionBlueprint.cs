@@ -15,7 +15,12 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly DrawableHitObject DrawableObject;
 
-        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || State == SelectionState.Selected;
+        /// <summary>
+        /// Whether the blueprint should be shown even when the <see cref="DrawableObject"/> is not alive.
+        /// </summary>
+        protected virtual bool AlwaysShowWhenSelected => false;
+
+        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
         protected OverlaySelectionBlueprint(DrawableHitObject drawableObject)
             : base(drawableObject.HitObject)

@@ -55,12 +55,12 @@ namespace osu.Game.Database
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
+        /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemAdded => itemAdded;
+        public IBindable<WeakReference<TModel>> ItemUpdated => itemUpdated;
 
-        private readonly Bindable<WeakReference<TModel>> itemAdded = new Bindable<WeakReference<TModel>>();
+        private readonly Bindable<WeakReference<TModel>> itemUpdated = new Bindable<WeakReference<TModel>>();
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
@@ -90,7 +90,7 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => itemAdded.Value = new WeakReference<TModel>(item));
+            ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
             ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
 
             exportStorage = storage.GetStorageForDirectory("exports");

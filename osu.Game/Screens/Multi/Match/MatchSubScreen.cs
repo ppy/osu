@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Multi.Match
         private LeaderboardChatDisplay leaderboardChatDisplay;
         private MatchSettingsOverlay settingsOverlay;
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         public MatchSubScreen(Room room)
         {
@@ -183,8 +183,8 @@ namespace osu.Game.Screens.Multi.Match
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
             SelectedItem.Value = playlist.FirstOrDefault();
 
-            managerAdded = beatmapManager.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(beatmapAdded);
+            managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(beatmapUpdated);
         }
 
         public override bool OnExiting(IScreen next)
@@ -217,7 +217,7 @@ namespace osu.Game.Screens.Multi.Match
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
-        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
             Schedule(() =>
             {

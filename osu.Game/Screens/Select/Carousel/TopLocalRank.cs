@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private IBindable<WeakReference<ScoreInfo>> itemAdded;
+        private IBindable<WeakReference<ScoreInfo>> itemUpdated;
         private IBindable<WeakReference<ScoreInfo>> itemRemoved;
 
         public TopLocalRank(BeatmapInfo beatmap)
@@ -40,8 +40,8 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader]
         private void load()
         {
-            itemAdded = scores.ItemAdded.GetBoundCopy();
-            itemAdded.BindValueChanged(scoreChanged);
+            itemUpdated = scores.ItemUpdated.GetBoundCopy();
+            itemUpdated.BindValueChanged(scoreChanged);
 
             itemRemoved = scores.ItemRemoved.GetBoundCopy();
             itemRemoved.BindValueChanged(scoreChanged);
