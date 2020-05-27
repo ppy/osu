@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
+        public override Playfield Playfield => drawableRulesetWrapper.Playfield;
+
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
@@ -260,10 +262,12 @@ namespace osu.Game.Rulesets.Edit
     [Cached(typeof(IPositionSnapProvider))]
     public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
-        internal HitObjectComposer()
+        protected HitObjectComposer()
         {
             RelativeSizeAxes = Axes.Both;
         }
+
+        public abstract Playfield Playfield { get; }
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s.
