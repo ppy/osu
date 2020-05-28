@@ -15,7 +15,5 @@ namespace osu.Game.Tournament.Models
     {
         public Bindable<string> StablePath = new Bindable<string>(string.Empty);
 
-        [JsonIgnore]
-        public const string STABLE_CONFIG = "tournament/stable.json";
     }
 }
