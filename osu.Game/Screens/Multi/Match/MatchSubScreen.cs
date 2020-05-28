@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
@@ -18,6 +20,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
+using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Select;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
@@ -114,10 +117,29 @@ namespace osu.Game.Screens.Multi.Match
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Padding = new MarginPadding { Horizontal = 5 },
-                                                                Child = new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                Child = new GridContainer
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    SelectedItem = { BindTarget = SelectedItem }
+                                                                    Content = new[]
+                                                                    {
+                                                                        new Drawable[]
+                                                                        {
+                                                                            new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                            {
+                                                                                RelativeSizeAxes = Axes.Both,
+                                                                                SelectedItem = { BindTarget = SelectedItem }
+                                                                            }
+                                                                        },
+                                                                        new Drawable[]
+                                                                        {
+                                                                            new TriangleButton
+                                                                            {
+                                                                                RelativeSizeAxes = Axes.X,
+                                                                                Text = "Show beatmap results",
+                                                                                Action = showBeatmapResults
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
                                                             },
                                                             new Container
@@ -256,6 +278,13 @@ namespace osu.Game.Screens.Multi.Match
                     });
                     break;
             }
+        }
+
+        private void showBeatmapResults()
+        {
+            Debug.Assert(roomId.Value != null);
+
+            this.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, SelectedItem.Value, false));
         }
     }
 }

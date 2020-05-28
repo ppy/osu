@@ -19,9 +19,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneTimeshiftResultsScreen : ScreenTestScene
     {
         [Test]
-        public void TestShowResults()
+        public void TestShowResultsWithScore()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+            createResults(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+        }
+
+        [Test]
+        public void TestShowResultsNullScore()
+        {
+            createResults(null);
+        }
+
+        private void createResults(ScoreInfo score)
+        {
             var roomScores = new List<RoomScore>();
 
             for (int i = 0; i < 10; i++)

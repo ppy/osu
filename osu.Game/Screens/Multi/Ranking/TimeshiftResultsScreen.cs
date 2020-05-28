@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multi.Ranking
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
             var req = new GetRoomPlaylistScoresRequest(roomId, playlistItem.ID);
-            req.Success += r => scoresCallback?.Invoke(r.Select(s => s.CreateScoreInfo(playlistItem)));
+            req.Success += r => scoresCallback?.Invoke(r.Where(s => s.ID != Score?.OnlineScoreID).Select(s => s.CreateScoreInfo(playlistItem)));
             return req;
         }
     }
