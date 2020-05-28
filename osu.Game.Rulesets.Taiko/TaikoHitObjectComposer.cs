@@ -14,7 +14,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
@@ -37,7 +39,8 @@ namespace osu.Game.Rulesets.Taiko
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new HitCompositionTool(),
-            new DrumRollCompositionTool()
+            new DrumRollCompositionTool(),
+            new SwellCompositionTool()
         };
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer() => new TaikoBlueprintContainer(drawableRuleset.Playfield.AllHitObjects);
@@ -157,6 +160,16 @@ namespace osu.Game.Rulesets.Taiko
         }
     }
 
+    public class SwellCompositionTool : HitObjectCompositionTool
+    {
+        public SwellCompositionTool()
+            : base(nameof(Swell))
+        {
+        }
+
+        public override PlacementBlueprint CreatePlacementBlueprint() => new SwellPlacementBlueprint();
+    }
+
     public class DrumRollCompositionTool : HitObjectCompositionTool
     {
         public DrumRollCompositionTool()
@@ -167,13 +180,107 @@ namespace osu.Game.Rulesets.Taiko
         public override PlacementBlueprint CreatePlacementBlueprint() => new DrumRollPlacementBlueprint();
     }
 
-    public class DrumRollPlacementBlueprint : PlacementBlueprint
+    public class SwellPlacementBlueprint : TaikoSpanPlacementBlueprint
     {
-        private static DrumRoll drumRoll;
-
-        public DrumRollPlacementBlueprint()
-            : base(drumRoll = new DrumRoll())
+        public SwellPlacementBlueprint()
+            : base(new Swell())
         {
+        }
+    }
+
+    public class DrumRollPlacementBlueprint : TaikoSpanPlacementBlueprint
+    {
+        public DrumRollPlacementBlueprint()
+            : base(new DrumRoll())
+        {
+        }
+    }
+
+    public class TaikoSpanPlacementBlueprint : PlacementBlueprint
+    {
+        private readonly HitPiece headPiece;
+        private readonly HitPiece tailPiece;
+
+        private readonly LengthPiece lengthPiece;
+
+        private readonly IHasDuration spanPlacementObject;
+
+        public TaikoSpanPlacementBlueprint(HitObject hitObject)
+            : base(hitObject)
+
+        {
+            spanPlacementObject = hitObject as IHasDuration;
+
+            RelativeSizeAxes = Axes.Both;
+
+            InternalChildren = new Drawable[]
+            {
+                headPiece = new HitPiece
+                {
+                    Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT)
+                },
+                lengthPiece = new LengthPiece
+                {
+                    Height = TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT
+                },
+                tailPiece = new HitPiece
+                {
+                    Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT)
+                }
+            };
+        }
+
+        private double originalStartTime;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return false;
+
+            BeginPlacement(true);
+            return true;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return;
+
+            base.OnMouseUp(e);
+            EndPlacement(true);
+        }
+
+        public override void UpdatePosition(SnapResult result)
+        {
+            base.UpdatePosition(result);
+
+            if (PlacementActive)
+            {
+                if (result.Time is double endTime)
+                {
+                    if (endTime < originalStartTime)
+                    {
+                        HitObject.StartTime = endTime;
+                        spanPlacementObject.Duration = Math.Abs(endTime - originalStartTime);
+                        headPiece.Position = ToLocalSpace(result.ScreenSpacePosition);
+                        lengthPiece.X = headPiece.X;
+                        lengthPiece.Width = tailPiece.X - headPiece.X;
+                    }
+                    else
+                    {
+                        spanPlacementObject.Duration = Math.Abs(endTime - originalStartTime);
+                        tailPiece.Position = ToLocalSpace(result.ScreenSpacePosition);
+                        lengthPiece.Width = tailPiece.X - headPiece.X;
+                    }
+                }
+            }
+            else
+            {
+                lengthPiece.Position = headPiece.Position = tailPiece.Position = ToLocalSpace(result.ScreenSpacePosition);
+
+                if (result.Time is double startTime)
+                    originalStartTime = HitObject.StartTime = startTime;
+            }
         }
     }
 
@@ -221,10 +328,40 @@ namespace osu.Game.Rulesets.Taiko
             return false;
         }
 
-        public override void UpdatePosition(SnapResult snapResult)
+        public override void UpdatePosition(SnapResult result)
         {
-            piece.Position = ToLocalSpace(snapResult.ScreenSpacePosition);
-            base.UpdatePosition(snapResult);
+            piece.Position = ToLocalSpace(result.ScreenSpacePosition);
+            base.UpdatePosition(result);
+        }
+    }
+
+    public class LengthPiece : CompositeDrawable
+    {
+        public LengthPiece()
+        {
+            Origin = Anchor.CentreLeft;
+
+            InternalChild = new Container
+            {
+                Masking = true,
+                Colour = Color4.Yellow,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 8,
+                    },
+                    new Box
+                    {
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 8,
+                    }
+                }
+            };
         }
     }
 
