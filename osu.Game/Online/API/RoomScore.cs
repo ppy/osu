@@ -20,15 +20,6 @@ namespace osu.Game.Online.API
         [JsonProperty("user_id")]
         public int UserID { get; set; }
 
-        [JsonProperty("room_id")]
-        public int RoomID { get; set; }
-
-        [JsonProperty("playlist_item_id")]
-        public int PlaylistItemID { get; set; }
-
-        [JsonProperty("beatmap_id")]
-        public int BeatmapID { get; set; }
-
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
         public ScoreRank Rank { get; set; }
