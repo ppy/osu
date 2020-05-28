@@ -169,8 +169,6 @@ namespace osu.Game.Screens.Play
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
-            BreakSettingsOverlay.ReplayLoaded = e.NewValue;
-
             if (e.NewValue)
             {
                 BreakSettingsOverlay.Hide();
