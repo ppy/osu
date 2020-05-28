@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -48,6 +49,8 @@ namespace osu.Game.Online.API
 
         public ScoreInfo CreateScoreInfo(PlaylistItem playlistItem)
         {
+            var rulesetInstance = playlistItem.Ruleset.Value.CreateInstance();
+
             var scoreInfo = new ScoreInfo
             {
                 OnlineScoreID = ID,
@@ -62,7 +65,7 @@ namespace osu.Game.Online.API
                 Date = EndedAt,
                 Hash = string.Empty, // todo: temporary?
                 Rank = Rank,
-                Mods = Mods.Select(m => m.ToMod(playlistItem.Ruleset.Value.CreateInstance())).ToArray()
+                Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>()
             };
 
             return scoreInfo;
