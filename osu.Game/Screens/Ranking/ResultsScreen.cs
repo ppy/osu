@@ -63,9 +63,10 @@ namespace osu.Game.Screens.Ranking
                     {
                         new ResultsScrollContainer
                         {
-                            Child = panels = new ScorePanelList(Score)
+                            Child = panels = new ScorePanelList
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                SelectedScore = { Value = Score }
                             }
                         }
                     },

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
@@ -23,12 +24,13 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const float expanded_panel_spacing = 15;
 
+        public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
+
         private readonly Flow flow;
         private readonly Scroll scroll;
-
         private ScorePanel expandedPanel;
 
-        public ScorePanelList(ScoreInfo initialScore)
+        public ScorePanelList()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -44,12 +46,13 @@ namespace osu.Game.Screens.Ranking
                     AutoSizeAxes = Axes.Both,
                 }
             };
+        }
 
-            if (initialScore != null)
-            {
-                AddScore(initialScore);
-                presentScore(initialScore);
-            }
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            SelectedScore.BindValueChanged(selectedScoreChanged, true);
         }
 
         /// <summary>
@@ -67,19 +70,24 @@ namespace osu.Game.Screens.Ranking
                 p.StateChanged += s =>
                 {
                     if (s == PanelState.Expanded)
-                        presentScore(score);
+                        SelectedScore.Value = p.Score;
                 };
             }));
 
-            // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
-            // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
-            if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+            if (SelectedScore.Value == score)
+                selectedScoreChanged(new ValueChangedEvent<ScoreInfo>(SelectedScore.Value, SelectedScore.Value));
+            else
             {
-                // A somewhat hacky property is used here because we need to:
-                // 1) Scroll after the scroll container's visible range is updated.
-                // 2) Scroll before the scroll container's scroll position is updated.
-                // Without this, we would have a 1-frame positioning error which looks very jarring.
-                scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                // We want the scroll position to remain relative to the expanded panel. When a new panel is added after the expanded panel, nothing needs to be done.
+                // But when a panel is added before the expanded panel, we need to offset the scroll position by the width of the new panel.
+                if (expandedPanel != null && flow.GetPanelIndex(score) < flow.GetPanelIndex(expandedPanel.Score))
+                {
+                    // A somewhat hacky property is used here because we need to:
+                    // 1) Scroll after the scroll container's visible range is updated.
+                    // 2) Scroll before the scroll container's scroll position is updated.
+                    // Without this, we would have a 1-frame positioning error which looks very jarring.
+                    scroll.InstantScrollTarget = (scroll.InstantScrollTarget ?? scroll.Target) + ScorePanel.CONTRACTED_WIDTH + panel_spacing;
+                }
             }
         }
 
@@ -87,17 +95,22 @@ namespace osu.Game.Screens.Ranking
         /// Brings a <see cref="ScoreInfo"/> to the centre of the screen and expands it.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to present.</param>
-        private void presentScore(ScoreInfo score)
+        private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
             // Contract the old panel.
-            foreach (var p in flow.Where(p => p.Score != score))
+            foreach (var p in flow.Where(p => p.Score != score.OldValue))
             {
                 p.State = PanelState.Contracted;
                 p.Margin = new MarginPadding();
             }
 
+            // Find the panel corresponding to the new score.
+            expandedPanel = flow.SingleOrDefault(p => p.Score == score.NewValue);
+
+            if (expandedPanel == null)
+                return;
+
             // Expand the new panel.
-            expandedPanel = flow.Single(p => p.Score == score);
             expandedPanel.State = PanelState.Expanded;
             expandedPanel.Margin = new MarginPadding { Horizontal = expanded_panel_spacing };
 
