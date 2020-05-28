@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         [Resolved(canBeNull: true)]
         private IPositionSnapProvider snapProvider { get; set; }
 
