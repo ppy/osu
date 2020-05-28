@@ -194,6 +194,8 @@ namespace osu.Game.Overlays.MfMenu
             api.Register(this);
         }
 
+        #region 介绍
+
         protected Drawable introduceTextBox()
         {
             var t = new MfTextBox();
@@ -316,6 +318,10 @@ namespace osu.Game.Overlays.MfMenu
             return t;
         }
 
+        #endregion 介绍
+
+        #region faq
+
         protected Drawable faqLongCoverLoad()
         {
             var t = new MfTextBox();
@@ -354,6 +360,10 @@ namespace osu.Game.Overlays.MfMenu
             return c;
         }
 
+        #endregion faq
+
+        #region 功能函数
+
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
@@ -375,5 +385,7 @@ namespace osu.Game.Overlays.MfMenu
                     break;
             }
         }
+
+        #endregion 功能函数
     }
 }

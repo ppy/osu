@@ -60,7 +60,8 @@ namespace osu.Game.Overlays.MfMenu
                 }
             };
 
-            content.Add(D);
+            if ( D != null )
+                content.Add(D);
 
             if ( d != null )
                 throw new InvalidOperationException("\"d\" should not be used here, use \"D\" instead");

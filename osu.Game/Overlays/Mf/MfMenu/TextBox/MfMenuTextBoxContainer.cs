@@ -114,6 +114,7 @@ namespace osu.Game.Overlays.MfMenu
                     TextAnchor = Anchor.TopLeft,
                 };
 
+                //将传入的标题转化为charArray以避免ui缩放导致文字伸出容器
                 var title = Title.ToCharArray();
 
                 foreach(var c in title)
