@@ -9,10 +9,11 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneScorePanelList : OsuTestScene
+    public class TestSceneScorePanelList : OsuManualInputManagerTestScene
     {
         private ScoreInfo initialScore;
         private ScorePanelList list;
@@ -67,6 +68,41 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 for (int i = 0; i < 20; i++)
                     list.AddScore(new TestScoreInfo(new OsuRuleset().RulesetInfo) { TotalScore = initialScore.TotalScore + i + 1 });
+            });
+
+            assertPanelCentred();
+        }
+
+        [Test]
+        public void TestNullScore()
+        {
+            AddStep("create panel with null score", () =>
+            {
+                Child = list = new ScorePanelList(null)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddStep("add many panels", () =>
+            {
+                for (int i = 0; i < 20; i++)
+                    list.AddScore(new TestScoreInfo(new OsuRuleset().RulesetInfo) { TotalScore = initialScore.TotalScore - i - 1 });
+
+                for (int i = 0; i < 20; i++)
+                    list.AddScore(new TestScoreInfo(new OsuRuleset().RulesetInfo) { TotalScore = initialScore.TotalScore + i + 1 });
+            });
+
+            AddWaitStep("wait for panel animation", 5);
+
+            AddAssert("no panel selected", () => list.ChildrenOfType<ScorePanel>().All(p => p.State != PanelState.Expanded));
+
+            AddStep("expand second panel", () =>
+            {
+                var expandedPanel = list.ChildrenOfType<ScorePanel>().OrderBy(p => p.DrawPosition.X).ElementAt(1);
+                InputManager.MoveMouseTo(expandedPanel);
+                InputManager.Click(MouseButton.Left);
             });
 
             assertPanelCentred();
