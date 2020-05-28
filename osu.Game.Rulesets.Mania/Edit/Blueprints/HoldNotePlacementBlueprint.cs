@@ -21,9 +21,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private readonly EditNotePiece tailPiece;
 
         [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
-
-        [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
         public HoldNotePlacementBlueprint()
