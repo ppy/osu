@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Ranking
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (!string.IsNullOrEmpty(Model.Value.Hash))
+                if (!string.IsNullOrEmpty(Model.Value?.Hash))
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
