@@ -7,9 +7,9 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -18,8 +18,8 @@ namespace osu.Game.Online.API
         [JsonProperty("id")]
         public int ID { get; set; }
 
-        [JsonProperty("user_id")]
-        public int UserID { get; set; }
+        [JsonProperty("user")]
+        public User User { get; set; }
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -57,7 +57,7 @@ namespace osu.Game.Online.API
                 BeatmapInfoID = playlistItem.BeatmapID,
                 Ruleset = playlistItem.Ruleset.Value,
                 RulesetID = playlistItem.RulesetID,
-                User = null, // todo: do we have a user object?
+                User = User,
                 Accuracy = Accuracy,
                 Date = EndedAt,
                 Hash = string.Empty, // todo: temporary?
