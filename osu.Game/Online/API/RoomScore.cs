@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Online.Multiplayer;
@@ -61,7 +62,7 @@ namespace osu.Game.Online.API
                 Date = EndedAt,
                 Hash = string.Empty, // todo: temporary?
                 Rank = Rank,
-                Mods = Array.Empty<Mod>(), // todo: how?
+                Mods = Mods.Select(m => m.ToMod(playlistItem.Ruleset.Value.CreateInstance())).ToArray()
             };
 
             return scoreInfo;
