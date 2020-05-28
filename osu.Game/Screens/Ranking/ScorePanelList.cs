@@ -45,8 +45,11 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            AddScore(initialScore);
-            presentScore(initialScore);
+            if (initialScore != null)
+            {
+                AddScore(initialScore);
+                presentScore(initialScore);
+            }
         }
 
         /// <summary>
