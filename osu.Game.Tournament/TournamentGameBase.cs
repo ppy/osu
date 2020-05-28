@@ -148,9 +148,9 @@ namespace osu.Game.Tournament
             if (stableInfo == null)
                 stableInfo = new StableInfo();
 
-            if (storage.Exists(StableInfo.STABLE_CONFIG))
+            if (storage.Exists(FileBasedIPC.STABLE_CONFIG))
             {
-                using (Stream stream = storage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
+                using (Stream stream = storage.GetStream(FileBasedIPC.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
                 using (var sr = new StreamReader(stream))
                 {
                     stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());

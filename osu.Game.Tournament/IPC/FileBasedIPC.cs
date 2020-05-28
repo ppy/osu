@@ -39,7 +39,8 @@ namespace osu.Game.Tournament.IPC
 
         [Resolved]
         private StableInfo stableInfo { get; set; }
-        private const string STABLE_CONFIG = "tournament/stable.json";
+
+        public const string STABLE_CONFIG = "tournament/stable.json";
 
         public Storage IPCStorage { get; private set; }
 
@@ -166,6 +167,7 @@ namespace osu.Game.Tournament.IPC
                 return stableInfo.StablePath.Value;
 
             string stableInstallPath = string.Empty;
+
             try
             {
                 List<Func<string>> stableFindMethods = new List<Func<string>>
@@ -194,7 +196,6 @@ namespace osu.Game.Tournament.IPC
                 Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
             }
         }
-
 
         private void saveStableConfig(string path)
         {
