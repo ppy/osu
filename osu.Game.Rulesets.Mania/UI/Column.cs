@@ -17,7 +17,6 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -143,54 +142,5 @@ namespace osu.Game.Rulesets.Mania.UI
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
-
-        /// <summary>
-        /// Given a time, return the screen space position within this column.
-        /// </summary>
-        public Vector2 ScreenSpacePositionAtTime(double time)
-        {
-            var pos = ScrollingInfo.Algorithm.PositionAt(time, Time.Current, ScrollingInfo.TimeRange.Value, HitObjectContainer.DrawHeight);
-
-            switch (ScrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Down:
-                    // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
-                    // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
-                    // so when scrolling downwards the coordinates need to be flipped.
-                    pos = HitObjectContainer.DrawHeight - pos;
-
-                    // Blueprints are centred on the mouse position, such that the hitobject position is anchored at the top or bottom of the blueprint depending on the scroll direction.
-                    pos -= DefaultNotePiece.NOTE_HEIGHT / 2;
-                    break;
-
-                case ScrollingDirection.Up:
-                    pos += DefaultNotePiece.NOTE_HEIGHT / 2;
-                    break;
-            }
-
-            return HitObjectContainer.ToScreenSpace(new Vector2(HitObjectContainer.DrawWidth / 2, pos));
-        }
-
-        /// <summary>
-        /// Given a position in screen space, return the time within this column.
-        /// </summary>
-        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
-        {
-            // convert to local space of column so we can snap and fetch correct location.
-            Vector2 localPosition = HitObjectContainer.ToLocalSpace(screenSpacePosition);
-
-            switch (ScrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Down:
-                    // as above
-                    localPosition.Y = HitObjectContainer.DrawHeight - localPosition.Y;
-                    break;
-            }
-
-            // offset for the fact that blueprints are centered, as above.
-            localPosition.Y -= DefaultNotePiece.NOTE_HEIGHT / 2;
-
-            return ScrollingInfo.Algorithm.TimeAt(localPosition.Y, Time.Current, ScrollingInfo.TimeRange.Value, HitObjectContainer.DrawHeight);
-        }
     }
 }

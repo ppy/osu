@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.UpdatePosition(result);
 
-            if (result is ManiaSnapResult maniaResult)
+            if (result.Playfield != null)
             {
-                piece.Width = maniaResult.Column.DrawWidth;
+                piece.Width = result.Playfield.DrawWidth;
                 piece.Position = ToLocalSpace(result.ScreenSpacePosition);
             }
         }
