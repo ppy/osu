@@ -39,6 +39,7 @@ namespace osu.Game.Tournament.IPC
 
         [Resolved]
         private StableInfo stableInfo { get; set; }
+        private const string STABLE_CONFIG = "tournament/stable.json";
 
         public Storage IPCStorage { get; private set; }
 
@@ -161,13 +162,14 @@ namespace osu.Game.Tournament.IPC
 
         private string findStablePath()
         {
-            string stableInstallPath = string.Empty;
+            if (!string.IsNullOrEmpty(stableInfo.StablePath.Value))
+                return stableInfo.StablePath.Value;
 
+            string stableInstallPath = string.Empty;
             try
             {
                 List<Func<string>> stableFindMethods = new List<Func<string>>
                 {
-                    readFromStableInfo,
                     findFromEnvVar,
                     findFromRegistry,
                     findFromLocalAppData,
@@ -180,7 +182,7 @@ namespace osu.Game.Tournament.IPC
 
                     if (stableInstallPath != null)
                     {
-                        saveStablePath(stableInstallPath);
+                        saveStableConfig(stableInstallPath);
                         return stableInstallPath;
                     }
                 }
@@ -193,11 +195,12 @@ namespace osu.Game.Tournament.IPC
             }
         }
 
-        private void saveStablePath(string path)
+
+        private void saveStableConfig(string path)
         {
             stableInfo.StablePath.Value = path;
 
-            using (var stream = tournamentStorage.GetStream(StableInfo.STABLE_CONFIG, FileAccess.Write, FileMode.Create))
+            using (var stream = tournamentStorage.GetStream(STABLE_CONFIG, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(stableInfo,
@@ -219,22 +222,6 @@ namespace osu.Game.Tournament.IPC
 
                 if (CheckExists(stableInstallPath))
                     return stableInstallPath;
-            }
-            catch
-            {
-            }
-
-            return null;
-        }
-
-        private string readFromStableInfo()
-        {
-            try
-            {
-                Logger.Log("Trying to find stable through the json config");
-
-                if (!string.IsNullOrEmpty(stableInfo.StablePath.Value))
-                    return stableInfo.StablePath.Value;
             }
             catch
             {
