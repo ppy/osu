@@ -3,15 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Configuration;
@@ -20,6 +19,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
@@ -38,23 +38,21 @@ namespace osu.Game.Rulesets.Edit
         protected readonly Ruleset Ruleset;
 
         [Resolved]
-        protected IFrameBasedClock EditorClock { get; private set; }
+        protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
-
-        [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
+        public override Playfield Playfield => drawableRulesetWrapper.Playfield;
+
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private Container distanceSnapGridContainer;
-        private DistanceSnapGrid distanceSnapGrid;
-        private readonly List<Container> layerContainers = new List<Container>();
+
+        protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
         private InputManager inputManager;
 
@@ -67,7 +65,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IFrameBasedClock framedClock)
+        private void load()
         {
             Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
@@ -75,7 +73,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
                 {
-                    Clock = framedClock,
+                    Clock = EditorClock,
                     ProcessCustomClock = false
                 };
             }
@@ -84,17 +82,6 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
-
-            var layerBelowRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
-            {
-                distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both },
-                new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-            });
-
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
-
-            layerContainers.Add(layerBelowRuleset);
-            layerContainers.Add(layerAboveRuleset);
 
             InternalChild = new GridContainer
             {
@@ -117,11 +104,19 @@ namespace osu.Game.Rulesets.Edit
                         {
                             Name = "Content",
                             RelativeSizeAxes = Axes.Both,
+                            Masking = true,
                             Children = new Drawable[]
                             {
-                                layerBelowRuleset,
+                                // layers below playfield
+                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
+                                {
+                                    LayerBelowRuleset,
+                                    new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                                }),
                                 drawableRulesetWrapper,
-                                layerAboveRuleset
+                                // layers above playfield
+                                drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer())
                             }
                         }
                     },
@@ -139,7 +134,7 @@ namespace osu.Game.Rulesets.Edit
 
             setSelectTool();
 
-            BlueprintContainer.SelectionChanged += selectionChanged;
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -165,42 +160,13 @@ namespace osu.Game.Rulesets.Edit
             inputManager = GetContainingInputManager();
         }
 
-        private double lastGridUpdateTime;
-
-        protected override void Update()
+        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
         {
-            base.Update();
-
-            if (EditorClock.CurrentTime != lastGridUpdateTime && !(BlueprintContainer.CurrentTool is SelectTool))
-                showGridFor(Enumerable.Empty<HitObject>());
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            layerContainers.ForEach(l =>
-            {
-                l.Anchor = drawableRulesetWrapper.Playfield.Anchor;
-                l.Origin = drawableRulesetWrapper.Playfield.Origin;
-                l.Position = drawableRulesetWrapper.Playfield.Position;
-                l.Size = drawableRulesetWrapper.Playfield.Size;
-            });
-        }
-
-        private void selectionChanged(IEnumerable<HitObject> selectedHitObjects)
-        {
-            var hitObjects = selectedHitObjects.ToArray();
-
-            if (hitObjects.Any())
+            if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
                 setSelectTool();
-
-                showGridFor(hitObjects);
             }
-            else
-                distanceSnapGridContainer.Hide();
         }
 
         private void setSelectTool() => toolboxCollection.Items.First().Select();
@@ -209,30 +175,12 @@ namespace osu.Game.Rulesets.Edit
         {
             BlueprintContainer.CurrentTool = tool;
 
-            if (tool is SelectTool)
-                distanceSnapGridContainer.Hide();
-            else
-            {
+            if (!(tool is SelectTool))
                 EditorBeatmap.SelectedHitObjects.Clear();
-                showGridFor(Enumerable.Empty<HitObject>());
-            }
-        }
-
-        private void showGridFor(IEnumerable<HitObject> selectedHitObjects)
-        {
-            distanceSnapGridContainer.Clear();
-            distanceSnapGrid = CreateDistanceSnapGrid(selectedHitObjects);
-
-            if (distanceSnapGrid != null)
-            {
-                distanceSnapGridContainer.Child = distanceSnapGrid;
-                distanceSnapGridContainer.Show();
-            }
-
-            lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
+
         public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
@@ -254,23 +202,32 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                if (adjustableClock.CurrentTime < hitObject.StartTime)
-                    adjustableClock.Seek(hitObject.StartTime);
+                if (EditorClock.CurrentTime < hitObject.StartTime)
+                    EditorClock.SeekTo(hitObject.StartTime);
             }
-
-            showGridFor(Enumerable.Empty<HitObject>());
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
+        protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
+
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            if (distanceSnapGrid == null) return new SnapResult(screenSpacePosition, null);
+            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
+            double? targetTime = null;
 
-            // TODO: move distance snap grid to OsuHitObjectComposer.
-            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
+            if (playfield is ScrollingPlayfield scrollingPlayfield)
+            {
+                targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
 
-            return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time);
+                // apply beat snapping
+                targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+
+                // convert back to screen space
+                screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+            }
+
+            return new SnapResult(screenSpacePosition, targetTime, playfield);
         }
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
@@ -306,10 +263,12 @@ namespace osu.Game.Rulesets.Edit
     [Cached(typeof(IPositionSnapProvider))]
     public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
-        internal HitObjectComposer()
+        protected HitObjectComposer()
         {
             RelativeSizeAxes = Axes.Both;
         }
+
+        public abstract Playfield Playfield { get; }
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s.
@@ -320,14 +279,6 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
-
-        /// <summary>
-        /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
-        /// </summary>
-        /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
-        [CanBeNull]
-        protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
