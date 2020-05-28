@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,15 +31,16 @@ namespace osu.Game.Screens.Ranking
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
+        public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
+
+        public readonly ScoreInfo Score;
+        private readonly bool allowRetry;
+
         [Resolved(CanBeNull = true)]
         private Player player { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        public readonly ScoreInfo Score;
-
-        private readonly bool allowRetry;
 
         private Drawable bottomPanel;
         private ScorePanelList panels;
@@ -47,6 +49,8 @@ namespace osu.Game.Screens.Ranking
         {
             Score = score;
             this.allowRetry = allowRetry;
+
+            SelectedScore.Value = score;
         }
 
         [BackgroundDependencyLoader]
@@ -66,7 +70,7 @@ namespace osu.Game.Screens.Ranking
                             Child = panels = new ScorePanelList
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                SelectedScore = { Value = Score }
+                                SelectedScore = { BindTarget = SelectedScore }
                             }
                         }
                     },
@@ -95,7 +99,11 @@ namespace osu.Game.Screens.Ranking
                                     Direction = FillDirection.Horizontal,
                                     Children = new Drawable[]
                                     {
-                                        new ReplayDownloadButton(Score) { Width = 300 },
+                                        new ReplayDownloadButton(null)
+                                        {
+                                            Score = { BindTarget = SelectedScore },
+                                            Width = 300
+                                        },
                                     }
                                 }
                             }
@@ -108,6 +116,9 @@ namespace osu.Game.Screens.Ranking
                     new Dimension(GridSizeMode.AutoSize)
                 }
             };
+
+            if (Score != null)
+                panels.AddScore(Score);
 
             if (player != null && allowRetry)
             {
@@ -132,12 +143,7 @@ namespace osu.Game.Screens.Ranking
             var req = FetchScores(scores => Schedule(() =>
             {
                 foreach (var s in scores)
-                {
-                    if (s.OnlineScoreID == Score.OnlineScoreID)
-                        continue;
-
                     panels.AddScore(s);
-                }
             }));
 
             if (req != null)
