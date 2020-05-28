@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Ranking
         private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
             // Contract the old panel.
-            foreach (var p in flow.Where(p => p.Score != score.OldValue))
+            foreach (var p in flow.Where(p => p.Score == score.OldValue))
             {
                 p.State = PanelState.Contracted;
                 p.Margin = new MarginPadding();
@@ -126,8 +126,19 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
+            float offset = DrawWidth / 2f;
+
             // Add padding to both sides such that the centre of an expanded panel on either side is in the middle of the screen.
-            flow.Padding = new MarginPadding { Horizontal = DrawWidth / 2f - ScorePanel.EXPANDED_WIDTH / 2f - expanded_panel_spacing };
+
+            if (SelectedScore.Value != null)
+            {
+                // The expanded panel has extra padding applied to it, so it needs to be included into the offset.
+                offset -= ScorePanel.EXPANDED_WIDTH / 2f + expanded_panel_spacing;
+            }
+            else
+                offset -= ScorePanel.CONTRACTED_WIDTH / 2f;
+
+            flow.Padding = new MarginPadding { Horizontal = offset };
         }
 
         private class Flow : FillFlowContainer<ScorePanel>
