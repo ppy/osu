@@ -468,7 +468,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (obj0 != null)
             {
                 double d01OverlapNerf = Math.Min(1, Math.Pow(d01, 3));
-                double timeDifferenceNerf = Math.Exp(-4 * Math.Pow(1 - Math.Max(t12 / t01, t01 / t12), 2));
+                double timeDifferenceNerf = Math.Exp(-4 * Math.Pow(1 - Math.Max(t12 / (t01 + 1e-10), t01 / (t12 + 1e-10)), 2));
                 double distanceRatio = d12 / Math.Max(1, d01);
                 double bpmScaling = Math.Max(1, -16 * t12 + 3.4);
                 distanceIncreaseBuff = 1 + 0.225 * bpmScaling * timeDifferenceNerf * d01OverlapNerf * Math.Max(0, distanceRatio - 2);
