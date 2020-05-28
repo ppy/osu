@@ -8,7 +8,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public static class FingerControl
     {
-
+        /// <summary>
+        /// Calculates finger control difficulty of the map
+        /// </summary>
         public static double CalculateFingerControlDiff(List<OsuHitObject> hitObjects, double clockRate)
         {
             if (hitObjects.Count == 0)
@@ -22,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             int repeatStrainCount = 1;
             var strainHistory = new List<double> { 0 };
 
+            // calculate strain value for each hit object
             for (int i = 1; i < hitObjects.Count; i++)
             {
                 double currTime = hitObjects[i].StartTime / 1000.0;
@@ -55,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 prevStrainTime = strainTime;
             }
 
+            // aggregate strain values to compute difficulty
             var strainHistoryArray = strainHistory.ToArray();
 
             Array.Sort(strainHistoryArray);

@@ -24,12 +24,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : Skill
     {
-        private const double probability_threshold = 0.02;
+        /// <summary>
+        /// We want to find a throughput level at which the probability of FC = prob_threshold
+        /// </summary>
+        private const double prob_threshold = 0.02;
+
+        /// <summary>
+        /// We want to find a throughput level at which (the expected time for FC - the length of the song) = time_threshold_base
+        /// </summary>
         private const double time_threshold_base = 1200;
+
+        /// <summary>
+        /// Minimum throughput for root-finding
+        /// </summary>
         private const double tp_min = 0.1;
+
+        /// <summary>
+        /// Maximum throughput for root-finding
+        /// </summary>
         private const double tp_max = 100;
+
+        /// <summary>
+        /// Precision of probability of FC for root-finding
+        /// </summary>
         private const double prob_precision = 1e-4;
-        private const double time_precision = 5e-4;
+
+        /// <summary>
+        /// Precision of expected time for FC for root-finding
+        /// </summary>
+        private const double time_precision = 0.6;
+
+        /// <summary>
+        /// Maximum number of iterations for root-finding
+        /// </summary>
         private const int max_iterations = 100;
 
         private const double default_cheese_level = 0.4;
@@ -38,7 +65,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int miss_tp_count = 20;
         private const int combo_tp_count = 50;
 
-
+        /// <summary>
+        /// Calculates attributes related to aiming difficulty.
+        /// </summary>
         public static (double, double, double[], double[], double[], double, double[], double[], string)
             CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                    double clockRate,
@@ -66,6 +95,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return (fcProbTP, hiddenFactor, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
         }
 
+        /// <summary>
+        /// Converts hit objects into movements.
+        /// </summary>
         private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory,
                                                          bool hidden = false, List<double> noteDensities = null)
         {
@@ -99,26 +131,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return movements;
         }
 
+        /// <summary>
+        /// Calculates the throughput at which the probability of FC = prob_threshold
+        /// </summary>
         private static double calculateFCProbTP(IEnumerable<OsuMovement> movements, double cheeseLevel = default_cheese_level)
         {
-            double fcProbabilityTPMin = calculateFCProb(movements, tp_min, cheeseLevel);
+            double fcProbTPMin = calculateFCProb(movements, tp_min, cheeseLevel);
 
-            if (fcProbabilityTPMin >= probability_threshold)
+            if (fcProbTPMin >= prob_threshold)
                 return tp_min;
 
-            double fcProbabilityTPMax = calculateFCProb(movements, tp_max, cheeseLevel);
+            double fcProbTPMax = calculateFCProb(movements, tp_max, cheeseLevel);
 
-            if (fcProbabilityTPMax <= probability_threshold)
+            if (fcProbTPMax <= prob_threshold)
                 return tp_max;
 
-            double fcProbMinusThreshold(double tp) => calculateFCProb(movements, tp, cheeseLevel) - probability_threshold;
+            double fcProbMinusThreshold(double tp) => calculateFCProb(movements, tp, cheeseLevel) - prob_threshold;
             return Brent.FindRoot(fcProbMinusThreshold, tp_min, tp_max, prob_precision, max_iterations);
         }
 
         /// <summary>
-        /// Calculates the throughput at which the expected time to FC the given movements =
-        /// timeThresholdBase + time span of the movements
+        /// Calculates the throughput at which MinExpectedTimeForCount(throughput, sectionCount) = timeThresholdBase.
         /// </summary>
+        // The map is divided into combo_tp_count sections, and a submap can span x sections.
+        // This function calculates the minimum skill level such that
+        // there exists a submap of length sectionCount that can be FC'd in timeThresholdBase seconds.
         private static double calculateFCTimeTP(HitProbabilities mapHitProbs, int sectionCount)
         {
             if (mapHitProbs.IsEmpty(sectionCount))
@@ -135,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return tp_max;
 
             double fcTimeMinusThreshold(double tp) => mapHitProbs.MinExpectedTimeForCount(tp, sectionCount) - time_threshold_base;
-            return Bisection.FindRoot(fcTimeMinusThreshold, tp_min, tp_max, time_threshold_base * time_precision, max_iterations);
+            return Bisection.FindRoot(fcTimeMinusThreshold, tp_min, tp_max, time_precision, max_iterations);
         }
 
         private static string generateGraphText(List<OsuMovement> movements, double tp)
@@ -210,6 +247,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Brent.FindRootExpand(cdfMinusProb, -100, 1000);
         }
 
+        /// <summary>
+        /// For each cheese level, it first calculates the required throughput,
+        /// then divides the result by the throughput corresponding to the default cheese level.
+        /// </summary>
         private static (double[], double[]) calculateCheeseLevelsVSCheeseFactors(IList<OsuMovement> movements, double fcProbTP)
         {
             double[] cheeseLevels = new double[cheese_level_count];
@@ -224,6 +265,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return (cheeseLevels, cheeseFactors);
         }
 
+        /// <summary>
+        /// Gets the number of movements that might be cheesed.
+        /// A movement might be cheesed if it is both difficult and cheesable.
+        /// </summary>
         private static double getCheeseNoteCount(IList<OsuMovement> movements, double tp)
         {
             double count = 0;
@@ -236,6 +281,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return count;
         }
 
+        /// <summary>
+        /// The map is divided into combo_tp_count sections, and a submap can span x sections.
+        /// This function calculates fcTimeTP for every possible submap length.
+        /// </summary>
         private static double[] calculateComboTps(HitProbabilities hitProbabilities)
         {
             double[] ComboTPs = new double[combo_tp_count];
@@ -248,6 +297,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return ComboTPs;
         }
 
+        /// <summary>
+        /// Calculates the probability to FC the movements.
+        /// </summary>
         private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp, double cheeseLevel)
         {
             double fcProb = 1;

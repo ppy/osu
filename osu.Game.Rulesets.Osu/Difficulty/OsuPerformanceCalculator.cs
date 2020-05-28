@@ -24,9 +24,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
+        /// <summary>
+        /// Aim, tap and acc values are combined using power mean with this as the exponent.
+        /// </summary>
         private const double total_value_exponent = 1.5;
-        private const double combo_weight = 0.5;
+
+        /// <summary>
+        /// This exponent is used to convert throughput to aim pp and tap skill to tap pp.
+        /// </summary>
         private const double skill_to_pp_exponent = 2.7;
+
+        /// <summary>
+        /// The first 0.5 miss doesn't count when we penalize misses
+        /// </summary>
         private const double miss_count_leniency = 0.5;
 
         private readonly int countHitCircles;

@@ -45,6 +45,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return isEmpty;
         }
 
+        /// <summary>
+        /// Calculates duration of the submap
+        /// </summary>
         public double Length(int start, int sectionCount)
         {
             double first = 0, last = 0;
@@ -67,6 +70,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return last - first;
         }
 
+        /// <summary>
+        /// Calculates (expected time for FC - duration of the submap) for every submap that spans sectionCount sections
+        /// and takes the minimum value.
+        /// </summary>
         public double MinExpectedTimeForCount(double tp, int sectionCount)
         {
             double fcTime = double.PositiveInfinity;
@@ -152,7 +159,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                 foreach (OsuMovement movement in Movements)
                 {
                     double hitProb = CalculateCheeseHitProb(movement, tp, cheeseLevel)+1e-10;
+
+                    // This line nerfs notes with high miss probability
                     hitProb = 1 - (Math.Sqrt(1 - hitProb + 0.25) - 0.5);
+
                     result.ExpectedTime = (result.ExpectedTime + movement.RawMT) / hitProb;
                     result.FcProbability *= hitProb;
                 }
