@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
-           var initialPath = new DirectoryInfo(storage.GetFullPath(stableInfo.StablePath.Value ?? string.Empty)).Parent?.FullName;
+            var initialPath = new DirectoryInfo(storage.GetFullPath(stableInfo.StablePath.Value ?? string.Empty)).Parent?.FullName;
 
             AddRangeInternal(new Drawable[]
             {
