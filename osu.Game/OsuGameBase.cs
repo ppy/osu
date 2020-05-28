@@ -229,8 +229,8 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            if (API is APIAccess apiAcces)
-                AddInternal(apiAcces);
+            if (API is APIAccess apiAccess)
+                AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;
