@@ -16,6 +16,8 @@ using osu.Game.Overlays.OnlinePicture;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays
 {
@@ -23,7 +25,7 @@ namespace osu.Game.Overlays
     {
 
         [Resolved]
-        private GameHost host { get; set; }
+        private OsuGame game { get; set; }
 
         private const float DURATION = 1000;
 
@@ -42,6 +44,8 @@ namespace osu.Game.Overlays
             Colour = Color4.Black.Opacity(0.5f),
             Radius = 12,
         };
+
+        private BindableBool OptUI = new BindableBool();
 
         public float BottomContainerHeight => bottomContainer.Position.Y + bottomContainer.DrawHeight;
         public float TopBarHeight => topbarContainer.DrawHeight;
@@ -112,7 +116,7 @@ namespace osu.Game.Overlays
                                     Text = "在浏览器中打开",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Action = () => host.OpenUrlExternally(Target),
+                                    Action = () => game.OpenUrlExternally(Target),
                                 },
                                 closeButton = new TriangleButton
                                 {
@@ -155,6 +159,14 @@ namespace osu.Game.Overlays
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(MfConfigManager config)
+        {
+            config.BindWith(MfSetting.OptUI, OptUI);
+
+            OptUI.BindValueChanged(OnOptUIChanged);
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -176,9 +188,24 @@ namespace osu.Game.Overlays
         DelayedLoadWrapper delayedLoadWrapper;
         UpdateableOnlinePicture pict;
 
+        private void OnOptUIChanged(ValueChangedEvent<bool> v)
+        {
+            if ( this.Alpha != 0 && v.NewValue == false )
+            {
+                game.OpenUrlExternally(Target);
+                this.Hide();
+            }
+        }
+
         public void UpdateImage(string NewUri, bool popIn)
         {
             Target = NewUri;
+
+            if ( OptUI.Value != true )
+            {
+                game.OpenUrlExternally(Target);
+                return;
+            }
 
             if (popIn)
                 this.Show();
