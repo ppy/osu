@@ -60,6 +60,7 @@ namespace osu.Game.Online.API
                 BeatmapInfoID = playlistItem.BeatmapID,
                 Ruleset = playlistItem.Ruleset.Value,
                 RulesetID = playlistItem.RulesetID,
+                Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,
                 Date = EndedAt,
