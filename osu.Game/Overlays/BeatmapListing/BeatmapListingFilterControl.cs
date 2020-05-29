@@ -188,6 +188,9 @@ namespace osu.Game.Overlays.BeatmapListing
                 if (sets.Count == 0)
                     noMoreResults = true;
 
+                if (CurrentPage == 0)
+                    searchControl.BeatmapSet = sets.FirstOrDefault();
+
                 lastResponse = response;
                 getSetsRequest = null;
 
