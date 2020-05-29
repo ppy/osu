@@ -177,7 +177,9 @@ namespace osu.Game.Overlays.BeatmapListing
                 lastResponse?.Cursor,
                 searchControl.Category.Value,
                 sortControl.Current.Value,
-                sortControl.SortDirection.Value);
+                sortControl.SortDirection.Value,
+                searchControl.Genre.Value,
+                searchControl.Language.Value);
 
             getSetsRequest.Success += response =>
             {
