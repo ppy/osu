@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays.MfMenu
 {
@@ -22,173 +23,201 @@ namespace osu.Game.Overlays.MfMenu
 
         private OsuSpriteText faqCannotUseOnlineFunctionText = new OsuSpriteText{};
 
+        private FillFlowContainer IntroduceContainer;
+        private FillFlowContainer FaqContainer;
+        private Container baseContainer;
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            InternalChild = new FillFlowContainer
+            InternalChild = baseContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding{ Top = 20, Bottom = 50 },
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = "介绍",
-                        Font = OsuFont.GetFont(size: 30),
-                    },
-                    new GridContainer
+                    IntroduceContainer = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        RowDimensions = new[]
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Spacing = new Vector2(0, 20),
+                        Children = new Drawable[]
                         {
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            new OsuSpriteText
                             {
-                                //Left
-                                new FillFlowContainer
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = "介绍",
+                                Font = OsuFont.GetFont(size: 30),
+                            },
+                            new GridContainer
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                RowDimensions = new[]
                                 {
-                                    LayoutDuration = 500,
-                                    LayoutEasing = Easing.OutQuint,
-                                    Padding = new MarginPadding{ Right = 25f },
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Spacing = FillFlowSpacing,
-                                    Children = new Drawable[]
+                                    new Dimension(GridSizeMode.AutoSize),
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                            new MfMenuTextBoxContainer
+                                        //Left
+                                        new FillFlowContainer
+                                        {
+                                            LayoutDuration = 500,
+                                            LayoutEasing = Easing.OutQuint,
+                                            Padding = new MarginPadding{ Right = 25f },
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Spacing = FillFlowSpacing,
+                                            Children = new Drawable[]
                                             {
-                                                Title = "关于Mf-osu",
-                                                d = introduceTextBox()
-                                            },
-                                            new MfMenuTextBoxContainer
-                                            {
-                                                Title = "Bug反馈/提出建议",
-                                                d = reportIssuesTextBox()
-                                            },
-                                            new MfMenuTextBoxContainer
-                                            {
-                                                Title = "项目引用",
-                                                d = projectRefsTextBox(),
+                                                    new MfMenuTextBoxContainer
+                                                    {
+                                                        Title = "关于Mf-osu",
+                                                        d = introduceTextBox()
+                                                    },
+                                                    new MfMenuTextBoxContainer
+                                                    {
+                                                        Title = "Bug反馈/提出建议",
+                                                        d = reportIssuesTextBox()
+                                                    },
+                                                    new MfMenuTextBoxContainer
+                                                    {
+                                                        Title = "项目引用",
+                                                        d = projectRefsTextBox(),
+                                                    }
                                             }
-                                    }
-                                },
-                                //Right
-                                new FillFlowContainer
-                                {
-                                    LayoutDuration = 500,
-                                    LayoutEasing = Easing.OutQuint,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Padding = new MarginPadding{ Left = 25f },
-                                    Spacing = FillFlowSpacing,
-                                    Children = new Drawable[]
-                                    {
-                                        new MfMenuTextBoxContainer
-                                        {
-                                            Title = "参与过完善该分支的人(按首字母排序)",
-                                            d = staffTextBox()
                                         },
-                                        new MfMenuTextBoxContainer
+                                        //Right
+                                        new FillFlowContainer
                                         {
-                                            Title = "注意事项",
-                                            d = attentionsTextBox()
+                                            LayoutDuration = 500,
+                                            LayoutEasing = Easing.OutQuint,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Padding = new MarginPadding{ Left = 25f },
+                                            Spacing = FillFlowSpacing,
+                                            Children = new Drawable[]
+                                            {
+                                                new MfMenuTextBoxContainer
+                                                {
+                                                    Title = "参与过完善该分支的人(按首字母排序)",
+                                                    d = staffTextBox()
+                                                },
+                                                new MfMenuTextBoxContainer
+                                                {
+                                                    Title = "注意事项",
+                                                    d = attentionsTextBox()
+                                                },
+                                                new MfMenuTextBoxContainer
+                                                {
+                                                    Title = "Special Thanks",
+                                                    d = specialThanksTextBox()
+                                                }
+                                            }
                                         },
-                                        new MfMenuTextBoxContainer
-                                        {
-                                            Title = "Special Thanks",
-                                            d = specialThanksTextBox()
-                                        }
-                                    }
-                                },
+                                    },
+                                }
                             },
                         }
                     },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = "F&Q",
-                        Font = OsuFont.GetFont(size: 30),
-                    },
-                    new GridContainer
+                    FaqContainer = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        RowDimensions = new[]
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Spacing = new Vector2(0, 20),
+                        Children = new Drawable[]
                         {
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            new OsuSpriteText
                             {
-                                //Left
-                                new FillFlowContainer
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = "常见问题",
+                                Font = OsuFont.GetFont(size: 30),
+                            },
+                            new GridContainer
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                RowDimensions = new[]
                                 {
-                                    LayoutDuration = 500,
-                                    LayoutEasing = Easing.OutQuint,
-                                    Padding = new MarginPadding{ Right = 25f },
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Spacing = FillFlowSpacing,
-                                    Children = new Drawable[]
-                                    {
-                                        new MfMenuDropDownTextBoxContainer
-                                        {
-                                            Title = "为什么加载谱面封面/音频预览的时间会那么长?",
-                                            D = faqLongCoverLoad()
-                                        },
-                                        new MfMenuDropDownTextBoxContainer
-                                        {
-                                            Title = "为什么我没法查看谱面/在线列表/排名/聊天/看板?",
-                                            D = faqCannotUseOnlineFunction()
-                                        }
-                                    }
+                                    new Dimension(GridSizeMode.AutoSize),
                                 },
-                                //Right
-                                new FillFlowContainer
+                                Content = new[]
                                 {
-                                    LayoutDuration = 500,
-                                    LayoutEasing = Easing.OutQuint,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Padding = new MarginPadding{ Left = 25f },
-                                    Spacing = FillFlowSpacing,
-                                    Children = new Drawable[]
+                                    new Drawable[]
                                     {
-                                        new MfMenuDropDownTextBoxContainer
+                                        //Left
+                                        new FillFlowContainer
                                         {
-                                            Title = "为什么我突然没法从Sayobot下图了?",
-                                            D = faqSayobotFail()
+                                            LayoutDuration = 500,
+                                            LayoutEasing = Easing.OutQuint,
+                                            Padding = new MarginPadding{ Right = 25f },
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Spacing = FillFlowSpacing,
+                                            Children = new Drawable[]
+                                            {
+                                                new MfMenuDropDownTextBoxContainer
+                                                {
+                                                    Title = "为什么加载谱面封面/音频预览的时间会那么长?",
+                                                    D = faqLongCoverLoad()
+                                                },
+                                                new MfMenuDropDownTextBoxContainer
+                                                {
+                                                    Title = "为什么我没法查看谱面/在线列表/排名/聊天/看板?",
+                                                    D = faqCannotUseOnlineFunction()
+                                                }
+                                            }
                                         },
-                                    }
-                                },
+                                        //Right
+                                        new FillFlowContainer
+                                        {
+                                            LayoutDuration = 500,
+                                            LayoutEasing = Easing.OutQuint,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Padding = new MarginPadding{ Left = 25f },
+                                            Spacing = FillFlowSpacing,
+                                            Children = new Drawable[]
+                                            {
+                                                new MfMenuDropDownTextBoxContainer
+                                                {
+                                                    Title = "为什么我突然没法从Sayobot下图了?",
+                                                    D = faqSayobotFail()
+                                                },
+                                            }
+                                        },
+                                    },
+                                }
                             },
                         }
-                    },
+                    }
                 }
             };
             api.Register(this);
@@ -363,6 +392,32 @@ namespace osu.Game.Overlays.MfMenu
         #endregion faq
 
         #region 功能函数
+
+        private ScheduledDelegate scheduledChangeContent;
+        public void UpdateContent(SelectedTabType tabType)
+        {
+            scheduledChangeContent?.Cancel();
+            scheduledChangeContent = null;
+
+            foreach (var i in baseContainer)
+            {
+                i.FadeOut(400, Easing.OutQuint);
+            }
+
+            scheduledChangeContent = Scheduler.AddDelayed( () =>
+            {
+                switch (tabType)
+                {
+                    case SelectedTabType.Introduce:
+                        IntroduceContainer.FadeIn(400, Easing.OutQuint);
+                        break;
+
+                    case SelectedTabType.Faq:
+                        FaqContainer.FadeIn(400, Easing.OutQuint);
+                        break;
+                }
+            } , 300);
+        }
 
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
