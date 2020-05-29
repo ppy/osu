@@ -286,7 +286,6 @@ namespace osu.Game.Rulesets.Taiko
     }
 
     public class HitPlacementBlueprint : PlacementBlueprint
-
     {
         private readonly HitPiece piece;
 
