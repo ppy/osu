@@ -48,8 +48,6 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
-        public override Playfield Playfield => drawableRulesetWrapper.Playfield;
-
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
@@ -61,7 +59,6 @@ namespace osu.Game.Rulesets.Edit
         protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -137,6 +134,49 @@ namespace osu.Game.Rulesets.Edit
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
+
+        public override Playfield Playfield => drawableRulesetWrapper.Playfield;
+
+        public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
+
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+
+        /// <summary>
+        /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
+        /// This should usually define one tool for each <see cref="HitObject"/> type used in the target ruleset.
+        /// </summary>
+        /// <remarks>
+        /// A "select" tool is automatically added as the first tool.
+        /// </remarks>
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
+        /// </summary>
+        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
+
+        /// <summary>
+        /// Construct a drawable ruleset for the provided ruleset.
+        /// </summary>
+        /// <remarks>
+        /// Can be overridden to add editor-specific logical changes to a <see cref="Ruleset"/>'s standard <see cref="DrawableRuleset{TObject}"/>.
+        /// For example, hit animations or judgement logic may be changed to give a better editor user experience.
+        /// </remarks>
+        /// <param name="ruleset">The ruleset used to construct its drawable counterpart.</param>
+        /// <param name="beatmap">The loaded beatmap.</param>
+        /// <param name="mods">The mods to be applied.</param>
+        /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/></returns>.
+        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+            => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
+
+        #region Tool selection logic
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
@@ -151,13 +191,6 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnKeyDown(e);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            inputManager = GetContainingInputManager();
         }
 
         private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
@@ -179,15 +212,9 @@ namespace osu.Game.Rulesets.Edit
                 EditorBeatmap.SelectedHitObjects.Clear();
         }
 
-        public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
+        #endregion
 
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
-
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
-
-        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
-
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+        #region IPlacementHandler
 
         public void BeginPlacement(HitObject hitObject)
         {
@@ -209,6 +236,17 @@ namespace osu.Game.Rulesets.Edit
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
+        #endregion
+
+        #region IPositionSnapProvider
+
+        /// <summary>
+        /// Retrieve the relevant <see cref="Playfield"/> at a specified screen-space position.
+        /// In cases where a ruleset doesn't require custom logic (due to nested playfields, for example)
+        /// this will return the ruleset's main playfield.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position to query.</param>
+        /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
@@ -257,8 +295,14 @@ namespace osu.Game.Rulesets.Edit
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
+
+        #endregion
     }
 
+    /// <summary>
+    /// A non-generic definition of a HitObject composer class.
+    /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
+    /// </summary>
     [Cached(typeof(HitObjectComposer))]
     [Cached(typeof(IPositionSnapProvider))]
     public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
@@ -268,10 +312,13 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
         }
 
+        /// <summary>
+        /// The target ruleset's playfield.
+        /// </summary>
         public abstract Playfield Playfield { get; }
 
         /// <summary>
-        /// All the <see cref="DrawableHitObject"/>s.
+        /// All <see cref="DrawableHitObject"/>s in currently loaded beatmap.
         /// </summary>
         public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
 
@@ -279,6 +326,8 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
+
+        #region IPositionSnapProvider
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
@@ -291,5 +340,7 @@ namespace osu.Game.Rulesets.Edit
         public abstract double GetSnappedDurationFromDistance(double referenceTime, float distance);
 
         public abstract float GetSnappedDistanceFromDistance(double referenceTime, float distance);
+
+        #endregion
     }
 }
