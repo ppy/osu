@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;

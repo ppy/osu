@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Skinning;
 
