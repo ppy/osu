@@ -27,7 +27,8 @@ namespace osu.Game.Online.API.Requests
 
         private string directionString => SortDirection == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query,
+        public SearchBeatmapSetsRequest(
+            string query,
             RulesetInfo ruleset,
             Cursor cursor = null,
             SearchCategory searchCategory = SearchCategory.Any,
