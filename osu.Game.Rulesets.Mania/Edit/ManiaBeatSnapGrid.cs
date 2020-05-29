@@ -11,6 +11,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -63,9 +65,9 @@ namespace osu.Game.Rulesets.Mania.Edit
         private (double start, double end)? selectionTimeRange;
 
         [BackgroundDependencyLoader]
-        private void load(IManiaHitObjectComposer composer)
+        private void load(HitObjectComposer composer)
         {
-            foreach (var stage in composer.Playfield.Stages)
+            foreach (var stage in ((ManiaPlayfield)composer.Playfield).Stages)
             {
                 foreach (var column in stage.Columns)
                 {
