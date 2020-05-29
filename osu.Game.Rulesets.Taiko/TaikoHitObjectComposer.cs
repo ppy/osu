@@ -9,17 +9,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -29,8 +26,6 @@ namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoHitObjectComposer : HitObjectComposer<TaikoHitObject>
     {
-        private DrawableTaikoRuleset drawableRuleset;
-
         public TaikoHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
@@ -43,12 +38,7 @@ namespace osu.Game.Rulesets.Taiko
             new SwellCompositionTool()
         };
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new TaikoBlueprintContainer(drawableRuleset.Playfield.AllHitObjects);
-
-        protected override DrawableRuleset<TaikoHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
-        {
-            return drawableRuleset = new DrawableTaikoRuleset(ruleset, beatmap, mods);
-        }
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new TaikoBlueprintContainer(Playfield.AllHitObjects);
     }
 
     public class TaikoBlueprintContainer : ComposeBlueprintContainer
