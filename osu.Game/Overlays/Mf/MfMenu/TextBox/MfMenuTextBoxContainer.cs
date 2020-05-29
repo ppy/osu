@@ -23,7 +23,6 @@ namespace osu.Game.Overlays.MfMenu
 
         private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.BlueLighter);
 
-        private Container baseContainer;
         protected Container backgroundContainer;
         private FillFlowContainer contentFillFlow;
 
@@ -42,7 +41,7 @@ namespace osu.Game.Overlays.MfMenu
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                baseContainer = new Container
+                new Container
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -85,28 +84,12 @@ namespace osu.Game.Overlays.MfMenu
             };
 
             CanChangeBorderThickness.Value = true;
-            borderThickness.BindValueChanged(OnborderThicknessChanged);
-        }
-
-        private Drawable SelectSounds()
-        {
-            Drawable s;
-
-            if ( Clickable )
-                s = new HoverClickSounds();
-            else
-                s = new HoverSounds();
-
-            return s;
-        }
-
-        private void OnborderThicknessChanged(ValueChangedEvent<float> v)
-        {
-            backgroundContainer.BorderThickness = v.NewValue;
         }
 
         protected override void LoadComplete()
         {
+            borderThickness.BindValueChanged(OnborderThicknessChanged);
+
             if ( Title != null )
             {
                 var titleTextFlow = new LinkFlowContainer
@@ -134,6 +117,23 @@ namespace osu.Game.Overlays.MfMenu
             contentFillFlow.LayoutDuration = 750;
 
             base.LoadComplete();
+        }
+
+        private Drawable SelectSounds()
+        {
+            Drawable s;
+
+            if ( Clickable )
+                s = new HoverClickSounds();
+            else
+                s = new HoverSounds();
+
+            return s;
+        }
+
+        private void OnborderThicknessChanged(ValueChangedEvent<float> v)
+        {
+            backgroundContainer.BorderThickness = v.NewValue;
         }
 
         //我已经不知道要怎么处理光标悬浮时的动画了就这样吧

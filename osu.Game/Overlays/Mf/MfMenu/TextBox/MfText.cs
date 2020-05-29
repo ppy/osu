@@ -4,9 +4,9 @@ using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
 {
-    public class MfTextBox : LinkFlowContainer
+    public class MfText : LinkFlowContainer
     {
-        public MfTextBox()
+        public MfText()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

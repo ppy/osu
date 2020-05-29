@@ -11,6 +11,7 @@ using osu.Game.Users;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Framework.Threading;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays.MfMenu
 {
@@ -25,36 +26,37 @@ namespace osu.Game.Overlays.MfMenu
 
         private FillFlowContainer IntroduceContainer;
         private FillFlowContainer FaqContainer;
-        private Container baseContainer;
+        private FillFlowContainer baseContainer;
+        private OsuSpriteText subTitle;
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            InternalChild = baseContainer = new Container
+            InternalChild = baseContainer = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
+                Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding{ Top = 20, Bottom = 50 },
                 Children = new Drawable[]
                 {
+                    subTitle = new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Font = OsuFont.GetFont(size: 30),
+                        Alpha = 1
+                    },
                     IntroduceContainer = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = "介绍",
-                                Font = OsuFont.GetFont(size: 30),
-                            },
                             new GridContainer
                             {
                                 Anchor = Anchor.TopCentre,
@@ -86,17 +88,17 @@ namespace osu.Game.Overlays.MfMenu
                                                     new MfMenuTextBoxContainer
                                                     {
                                                         Title = "关于Mf-osu",
-                                                        d = introduceTextBox()
+                                                        d = introduceText()
                                                     },
                                                     new MfMenuTextBoxContainer
                                                     {
                                                         Title = "Bug反馈/提出建议",
-                                                        d = reportIssuesTextBox()
+                                                        d = reportIssuesText()
                                                     },
                                                     new MfMenuTextBoxContainer
                                                     {
                                                         Title = "项目引用",
-                                                        d = projectRefsTextBox(),
+                                                        d = projectRefsText(),
                                                     }
                                             }
                                         },
@@ -117,17 +119,17 @@ namespace osu.Game.Overlays.MfMenu
                                                 new MfMenuTextBoxContainer
                                                 {
                                                     Title = "参与过完善该分支的人(按首字母排序)",
-                                                    d = staffTextBox()
+                                                    d = staffText()
                                                 },
                                                 new MfMenuTextBoxContainer
                                                 {
                                                     Title = "注意事项",
-                                                    d = attentionsTextBox()
+                                                    d = attentionsText()
                                                 },
                                                 new MfMenuTextBoxContainer
                                                 {
                                                     Title = "Special Thanks",
-                                                    d = specialThanksTextBox()
+                                                    d = specialThanksText()
                                                 }
                                             }
                                         },
@@ -145,13 +147,6 @@ namespace osu.Game.Overlays.MfMenu
                         Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Text = "常见问题",
-                                Font = OsuFont.GetFont(size: 30),
-                            },
                             new GridContainer
                             {
                                 Anchor = Anchor.TopCentre,
@@ -225,10 +220,10 @@ namespace osu.Game.Overlays.MfMenu
 
         #region 介绍
 
-        protected Drawable introduceTextBox()
+        protected Drawable introduceText()
         {
-            var t = new MfTextBox();
-            
+            var t = new MfText();
+
             t.AddLink("Mf-osu","https://github.com/MATRIX-feather/osu");
             t.AddText("是一个基于");
             t.AddLink("官方osu!lazer","https://github.com/ppy/osu");
@@ -237,9 +232,9 @@ namespace osu.Game.Overlays.MfMenu
             return t;
         }
 
-        protected Drawable staffTextBox()
+        protected Drawable staffText()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddUserLink(new User
                         {
@@ -261,12 +256,11 @@ namespace osu.Game.Overlays.MfMenu
             t.NewParagraph();
 
             return t;
-            
         }
 
-        protected Drawable reportIssuesTextBox()
+        protected Drawable reportIssuesText()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddText("任何与翻译文本、字体大小等有关的问题, 请前往");
             t.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
@@ -282,9 +276,9 @@ namespace osu.Game.Overlays.MfMenu
             return t;
         }
 
-        protected Drawable attentionsTextBox()
+        protected Drawable attentionsText()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddText("虽然osu!lazer和他的框架osu!");
             t.AddText("framework");
@@ -306,9 +300,9 @@ namespace osu.Game.Overlays.MfMenu
             return t;
         }
 
-        protected Drawable projectRefsTextBox()
+        protected Drawable projectRefsText()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddText("Mf-osu项目在跟进和维护的同时也会尝试");
             t.AddText("添加一些新奇的功能。");
@@ -331,9 +325,9 @@ namespace osu.Game.Overlays.MfMenu
             return t;
         }
 
-        protected Drawable specialThanksTextBox()
+        protected Drawable specialThanksText()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddUserLink(new User
             {
@@ -353,7 +347,7 @@ namespace osu.Game.Overlays.MfMenu
 
         protected Drawable faqLongCoverLoad()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddParagraph("这与你的系统和当前的网络环境等", AnswerTitlefont);
             t.AddText("一系列因素有关, 也可能是你一次性发送了过多的资源请求, 请多等待一会, 你也可以尝试重新进入谱面列表/信息界面", AnswerTitlefont);
@@ -363,7 +357,7 @@ namespace osu.Game.Overlays.MfMenu
 
         protected Drawable faqSayobotFail()
         {
-            var t = new MfTextBox();
+            var t = new MfText();
 
             t.AddParagraph("这可能是因为小夜那边出了点状况, 尝试访问一下", AnswerTitlefont);
             t.AddLink("镜像站官网","https://osu.sayobot.cn/", AnswerTitlefont);
@@ -401,11 +395,13 @@ namespace osu.Game.Overlays.MfMenu
 
             foreach (var i in baseContainer)
             {
-                i.FadeOut(400, Easing.OutQuint);
+                i.FadeOut(300, Easing.OutQuint);
             }
 
             scheduledChangeContent = Scheduler.AddDelayed( () =>
             {
+                subTitle.Text = tabType.GetDescription() ?? tabType.ToString();
+
                 switch (tabType)
                 {
                     case SelectedTabType.Introduce:
@@ -416,6 +412,8 @@ namespace osu.Game.Overlays.MfMenu
                         FaqContainer.FadeIn(400, Easing.OutQuint);
                         break;
                 }
+
+                subTitle.FadeIn(400, Easing.OutQuint);
             } , 300);
         }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,6 +10,9 @@ using osu.Game.Overlays.MfMenu;
 
 namespace osu.Game.Overlays
 {
+    ///<summary>
+    ///TODO: 像玩家信息那样显示tab栏
+    ///</summary>
     public class MfMenuOverlay : FullscreenOverlay
     {
         private MfMenuHeader header;
@@ -38,7 +42,6 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new MfMenuHeader(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -50,10 +53,20 @@ namespace osu.Game.Overlays
                             }
                         }
                     }
-                }
+                },
+                header = new MfMenuHeader(),
             };
         }
-    
+
+        protected override void UpdateAfterChildren()
+        {
+            var s = scrollContainer.Current; //滚动高度
+
+            header.Y = -(Math.Min(s, header.DrawHeight - 47));
+
+            scrollContainer.Padding = new MarginPadding { Top = header.DrawHeight };
+        }
+
         protected override void LoadComplete()
         {
             selectedTabType.BindValueChanged(OnSelectedTabTypeChanged, true);

@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Overlays.MfMenu
 {
@@ -14,8 +15,6 @@ namespace osu.Game.Overlays.MfMenu
 
         private class MfMenuTitle : OverlayTitle
         {
-            public readonly Bindable<SelectedTabType> SelectedTabType = new Bindable<SelectedTabType>();
-
             public MfMenuTitle()
             {
                 Title = "关于Mf-osu 页面";
@@ -23,7 +22,7 @@ namespace osu.Game.Overlays.MfMenu
             }
         }
     }
-    
+
     public enum SelectedTabType
     {
         [Description("介绍")]
