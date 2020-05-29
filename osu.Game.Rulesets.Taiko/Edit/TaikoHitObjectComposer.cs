@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
 {
     public class TaikoHitObjectComposer : HitObjectComposer<TaikoHitObject>
     {
-        public TaikoHitObjectComposer(Ruleset ruleset)
+        public TaikoHitObjectComposer(TaikoRuleset ruleset)
             : base(ruleset)
         {
         }
