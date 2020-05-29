@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 tp *= hiddenFactor;
             }
-                
+
 
             // Account for cheesing
             double modifiedAcc = getModifiedAcc();
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double urOnStreams = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
 
             double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4000) / 1000);
-            
+
             double tapSkill = mashLevel * Attributes.MashTapDiff + (1 - mashLevel) * Attributes.TapDiff;
 
             double tapValue = tapSkillToPP(tapSkill);

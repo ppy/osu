@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 else
                     movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate, objMinus2: objMinus2));
 
-                
+
             }
             return movements;
         }

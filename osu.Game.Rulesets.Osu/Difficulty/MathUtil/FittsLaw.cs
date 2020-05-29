@@ -48,11 +48,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         /// </summary>
         public static double Power2(double x)
         {
-            if (x<0)
+            if (x < 0)
             {
                 return 1 / Power2(-x);
             }
-            if (x>60)
+            if (x > 60)
             {
                 return double.PositiveInfinity;
             }

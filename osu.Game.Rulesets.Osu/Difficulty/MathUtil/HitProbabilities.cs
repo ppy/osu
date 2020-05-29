@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 
                 foreach (OsuMovement movement in Movements)
                 {
-                    double hitProb = CalculateCheeseHitProb(movement, tp, cheeseLevel)+1e-10;
+                    double hitProb = CalculateCheeseHitProb(movement, tp, cheeseLevel) + 1e-10;
 
                     // This line nerfs notes with high miss probability
                     hitProb = 1 - (Math.Sqrt(1 - hitProb + 0.25) - 0.5);

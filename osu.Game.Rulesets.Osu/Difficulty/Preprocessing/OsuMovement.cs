@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                         Vector<double> tapStrain, double clockRate,
                                                         bool hidden = false, double noteDensity = 0, OsuHitObject objMinus2 = null)
         {
-            
+
             var movement = new OsuMovement();
 
             double t12 = (obj2.StartTime - obj1.StartTime) / clockRate / 1000.0;
@@ -196,8 +196,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // txy : time difference of obj x and obj y
             // dxy : distance (normalized) from obj x to obj y
             // ipxy: index of performance of the movement from obj x to obj y
-            var pos1 = Vector<double>.Build.Dense(new[] {(double)obj1.Position.X, (double)obj1.Position.Y});
-            var pos2 = Vector<double>.Build.Dense(new[] {(double)obj2.Position.X, (double)obj2.Position.Y});
+            var pos1 = Vector<double>.Build.Dense(new[] { (double)obj1.Position.X, (double)obj1.Position.Y });
+            var pos2 = Vector<double>.Build.Dense(new[] { (double)obj2.Position.X, (double)obj2.Position.Y });
             var s12 = (pos2 - pos1) / (2 * obj2.Radius);
             double d12 = s12.L2Norm();
             double ip12 = FittsLaw.CalculateIP(d12, t12);
@@ -396,7 +396,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     ip01 = 0;
                 }
                 cheesabilityEarly = SpecialFunctions.Logistic((ip01 / ip12 - 0.6) * (-15)) * 0.5;
-                timeEarly = cheesabilityEarly * (1 / (1 / (t12 + 0.07) + t01Reciprocal)) ;
+                timeEarly = cheesabilityEarly * (1 / (1 / (t12 + 0.07) + t01Reciprocal));
 
                 double t23Reciprocal;
                 double ip23;
