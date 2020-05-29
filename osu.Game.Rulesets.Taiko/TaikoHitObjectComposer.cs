@@ -38,7 +38,8 @@ namespace osu.Game.Rulesets.Taiko
             new SwellCompositionTool()
         };
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new TaikoBlueprintContainer(Playfield.AllHitObjects);
+        protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
+            => new TaikoBlueprintContainer(hitObjects);
     }
 
     public class TaikoBlueprintContainer : ComposeBlueprintContainer
