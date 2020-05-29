@@ -11,7 +11,7 @@ namespace osu.Game.Overlays
     public class MfMenuOverlay : FullscreenOverlay
     {
         public MfMenuOverlay()
-            : base(OverlayColourScheme.Orange)
+            : base(OverlayColourScheme.BlueLighter)
         {
             Children = new Drawable[]
             {

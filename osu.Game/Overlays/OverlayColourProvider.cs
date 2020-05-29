@@ -64,6 +64,9 @@ namespace osu.Game.Overlays
 
                 case OverlayColourScheme.Blue:
                     return 200 / 360f;
+
+                case OverlayColourScheme.BlueLighter:
+                    return 212 / 360f;
             }
         }
     }
@@ -75,6 +78,7 @@ namespace osu.Game.Overlays
         Orange,
         Green,
         Purple,
-        Blue
+        Blue,
+        BlueLighter
     }
 }

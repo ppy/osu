@@ -21,14 +21,7 @@ namespace osu.Game.Overlays.MfMenu
         public float HoverScale = 1.025f;
         public string Title { get; set; }
 
-        private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.Orange);
-
-        private EdgeEffectParameters edgeEffect = new EdgeEffectParameters
-        {
-            Type = EdgeEffectType.Shadow,
-            Colour = Colour4.Black.Opacity(0.35f),
-            Radius = 18,
-        };
+        private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.BlueLighter);
 
         private Container baseContainer;
         protected Container backgroundContainer;
@@ -36,10 +29,13 @@ namespace osu.Game.Overlays.MfMenu
 
         protected virtual bool Clickable => false;
         protected BindableBool CanChangeBorderThickness = new BindableBool();
+        protected BindableFloat borderThickness = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Masking = true;
+            CornerRadius = 25;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
             RelativeSizeAxes = Axes.X;
@@ -57,8 +53,8 @@ namespace osu.Game.Overlays.MfMenu
                         backgroundContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 25,
                             Masking = true,
+                            CornerRadius = 25,
                             BorderColour = colourProvider.Light1,
                             Children = new Drawable[]
                             {
@@ -89,6 +85,7 @@ namespace osu.Game.Overlays.MfMenu
             };
 
             CanChangeBorderThickness.Value = true;
+            borderThickness.BindValueChanged(OnborderThicknessChanged);
         }
 
         private Drawable SelectSounds()
@@ -101,6 +98,11 @@ namespace osu.Game.Overlays.MfMenu
                 s = new HoverSounds();
 
             return s;
+        }
+
+        private void OnborderThicknessChanged(ValueChangedEvent<float> v)
+        {
+            backgroundContainer.BorderThickness = v.NewValue;
         }
 
         protected override void LoadComplete()
@@ -138,7 +140,7 @@ namespace osu.Game.Overlays.MfMenu
         protected override bool OnHover(HoverEvent e)
         {
             if ( CanChangeBorderThickness.Value )
-                backgroundContainer.BorderThickness = 2;
+                this.TransformBindableTo(borderThickness, 2);
 
             return base.OnHover(e);
         }
@@ -146,7 +148,7 @@ namespace osu.Game.Overlays.MfMenu
         protected override void OnHoverLost(HoverLostEvent e)
         {
             if ( CanChangeBorderThickness.Value )
-                backgroundContainer.BorderThickness = 0;
+                this.TransformBindableTo(borderThickness, 0);
 
             base.OnHoverLost(e);
         }

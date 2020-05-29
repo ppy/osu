@@ -3,6 +3,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osuTK;
@@ -12,6 +13,8 @@ namespace osu.Game.Overlays.MfMenu
     public class MfMenuDropDownTextBoxContainer : MfMenuTextBoxContainer
     {
         private const float DURATION = 500;
+        private const Easing EASING = Easing.OutQuint;
+        private float UnExpandedBarWidth;
 
         public Drawable D;
 
@@ -28,6 +31,12 @@ namespace osu.Game.Overlays.MfMenu
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = Colour4.White.Opacity(0.35f),
+                Radius = 18,
+            };
 
             drawableContentContainer = new FillFlowContainer
             {
@@ -71,7 +80,7 @@ namespace osu.Game.Overlays.MfMenu
             IsExpanded.Value = false;
             IsExpanded.BindValueChanged(OnIsExpandedChanged, true);
 
-            ContentWidth.BindValueChanged(OnContentWidthChanged);
+            ContentWidth.BindValueChanged(OnContentWidthChanged, true);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -88,8 +97,9 @@ namespace osu.Game.Overlays.MfMenu
                 //点击时
                 case true:
                     CanChangeBorderThickness.Value = false;
-                    backgroundContainer.BorderThickness = 4;
+                    this.TransformBindableTo(borderThickness, 4, DURATION, EASING);
                     dropDownBar.ResizeTo(new Vector2(drawableContentContainer.DrawWidth, 3), DURATION, Easing.OutQuint);
+                    FadeEdgeEffectTo(0.35f, DURATION, EASING);
                     content.FadeIn(DURATION, Easing.OutQuint);
                     break;
 
@@ -98,9 +108,10 @@ namespace osu.Game.Overlays.MfMenu
                     CanChangeBorderThickness.Value = true;
 
                     if ( backgroundContainer.BorderThickness != 0 )
-                        backgroundContainer.BorderThickness = 2;
+                        this.TransformBindableTo(borderThickness, 2, DURATION, EASING);
 
-                    dropDownBar.ResizeTo(new Vector2(ContentWidth.Value * 0.2f, 7), DURATION, Easing.OutQuint);
+                    dropDownBar.ResizeTo(new Vector2(ContentWidth.Value * 0.1f, 7), DURATION, Easing.OutQuint);
+                    FadeEdgeEffectTo(0, DURATION, EASING);
                     content.FadeOut(DURATION, Easing.OutQuint);
                     break;
             }
@@ -108,10 +119,32 @@ namespace osu.Game.Overlays.MfMenu
 
         private void OnContentWidthChanged(ValueChangedEvent<float> w)
         {
+            UnExpandedBarWidth = w.NewValue * 0.1f;
+
             if ( IsExpanded.Value )
                 dropDownBar.ResizeWidthTo(w.NewValue);
             else
-                dropDownBar.ResizeWidthTo(w.NewValue * 0.2f);
+                dropDownBar.ResizeWidthTo(UnExpandedBarWidth);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            UnExpandedBarWidth *= 1.5f;
+
+            if ( !IsExpanded.Value )
+                dropDownBar.ResizeWidthTo(UnExpandedBarWidth, 500, Easing.OutElastic);
+
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            UnExpandedBarWidth = ContentWidth.Value * 0.1f;
+
+            if ( !IsExpanded.Value )
+                dropDownBar.ResizeWidthTo(UnExpandedBarWidth, 500, Easing.OutQuint);
+
+            base.OnHoverLost(e);
         }
 
         protected override void Update()
