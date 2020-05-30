@@ -131,7 +131,6 @@ namespace osu.Game.Overlays.MfMenu
                             Username = "pedajilao (游戏内翻译修正)",
                             Id = 13851970
                         });
-            t.NewParagraph();
 
             return t;
         }
@@ -143,9 +142,9 @@ namespace osu.Game.Overlays.MfMenu
             t.AddText("任何与翻译文本、字体大小等有关的问题, 请前往");
             t.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
             t.AddText("提交新的issue来讨论。");
-            t.AddParagraph("如果你在游玩时发现了一个游戏功能bug, 请先");
+            t.AddParagraph("如果你在使用时发现了一个bug, 请先");
             t.AddLink("下载最新官方版本","https://github.com/ppy/osu/releases/latest");
-            t.AddText(", 如果该问题仍然存在, 则请前往");
+            t.AddText(", 如果该问题仍然存在, 请前往");
             t.AddLink("osu!lazer的issue页面","https://github.com/ppy/osu/issues");
             t.AddText("提交新的issue, 反之则前往");
             t.AddLink("Mf-osu的issue页面","https://github.com/MATRIX-feather/osu/issues");
