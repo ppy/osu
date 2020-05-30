@@ -20,6 +20,7 @@ namespace osu.Game.Overlays.MfMenu.Sections
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
             Spacing = new Vector2(0, 40),
+            Margin = new MarginPadding{Bottom = 50},
         };
     }
 }
