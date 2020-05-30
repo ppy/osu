@@ -4,10 +4,9 @@
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Edit.Blueprints;
 using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Edit
+namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 {
     public class TaikoSelectionBlueprint : OverlaySelectionBlueprint
     {
