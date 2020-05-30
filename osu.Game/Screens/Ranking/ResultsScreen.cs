@@ -47,9 +47,10 @@ namespace osu.Game.Screens.Ranking
         private IAPIProvider api { get; set; }
 
         private Bindable<bool> OptUIEnabled;
-        FillFlowContainer buttons;
-        OsuSpriteText texts;
-        Box colorBox;
+        private FillFlowContainer buttons;
+        private OsuSpriteText texts;
+        private Box colorBox;
+        private ResultsScrollContainer results;
         private const float DURATION = 500;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
 
@@ -83,7 +84,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         new Drawable[]
                         {
-                            new ResultsScrollContainer
+                            results = new ResultsScrollContainer
                             {
                                 Child = panels = new ScorePanelList
                                 {
@@ -219,7 +220,7 @@ namespace osu.Game.Screens.Ranking
                            .Then().Delay(250)
                            .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
 
-                    panels.MoveToY(DrawHeight)
+                    results.MoveToY(DrawHeight)
                                       .Then().Delay(250)
                                       .Then().MoveToY(0, 750, Easing.OutExpo);
                     break;
