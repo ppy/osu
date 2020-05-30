@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Profile;
 using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
@@ -14,13 +15,15 @@ namespace osu.Game.Overlays.MfMenu
         public abstract string SectionId { get; }
         public Drawable ChildDrawable { get; set; }
 
-        private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.BlueLighter);
         private FillFlowContainer contentFillFlow;
+        private SectionTriangles bgTriangle;
 
-        public MfMenuSection()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Masking = true;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
             InternalChildren = new Drawable[]
@@ -29,6 +32,11 @@ namespace osu.Game.Overlays.MfMenu
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
+                },
+                bgTriangle = new SectionTriangles
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre
                 },
                 contentFillFlow = new FillFlowContainer
                 {
@@ -50,6 +58,12 @@ namespace osu.Game.Overlays.MfMenu
                     }
                 }
             };
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            bgTriangle.Height = this.DrawHeight * 0.3f;
+            base.UpdateAfterChildren();
         }
 
         protected override void LoadComplete()

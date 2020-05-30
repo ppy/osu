@@ -20,20 +20,19 @@ namespace osu.Game.Overlays.MfMenu
         public float HoverScale = 1.025f;
         public string Title { get; set; }
 
-        private OverlayColourProvider colourProvider  = new OverlayColourProvider(OverlayColourScheme.BlueLighter);
-
         protected Container backgroundContainer;
         private FillFlowContainer contentFillFlow;
 
         protected virtual bool Clickable => false;
         protected BindableBool CanChangeBorderThickness = new BindableBool();
         protected BindableFloat borderThickness = new BindableFloat();
+        protected float cornerRadius = 25;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Masking = true;
-            CornerRadius = 25;
+            CornerRadius = cornerRadius;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
             RelativeSizeAxes = Axes.X;
@@ -52,7 +51,7 @@ namespace osu.Game.Overlays.MfMenu
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            CornerRadius = 25,
+                            CornerRadius = cornerRadius,
                             BorderColour = colourProvider.Light1,
                             Children = new Drawable[]
                             {

@@ -2,7 +2,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 
@@ -13,8 +12,6 @@ namespace osu.Game.Overlays.MfMenu.Header
         public Func<float> GetHeaderDrawHeight;
         public const float height = 47;
         private const float barHeight = 2;
-
-        private OverlayColourProvider ColourProvider  = new OverlayColourProvider(OverlayColourScheme.BlueLighter);
 
         public MfMenuHeaderTabControl()
         {

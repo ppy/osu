@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
         private MfMenuHeaderTabControl tabControl;
 
         public MfMenuOverlay()
-            : base(OverlayColourScheme.BlueLighter)
+            : base(OverlayColourScheme.Blue1)
         {
             Children = new Drawable[]
             {
