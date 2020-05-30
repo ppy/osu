@@ -10,9 +10,6 @@ using osu.Game.Overlays.MfMenu;
 
 namespace osu.Game.Overlays
 {
-    ///<summary>
-    ///TODO: 像玩家信息那样显示tab栏
-    ///</summary>
     public class MfMenuOverlay : FullscreenOverlay
     {
         private MfMenuHeader header;

@@ -36,8 +36,7 @@ namespace osu.Game.Overlays.MfMenu
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Font = OsuFont.GetFont(size: 30),
-                        Alpha = 1
+                        Font = OsuFont.GetFont(size: 30)
                     },
                     IntroduceSection = new MfMenuIntroduceSection(),
                     FaqSection = new MfMenuFaqSection(),

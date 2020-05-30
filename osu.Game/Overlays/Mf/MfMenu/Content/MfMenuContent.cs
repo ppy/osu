@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.MfMenu
 {
-    public class MfMenuContent : FillFlowContainer
+    public class MfMenuContent : Container
     {
         public const float HORIZONTAL_PADDING = 50;
         private const float transition_time = 400;
@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.MfMenu
             Padding = new MarginPadding { Horizontal = HORIZONTAL_PADDING };
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
             new Container
             {
                 RelativeSizeAxes = Axes.Both,
