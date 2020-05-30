@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Edit.Blueprints;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
