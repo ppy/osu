@@ -3,6 +3,7 @@
 
 using System.IO;
 using NUnit.Framework;
+using osu.Framework;
 using osu.Framework.IO.Stores;
 
 namespace osu.Game.Tests.Resources
@@ -20,10 +21,10 @@ namespace osu.Game.Tests.Resources
             var temp = Path.GetTempFileName() + ".osz";
 
             using (var stream = GetTestBeatmapStream(virtualTrack))
-            using (var newFile = File.Create(temp))
+            using (var newFile = RuntimeInfo.StartupStorage.GetStream(temp, FileAccess.Write))
                 stream.CopyTo(newFile);
 
-            Assert.IsTrue(File.Exists(temp));
+            Assert.IsTrue(RuntimeInfo.StartupStorage.Exists(temp));
             return temp;
         }
     }
