@@ -182,7 +182,8 @@ namespace osu.Game.Screens.Ranking
             base.LoadComplete();
 
             bottomPanel.panel_IsHovered.BindValueChanged( _ => UpdateVisualEffects());
-            UpdateRankTexts();
+            panels.SelectedScore.BindValueChanged( OnSelectedScoreChanged );
+            UpdateRankTexts(Score);
 
             var req = FetchScores(scores => Schedule(() =>
             {
@@ -245,9 +246,13 @@ namespace osu.Game.Screens.Ranking
 
             return base.OnExiting(next);
         }
-        private void UpdateRankTexts()
+
+        private void OnSelectedScoreChanged(ValueChangedEvent<ScoreInfo> s)
+            => UpdateRankTexts(s.NewValue);
+
+        private void UpdateRankTexts(ScoreInfo s)
         {
-                switch ( Score.Rank )
+                switch ( s.Rank )
                 {
                     case ScoreRank.X:
                     case ScoreRank.XH:
