@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep(@"locally available state", () => downloadButton.SetDownloadState(DownloadState.LocallyAvailable));
             AddStep(@"not downloaded state", () => downloadButton.SetDownloadState(DownloadState.NotDownloaded));
             createButton(false);
+            createButtonNoScore();
         }
 
         private void createButton(bool withReplay)
@@ -40,6 +41,22 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Origin = Anchor.Centre,
                 };
             });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+        }
+
+        private void createButtonNoScore()
+        {
+            AddStep("create button with null score", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(null)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
         }
 
         private ScoreInfo getScoreInfo(bool replayAvailable)
