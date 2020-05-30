@@ -4,15 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    [Cached(Type = typeof(IManiaHitObjectComposer))]
-    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene, IManiaHitObjectComposer
+    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
         [Cached(Type = typeof(IAdjustableClock))]
         private readonly IAdjustableClock clock = new StopwatchClock();

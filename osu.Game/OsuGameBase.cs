@@ -192,7 +192,7 @@ namespace osu.Game
                     ScoreManager.Delete(getBeatmapScores(item), true);
             });
 
-            BeatmapManager.ItemAdded.BindValueChanged(i =>
+            BeatmapManager.ItemUpdated.BindValueChanged(i =>
             {
                 if (i.NewValue.TryGetTarget(out var item))
                     ScoreManager.Undelete(getBeatmapScores(item), true);
@@ -229,8 +229,8 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            if (API is APIAccess apiAcces)
-                AddInternal(apiAcces);
+            if (API is APIAccess apiAccess)
+                AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;

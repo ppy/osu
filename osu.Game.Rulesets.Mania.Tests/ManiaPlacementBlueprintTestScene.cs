@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -19,8 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    [Cached(Type = typeof(IManiaHitObjectComposer))]
-    public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene, IManiaHitObjectComposer
+    public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
         private readonly Column column;
 

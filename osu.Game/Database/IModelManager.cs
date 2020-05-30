@@ -13,7 +13,7 @@ namespace osu.Game.Database
     public interface IModelManager<TModel>
         where TModel : class
     {
-        IBindable<WeakReference<TModel>> ItemAdded { get; }
+        IBindable<WeakReference<TModel>> ItemUpdated { get; }
 
         IBindable<WeakReference<TModel>> ItemRemoved { get; }
     }
