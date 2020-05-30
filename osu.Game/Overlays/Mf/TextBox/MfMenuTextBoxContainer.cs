@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.MfMenu
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background6,
+                                    Colour = colourProvider.Background5,
                                 },
                                 new Box
                                 {

@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Graphics;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.MfMenu.Header
 {
-    public class MfMenuHeader : TabControlOverlayHeaderCN<SelectedTabType>
+    public class MfMenuHeader : OverlayHeader
     {
         protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/search");
         protected override OverlayTitle CreateTitle() => new MfMenuTitle();
@@ -15,17 +14,9 @@ namespace osu.Game.Overlays.MfMenu
         {
             public MfMenuTitle()
             {
-                Title = "关于Mf-osu 页面";
+                Title = "关于Mf-osu";
                 IconTexture = "Icons/news";
             }
         }
-    }
-
-    public enum SelectedTabType
-    {
-        [Description("介绍")]
-        Introduce,
-        [Description("常见问题")]
-        Faq,
     }
 }

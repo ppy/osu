@@ -11,6 +11,9 @@ namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuFaqSection : MfMenuSection, IOnlineComponent
     {
+        public override string Title => "常见问题";
+        public override string SectionId => "Faq";
+
         private IAPIProvider API;
 
         private OsuSpriteText faqCannotUseOnlineFunctionText = new OsuSpriteText();
@@ -22,7 +25,7 @@ namespace osu.Game.Overlays.MfMenu
         {
             this.API = api;
 
-            InternalChild = new GridContainer
+            ChildDrawable = new GridContainer
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

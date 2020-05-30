@@ -8,10 +8,13 @@ namespace osu.Game.Overlays.MfMenu
 {
     public class MfMenuIntroduceSection : MfMenuSection
     {
+        public override string Title => "关于";
+        public override string SectionId => "Introduce";
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new GridContainer
+            ChildDrawable = new GridContainer
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
