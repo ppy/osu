@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.MfMenu
 {
-    public class MfMenuFaqSection : Container, IOnlineComponent
+    public class MfMenuFaqSection : MfMenuSection, IOnlineComponent
     {
         private IAPIProvider API;
 
@@ -22,10 +22,6 @@ namespace osu.Game.Overlays.MfMenu
         {
             this.API = api;
 
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
             InternalChild = new GridContainer
             {
                 Anchor = Anchor.TopCentre,
@@ -43,7 +39,7 @@ namespace osu.Game.Overlays.MfMenu
                         //Left
                         new FillFlowContainer
                         {
-                            LayoutDuration = 500,
+                            LayoutDuration = 300,
                             LayoutEasing = Easing.OutQuint,
                             Padding = new MarginPadding{ Right = 25f },
                             RelativeSizeAxes = Axes.X,
@@ -69,7 +65,7 @@ namespace osu.Game.Overlays.MfMenu
                         //Right
                         new FillFlowContainer
                         {
-                            LayoutDuration = 500,
+                            LayoutDuration = 300,
                             LayoutEasing = Easing.OutQuint,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
