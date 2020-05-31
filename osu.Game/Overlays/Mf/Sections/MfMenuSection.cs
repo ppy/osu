@@ -46,6 +46,8 @@ namespace osu.Game.Overlays.MfMenu
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(20),
+                    LayoutEasing = Easing.OutQuint,
+                    LayoutDuration = 500,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText

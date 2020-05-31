@@ -3,10 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Input.Bindings;
-using osu.Game.Overlays.KeyBinding;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays
 {

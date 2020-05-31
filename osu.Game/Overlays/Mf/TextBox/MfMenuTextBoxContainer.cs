@@ -1,7 +1,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -9,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.MfMenu
 {
@@ -20,18 +23,35 @@ namespace osu.Game.Overlays.MfMenu
         public float HoverScale = 1.025f;
         public string Title { get; set; }
 
-        protected Container backgroundContainer;
         private FillFlowContainer contentFillFlow;
 
         protected virtual bool Clickable => false;
-        protected BindableBool CanChangeBorderThickness = new BindableBool();
+        protected BindableBool AllowTransformBasicEffects = new BindableBool();
         protected BindableFloat borderThickness = new BindableFloat();
-        protected float cornerRadius = 25;
+        protected float cornerRadius = 12.5f;
+        protected float DURATION = 500;
+        protected Easing EASING = Easing.OutQuint;
+
+        protected EdgeEffectParameters edgeEffectNormal = new EdgeEffectParameters
+        {
+            Type = EdgeEffectType.Shadow,
+            Radius = 0,
+            Colour = Color4.Black.Opacity(0),
+        };
+        protected EdgeEffectParameters edgeEffectHover = new EdgeEffectParameters
+        {
+            Type = EdgeEffectType.Shadow,
+            Radius = 7,
+            Offset = new Vector2(0, 3.5f),
+            Colour = Color4.Black.Opacity(0.35f),
+        };
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             Masking = true;
+            EdgeEffect = edgeEffectNormal;
+            BorderColour = colourProvider.Light1;
             CornerRadius = cornerRadius;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
@@ -47,26 +67,16 @@ namespace osu.Game.Overlays.MfMenu
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        backgroundContainer = new Container
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = cornerRadius,
-                            BorderColour = colourProvider.Light1,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background5,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0.3f,
-                                    Colour = Colour4.Black,
-                                },
-                            }
+                            Colour = colourProvider.Background5,
+                        },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.3f,
+                            Colour = Colour4.Black,
                         },
                         contentFillFlow = new FillFlowContainer
                         {
@@ -75,13 +85,15 @@ namespace osu.Game.Overlays.MfMenu
                             Padding = new MarginPadding(25),
                             Spacing = new Vector2(15),
                             Masking = true,
+                            LayoutEasing = EASING,
+                            LayoutDuration = DURATION + 250,
                         },
                         SelectSounds()
                     }
                 },
             };
 
-            CanChangeBorderThickness.Value = true;
+            AllowTransformBasicEffects.Value = true;
         }
 
         protected override void LoadComplete()
@@ -111,9 +123,6 @@ namespace osu.Game.Overlays.MfMenu
             if ( d != null )
                 contentFillFlow.Add(d);
 
-            contentFillFlow.LayoutEasing = Easing.OutQuint;
-            contentFillFlow.LayoutDuration = 750;
-
             base.LoadComplete();
         }
 
@@ -131,22 +140,28 @@ namespace osu.Game.Overlays.MfMenu
 
         private void OnborderThicknessChanged(ValueChangedEvent<float> v)
         {
-            backgroundContainer.BorderThickness = v.NewValue;
+            this.BorderThickness = v.NewValue;
         }
 
         //我已经不知道要怎么处理光标悬浮时的动画了就这样吧
         protected override bool OnHover(HoverEvent e)
         {
-            if ( CanChangeBorderThickness.Value )
+            if ( AllowTransformBasicEffects.Value )
+            {
                 this.TransformBindableTo(borderThickness, 2);
+                this.TweenEdgeEffectTo(edgeEffectHover, DURATION, EASING);
+            }
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if ( CanChangeBorderThickness.Value )
+            if ( AllowTransformBasicEffects.Value )
+            {
                 this.TransformBindableTo(borderThickness, 0);
+                this.TweenEdgeEffectTo(edgeEffectNormal, DURATION, EASING);
+            }
 
             base.OnHoverLost(e);
         }
