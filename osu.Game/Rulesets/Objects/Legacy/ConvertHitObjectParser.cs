@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
-        /// <param name="duration">The hold end time.</param>
+        /// <param name="duration">The hold duration.</param>
         protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration);
 
         private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
