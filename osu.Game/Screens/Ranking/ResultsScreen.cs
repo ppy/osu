@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Ranking
                                                 Anchor = Anchor.BottomCentre,
                                                 Origin = Anchor.BottomCentre,
                                                 AutoSizeAxes = Axes.Both,
-                                                Margin = new MarginPadding{ Bottom = 7.5f },
+                                                Margin = new MarginPadding{ Bottom = 10f },
                                                 Spacing = new Vector2(5),
                                                 Direction = FillDirection.Horizontal,
                                                 Children = new Drawable[]
@@ -145,7 +145,6 @@ namespace osu.Game.Screens.Ranking
                                             }
                                         }
                                     },
-
                                 }
                             }
                         }
