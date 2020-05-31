@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Tournament.Models;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -25,9 +24,6 @@ namespace osu.Game.Tournament.Screens
         private DirectorySelector directorySelector;
 
         [Resolved]
-        private StableInfo stableInfo { get; set; }
-
-        [Resolved]
         private MatchIPCInfo ipc { get; set; }
 
         private DialogOverlay overlay;
@@ -38,7 +34,7 @@ namespace osu.Game.Tournament.Screens
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
-            var initialPath = new DirectoryInfo(storage.GetFullPath(stableInfo.StablePath.Value ?? string.Empty)).Parent?.FullName;
+            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
 
             AddRangeInternal(new Drawable[]
             {
@@ -131,7 +127,7 @@ namespace osu.Game.Tournament.Screens
         protected virtual void ChangePath(Storage storage)
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
-            stableInfo.StablePath.Value = target;
+            var fileBasedIpc = ipc as FileBasedIPC;
             Logger.Log($"Changing Stable CE location to {target}");
 
             if (!FileBasedIPC.CheckExists(target))
@@ -143,7 +139,7 @@ namespace osu.Game.Tournament.Screens
                 return;
             }
 
-            var fileBasedIpc = ipc as FileBasedIPC;
+            fileBasedIpc?.SaveStableConfig(target);
             fileBasedIpc?.LocateStableStorage();
             sceneManager?.SetScreen(typeof(SetupScreen));
         }

@@ -43,7 +43,6 @@ namespace osu.Game.Tournament
 
         private Bindable<Size> windowSize;
         private FileBasedIPC ipc;
-        private StableInfo stableInfo;
 
         private Drawable heightWarning;
 
@@ -72,7 +71,6 @@ namespace osu.Game.Tournament
             }), true);
 
             readBracket();
-            readStableConfig();
 
             ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
@@ -141,23 +139,6 @@ namespace osu.Game.Tournament
                     }
                 },
             });
-        }
-
-        private void readStableConfig()
-        {
-            if (stableInfo == null)
-                stableInfo = new StableInfo();
-
-            if (storage.Exists(FileBasedIPC.STABLE_CONFIG))
-            {
-                using (Stream stream = storage.GetStream(FileBasedIPC.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
-                using (var sr = new StreamReader(stream))
-                {
-                    stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
-                }
-            }
-
-            dependencies.Cache(stableInfo);
         }
 
         private void readBracket()

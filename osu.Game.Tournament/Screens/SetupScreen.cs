@@ -15,7 +15,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
-using osu.Framework.Platform;
 using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
@@ -43,12 +42,6 @@ namespace osu.Game.Tournament.Screens
 
         private Bindable<Size> windowSize;
 
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private StableInfo stableInfo { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
@@ -73,6 +66,7 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
+            StableInfo stableInfo = fileBasedIpc?.GetStableInfo();
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
@@ -81,13 +75,13 @@ namespace osu.Game.Tournament.Screens
                     ButtonText = "Change source",
                     Action = () =>
                     {
-                        stableInfo.StablePath.BindValueChanged(_ =>
+                        stableInfo?.StablePath.BindValueChanged(_ =>
                         {
                             Schedule(reload);
                         });
                         sceneManager?.SetScreen(new StablePathSelectScreen());
                     },
-                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
+                    Value = fileBasedIpc?.IPCStorage.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.IPCStorage == null,
                     Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
                 },
