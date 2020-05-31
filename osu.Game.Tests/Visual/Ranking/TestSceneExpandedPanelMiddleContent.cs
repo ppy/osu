@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -14,10 +13,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
@@ -37,7 +33,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var author = new User { Username = "mapper_name" };
 
-            AddStep("show example score", () => showPanel(createTestBeatmap(author), createTestScore()));
+            AddStep("show example score", () => showPanel(createTestBeatmap(author), new TestScoreInfo(new OsuRuleset().RulesetInfo)));
 
             AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Text == "mapper_name"));
         }
@@ -45,7 +41,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithUnknownMapper()
         {
-            AddStep("show example score", () => showPanel(createTestBeatmap(null), createTestScore()));
+            AddStep("show example score", () => showPanel(createTestBeatmap(null), new TestScoreInfo(new OsuRuleset().RulesetInfo)));
 
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text, "mapped", "by")));
@@ -65,29 +61,6 @@ namespace osu.Game.Tests.Visual.Ranking
 
             return new TestWorkingBeatmap(beatmap);
         }
-
-        private ScoreInfo createTestScore() => new ScoreInfo
-        {
-            User = new User
-            {
-                Id = 2,
-                Username = "peppy",
-            },
-            Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
-            Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
-            TotalScore = 999999,
-            Accuracy = 0.95,
-            MaxCombo = 999,
-            Rank = ScoreRank.S,
-            Date = DateTimeOffset.Now,
-            Statistics =
-            {
-                { HitResult.Miss, 1 },
-                { HitResult.Meh, 50 },
-                { HitResult.Good, 100 },
-                { HitResult.Great, 300 },
-            }
-        };
 
         private bool containsAny(string text, params string[] stringsToMatch) => stringsToMatch.Any(text.Contains);
 
