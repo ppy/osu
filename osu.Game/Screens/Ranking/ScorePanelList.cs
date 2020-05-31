@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -107,6 +108,9 @@ namespace osu.Game.Screens.Ranking
             // Find the panel corresponding to the new score.
             expandedPanel = flow.SingleOrDefault(p => p.Score == score.NewValue);
 
+            // handle horizontal scroll only when not hovering the expanded panel.
+            scroll.HandleScroll = () => expandedPanel?.IsHovered != true;
+
             if (expandedPanel == null)
                 return;
 
@@ -166,6 +170,11 @@ namespace osu.Game.Screens.Ranking
             /// </summary>
             public float? InstantScrollTarget;
 
+            /// <summary>
+            /// Whether this container should handle scroll trigger events.
+            /// </summary>
+            public Func<bool> HandleScroll;
+
             protected override void UpdateAfterChildren()
             {
                 if (InstantScrollTarget != null)
@@ -177,9 +186,9 @@ namespace osu.Game.Screens.Ranking
                 base.UpdateAfterChildren();
             }
 
-            public override bool HandlePositionalInput => false;
+            public override bool HandlePositionalInput => HandleScroll();
 
-            public override bool HandleNonPositionalInput => false;
+            public override bool HandleNonPositionalInput => HandleScroll();
         }
     }
 }
