@@ -31,10 +31,14 @@ namespace osu.Game.Tournament.Screens
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
-            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
+            var fileBasedIpc = ipc as FileBasedIPC;
+            var initialPath = new DirectoryInfo(host.GetStorage(fileBasedIpc?.GetStableInfo().StablePath.Value).GetFullPath(string.Empty) ?? storage.GetFullPath(string.Empty)).Parent?.FullName;
 
             AddRangeInternal(new Drawable[]
             {
