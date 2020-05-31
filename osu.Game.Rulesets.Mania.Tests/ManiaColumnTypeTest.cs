@@ -31,11 +31,40 @@ namespace osu.Game.Rulesets.Mania.Tests
             ColumnType.Even,
             ColumnType.Odd
         }, 7)]
-        public void Test(IEnumerable<ColumnType> expected, int columns)
+        public void TestNormal(IEnumerable<ColumnType> expected, int columns)
         {
             var definition = new StageDefinition
             {
                 Columns = columns
+            };
+            var results = getResults(definition);
+            Assert.AreEqual(expected, results);
+        }
+
+        [TestCase(new[]
+        {
+            ColumnType.Special,
+            ColumnType.Odd,
+            ColumnType.Even,
+            ColumnType.Odd,
+            ColumnType.Even,
+            ColumnType.Odd,
+            ColumnType.Even,
+            ColumnType.Odd
+        }, 8)]
+        [TestCase(new[]
+        {
+            ColumnType.Odd,
+            ColumnType.Even,
+            ColumnType.Even,
+            ColumnType.Odd
+        }, 4)]
+        public void TestSpecial(IEnumerable<ColumnType> expected, int columns)
+        {
+            var definition = new StageDefinition
+            {
+                Columns = columns,
+                SpecialStyle = true
             };
             var results = getResults(definition);
             Assert.AreEqual(expected, results);
