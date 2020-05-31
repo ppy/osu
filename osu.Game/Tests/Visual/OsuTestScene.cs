@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage = new Lazy<Storage>(() => RuntimeInfo.StartupStorage.GetStorageForDirectory($"{GetType().Name}-{Guid.NewGuid()}"));
+            localStorage = new Lazy<Storage>(() => new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
 
         [Resolved]
