@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -73,7 +72,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new RomanisableString(beatmap.Value.Metadata.Artist, beatmap.Value.Metadata.ArtistUnicode),
+                        Text = beatmap.Value.Metadata.ArtistRomanisable,
                         Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new RomanisableString(beatmap.Value.Metadata.Title, beatmap.Value.Metadata.TitleUnicode),
+                        Text = beatmap.Value.Metadata.TitleRomanisable,
                         Font = OsuFont.GetFont(size: TextSize),
                     }
                 }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");

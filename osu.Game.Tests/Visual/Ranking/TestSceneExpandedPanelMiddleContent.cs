@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("show example score", () => showPanel(createTestBeatmap(null), new TestScoreInfo(new OsuRuleset().RulesetInfo)));
 
             AddAssert("mapped by text not present", () =>
-                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text, "mapped", "by")));
+                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
         }
 
         private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)

@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -269,8 +268,8 @@ namespace osu.Game.Overlays
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Text = new RomanisableString(metadata.Title, metadata.TitleUnicode);
-                        artist.Text = new RomanisableString(metadata.Artist, metadata.ArtistUnicode);
+                        title.Text = metadata.TitleRomanisable;
+                        artist.Text = metadata.ArtistRomanisable;
                     }
                 });
 

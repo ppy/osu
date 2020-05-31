@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Users;
 
@@ -18,8 +19,15 @@ namespace osu.Game.Beatmaps
 
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
+
+        [JsonIgnore]
+        public RomanisableString TitleRomanisable => new RomanisableString(Title, TitleUnicode);
+
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
+
+        [JsonIgnore]
+        public RomanisableString ArtistRomanisable => new RomanisableString(Artist, ArtistUnicode);
 
         [JsonIgnore]
         public List<BeatmapInfo> Beatmaps { get; set; }

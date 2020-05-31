@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click delete option", () =>
             {
-                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.Value.ToLowerInvariant() == "delete"));
+                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.Value.ToString().ToLowerInvariant() == "delete"));
                 InputManager.Click(MouseButton.Left);
             });
 

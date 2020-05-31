@@ -9,7 +9,6 @@ using osuTK;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
@@ -61,8 +60,8 @@ namespace osu.Game.Screens.Menu
         {
             var metadata = beatmap.Value.Metadata;
 
-            title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
-            artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
+            title.Text = metadata.TitleRomanisable;
+            artist.Text = metadata.ArtistRomanisable;
 
             this.FadeInFromZero(fade_duration / 2f)
                 .Delay(4000)

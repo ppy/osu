@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
+                                Text = metadata.TitleRomanisable,
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                                 Truncate = true,
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
+                                Text = metadata.ArtistRomanisable,
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                                 MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                                 Truncate = true,

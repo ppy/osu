@@ -159,8 +159,8 @@ namespace osu.Game.Screens.Select
 
                 RelativeSizeAxes = Axes.Both;
 
-                titleBinding = localisation.GetLocalisedString(new RomanisableString(metadata.Title, metadata.TitleUnicode));
-                artistBinding = localisation.GetLocalisedString(new RomanisableString(metadata.Artist, metadata.ArtistUnicode));
+                titleBinding = localisation.GetLocalisedString(metadata.TitleRomanisable);
+                artistBinding = localisation.GetLocalisedString(metadata.ArtistRomanisable);
 
                 Children = new Drawable[]
                 {
