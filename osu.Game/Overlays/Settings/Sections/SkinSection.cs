@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections
         [Resolved]
         private SkinManager skins { get; set; }
 
-        private IBindable<WeakReference<SkinInfo>> managerAdded;
+        private IBindable<WeakReference<SkinInfo>> managerUpdated;
         private IBindable<WeakReference<SkinInfo>> managerRemoved;
 
         [BackgroundDependencyLoader]
@@ -73,8 +73,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            managerAdded = skins.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(itemAdded);
+            managerUpdated = skins.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(itemUpdated);
 
             managerRemoved = skins.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(itemRemoved);
@@ -92,10 +92,10 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownBindable.BindValueChanged(skin => configBindable.Value = skin.NewValue.ID);
         }
 
-        private void itemAdded(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
+        private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(item).ToArray());
+                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToArray());
         }
 
         private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
