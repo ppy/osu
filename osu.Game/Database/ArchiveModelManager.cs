@@ -11,6 +11,7 @@ using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -21,6 +22,7 @@ using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
+using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
@@ -34,7 +36,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -53,16 +55,20 @@ namespace osu.Game.Database
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
+        /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemAdded;
+        public IBindable<WeakReference<TModel>> ItemUpdated => itemUpdated;
+
+        private readonly Bindable<WeakReference<TModel>> itemUpdated = new Bindable<WeakReference<TModel>>();
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemRemoved;
+        public IBindable<WeakReference<TModel>> ItemRemoved => itemRemoved;
+
+        private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
 
@@ -77,13 +83,17 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
+        private readonly Storage exportStorage;
+
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
-            ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
+            ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
+            ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
+
+            exportStorage = storage.GetStorageForDirectory("exports");
 
             Files = new FileStore(contextFactory, storage);
 
@@ -222,9 +232,8 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return Task.FromResult<TModel>(null);
-
-                model.Hash = computeHash(archive);
+                if (model == null)
+                    return Task.FromResult<TModel>(null);
             }
             catch (TaskCanceledException)
             {
@@ -246,7 +255,7 @@ namespace osu.Game.Database
         /// </summary>
         protected abstract string[] HashableFileTypes { get; }
 
-        protected static void LogForModel(TModel model, string message, Exception e = null)
+        internal static void LogForModel(TModel model, string message, Exception e = null)
         {
             string prefix = $"[{(model?.Hash ?? "?????").Substring(0, 5)}]";
 
@@ -262,18 +271,24 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        private string computeHash(ArchiveReader reader)
+        private string computeHash(TModel item, ArchiveReader reader = null)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)))
             {
-                using (Stream s = reader.GetStream(file))
+                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
             }
 
-            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : reader.Name.ComputeSHA2Hash();
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            if (reader != null)
+                return reader.Name.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         /// <summary>
@@ -303,6 +318,7 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Hash = computeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
 
@@ -359,11 +375,64 @@ namespace osu.Game.Database
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
         /// <summary>
+        /// Exports an item to a legacy (.zip based) package.
+        /// </summary>
+        /// <param name="item">The item to export.</param>
+        public void Export(TModel item)
+        {
+            var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
+
+            if (retrievedItem == null)
+                throw new ArgumentException("Specified model could not be found", nameof(item));
+
+            using (var archive = ZipArchive.Create())
+            {
+                foreach (var file in retrievedItem.Files)
+                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
+
+                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                    archive.SaveTo(outputStream);
+
+                exportStorage.OpenInNativeExplorer();
+            }
+        }
+
+        public void UpdateFile(TModel model, TFileModel file, Stream contents)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                // Dereference the existing file info, since the file model will be removed.
+                Files.Dereference(file.FileInfo);
+
+                // Remove the file model.
+                usage.Context.Set<TFileModel>().Remove(file);
+
+                // Add the new file info and containing file model.
+                model.Files.Remove(file);
+                model.Files.Add(new TFileModel
+                {
+                    Filename = file.Filename,
+                    FileInfo = Files.Add(contents)
+                });
+
+                Update(model);
+            }
+        }
+
+        /// <summary>
         /// Perform an update of the specified item.
-        /// TODO: Support file changes.
+        /// TODO: Support file additions/removals.
         /// </summary>
         /// <param name="item">The item to update.</param>
-        public void Update(TModel item) => ModelStore.Update(item);
+        public void Update(TModel item)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                item.Hash = computeHash(item);
+
+                ModelStore.Update(item);
+            }
+        }
 
         /// <summary>
         /// Delete an item from the manager.
@@ -669,5 +738,12 @@ namespace osu.Game.Database
         }
 
         #endregion
+
+        private string getValidFilename(string filename)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+                filename = filename.Replace(c, '_');
+            return filename;
+        }
     }
 }

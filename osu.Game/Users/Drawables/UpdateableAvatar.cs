@@ -43,6 +43,8 @@ namespace osu.Game.Users.Drawables
             set => base.EdgeEffect = value;
         }
 
+        protected override double LoadDelay => 200;
+
         /// <summary>
         /// Whether to show a default guest representation on null user (as opposed to nothing).
         /// </summary>

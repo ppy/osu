@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -29,6 +28,11 @@ namespace osu.Game.Rulesets.UI
         /// A function that converts gamefield coordinates to screen space.
         /// </summary>
         public Func<Vector2, Vector2> GamefieldToScreenSpace => HitObjectContainer.ToScreenSpace;
+
+        /// <summary>
+        /// A function that converts screen space coordinates to gamefield.
+        /// </summary>
+        public Func<Vector2, Vector2> ScreenSpaceToGamefield => HitObjectContainer.ToLocalSpace;
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
@@ -57,10 +61,7 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
@@ -132,7 +133,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (beatmap != null)
+            if (mods != null)
             {
                 foreach (var mod in mods)
                 {

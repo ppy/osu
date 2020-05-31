@@ -26,7 +26,7 @@ namespace osu.Game.Online.Chat
 
         protected ChannelManager ChannelManager;
 
-        private DrawableChannel drawableChannel;
+        private StandAloneDrawableChannel drawableChannel;
 
         private readonly bool postingTextbox;
 
@@ -77,6 +77,9 @@ namespace osu.Game.Online.Chat
                 ChannelManager = manager;
         }
 
+        protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>
+            new StandAloneDrawableChannel(channel);
+
         private void postMessage(TextBox sender, bool newtext)
         {
             var text = textbox.Text.Trim();
@@ -92,18 +95,6 @@ namespace osu.Game.Online.Chat
             textbox.Text = string.Empty;
         }
 
-        public void Contract()
-        {
-            this.FadeIn(300);
-            this.MoveToY(0, 500, Easing.OutQuint);
-        }
-
-        public void Expand()
-        {
-            this.FadeOut(200);
-            this.MoveToY(100, 500, Easing.In);
-        }
-
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
 
         private void channelChanged(ValueChangedEvent<Channel> e)
@@ -112,14 +103,14 @@ namespace osu.Game.Online.Chat
 
             if (e.NewValue == null) return;
 
-            AddInternal(drawableChannel = new StandAloneDrawableChannel(e.NewValue)
-            {
-                CreateChatLineAction = CreateMessage,
-                Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 }
-            });
+            drawableChannel = CreateDrawableChannel(e.NewValue);
+            drawableChannel.CreateChatLineAction = CreateMessage;
+            drawableChannel.Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 };
+
+            AddInternal(drawableChannel);
         }
 
-        protected class StandAloneDrawableChannel : DrawableChannel
+        public class StandAloneDrawableChannel : DrawableChannel
         {
             public Func<Message, ChatLine> CreateChatLineAction;
 

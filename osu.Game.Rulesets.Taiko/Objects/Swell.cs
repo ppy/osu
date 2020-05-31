@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -11,7 +12,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Swell : TaikoHitObject, IHasEndTime
     {
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
 
@@ -25,12 +30,15 @@ namespace osu.Game.Rulesets.Taiko.Objects
             set => throw new NotSupportedException($"{nameof(Swell)} cannot be a strong hitobject.");
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
             for (int i = 0; i < RequiredHits; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
                 AddNested(new SwellTick());
+            }
         }
 
         public override Judgement CreateJudgement() => new TaikoSwellJudgement();

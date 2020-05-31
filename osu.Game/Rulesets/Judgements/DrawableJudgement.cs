@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -23,7 +22,8 @@ namespace osu.Game.Rulesets.Judgements
     {
         private const float judgement_size = 128;
 
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         protected readonly JudgementResult Result;
 
@@ -56,10 +56,8 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             InternalChild = JudgementBody = new Container
             {
                 Anchor = Anchor.Centre,
@@ -69,7 +67,7 @@ namespace osu.Game.Rulesets.Judgements
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
                     Font = OsuFont.Numeric.With(size: 20),
-                    Colour = judgementColour(Result.Type),
+                    Colour = colours.ForHitResult(Result.Type),
                     Scale = new Vector2(0.85f, 1),
                 }, confineMode: ConfineMode.NoScaling)
             };
@@ -110,29 +108,6 @@ namespace osu.Game.Rulesets.Judgements
             }
 
             Expire(true);
-        }
-
-        private Color4 judgementColour(HitResult judgement)
-        {
-            switch (judgement)
-            {
-                case HitResult.Perfect:
-                case HitResult.Great:
-                    return colours.Blue;
-
-                case HitResult.Ok:
-                case HitResult.Good:
-                    return colours.Green;
-
-                case HitResult.Meh:
-                    return colours.Yellow;
-
-                case HitResult.Miss:
-                    return colours.Red;
-
-                default:
-                    return Color4.White;
-            }
         }
     }
 }

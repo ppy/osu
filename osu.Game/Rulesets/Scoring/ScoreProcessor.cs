@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<ScoreRank> Rank = new Bindable<ScoreRank>(ScoreRank.X);
 
         /// <summary>
-        /// THe highest combo achieved by this score.
+        /// The highest combo achieved by this score.
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Scoring
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * ((1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier) / 25);
+                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier / 25);
             }
         }
 

@@ -5,16 +5,16 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class ReadyButton : HeaderButton
+    public class ReadyButton : TriangleButton
     {
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         [Resolved(typeof(Room), nameof(Room.EndDate))]
         private Bindable<DateTimeOffset> endDate { get; set; }
@@ -29,44 +29,62 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public ReadyButton()
         {
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(200, 1);
-
             Text = "Start";
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            beatmaps.ItemAdded += beatmapAdded;
-            beatmaps.ItemRemoved += beatmapRemoved;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
 
-            Beatmap.BindValueChanged(b => updateBeatmap(b.NewValue), true);
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(beatmapUpdated);
+            managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
+            managerRemoved.BindValueChanged(beatmapRemoved);
+
+            SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
+
+            BackgroundColour = colours.Green;
+            Triangles.ColourDark = colours.Green;
+            Triangles.ColourLight = colours.GreenLight;
         }
 
-        private void updateBeatmap(BeatmapInfo beatmap)
+        private void updateSelectedItem(PlaylistItem item)
         {
             hasBeatmap = false;
 
-            if (beatmap?.OnlineBeatmapID == null)
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            if (beatmapId == null)
                 return;
 
-            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID) != null;
+            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId) != null;
         }
 
-        private void beatmapAdded(BeatmapSetInfo model)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
-            if (model.Beatmaps.Any(b => b.OnlineBeatmapID == Beatmap.Value.OnlineBeatmapID))
-                Schedule(() => hasBeatmap = true);
+            if (weakSet.NewValue.TryGetTarget(out var set))
+            {
+                int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+                if (beatmapId == null)
+                    return;
+
+                if (set.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
+                    Schedule(() => hasBeatmap = true);
+            }
         }
 
-        private void beatmapRemoved(BeatmapSetInfo model)
+        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
-            if (Beatmap.Value == null)
-                return;
+            if (weakSet.NewValue.TryGetTarget(out var set))
+            {
+                int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+                if (beatmapId == null)
+                    return;
 
-            if (model.OnlineBeatmapSetID == Beatmap.Value.BeatmapSet.OnlineBeatmapSetID)
-                Schedule(() => hasBeatmap = false);
+                if (set.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
+                    Schedule(() => hasBeatmap = false);
+            }
         }
 
         protected override void Update()
@@ -78,7 +96,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void updateEnabledState()
         {
-            if (gameBeatmap.Value == null)
+            if (gameBeatmap.Value == null || SelectedItem.Value == null)
             {
                 Enabled.Value = false;
                 return;
@@ -87,14 +105,6 @@ namespace osu.Game.Screens.Multi.Match.Components
             bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate.Value;
 
             Enabled.Value = hasBeatmap && hasEnoughTime;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmaps != null)
-                beatmaps.ItemAdded -= beatmapAdded;
         }
     }
 }

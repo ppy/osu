@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : HitResult.Miss);
         }
 
         private void updatePosition() => Position = HitObject.Position - slider.Position;

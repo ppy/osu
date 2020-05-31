@@ -34,22 +34,24 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
-        private SpriteText text;
+        private SpriteText labelText;
 
         public bool ShowsDefaultIndicator = true;
 
         public virtual LocalisableString LabelText
         {
-            get => text?.Text ?? string.Empty;
+            get => labelText?.Text ?? string.Empty;
             set
             {
-                if (text == null)
+                if (labelText == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Insert(-1, text = new OsuSpriteText());
+                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
+
+                    updateDisabled();
                 }
 
-                text.Text = value;
+                labelText.Text = value;
             }
         }
 
@@ -97,11 +99,17 @@ namespace osu.Game.Overlays.Settings
             if (controlWithCurrent != null)
             {
                 controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
-                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+                controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
 
                 if (ShowsDefaultIndicator)
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
+        }
+
+        private void updateDisabled()
+        {
+            if (labelText != null)
+                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
         private class RestoreDefaultValueButton : Container, IHasTooltip
@@ -162,7 +170,7 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public string TooltipText => "Revert to default";
+            public string TooltipText => "revert to default";
 
             protected override bool OnClick(ClickEvent e)
             {

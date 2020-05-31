@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Selection
         private const float text_size = 15;
         private const float transition_duration = 100;
 
-        private readonly Channel channel;
+        public readonly Channel Channel;
 
         private readonly Bindable<bool> joinedBind = new Bindable<bool>();
         private readonly OsuSpriteText name;
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Chat.Selection
         private Color4 topicColour;
         private Color4 hoverColour;
 
-        public IEnumerable<string> FilterTerms => new[] { channel.Name, channel.Topic };
+        public IEnumerable<string> FilterTerms => new[] { Channel.Name, Channel.Topic ?? string.Empty };
 
         public bool MatchingFilter
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public ChannelListItem(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Chat.Selection
             hoverColour = colours.Yellow;
 
             joinedBind.ValueChanged += joined => updateColour(joined.NewValue);
-            joinedBind.BindTo(channel.Joined);
+            joinedBind.BindTo(Channel.Joined);
 
             joinedBind.TriggerChange();
             FinishTransforms(true);
@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!channel.Joined.Value)
+            if (!Channel.Joined.Value)
                 name.FadeColour(hoverColour, 50, Easing.OutQuint);
 
             return base.OnHover(e);
@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!channel.Joined.Value)
+            if (!Channel.Joined.Value)
                 name.FadeColour(Color4.White, transition_duration);
         }
 

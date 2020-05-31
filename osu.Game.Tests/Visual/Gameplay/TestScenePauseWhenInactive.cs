@@ -9,15 +9,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [HeadlessTest] // we alter unsafe properties on the game host to test inactive window state.
     public class TestScenePauseWhenInactive : PlayerTestScene
     {
-        protected new TestPlayer Player => (TestPlayer)base.Player;
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = (Beatmap)base.CreateBeatmap(ruleset);
@@ -46,6 +43,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("time of pause is after gameplay start time", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= Player.DrawableRuleset.GameplayStartTime);
         }
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new TestPlayer(true, true, true);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(true, true, true);
     }
 }

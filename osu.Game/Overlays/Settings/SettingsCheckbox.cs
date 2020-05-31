@@ -9,16 +9,14 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsCheckbox : SettingsItem<bool>
     {
-        private OsuCheckbox checkbox;
-
         private LocalisableString labelText;
 
-        protected override Drawable CreateControl() => checkbox = new OsuCheckbox();
+        protected override Drawable CreateControl() => new OsuCheckbox();
 
         public override LocalisableString LabelText
         {
             get => labelText;
-            set => checkbox.LabelText = labelText = value;
+            set => ((OsuCheckbox)Control).LabelText = labelText = value;
         }
     }
 }

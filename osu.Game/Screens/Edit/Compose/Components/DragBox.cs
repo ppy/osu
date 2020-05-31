@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,11 +16,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A box that displays the drag selection and provides selection events for users to handle.
     /// </summary>
-    public class DragBox : CompositeDrawable
+    public class DragBox : CompositeDrawable, IStateful<Visibility>
     {
-        private readonly Action<RectangleF> performSelection;
+        protected readonly Action<RectangleF> PerformSelection;
 
-        private Drawable box;
+        protected Drawable Box;
 
         /// <summary>
         /// Creates a new <see cref="DragBox"/>.
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="performSelection">A delegate that performs drag selection.</param>
         public DragBox(Action<RectangleF> performSelection)
         {
-            this.performSelection = performSelection;
+            PerformSelection = performSelection;
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -37,20 +38,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = box = new Container
-            {
-                Masking = true,
-                BorderColour = Color4.White,
-                BorderThickness = SelectionHandler.BORDER_RADIUS,
-                Child = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.1f
-                }
-            };
+            InternalChild = Box = CreateBox();
         }
 
-        public void UpdateDrag(MouseButtonEvent e)
+        protected virtual Drawable CreateBox() => new Container
+        {
+            Masking = true,
+            BorderColour = Color4.White,
+            BorderThickness = SelectionHandler.BORDER_RADIUS,
+            Child = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.1f
+            }
+        };
+
+        /// <summary>
+        /// Handle a forwarded mouse event.
+        /// </summary>
+        /// <param name="e">The mouse event.</param>
+        /// <returns>Whether the event should be handled and blocking.</returns>
+        public virtual bool HandleDrag(MouseButtonEvent e)
         {
             var dragPosition = e.ScreenSpaceMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
@@ -63,10 +71,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var topLeft = ToLocalSpace(dragRectangle.TopLeft);
             var bottomRight = ToLocalSpace(dragRectangle.BottomRight);
 
-            box.Position = topLeft;
-            box.Size = bottomRight - topLeft;
+            Box.Position = topLeft;
+            Box.Size = bottomRight - topLeft;
 
-            performSelection?.Invoke(dragRectangle);
+            PerformSelection?.Invoke(dragRectangle);
+            return true;
         }
+
+        private Visibility state;
+
+        public Visibility State
+        {
+            get => state;
+            set
+            {
+                if (value == state) return;
+
+                state = value;
+                this.FadeTo(state == Visibility.Hidden ? 0 : 1, 250, Easing.OutQuint);
+                StateChanged?.Invoke(state);
+            }
+        }
+
+        public override void Hide() => State = Visibility.Hidden;
+
+        public override void Show() => State = Visibility.Visible;
+
+        public event Action<Visibility> StateChanged;
     }
 }

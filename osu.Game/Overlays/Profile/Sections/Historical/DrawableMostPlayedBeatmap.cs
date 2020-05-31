@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -13,44 +12,34 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using System.Collections.Generic;
 using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class DrawableMostPlayedBeatmap : OsuHoverContainer
+    public class DrawableMostPlayedBeatmap : CompositeDrawable
     {
         private const int cover_width = 100;
         private const int corner_radius = 6;
-        private const int height = 50;
 
         private readonly BeatmapInfo beatmap;
         private readonly int playCount;
-
-        private Box background;
-
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public DrawableMostPlayedBeatmap(BeatmapInfo beatmap, int playCount)
         {
             this.beatmap = beatmap;
             this.playCount = playCount;
-            Enabled.Value = true; //manually enabled, because we have no action
 
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            Height = 50;
 
             Masking = true;
             CornerRadius = corner_radius;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            IdleColour = colours.GreySeafoam;
-            HoverColour = colours.GreySeafoamLight;
-
-            Children = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new UpdateableBeatmapSetCover
                 {
@@ -72,46 +61,61 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
                             {
-                                background = new Box { RelativeSizeAxes = Axes.Both },
-                                new Container
+                                new MostPlayedBeatmapContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding(10),
-                                    Children = new Drawable[]
+                                    Child = new Container
                                     {
-                                        new FillFlowContainer
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding(10),
+                                        Children = new Drawable[]
                                         {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Vertical,
-                                            Children = new Drawable[]
+                                            new FillFlowContainer
                                             {
-                                                new MostPlayedBeatmapMetadataContainer(beatmap),
-                                                new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular))
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Colour = colours.GreySeafoamLighter
-                                                }.With(d =>
-                                                {
-                                                    d.AddText("mapped by ");
-                                                    d.AddUserLink(beatmap.Metadata.Author);
-                                                }),
-                                            }
-                                        },
-                                        new PlayCountText(playCount)
-                                        {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight
-                                        },
-                                    }
-                                },
+                                                    new MostPlayedBeatmapMetadataContainer(beatmap),
+                                                    new LinkFlowContainer(t =>
+                                                    {
+                                                        t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
+                                                        t.Colour = colourProvider.Foreground1;
+                                                    })
+                                                    {
+                                                        AutoSizeAxes = Axes.Both,
+                                                        Direction = FillDirection.Horizontal,
+                                                    }.With(d =>
+                                                    {
+                                                        d.AddText("mapped by ");
+                                                        d.AddUserLink(beatmap.Metadata.Author);
+                                                    }),
+                                                }
+                                            },
+                                            new PlayCountText(playCount)
+                                            {
+                                                Anchor = Anchor.CentreRight,
+                                                Origin = Anchor.CentreRight
+                                            },
+                                        }
+                                    },
+                                }
                             }
                         }
                     }
                 }
-            };
+            });
+        }
+
+        private class MostPlayedBeatmapContainer : ProfileItemContainer
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                IdleColour = colourProvider.Background4;
+                HoverColour = colourProvider.Background3;
+            }
         }
 
         private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer

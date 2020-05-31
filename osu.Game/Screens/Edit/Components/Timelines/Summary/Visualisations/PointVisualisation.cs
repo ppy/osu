@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// </summary>
     public class PointVisualisation : Box
     {
-        protected PointVisualisation(double startTime)
+        public PointVisualisation(double startTime)
         {
             Origin = Anchor.TopCentre;
 

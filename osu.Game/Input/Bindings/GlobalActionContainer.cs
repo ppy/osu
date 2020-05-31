@@ -15,6 +15,7 @@ namespace osu.Game.Input.Bindings
         private readonly Drawable handler;
 
         public GlobalActionContainer(OsuGameBase game)
+            : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
@@ -24,6 +25,7 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
+            new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
@@ -36,6 +38,9 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
+
+            new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
+            new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
@@ -53,10 +58,11 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
         {
-            new KeyBinding(InputKey.Up, GlobalAction.IncreaseVolume),
-            new KeyBinding(InputKey.MouseWheelUp, GlobalAction.IncreaseVolume),
-            new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
-            new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
+
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
@@ -137,5 +143,14 @@ namespace osu.Game.Input.Bindings
 
         [Description("Play / pause")]
         MusicPlay,
+
+        [Description("Toggle now playing overlay")]
+        ToggleNowPlaying,
+
+        [Description("Previous Selection")]
+        SelectPrevious,
+
+        [Description("Next Selection")]
+        SelectNext,
     }
 }

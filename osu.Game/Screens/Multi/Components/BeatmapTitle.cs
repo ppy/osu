@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -25,7 +26,9 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            CurrentItem.BindValueChanged(_ => updateText(), true);
+            Playlist.CollectionChanged += (_, __) => updateText();
+
+            updateText();
         }
 
         private float textSize = OsuFont.DEFAULT_FONT_SIZE;
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.Multi.Components
 
             textFlow.Clear();
 
-            var beatmap = CurrentItem.Value?.Beatmap;
+            var beatmap = Playlist.FirstOrDefault()?.Beatmap;
 
             if (beatmap == null)
             {
@@ -70,7 +73,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode),
+                        Text = new RomanisableString(beatmap.Value.Metadata.Artist, beatmap.Value.Metadata.ArtistUnicode),
                         Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
@@ -80,10 +83,10 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new RomanisableString(beatmap.Metadata.Title, beatmap.Metadata.TitleUnicode),
+                        Text = new RomanisableString(beatmap.Value.Metadata.Title, beatmap.Value.Metadata.TitleUnicode),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
-                }, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
+                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");
             }
         }
     }

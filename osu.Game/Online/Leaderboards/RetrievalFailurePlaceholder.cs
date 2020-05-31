@@ -55,10 +55,10 @@ namespace osu.Game.Online.Leaderboards
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 icon.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
         }
     }

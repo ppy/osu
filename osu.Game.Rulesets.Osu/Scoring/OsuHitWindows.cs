@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             new DifficultyRange(HitResult.Great, 80, 50, 20),
             new DifficultyRange(HitResult.Good, 140, 100, 60),
             new DifficultyRange(HitResult.Meh, 200, 150, 100),
-            new DifficultyRange(HitResult.Miss, 200, 200, 200),
+            new DifficultyRange(HitResult.Miss, 400, 400, 400),
         };
 
         public override bool IsHitResultAllowed(HitResult result)

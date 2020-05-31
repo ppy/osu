@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
         }
 
-        protected override void CreateContent(Vector2 startPosition)
+        protected override void CreateContent()
         {
             const float crosshair_thickness = 1;
             const float crosshair_max_size = 10;
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 new Box
                 {
                     Origin = Anchor.Centre,
-                    Position = startPosition,
+                    Position = StartPosition,
                     Width = crosshair_thickness,
                     EdgeSmoothness = new Vector2(1),
                     Height = Math.Min(crosshair_max_size, DistanceSpacing * 2),
@@ -34,15 +34,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 new Box
                 {
                     Origin = Anchor.Centre,
-                    Position = startPosition,
+                    Position = StartPosition,
                     EdgeSmoothness = new Vector2(1),
                     Width = Math.Min(crosshair_max_size, DistanceSpacing * 2),
                     Height = crosshair_thickness,
                 }
             });
 
-            float dx = Math.Max(startPosition.X, DrawWidth - startPosition.X);
-            float dy = Math.Max(startPosition.Y, DrawHeight - startPosition.Y);
+            float dx = Math.Max(StartPosition.X, DrawWidth - StartPosition.X);
+            float dy = Math.Max(StartPosition.Y, DrawHeight - StartPosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
             int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceSpacing));
 
@@ -53,11 +53,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 AddInternal(new CircularProgress
                 {
                     Origin = Anchor.Centre,
-                    Position = startPosition,
+                    Position = StartPosition,
                     Current = { Value = 1 },
                     Size = new Vector2(radius),
                     InnerRadius = 4 * 1f / radius,
-                    Colour = GetColourForBeatIndex(i)
+                    Colour = GetColourForIndexFromPlacement(i)
                 });
             }
         }

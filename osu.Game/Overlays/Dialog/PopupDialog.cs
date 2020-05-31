@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -114,13 +113,13 @@ namespace osu.Game.Overlays.Dialog
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"221a21"),
+                                    Colour = Color4Extensions.FromHex(@"221a21"),
                                 },
                                 new Triangles
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ColourLight = OsuColour.FromHex(@"271e26"),
-                                    ColourDark = OsuColour.FromHex(@"1e171e"),
+                                    ColourLight = Color4Extensions.FromHex(@"271e26"),
+                                    ColourDark = Color4Extensions.FromHex(@"1e171e"),
                                     TriangleScale = 4,
                                 },
                             },

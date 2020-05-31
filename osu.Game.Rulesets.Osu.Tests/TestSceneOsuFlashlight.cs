@@ -3,13 +3,13 @@
 
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Play;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneOsuFlashlight : TestSceneOsuPlayer
     {
-        protected override Player CreatePlayer(Ruleset ruleset)
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = new Mod[] { new OsuModAutoplay(), new OsuModFlashlight(), };
 

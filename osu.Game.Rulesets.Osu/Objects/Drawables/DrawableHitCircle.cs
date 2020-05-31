@@ -22,13 +22,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<float> scaleBindable = new BindableFloat();
 
         public OsuAction? HitAction => HitArea.HitAction;
 
         public readonly HitReceptor HitArea;
         public readonly SkinnableDrawable CirclePiece;
         private readonly Container scaleContainer;
+
+        protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece()),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -118,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
 
-            if (result == HitResult.None)
+            if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;
@@ -170,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => ApproachCircle;
 
-        public class HitReceptor : Drawable, IKeyBindingHandler<OsuAction>
+        public class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
         {
             // IsHovered is used
             public override bool HandlePositionalInput => true;
@@ -185,6 +187,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
+
+                CornerRadius = OsuHitObject.OBJECT_RADIUS;
+                CornerExponent = 2;
             }
 
             public bool OnPressed(OsuAction action)
@@ -205,7 +210,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
         }
     }
 }

@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
 
@@ -15,12 +16,10 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneBeatmapSetOverlayDetails : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Details)
-        };
-
         private RatingsExposingDetails details;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -55,8 +54,12 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
-                        }
+                        },
                     }
+                },
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    Status = BeatmapSetOnlineStatus.Ranked
                 }
             };
         }

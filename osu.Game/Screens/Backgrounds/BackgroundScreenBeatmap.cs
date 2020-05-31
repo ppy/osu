@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Backgrounds
         /// <summary>
         /// The amount of blur to be applied in addition to user-specified blur.
         /// </summary>
-        public readonly Bindable<float> BlurAmount = new Bindable<float>();
+        public readonly Bindable<float> BlurAmount = new BindableFloat();
 
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Backgrounds
             /// <remarks>
             /// Used in contexts where there can potentially be both user and screen-specified blurring occuring at the same time, such as in <see cref="PlayerLoader"/>
             /// </remarks>
-            public readonly Bindable<float> BlurAmount = new Bindable<float>();
+            public readonly Bindable<float> BlurAmount = new BindableFloat();
 
             public Background Background
             {
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Backgrounds
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }
 
-            protected override bool ShowDimContent => !ShowStoryboard.Value || !StoryboardReplacesBackground.Value || !ShowVideo.Value; // The background needs to be hidden in the case of it being replaced by the storyboard
+            protected override bool ShowDimContent => !ShowStoryboard.Value || !StoryboardReplacesBackground.Value; // The background needs to be hidden in the case of it being replaced by the storyboard
 
             protected override void UpdateVisuals()
             {

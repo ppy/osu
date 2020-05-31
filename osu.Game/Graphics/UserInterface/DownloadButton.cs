@@ -19,7 +19,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteIcon checkmark;
         private readonly Box background;
 
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public DownloadButton()
         {
@@ -49,10 +50,8 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             State.BindValueChanged(updateState, true);
         }
 

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer userStats;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             Height = 150;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDark,
+                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             RelativeSizeAxes = Axes.X,
                                             Height = 1.5f,
                                             Margin = new MarginPadding { Top = 10 },
-                                            Colour = colours.GreySeafoamLighter,
+                                            Colour = colourProvider.Light1,
                                         },
                                         new FillFlowContainer
                                         {
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Margin = new MarginPadding { Left = 10 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Colour = colours.GreySeafoamLighter,
+                                                    Colour = colourProvider.Light1,
                                                 }
                                             }
                                         },
@@ -171,14 +171,14 @@ namespace osu.Game.Overlays.Profile.Header
             userCountryText.Text = user?.Country?.FullName ?? "Alien";
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
-            titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
+            titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
 
             if (user?.Statistics != null)
             {
                 userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Hit Accuracy", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
+                userStats.Add(new UserStatsLine("Hit Accuracy", user.Statistics.DisplayAccuracy));
                 userStats.Add(new UserStatsLine("Play Count", user.Statistics.PlayCount.ToString("#,##0")));
                 userStats.Add(new UserStatsLine("Total Score", user.Statistics.TotalScore.ToString("#,##0")));
                 userStats.Add(new UserStatsLine("Total Hits", user.Statistics.TotalHits.ToString("#,##0")));

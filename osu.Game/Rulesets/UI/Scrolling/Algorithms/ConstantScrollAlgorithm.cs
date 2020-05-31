@@ -5,7 +5,11 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
     public class ConstantScrollAlgorithm : IScrollAlgorithm
     {
-        public double GetDisplayStartTime(double time, double timeRange) => time - timeRange;
+        public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
+        {
+            var adjustedTime = TimeAt(-offset, originTime, timeRange, scrollLength);
+            return adjustedTime - timeRange;
+        }
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {

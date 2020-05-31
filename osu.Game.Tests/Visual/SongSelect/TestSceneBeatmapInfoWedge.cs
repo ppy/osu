@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
@@ -194,7 +195,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             public new BufferedWedgeInfo Info => base.Info;
         }
 
-        private class TestHitObject : HitObject, IHasPosition
+        private class TestHitObject : ConvertHitObject, IHasPosition
         {
             public float X { get; } = 0;
             public float Y { get; } = 0;
