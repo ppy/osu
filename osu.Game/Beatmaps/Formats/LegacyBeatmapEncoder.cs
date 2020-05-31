@@ -233,9 +233,9 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{(int)getObjectType(hitObject)},"));
             writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
-            if (hitObject is IHasPathWithRepeats curveData)
+            if (hitObject is IHasPath path)
             {
-                addPathData(writer, curveData, position);
+                addPathData(writer, path, position);
                 writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
             }
             else
