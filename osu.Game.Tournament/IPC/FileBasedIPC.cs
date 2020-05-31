@@ -37,8 +37,7 @@ namespace osu.Game.Tournament.IPC
         private int lastBeatmapId;
         private ScheduledDelegate scheduled;
 
-        [Resolved]
-        private StableInfo stableInfo { get; set; }
+        private StableInfo stableInfo;
 
         public const string STABLE_CONFIG = "tournament/stable.json";
 
@@ -161,9 +160,11 @@ namespace osu.Game.Tournament.IPC
 
         public static bool CheckExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
+        public StableInfo GetStableInfo() => stableInfo;
+
         private string findStablePath()
         {
-            if (!string.IsNullOrEmpty(stableInfo.StablePath.Value))
+            if (!string.IsNullOrEmpty(readStableConfig()))
                 return stableInfo.StablePath.Value;
 
             string stableInstallPath = string.Empty;
@@ -184,7 +185,7 @@ namespace osu.Game.Tournament.IPC
 
                     if (stableInstallPath != null)
                     {
-                        saveStableConfig(stableInstallPath);
+                        SaveStableConfig(stableInstallPath);
                         return stableInstallPath;
                     }
                 }
@@ -197,7 +198,7 @@ namespace osu.Game.Tournament.IPC
             }
         }
 
-        private void saveStableConfig(string path)
+        public void SaveStableConfig(string path)
         {
             stableInfo.StablePath.Value = path;
 
@@ -212,6 +213,25 @@ namespace osu.Game.Tournament.IPC
                         DefaultValueHandling = DefaultValueHandling.Ignore,
                     }));
             }
+        }
+
+        private string readStableConfig()
+        {
+            if (stableInfo == null)
+                stableInfo = new StableInfo();
+
+            if (tournamentStorage.Exists(FileBasedIPC.STABLE_CONFIG))
+            {
+                using (Stream stream = tournamentStorage.GetStream(FileBasedIPC.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
+                using (var sr = new StreamReader(stream))
+                {
+                    stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
+                }
+
+                return stableInfo.StablePath.Value;
+            }
+
+            return null;
         }
 
         private string findFromEnvVar()
