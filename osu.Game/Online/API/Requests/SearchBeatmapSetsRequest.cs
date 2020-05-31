@@ -27,7 +27,15 @@ namespace osu.Game.Online.API.Requests
 
         private string directionString => SortDirection == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, Cursor cursor = null, SearchCategory searchCategory = SearchCategory.Any, SortCriteria sortCriteria = SortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(
+            string query,
+            RulesetInfo ruleset,
+            Cursor cursor = null,
+            SearchCategory searchCategory = SearchCategory.Any,
+            SortCriteria sortCriteria = SortCriteria.Ranked,
+            SortDirection sortDirection = SortDirection.Descending,
+            SearchGenre genre = SearchGenre.Any,
+            SearchLanguage language = SearchLanguage.Any)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
@@ -36,8 +44,8 @@ namespace osu.Game.Online.API.Requests
             SearchCategory = searchCategory;
             SortCriteria = sortCriteria;
             SortDirection = sortDirection;
-            Genre = SearchGenre.Any;
-            Language = SearchLanguage.Any;
+            Genre = genre;
+            Language = language;
         }
 
         protected override WebRequest CreateWebRequest()
