@@ -21,8 +21,10 @@ namespace osu.Game.Rulesets.Mania.Mods
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
+            var specialStyle = beatmap.BeatmapInfo.SpecialStyle;
 
-            beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = availableColumns - 1 - h.Column);
+            beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h =>
+                h.Column = specialStyle ? h.Column == 0 ? 0 : availableColumns - h.Column : availableColumns - 1 - h.Column);
         }
     }
 }
