@@ -81,7 +81,7 @@ namespace osu.Game.Tournament.Screens
                         });
                         sceneManager?.SetScreen(new StablePathSelectScreen());
                     },
-                    Value = fileBasedIpc?.IPCStorage.GetFullPath(string.Empty) ?? "Not found",
+                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.IPCStorage == null,
                     Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
                 },
