@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play
             this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
         }
 
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score, false);
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 
         protected override ScoreInfo CreateScore() => score.ScoreInfo;
     }
