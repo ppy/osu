@@ -9,12 +9,14 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// A HitObject that has a curve.
     /// </summary>
-    public interface IHasPathWithRepeats : IHasPath, IHasRepeats
+#pragma warning disable 618
+    public interface IHasPathWithRepeats : IHasCurve
+#pragma warning restore 618
     {
     }
 
     [Obsolete("Use IHasPathWithRepeats instead.")] // can be removed 20201126
-    public interface IHasCurve : IHasPathWithRepeats
+    public interface IHasCurve : IHasPath, IHasRepeats
     {
     }
 
