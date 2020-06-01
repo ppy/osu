@@ -479,7 +479,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
 
         #region Fail Logic
 

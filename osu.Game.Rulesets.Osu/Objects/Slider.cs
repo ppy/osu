@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasCurve
+    public class Slider : OsuHitObject, IHasPathWithRepeats
     {
         public double EndTime
         {

@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    internal class OsuScoreProcessor : ScoreProcessor
+    public class OsuScoreProcessor : ScoreProcessor
     {
         protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new OsuJudgementResult(hitObject, judgement);
 
