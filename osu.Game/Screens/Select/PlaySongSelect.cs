@@ -49,8 +49,11 @@ namespace osu.Game.Screens.Select
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
-                ModSelect.DeselectTypes(new[] { autoType }, true);
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
+
+                if (autoType != null)
+                    ModSelect.DeselectTypes(new[] { autoType }, true);
+
                 removeAutoModOnResume = false;
             }
         }
@@ -78,14 +81,17 @@ namespace osu.Game.Screens.Select
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto.GetType();
+                var autoType = auto?.GetType();
 
-                var mods = Mods.Value;
-
-                if (mods.All(m => m.GetType() != autoType))
+                if (autoType != null)
                 {
-                    Mods.Value = mods.Append(auto).ToArray();
-                    removeAutoModOnResume = true;
+                    var mods = Mods.Value;
+
+                    if (mods.All(m => m.GetType() != autoType))
+                    {
+                        Mods.Value = mods.Append(auto).ToArray();
+                        removeAutoModOnResume = true;
+                    }
                 }
             }
 
