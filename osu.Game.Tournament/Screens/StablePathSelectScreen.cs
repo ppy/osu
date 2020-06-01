@@ -38,7 +38,12 @@ namespace osu.Game.Tournament.Screens
         private void load(Storage storage, OsuColour colours)
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-            var initialPath = new DirectoryInfo(host.GetStorage(fileBasedIpc?.GetStableInfo().StablePath.Value).GetFullPath(string.Empty) ?? storage.GetFullPath(string.Empty)).Parent?.FullName;
+            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
+
+            if (!string.IsNullOrEmpty(fileBasedIpc?.StableInfo.StablePath.Value))
+            {
+                initialPath = new DirectoryInfo(host.GetStorage(fileBasedIpc.StableInfo.StablePath.Value).GetFullPath(string.Empty)).Parent?.FullName;
+            }
 
             AddRangeInternal(new Drawable[]
             {
