@@ -22,6 +22,7 @@ namespace osu.Game.Configuration
             //UI Settings
             Set(MfSetting.OptUI, true);
             Set(MfSetting.TrianglesEnabled, true);
+            Set(MfSetting.SongSelectBgBlur, 0.2f, 0f, 1f);
 
             //Gameplay Settings
             Set(MfSetting.SamplePlaybackGain, 1f, 0f, 20f);
@@ -56,6 +57,7 @@ namespace osu.Game.Configuration
         MvisBarRGBLighting,
         MvisEnableBrick,
         MvisEnableBgTriangles,
-        SamplePlaybackGain
+        SamplePlaybackGain,
+        SongSelectBgBlur
     }
 }

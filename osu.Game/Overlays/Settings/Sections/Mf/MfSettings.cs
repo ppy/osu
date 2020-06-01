@@ -53,6 +53,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = "歌曲选择界面背景模糊",
+                    Bindable = config.GetBindable<float>(MfSetting.SongSelectBgBlur),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                },
             };
         }
 
