@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             switch (obj)
             {
-                case IHasCurve curveData:
+                case IHasPathWithRepeats curveData:
                     return new JuiceStream
                     {
                         StartTime = obj.StartTime,
