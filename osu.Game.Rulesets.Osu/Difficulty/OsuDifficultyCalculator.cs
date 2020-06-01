@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double fingerControlDiff = FingerControl.CalculateFingerControlDiff(hitObjects, clockRate);
 
             // Aim
-            (var aimDiff, var aimHiddenFactor, var comboTPs, var missTPs, var missCounts,
+            (var aimDiff, var aimHiddenFactor, var comboTps, var missTps, var missCounts,
              var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory, noteDensities);
 
@@ -62,10 +62,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}_{string.Join(string.Empty, mods.Select(x => x.Acronym))}.txt");
             File.WriteAllText(graphFilePath, graphText);
 
-            double tapSR = tap_multiplier * Math.Pow(tapDiff, sr_exponent);
-            double aimSR = aim_multiplier * Math.Pow(aimDiff, sr_exponent);
-            double fingerControlSR = finger_control_multiplier * Math.Pow(fingerControlDiff, sr_exponent);
-            double sr = Mean.PowerMean(new double[] { tapSR, aimSR, fingerControlSR }, 7) * 1.131;
+            double tapSr = tap_multiplier * Math.Pow(tapDiff, sr_exponent);
+            double aimSr = aim_multiplier * Math.Pow(aimDiff, sr_exponent);
+            double fingerControlSr = finger_control_multiplier * Math.Pow(fingerControlDiff, sr_exponent);
+            double sr = Mean.PowerMean(new double[] { tapSr, aimSr, fingerControlSr }, 7) * 1.131;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -84,19 +84,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Mods = mods,
                 Length = mapLength,
 
-                TapSR = tapSR,
+                TapSr = tapSr,
                 TapDiff = tapDiff,
                 StreamNoteCount = streamNoteCount,
                 MashTapDiff = mashTapDiff,
 
-                FingerControlSR = fingerControlSR,
+                FingerControlSr = fingerControlSr,
                 FingerControlDiff = fingerControlDiff,
 
-                AimSR = aimSR,
+                AimSr = aimSr,
                 AimDiff = aimDiff,
                 AimHiddenFactor = aimHiddenFactor,
-                ComboTPs = comboTPs,
-                MissTPs = missTPs,
+                ComboTps = comboTps,
+                MissTps = missTps,
                 MissCounts = missCounts,
                 CheeseNoteCount = cheeseNoteCount,
                 CheeseLevels = cheeseLevels,

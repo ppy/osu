@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         /// Calculates the index of performance for the distance and the movement time specified.
         /// Index of performance is the difficulty of a movement.
         /// </summary>
-        public static double CalculateIP(double d, double mt)
+        public static double CalculateIp(double d, double mt)
         {
             return Math.Log(d + 1, 2) / (mt + 1e-10);
         }

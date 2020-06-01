@@ -137,21 +137,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             // Get player's throughput according to combo
-            int comboTPCount = Attributes.ComboTPs.Length;
-            var comboPercentages = Generate.LinearSpaced(comboTPCount, 1.0 / comboTPCount, 1);
+            int comboTpCount = Attributes.ComboTps.Length;
+            var comboPercentages = Generate.LinearSpaced(comboTpCount, 1.0 / comboTpCount, 1);
 
             double scoreComboPercentage = ((double)scoreMaxCombo) / beatmapMaxCombo;
-            double comboTP = LinearSpline.InterpolateSorted(comboPercentages, Attributes.ComboTPs)
+            double comboTp = LinearSpline.InterpolateSorted(comboPercentages, Attributes.ComboTps)
                              .Interpolate(scoreComboPercentage);
 
 
             // Get player's throughput according to miss count
-            double missTP = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTPs)
+            double missTp = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTps)
                                  .Interpolate(effectiveMissCount);
-            missTP = Math.Max(missTP, 0);
+            missTp = Math.Max(missTp, 0);
 
             // Combine combo based throughput and miss count based throughput
-            double tp = Mean.PowerMean(comboTP, missTP, 20);
+            double tp = Mean.PowerMean(comboTp, missTp, 20);
 
             // Hidden mod
             if (mods.Any(h => h is OsuModHidden))
@@ -256,9 +256,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Buff very high AR
             double approachRateFactor = 1.0;
-            double ar11lengthBuff = 0.8 * (SpecialFunctions.Logistic(totalHits / 500) - 0.5);
+            double ar11LengthBuff = 0.8 * (SpecialFunctions.Logistic(totalHits / 500) - 0.5);
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33) / 0.67;
+                approachRateFactor += ar11LengthBuff * (Attributes.ApproachRate - 10.33) / 0.67;
 
             tapValue *= approachRateFactor;
 

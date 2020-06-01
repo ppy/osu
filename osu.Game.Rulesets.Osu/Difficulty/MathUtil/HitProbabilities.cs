@@ -122,8 +122,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             if (movement.EndsOnSlider)
                 perMovementCheeseLevel = 0.5 * cheeseLevel + 0.5;
 
-            double cheeseMT = movement.MT * (1 + perMovementCheeseLevel * movement.CheesableRatio);
-            return FittsLaw.CalculateHitProb(movement.D, cheeseMT, tp);
+            double cheeseMt = movement.Mt * (1 + perMovementCheeseLevel * movement.CheesableRatio);
+            return FittsLaw.CalculateHitProb(movement.D, cheeseMt, tp);
         }
 
         private struct SkillData
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                     // This line nerfs notes with high miss probability
                     hitProb = 1 - (Math.Sqrt(1 - hitProb + 0.25) - 0.5);
 
-                    result.ExpectedTime = (result.ExpectedTime + movement.RawMT) / hitProb;
+                    result.ExpectedTime = (result.ExpectedTime + movement.RawMt) / hitProb;
                     result.FcProbability *= hitProb;
                 }
                 cache.Add(tp, result);
