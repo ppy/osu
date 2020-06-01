@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// <summary>
     /// Represents a hit object which requires pressing, holding, and releasing a key.
     /// </summary>
-    public class HoldNote : ManiaHitObject, IHasEndTime
+    public class HoldNote : ManiaHitObject, IHasDuration
     {
         public double EndTime
         {

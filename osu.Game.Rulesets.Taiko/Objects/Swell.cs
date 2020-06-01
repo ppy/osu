@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class Swell : TaikoHitObject, IHasEndTime
+    public class Swell : TaikoHitObject, IHasDuration
     {
         public double EndTime
         {
