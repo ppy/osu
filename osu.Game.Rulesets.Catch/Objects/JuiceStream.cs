@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchHitObject, IHasCurve
+    public class JuiceStream : CatchHitObject, IHasPathWithRepeats
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
@@ -115,15 +115,15 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        public double EndTime
+        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
+
+        public double Duration
         {
-            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            get => this.SpanCount() * Path.Distance / Velocity;
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
-        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
-
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
 
         private readonly SliderPath path = new SliderPath();
 
