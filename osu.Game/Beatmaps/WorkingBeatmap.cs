@@ -63,7 +63,7 @@ namespace osu.Game.Beatmaps
                     length = emptyLength;
                     break;
 
-                case IHasEndTime endTime:
+                case IHasDuration endTime:
                     length = endTime.EndTime + excess_length;
                     break;
 
