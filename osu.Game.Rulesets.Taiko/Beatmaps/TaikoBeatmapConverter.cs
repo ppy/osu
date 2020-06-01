@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                     if (!isForCurrentRuleset && tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                     {
-                        List<IList<HitSampleInfo>> allSamples = obj is IHasCurve curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
+                        List<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
                         int i = 0;
 

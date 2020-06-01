@@ -233,9 +233,9 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{(int)getObjectType(hitObject)},"));
             writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
-            if (hitObject is IHasCurve curveData)
+            if (hitObject is IHasPath path)
             {
-                addCurveData(writer, curveData, position);
+                addPathData(writer, path, position);
                 writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
             }
             else
@@ -263,7 +263,7 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (hitObject)
             {
-                case IHasCurve _:
+                case IHasPath _:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
@@ -282,13 +282,13 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private void addCurveData(TextWriter writer, IHasCurve curveData, Vector2 position)
+        private void addPathData(TextWriter writer, IHasPath pathData, Vector2 position)
         {
             PathType? lastType = null;
 
-            for (int i = 0; i < curveData.Path.ControlPoints.Count; i++)
+            for (int i = 0; i < pathData.Path.ControlPoints.Count; i++)
             {
-                PathControlPoint point = curveData.Path.ControlPoints[i];
+                PathControlPoint point = pathData.Path.ControlPoints[i];
 
                 if (point.Type.Value != null)
                 {
@@ -325,23 +325,28 @@ namespace osu.Game.Beatmaps.Formats
                 if (i != 0)
                 {
                     writer.Write(FormattableString.Invariant($"{position.X + point.Position.Value.X}:{position.Y + point.Position.Value.Y}"));
-                    writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
+                    writer.Write(i != pathData.Path.ControlPoints.Count - 1 ? "|" : ",");
                 }
             }
 
-            writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
-            writer.Write(FormattableString.Invariant($"{curveData.Path.Distance},"));
+            var curveData = pathData as IHasPathWithRepeats;
 
-            for (int i = 0; i < curveData.NodeSamples.Count; i++)
-            {
-                writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
-                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
-            }
+            writer.Write(FormattableString.Invariant($"{(curveData?.RepeatCount ?? 0) + 1},"));
+            writer.Write(FormattableString.Invariant($"{pathData.Path.Distance},"));
 
-            for (int i = 0; i < curveData.NodeSamples.Count; i++)
+            if (curveData != null)
             {
-                writer.Write(getSampleBank(curveData.NodeSamples[i], true));
-                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                {
+                    writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
+                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                }
+
+                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                {
+                    writer.Write(getSampleBank(curveData.NodeSamples[i], true));
+                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                }
             }
         }
 
