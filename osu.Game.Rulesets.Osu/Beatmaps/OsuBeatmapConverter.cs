@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
             switch (original)
             {
-                case IHasCurve curveData:
+                case IHasPathWithRepeats curveData:
                     return new Slider
                     {
                         StartTime = original.StartTime,

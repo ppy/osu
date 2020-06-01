@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchHitObject, IHasCurve
+    public class JuiceStream : CatchHitObject, IHasPathWithRepeats
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
