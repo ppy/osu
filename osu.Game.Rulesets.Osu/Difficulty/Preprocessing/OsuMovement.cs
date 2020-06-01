@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
 using System.Collections.Generic;
 
 using MathNet.Numerics;
@@ -350,7 +353,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // Correction #3 - 4-object pattern
-            // Estimate how the whole pattern consisting of obj0 to obj3 affects 
+            // Estimate how the whole pattern consisting of obj0 to obj3 affects
             // the difficulty of hitting obj2. This only takes effect when the pattern
             // is not so spaced (i.e. does not contain jumps)
             double patternCorrection = 0;
@@ -373,8 +376,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // Correction #5 - Cheesing
-            // The player might make the movement of obj1 -> obj2 easier by 
-            // hitting obj1 early and obj2 late. Here we estimate the amount of 
+            // The player might make the movement of obj1 -> obj2 easier by
+            // hitting obj1 early and obj2 late. Here we estimate the amount of
             // cheesing and update MT accordingly.
             double timeEarly = 0;
             double timeLate = 0;
