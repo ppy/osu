@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets
             return value;
         }
 
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
+        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
 
         public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
 
