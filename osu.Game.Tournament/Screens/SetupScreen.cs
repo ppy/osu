@@ -66,7 +66,7 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-            StableInfo stableInfo = fileBasedIpc?.GetStableInfo();
+            StableInfo stableInfo = fileBasedIpc?.StableInfo;
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo

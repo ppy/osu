@@ -37,7 +37,7 @@ namespace osu.Game.Tournament.IPC
         private int lastBeatmapId;
         private ScheduledDelegate scheduled;
 
-        private StableInfo stableInfo;
+        public StableInfo StableInfo { get; private set; }
 
         public const string STABLE_CONFIG = "tournament/stable.json";
 
@@ -160,12 +160,10 @@ namespace osu.Game.Tournament.IPC
 
         public static bool CheckExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
-        public StableInfo GetStableInfo() => stableInfo;
-
         private string findStablePath()
         {
             if (!string.IsNullOrEmpty(readStableConfig()))
-                return stableInfo.StablePath.Value;
+                return StableInfo.StablePath.Value;
 
             string stableInstallPath = string.Empty;
 
@@ -186,7 +184,7 @@ namespace osu.Game.Tournament.IPC
                     if (stableInstallPath != null)
                     {
                         SaveStableConfig(stableInstallPath);
-                        return stableInstallPath;
+                        return null;
                     }
                 }
 
@@ -200,12 +198,12 @@ namespace osu.Game.Tournament.IPC
 
         public void SaveStableConfig(string path)
         {
-            stableInfo.StablePath.Value = path;
+            StableInfo.StablePath.Value = path;
 
             using (var stream = tournamentStorage.GetStream(STABLE_CONFIG, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
-                sw.Write(JsonConvert.SerializeObject(stableInfo,
+                sw.Write(JsonConvert.SerializeObject(StableInfo,
                     new JsonSerializerSettings
                     {
                         Formatting = Formatting.Indented,
@@ -217,18 +215,18 @@ namespace osu.Game.Tournament.IPC
 
         private string readStableConfig()
         {
-            if (stableInfo == null)
-                stableInfo = new StableInfo();
+            if (StableInfo == null)
+                StableInfo = new StableInfo();
 
             if (tournamentStorage.Exists(FileBasedIPC.STABLE_CONFIG))
             {
                 using (Stream stream = tournamentStorage.GetStream(FileBasedIPC.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
                 using (var sr = new StreamReader(stream))
                 {
-                    stableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
+                    StableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
                 }
 
-                return stableInfo.StablePath.Value;
+                return StableInfo.StablePath.Value;
             }
 
             return null;
