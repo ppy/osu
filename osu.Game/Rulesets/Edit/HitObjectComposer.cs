@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Edit
                                 drawableRulesetWrapper,
                                 // layers above playfield
                                 drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                                                      .WithChild(BlueprintContainer = CreateBlueprintContainer(HitObjects))
                             }
                         }
                     },
@@ -159,7 +159,9 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
+        /// <param name="hitObjects">A live collection of all <see cref="DrawableHitObject"/>s in the editor beatmap.</param>
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
+            => new ComposeBlueprintContainer(hitObjects);
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
