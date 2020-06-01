@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="ruleset">The ruleset used to construct its drawable counterpart.</param>
         /// <param name="beatmap">The loaded beatmap.</param>
         /// <param name="mods">The mods to be applied.</param>
-        /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/></returns>.
+        /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/>.</returns>
         protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
