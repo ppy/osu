@@ -33,13 +33,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static (double, double, double, List<Vector<double>>) CalculateTapAttributes
             (List<OsuHitObject> hitObjects, double clockRate)
         {
-            (var strainHistory, var tapDiff) = calculateTapStrain(hitObjects, 0, clockRate);
+            var (strainHistory, tapDiff) = calculateTapStrain(hitObjects, 0, clockRate);
             double burstStrain = strainHistory.Max(v => v[0]);
 
             var streamnessMask = CalculateStreamnessMask(hitObjects, burstStrain, clockRate);
             double streamNoteCount = streamnessMask.Sum();
 
-            (_, var mashTapDiff) = calculateTapStrain(hitObjects, 1, clockRate);
+            var (_, mashTapDiff) = calculateTapStrain(hitObjects, 1, clockRate);
 
             return (tapDiff, streamNoteCount, mashTapDiff, strainHistory);
         }

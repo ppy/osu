@@ -45,15 +45,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var noteDensities = NoteDensity.CalculateNoteDensities(hitObjects, preemptNoClockRate);
 
             // Tap
-            (var tapDiff, var streamNoteCount, var mashTapDiff, var strainHistory) =
+            var (tapDiff, streamNoteCount, mashTapDiff, strainHistory) =
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
 
             // Finger Control
             double fingerControlDiff = FingerControl.CalculateFingerControlDiff(hitObjects, clockRate);
 
             // Aim
-            (var aimDiff, var aimHiddenFactor, var comboTps, var missTps, var missCounts,
-                    var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
+            var (aimDiff, aimHiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText) =
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory, noteDensities);
 
             // graph for aim

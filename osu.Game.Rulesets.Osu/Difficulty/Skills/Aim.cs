@@ -85,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double[] comboTps = calculateComboTps(mapHitProbs);
             double fcTimeTp = comboTps.Last();
-            (var missTps, var missCounts) = calculateMissTpsMissCounts(movements, fcTimeTp);
-            (var cheeseLevels, var cheeseFactors) = calculateCheeseLevelsCheeseFactors(movements, fcProbTp);
+            var (missTps, missCounts) = calculateMissTpsMissCounts(movements, fcTimeTp);
+            var (cheeseLevels, cheeseFactors) = calculateCheeseLevelsCheeseFactors(movements, fcProbTp);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTp);
 
             return (fcProbTp, hiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
