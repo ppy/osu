@@ -14,8 +14,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     public class OsuMovement
     {
         private static readonly LinearSpline correction0_moving_spline = LinearSpline.InterpolateSorted(
-            new double[] { -1, 1 },
-            new double[] { 1.1, 0 });
+            new[] { -1.0, 1.0 },
+            new[] { 1.1, 0 });
 
         // number of coefficients in the formula for correction0/3
         private const int num_coeffs = 4;
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static readonly double[] ks0_snap = { -1, -5, -6.7, -6.5, -4.3, -4.3 };
         private static readonly double[] scales0_snap = { 1, 0.85, 0.6, 0.8, 1, 1 };
 
-        private static readonly double[,,] coeffs0_snap = new double[,,]
+        private static readonly double[,,] coeffs0_snap =
         {
             {
                 { 0.5, 2, 2.8, 5, 5, 5 },
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static readonly double[] ks3_flow = { -4, -5.3, -5.2, -2.5, -2.5 };
         private static readonly double[] scales3_flow = { 1, 1, 1, 1, 1 };
 
-        private static readonly double[,,] coeffs3_flow = new double[,,]
+        private static readonly double[,,] coeffs3_flow =
         {
             {
                 { 0, 1.2, 2, 2, 2 },
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static readonly double[] ks3_snap = { -2, -2, -3, -5.4, -4.9, -4.9 };
         private static readonly double[] scales3_snap = { 1, 1, 1, 1, 1, 1 };
 
-        private static readonly double[,,] coeffs3_snap = new double[,,]
+        private static readonly double[,,] coeffs3_snap =
         {
             {
                 { -2, -2, -3, -4, -6, -6 },
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             var movement = GetEmptyMovement(obj.StartTime / 1000.0);
 
-            var movementWithNested = new List<OsuMovement>() { movement };
+            var movementWithNested = new List<OsuMovement> { movement };
             // add zero difficulty movements corresponding to slider ticks/slider ends so combo is reflected properly
             int extraNestedCount = obj.NestedHitObjects.Count - 1;
 
@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 movement.Mt = 1;
                 movement.Cheesablility = 0;
                 movement.CheesableRatio = 0;
-                return new List<OsuMovement>() { movement };
+                return new List<OsuMovement> { movement };
             }
 
             if (obj0 is Spinner)
@@ -247,8 +247,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // txy : time difference of obj x and obj y
             // dxy : distance (normalized) from obj x to obj y
             // ipxy: index of performance of the movement from obj x to obj y
-            var pos1 = Vector<double>.Build.Dense(new[] { (double)obj1.Position.X, (double)obj1.Position.Y });
-            var pos2 = Vector<double>.Build.Dense(new[] { (double)obj2.Position.X, (double)obj2.Position.Y });
+            var pos1 = Vector<double>.Build.Dense(new[] { obj1.Position.X, (double)obj1.Position.Y });
+            var pos2 = Vector<double>.Build.Dense(new[] { obj2.Position.X, (double)obj2.Position.Y });
             var s12 = (pos2 - pos1) / (2 * obj2.Radius);
             double d12 = s12.L2Norm();
             double ip12 = FittsLaw.CalculateIp(d12, t12);
@@ -274,13 +274,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (objMinus2 != null)
             {
-                var posMinus2 = Vector<double>.Build.Dense(new[] { (double)objMinus2.Position.X, (double)objMinus2.Position.Y });
+                var posMinus2 = Vector<double>.Build.Dense(new[] { objMinus2.Position.X, (double)objMinus2.Position.Y });
                 dMinus22 = ((pos2 - posMinus2) / (2 * obj2.Radius)).L2Norm();
             }
 
             if (obj0 != null)
             {
-                pos0 = Vector<double>.Build.Dense(new[] { (double)obj0.Position.X, (double)obj0.Position.Y });
+                pos0 = Vector<double>.Build.Dense(new[] { obj0.Position.X, (double)obj0.Position.Y });
                 s01 = (pos1 - pos0) / (2 * obj2.Radius);
                 d01 = s01.L2Norm();
                 t01 = (obj1.StartTime - obj0.StartTime) / clockRate / 1000.0;
@@ -289,7 +289,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (obj3 != null)
             {
-                pos3 = Vector<double>.Build.Dense(new[] { (double)obj3.Position.X, (double)obj3.Position.Y });
+                pos3 = Vector<double>.Build.Dense(new[] { obj3.Position.X, (double)obj3.Position.Y });
                 s23 = (pos3 - pos2) / (2 * obj2.Radius);
                 d23 = s23.L2Norm();
                 t23 = (obj3.StartTime - obj2.StartTime) / clockRate / 1000.0;
@@ -344,7 +344,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
 
-                    correction0 = Mean.PowerMean(new double[] { correction0Flow, correction0Snap, correction0Stop }, -10) * 1.3;
+                    correction0 = Mean.PowerMean(new[] { correction0Flow, correction0Snap, correction0Stop }, -10) * 1.3;
                 }
             }
 
@@ -538,7 +538,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             movement.Cheesablility = cheesabilityEarly + cheesabilityLate;
             movement.CheesableRatio = (timeEarly + timeLate) / (t12 + 1e-10);
 
-            var movementWithNested = new List<OsuMovement>() { movement };
+            var movementWithNested = new List<OsuMovement> { movement };
 
             // add zero difficulty movements corresponding to slider ticks/slider ends so combo is reflected properly
             int extraNestedCount = obj2.NestedHitObjects.Count - 1;
@@ -553,7 +553,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public static OsuMovement GetEmptyMovement(double time)
         {
-            return new OsuMovement()
+            return new OsuMovement
             {
                 D = 0,
                 Mt = 1,

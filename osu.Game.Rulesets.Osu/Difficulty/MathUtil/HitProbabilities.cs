@@ -4,17 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 {
     public class HitProbabilities
     {
-        private static int cacheHit = 0;
-        private static int cacheMiss = 0;
-
-        private List<MapSectionCache> sections = new List<MapSectionCache>();
+        private readonly List<MapSectionCache> sections = new List<MapSectionCache>();
 
         public HitProbabilities(List<OsuMovement> movements, double cheeseLevel, int difficultyCount = 20)
         {
@@ -29,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         public int Count(int start, int sectionCount)
         {
             int count = 0;
+
             for (int i = start; i != start + sectionCount; i++)
             {
                 count += sections[i].Movements.Count;
@@ -40,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         public bool IsEmpty(int sectionCount)
         {
             bool isEmpty = false;
+
             for (int i = 0; i <= sections.Count - sectionCount; i++)
             {
                 isEmpty = isEmpty || Count(i, sectionCount) == 0;
@@ -54,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         public double Length(int start, int sectionCount)
         {
             double first = 0, last = 0;
+
             for (int i = start; i != start + sectionCount; i++)
             {
                 if (sections[i].Movements.Count != 0)
@@ -62,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                     break;
                 }
             }
+
             for (int i = start + sectionCount - 1; i != start - 1; i--)
             {
                 if (sections[i].Movements.Count != 0)
@@ -70,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                     break;
                 }
             }
+
             return last - first;
         }
 
@@ -80,6 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         public double MinExpectedTimeForCount(double tp, int sectionCount)
         {
             double fcTime = double.PositiveInfinity;
+
             for (int i = 0; i <= sections.Count - sectionCount; i++)
             {
                 fcTime = Math.Min(fcTime, ExpectedFcTime(tp, i, sectionCount) - Length(i, sectionCount));
@@ -91,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         public double ExpectedFcTime(double tp, int start, int sectionCount)
         {
             double fcTime = 15;
+
             for (int i = start; i != start + sectionCount; i++)
             {
                 if (sections[i].Movements.Count != 0)
@@ -101,17 +104,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                     fcTime += s.ExpectedTime;
                 }
             }
+
             return fcTime;
         }
-
 
         public double FcProbability(double tp)
         {
             double fcProb = 1;
+
             foreach (var section in sections)
             {
                 fcProb *= section.Evaluate(tp).FcProbability;
             }
+
             return fcProb;
         }
 
@@ -132,29 +137,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             public double FcProbability;
         }
 
-
         private class MapSectionCache
         {
-            private Dictionary<double, SkillData> cache = new Dictionary<double, SkillData>();
+            private readonly Dictionary<double, SkillData> cache = new Dictionary<double, SkillData>();
             private readonly double cheeseLevel;
 
             public List<OsuMovement> Movements { get; }
 
             public MapSectionCache(List<OsuMovement> movements, double cheeseLevel)
             {
-                this.Movements = movements;
+                Movements = movements;
                 this.cheeseLevel = cheeseLevel;
             }
-
 
             public SkillData Evaluate(double tp)
             {
                 if (cache.TryGetValue(tp, out SkillData result))
                 {
-                    cacheHit++;
                     return result;
                 }
-                cacheMiss++;
 
                 result.ExpectedTime = 0;
                 result.FcProbability = 1;
@@ -169,6 +170,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
                     result.ExpectedTime = (result.ExpectedTime + movement.RawMt) / hitProb;
                     result.FcProbability *= hitProb;
                 }
+
                 cache.Add(tp, result);
 
                 return result;

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
@@ -39,7 +38,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             return noteDensities;
         }
-
 
         private static double calculateNoteDensity(double time, double preempt, Queue<OsuHitObject> window)
         {

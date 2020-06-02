@@ -5,17 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
-
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -76,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             List<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
             List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
-                                                                hidden: true, noteDensities: noteDensities);
+                hidden: true, noteDensities: noteDensities);
 
             var mapHitProbs = new HitProbabilities(movements, default_cheese_level, difficultyCount: combo_tp_count);
             double fcProbTp = calculateFcProbTp(movements);
@@ -121,13 +118,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var tapStrain = strainHistory[i];
 
                 if (hidden)
+                {
                     movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate,
-                                                                   hidden: true, noteDensity: noteDensities[i], objMinus2: objMinus2));
+                        hidden: true, noteDensity: noteDensities[i], objMinus2: objMinus2));
+                }
                 else
                     movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate, objMinus2: objMinus2));
-
-
             }
+
             return movements;
         }
 
@@ -194,8 +192,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return graphText;
         }
 
-
-
         /// <summary>
         /// Calculate miss count for a list of throughputs (used to evaluate miss count of plays).
         /// </summary>
@@ -212,9 +208,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 missTps[i] = missTp;
                 missCounts[i] = getMissCount(fcProb, missProbs);
             }
+
             return (missTps, missCounts);
         }
-
 
         /// <summary>
         /// Calculate the probability of missing each note given a skill level.
@@ -262,6 +258,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 cheeseLevels[i] = cheeseLevel;
                 cheeseFactors[i] = calculateFcProbTp(movements, cheeseLevel) / fcProbTp;
             }
+
             return (cheeseLevels, cheeseFactors);
         }
 
@@ -272,6 +269,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private static double getCheeseNoteCount(IList<OsuMovement> movements, double tp)
         {
             double count = 0;
+
             foreach (var movement in movements)
             {
                 double cheeseness = SpecialFunctions.Logistic((movement.Ip12 / tp - 0.6) * 15) * movement.Cheesablility;
@@ -309,12 +307,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double hitProb = HitProbabilities.CalculateCheeseHitProb(movement, tp, cheeseLevel);
                 fcProb *= hitProb;
             }
+
             return fcProb;
         }
 
-
         protected override double SkillMultiplier => 0;
         protected override double StrainDecayBase => 0;
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             throw new NotImplementedException();

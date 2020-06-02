@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -45,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double preemptNoClockRate = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
             var noteDensities = NoteDensity.CalculateNoteDensities(hitObjects, preemptNoClockRate);
 
-
             // Tap
             (var tapDiff, var streamNoteCount, var mashTapDiff, var strainHistory) =
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
@@ -55,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Aim
             (var aimDiff, var aimHiddenFactor, var comboTps, var missTps, var missCounts,
-             var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
+                    var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory, noteDensities);
 
             // graph for aim
@@ -65,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapSr = tap_multiplier * Math.Pow(tapDiff, sr_exponent);
             double aimSr = aim_multiplier * Math.Pow(aimDiff, sr_exponent);
             double fingerControlSr = finger_control_multiplier * Math.Pow(fingerControlDiff, sr_exponent);
-            double sr = Mean.PowerMean(new double[] { tapSr, aimSr, fingerControlSr }, 7) * 1.131;
+            double sr = Mean.PowerMean(new[] { tapSr, aimSr, fingerControlSr }, 7) * 1.131;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -107,7 +105,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 MaxCombo = maxCombo
             };
         }
-
 
         protected override Skill[] CreateSkills(IBeatmap beatmap)
         {

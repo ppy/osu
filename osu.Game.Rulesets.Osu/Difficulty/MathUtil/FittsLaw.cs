@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-
 using MathNet.Numerics;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
@@ -35,7 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             return SpecialFunctions.Erf(2.066 / d * (Power2(mt * tp) - 1) / Math.Sqrt(2));
         }
 
-        private static readonly double[] coeffs = {
+        private static readonly double[] coeffs =
+        {
             1.0000000060371126,
             0.693146840098149,
             0.2402310826131064,
@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             {
                 return 1 / Power2(-x);
             }
+
             if (x > 60)
             {
                 return double.PositiveInfinity;
@@ -69,11 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             double frac6 = frac * frac5;
 
             return (1L << floor) * (coeffs[0] + coeffs[1] * frac + coeffs[2] * frac2
-                + coeffs[3] * frac3 + coeffs[4] * frac4 + coeffs[5] * frac5 + coeffs[6] * frac6);
+                                    + coeffs[3] * frac3 + coeffs[4] * frac4 + coeffs[5] * frac5 + coeffs[6] * frac6);
         }
-
     }
-
-
-
 }

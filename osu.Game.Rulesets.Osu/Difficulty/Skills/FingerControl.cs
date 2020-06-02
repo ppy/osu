@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-
 using osu.Game.Rulesets.Osu.Objects;
-
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -68,7 +66,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             Array.Reverse(strainHistoryArray);
 
             double diff = 0;
-            double k = 0.95;
+
+            const double k = 0.95;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {

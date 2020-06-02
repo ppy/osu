@@ -4,13 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
 using osu.Game.Rulesets.Osu.Objects;
-
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -20,10 +17,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int timescale_count = 4;
 
         /// <summary>
-        /// Decay coefficient for each timescale. 
+        /// Decay coefficient for each timescale.
         /// </summary>
         private static readonly Vector<double> decay_coeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(timescale_count, 2.3, -2.8))
-                                                                                  .PointwiseExp();
+                                                                            .PointwiseExp();
+
         /// <summary>
         /// For each timescale, the strain result is multiplied by the corresponding factor in timescale_factors.
         /// </summary>
@@ -50,11 +48,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Calculates the strain values at each note and the maximum strain values
         /// </summary>
         private static (List<Vector<double>>, double) calculateTapStrain(List<OsuHitObject> hitObjects,
-                                                                                 double mashLevel,
-                                                                                 double clockRate)
+                                                                         double mashLevel,
+                                                                         double clockRate)
         {
-            var strainHistory = new List<Vector<double>> { Vector<double>.Build.Dense(timescale_count),
-                                                           Vector<double>.Build.Dense(timescale_count) };
+            var strainHistory = new List<Vector<double>>
+            {
+                Vector<double>.Build.Dense(timescale_count),
+                Vector<double>.Build.Dense(timescale_count)
+            };
             var currStrain = Vector<double>.Build.Dense(timescale_count);
 
             // compute strain at each object and store the results into strainHistory
@@ -139,6 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / streamTimeThreshold - 1) * 15);
                 }
             }
+
             return streamnessMask;
         }
 
