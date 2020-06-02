@@ -65,18 +65,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double? LegacyLastTickOffset { get; set; }
 
-        /// <summary>
-        /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
-        /// with as few movements as possible. This is set and used by difficulty calculation.
-        /// </summary>
-        internal Vector2? LazyEndPosition;
-
-        /// <summary>
-        /// The distance travelled by the cursor upon completion of this <see cref="Slider"/> if it was hit
-        /// with as few movements as possible. This is set and used by difficulty calculation.
-        /// </summary>
-        internal float LazyTravelDistance;
-
         public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
         private int repeatCount;
