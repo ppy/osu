@@ -211,7 +211,8 @@ namespace osu.Game.Tournament.Screens
         private class ResolutionSelector : ActionableInfo
         {
             private const int minimum_window_height = 480;
-            private const int maximum_window_height = 2160; // 4k
+            private const int maximum_window_height = 2160;
+
             public new Action<int> Action;
 
             private OsuNumberBox numberBox;
@@ -221,6 +222,7 @@ namespace osu.Game.Tournament.Screens
                 var drawable = base.CreateComponent();
                 FlowContainer.Insert(-1, numberBox = new OsuNumberBox
                 {
+                    Text = "1080",
                     Width = 100
                 });
 
