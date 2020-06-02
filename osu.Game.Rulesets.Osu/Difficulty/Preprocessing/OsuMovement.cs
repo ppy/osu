@@ -3,22 +3,19 @@
 
 using System;
 using System.Collections.Generic;
-
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Interpolation;
-
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuMovement
     {
         private static readonly LinearSpline correction0_moving_spline = LinearSpline.InterpolateSorted(
-                                                                           new double[] { -1, 1 },
-                                                                           new double[] { 1.1, 0 });
+            new double[] { -1, 1 },
+            new double[] { 1.1, 0 });
 
         // number of coefficients in the formula for correction0/3
         private const int num_coeffs = 4;
@@ -27,93 +24,145 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static readonly double[] ds0_flow = { 0, 1, 1.35, 1.7, 2.3, 3 };
         private static readonly double[] ks0_flow = { -11.5, -5.9, -5.4, -5.6, -2, -2 };
         private static readonly double[] scales0_flow = { 1, 1, 1, 1, 1, 1 };
-        private static readonly double[,,] coeffs0_flow = new double[,,]  {{{ 0   , -0.5 , -1.15 , -1.8 , -2   , -2   },
-                                                                            { 0   ,  0   ,  0    ,  0   ,  0   ,  0   },
-                                                                            { 1   ,  1   ,  1    ,  1   ,  1   ,  1   },
-                                                                            { 6   ,  1   ,  1    ,  1   ,  1   ,  1   }},
-                                                                           {{ 0   , -0.8 , -0.9  , -1   , -1   , -1   },
-                                                                            { 0   ,  0.5 ,  0.75 ,  1   ,  2   ,  2   },
-                                                                            { 1   ,  0.5 ,  0.4  ,  0.3 ,  0   ,  0   },
-                                                                            { 3   ,  0.7 ,  0.7  ,  0.7 ,  1   ,  1   }},
-                                                                           {{ 0   , -0.8 , -0.9  , -1   , -1   , -1   },
-                                                                            { 0   , -0.5 , -0.75 , -1   , -2   , -2   },
-                                                                            { 1   ,  0.5 ,  0.4  ,  0.3 ,  0   ,  0   },
-                                                                            { 3   ,  0.7 ,  0.7  ,  0.7 ,  1   ,  1   }},
-                                                                           {{ 0   ,  0   ,  0    ,  0   ,  0   ,  0   },
-                                                                            { 0   ,  0.95,  0.975,  1   ,  0   ,  0   },
-                                                                            { 0   ,  0   ,  0    ,  0   ,  0   ,  0   },
-                                                                            { 0   ,  0.7 ,  0.55 ,  0.4 ,  0   ,  0   }},
-                                                                           {{ 0   ,  0   ,  0    ,  0   ,  0   ,  0   },
-                                                                            { 0   , -0.95, -0.975, -1   ,  0   ,  0   },
-                                                                            { 0   ,  0   ,  0    ,  0   ,  0   ,  0   },
-                                                                            { 0   ,  0.7 ,  0.55 ,  0.4 ,  0   ,  0   }}};
+
+        private static readonly double[,,] coeffs0_flow =
+        {
+            {
+                { 0, -0.5, -1.15, -1.8, -2, -2 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 6, 1, 1, 1, 1, 1 }
+            },
+            {
+                { 0, -0.8, -0.9, -1, -1, -1 },
+                { 0, 0.5, 0.75, 1, 2, 2 },
+                { 1, 0.5, 0.4, 0.3, 0, 0 },
+                { 3, 0.7, 0.7, 0.7, 1, 1 }
+            },
+            {
+                { 0, -0.8, -0.9, -1, -1, -1 },
+                { 0, -0.5, -0.75, -1, -2, -2 },
+                { 1, 0.5, 0.4, 0.3, 0, 0 },
+                { 3, 0.7, 0.7, 0.7, 1, 1 }
+            },
+            {
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0.95, 0.975, 1, 0, 0 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0.7, 0.55, 0.4, 0, 0 }
+            },
+            {
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, -0.95, -0.975, -1, 0, 0 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0.7, 0.55, 0.4, 0, 0 }
+            }
+        };
 
         // correction0 snap
         private static readonly double[] ds0_snap = { 0, 1.5, 2.5, 4, 6, 8 };
         private static readonly double[] ks0_snap = { -1, -5, -6.7, -6.5, -4.3, -4.3 };
         private static readonly double[] scales0_snap = { 1, 0.85, 0.6, 0.8, 1, 1 };
-        private static readonly double[,,] coeffs0_snap = new double[,,]  {{{ 0.5 ,  2   ,  2.8 ,  5   ,  5   ,  5   },
-                                                                            { 0   ,  0   ,  0   ,  0   ,  0   ,  0   },
-                                                                            { 1   ,  1   ,  1   ,  0   ,  0   ,  0   },
-                                                                            { 0.6 ,  1   ,  0.8 ,  0.6 ,  0.2 ,  0.2 }},
-                                                                           {{ 0.25,  1   ,  0.7 ,  2   ,  2   ,  2   },
-                                                                            { 0.5 ,  2   ,  2.8 ,  4   ,  6   ,  6   },
-                                                                            { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
-                                                                            { 0.6 ,  1   ,  0.8 ,  0.3 ,  0.2 ,  0.2 }},
-                                                                           {{ 0.25,  1   ,  0.7 ,  2   ,  2   ,  2   },
-                                                                            {-0.5 , -2   , -2.8 , -4   , -6   , -6   },
-                                                                            { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
-                                                                            { 0.6 ,  1   ,  0.8 ,  0.3 ,  0.2 ,  0.2 }},
-                                                                           {{ 0   ,  0   , -0.5 , -2   , -3   , -3   },
-                                                                            { 0   ,  0   ,  0   ,  0   ,  0   ,  0   },
-                                                                            { 1   ,  1   ,  1   ,  1   ,  1   ,  1   },
-                                                                            {-0.7 , -1   , -0.9 , -0.1 , -0.1 , -0.1 }}};
+
+        private static readonly double[,,] coeffs0_snap = new double[,,]
+        {
+            {
+                { 0.5, 2, 2.8, 5, 5, 5 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 0, 0, 0 },
+                { 0.6, 1, 0.8, 0.6, 0.2, 0.2 }
+            },
+            {
+                { 0.25, 1, 0.7, 2, 2, 2 },
+                { 0.5, 2, 2.8, 4, 6, 6 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 0.6, 1, 0.8, 0.3, 0.2, 0.2 }
+            },
+            {
+                { 0.25, 1, 0.7, 2, 2, 2 },
+                { -0.5, -2, -2.8, -4, -6, -6 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 0.6, 1, 0.8, 0.3, 0.2, 0.2 }
+            },
+            {
+                { 0, 0, -0.5, -2, -3, -3 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 1, 1, 1 },
+                { -0.7, -1, -0.9, -0.1, -0.1, -0.1 }
+            }
+        };
 
         // correction3 flow
         private static readonly double[] ds3_flow = { 0, 1, 2, 3, 4 };
         private static readonly double[] ks3_flow = { -4, -5.3, -5.2, -2.5, -2.5 };
         private static readonly double[] scales3_flow = { 1, 1, 1, 1, 1 };
-        private static readonly double[,,] coeffs3_flow = new double[,,]  {{{0   ,  1.2 ,  2   ,  2   ,  2  },
-                                                                            {0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {1.5 ,  1   ,  0.4 ,  0   ,  0  }},
-                                                                           {{0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {2   ,  1.5 ,  2.5 ,  3.5 ,  3.5}},
-                                                                           {{0   ,  0.3 ,  0.6 ,  0.6 ,  0.6},
-                                                                            {0   ,  1   ,  2.4 ,  2.4 ,  2.4},
-                                                                            {0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {0   ,  0.4 ,  0.4 ,  0   ,  0  }},
-                                                                           {{0   ,  0.3 ,  0.6 ,  0.6 ,  0.6},
-                                                                            {0   , -1   , -2.4 , -2.4 , -2.4},
-                                                                            {0   ,  0   ,  0   ,  0   ,  0  },
-                                                                            {0   ,  0.4 ,  0.4 ,  0   ,  0  }}};
+
+        private static readonly double[,,] coeffs3_flow = new double[,,]
+        {
+            {
+                { 0, 1.2, 2, 2, 2 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1.5, 1, 0.4, 0, 0 }
+            },
+            {
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 2, 1.5, 2.5, 3.5, 3.5 }
+            },
+            {
+                { 0, 0.3, 0.6, 0.6, 0.6 },
+                { 0, 1, 2.4, 2.4, 2.4 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0.4, 0.4, 0, 0 }
+            },
+            {
+                { 0, 0.3, 0.6, 0.6, 0.6 },
+                { 0, -1, -2.4, -2.4, -2.4 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0.4, 0.4, 0, 0 }
+            }
+        };
 
         // correction3 snap
         private static readonly double[] ds3_snap = { 1, 1.5, 2.5, 4, 6, 8 };
         private static readonly double[] ks3_snap = { -2, -2, -3, -5.4, -4.9, -4.9 };
         private static readonly double[] scales3_snap = { 1, 1, 1, 1, 1, 1 };
-        private static readonly double[,,] coeffs3_snap = new double[,,]  {{{-2  , -2  , -3  , -4  , -6  , -6  },
-                                                                            { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
-                                                                            { 1  ,  1  ,  1  ,  0  ,  0  ,  0  },
-                                                                            { 0.4,  0.4,  0.2,  0.4,  0.3,  0.3}},
-                                                                           {{-1  , -1  , -1.5, -2  , -3  , -3  },
-                                                                            { 1.4,  1.4,  2.1,  2  ,  3  ,  3  },
-                                                                            { 1  ,  1  ,  1  ,  1  ,  1  ,  1  },
-                                                                            { 0.4,  0.4,  0.2,  0.4,  0.2,  0.2}},
-                                                                           {{-1  , -1  , -1.5, -2  , -3  , -3  },
-                                                                            {-1.4, -1.4, -2.1, -2  , -3  , -3  },
-                                                                            { 1  ,  1  ,  1  ,  1  ,  1  ,  1  },
-                                                                            { 0.4,  0.4,  0.2,  0.4,  0.2,  0.2}},
-                                                                           {{ 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
-                                                                            { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
-                                                                            { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
-                                                                            { 0  ,  0  ,  1  ,  0.6,  0.6,  0.6}},
-                                                                           {{ 1  ,  1  ,  1.5,  2  ,  3  ,  3  },
-                                                                            { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
-                                                                            { 1  ,  1  ,  1  ,  1  ,  1  ,  1  },
-                                                                            { 0  ,  0  , -0.6, -0.4, -0.3, -0.3}}};
+
+        private static readonly double[,,] coeffs3_snap = new double[,,]
+        {
+            {
+                { -2, -2, -3, -4, -6, -6 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 0, 0, 0 },
+                { 0.4, 0.4, 0.2, 0.4, 0.3, 0.3 }
+            },
+            {
+                { -1, -1, -1.5, -2, -3, -3 },
+                { 1.4, 1.4, 2.1, 2, 3, 3 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 0.4, 0.4, 0.2, 0.4, 0.2, 0.2 }
+            },
+            {
+                { -1, -1, -1.5, -2, -3, -3 },
+                { -1.4, -1.4, -2.1, -2, -3, -3 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 0.4, 0.4, 0.2, 0.4, 0.2, 0.2 }
+            },
+            {
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0.6, 0.6, 0.6 }
+            },
+            {
+                { 1, 1, 1.5, 2, 3, 3 },
+                { 0, 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 0, 0, -0.6, -0.4, -0.3, -0.3 }
+            }
+        };
 
         private static LinearSpline k0FlowInterp;
         private static LinearSpline scale0FlowInterp;
@@ -166,7 +215,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                         Vector<double> tapStrain, double clockRate,
                                                         bool hidden = false, double noteDensity = 0, OsuHitObject objMinus2 = null)
         {
-
             var movement = new OsuMovement();
 
             double t12 = (obj2.StartTime - obj1.StartTime) / clockRate / 1000.0;
@@ -223,6 +271,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             bool obj2InTheMiddle = false;
 
             double dMinus22 = 0;
+
             if (objMinus2 != null)
             {
                 var posMinus2 = Vector<double>.Build.Dense(new[] { (double)objMinus2.Position.X, (double)objMinus2.Position.Y });
@@ -320,7 +369,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                         double movingness = SpecialFunctions.Logistic(d23 * 6 - 5) - SpecialFunctions.Logistic(-5);
                         correction3 = (movingness * correction3Moving) * 0.5;
-
                     }
                 }
                 else if (tRatio3 < 1 / t_ratio_threshold)
@@ -388,6 +436,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 double t01Reciprocal;
                 double ip01;
+
                 if (obj0 != null)
                 {
                     t01Reciprocal = 1 / (t01 + 1e-10);
@@ -398,11 +447,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     t01Reciprocal = 0;
                     ip01 = 0;
                 }
+
                 cheesabilityEarly = SpecialFunctions.Logistic((ip01 / ip12 - 0.6) * (-15)) * 0.5;
                 timeEarly = cheesabilityEarly * (1 / (1 / (t12 + 0.07) + t01Reciprocal));
 
                 double t23Reciprocal;
                 double ip23;
+
                 if (obj3 != null)
                 {
                     t23Reciprocal = 1 / (t23 + 1e-10);
@@ -413,6 +464,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     t23Reciprocal = 0;
                     ip23 = 0;
                 }
+
                 cheesabilityLate = SpecialFunctions.Logistic((ip23 / ip12 - 0.6) * (-15)) * 0.5;
                 timeLate = cheesabilityLate * (1 / (1 / (t12 + 0.07) + t23Reciprocal));
             }
@@ -422,7 +474,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double highBpmJumpBuff = SpecialFunctions.Logistic((effectiveBpm - 354) / 16) *
                                      SpecialFunctions.Logistic((d12 - 1.9) / 0.15) * 0.23;
 
-
             // Correction #7 - Small circle bonus
             double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.3;
 
@@ -431,19 +482,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Correction #9 - Slow small jump nerf
             double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((d12 - 2.2) / 0.7, 2)) *
-                                             SpecialFunctions.Logistic((255 - effectiveBpm) / 10);
+                SpecialFunctions.Logistic((255 - effectiveBpm) / 10);
 
             // Correction #10 - Slow big jump buff
             double bigJumpBuffFactor = 1 + 0.15 * SpecialFunctions.Logistic((d12 - 6) / 0.5) *
-                                           SpecialFunctions.Logistic((210 - effectiveBpm) / 8);
+                SpecialFunctions.Logistic((210 - effectiveBpm) / 8);
 
             // Correction #11 - Hidden Mod
             double correctionHidden = 0;
+
             if (hidden)
             {
                 correctionHidden = 0.05 + 0.008 * noteDensity;
             }
-
 
             // Correction #12 - Stacked wiggle fix
             if (obj0 != null && obj3 != null)
@@ -463,11 +514,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Correction #13 - Repetitive jump nerf
             // Nerf big jumps where obj0 and obj2 are close or where objMinus2 and obj2 are close
             double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * d02, 0) + Math.Max(0.1125 - 0.075 * dMinus22, 0)) *
-                                               SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
-
+                SpecialFunctions.Logistic((d12 - 3.3) / 0.25);
 
             // Correction #14 - Sudden distance increase buff
             double distanceIncreaseBuff = 1;
+
             if (obj0 != null)
             {
                 double d01OverlapNerf = Math.Min(1, Math.Pow(d01, 3));
@@ -526,23 +577,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             prepareInterp(ds3_snap, ks3_snap, scales3_snap, coeffs3_snap, ref k3SnapInterp, ref scale3SnapInterp, ref coeffs3SnapInterps);
         }
 
-
         private static void prepareInterp(double[] ds, double[] ks, double[] scales, double[,,] coeffs,
-                                           ref LinearSpline kInterp, ref LinearSpline scaleInterp, ref LinearSpline[,] coeffsInterps)
+                                          ref LinearSpline kInterp, ref LinearSpline scaleInterp, ref LinearSpline[,] coeffsInterps)
         {
             kInterp = LinearSpline.InterpolateSorted(ds, ks);
             scaleInterp = LinearSpline.InterpolateSorted(ds, scales);
 
             coeffsInterps = new LinearSpline[coeffs.GetLength(0), num_coeffs];
+
             for (int i = 0; i < coeffs.GetLength(0); i++)
             {
                 for (int j = 0; j < num_coeffs; j++)
                 {
                     double[] coeffij = new double[coeffs.GetLength(2)];
+
                     for (int k = 0; k < coeffs.GetLength(2); k++)
                     {
                         coeffij[k] = coeffs[i, j, k];
                     }
+
                     coeffsInterps[i, j] = LinearSpline.InterpolateSorted(ds, coeffij);
                 }
             }
@@ -552,17 +605,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                  LinearSpline kInterp, LinearSpline scaleInterp, LinearSpline[,] coeffsInterps)
         {
             double correctionRaw = kInterp.Interpolate(d);
+
             for (int i = 0; i < coeffsInterps.GetLength(0); i++)
             {
                 double[] cs = new double[num_coeffs];
+
                 for (int j = 0; j < num_coeffs; j++)
                 {
                     cs[j] = coeffsInterps[i, j].Interpolate(d);
                 }
+
                 correctionRaw += cs[3] * Math.Sqrt(Math.Pow((x - cs[0]), 2) +
                                                    Math.Pow((y - cs[1]), 2) +
                                                    cs[2]);
             }
+
             return SpecialFunctions.Logistic(correctionRaw) * scaleInterp.Interpolate(d);
         }
 
