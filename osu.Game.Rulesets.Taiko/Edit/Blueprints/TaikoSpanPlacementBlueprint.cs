@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         public TaikoSpanPlacementBlueprint(HitObject hitObject)
             : base(hitObject)
-
         {
             spanPlacementObject = hitObject as IHasDuration;
 
