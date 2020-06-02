@@ -95,7 +95,8 @@ namespace osu.Game.Screens.Menu
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Alpha = 0.5f,
-                                        AccentColour = Color4.Blue,
+                                        isIntro = true,
+                                        AccentColour = Color4.DarkBlue,
                                         Size = new Vector2(0.96f)
                                     },
                                     circleContainer = new Container
