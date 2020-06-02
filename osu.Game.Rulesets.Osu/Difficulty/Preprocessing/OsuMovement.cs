@@ -571,14 +571,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public static void Initialize()
         {
-            prepareInterp(ds0_flow, ks0_flow, scales0_flow, coeffs0_flow, ref k0FlowInterp, ref scale0FlowInterp, ref coeffs0FlowInterps);
-            prepareInterp(ds0_snap, ks0_snap, scales0_snap, coeffs0_snap, ref k0SnapInterp, ref scale0SnapInterp, ref coeffs0SnapInterps);
-            prepareInterp(ds3_flow, ks3_flow, scales3_flow, coeffs3_flow, ref k3FlowInterp, ref scale3FlowInterp, ref coeffs3FlowInterps);
-            prepareInterp(ds3_snap, ks3_snap, scales3_snap, coeffs3_snap, ref k3SnapInterp, ref scale3SnapInterp, ref coeffs3SnapInterps);
+            prepareInterp(ds0_flow, ks0_flow, scales0_flow, coeffs0_flow, out k0FlowInterp, out scale0FlowInterp, out coeffs0FlowInterps);
+            prepareInterp(ds0_snap, ks0_snap, scales0_snap, coeffs0_snap, out k0SnapInterp, out scale0SnapInterp, out coeffs0SnapInterps);
+            prepareInterp(ds3_flow, ks3_flow, scales3_flow, coeffs3_flow, out k3FlowInterp, out scale3FlowInterp, out coeffs3FlowInterps);
+            prepareInterp(ds3_snap, ks3_snap, scales3_snap, coeffs3_snap, out k3SnapInterp, out scale3SnapInterp, out coeffs3SnapInterps);
         }
 
         private static void prepareInterp(double[] ds, double[] ks, double[] scales, double[,,] coeffs,
-                                          ref LinearSpline kInterp, ref LinearSpline scaleInterp, ref LinearSpline[,] coeffsInterps)
+                                          out LinearSpline kInterp, out LinearSpline scaleInterp, out LinearSpline[,] coeffsInterps)
         {
             kInterp = LinearSpline.InterpolateSorted(ds, ks);
             scaleInterp = LinearSpline.InterpolateSorted(ds, scales);
