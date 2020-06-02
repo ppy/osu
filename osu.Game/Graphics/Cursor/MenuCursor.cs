@@ -83,10 +83,13 @@ namespace osu.Game.Graphics.Cursor
                 activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             }
 
-            if (e.Button == MouseButton.Left && cursorRotate.Value)
+            if ((e.Button == MouseButton.Left || e.Button == MouseButton.Right) && cursorRotate.Value)
             {
-                dragRotationState = DragRotationState.DragStarted;
-                positionMouseDown = e.MousePosition;
+                if(!(dragRotationState == DragRotationState.Rotating))
+                {
+                    positionMouseDown = e.MousePosition;
+                    dragRotationState = DragRotationState.DragStarted;
+                }
             }
 
             return base.OnMouseDown(e);
@@ -94,13 +97,13 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
+            if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Middle) && !e.IsPressed(MouseButton.Right))
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 activeCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
-            if (e.Button == MouseButton.Left)
+            if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
             {
                 if (dragRotationState == DragRotationState.Rotating)
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
