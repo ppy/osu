@@ -87,8 +87,8 @@ namespace osu.Game.Graphics.Cursor
             {
                 if(!(dragRotationState == DragRotationState.Rotating))
                 {
-                    positionMouseDown = e.MousePosition;
                     dragRotationState = DragRotationState.DragStarted;
+                    positionMouseDown = e.MousePosition;
                 }
             }
 
