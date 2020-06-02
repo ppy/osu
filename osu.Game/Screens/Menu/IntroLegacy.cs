@@ -14,7 +14,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroFallback : IntroScreen
+    public class IntroLegacy : IntroScreen
     {
         protected override string BeatmapHash => "64E00D7022195959BFA3109D09C2E2276C8F12F486B91FCF6175583E973B48F2";
         protected override string BeatmapFile => "welcome.osz";
@@ -27,12 +27,12 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            Seeya = audio.Samples.Get(@"Intro/seeya-fallback");
+            Seeya = audio.Samples.Get(@"Intro/legacy/seeya");
 
             if (MenuVoice.Value)
             {
-                welcome = audio.Samples.Get(@"Intro/welcome-fallback");
-                pianoReverb = audio.Samples.Get(@"Intro/welcome_piano");
+                welcome = audio.Samples.Get(@"Intro/legacy/welcome");
+                pianoReverb = audio.Samples.Get(@"Intro/legacy/welcome_piano");
             }
         }
 
