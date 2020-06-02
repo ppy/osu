@@ -3,7 +3,6 @@
 
 using System.IO;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.IO.Stores;
 
 namespace osu.Game.Tests.Resources
@@ -18,7 +17,7 @@ namespace osu.Game.Tests.Resources
 
         public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
-            var tempPath = Path.Combine(RuntimeInfo.StartupDirectory, Path.GetTempFileName() + ".osz");
+            var tempPath = Path.GetTempFileName() + ".osz";
 
             using (var stream = GetTestBeatmapStream(virtualTrack))
             using (var newFile = File.Create(tempPath))
