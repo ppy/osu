@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -19,6 +21,9 @@ namespace osu.Game.Screens.Select
     {
         private bool removeAutoModOnResume;
         private OsuScreen player;
+
+        [Resolved]
+        private NotificationOverlay notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
 
@@ -83,15 +88,21 @@ namespace osu.Game.Screens.Select
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto?.GetType();
 
-                if (autoType != null)
-                {
-                    var mods = Mods.Value;
+                var mods = Mods.Value;
 
-                    if (mods.All(m => m.GetType() != autoType))
+                if (autoType == null)
+                {
+                    notifications.Post(new SimpleNotification
                     {
-                        Mods.Value = mods.Append(auto).ToArray();
-                        removeAutoModOnResume = true;
-                    }
+                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                    });
+                    return false;
+                }
+
+                if (mods.All(m => m.GetType() != autoType))
+                {
+                    Mods.Value = mods.Append(auto).ToArray();
+                    removeAutoModOnResume = true;
                 }
             }
 
