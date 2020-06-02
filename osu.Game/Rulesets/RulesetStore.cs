@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                var files = Directory.GetFiles(Path.Combine(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll"));
+                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
