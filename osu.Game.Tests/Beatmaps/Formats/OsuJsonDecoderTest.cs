@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
 
-            var curveData = beatmap.HitObjects[0] as IHasCurve;
+            var curveData = beatmap.HitObjects[0] as IHasPathWithRepeats;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
 
             Assert.IsNotNull(positionData);

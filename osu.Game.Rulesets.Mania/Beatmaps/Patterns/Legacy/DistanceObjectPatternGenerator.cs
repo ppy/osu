@@ -474,7 +474,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns></returns>
         private IList<HitSampleInfo> sampleInfoListAt(double time)
         {
-            if (!(HitObject is IHasCurve curveData))
+            if (!(HitObject is IHasPathWithRepeats curveData))
                 return HitObject.Samples;
 
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
