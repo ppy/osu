@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
@@ -65,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculates attributes related to aiming difficulty.
         /// </summary>
-        public static (double, double, double[], double[], double[], double, double[], double[], string)
+        public static (double, double, double[], double[], double[], double, double[], double[])
             CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                    double clockRate,
                                    List<Vector<double>> strainHistory,
@@ -81,15 +80,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double hiddenFactor = fcProbTpHidden / fcProbTp;
 
-            string graphText = generateGraphText(movements, fcProbTp);
-
             double[] comboTps = calculateComboTps(mapHitProbs);
             double fcTimeTp = comboTps.Last();
             var (missTps, missCounts) = calculateMissTpsMissCounts(movements, fcTimeTp);
             var (cheeseLevels, cheeseFactors) = calculateCheeseLevelsCheeseFactors(movements, fcProbTp);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTp);
 
-            return (fcProbTp, hiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
+            return (fcProbTp, hiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors);
         }
 
         /// <summary>
@@ -171,25 +168,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double fcTimeMinusThreshold(double tp) => mapHitProbs.MinExpectedTimeForCount(tp, sectionCount) - time_threshold_base;
             return Bisection.FindRoot(fcTimeMinusThreshold, tp_min, tp_max, time_precision, max_iterations);
-        }
-
-        private static string generateGraphText(List<OsuMovement> movements, double tp)
-        {
-            var sw = new StringWriter();
-
-            foreach (var movement in movements)
-            {
-                double time = movement.Time;
-                double ipRaw = movement.Ip12;
-                double ipCorrected = FittsLaw.CalculateIp(movement.D, movement.Mt * (1 + default_cheese_level * movement.CheesableRatio));
-                double missProb = 1 - HitProbabilities.CalculateCheeseHitProb(movement, tp, default_cheese_level);
-
-                sw.WriteLine($"{time} {ipRaw} {ipCorrected} {missProb}");
-            }
-
-            string graphText = sw.ToString();
-            sw.Dispose();
-            return graphText;
         }
 
         /// <summary>

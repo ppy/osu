@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -52,12 +51,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double fingerControlDiff = FingerControl.CalculateFingerControlDiff(hitObjects, clockRate);
 
             // Aim
-            var (aimDiff, aimHiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText) =
+            var (aimDiff, aimHiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors) =
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory, noteDensities);
-
-            // graph for aim
-            string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}_{string.Join(string.Empty, mods.Select(x => x.Acronym))}.txt");
-            File.WriteAllText(graphFilePath, graphText);
 
             double tapSr = tap_multiplier * Math.Pow(tapDiff, sr_exponent);
             double aimSr = aim_multiplier * Math.Pow(aimDiff, sr_exponent);
