@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 
@@ -103,7 +104,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 Textures = fileNames.ToDictionary(fileName => fileName, fileName => new Texture(1, 1));
             }
 
-            public override Texture Get(string name) => Textures.GetValueOrDefault(name);
+            public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT) => Textures.GetValueOrDefault(name);
         }
     }
 }
