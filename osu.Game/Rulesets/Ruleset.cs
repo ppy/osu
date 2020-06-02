@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using JetBrains.Annotations;
 
 namespace osu.Game.Rulesets
 {
@@ -100,6 +101,7 @@ namespace osu.Game.Rulesets
             return value;
         }
 
+        [CanBeNull]
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
 
         public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
