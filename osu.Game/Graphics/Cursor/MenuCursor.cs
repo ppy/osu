@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.Cursor
 
             if ((e.Button == MouseButton.Left || e.Button == MouseButton.Right) && cursorRotate.Value)
             {
-                if(!(dragRotationState == DragRotationState.Rotating))
+                if (!(dragRotationState == DragRotationState.Rotating))
                 {
                     dragRotationState = DragRotationState.DragStarted;
                     positionMouseDown = e.MousePosition;
