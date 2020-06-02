@@ -18,5 +18,7 @@ namespace osu.Game.Rulesets.Taiko
         TaikoExplosionMiss,
         TaikoExplosionGood,
         TaikoExplosionGreat,
+        Scroller,
+        Mascot,
     }
 }

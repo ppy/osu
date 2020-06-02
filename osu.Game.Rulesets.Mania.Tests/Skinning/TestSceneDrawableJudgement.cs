@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -15,12 +14,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     public class TestSceneDrawableJudgement : ManiaSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableJudgement),
-            typeof(DrawableManiaJudgement)
-        };
-
         public TestSceneDrawableJudgement()
         {
             foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))

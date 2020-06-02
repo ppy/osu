@@ -16,11 +16,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneKudosuHistory : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableKudosuHistoryItem),
-        };
-
         private readonly Box background;
 
         public TestSceneKudosuHistory()

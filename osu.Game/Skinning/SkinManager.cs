@@ -43,12 +43,15 @@ namespace osu.Game.Skinning
             this.audio = audio;
             this.legacyDefaultResources = legacyDefaultResources;
 
-            ItemRemoved += removedInfo =>
+            ItemRemoved.BindValueChanged(weakRemovedInfo =>
             {
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (removedInfo.ID == CurrentSkinInfo.Value.ID)
-                    CurrentSkinInfo.Value = SkinInfo.Default;
-            };
+                if (weakRemovedInfo.NewValue.TryGetTarget(out var removedInfo))
+                {
+                    // check the removed skin is not the current user choice. if it is, switch back to default.
+                    if (removedInfo.ID == CurrentSkinInfo.Value.ID)
+                        CurrentSkinInfo.Value = SkinInfo.Default;
+                }
+            });
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>

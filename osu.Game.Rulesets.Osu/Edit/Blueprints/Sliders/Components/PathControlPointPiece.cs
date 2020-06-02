@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private IEditorChangeHandler changeHandler { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IPositionSnapProvider snapProvider { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -162,11 +162,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
-                (Vector2 snappedPosition, double snappedTime) = snapProvider?.GetSnappedPosition(e.MousePosition, slider.StartTime) ?? (e.MousePosition, slider.StartTime);
-                Vector2 movementDelta = snappedPosition - slider.Position;
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
 
                 slider.Position += movementDelta;
-                slider.StartTime = snappedTime;
+                slider.StartTime = result?.Time ?? slider.StartTime;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
                 for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
