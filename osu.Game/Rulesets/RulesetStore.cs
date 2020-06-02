@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using osu.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -153,14 +154,14 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+                var files = Directory.GetFiles(Path.Combine(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll"));
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Error(e, $"Could not load rulesets from directory {RuntimeInfo.StartupDirectory}");
             }
         }
 
