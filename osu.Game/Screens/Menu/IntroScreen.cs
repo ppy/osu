@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Menu
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            Seeya = audio.Samples.Get(@"Intro/seeya-lazer");
+            Seeya = audio.Samples.Get(@"Intro/lazer/seeya");
 
             BeatmapSetInfo setInfo = null;
 

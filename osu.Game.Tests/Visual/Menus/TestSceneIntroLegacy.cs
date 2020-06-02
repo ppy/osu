@@ -8,8 +8,8 @@ using osu.Game.Screens.Menu;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneIntroFallback : IntroTestScene
+    public class TestSceneIntroLegacy : IntroTestScene
     {
-        protected override IScreen CreateScreen() => new IntroFallback();
+        protected override IScreen CreateScreen() => new IntroLegacy();
     }
 }

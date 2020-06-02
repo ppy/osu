@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio)
         {
             if (MenuVoice.Value)
-                welcome = audio.Samples.Get(@"Intro/welcome-lazer");
+                welcome = audio.Samples.Get(@"Intro/lazer/welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
