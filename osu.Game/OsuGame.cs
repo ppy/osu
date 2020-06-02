@@ -72,7 +72,7 @@ namespace osu.Game
 
         private MfMenuOverlay mfmenu;
         
-        private OnlinePictureOverlay picture;
+        public OnlinePictureOverlay picture;
 
         private UserProfileOverlay userProfile;
 

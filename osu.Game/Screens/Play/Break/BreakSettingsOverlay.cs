@@ -8,32 +8,15 @@ using osuTK;
 using osu.Game.Screens.Play.PlayerSettings;
 using osuTK.Input;
 using osu.Framework.Bindables;
-using osu.Framework.Allocation;
-using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class BreakSettingsOverlay : VisibilityContainer
     {
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
         private const int fade_duration = 200;
-
-        public bool ReplayLoaded;
-
-        public readonly VisualSettings VisualSettings;
-
-        [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
-        {
-            config.BindWith(MfSetting.OptUI, Optui);
-
-            Optui.ValueChanged += _ => UpdateVisibilities();
-            UpdateVisibilities();
-        }
 
         public BreakSettingsOverlay()
         {
-            AlwaysPresent = true;
             RelativeSizeAxes = Axes.Both;
 
             Child = new FillFlowContainer<PlayerSettingsGroup>
@@ -46,45 +29,12 @@ namespace osu.Game.Screens.Play.HUD
                 Margin = new MarginPadding { Top = 100, Right = 10 },
                 Children = new PlayerSettingsGroup[]
                 {
-                    VisualSettings = new VisualSettings { Expanded = false}
+                    new VisualSettings { Expanded = false, IgnoreOptUI = false }
                 }
             };
         }
 
-        private void UpdateVisibilities()
-        {
-            switch (Optui.Value)
-            {
-                case true:
-                    VisualSettings.FadeTo(0.5f, 250);
-                    break;
-
-                case false:
-                    VisualSettings.FadeOut(250);
-                    break;
-            }
-        }
-
         protected override void PopIn() => this.FadeIn(fade_duration);
         protected override void PopOut() => this.FadeOut(fade_duration);
-
-        //We want to handle keyboard inputs all the time in order to trigger ToggleVisibility() when not visible
-        public override bool PropagateNonPositionalInputSubTree => true;
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat) return false;
-
-            if (e.ControlPressed)
-            {
-                if (e.Key == Key.H && ReplayLoaded)
-                {
-                    ToggleVisibility();
-                    return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
     }
 }

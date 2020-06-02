@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "WG";
         public override IconUsage? Icon => FontAwesome.Solid.Certificate;
         public override ModType Type => ModType.Fun;
-        public override string Description => "他们不就就那样老老实实的待着...";
+        public override string Description => "他们不会就那样老老实实的待着...";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform) };
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Keep wiggling sliders and spinners for their duration
-            if (!(osuObject is IHasEndTime endTime))
+            if (!(osuObject is IHasDuration endTime))
                 return;
 
             amountWiggles = (int)(endTime.Duration / wiggle_duration);

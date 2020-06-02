@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 
-namespace osu.Game.Overlays.MfMenu
+namespace osu.Game.Overlays.MfMenu.Header
 {
     public class MfMenuHeader : OverlayHeader
     {
@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.MfMenu
         {
             public MfMenuTitle()
             {
-                Title = "关于Mf-osu 页面";
+                Title = "关于Mf-osu";
                 IconTexture = "Icons/news";
             }
         }

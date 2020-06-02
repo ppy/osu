@@ -16,6 +16,8 @@ using osu.Game.Overlays.OnlinePicture;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays
 {
@@ -23,7 +25,7 @@ namespace osu.Game.Overlays
     {
 
         [Resolved]
-        private GameHost host { get; set; }
+        private OsuGame game { get; set; }
 
         private const float DURATION = 1000;
 
@@ -36,12 +38,15 @@ namespace osu.Game.Overlays
         private TriangleButton openInBrowserButton;
         private TriangleButton closeButton;
         private OsuSpriteText infoText;
+        private bool CanOpenInBrowser;
         private EdgeEffectParameters edgeEffect = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
             Colour = Color4.Black.Opacity(0.5f),
             Radius = 12,
         };
+
+        private BindableBool OptUI = new BindableBool();
 
         public float BottomContainerHeight => bottomContainer.Position.Y + bottomContainer.DrawHeight;
         public float TopBarHeight => topbarContainer.DrawHeight;
@@ -58,6 +63,17 @@ namespace osu.Game.Overlays
             Masking = true;
             Children = new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
+                },
+                loadingSpinner = new LoadingSpinner(true)
+                {
+                    Depth = -1,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
                 contentContainer = new OnlinePictureContentContainer
                 {
                     GetBottomContainerHeight = () => BottomContainerHeight,
@@ -65,20 +81,6 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
-                        },
-                        loadingSpinner = new LoadingSpinner(true)
-                        {
-                            Depth = -1,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
-                    }
                 },
                 bottomContainer = new Container
                 {
@@ -112,7 +114,7 @@ namespace osu.Game.Overlays
                                     Text = "在浏览器中打开",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Action = () => host.OpenUrlExternally(Target),
+                                    Action = () => OpenLink(Target),
                                 },
                                 closeButton = new TriangleButton
                                 {
@@ -155,6 +157,14 @@ namespace osu.Game.Overlays
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(MfConfigManager config)
+        {
+            config.BindWith(MfSetting.OptUI, OptUI);
+
+            OptUI.BindValueChanged(OnOptUIChanged);
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -176,9 +186,34 @@ namespace osu.Game.Overlays
         DelayedLoadWrapper delayedLoadWrapper;
         UpdateableOnlinePicture pict;
 
-        public void UpdateImage(string NewUri, bool popIn)
+        private void OnOptUIChanged(ValueChangedEvent<bool> v)
+        {
+            if ( this.Alpha != 0 && v.NewValue == false )
+                if (OpenLink(Target))
+                    this.Hide();
+        }
+
+        private bool OpenLink(string link)
+        {
+            if ( CanOpenInBrowser )
+            {
+                game?.OpenUrlExternally(Target);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public void UpdateImage(string NewUri, bool popIn, bool CanOpenInBrowser = true, string Title = null)
         {
             Target = NewUri;
+            this.CanOpenInBrowser = CanOpenInBrowser;
+
+            if ( OptUI.Value != true && CanOpenInBrowser )
+            {
+                OpenLink(Target);
+                return;
+            }
 
             if (popIn)
                 this.Show();
@@ -191,7 +226,21 @@ namespace osu.Game.Overlays
                 delayedLoadWrapper.Expire();
             }
 
-            infoText.Text = $"{Target}";
+            if ( Title != null )
+                infoText.Text = Title;
+            else
+                infoText.Text = Target;
+
+            if ( CanOpenInBrowser )
+                openInBrowserButton.Action = () => OpenLink(Target);
+            else
+                openInBrowserButton.Action = null;
+
+            foreach (var i in contentContainer)
+            {
+                i.Hide();
+                i.Expire();
+            }
 
             contentContainer.Add(delayedLoadWrapper = new DelayedLoadWrapper(
                 pict = new UpdateableOnlinePicture(Target)

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 
                 if (time < tauHit.HitObject.StartTime + relax_leniency) continue;
 
-                if (tauHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime || tauHit.IsHit)
+                if (tauHit.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime || tauHit.IsHit)
                     continue;
 
                 if (tauHit is DrawabletauHitObject)

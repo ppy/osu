@@ -34,7 +34,7 @@ namespace osu.Game.Online
             Model.Value = model;
         }
 
-        private IBindable<WeakReference<TModel>> managerAdded;
+        private IBindable<WeakReference<TModel>> managedUpdated;
         private IBindable<WeakReference<TModel>> managerRemoved;
         private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadBegan;
         private IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> managerDownloadFailed;
@@ -56,8 +56,8 @@ namespace osu.Game.Online
             managerDownloadBegan.BindValueChanged(downloadBegan);
             managerDownloadFailed = manager.DownloadFailed.GetBoundCopy();
             managerDownloadFailed.BindValueChanged(downloadFailed);
-            managerAdded = manager.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(itemAdded);
+            managedUpdated = manager.ItemUpdated.GetBoundCopy();
+            managedUpdated.BindValueChanged(itemUpdated);
             managerRemoved = manager.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(itemRemoved);
         }
@@ -128,7 +128,7 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemAdded(ValueChangedEvent<WeakReference<TModel>> weakItem)
+        private void itemUpdated(ValueChangedEvent<WeakReference<TModel>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
                 setDownloadStateFromManager(item, DownloadState.LocallyAvailable);

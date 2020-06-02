@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -25,7 +24,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
+        private EditorClock editorClock { get; set; }
 
         public Timeline()
         {
@@ -101,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
 
             // This needs to happen after transforms are updated, but before the scroll position is updated in base.UpdateAfterChildren
-            if (adjustableClock.IsRunning)
+            if (editorClock.IsRunning)
                 scrollToTrackTime();
         }
 
@@ -111,21 +110,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (handlingDragInput)
                 seekTrackToCurrent();
-            else if (!adjustableClock.IsRunning)
+            else if (!editorClock.IsRunning)
             {
                 // The track isn't running. There are two cases we have to be wary of:
                 // 1) The user flick-drags on this timeline: We want the track to follow us
                 // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
 
                 // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
-                if (Current != lastScrollPosition && adjustableClock.CurrentTime == lastTrackTime)
+                if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime)
                     seekTrackToCurrent();
                 else
                     scrollToTrackTime();
             }
 
             lastScrollPosition = Current;
-            lastTrackTime = adjustableClock.CurrentTime;
+            lastTrackTime = editorClock.CurrentTime;
         }
 
         private void seekTrackToCurrent()
@@ -133,7 +132,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded)
                 return;
 
-            adjustableClock.Seek(Current / Content.DrawWidth * track.Length);
+            editorClock.Seek(Current / Content.DrawWidth * track.Length);
         }
 
         private void scrollToTrackTime()
@@ -141,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded || track.Length == 0)
                 return;
 
-            ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
+            ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -164,15 +163,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void beginUserDrag()
         {
             handlingDragInput = true;
-            trackWasPlaying = adjustableClock.IsRunning;
-            adjustableClock.Stop();
+            trackWasPlaying = editorClock.IsRunning;
+            editorClock.Stop();
         }
 
         private void endUserDrag()
         {
             handlingDragInput = false;
             if (trackWasPlaying)
-                adjustableClock.Start();
+                editorClock.Start();
         }
 
         [Resolved]

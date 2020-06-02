@@ -101,39 +101,40 @@ namespace osu.Game.Overlays.Profile
             underscore.Colour = colourProvider.Highlight1;
         }
 
-        private class SectionTriangles : Container
+    }
+
+    public class SectionTriangles : Container
+    {
+        private readonly Triangles triangles;
+        private readonly Box foreground;
+
+        public SectionTriangles()
         {
-            private readonly Triangles triangles;
-            private readonly Box foreground;
-
-            public SectionTriangles()
+            RelativeSizeAxes = Axes.X;
+            Height = 100;
+            Masking = true;
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X;
-                Height = 100;
-                Masking = true;
-                Children = new Drawable[]
+                triangles = new Triangles
                 {
-                    triangles = new Triangles
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        TriangleScale = 3,
-                    },
-                    foreground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                };
-            }
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    TriangleScale = 3,
+                },
+                foreground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
+            };
+        }
 
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                triangles.ColourLight = colourProvider.Background4;
-                triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
-                foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
-            }
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            triangles.ColourLight = colourProvider.Background4;
+            triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
+            foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
         }
     }
 }

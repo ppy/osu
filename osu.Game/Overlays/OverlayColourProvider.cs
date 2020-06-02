@@ -64,6 +64,12 @@ namespace osu.Game.Overlays
 
                 case OverlayColourScheme.Blue:
                     return 200 / 360f;
+
+                case OverlayColourScheme.Blue1:
+                    return 212 / 360f;
+
+                case OverlayColourScheme.Teal:
+                    return 174 / 360f;
             }
         }
     }
@@ -75,6 +81,8 @@ namespace osu.Game.Overlays
         Orange,
         Green,
         Purple,
-        Blue
+        Blue,
+        Blue1,
+        Teal
     }
 }

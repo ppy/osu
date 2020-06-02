@@ -33,14 +33,14 @@ namespace osu.Game.Screens.Multi.Match.Components
             Font = OsuFont.GetFont(size: 22);
         }
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            managerAdded = beatmaps.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(beatmapAdded);
+            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(beatmapUpdated);
             managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(beatmapRemoved);
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId) != null;
         }
 
-        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
             if (weakSet.NewValue.TryGetTarget(out var set))
             {

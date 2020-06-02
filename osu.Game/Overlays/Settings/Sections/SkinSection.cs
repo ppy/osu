@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
@@ -31,16 +32,18 @@ namespace osu.Game.Overlays.Settings.Sections
         [Resolved]
         private SkinManager skins { get; set; }
 
-        private IBindable<WeakReference<SkinInfo>> managerAdded;
+        private IBindable<WeakReference<SkinInfo>> managerUpdated;
         private IBindable<WeakReference<SkinInfo>> managerRemoved;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             FlowContent.Spacing = new Vector2(0, 5);
+
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
+                new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "菜单光标大小",
@@ -70,8 +73,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            managerAdded = skins.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(itemAdded);
+            managerUpdated = skins.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(itemUpdated);
 
             managerRemoved = skins.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(itemRemoved);
@@ -89,10 +92,10 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownBindable.BindValueChanged(skin => configBindable.Value = skin.NewValue.ID);
         }
 
-        private void itemAdded(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
+        private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(item).ToArray());
+                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToArray());
         }
 
         private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
@@ -115,6 +118,36 @@ namespace osu.Game.Overlays.Settings.Sections
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
 
                 protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+            }
+        }
+
+        private class ExportSkinButton : SettingsButton
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            private Bindable<Skin> currentSkin;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Text = "导出已选中的皮肤";
+                Action = export;
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.ID > 0, true);
+            }
+
+            private void export()
+            {
+                try
+                {
+                    skins.Export(currentSkin.Value.SkinInfo);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Could not export current skin: {e.Message}", level: LogLevel.Error);
+                }
             }
         }
     }

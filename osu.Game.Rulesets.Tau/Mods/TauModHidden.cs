@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Tau.Mods
             var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = (h as IHasEndTime)?.EndTime ?? h.StartTime - fadeOutStartTime;
+            var longFadeDuration = (h as IHasDuration)?.EndTime ?? h.StartTime - fadeOutStartTime;
 
             // future proofing yet again.
             switch (drawable)

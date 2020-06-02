@@ -3,8 +3,7 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
-using System.Collections.Generic;
-using osu.Game.Audio;
+using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -16,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasCurve
+    public class DrumRoll : TaikoHitObject, IHasPath
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
@@ -73,17 +72,17 @@ namespace osu.Game.Rulesets.Taiko.Objects
             overallDifficulty = difficulty.OverallDifficulty;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            createTicks();
+            createTicks(cancellationToken);
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
 
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
         }
 
-        private void createTicks()
+        private void createTicks(CancellationToken cancellationToken)
         {
             if (tickSpacing == 0)
                 return;
@@ -92,6 +91,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new DrumRollTick
                 {
                     FirstTick = first,
@@ -112,11 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         double IHasDistance.Distance => Duration * Velocity;
 
-        int IHasRepeats.RepeatCount { get => 0; set { } }
-
-        List<IList<HitSampleInfo>> IHasRepeats.NodeSamples => new List<IList<HitSampleInfo>>();
-
-        SliderPath IHasCurve.Path
+        SliderPath IHasPath.Path
             => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER);
 
         #endregion

@@ -63,7 +63,7 @@ namespace osu.Game.Beatmaps
                     length = emptyLength;
                     break;
 
-                case IHasEndTime endTime:
+                case IHasDuration endTime:
                     length = endTime.EndTime + excess_length;
                     break;
 
@@ -129,12 +129,19 @@ namespace osu.Game.Beatmaps
                 processor?.PreProcess();
 
                 // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
-                foreach (var obj in converted.HitObjects)
+                try
                 {
-                    if (cancellationSource.IsCancellationRequested)
-                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
+                    foreach (var obj in converted.HitObjects)
+                    {
+                        if (cancellationSource.IsCancellationRequested)
+                            throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
-                    obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+                        obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty, cancellationSource.Token);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    throw new BeatmapLoadTimeoutException(BeatmapInfo);
                 }
 
                 foreach (var mod in mods.OfType<IApplicableToHitObject>())

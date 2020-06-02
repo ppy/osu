@@ -30,8 +30,6 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens
 {
@@ -153,6 +151,12 @@ namespace osu.Game.Screens
                                                                     ButtonIcon = FontAwesome.Solid.ArrowLeft,
                                                                     Action = () => this.Exit(),
                                                                     TooltipText = "退出",
+                                                                },
+                                                                new BottomBarButton()
+                                                                {
+                                                                    ButtonIcon = FontAwesome.Regular.QuestionCircle,
+                                                                    Action = () => game?.picture.UpdateImage("https://i0.hdslb.com/bfs/article/91cdfbdf623775b2bb9e93b6c0842cf5740ef912.png", true, false, "食用指南"),
+                                                                    TooltipText = "Mvis播放器食用指南(需要网络连接)",
                                                                 },
                                                             }
                                                         },
