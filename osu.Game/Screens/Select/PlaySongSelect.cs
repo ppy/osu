@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
         private bool removeAutoModOnResume;
         private OsuScreen player;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Select
 
                 if (autoType == null)
                 {
-                    notifications.Post(new SimpleNotification
+                    notifications?.Post(new SimpleNotification
                     {
                         Text = "The current ruleset doesn't have an autoplay mod avalaible!"
                     });
