@@ -433,7 +433,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             }
         }
 
-        private class CreateRoomButton : TriangleButton
+        public class CreateRoomButton : TriangleButton
         {
             public CreateRoomButton()
             {
