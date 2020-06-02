@@ -70,6 +70,7 @@ namespace osu.Game.Screens.Menu
 
         private IShader shader;
         private readonly Texture texture;
+        public bool isIntro = false;
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
@@ -88,8 +89,11 @@ namespace osu.Game.Screens.Menu
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
 
-            user.ValueChanged += _ => updateColour();
-            skin.BindValueChanged(_ => updateColour(), true);
+            if (!isIntro)
+            {
+                user.ValueChanged += _ => updateColour();
+                skin.BindValueChanged(_ => updateColour(), true);
+            }
         }
 
         private void updateAmplitudes()
