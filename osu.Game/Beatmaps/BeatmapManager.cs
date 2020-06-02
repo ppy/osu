@@ -201,16 +201,25 @@ namespace osu.Game.Beatmaps
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     new LegacyBeatmapEncoder(beatmapContent).Encode(sw);
 
-                var attachedInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
-                var md5Hash = stream.ComputeMD5Hash();
-                attachedInfo.MD5Hash = md5Hash;
-
                 UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
             }
 
             var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
             if (working != null)
                 workingCache.Remove(working);
+        }
+
+        protected override void PreUpdate(BeatmapSetInfo item)
+        {
+            base.PreUpdate(item);
+
+            foreach (var info in item.Beatmaps)
+            {
+                var file = item.Files.FirstOrDefault(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+
+                using (var stream = Files.Store.GetStream(file))
+                    info.MD5Hash = stream.ComputeMD5Hash();
+            }
         }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
