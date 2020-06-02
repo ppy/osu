@@ -13,15 +13,22 @@ namespace osu.Game.Screens.Menu
     {
         protected override string BeatmapHash => "64E00D7022195959BFA3109D09C2E2276C8F12F486B91FCF6175583E973B48F2";
         protected override string BeatmapFile => "welcome.osz";
-        private const double delay_step_two = 3000;
+        private const double delay_step_two = 2142;
 
         private SampleChannel welcome;
+
+        private SampleChannel pianoReverb;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            seeya = audio.Samples.Get(@"Intro/seeya-fallback");
+            
             if (MenuVoice.Value)
-                welcome = audio.Samples.Get(@"welcome");
+            {
+                welcome = audio.Samples.Get(@"Intro/welcome-fallback");
+                pianoReverb = audio.Samples.Get(@"Intro/welcome_piano");
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -31,14 +38,15 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 welcome?.Play();
-
+                pianoReverb?.Play();
                 Scheduler.AddDelayed(delegate
                 {
                     StartTrack();
 
                     PrepareMenuLoad();
 
-                    Scheduler.AddDelayed(LoadMenu, 0);
+                    Scheduler.Add(LoadMenu);
+                    
                 }, delay_step_two);
 
                 logo.ScaleTo(1);

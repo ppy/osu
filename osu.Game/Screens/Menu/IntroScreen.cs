@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Menu
 
         private const int exit_delay = 3000;
 
-        private SampleChannel seeya;
+        protected SampleChannel seeya { get; set; }
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Menu
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            seeya = audio.Samples.Get(@"seeya");
+            seeya = audio.Samples.Get(@"Intro/seeya-lazer");
 
             BeatmapSetInfo setInfo = null;
 
