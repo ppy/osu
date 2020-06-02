@@ -51,6 +51,9 @@ namespace osu.Game.Screens
                 case IntroSequence.Circles:
                     return new IntroCircles();
 
+                case IntroSequence.Fallback:
+                    return new IntroFallback();
+
                 default:
                     return new IntroTriangles();
             }
