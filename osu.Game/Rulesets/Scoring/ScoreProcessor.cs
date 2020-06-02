@@ -129,6 +129,12 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             updateScore();
+
+            OnResultApplied(result);
+        }
+
+        protected virtual void OnResultApplied(JudgementResult result)
+        {
         }
 
         protected sealed override void RevertResultInternal(JudgementResult result)
@@ -154,6 +160,12 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             updateScore();
+
+            OnResultReverted(result);
+        }
+
+        protected virtual void OnResultReverted(JudgementResult result)
+        {
         }
 
         private void updateScore()
