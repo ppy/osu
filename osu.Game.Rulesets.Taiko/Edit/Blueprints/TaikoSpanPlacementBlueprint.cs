@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         }
 
         private double originalStartTime;
+        private Vector2 originalPosition;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -73,22 +74,25 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
             if (PlacementActive)
             {
-                if (result.Time is double endTime)
+                if (result.Time is double dragTime)
                 {
-                    if (endTime < originalStartTime)
+                    if (dragTime < originalStartTime)
                     {
-                        HitObject.StartTime = endTime;
-                        spanPlacementObject.Duration = Math.Abs(endTime - originalStartTime);
+                        HitObject.StartTime = dragTime;
+                        spanPlacementObject.Duration = Math.Abs(dragTime - originalStartTime);
                         headPiece.Position = ToLocalSpace(result.ScreenSpacePosition);
-                        lengthPiece.X = headPiece.X;
-                        lengthPiece.Width = tailPiece.X - headPiece.X;
+                        tailPiece.Position = originalPosition;
                     }
                     else
                     {
-                        spanPlacementObject.Duration = Math.Abs(endTime - originalStartTime);
+                        HitObject.StartTime = originalStartTime;
+                        spanPlacementObject.Duration = Math.Abs(dragTime - originalStartTime);
                         tailPiece.Position = ToLocalSpace(result.ScreenSpacePosition);
-                        lengthPiece.Width = tailPiece.X - headPiece.X;
+                        headPiece.Position = originalPosition;
                     }
+
+                    lengthPiece.X = headPiece.X;
+                    lengthPiece.Width = tailPiece.X - headPiece.X;
                 }
             }
             else
@@ -96,7 +100,10 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                 lengthPiece.Position = headPiece.Position = tailPiece.Position = ToLocalSpace(result.ScreenSpacePosition);
 
                 if (result.Time is double startTime)
+                {
                     originalStartTime = HitObject.StartTime = startTime;
+                    originalPosition = ToLocalSpace(result.ScreenSpacePosition);
+                }
             }
         }
     }
