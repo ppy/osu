@@ -199,7 +199,7 @@ namespace osu.Game.Tournament.Screens
                         {
                             button = new TriangleButton
                             {
-                                Size = new Vector2(100, 30),
+                                Size = new Vector2(100, 40),
                                 Action = () => Action?.Invoke()
                             }
                         }
