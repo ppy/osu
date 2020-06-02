@@ -60,14 +60,14 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            managerAdded = beatmaps.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(beatmapAdded);
+            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(beatmapUpdated);
             managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(beatmapRemoved);
 
@@ -98,14 +98,14 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool IsPlaying => current?.Track.IsRunning ?? false;
 
-        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
             if (weakSet.NewValue.TryGetTarget(out var set))
             {
                 Schedule(() =>
                 {
-                    if (!beatmapSets.Contains(set))
-                        beatmapSets.Add(set);
+                    beatmapSets.Remove(set);
+                    beatmapSets.Add(set);
                 });
             }
         }
