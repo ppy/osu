@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
             switch (original)
             {
-                case IHasCurve curveData:
+                case IHasPathWithRepeats curveData:
                     return new Slider
                     {
                         StartTime = original.StartTime,
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / beatmap.ControlPointInfo.DifficultyPointAt(original.StartTime).SpeedMultiplier : 1
                     }.Yield();
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                     return new Spinner
                     {
                         StartTime = original.StartTime,

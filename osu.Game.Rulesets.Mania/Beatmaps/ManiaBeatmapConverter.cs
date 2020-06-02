@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
             else
             {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasDuration) / beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     break;
                 }
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                 {
                     conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
@@ -231,7 +231,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 var pattern = new Pattern();
 
-                if (HitObject is IHasEndTime endTimeData)
+                if (HitObject is IHasDuration endTimeData)
                 {
                     pattern.Add(new HoldNote
                     {

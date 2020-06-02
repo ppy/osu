@@ -2,23 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    [Cached(typeof(IManiaHitObjectComposer))]
-    public class TestSceneManiaBeatSnapGrid : EditorClockTestScene, IManiaHitObjectComposer
+    public class TestSceneManiaBeatSnapGrid : EditorClockTestScene
     {
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo scrollingInfo = new ScrollingTestContainer.TestScrollingInfo();
@@ -50,7 +54,10 @@ namespace osu.Game.Rulesets.Mania.Tests
                 {
                     Clock = new FramedClock(new StopwatchClock())
                 },
-                beatSnapGrid = new ManiaBeatSnapGrid()
+                new TestHitObjectComposer(Playfield)
+                {
+                    Child = beatSnapGrid = new ManiaBeatSnapGrid()
+                }
             };
         }
 
@@ -66,5 +73,52 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         public ManiaPlayfield Playfield { get; }
+    }
+
+    public class TestHitObjectComposer : HitObjectComposer
+    {
+        public override Playfield Playfield { get; }
+        public override IEnumerable<DrawableHitObject> HitObjects => Enumerable.Empty<DrawableHitObject>();
+        public override bool CursorInPlacementArea => false;
+
+        public TestHitObjectComposer(Playfield playfield)
+        {
+            Playfield = playfield;
+        }
+
+        public Drawable Child
+        {
+            set => InternalChild = value;
+        }
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override float GetBeatSnapDistanceAt(double referenceTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override float DurationToDistance(double referenceTime, double duration)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double DistanceToDuration(double referenceTime, float distance)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
