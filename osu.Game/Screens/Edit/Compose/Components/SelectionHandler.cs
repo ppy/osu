@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Drawable outline;
 
         [Resolved(CanBeNull = true)]
-        private EditorBeatmap editorBeatmap { get; set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleSelected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Add(blueprint);
-            editorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+            EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
 
             UpdateVisibility();
         }
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
-            editorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
+            EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
             if (selectedBlueprints.Count == 0)
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             changeHandler?.BeginChange();
 
             foreach (var h in selectedBlueprints.ToList())
-                editorBeatmap?.Remove(h.HitObject);
+                EditorBeatmap?.Remove(h.HitObject);
 
             changeHandler?.EndChange();
         }
