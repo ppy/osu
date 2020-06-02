@@ -30,8 +30,7 @@ namespace osu.Game.Tests.Visual
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             dependencies.Cache(BeatDivisor);
-            dependencies.CacheAs<IFrameBasedClock>(Clock);
-            dependencies.CacheAs<IAdjustableClock>(Clock);
+            dependencies.CacheAs(Clock);
 
             return dependencies;
         }

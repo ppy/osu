@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                     if (!isForCurrentRuleset && tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                     {
-                        List<IList<HitSampleInfo>> allSamples = obj is IHasCurve curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
+                        List<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
                         int i = 0;
 
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     break;
                 }
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                 {
                     double hitMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
 
@@ -167,13 +167,15 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 default:
                 {
-                    bool isRim = samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE);
+                    bool isRimDefinition(HitSampleInfo s) => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE;
+
+                    bool isRim = samples.Any(isRimDefinition);
 
                     yield return new Hit
                     {
                         StartTime = obj.StartTime,
                         Type = isRim ? HitType.Rim : HitType.Centre,
-                        Samples = obj.Samples,
+                        Samples = samples,
                         IsStrong = strong
                     };
 

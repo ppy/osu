@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -29,11 +27,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public class TestSceneManiaHitObjectComposer : EditorClockTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ManiaBlueprintContainer)
-        };
-
         private TestComposer composer;
 
         [SetUp]
@@ -49,6 +42,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void TestDragOffscreenSelectionVerticallyUpScroll()
         {
             DrawableHitObject lastObject = null;
+            double originalTime = 0;
             Vector2 originalPosition = Vector2.Zero;
 
             setScrollStep(ScrollingDirection.Up);
@@ -56,6 +50,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("seek to last object", () =>
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
+                originalTime = lastObject.HitObject.StartTime;
                 Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
             });
 
@@ -71,19 +66,20 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("move mouse downwards", () =>
             {
-                InputManager.MoveMouseTo(lastObject, new Vector2(0, 20));
+                InputManager.MoveMouseTo(lastObject, new Vector2(0, lastObject.ScreenSpaceDrawQuad.Height * 4));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
             AddAssert("hitobjects not moved columns", () => composer.EditorBeatmap.HitObjects.All(h => ((ManiaHitObject)h).Column == 0));
             AddAssert("hitobjects moved downwards", () => lastObject.DrawPosition.Y - originalPosition.Y > 0);
-            AddAssert("hitobjects not moved too far", () => lastObject.DrawPosition.Y - originalPosition.Y < 50);
+            AddAssert("hitobject has moved time", () => lastObject.HitObject.StartTime == originalTime + 125);
         }
 
         [Test]
         public void TestDragOffscreenSelectionVerticallyDownScroll()
         {
             DrawableHitObject lastObject = null;
+            double originalTime = 0;
             Vector2 originalPosition = Vector2.Zero;
 
             setScrollStep(ScrollingDirection.Down);
@@ -91,6 +87,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("seek to last object", () =>
             {
                 lastObject = this.ChildrenOfType<DrawableHitObject>().Single(d => d.HitObject == composer.EditorBeatmap.HitObjects.Last());
+                originalTime = lastObject.HitObject.StartTime;
                 Clock.Seek(composer.EditorBeatmap.HitObjects.Last().StartTime);
             });
 
@@ -106,13 +103,13 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("move mouse upwards", () =>
             {
-                InputManager.MoveMouseTo(lastObject, new Vector2(0, -20));
+                InputManager.MoveMouseTo(lastObject, new Vector2(0, -lastObject.ScreenSpaceDrawQuad.Height * 4));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
             AddAssert("hitobjects not moved columns", () => composer.EditorBeatmap.HitObjects.All(h => ((ManiaHitObject)h).Column == 0));
             AddAssert("hitobjects moved upwards", () => originalPosition.Y - lastObject.DrawPosition.Y > 0);
-            AddAssert("hitobjects not moved too far", () => originalPosition.Y - lastObject.DrawPosition.Y < 50);
+            AddAssert("hitobject has moved time", () => lastObject.HitObject.StartTime == originalTime + 125);
         }
 
         [Test]
@@ -214,7 +211,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
 
                 for (int i = 0; i < 10; i++)
-                    EditorBeatmap.Add(new Note { StartTime = 100 * i });
+                    EditorBeatmap.Add(new Note { StartTime = 125 * i });
             }
         }
     }

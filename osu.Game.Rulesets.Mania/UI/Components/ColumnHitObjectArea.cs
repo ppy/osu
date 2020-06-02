@@ -12,6 +12,9 @@ namespace osu.Game.Rulesets.Mania.UI.Components
     public class ColumnHitObjectArea : HitObjectArea
     {
         public readonly Container Explosions;
+
+        public readonly Container UnderlayElements;
+
         private readonly Drawable hitTarget;
 
         public ColumnHitObjectArea(int columnIndex, HitObjectContainer hitObjectContainer)
@@ -19,6 +22,11 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         {
             AddRangeInternal(new[]
             {
+                UnderlayElements = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = 2,
+                },
                 hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget, columnIndex), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
