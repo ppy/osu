@@ -602,6 +602,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
                     BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
 
+                    string oldMd5Hash = beatmapToUpdate.BeatmapInfo.MD5Hash;
+
                     using (var stream = new MemoryStream())
                     {
                         using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
@@ -624,6 +626,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
                     Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
                     Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
+                    Assert.That(updatedBeatmap.BeatmapInfo.MD5Hash, Is.Not.EqualTo(oldMd5Hash));
                 }
                 finally
                 {
