@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
 
         private IShader shader;
         private readonly Texture texture;
-        public bool isIntro = false;
+        public bool IsIntro = false;
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Menu
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
 
-            if (!isIntro)
+            if (!IsIntro)
             {
                 user.ValueChanged += _ => updateColour();
                 skin.BindValueChanged(_ => updateColour(), true);
