@@ -8,8 +8,8 @@ using osu.Game.Screens.Menu;
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneIntroLegacy : IntroTestScene
+    public class TestSceneIntroWelcome : IntroTestScene
     {
-        protected override IScreen CreateScreen() => new IntroLegacy();
+        protected override IScreen CreateScreen() => new IntroWelcome();
     }
 }
