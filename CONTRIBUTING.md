@@ -52,7 +52,7 @@ Issues, bug reports and feature suggestions are welcomed, though please keep in 
 
 ## I would like to submit a pull request!
 
-We also welcome pull requests from unaffiliated contributors. The issue tracker should provide plenty of issues that you can work on; we also mark issues that we think would be good for newcomers with the [`good-first-issue`](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue) label.
+We also welcome pull requests from unaffiliated contributors. The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of issues that you can work on; we also mark issues that we think would be good for newcomers with the [`good-first-issue`](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue) label.
 
 However, do keep in mind that the core team is committed to bringing osu!lazer up to par with stable first and foremost, so depending on what your contribution concerns, it might not be merged and released right away. Our approach to managing issues and their priorities is described [in the wiki](https://github.com/ppy/osu/wiki/Project-management).
 
@@ -62,11 +62,17 @@ Here are some key things to note before jumping in:
 
   While we are accepting of all kinds of contributions, we also have a certain quality standard we'd like to uphold and limited time to review your code. Therefore, we would like to avoid providing entry-level advice, and as such if you're not very familiar with C\# as a programming language, we'd recommend that you start off with a few personal projects to get acquainted with the language's syntax, toolchain and principles of object-oriented programming first.
 
+  In addition, please take the time to take a look at and get acquainted with the [development and testing](https://github.com/ppy/osu-framework/wiki/Development-and-Testing) procedure we have set up.
+
 * **Make sure you are familiar with git and the pull request workflow.**
 
   [git](https://git-scm.com/) is a distributed version control system that might not be very intuitive at the beginning if you're not familiar with version control. In particular, projects using git have a particular workflow for submitting code changes, which is called the pull request workflow.
 
   To make things run more smoothly, we recommend that you look up some online resources to familiarise yourself with the git vocabulary and commands, and practice working with forks and submitting pull requests at your own pace. A high-level overview of the process can be found in [this article by GitHub](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/proposing-changes-to-your-work-with-pull-requests).
+
+* **Double-check designs before starting work on new functionality.**
+
+  When implementing new features, keep in mind that we already have a lot of the UI designed. If you wish to work on something with the intention of having it included in the official distribution, please open an issue for discussion and we will give you what you need from a design perspective to proceed. If you want to make *changes* to the design, we recommend you open an issue with your intentions before spending too much time to ensure no effort is wasted.
 
 * **Make sure to submit pull requests off of a topic branch.**
 
