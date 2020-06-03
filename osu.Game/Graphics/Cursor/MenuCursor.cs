@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.Cursor
             if (shouldRotateCursor(e) && cursorRotate.Value)
             {
                 // if cursor is already rotating don't reset its rotate origin
-                if (!(dragRotationState == DragRotationState.Rotating))
+                if (dragRotationState != DragRotationState.Rotating)
                 {
                     dragRotationState = DragRotationState.DragStarted;
                     positionMouseDown = e.MousePosition;
