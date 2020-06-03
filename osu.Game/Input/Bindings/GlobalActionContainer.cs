@@ -58,9 +58,10 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
         {
-            new KeyBinding(InputKey.F1, GlobalAction.ToggleMods),
-            new KeyBinding(InputKey.F2, GlobalAction.SelectRandom),
-            new KeyBinding(InputKey.F3, GlobalAction.ToggleOptions)
+            new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
+            new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -115,13 +116,16 @@ namespace osu.Game.Input.Bindings
 
         // Song select keybindings
         [Description("Toggle mod selection overlay")]
-        ToggleMods,
+        ToggleModSelection,
 
         [Description("Select a random beatmap")]
-        SelectRandom,
+        SelectNextRandom,
+
+        [Description("Select the last random beatmap")]
+        SelectPreviousRandom,
 
         [Description("Toggle beatmap options overlay")]
-        ToggleOptions,
+        ToggleBeatmapOptions,
 
         // In-Game Keybindings
         [Description("Skip cutscene")]
