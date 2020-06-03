@@ -127,13 +127,7 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
         }
 
-        private static bool shouldRotate(MouseEvent e)
-        {
-            if (e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right))
-                return true;
-            else
-                return false;
-        }
+        private static bool shouldRotate(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right);
 
         public class Cursor : Container
         {
