@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -140,7 +141,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            if (Score.Beatmap.OnlineBeatmapID != null)
+            if (Score.Beatmap.OnlineBeatmapID != null && Score.Beatmap.Status > BeatmapSetOnlineStatus.Pending)
             {
                 var req = FetchScores(scores => Schedule(() =>
                 {
