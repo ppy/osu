@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 switch (request)
                 {
                     case GetRoomPlaylistScoresRequest r:
-                        r.TriggerSuccess(roomScores);
+                        r.TriggerSuccess(new RoomPlaylistScores { Scores = roomScores });
                         break;
                 }
             });
