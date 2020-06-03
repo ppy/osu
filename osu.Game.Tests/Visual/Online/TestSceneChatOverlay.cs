@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -14,7 +13,6 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
@@ -24,17 +22,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ChatLine),
-            typeof(DrawableChannel),
-            typeof(ChannelSelectorTabItem),
-            typeof(ChannelTabControl),
-            typeof(ChannelTabItem),
-            typeof(PrivateChannelTabItem),
-            typeof(TabCloseButton)
-        };
-
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
@@ -259,7 +246,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
 
-                Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
+                InternalChildren = new Drawable[]
+                {
+                    ChannelManager,
+                    ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
+                };
+
                 ChatOverlay.Show();
             }
         }

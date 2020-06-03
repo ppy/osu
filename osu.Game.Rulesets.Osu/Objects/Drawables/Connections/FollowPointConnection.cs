@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private void bindEvents(DrawableOsuHitObject drawableObject)
         {
             drawableObject.HitObject.PositionBindable.BindValueChanged(_ => scheduleRefresh());
-            drawableObject.HitObject.DefaultsApplied += scheduleRefresh;
+            drawableObject.HitObject.DefaultsApplied += _ => scheduleRefresh();
         }
 
         private void scheduleRefresh()

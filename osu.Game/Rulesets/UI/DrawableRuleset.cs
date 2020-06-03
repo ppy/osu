@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public PassThroughInputManager KeyBindingInputManager;
 
-        public override double GameplayStartTime => Objects.First().StartTime - 2000;
+        public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
         private readonly Lazy<Playfield> playfield;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.UI
         /// The mods which are to be applied.
         /// </summary>
         [Cached(typeof(IReadOnlyList<Mod>))]
-        private readonly IReadOnlyList<Mod> mods;
+        protected readonly IReadOnlyList<Mod> Mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.UI
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
 
             Beatmap = tBeatmap;
-            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
+            Mods = mods?.ToArray() ?? Array.Empty<Mod>();
 
             RelativeSizeAxes = Axes.Both;
 
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(mods, config);
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken);
         }
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
         }
 
@@ -486,6 +486,11 @@ namespace osu.Game.Rulesets.UI
         }
 
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
+
+        /// <summary>
+        /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
+        /// </summary>
+        public virtual bool AllowGameplayOverlays => true;
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.

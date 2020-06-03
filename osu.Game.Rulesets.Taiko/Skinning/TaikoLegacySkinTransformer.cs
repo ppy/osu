@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
@@ -52,12 +54,70 @@ namespace osu.Game.Rulesets.Taiko.Skinning
 
                 case TaikoSkinComponents.HitTarget:
                     if (GetTexture("taikobigcircle") != null)
-                        return new LegacyHitTarget();
+                        return new TaikoLegacyHitTarget();
+
+                    return null;
+
+                case TaikoSkinComponents.PlayfieldBackgroundRight:
+                    if (GetTexture("taiko-bar-right") != null)
+                        return new TaikoLegacyPlayfieldBackgroundRight();
+
+                    return null;
+
+                case TaikoSkinComponents.PlayfieldBackgroundLeft:
+                    // This is displayed inside LegacyInputDrum. It is required to be there for layout purposes (can be seen on legacy skins).
+                    if (GetTexture("taiko-bar-right") != null)
+                        return Drawable.Empty();
+
+                    return null;
+
+                case TaikoSkinComponents.BarLine:
+                    if (GetTexture("taiko-barline") != null)
+                        return new LegacyBarLine();
+
+                    return null;
+
+                case TaikoSkinComponents.TaikoExplosionGood:
+                case TaikoSkinComponents.TaikoExplosionGreat:
+                case TaikoSkinComponents.TaikoExplosionMiss:
+
+                    var sprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
+                    if (sprite != null)
+                        return new LegacyHitExplosion(sprite);
+
+                    return null;
+
+                case TaikoSkinComponents.Scroller:
+                    if (GetTexture("taiko-slider") != null)
+                        return new LegacyTaikoScroller();
+
+                    return null;
+
+                case TaikoSkinComponents.Mascot:
+                    if (GetTexture("pippidonclear0") != null)
+                        return new DrawableTaikoMascot();
 
                     return null;
             }
 
             return source.GetDrawableComponent(component);
+        }
+
+        private string getHitName(TaikoSkinComponents component)
+        {
+            switch (component)
+            {
+                case TaikoSkinComponents.TaikoExplosionMiss:
+                    return "taiko-hit0";
+
+                case TaikoSkinComponents.TaikoExplosionGood:
+                    return "taiko-hit100";
+
+                case TaikoSkinComponents.TaikoExplosionGreat:
+                    return "taiko-hit300";
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);

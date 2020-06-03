@@ -50,13 +50,6 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, BeatmapManager beatmaps, OsuConfigManager osuConfig)
         {
-            if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
-            {
-                button.Enabled.Value = false;
-                button.TooltipText = "this beatmap is currently not available for download.";
-                return;
-            }
-
             noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             button.Action = () =>
@@ -81,6 +74,26 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         break;
                 }
             };
+
+            State.BindValueChanged(state =>
+            {
+                switch (state.NewValue)
+                {
+                    case DownloadState.LocallyAvailable:
+                        button.Enabled.Value = true;
+                        button.TooltipText = string.Empty;
+                        break;
+
+                    default:
+                        if (BeatmapSet.Value?.OnlineInfo?.Availability?.DownloadDisabled ?? false)
+                        {
+                            button.Enabled.Value = false;
+                            button.TooltipText = "this beatmap is currently not available for download.";
+                        }
+
+                        break;
+                }
+            }, true);
         }
     }
 }

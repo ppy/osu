@@ -29,8 +29,22 @@ namespace osu.Game.Tests.ScrollAlgorithms
         [Test]
         public void TestDisplayStartTime()
         {
-            // Sequential scroll algorithm approximates the start time
-            // This should be fixed in the future
+            // easy cases - time range adjusted for velocity fits within control point duration
+            Assert.AreEqual(2500, algorithm.GetDisplayStartTime(5000, 0, 2500, 1)); // 5000 - (2500 / 1)
+            Assert.AreEqual(13750, algorithm.GetDisplayStartTime(15000, 0, 2500, 1)); // 15000 - (2500 / 2)
+            Assert.AreEqual(20000, algorithm.GetDisplayStartTime(25000, 0, 2500, 1)); // 25000 - (2500 / 0.5)
+
+            // hard case - time range adjusted for velocity exceeds control point duration
+
+            // 1st multiplier point takes 10000 / 2500 = 4 scroll lengths
+            // 2nd multiplier point takes 10000 / (2500 / 2) = 8 scroll lengths
+            // 3rd multiplier point takes 2500 / (2500 * 2) = 0.5 scroll lengths up to hitobject start
+
+            // absolute position of the hitobject = 1000 * (4 + 8 + 0.5) = 12500
+            // minus one scroll length allowance = 12500 - 1000 = 11500 = 11.5 [scroll lengths]
+            // therefore the start time lies within the second multiplier point (because 11.5 < 4 + 8)
+            // its exact time position is = 10000 + 7.5 * (2500 / 2) = 19375
+            Assert.AreEqual(19375, algorithm.GetDisplayStartTime(22500, 0, 2500, 1000));
         }
 
         [Test]

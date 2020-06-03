@@ -234,7 +234,6 @@ namespace osu.Game.Online.Chat
                     }
 
                     JoinChannel(channel);
-                    CurrentChannel.Value = channel;
                     break;
 
                 case "help":
@@ -269,7 +268,7 @@ namespace osu.Game.Online.Chat
 
                     // join any channels classified as "defaults"
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                        JoinChannel(ch);
+                        joinChannel(ch);
                 }
             };
             req.Failure += error =>
@@ -290,7 +289,7 @@ namespace osu.Game.Online.Chat
         /// <param name="channel">The channel </param>
         private void fetchInitalMessages(Channel channel)
         {
-            if (channel.Id <= 0) return;
+            if (channel.Id <= 0 || channel.MessagesLoaded) return;
 
             var fetchInitialMsgReq = new GetMessagesRequest(channel);
             fetchInitialMsgReq.Success += messages =>
@@ -345,9 +344,10 @@ namespace osu.Game.Online.Chat
         /// Joins a channel if it has not already been joined.
         /// </summary>
         /// <param name="channel">The channel to join.</param>
-        /// <param name="alreadyJoined">Whether the channel has already been joined server-side. Will skip a join request.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
-        public Channel JoinChannel(Channel channel, bool alreadyJoined = false)
+        public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
+
+        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false)
         {
             if (channel == null) return null;
 
@@ -356,30 +356,39 @@ namespace osu.Game.Online.Chat
             // ensure we are joined to the channel
             if (!channel.Joined.Value)
             {
-                if (alreadyJoined)
-                    channel.Joined.Value = true;
-                else
+                switch (channel.Type)
                 {
-                    switch (channel.Type)
-                    {
-                        case ChannelType.Public:
-                            var req = new JoinChannelRequest(channel, api.LocalUser.Value);
-                            req.Success += () => JoinChannel(channel, true);
-                            req.Failure += ex => LeaveChannel(channel);
-                            api.Queue(req);
-                            return channel;
-                    }
+                    case ChannelType.Multiplayer:
+                        // join is implicit. happens when you join a multiplayer game.
+                        // this will probably change in the future.
+                        channel.Joined.Value = true;
+                        joinChannel(channel, fetchInitialMessages);
+                        return channel;
+
+                    case ChannelType.Private:
+                        // can't do this yet.
+                        break;
+
+                    default:
+                        var req = new JoinChannelRequest(channel, api.LocalUser.Value);
+                        req.Success += () =>
+                        {
+                            channel.Joined.Value = true;
+                            joinChannel(channel, fetchInitialMessages);
+                        };
+                        req.Failure += ex => LeaveChannel(channel);
+                        api.Queue(req);
+                        return channel;
                 }
+            }
+            else
+            {
+                if (fetchInitialMessages)
+                    fetchInitalMessages(channel);
             }
 
             if (CurrentChannel.Value == null)
                 CurrentChannel.Value = channel;
-
-            if (!channel.MessagesLoaded)
-            {
-                // let's fetch a small number of messages to bring us up-to-date with the backlog.
-                fetchInitalMessages(channel);
-            }
 
             return channel;
         }
@@ -420,7 +429,8 @@ namespace osu.Game.Online.Chat
                     foreach (var channel in updates.Presence)
                     {
                         // we received this from the server so should mark the channel already joined.
-                        JoinChannel(channel, true);
+                        channel.Joined.Value = true;
+                        joinChannel(channel);
                     }
 
                     //todo: handle left channels

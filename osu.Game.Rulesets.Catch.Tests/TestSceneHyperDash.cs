@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
@@ -17,10 +16,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneHyperDash : TestSceneCatchPlayer
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CatcherArea),
-        };
 
         protected override bool Autoplay => true;
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using osu.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets
 
                 var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r)).ToList();
 
-                //add all legacy rulesets first to ensure they have exclusive choice of primary key.
+                // add all legacy rulesets first to ensure they have exclusive choice of primary key.
                 foreach (var r in instances.Where(r => r is ILegacyRuleset))
                 {
                     if (context.RulesetInfo.SingleOrDefault(dbRuleset => dbRuleset.ID == r.RulesetInfo.ID) == null)
@@ -90,27 +91,23 @@ namespace osu.Game.Rulesets
 
                 context.SaveChanges();
 
-                //add any other modes
+                // add any other modes
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
-                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
+                    // todo: StartsWith can be changed to Equals on 2020-11-08
+                    // This is to give users enough time to have their database use new abbreviated info).
+                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo.StartsWith(r.RulesetInfo.InstantiationInfo)) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
                 }
 
                 context.SaveChanges();
 
-                //perform a consistency check
+                // perform a consistency check
                 foreach (var r in context.RulesetInfo)
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
-                        {
-                            // for the time being, let's ignore the version being loaded.
-                            // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
-                            asm.Version = null;
-                            return Assembly.Load(asm);
-                        }, null))).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo))).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
@@ -157,14 +154,14 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Error(e, $"Could not load rulesets from directory {RuntimeInfo.StartupDirectory}");
             }
         }
 

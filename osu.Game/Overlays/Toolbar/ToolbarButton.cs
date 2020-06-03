@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Toolbar
                 tooltipContainer = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
+                    RelativeSizeAxes = Axes.Both, // stops us being considered in parent's autosize
                     Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
                     Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),

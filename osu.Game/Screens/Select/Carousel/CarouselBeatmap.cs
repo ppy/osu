@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
@@ -55,10 +54,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (match)
             {
-                var terms = new List<string>();
-
-                terms.AddRange(Beatmap.Metadata.SearchableTerms);
-                terms.Add(Beatmap.Version);
+                var terms = Beatmap.SearchableTerms;
 
                 foreach (var criteriaTerm in criteria.SearchTerms)
                     match &= terms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);

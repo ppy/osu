@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             : base(beatmap)
         {
             Width = 380;
-            Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
+            Height = 140 + vertical_padding; // full height of all the elements plus vertical padding (autosize uses the image)
         }
 
         protected override void LoadComplete()

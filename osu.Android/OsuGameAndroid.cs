@@ -18,7 +18,8 @@ namespace osu.Android
 
                 try
                 {
-                    string versionName = packageInfo.VersionCode.ToString();
+                    // todo: needs checking before play store redeploy.
+                    string versionName = packageInfo.VersionName;
                     // undo play store version garbling
                     return new Version(int.Parse(versionName.Substring(0, 4)), int.Parse(versionName.Substring(4, 4)), int.Parse(versionName.Substring(8, 1)));
                 }

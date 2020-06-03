@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private RollingCounter<long> scoreCounter;
 
+        private const float padding = 10;
+
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelMiddleContent"/>.
         /// </summary>
@@ -46,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             RelativeSizeAxes = Axes.Both;
             Masking = true;
 
-            Padding = new MarginPadding { Vertical = 10, Horizontal = 10 };
+            Padding = new MarginPadding(padding);
         }
 
         [BackgroundDependencyLoader]
@@ -92,13 +94,17 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                Truncate = true,
                             },
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold)
+                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
+                                Truncate = true,
                             },
                             new Container
                             {
