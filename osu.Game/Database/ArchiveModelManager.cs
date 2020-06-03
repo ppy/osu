@@ -667,21 +667,21 @@ namespace osu.Game.Database
         /// <param name="import">The newly imported model.</param>
         /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
         protected virtual bool CanReuseExisting(TModel existing, TModel import) =>
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
-            // poor-man's (cheap) equality comparison, avoiding hashing unnecessarily.
-            // can switch to full hash checks on a per-case basis (or for all) if we decide this is not a performance issue.
-            getTimestamps(existing.Files).SequenceEqual(getTimestamps(import.Files));
+            // for the best or worst, we copy and import files of a new import before checking whether
+            // it is a duplicate. so to check if anything has changed, we can just compare all FileInfo IDs.
+            getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
+
+        private IEnumerable<long> getIDs(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return f.FileInfo.ID;
+        }
 
         private IEnumerable<string> getFilenames(List<TFileModel> files)
         {
             foreach (var f in files.OrderBy(f => f.Filename))
                 yield return f.Filename;
-        }
-
-        private IEnumerable<long> getTimestamps(List<TFileModel> files)
-        {
-            foreach (var f in files.OrderBy(f => f.Filename))
-                yield return File.GetLastWriteTimeUtc(Files.Storage.GetFullPath(f.FileInfo.StoragePath)).ToFileTime();
         }
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
