@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using osu.Framework.Utils;
-using osu.Game.Screens.Multi.Components;
 
 namespace osu.Game.Graphics.Cursor
 {
