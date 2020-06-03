@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Menu
         protected override string BeatmapFile => "welcome.osz";
         private const double delay_step_two = 2142;
         private SampleChannel welcome;
+        private SampleChannel pianoReverb;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -28,7 +29,10 @@ namespace osu.Game.Screens.Menu
             Seeya = audio.Samples.Get(@"Intro/welcome/seeya");
 
             if (MenuVoice.Value)
+            {
                 welcome = audio.Samples.Get(@"Intro/welcome/welcome");
+                pianoReverb = audio.Samples.Get(@"Intro/welcome/welcome_piano");
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -38,9 +42,11 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 welcome?.Play();
-                StartTrack();
+                pianoReverb?.Play();
+
                 Scheduler.AddDelayed(delegate
                 {
+                    StartTrack();
                     PrepareMenuLoad();
 
                     logo.ScaleTo(1);
