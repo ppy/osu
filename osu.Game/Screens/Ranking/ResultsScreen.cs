@@ -141,17 +141,14 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            if (Score.Beatmap.OnlineBeatmapID != null && Score.Beatmap.Status > BeatmapSetOnlineStatus.Pending)
+            var req = FetchScores(scores => Schedule(() =>
             {
-                var req = FetchScores(scores => Schedule(() =>
-                {
-                    foreach (var s in scores)
-                        panels.AddScore(s);
-                }));
+                foreach (var s in scores)
+                    panels.AddScore(s);
+            }));
 
-                if (req != null)
-                    api.Queue(req);
-            }
+            if (req != null)
+                api.Queue(req);
         }
 
         /// <summary>
