@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public async Task TestImportThenImportWithReZip()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithNewerTimestamp)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithReZip)))
             {
                 try
                 {
