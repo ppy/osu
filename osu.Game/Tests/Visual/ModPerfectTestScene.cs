@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
             Mod = mod,
             Beatmap = new Beatmap
             {
-                BeatmapInfo = { Ruleset = Ruleset.Value },
+                BeatmapInfo = { Ruleset = CreatePlayerRuleset().RulesetInfo },
                 HitObjects = { testData.HitObject }
             },
             Autoplay = !shouldMiss,
