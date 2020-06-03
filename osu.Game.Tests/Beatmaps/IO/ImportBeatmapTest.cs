@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -366,37 +366,6 @@ namespace osu.Game.Tests.Beatmaps.IO
                     checkSingleReferencedFileCount(osu, 18);
 
                     Assert.AreEqual(1, loggedExceptionCount);
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
-
-        [Test]
-        public async Task TestImportThenImportDifferentHash()
-        {
-            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportDifferentHash)))
-            {
-                try
-                {
-                    var osu = loadOsu(host);
-                    var manager = osu.Dependencies.Get<BeatmapManager>();
-
-                    var imported = await LoadOszIntoOsu(osu);
-
-                    imported.Hash += "-changed";
-                    manager.Update(imported);
-
-                    var importedSecondTime = await LoadOszIntoOsu(osu);
-
-                    Assert.IsTrue(imported.ID != importedSecondTime.ID);
-                    Assert.IsTrue(imported.Beatmaps.First().ID < importedSecondTime.Beatmaps.First().ID);
-
-                    // only one beatmap will exist as the online set ID matched, causing purging of the first import.
-                    checkBeatmapSetCount(osu, 1);
                 }
                 finally
                 {
