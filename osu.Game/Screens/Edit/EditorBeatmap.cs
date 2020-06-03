@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -197,6 +198,25 @@ namespace osu.Game.Screens.Edit
 
             startTimeBindables.Remove(hitObject);
             HitObjectRemoved?.Invoke(hitObject);
+
+            updateHitObject(null, true);
+        }
+
+        /// <summary>
+        /// Clears all <see cref="HitObjects"/> from this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        public void Clear()
+        {
+            var removed = HitObjects.ToList();
+
+            mutableHitObjects.Clear();
+
+            foreach (var b in startTimeBindables)
+                b.Value.UnbindAll();
+            startTimeBindables.Clear();
+
+            foreach (var h in removed)
+                HitObjectRemoved?.Invoke(h);
 
             updateHitObject(null, true);
         }

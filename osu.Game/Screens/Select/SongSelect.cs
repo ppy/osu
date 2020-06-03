@@ -339,12 +339,16 @@ namespace osu.Game.Screens.Select
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
         /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
-        /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
-        public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
+        /// <param name="ruleset">An optional ruleset to override the current carousel selection.</param>
+        /// <param name="customStartAction">An optional custom action to perform instead of <see cref="OnStart"/>.</param>
+        public void FinaliseSelection(BeatmapInfo beatmap = null, RulesetInfo ruleset = null, Action customStartAction = null)
         {
             // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
             if (!Carousel.BeatmapSetsLoaded)
                 return;
+
+            if (ruleset != null)
+                Ruleset.Value = ruleset;
 
             transferRulesetValue();
 
@@ -366,7 +370,12 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            if (performStartAction && OnStart())
+            if (customStartAction != null)
+            {
+                customStartAction();
+                Carousel.AllowSelection = false;
+            }
+            else if (OnStart())
                 Carousel.AllowSelection = false;
         }
 
@@ -795,7 +804,7 @@ namespace osu.Game.Screens.Select
                 Masking = true;
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
                 InternalChild = Content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,

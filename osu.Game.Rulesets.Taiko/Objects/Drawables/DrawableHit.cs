@@ -2,9 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -17,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public TaikoAction[] HitActions { get; }
+        public TaikoAction[] HitActions { get; private set; }
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.
@@ -32,20 +36,76 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool pressHandledThisFrame;
 
+        private Bindable<HitType> type;
+
         public DrawableHit(Hit hit)
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            type = HitObject.TypeBindable.GetBoundCopy();
+            type.BindValueChanged(_ =>
+            {
+                updateType();
+                RecreatePieces();
+            });
+
+            updateType();
+        }
+
+        private void updateType()
+        {
             HitActions =
                 HitObject.Type == HitType.Centre
                     ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
                     : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
+
+            RecreatePieces();
         }
 
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre
             ? new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
             : new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
+
+        public override IEnumerable<HitSampleInfo> GetSamples()
+        {
+            // normal and claps are always handled by the drum (see DrumSampleMapping).
+            // in addition, whistles are excluded as they are an alternative rim marker.
+
+            var samples = HitObject.Samples.Where(s =>
+                s.Name != HitSampleInfo.HIT_NORMAL
+                && s.Name != HitSampleInfo.HIT_CLAP
+                && s.Name != HitSampleInfo.HIT_WHISTLE);
+
+            if (HitObject.Type == HitType.Rim && HitObject.IsStrong)
+            {
+                // strong + rim always maps to whistle.
+                // TODO: this should really be in the legacy decoder, but can't be because legacy encoding parity would be broken.
+                // when we add a taiko editor, this is probably not going to play nice.
+
+                var corrected = samples.ToList();
+
+                for (var i = 0; i < corrected.Count; i++)
+                {
+                    var s = corrected[i];
+
+                    if (s.Name != HitSampleInfo.HIT_FINISH)
+                        continue;
+
+                    var sClone = s.Clone();
+                    sClone.Name = HitSampleInfo.HIT_WHISTLE;
+                    corrected[i] = sClone;
+                }
+
+                return corrected;
+            }
+
+            return samples;
+        }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

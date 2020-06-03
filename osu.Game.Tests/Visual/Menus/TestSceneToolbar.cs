@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -17,14 +15,6 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public class TestSceneToolbar : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ToolbarButton),
-            typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetTabButton),
-            typeof(ToolbarNotificationButton),
-        };
-
         private Toolbar toolbar;
 
         [Resolved]

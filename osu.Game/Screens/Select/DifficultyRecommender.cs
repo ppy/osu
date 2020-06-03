@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            api.Unregister(this);
+            api?.Unregister(this);
         }
     }
 }

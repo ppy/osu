@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.SearchableList
                                         RelativeSizeAxes = Axes.X,
                                     },
                                 },
-                                new Box //keep the tab strip part of autosize, but don't put it in the flow container
+                                new Box // keep the tab strip part of autosize, but don't put it in the flow container
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = 1,

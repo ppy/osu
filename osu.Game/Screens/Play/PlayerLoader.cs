@@ -314,8 +314,8 @@ namespace osu.Game.Screens.Play
 
                         LoadTask = null;
 
-                        //By default, we want to load the player and never be returned to.
-                        //Note that this may change if the player we load requested a re-run.
+                        // By default, we want to load the player and never be returned to.
+                        // Note that this may change if the player we load requested a re-run.
                         ValidForResume = false;
 
                         if (player.LoadedBeatmapSuccessfully)
@@ -360,7 +360,7 @@ namespace osu.Game.Screens.Play
         {
             if (!muteWarningShownOnce.Value)
             {
-                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
+                // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
                 if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
                 {
                     notificationOverlay?.Post(new MutedNotification());

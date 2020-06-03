@@ -488,6 +488,11 @@ namespace osu.Game.Rulesets.UI
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
+        /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
+        /// </summary>
+        public virtual bool AllowGameplayOverlays => true;
+
+        /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>

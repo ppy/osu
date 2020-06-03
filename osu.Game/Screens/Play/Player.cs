@@ -83,6 +83,8 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
+        private SkipOverlay skipOverlay;
+
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -105,7 +107,7 @@ namespace osu.Game.Screens.Play
         /// Whether failing should be allowed.
         /// By default, this checks whether all selected mods allow failing.
         /// </summary>
-        protected virtual bool AllowFail => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.AllowFail);
+        protected virtual bool CheckModsAllowFailure() => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
 
         private readonly bool allowPause;
         private readonly bool showResults;
@@ -184,6 +186,14 @@ namespace osu.Game.Screens.Play
             addGameplayComponents(GameplayClockContainer, Beatmap.Value, playableBeatmap);
             addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
+            if (!DrawableRuleset.AllowGameplayOverlays)
+            {
+                HUDOverlay.ShowHud.Value = false;
+                HUDOverlay.ShowHud.Disabled = true;
+                BreakOverlay.Hide();
+                skipOverlay.Hide();
+            }
+
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
@@ -193,6 +203,7 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
+                gameplayBeatmap.ApplyResult(r);
             };
 
             DrawableRuleset.OnRevertResult += r =>
@@ -248,14 +259,13 @@ namespace osu.Game.Screens.Play
                     Breaks = working.Beatmap.Breaks
                 }
             });
-
-            HealthProcessor.IsBreakTime.BindTo(breakTracker.IsBreakTime);
         }
 
         private void addOverlayComponents(Container target, WorkingBeatmap working)
         {
             target.AddRange(new[]
             {
+                DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
                 BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                 {
                     Clock = DrawableRuleset.FrameStableClock,
@@ -282,7 +292,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 },
-                new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                skipOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
                     RequestSkip = GameplayClockContainer.Skip
                 },
@@ -467,7 +477,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score);
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
 
         #region Fail Logic
 
@@ -477,7 +487,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (!AllowFail)
+            if (!CheckModsAllowFailure())
                 return false;
 
             HasFailed = true;

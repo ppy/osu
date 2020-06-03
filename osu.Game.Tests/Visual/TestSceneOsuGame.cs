@@ -34,11 +34,6 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestSceneOsuGame : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OsuLogo),
-        };
-
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
             typeof(OsuGame),

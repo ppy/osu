@@ -136,6 +136,8 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.CacheAs(Storage);
+
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
@@ -188,8 +190,17 @@ namespace osu.Game
                 return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
             }
 
-            BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
-            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
+            BeatmapManager.ItemRemoved.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Delete(getBeatmapScores(item), true);
+            });
+
+            BeatmapManager.ItemUpdated.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Undelete(getBeatmapScores(item), true);
+            });
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -222,8 +233,8 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            if (API is APIAccess apiAcces)
-                AddInternal(apiAcces);
+            if (API is APIAccess apiAccess)
+                AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;
@@ -306,8 +317,8 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null)
-                Storage = host.Storage;
+            if (Storage == null) // may be non-null for certain tests
+                Storage = new OsuStorage(host);
 
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(Storage);
@@ -332,6 +343,9 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+            BeatmapManager?.Dispose();
+
+            contextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
@@ -358,6 +372,12 @@ namespace osu.Game
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
+        }
+
+        public void Migrate(string path)
+        {
+            contextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(path);
         }
     }
 }

@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
-                    using (BeginAbsoluteSequence(Time.Current, true))
+                    using (BeginDelayedSequence(HitObject.Duration, true))
                     {
                         this.FadeOut(transition_duration, Easing.Out);
                         bodyContainer.ScaleTo(1.4f, transition_duration);

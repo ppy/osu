@@ -399,7 +399,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public TestSlider()
             {
-                DefaultsApplied += () =>
+                DefaultsApplied += _ =>
                 {
                     HeadCircle.HitWindows = new TestHitWindows();
                     TailCircle.HitWindows = new TestHitWindows();
