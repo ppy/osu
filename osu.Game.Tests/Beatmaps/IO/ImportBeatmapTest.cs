@@ -154,9 +154,9 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
-        public async Task TestImportThenImportWithNewerTimestamp()
+        public async Task TestImportThenImportWithChangedFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithNewerTimestamp)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithChangedFile)))
             {
                 try
                 {
@@ -174,8 +174,9 @@ namespace osu.Game.Tests.Beatmaps.IO
                         using (var zip = ZipArchive.Open(temp))
                             zip.WriteToDirectory(extractedFolder);
 
-                        // change timestamp
-                        new FileInfo(Directory.GetFiles(extractedFolder).First()).LastWriteTime = DateTime.Now;
+                        // arbitrary write to non-hashed file
+                        using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.mp3").First()).AppendText())
+                            sw.WriteLine("text");
 
                         using (var zip = ZipArchive.Create())
                         {
