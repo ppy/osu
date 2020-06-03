@@ -36,12 +36,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
         }
 
-        private TestSoloResults createResultsScreen() => new TestSoloResults(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+        private TestResultsScreen createResultsScreen() => new TestResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+
+        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
 
         [Test]
         public void ResultsWithoutPlayer()
         {
-            TestSoloResults screen = null;
+            TestResultsScreen screen = null;
             OsuScreenStack stack;
 
             AddStep("load results", () =>
@@ -60,9 +62,19 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void ResultsWithPlayer()
         {
-            TestSoloResults screen = null;
+            TestResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
+        [Test]
+        public void ResultsForUnranked()
+        {
+            UnrankedSoloResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createUnrankedSoloResultsScreen()));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
@@ -86,13 +98,32 @@ namespace osu.Game.Tests.Visual.Ranking
             }
         }
 
-        private class TestSoloResults : ResultsScreen
+        private class TestResultsScreen : ResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 
-            public TestSoloResults(ScoreInfo score)
+            public TestResultsScreen(ScoreInfo score)
                 : base(score)
             {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
+            }
+        }
+
+        private class UnrankedSoloResultsScreen : SoloResultsScreen
+        {
+            public HotkeyRetryOverlay RetryOverlay;
+
+            public UnrankedSoloResultsScreen(ScoreInfo score)
+                : base(score)
+            {
+                Score.Beatmap.OnlineBeatmapID = 0;
+                Score.Beatmap.Status = BeatmapSetOnlineStatus.Pending;
             }
 
             protected override void LoadComplete()
