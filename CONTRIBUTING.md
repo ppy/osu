@@ -92,6 +92,16 @@ Here are some key things to note before jumping in:
 
   As part of continuous integration, we also run code style analysis, which is supposed to make sure that your code is formatted the same way as all the pre-existing code in the repository. The reason we enforce a particular code style everywhere is to make sure the codebase is consistent in that regard - having one whitespace convention in one place and another one elsewhere causes disorganisation.
 
+* **Make sure that the pull request is complete before opening it.**
+
+  Whether it's fixing a bug or implementing new functionality, it's best that you make sure that the change you want to submit as a pull request is as complete as it can be before clicking the *Create pull request* button. Having to track if a pull request is ready for review or not places additional burden on reviewers.
+
+  Draft pull requests are an option, but use them sparingly and within reason. They are best suited to discuss code changes that cannot be easily described in natural language or have a potential large impact on the future direction of the project. When in doubt, don't open drafts unless a maintainer asks you to do so.
+
+* **Only push code when it's ready.**
+
+  As an extension of the above, when making changes to an already-open PR, please try to only push changes you are reasonably certain of. Pushing after every commit causes the continuous integration build queue to grow in size, slowing down work and taking up time that could be spent verifying other changes.
+
 * **Make sure to keep the *Allow edits from maintainers* check box checked.**
 
   To speed up the merging process, collaborators and team members will sometimes want to push changes to your branch themselves, to make minor code style adjustments or to otherwise refactor the code without having to describe how they'd like the code to look like in painstaking detail. Having the *Allow edits from maintainers* check box checked lets them do that; without it they are forced to report issues back to you and wait for you to address them.
