@@ -332,7 +332,7 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
-                            if (CanUndelete(existing, item))
+                            if (CanReuseExisting(existing, item))
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -660,13 +660,29 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to use/restore the existing
         /// item and skip the import. This method allows changing that behaviour.
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
         /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
-        protected virtual bool CanUndelete(TModel existing, TModel import) => true;
+        protected virtual bool CanReuseExisting(TModel existing, TModel import) =>
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
+            // poor-man's (cheap) equality comparison, avoiding hashing unnecessarily.
+            // can switch to full hash checks on a per-case basis (or for all) if we decide this is not a performance issue.
+            getTimestamps(existing.Files).SequenceEqual(getTimestamps(import.Files));
+
+        private IEnumerable<string> getFilenames(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return f.Filename;
+        }
+
+        private IEnumerable<long> getTimestamps(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return File.GetLastWriteTimeUtc(Files.Storage.GetFullPath(f.FileInfo.StoragePath)).ToFileTime();
+        }
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
