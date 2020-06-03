@@ -8,15 +8,12 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModHidden : ModTestScene
+    public class TestSceneOsuModHidden : OsuModTestScene
     {
-        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
-
         [Test]
         public void TestDefaultBeatmapTest() => CreateModTest(new ModTestData
         {
