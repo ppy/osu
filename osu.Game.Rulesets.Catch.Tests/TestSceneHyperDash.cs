@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestSceneHyperDash : TestSceneCatchPlayer
     {
-
         protected override bool Autoplay => true;
 
         [Test]
