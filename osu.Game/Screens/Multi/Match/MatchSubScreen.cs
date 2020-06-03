@@ -20,6 +20,7 @@ using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Multi.Ranking;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
@@ -260,10 +261,10 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer?.Start(() => new TimeshiftPlayer(SelectedItem.Value)
+                    multiplayer?.Push(new PlayerLoader(() => new TimeshiftPlayer(SelectedItem.Value)
                     {
                         Exited = () => leaderboardChatDisplay.RefreshScores()
-                    });
+                    }));
                     break;
             }
         }
@@ -271,8 +272,7 @@ namespace osu.Game.Screens.Multi.Match
         private void showBeatmapResults()
         {
             Debug.Assert(roomId.Value != null);
-
-            this.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, SelectedItem.Value, false));
+            multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, SelectedItem.Value, false));
         }
     }
 }
