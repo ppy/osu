@@ -158,7 +158,7 @@ namespace osu.Game.Tournament.IPC
             return IPCStorage;
         }
 
-        public static bool CheckExists(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
+        private static bool ipcFileExistsInDirectory(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
         private string findStablePath()
         {
@@ -183,8 +183,8 @@ namespace osu.Game.Tournament.IPC
 
                     if (stableInstallPath != null)
                     {
-                        SaveStableConfig(stableInstallPath);
-                        return null;
+                        SetIPCLocation(stableInstallPath);
+                        return stableInstallPath;
                     }
                 }
 
@@ -196,8 +196,11 @@ namespace osu.Game.Tournament.IPC
             }
         }
 
-        public void SaveStableConfig(string path)
+        public bool SetIPCLocation(string path)
         {
+            if (!ipcFileExistsInDirectory(path))
+                return false;
+
             StableInfo.StablePath.Value = path;
 
             using (var stream = tournamentStorage.GetStream(STABLE_CONFIG, FileAccess.Write, FileMode.Create))
@@ -211,6 +214,9 @@ namespace osu.Game.Tournament.IPC
                         DefaultValueHandling = DefaultValueHandling.Ignore,
                     }));
             }
+
+            LocateStableStorage();
+            return true;
         }
 
         private string readStableConfig()
@@ -239,7 +245,7 @@ namespace osu.Game.Tournament.IPC
                 Logger.Log("Trying to find stable with environment variables");
                 string stableInstallPath = Environment.GetEnvironmentVariable("OSU_STABLE_PATH");
 
-                if (CheckExists(stableInstallPath))
+                if (ipcFileExistsInDirectory(stableInstallPath))
                     return stableInstallPath;
             }
             catch
@@ -254,7 +260,7 @@ namespace osu.Game.Tournament.IPC
             Logger.Log("Trying to find stable in %LOCALAPPDATA%");
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
 
-            if (CheckExists(stableInstallPath))
+            if (ipcFileExistsInDirectory(stableInstallPath))
                 return stableInstallPath;
 
             return null;
@@ -265,7 +271,7 @@ namespace osu.Game.Tournament.IPC
             Logger.Log("Trying to find stable in dotfolders");
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
 
-            if (CheckExists(stableInstallPath))
+            if (ipcFileExistsInDirectory(stableInstallPath))
                 return stableInstallPath;
 
             return null;
@@ -280,7 +286,7 @@ namespace osu.Game.Tournament.IPC
             using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
                 stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
-            if (CheckExists(stableInstallPath))
+            if (ipcFileExistsInDirectory(stableInstallPath))
                 return stableInstallPath;
 
             return null;
