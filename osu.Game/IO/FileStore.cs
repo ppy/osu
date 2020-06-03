@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -57,6 +59,12 @@ namespace osu.Game.IO
                     // even if the file already exists, check the existing checksum for safety.
                     using (var stream = Storage.GetStream(path))
                         requiresCopy |= stream.ComputeSHA2Hash() != hash;
+                }
+
+                if (requiresCopy && RuntimeInfo.OS == RuntimeInfo.Platform.Windows && data is FileStream fs)
+                {
+                    // attempt to do a fast hard link rather than copy.
+                    requiresCopy &= !CreateHardLink(Storage.GetFullPath(path), fs.Name, IntPtr.Zero);
                 }
 
                 if (requiresCopy)
@@ -130,5 +138,12 @@ namespace osu.Game.IO
                 }
             }
         }
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool CreateHardLink(
+            string lpFileName,
+            string lpExistingFileName,
+            IntPtr lpSecurityAttributes
+        );
     }
 }
