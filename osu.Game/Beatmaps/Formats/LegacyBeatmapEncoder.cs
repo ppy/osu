@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -124,7 +125,12 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"CircleSize: {beatmap.BeatmapInfo.BaseDifficulty.CircleSize}"));
             writer.WriteLine(FormattableString.Invariant($"OverallDifficulty: {beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty}"));
             writer.WriteLine(FormattableString.Invariant($"ApproachRate: {beatmap.BeatmapInfo.BaseDifficulty.ApproachRate}"));
-            writer.WriteLine(FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier}"));
+
+            // Taiko adjusts the slider multiplier (see: TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER)
+            writer.WriteLine(beatmap.BeatmapInfo.RulesetID == 1
+                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / 1.4f}")
+                : FormattableString.Invariant($"SliderMultiplier: {beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier}"));
+
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate}"));
         }
 
@@ -197,60 +203,75 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[HitObjects]");
 
-            // TODO: implement other legacy rulesets
+            foreach (var h in beatmap.HitObjects)
+                handleHitObject(writer, h);
+        }
+
+        private void handleHitObject(TextWriter writer, HitObject hitObject)
+        {
+            Vector2 position = new Vector2(256, 192);
+
             switch (beatmap.BeatmapInfo.RulesetID)
             {
                 case 0:
-                    foreach (var h in beatmap.HitObjects)
-                        handleOsuHitObject(writer, h);
+                    position = ((IHasPosition)hitObject).Position;
+                    break;
+
+                case 2:
+                    position.X = ((IHasXPosition)hitObject).X * 512;
+                    break;
+
+                case 3:
+                    int totalColumns = (int)Math.Max(1, beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
+                    position.X = (int)Math.Ceiling(((IHasXPosition)hitObject).X * (512f / totalColumns));
                     break;
             }
-        }
 
-        private void handleOsuHitObject(TextWriter writer, HitObject hitObject)
-        {
-            var positionData = (IHasPosition)hitObject;
-
-            writer.Write(FormattableString.Invariant($"{positionData.X},"));
-            writer.Write(FormattableString.Invariant($"{positionData.Y},"));
+            writer.Write(FormattableString.Invariant($"{position.X},"));
+            writer.Write(FormattableString.Invariant($"{position.Y},"));
             writer.Write(FormattableString.Invariant($"{hitObject.StartTime},"));
             writer.Write(FormattableString.Invariant($"{(int)getObjectType(hitObject)},"));
+            writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
-            writer.Write(hitObject is IHasCurve
-                ? FormattableString.Invariant($"0,")
-                : FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
-
-            if (hitObject is IHasCurve curveData)
+            if (hitObject is IHasPath path)
             {
-                addCurveData(writer, curveData, positionData);
+                addPathData(writer, path, position);
                 writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
             }
             else
             {
-                if (hitObject is IHasEndTime endTimeData)
-                    writer.Write(FormattableString.Invariant($"{endTimeData.EndTime},"));
+                if (hitObject is IHasDuration)
+                    addEndTimeData(writer, hitObject);
+
                 writer.Write(getSampleBank(hitObject.Samples));
             }
 
             writer.WriteLine();
         }
 
-        private static LegacyHitObjectType getObjectType(HitObject hitObject)
+        private LegacyHitObjectType getObjectType(HitObject hitObject)
         {
-            var comboData = (IHasCombo)hitObject;
+            LegacyHitObjectType type = 0;
 
-            var type = (LegacyHitObjectType)(comboData.ComboOffset << 4);
+            if (hitObject is IHasCombo combo)
+            {
+                type = (LegacyHitObjectType)(combo.ComboOffset << 4);
 
-            if (comboData.NewCombo) type |= LegacyHitObjectType.NewCombo;
+                if (combo.NewCombo)
+                    type |= LegacyHitObjectType.NewCombo;
+            }
 
             switch (hitObject)
             {
-                case IHasCurve _:
+                case IHasPath _:
                     type |= LegacyHitObjectType.Slider;
                     break;
 
-                case IHasEndTime _:
-                    type |= LegacyHitObjectType.Spinner;
+                case IHasDuration _:
+                    if (beatmap.BeatmapInfo.RulesetID == 3)
+                        type |= LegacyHitObjectType.Hold;
+                    else
+                        type |= LegacyHitObjectType.Spinner;
                     break;
 
                 default:
@@ -261,13 +282,13 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private void addCurveData(TextWriter writer, IHasCurve curveData, IHasPosition positionData)
+        private void addPathData(TextWriter writer, IHasPath pathData, Vector2 position)
         {
             PathType? lastType = null;
 
-            for (int i = 0; i < curveData.Path.ControlPoints.Count; i++)
+            for (int i = 0; i < pathData.Path.ControlPoints.Count; i++)
             {
-                PathControlPoint point = curveData.Path.ControlPoints[i];
+                PathControlPoint point = pathData.Path.ControlPoints[i];
 
                 if (point.Type.Value != null)
                 {
@@ -297,31 +318,50 @@ namespace osu.Game.Beatmaps.Formats
                     else
                     {
                         // New segment with the same type - duplicate the control point
-                        writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}|"));
+                        writer.Write(FormattableString.Invariant($"{position.X + point.Position.Value.X}:{position.Y + point.Position.Value.Y}|"));
                     }
                 }
 
                 if (i != 0)
                 {
-                    writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}"));
-                    writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
+                    writer.Write(FormattableString.Invariant($"{position.X + point.Position.Value.X}:{position.Y + point.Position.Value.Y}"));
+                    writer.Write(i != pathData.Path.ControlPoints.Count - 1 ? "|" : ",");
                 }
             }
 
-            writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
-            writer.Write(FormattableString.Invariant($"{curveData.Path.Distance},"));
+            var curveData = pathData as IHasPathWithRepeats;
 
-            for (int i = 0; i < curveData.NodeSamples.Count; i++)
-            {
-                writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
-                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
-            }
+            writer.Write(FormattableString.Invariant($"{(curveData?.RepeatCount ?? 0) + 1},"));
+            writer.Write(FormattableString.Invariant($"{pathData.Path.Distance},"));
 
-            for (int i = 0; i < curveData.NodeSamples.Count; i++)
+            if (curveData != null)
             {
-                writer.Write(getSampleBank(curveData.NodeSamples[i], true));
-                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                {
+                    writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
+                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                }
+
+                for (int i = 0; i < curveData.NodeSamples.Count; i++)
+                {
+                    writer.Write(getSampleBank(curveData.NodeSamples[i], true));
+                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+                }
             }
+        }
+
+        private void addEndTimeData(TextWriter writer, HitObject hitObject)
+        {
+            var endTimeData = (IHasDuration)hitObject;
+            var type = getObjectType(hitObject);
+
+            char suffix = ',';
+
+            // Holds write the end time as if it's part of sample data.
+            if (type == LegacyHitObjectType.Hold)
+                suffix = ':';
+
+            writer.Write(FormattableString.Invariant($"{endTimeData.EndTime}{suffix}"));
         }
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)

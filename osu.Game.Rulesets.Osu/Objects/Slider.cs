@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -16,15 +17,15 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasCurve
+    public class Slider : OsuHitObject, IHasPathWithRepeats
     {
-        public double EndTime
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+
+        public double Duration
         {
-            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            get => EndTime - StartTime;
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
-
-        public double Duration => EndTime - StartTime;
 
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
@@ -133,12 +134,12 @@ namespace osu.Game.Rulesets.Osu.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
             foreach (var e in
-                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
             {
                 switch (e.Type)
                 {

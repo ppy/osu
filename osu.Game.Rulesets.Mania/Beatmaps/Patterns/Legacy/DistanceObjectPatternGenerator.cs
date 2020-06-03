@@ -474,7 +474,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns></returns>
         private IList<HitSampleInfo> sampleInfoListAt(double time)
         {
-            if (!(HitObject is IHasCurve curveData))
+            if (!(HitObject is IHasPathWithRepeats curveData))
                 return HitObject.Samples;
 
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
@@ -505,16 +505,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
             {
-                var holdNote = new HoldNote
+                newObject = new HoldNote
                 {
                     StartTime = startTime,
-                    Column = column,
                     Duration = endTime - startTime,
-                    Head = { Samples = sampleInfoListAt(startTime) },
-                    Tail = { Samples = sampleInfoListAt(endTime) }
+                    Column = column,
+                    Samples = HitObject.Samples,
+                    NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
                 };
-
-                newObject = holdNote;
             }
 
             pattern.Add(newObject);

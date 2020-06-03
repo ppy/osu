@@ -365,7 +365,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                var curveData = hitObjects[0] as IHasCurve;
+                var curveData = hitObjects[0] as IHasPathWithRepeats;
                 var positionData = hitObjects[0] as IHasPosition;
 
                 Assert.IsNotNull(positionData);

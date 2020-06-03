@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -13,8 +12,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
@@ -27,17 +24,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneSliderInput : RateAdjustedBeatmapTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(SliderBall),
-            typeof(DrawableSlider),
-            typeof(DrawableSliderTick),
-            typeof(DrawableSliderRepeat),
-            typeof(DrawableOsuHitObject),
-            typeof(DrawableSliderHead),
-            typeof(DrawableSliderTail),
-        };
-
         private const double time_before_slider = 250;
         private const double time_slider_start = 1500;
         private const double time_during_slide_1 = 2500;

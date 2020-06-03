@@ -12,6 +12,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Audio;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -31,7 +32,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             sampleMapping = new DrumSampleMapping(controlPoints);
 
             RelativeSizeAxes = Axes.Both;
-            FillMode = FillMode.Fit;
         }
 
         [BackgroundDependencyLoader]
@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             Child = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                Scale = new Vector2(0.9f),
                 Children = new Drawable[]
                 {
                     new TaikoHalfDrum(false)
@@ -144,6 +146,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                 centreHit.Colour = colours.Pink;
             }
 
+            [Resolved(canBeNull: true)]
+            private GameplayClock gameplayClock { get; set; }
+
             public bool OnPressed(TaikoAction action)
             {
                 Drawable target = null;
@@ -156,14 +161,16 @@ namespace osu.Game.Rulesets.Taiko.UI
                     target = centreHit;
                     back = centre;
 
-                    drumSample.Centre?.Play();
+                    if (gameplayClock?.IsSeeking != true)
+                        drumSample.Centre?.Play();
                 }
                 else if (action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
 
-                    drumSample.Rim?.Play();
+                    if (gameplayClock?.IsSeeking != true)
+                        drumSample.Rim?.Play();
                 }
 
                 if (target != null)

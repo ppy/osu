@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osuTK;
-using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -55,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
             else
             {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasDuration) / beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
@@ -67,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition || h is ManiaHitObject);
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
@@ -176,7 +175,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     break;
                 }
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                 {
                     conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
@@ -232,15 +231,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 var pattern = new Pattern();
 
-                if (HitObject is IHasEndTime endTimeData)
+                if (HitObject is IHasDuration endTimeData)
                 {
                     pattern.Add(new HoldNote
                     {
                         StartTime = HitObject.StartTime,
                         Duration = endTimeData.Duration,
                         Column = column,
-                        Head = { Samples = sampleInfoListAt(HitObject.StartTime) },
-                        Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
+                        Samples = HitObject.Samples,
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
                     });
                 }
                 else if (HitObject is IHasXPosition)
@@ -254,22 +253,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
 
                 return pattern;
-            }
-
-            /// <summary>
-            /// Retrieves the sample info list at a point in time.
-            /// </summary>
-            /// <param name="time">The time to retrieve the sample info list from.</param>
-            /// <returns></returns>
-            private IList<HitSampleInfo> sampleInfoListAt(double time)
-            {
-                if (!(HitObject is IHasCurve curveData))
-                    return HitObject.Samples;
-
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
-
-                int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                return curveData.NodeSamples[index];
             }
         }
     }
