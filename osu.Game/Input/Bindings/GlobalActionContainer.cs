@@ -56,6 +56,13 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
 
+        public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.F1, GlobalAction.ToggleMods),
+            new KeyBinding(InputKey.F2, GlobalAction.SelectRandom),
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleOptions)
+        };
+
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
         {
             new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
@@ -105,6 +112,16 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle mute")]
         ToggleMute,
+
+        // Song select keybindings
+        [Description("Toggle mod selection overlay")]
+        ToggleMods,
+
+        [Description("Select a random beatmap")]
+        SelectRandom,
+
+        [Description("Toggle beatmap options overlay")]
+        ToggleOptions,
 
         // In-Game Keybindings
         [Description("Skip cutscene")]
