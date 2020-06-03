@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            Ruleset.Value = ruleset.RulesetInfo;
+
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
             LocalConfig.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
@@ -67,7 +69,6 @@ namespace osu.Game.Tests.Visual
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
-            Ruleset.Value = ruleset.RulesetInfo;
             SelectedMods.Value = Array.Empty<Mod>();
 
             if (!AllowFail)
