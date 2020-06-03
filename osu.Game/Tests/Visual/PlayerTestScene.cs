@@ -24,15 +24,6 @@ namespace osu.Game.Tests.Visual
 
         protected OsuConfigManager LocalConfig;
 
-        /// <summary>
-        /// Creates the ruleset for setting up the <see cref="Player"/> component.
-        /// </summary>
-        [NotNull]
-        protected abstract Ruleset CreatePlayerRuleset();
-
-        protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
-
-        [NotNull]
         private readonly Ruleset ruleset;
 
         protected PlayerTestScene()
@@ -96,6 +87,14 @@ namespace osu.Game.Tests.Visual
             Player = CreatePlayer(ruleset);
             LoadScreen(Player);
         }
+
+        /// <summary>
+        /// Creates the ruleset for setting up the <see cref="Player"/> component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreatePlayerRuleset();
+
+        protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
 
         protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
