@@ -239,8 +239,7 @@ namespace osu.Game.Beatmaps
 
                 if (working == null)
                 {
-                    if (beatmapInfo.Metadata == null)
-                        beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
+                    beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
                     workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
                         new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));

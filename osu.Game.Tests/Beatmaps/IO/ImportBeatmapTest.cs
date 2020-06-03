@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var breakTemp = TestResources.GetTestBeatmapForImport();
 
                     MemoryStream brokenOsu = new MemoryStream();
-                    MemoryStream brokenOsz = new MemoryStream(File.ReadAllBytes(breakTemp));
+                    MemoryStream brokenOsz = new MemoryStream(await File.ReadAllBytesAsync(breakTemp));
 
                     File.Delete(breakTemp);
 
@@ -522,7 +522,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     using (var resourceForkFile = File.CreateText(resourceForkFilePath))
                     {
-                        resourceForkFile.WriteLine("adding content so that it's not empty");
+                        await resourceForkFile.WriteLineAsync("adding content so that it's not empty");
                     }
 
                     try
