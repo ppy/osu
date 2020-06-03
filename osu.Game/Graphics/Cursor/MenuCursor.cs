@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osuTK.Input;
 using osu.Framework.Utils;
+using osu.Game.Screens.Multi.Components;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -83,7 +84,7 @@ namespace osu.Game.Graphics.Cursor
                 activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             }
 
-            if (shouldRotate(e) && cursorRotate.Value)
+            if (shouldRotateCursor(e) && cursorRotate.Value)
             {
                 // if cursor is already rotating don't reset its rotate origin
                 if (!(dragRotationState == DragRotationState.Rotating))
@@ -99,13 +100,13 @@ namespace osu.Game.Graphics.Cursor
         protected override void OnMouseUp(MouseUpEvent e)
         {
             // cursor should go back to original size when none of main buttons are pressed
-            if (!(e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Middle) || e.IsPressed(MouseButton.Right)))
+            if (!anyMouseButtonPressed(e))
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 activeCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
-            if (!shouldRotate(e))
+            if (!shouldRotateCursor(e))
             {
                 if (dragRotationState == DragRotationState.Rotating)
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
@@ -127,7 +128,9 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
         }
 
-        private static bool shouldRotate(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right);
+        private static bool shouldRotateCursor(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right);
+
+        private static bool anyMouseButtonPressed(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Middle) || e.IsPressed(MouseButton.Right);
 
         public class Cursor : Container
         {
