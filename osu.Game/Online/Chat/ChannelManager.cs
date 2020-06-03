@@ -358,6 +358,13 @@ namespace osu.Game.Online.Chat
             {
                 switch (channel.Type)
                 {
+                    case ChannelType.Multiplayer:
+                        // join is implicit. happens when you join a multiplayer game.
+                        // this will probably change in the future.
+                        channel.Joined.Value = true;
+                        joinChannel(channel, fetchInitialMessages);
+                        return channel;
+
                     case ChannelType.Private:
                         // can't do this yet.
                         break;
