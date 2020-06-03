@@ -72,22 +72,7 @@ namespace osu.Game.Tests.Visual
             Beatmap.SetDefault();
 
             Ruleset = Dependencies.Ruleset;
-
-            var definedRuleset = CreateRuleset()?.RulesetInfo;
-
-            if (definedRuleset != null)
-            {
-                // re-enable the bindable in case it was disabled.
-                // happens when restarting current test scene.
-                Ruleset.Disabled = false;
-
-                // Set global ruleset bindable to the ruleset defined
-                // for this test scene and disallow changing it.
-                Ruleset.Value = definedRuleset;
-                Ruleset.Disabled = true;
-            }
-            else
-                Ruleset.SetDefault();
+            Ruleset.SetDefault();
 
             SelectedMods = Dependencies.Mods;
             SelectedMods.SetDefault();
@@ -145,7 +130,7 @@ namespace osu.Game.Tests.Visual
         /// Creates the ruleset to be used for this test scene.
         /// </summary>
         /// <remarks>
-        /// When testing against ruleset-specific components, this method must be overriden to their ruleset.
+        /// When testing against ruleset-specific components, this method must be overriden to their corresponding ruleset.
         /// </remarks>
         [CanBeNull]
         protected virtual Ruleset CreateRuleset() => null;
