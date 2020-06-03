@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetRoomPlaylistScoresRequest : APIRequest<List<RoomScore>>
+    public class GetRoomPlaylistScoresRequest : APIRequest<RoomPlaylistScores>
     {
         private readonly int roomId;
         private readonly int playlistItemId;
@@ -17,5 +18,11 @@ namespace osu.Game.Online.API.Requests
         }
 
         protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores";
+    }
+
+    public class RoomPlaylistScores
+    {
+        [JsonProperty("scores")]
+        public List<RoomScore> Scores { get; set; }
     }
 }
