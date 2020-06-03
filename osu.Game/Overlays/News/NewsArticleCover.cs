@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.News
             public string TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz").ToUpper();
         }
 
-        //fake API data struct to use for now as a skeleton for data, as there is no API struct for news article info for now
+        // fake API data struct to use for now as a skeleton for data, as there is no API struct for news article info for now
         public class ArticleInfo
         {
             public string Title { get; set; }

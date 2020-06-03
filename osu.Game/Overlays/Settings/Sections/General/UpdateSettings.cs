@@ -4,7 +4,9 @@
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -12,8 +14,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         protected override string Header => "Updates";
 
-        [BackgroundDependencyLoader]
-        private void load(Storage storage, OsuConfigManager config)
+        [BackgroundDependencyLoader(true)]
+        private void load(Storage storage, OsuConfigManager config, OsuGame game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
@@ -27,6 +29,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     Text = "Open osu! folder",
                     Action = storage.OpenInNativeExplorer,
+                });
+
+                Add(new SettingsButton
+                {
+                    Text = "Change folder location...",
+                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
         }

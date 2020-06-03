@@ -9,7 +9,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 using osuTK.Graphics;
@@ -21,12 +23,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Width of the panel when contracted.
         /// </summary>
-        private const float contracted_width = 160;
+        public const float CONTRACTED_WIDTH = 130;
 
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 320;
+        private const float contracted_height = 355;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -46,7 +48,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the top layer when the panel is contracted.
         /// </summary>
-        private const float contracted_top_layer_height = 40;
+        private const float contracted_top_layer_height = 30;
 
         /// <summary>
         /// Duration for the panel to resize into its expanded/contracted size.
@@ -71,11 +73,12 @@ namespace osu.Game.Screens.Ranking
         private static readonly ColourInfo expanded_top_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#444"), Color4Extensions.FromHex("#333"));
         private static readonly ColourInfo expanded_middle_layer_colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"));
         private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
-        private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#444");
+        private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
+        public readonly ScoreInfo Score;
 
-        private readonly ScoreInfo score;
+        private Container content;
 
         private Container topLayerContainer;
         private Drawable topLayerBackground;
@@ -89,47 +92,54 @@ namespace osu.Game.Screens.Ranking
 
         public ScorePanel(ScoreInfo score)
         {
-            this.score = score;
+            Score = score;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = content = new Container
             {
-                topLayerContainer = new Container
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(40),
+                Children = new Drawable[]
                 {
-                    Name = "Top layer",
-                    RelativeSizeAxes = Axes.X,
-                    Height = 120,
-                    Children = new Drawable[]
+                    topLayerContainer = new Container
                     {
-                        new Container
+                        Name = "Top layer",
+                        RelativeSizeAxes = Axes.X,
+                        Alpha = 0,
+                        Height = 120,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            Masking = true,
-                            Child = topLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
-                        },
-                        topLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
-                    }
-                },
-                middleLayerContainer = new Container
-                {
-                    Name = "Middle layer",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                CornerRadius = 20,
+                                CornerExponent = 2.5f,
+                                Masking = true,
+                                Child = topLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                            },
+                            topLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                        }
+                    },
+                    middleLayerContainer = new Container
                     {
-                        new Container
+                        Name = "Middle layer",
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            Masking = true,
-                            Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
-                        },
-                        middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                CornerRadius = 20,
+                                CornerExponent = 2.5f,
+                                Masking = true,
+                                Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                            },
+                            middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
+                        }
                     }
                 }
             };
@@ -174,34 +184,40 @@ namespace osu.Game.Screens.Ranking
 
         private void updateState()
         {
-            topLayerContainer.MoveToY(0, resize_duration, Easing.OutQuint);
-            middleLayerContainer.MoveToY(0, resize_duration, Easing.OutQuint);
-
             topLayerContent?.FadeOut(content_fade_duration).Expire();
             middleLayerContent?.FadeOut(content_fade_duration).Expire();
 
             switch (state)
             {
                 case PanelState.Expanded:
-                    this.ResizeTo(new Vector2(EXPANDED_WIDTH, expanded_height), resize_duration, Easing.OutQuint);
+                    Size = new Vector2(EXPANDED_WIDTH, expanded_height);
 
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
 
                 case PanelState.Contracted:
-                    this.ResizeTo(new Vector2(contracted_width, contracted_height), resize_duration, Easing.OutQuint);
+                    Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
+
+                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 
-            using (BeginDelayedSequence(resize_duration + top_layer_expand_delay, true))
+            content.ResizeTo(Size, resize_duration, Easing.OutQuint);
+
+            bool topLayerExpanded = topLayerContainer.Y < 0;
+
+            // If the top layer was already expanded, then we don't need to wait for the resize and can instead transform immediately. This looks better when changing the panel state.
+            using (BeginDelayedSequence(topLayerExpanded ? 0 : resize_duration + top_layer_expand_delay, true))
             {
+                topLayerContainer.FadeIn();
+
                 switch (state)
                 {
                     case PanelState.Expanded:
@@ -218,6 +234,14 @@ namespace osu.Game.Screens.Ranking
                 topLayerContent?.FadeIn(content_fade_duration);
                 middleLayerContent?.FadeIn(content_fade_duration);
             }
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (State == PanelState.Contracted)
+                State = PanelState.Expanded;
+
+            return true;
         }
     }
 }

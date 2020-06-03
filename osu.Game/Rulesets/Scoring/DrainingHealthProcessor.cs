@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -47,6 +49,8 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
+        private PeriodTracker noDrainPeriodTracker;
+
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
         /// </summary>
@@ -60,14 +64,14 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Update();
 
-            if (!IsBreakTime.Value)
-            {
-                // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
-                double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
-                double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
+            if (noDrainPeriodTracker?.IsInAny(Time.Current) == true)
+                return;
 
-                Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
-            }
+            // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
+            double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
+            double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
+
+            Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
@@ -76,6 +80,19 @@ namespace osu.Game.Rulesets.Scoring
 
             if (beatmap.HitObjects.Count > 0)
                 gameplayEndTime = beatmap.HitObjects[^1].GetEndTime();
+
+            noDrainPeriodTracker = new PeriodTracker(beatmap.Breaks.Select(breakPeriod => new Period(
+                beatmap.HitObjects
+                       .Select(hitObject => hitObject.GetEndTime())
+                       .Where(endTime => endTime <= breakPeriod.StartTime)
+                       .DefaultIfEmpty(double.MinValue)
+                       .Last(),
+                beatmap.HitObjects
+                       .Select(hitObject => hitObject.StartTime)
+                       .Where(startTime => startTime >= breakPeriod.EndTime)
+                       .DefaultIfEmpty(double.MaxValue)
+                       .First()
+            )));
 
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
 
