@@ -12,6 +12,7 @@ using NUnit.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -22,6 +23,7 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
+using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -85,6 +87,165 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     checkBeatmapSetCount(osu, 1);
                     checkSingleReferencedFileCount(osu, 18);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestImportThenImportWithReZip()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithNewerTimestamp)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    try
+                    {
+                        var imported = await LoadOszIntoOsu(osu);
+
+                        string hashBefore = hashFile(temp);
+
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(extractedFolder);
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        // zip files differ because different compression or encoder.
+                        Assert.AreNotEqual(hashBefore, hashFile(temp));
+
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                        ensureLoaded(osu);
+
+                        // but contents doesn't, so existing should still be used.
+                        Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                        Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        private string hashFile(string filename)
+        {
+            using (var s = File.OpenRead(filename))
+                return s.ComputeMD5Hash();
+        }
+
+        [Test]
+        public async Task TestImportThenImportWithNewerTimestamp()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithNewerTimestamp)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    try
+                    {
+                        var imported = await LoadOszIntoOsu(osu);
+
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(extractedFolder);
+
+                        // change timestamp
+                        new FileInfo(Directory.GetFiles(extractedFolder).First()).LastWriteTime = DateTime.Now;
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                        ensureLoaded(osu);
+
+                        // check the newly "imported" beatmap is not the original.
+                        Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                        Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestImportThenImportWithDifferentFilename()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportThenImportWithDifferentFilename)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    try
+                    {
+                        var imported = await LoadOszIntoOsu(osu);
+
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(extractedFolder);
+
+                        // change filename
+                        var firstFile = new FileInfo(Directory.GetFiles(extractedFolder).First());
+                        firstFile.MoveTo(Path.Combine(firstFile.DirectoryName, $"{firstFile.Name}-changed{firstFile.Extension}"));
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                        ensureLoaded(osu);
+
+                        // check the newly "imported" beatmap is not the original.
+                        Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                        Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
                 }
                 finally
                 {
