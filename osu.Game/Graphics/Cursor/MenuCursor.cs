@@ -99,7 +99,6 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            // cursor should go back to original size when none of main buttons are pressed
             if (!anyMouseButtonPressed(e))
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
