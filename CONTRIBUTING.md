@@ -11,21 +11,21 @@ These are not "official rules" *per se*, but following them will help everyone d
 
 ## I would like to submit an issue!
 
-When it comes to issues, bug reports and feature suggestions are welcomed, although please keep in mind that at any point in time, hundreds of issues are open, which vary in severity and the amount of time needed to address them. As such it's not uncommon for issues to remain unresolved for a long time or even closed outright if they are deemed not important enough to fix in the foreseeable future. Issues that are required to "go live" or otherwise achieve parity with stable are prioritised the most.
+Issues, bug reports and feature suggestions are welcomed, though please keep in mind that at any point in time, hundreds of issues are open, which vary in severity and the amount of time needed to address them. As such it's not uncommon for issues to remain unresolved for a long time or even closed outright if they are deemed not important enough to fix in the foreseeable future. Issues that are required to "go live" or otherwise achieve parity with stable are prioritised the most.
 
 * **Before submitting an issue, try searching existing issues first.**
 
-  For housekeeping purposes, we close issues that overlap with or duplicate other pre-existing issues - you can help us not have to do that by searching existing issues yourself first. The issue search box, as well as the issue tag system, are tools you can use to check if an issue has been reported before.
+  For housekeeping purposes, we close issues that overlap with or duplicate other pre-existing issues - you can help us not to have to do that by searching existing issues yourself first. The issue search box, as well as the issue tag system, are tools you can use to check if an issue has been reported before.
 
 * **When submitting a bug report, please try to include as much detail as possible.**
 
-  Bugs are not equal - some of them will be reproducible every time on pretty much all hardware, while others will be hard to track down due to being specific to particular hardware or even somewhat random in nature. As such, providing as much detail as possible when reporting a bug is hugely appreciated. A good starting set of information contains of:
+  Bugs are not equal - some of them will be reproducible every time on pretty much all hardware, while others will be hard to track down due to being specific to particular hardware or even somewhat random in nature. As such, providing as much detail as possible when reporting a bug is hugely appreciated. A good starting set of information consists of:
 
   * the in-game logs, which are located at:
     * `%AppData%/osu/logs` (on Windows),
     * `~/.local/share/osu/logs` (on Linux and macOS),
     * `Android/Data/sh.ppy.osulazer/logs` (on Android),
-    * on iOS they can be obtained by connecting your device to your desktop and copying the `logs` directory from the app's own document storage using iTunes,
+    * on iOS they can be obtained by connecting your device to your desktop and [copying the `logs` directory from the app's own document storage using iTunes](https://support.apple.com/en-us/HT201301#copy-to-computer),
   * your system specifications (including the operating system and platform you are playing on),
   * a reproduction scenario (list of steps you have performed leading up to the occurrence of the bug),
   * a video or picture of the bug, if at all possible.
