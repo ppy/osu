@@ -41,13 +41,25 @@ namespace osu.Game.IO.Serialization.Converters
             var list = new List<T>();
 
             var obj = JObject.Load(reader);
-            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"].CreateReader());
 
-            foreach (var tok in obj["$items"])
+            if (!obj.TryGetValue("$lookup_table", out var lookupTableToken) || lookupTableToken == null)
+                return list;
+
+            var lookupTable = serializer.Deserialize<List<string>>(lookupTableToken.CreateReader());
+            if (lookupTable == null)
+                return list;
+
+            if (!obj.TryGetValue("$items", out var itemsToken) || itemsToken == null)
+                return list;
+
+            foreach (var tok in itemsToken)
             {
                 var itemReader = tok.CreateReader();
 
-                var typeName = lookupTable[(int)tok["$type"]];
+                if (!obj.TryGetValue("$type", out var typeToken) || typeToken == null)
+                    throw new JsonException("Expected $type token.");
+
+                var typeName = lookupTable[(int)typeToken];
                 var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
                 serializer.Populate(itemReader, instance);
 
