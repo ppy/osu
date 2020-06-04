@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom
                 {
-                    NextRandom = triggerNextRandom,
+                    NextRandom = () => Carousel.SelectNextRandom(),
                     PreviousRandom = Carousel.SelectPreviousRandom
                 });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
@@ -498,11 +498,6 @@ namespace osu.Game.Screens.Select
 
                 updateComponentFromBeatmap(Beatmap.Value);
             }
-        }
-
-        private void triggerNextRandom()
-        {
-            Carousel.SelectNextRandom();
         }
 
         public override void OnEntering(IScreen last)
