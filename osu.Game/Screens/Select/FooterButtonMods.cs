@@ -14,12 +14,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>, IKeyBindingHandler<GlobalAction>
+    public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         public Bindable<IReadOnlyList<Mod>> Current
         {
