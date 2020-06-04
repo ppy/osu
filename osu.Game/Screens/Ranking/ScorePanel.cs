@@ -243,5 +243,10 @@ namespace osu.Game.Screens.Ranking
 
             return true;
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            => base.ReceivePositionalInputAt(screenSpacePos)
+               || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
+               || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
     }
 }
