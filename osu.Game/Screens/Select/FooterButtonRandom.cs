@@ -1,19 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Input;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
     public class FooterButtonRandom : FooterButton
     {
+        public Action PrimaryAction { get; set; }
+        public Action SecondaryAction { get; set; }
+
         private readonly SpriteText secondaryText;
         private bool secondaryActive;
 
@@ -37,21 +40,7 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"random";
-            Hotkey = Key.F2;
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            secondaryActive = e.ShiftPressed;
-            updateText();
-            return base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            secondaryActive = e.ShiftPressed;
-            updateText();
-            base.OnKeyUp(e);
+            Hotkey = GlobalAction.SelectNextRandom;
         }
 
         private void updateText()
@@ -65,6 +54,35 @@ namespace osu.Game.Screens.Select
             {
                 SpriteText.FadeIn(120, Easing.InQuad);
                 secondaryText.FadeOut(120, Easing.InQuad);
+            }
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.SelectPreviousRandom:
+                    secondaryActive = true;
+                    Action = SecondaryAction;
+                    updateText();
+                    Click();
+                    return true;
+                case GlobalAction.SelectNextRandom:
+                    Action = PrimaryAction;
+                    updateText();
+                    Click();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public override void OnReleased(GlobalAction action)
+        {
+            if (action == GlobalAction.SelectPreviousRandom)
+            {
+                secondaryActive = false;
+                updateText();
             }
         }
     }
