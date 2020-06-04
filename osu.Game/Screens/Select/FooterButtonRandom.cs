@@ -40,7 +40,6 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"random";
-            Hotkey = GlobalAction.SelectNextRandom;
         }
 
         private void updateText()
