@@ -272,7 +272,11 @@ namespace osu.Game.Screens.Select
             if (Footer != null)
             {
                 Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
-                Footer.AddButton(new FooterButtonRandom { NextRandom = triggerNextRandom, PreviousRandom = triggerPreviousRandom });
+                Footer.AddButton(new FooterButtonRandom
+                {
+                    NextRandom = triggerNextRandom,
+                    PreviousRandom = triggerPreviousRandom
+                });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
