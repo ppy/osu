@@ -58,17 +58,19 @@ namespace osu.Game.Rulesets.Mania.Tests
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
                && samplesEqual(NodeSamples, other.NodeSamples);
 
-        private static bool samplesEqual(ICollection<IList<string>> first, ICollection<IList<string>> second)
+        private static bool samplesEqual(ICollection<IList<string>> firstSampleList, ICollection<IList<string>> secondSampleList)
         {
-            if (first == null && second == null)
+            if (firstSampleList == null && secondSampleList == null)
                 return true;
 
             // both items can't be null now, so if any single one is, then they're not equal
-            if (first == null || second == null)
+            if (firstSampleList == null || secondSampleList == null)
                 return false;
 
-            return first.Count == second.Count
-                   && first.Zip(second).All(samples => samples.First.SequenceEqual(samples.Second));
+            return firstSampleList.Count == secondSampleList.Count
+                   // cannot use .Zip() without the selector function as it doesn't compile in android test project
+                   && firstSampleList.Zip(secondSampleList, (first, second) => (first, second))
+                                     .All(samples => samples.first.SequenceEqual(samples.second));
         }
     }
 }
