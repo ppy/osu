@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Select
         public Action SecondaryAction { get; set; }
 
         private readonly SpriteText secondaryText;
-        private bool secondaryActive;
+        private bool rewindSearch;
 
         public FooterButtonRandom()
         {
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select
 
         private void updateText()
         {
-            if (secondaryActive)
+            if (rewindSearch)
             {
                 SpriteText.FadeOut(120, Easing.InQuad);
                 secondaryText.FadeIn(120, Easing.InQuad);
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
             switch (action)
             {
                 case GlobalAction.SelectPreviousRandom:
-                    secondaryActive = true;
+                    rewindSearch = true;
                     Action = SecondaryAction;
                     updateText();
                     Click();
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Select
         {
             if (action == GlobalAction.SelectPreviousRandom)
             {
-                secondaryActive = false;
+                rewindSearch = false;
                 updateText();
             }
         }
