@@ -14,11 +14,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>, IKeyBindingHandler<GlobalAction>
     {
         public Bindable<IReadOnlyList<Mod>> Current
         {
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Select
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"mods";
-            Hotkey = Key.F1;
+            Hotkey = GlobalAction.ToggleModSelection;
         }
 
         protected override void LoadComplete()
