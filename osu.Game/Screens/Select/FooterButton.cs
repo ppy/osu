@@ -175,6 +175,7 @@ namespace osu.Game.Screens.Select
                 Click();
                 return true;
             }
+
             return false;
         }
 
