@@ -73,10 +73,9 @@ namespace osu.Game.Screens.Select
                     updateText();
                     Click();
                     return true;
-
-                default:
-                    return false;
             }
+
+            return false;
         }
 
         public override void OnReleased(GlobalAction action)
