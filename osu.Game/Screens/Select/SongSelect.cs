@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Select
             if (Footer != null)
             {
                 Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
-                Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
+                Footer.AddButton(new FooterButtonRandom { PrimaryAction = triggerNextRandom, SecondaryAction = triggerPreviousRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
@@ -496,12 +496,14 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void triggerRandom()
+        private void triggerNextRandom()
         {
-            if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
-                Carousel.SelectPreviousRandom();
-            else
-                Carousel.SelectNextRandom();
+            Carousel.SelectNextRandom();
+        }
+
+        private void triggerPreviousRandom()
+        {
+            Carousel.SelectPreviousRandom();
         }
 
         public override void OnEntering(IScreen last)
