@@ -478,7 +478,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Retrieves the list of node samples that occur at time greater than or equal to <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to retrieve node samples at.</param>
-        private IEnumerable<IList<HitSampleInfo>> nodeSamplesAt(double time)
+        private List<IList<HitSampleInfo>> nodeSamplesAt(double time)
         {
             if (!(HitObject is IHasPathWithRepeats curveData))
                 return null;
@@ -486,7 +486,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-            return curveData.NodeSamples.Skip(index);
+
+            // avoid slicing the list & creating copies, if at all possible.
+            return index == 0 ? curveData.NodeSamples : curveData.NodeSamples.Skip(index).ToList();
         }
 
         /// <summary>
@@ -517,7 +519,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - startTime,
                     Column = column,
                     Samples = HitObject.Samples,
-                    NodeSamples = nodeSamplesAt(startTime)?.ToList()
+                    NodeSamples = nodeSamplesAt(startTime)
                 };
             }
 
