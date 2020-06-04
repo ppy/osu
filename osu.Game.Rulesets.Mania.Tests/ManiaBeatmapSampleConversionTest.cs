@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
+        [TestCase("convert-samples")]
+        [TestCase("mania-samples")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<SampleConvertValue> CreateConvertValue(HitObject hitObject)
