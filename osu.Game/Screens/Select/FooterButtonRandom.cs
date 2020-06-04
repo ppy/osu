@@ -14,8 +14,8 @@ namespace osu.Game.Screens.Select
 {
     public class FooterButtonRandom : FooterButton
     {
-        public Action PrimaryAction { get; set; }
-        public Action SecondaryAction { get; set; }
+        public Action NextRandom { get; set; }
+        public Action PreviousRandom { get; set; }
 
         private readonly SpriteText secondaryText;
         private bool rewindSearch;
@@ -62,13 +62,13 @@ namespace osu.Game.Screens.Select
             {
                 case GlobalAction.SelectPreviousRandom:
                     rewindSearch = true;
-                    Action = SecondaryAction;
+                    Action = PreviousRandom;
                     updateText();
                     Click();
                     return true;
 
                 case GlobalAction.SelectNextRandom:
-                    Action = PrimaryAction;
+                    Action = NextRandom;
                     updateText();
                     Click();
                     return true;
