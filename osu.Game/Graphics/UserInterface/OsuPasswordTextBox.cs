@@ -24,6 +24,8 @@ namespace osu.Game.Graphics.UserInterface
             Child = new PasswordMaskChar(CalculatedTextSize),
         };
 
+        protected override bool AllowUpperCaseSamples => false;
+
         protected override bool AllowClipboardExport => false;
 
         private readonly CapsWarning warning;
