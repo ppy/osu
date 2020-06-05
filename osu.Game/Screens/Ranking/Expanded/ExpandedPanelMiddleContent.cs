@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
-                                        Text = $"于 {score.Date.ToLocalTime():g} 游玩"
+                                        Text = $"于 {score.Date.ToLocalTime():d MMMM yyyy HH:mm} 游玩"
                                     }
                                 }
                             },
