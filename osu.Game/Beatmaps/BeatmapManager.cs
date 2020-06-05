@@ -215,7 +215,7 @@ namespace osu.Game.Beatmaps
 
             foreach (var info in item.Beatmaps)
             {
-                var file = item.Files.FirstOrDefault(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+                var file = item.Files.SingleOrDefault(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
                 using (var stream = Files.Store.GetStream(file))
                     info.MD5Hash = stream.ComputeMD5Hash();
