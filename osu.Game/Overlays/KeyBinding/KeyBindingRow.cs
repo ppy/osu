@@ -274,6 +274,9 @@ namespace osu.Game.Overlays.KeyBinding
 
         private void clear()
         {
+            if (bindTarget == null)
+                return;
+
             bindTarget.UpdateKeyCombination(InputKey.None);
             finalise();
         }
@@ -333,7 +336,7 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        private class ClearButton : TriangleButton
+        public class ClearButton : TriangleButton
         {
             public ClearButton()
             {

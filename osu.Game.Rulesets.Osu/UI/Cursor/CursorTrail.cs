@@ -237,6 +237,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y + size.Y / 2),
                         TexturePosition = textureRect.BottomLeft,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomLeft.Linear,
                         Time = part.Time
                     });
@@ -245,6 +246,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y + size.Y / 2),
                         TexturePosition = textureRect.BottomRight,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
                         Time = part.Time
                     });
@@ -253,6 +255,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y - size.Y / 2),
                         TexturePosition = textureRect.TopRight,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopRight.Linear,
                         Time = part.Time
                     });
@@ -261,6 +264,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     {
                         Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y - size.Y / 2),
                         TexturePosition = textureRect.TopLeft,
+                        TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopLeft.Linear,
                         Time = part.Time
                     });
@@ -289,6 +293,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;
+
+            [VertexMember(4, VertexAttribPointerType.Float)]
+            public Vector4 TextureRect;
 
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;
