@@ -87,11 +87,11 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
         /// </summary>
-        /// <param name="snapResult">The snap result information.</param>
-        public virtual void UpdatePosition(SnapResult snapResult)
+        /// <param name="result">The snap result information.</param>
+        public virtual void UpdatePosition(SnapResult result)
         {
             if (!PlacementActive)
-                HitObject.StartTime = snapResult.Time ?? EditorClock?.CurrentTime ?? Time.Current;
+                HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
         }
 
         /// <summary>
