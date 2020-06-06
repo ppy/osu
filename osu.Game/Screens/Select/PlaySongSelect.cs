@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -9,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -55,9 +57,13 @@ namespace osu.Game.Screens.Select
             if (removeAutoModOnResume)
             {
                 var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
+                var cinemaType = Ruleset.Value.CreateInstance().GetAllMods().OfType<ModCinema>().FirstOrDefault()?.GetType();
 
                 if (autoType != null)
                     ModSelect.DeselectTypes(new[] { autoType }, true);
+
+                if (cinemaType != null)
+                    ModSelect.DeselectTypes(new[] { cinemaType }, true);
 
                 removeAutoModOnResume = false;
             }
@@ -82,28 +88,48 @@ namespace osu.Game.Screens.Select
         {
             if (player != null) return false;
 
-            // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto?.GetType();
-
                 var mods = Mods.Value;
 
-                if (autoType == null)
+                Mod mod;
+                Type modType;
+
+                if (GetContainingInputManager().CurrentState?.Keyboard.ShiftPressed == true)
                 {
-                    notifications?.Post(new SimpleNotification
+                    // Ctrl + Shift + Enter should start map with cinema mod enabled.
+                    mod = Ruleset.Value.CreateInstance().GetAllMods().OfType<ModCinema>().FirstOrDefault();
+                    modType = mod?.GetType();
+
+                    if (modType == null)
                     {
-                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
-                    });
-                    return false;
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = "The current ruleset doesn't have a cinema mod avalaible!"
+                        });
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Ctrl + Enter should start map with autoplay mod enabled.
+                    mod = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                    modType = mod?.GetType();
+
+                    if (modType == null)
+                    {
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                        });
+                        return false;
+                    }
                 }
 
-                if (mods.All(m => m.GetType() != autoType))
-                {
-                    Mods.Value = mods.Append(auto).ToArray();
-                    removeAutoModOnResume = true;
-                }
+                if (mods.All(m => m.GetType() != modType))
+                    Mods.Value = mods.Append(mod).ToArray();
+
+                removeAutoModOnResume = true;
             }
 
             SampleConfirm?.Play();
