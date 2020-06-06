@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            // There are test scenes using current value of the ruleset bindable
+            // on their BDLs (example in TestSceneSliderSnaking's BDL)
             Ruleset.Value = ruleset.RulesetInfo;
 
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
