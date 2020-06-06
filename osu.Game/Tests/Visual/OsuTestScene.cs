@@ -146,8 +146,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            if (!Ruleset.Disabled)
-                Ruleset.Value = rulesets.AvailableRulesets.First();
+            Ruleset.Value = rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)
