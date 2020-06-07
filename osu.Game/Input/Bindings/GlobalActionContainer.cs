@@ -114,19 +114,6 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle mute")]
         ToggleMute,
 
-        // Song select keybindings
-        [Description("Toggle mod selection overlay")]
-        ToggleModSelection,
-
-        [Description("Select a random beatmap")]
-        SelectNextRandom,
-
-        [Description("Select the last random beatmap")]
-        SelectPreviousRandom,
-
-        [Description("Toggle beatmap options overlay")]
-        ToggleBeatmapOptions,
-
         // In-Game Keybindings
         [Description("Skip cutscene")]
         SkipCutscene,
@@ -173,5 +160,18 @@ namespace osu.Game.Input.Bindings
 
         [Description("Next Selection")]
         SelectNext,
+
+        // Song select keybindings
+        [Description("Toggle mod selection overlay")]
+        ToggleModSelection,
+
+        [Description("Select a random beatmap")]
+        SelectNextRandom,
+
+        [Description("Select the last random beatmap")]
+        SelectPreviousRandom,
+
+        [Description("Toggle beatmap options overlay")]
+        ToggleBeatmapOptions,
     }
 }
