@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
@@ -35,8 +36,7 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
-                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, "headless", nameof(TestDefaultDirectory));
-
+                    string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestDefaultDirectory));
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
                 }
                 finally
@@ -46,17 +46,17 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
-        private string customPath => Path.Combine(Environment.CurrentDirectory, "custom-path");
+        private string customPath => Path.Combine(RuntimeInfo.StartupDirectory, "custom-path");
 
         [Test]
         public void TestCustomDirectory()
         {
             using (var host = new HeadlessGameHost(nameof(TestCustomDirectory)))
             {
-                string headlessPrefix = Path.Combine("headless", nameof(TestCustomDirectory));
+                string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestCustomDirectory));
 
                 // need access before the game has constructed its own storage yet.
-                Storage storage = new DesktopStorage(headlessPrefix, host);
+                Storage storage = new DesktopStorage(defaultStorageLocation, host);
                 // manual cleaning so we can prepare a config file.
                 storage.DeleteDirectory(string.Empty);
 
@@ -84,10 +84,10 @@ namespace osu.Game.Tests.NonVisual
         {
             using (var host = new HeadlessGameHost(nameof(TestSubDirectoryLookup)))
             {
-                string headlessPrefix = Path.Combine("headless", nameof(TestSubDirectoryLookup));
+                string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestSubDirectoryLookup));
 
                 // need access before the game has constructed its own storage yet.
-                Storage storage = new DesktopStorage(headlessPrefix, host);
+                Storage storage = new DesktopStorage(defaultStorageLocation, host);
                 // manual cleaning so we can prepare a config file.
                 storage.DeleteDirectory(string.Empty);
 
@@ -136,7 +136,7 @@ namespace osu.Game.Tests.NonVisual
                     // for testing nested files are not ignored (only top level)
                     host.Storage.GetStorageForDirectory("test-nested").GetStorageForDirectory("cache");
 
-                    string defaultStorageLocation = Path.Combine(Environment.CurrentDirectory, "headless", nameof(TestMigration));
+                    string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestMigration));
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
 

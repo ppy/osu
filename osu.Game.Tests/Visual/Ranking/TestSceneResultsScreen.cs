@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -11,13 +9,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
-using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -41,31 +36,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
         }
 
-        private TestSoloResults createResultsScreen() => new TestSoloResults(new ScoreInfo
-        {
-            TotalScore = 2845370,
-            Accuracy = 0.98,
-            MaxCombo = 123,
-            Rank = ScoreRank.A,
-            Date = DateTimeOffset.Now,
-            Statistics = new Dictionary<HitResult, int>
-            {
-                { HitResult.Great, 50 },
-                { HitResult.Good, 20 },
-                { HitResult.Meh, 50 },
-                { HitResult.Miss, 1 }
-            },
-            Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
-            User = new User
-            {
-                Username = "peppy",
-            }
-        });
+        private TestResultsScreen createResultsScreen() => new TestResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+
+        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
 
         [Test]
         public void ResultsWithoutPlayer()
         {
-            TestSoloResults screen = null;
+            TestResultsScreen screen = null;
             OsuScreenStack stack;
 
             AddStep("load results", () =>
@@ -84,9 +62,19 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void ResultsWithPlayer()
         {
-            TestSoloResults screen = null;
+            TestResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
+        [Test]
+        public void ResultsForUnranked()
+        {
+            UnrankedSoloResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createUnrankedSoloResultsScreen()));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
         }
@@ -110,13 +98,32 @@ namespace osu.Game.Tests.Visual.Ranking
             }
         }
 
-        private class TestSoloResults : ResultsScreen
+        private class TestResultsScreen : ResultsScreen
         {
             public HotkeyRetryOverlay RetryOverlay;
 
-            public TestSoloResults(ScoreInfo score)
+            public TestResultsScreen(ScoreInfo score)
                 : base(score)
             {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
+            }
+        }
+
+        private class UnrankedSoloResultsScreen : SoloResultsScreen
+        {
+            public HotkeyRetryOverlay RetryOverlay;
+
+            public UnrankedSoloResultsScreen(ScoreInfo score)
+                : base(score)
+            {
+                Score.Beatmap.OnlineBeatmapID = 0;
+                Score.Beatmap.Status = BeatmapSetOnlineStatus.Pending;
             }
 
             protected override void LoadComplete()
