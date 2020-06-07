@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -18,9 +18,11 @@ namespace osu.Game.Updater
     public class UpdateManager : CompositeDrawable
     {
         /// <summary>
-        /// Whether this UpdateManager is capable of checking for updates.
+        /// Whether this UpdateManager should be or is capable of checking for updates.
         /// </summary>
-        public virtual bool CanCheckForUpdate => false;
+        public bool CanCheckForUpdate => game.IsDeployedBuild;
+
+        private string lastVersion;
 
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -35,24 +37,37 @@ namespace osu.Game.Updater
         {
             base.LoadComplete();
 
-            var version = game.Version;
-            var lastVersion = config.Get<string>(OsuSetting.Version);
+            Schedule(() => Task.Run(CheckForUpdateAsync));
 
-            if (game.IsDeployedBuild && version != lastVersion)
+            // debug / local compilations will reset to a non-release string.
+            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
+            config.Set(OsuSetting.Version, game.Version);
+        }
+
+        public async Task CheckForUpdateAsync()
+        {
+            if (!CanCheckForUpdate)
+                return;
+
+            await InternalCheckForUpdateAsync();
+        }
+
+        protected virtual Task InternalCheckForUpdateAsync()
+        {
+            // Query last version only *once*, so the user can re-check for updates, in case they closed the notification or else.
+            lastVersion ??= config.Get<string>(OsuSetting.Version);
+
+            var version = game.Version;
+
+            if (version != lastVersion)
             {
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
                     Notifications.Post(new UpdateCompleteNotification(version));
             }
 
-            // debug / local compilations will reset to a non-release string.
-            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
-            config.Set(OsuSetting.Version, version);
-        }
-
-        public virtual void CheckForUpdate()
-        {
-            Logger.Log("CheckForUpdate was called on the base class (UpdateManager)", LoggingTarget.Information);
+            // we aren't doing any async in this method, so we return a completed task instead.
+            return Task.CompletedTask;
         }
 
         private class UpdateCompleteNotification : SimpleNotification

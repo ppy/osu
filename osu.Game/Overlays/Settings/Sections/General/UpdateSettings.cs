@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
@@ -28,15 +29,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
             });
 
             // We should only display the button for UpdateManagers that do check for updates
-            if (updateManager?.CanCheckForUpdate == true)
+            Add(new SettingsButton
             {
-                Add(new SettingsButton
-                {
-                    Text = "Check for updates",
-                    Action = updateManager.CheckForUpdate,
-                    Enabled = { Value = game.IsDeployedBuild }
-                });
-            }
+                Text = "Check for updates",
+                Action = () => Schedule(() => Task.Run(updateManager.CheckForUpdateAsync)),
+                Enabled = { Value = updateManager.CanCheckForUpdate }
+            });
 
             if (RuntimeInfo.IsDesktop)
             {

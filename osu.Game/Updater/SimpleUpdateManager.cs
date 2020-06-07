@@ -19,31 +19,20 @@ namespace osu.Game.Updater
     /// </summary>
     public class SimpleUpdateManager : UpdateManager
     {
-        public override bool CanCheckForUpdate => true;
-
         private string version;
 
         [Resolved]
         private GameHost host { get; set; }
 
-        private OsuGameBase gameBase;
-
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            gameBase = game;
             version = game.Version;
 
-            CheckForUpdate();
+            Schedule(() => Task.Run(CheckForUpdateAsync));
         }
 
-        public override void CheckForUpdate()
-        {
-            if (gameBase.IsDeployedBuild)
-                Schedule(() => Task.Run(checkForUpdateAsync));
-        }
-
-        private async void checkForUpdateAsync()
+        protected override async Task InternalCheckForUpdateAsync()
         {
             try
             {
