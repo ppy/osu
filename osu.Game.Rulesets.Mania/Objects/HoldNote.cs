@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// <summary>
     /// Represents a hit object which requires pressing, holding, and releasing a key.
     /// </summary>
-    public class HoldNote : ManiaHitObject, IHasEndTime
+    public class HoldNote : ManiaHitObject, IHasDuration
     {
         public double EndTime
         {
@@ -91,11 +92,11 @@ namespace osu.Game.Rulesets.Mania.Objects
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
-            createTicks();
+            createTicks(cancellationToken);
 
             AddNested(Head = new Note
             {
@@ -112,13 +113,15 @@ namespace osu.Game.Rulesets.Mania.Objects
             });
         }
 
-        private void createTicks()
+        private void createTicks(CancellationToken cancellationToken)
         {
             if (tickSpacing == 0)
                 return;
 
             for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new HoldNoteTick
                 {
                     StartTime = t,

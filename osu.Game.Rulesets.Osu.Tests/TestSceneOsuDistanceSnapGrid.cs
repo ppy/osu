@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        [Cached(typeof(IDistanceSnapProvider))]
+        [Cached(typeof(IPositionSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         private TestOsuDistanceSnapGrid grid;
@@ -172,9 +172,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class SnapProvider : IDistanceSnapProvider
+        private class SnapProvider : IPositionSnapProvider
         {
-            public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, time);
+            public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
             public float GetBeatSnapDistanceAt(double referenceTime) => (float)beat_length;
 

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Layout;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -76,6 +77,98 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             combinedObjCache.Invalidate();
             hitObjectInitialStateCache.Clear();
+        }
+
+        /// <summary>
+        /// Given a position in screen space, return the time within this column.
+        /// </summary>
+        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
+        {
+            // convert to local space of column so we can snap and fetch correct location.
+            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
+
+            float position = 0;
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    position = localPosition.Y;
+                    break;
+
+                case ScrollingDirection.Right:
+                case ScrollingDirection.Left:
+                    position = localPosition.X;
+                    break;
+            }
+
+            flipPositionIfRequired(ref position);
+
+            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+        }
+
+        /// <summary>
+        /// Given a time, return the screen space position within this column.
+        /// </summary>
+        public Vector2 ScreenSpacePositionAtTime(double time)
+        {
+            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+
+            flipPositionIfRequired(ref pos);
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    return ToScreenSpace(new Vector2(getBreadth() / 2, pos));
+
+                default:
+                    return ToScreenSpace(new Vector2(pos, getBreadth() / 2));
+            }
+        }
+
+        private float getLength()
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Left:
+                case ScrollingDirection.Right:
+                    return DrawWidth;
+
+                default:
+                    return DrawHeight;
+            }
+        }
+
+        private float getBreadth()
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    return DrawWidth;
+
+                default:
+                    return DrawHeight;
+            }
+        }
+
+        private void flipPositionIfRequired(ref float position)
+        {
+            // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+            // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
+            // so when scrolling downwards the coordinates need to be flipped.
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Down:
+                    position = DrawHeight - position;
+                    break;
+
+                case ScrollingDirection.Right:
+                    position = DrawWidth - position;
+                    break;
+            }
         }
 
         private void onDefaultsApplied(DrawableHitObject drawableObject)
@@ -177,7 +270,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         // Cant use AddOnce() since the delegate is re-constructed every invocation
         private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
         {
-            if (hitObject.HitObject is IHasEndTime e)
+            if (hitObject.HitObject is IHasDuration e)
             {
                 switch (direction.Value)
                 {
