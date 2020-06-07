@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -21,7 +20,7 @@ namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : SongSelect
     {
-        private bool removeAutoModOnResume;
+        private Mod removeModOnResume;
         private OsuScreen player;
 
         [Resolved(CanBeNull = true)]
@@ -54,18 +53,10 @@ namespace osu.Game.Screens.Select
 
             player = null;
 
-            if (removeAutoModOnResume)
+            if (removeModOnResume != null)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
-                var cinemaType = Ruleset.Value.CreateInstance().GetAllMods().OfType<ModCinema>().FirstOrDefault()?.GetType();
-
-                if (autoType != null)
-                    ModSelect.DeselectTypes(new[] { autoType }, true);
-
-                if (cinemaType != null)
-                    ModSelect.DeselectTypes(new[] { cinemaType }, true);
-
-                removeAutoModOnResume = false;
+                ModSelect.DeselectTypes(new[] { removeModOnResume.GetType() }, true);
+                removeModOnResume = null;
             }
         }
 
@@ -90,51 +81,45 @@ namespace osu.Game.Screens.Select
 
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var mods = Mods.Value;
-
-                Mod mod;
-                Type modType;
-
                 if (GetContainingInputManager().CurrentState?.Keyboard.ShiftPressed == true)
                 {
-                    // Ctrl + Shift + Enter should start map with cinema mod enabled.
-                    mod = Ruleset.Value.CreateInstance().GetAllMods().OfType<ModCinema>().FirstOrDefault();
-                    modType = mod?.GetType();
-
-                    if (modType == null)
-                    {
-                        notifications?.Post(new SimpleNotification
-                        {
-                            Text = "The current ruleset doesn't have a cinema mod avalaible!"
-                        });
+                    if (!trySelectMod(Ruleset.Value.CreateInstance().GetAllMods().OfType<ModCinema>().FirstOrDefault(), "The current ruleset doesn't have a cinema mod avalaible!"))
                         return false;
-                    }
                 }
                 else
                 {
-                    // Ctrl + Enter should start map with autoplay mod enabled.
-                    mod = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                    modType = mod?.GetType();
-
-                    if (modType == null)
-                    {
-                        notifications?.Post(new SimpleNotification
-                        {
-                            Text = "The current ruleset doesn't have an autoplay mod avalaible!"
-                        });
+                    if (!trySelectMod(Ruleset.Value.CreateInstance().GetAutoplayMod(), "The current ruleset doesn't have an autoplay mod avalaible!"))
                         return false;
-                    }
                 }
-
-                if (mods.All(m => m.GetType() != modType))
-                    Mods.Value = mods.Append(mod).ToArray();
-
-                removeAutoModOnResume = true;
             }
 
             SampleConfirm?.Play();
 
             this.Push(player = new PlayerLoader(() => new Player()));
+
+            return true;
+        }
+
+        private bool trySelectMod(Mod mod, string notificationMessage)
+        {
+            var mods = Mods.Value;
+            var modType = mod?.GetType();
+
+            if (modType == null)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = notificationMessage
+                });
+                return false;
+            }
+
+            if (mods.All(m => m.GetType() != modType))
+            {
+                ModSelect.SelectTypes(new[] { modType });
+                Mods.Value = ModSelect.SelectedMods.Value;
+                removeModOnResume = mod;
+            }
 
             return true;
         }

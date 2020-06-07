@@ -336,6 +336,14 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
+        public void SelectTypes(Type[] modTypes)
+        {
+            if (modTypes.Length == 0) return;
+
+            foreach (var section in ModSectionsContainer.Children)
+                section.SelectTypes(modTypes, false);
+        }
+
         /// <summary>
         /// Deselect one or more mods.
         /// </summary>
