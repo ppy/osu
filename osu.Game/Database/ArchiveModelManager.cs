@@ -276,7 +276,7 @@ namespace osu.Game.Database
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)))
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)).OrderBy(f => f.Filename))
             {
                 using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
@@ -332,7 +332,7 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
-                            if (CanUndelete(existing, item))
+                            if (CanReuseExisting(existing, item))
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -660,13 +660,29 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to use/restore the existing
         /// item and skip the import. This method allows changing that behaviour.
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
         /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
-        protected virtual bool CanUndelete(TModel existing, TModel import) => true;
+        protected virtual bool CanReuseExisting(TModel existing, TModel import) =>
+            // for the best or worst, we copy and import files of a new import before checking whether
+            // it is a duplicate. so to check if anything has changed, we can just compare all FileInfo IDs.
+            getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
+
+        private IEnumerable<long> getIDs(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return f.FileInfo.ID;
+        }
+
+        private IEnumerable<string> getFilenames(List<TFileModel> files)
+        {
+            foreach (var f in files.OrderBy(f => f.Filename))
+                yield return f.Filename;
+        }
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
