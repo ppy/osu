@@ -19,6 +19,8 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Logging;
+using osu.Game.Tournament.Configuration;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
@@ -37,7 +39,7 @@ namespace osu.Game.Tournament
 
         private Storage storage;
 
-        private TournamentStorage tournamentStorage;
+        private NewTournamentStorage newTournamentStorage;
 
         private DependencyContainer dependencies;
 
@@ -52,15 +54,15 @@ namespace osu.Game.Tournament
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage, FrameworkConfigManager frameworkConfig)
+        private void load(FrameworkConfigManager frameworkConfig)
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            dependencies.CacheAs(tournamentStorage = new TournamentStorage(storage));
+            dependencies.CacheAs(newTournamentStorage = new NewTournamentStorage(Host));
 
-            Textures.AddStore(new TextureLoaderStore(tournamentStorage));
+            Textures.AddStore(new TextureLoaderStore(newTournamentStorage.VideoStorage));
 
-            this.storage = storage;
+            this.storage = newTournamentStorage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
