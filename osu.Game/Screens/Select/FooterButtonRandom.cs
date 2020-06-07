@@ -40,6 +40,17 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"random";
+            Action = () =>
+            {
+                if (rewindSearch)
+                {
+                    PreviousRandom.Invoke();
+                }
+                else
+                {
+                    NextRandom.Invoke();
+                }
+            };
         }
 
         private void updateText()
@@ -58,23 +69,14 @@ namespace osu.Game.Screens.Select
 
         public override bool OnPressed(GlobalAction action)
         {
-            switch (action)
+            rewindSearch = action == GlobalAction.SelectPreviousRandom;
+            if (action != GlobalAction.SelectNextRandom && !rewindSearch)
             {
-                case GlobalAction.SelectPreviousRandom:
-                    rewindSearch = true;
-                    Action = PreviousRandom;
-                    updateText();
-                    Click();
-                    return true;
-
-                case GlobalAction.SelectNextRandom:
-                    Action = NextRandom;
-                    updateText();
-                    Click();
-                    return true;
+                return false;
             }
-
-            return false;
+            updateText();
+            Click();
+            return true;
         }
 
         public override void OnReleased(GlobalAction action)
