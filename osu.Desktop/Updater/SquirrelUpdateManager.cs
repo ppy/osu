@@ -22,33 +22,25 @@ namespace osu.Desktop.Updater
 {
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
-        public override bool CanCheckForUpdate => true;
-
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
-        private OsuGameBase gameBase;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
         private static readonly Logger logger = Logger.GetLogger("updater");
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuGameBase game)
+        private void load(NotificationOverlay notification)
         {
-            gameBase = game;
             notificationOverlay = notification;
 
             Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
-            CheckForUpdate();
+            Schedule(() => Task.Run(CheckForUpdateAsync));
         }
 
-        public override void CheckForUpdate()
-        {
-            if (gameBase.IsDeployedBuild)
-                Schedule(() => Task.Run(() => checkForUpdateAsync()));
-        }
+        protected override async Task InternalCheckForUpdateAsync() => await checkForUpdateAsync();
 
-        private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        private async Task checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
@@ -90,7 +82,7 @@ namespace osu.Desktop.Updater
 
                         // could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         // try again without deltas.
-                        checkForUpdateAsync(false, notification);
+                        await checkForUpdateAsync(false, notification);
                         scheduleRecheck = false;
                     }
                     else
@@ -109,7 +101,7 @@ namespace osu.Desktop.Updater
                 if (scheduleRecheck)
                 {
                     // check again in 30 minutes.
-                    Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
+                    Scheduler.AddDelayed(async () => await checkForUpdateAsync(), 60000 * 30);
                 }
             }
         }
