@@ -31,6 +31,7 @@ using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Users;
 using osuTK.Input;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -589,6 +590,65 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCinemaViaCtrlShiftEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("press ctrl+shit+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressKey(Key.Enter);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("cinema enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModCinema);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestAutoplayWithCtrlShiftEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("select autoplay", () =>
+            {
+                songSelect.ModSelect.SelectTypes(new[] { typeof(ModAutoplay) });
+            });
+
+            AddStep("press ctrl+shit+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressKey(Key.Enter);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only cinema enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModCinema && songSelect.Mods.Value.Count == 1);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
         public void TestHideSetSelectsCorrectBeatmap()
         {
             int? previousID = null;
@@ -929,6 +989,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+
+            public new ModSelectOverlay ModSelect => base.ModSelect;
 
             public new void PresentScore(ScoreInfo score) => base.PresentScore(score);
 
