@@ -33,6 +33,6 @@ namespace osu.Game.Storyboards
         }
 
         public DrawableStoryboardLayer CreateDrawable()
-            => new DrawableStoryboardLayer(this) { Depth = Depth, };
+            => new DrawableStoryboardLayer(this) { Depth = Depth, Name = Name };
     }
 }
