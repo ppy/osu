@@ -39,7 +39,7 @@ namespace osu.Game.Tournament
 
         private Storage storage;
 
-        private NewTournamentStorage newTournamentStorage;
+        private TournamentStorage tournamentStorage;
 
         private DependencyContainer dependencies;
 
@@ -58,11 +58,11 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            dependencies.CacheAs(newTournamentStorage = new NewTournamentStorage(Host));
+            dependencies.CacheAs(tournamentStorage = new TournamentStorage(Host));
 
-            Textures.AddStore(new TextureLoaderStore(newTournamentStorage.VideoStorage));
+            Textures.AddStore(new TextureLoaderStore(tournamentStorage.VideoStorage));
 
-            this.storage = newTournamentStorage;
+            this.storage = tournamentStorage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>

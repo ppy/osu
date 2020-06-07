@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(NewTournamentStorage storage)
+        private void load(TournamentStorage storage)
         {
             var stream = storage.VideoStorage.GetStream($@"{filename}");
 
