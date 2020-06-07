@@ -2,15 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Taiko.Beatmaps;
-using osu.Game.Rulesets.Taiko.Skinning;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
@@ -19,14 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 {
     public class TestSceneTaikoPlayfield : TaikoSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[]
-        {
-            typeof(TaikoHitTarget),
-            typeof(TaikoLegacyHitTarget),
-            typeof(PlayfieldBackgroundRight),
-            typeof(LegacyTaikoScroller),
-        }).ToList();
-
         [Cached(typeof(IScrollingInfo))]
         private ScrollingTestContainer.TestScrollingInfo info = new ScrollingTestContainer.TestScrollingInfo
         {
