@@ -70,10 +70,12 @@ namespace osu.Game.Screens.Select
         public override bool OnPressed(GlobalAction action)
         {
             rewindSearch = action == GlobalAction.SelectPreviousRandom;
+
             if (action != GlobalAction.SelectNextRandom && !rewindSearch)
             {
                 return false;
             }
+
             updateText();
             Click();
             return true;
