@@ -20,13 +20,13 @@ namespace osu.Game.Tournament
         }
     }
 
-    internal class NewTournamentStorage : WrappedStorage
+    internal class TournamentStorage : WrappedStorage
     {
         private readonly GameHost host;
         private readonly TournamentStorageManager storageConfig;
         public readonly TournamentVideoStorage VideoStorage;
 
-        public NewTournamentStorage(GameHost host)
+        public TournamentStorage(GameHost host)
             : base(host.Storage, string.Empty)
         {
             this.host = host;
