@@ -39,12 +39,14 @@ namespace osu.Game.Screens.Menu
                     PrepareMenuLoad();
 
                     Scheduler.AddDelayed(LoadMenu, 0);
-                    //Scheduler.AddDelayed();
                 }, 0);
 
-                logo.ScaleTo(0);
-                logo.ScaleTo(1, 300, Easing.OutQuint);
-                logo.FadeIn(300);
+                logo.ScaleTo(0).FadeOut();
+                if ( !LoadDirectToSongSelect.Value )
+                {
+                    logo.ScaleTo(1, 300, Easing.OutQuint);
+                    logo.FadeIn(300);
+                }
             }
         }
 
