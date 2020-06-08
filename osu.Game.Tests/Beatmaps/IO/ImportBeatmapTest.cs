@@ -1,11 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -15,7 +14,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
@@ -730,25 +728,17 @@ namespace osu.Game.Tests.Beatmaps.IO
                     await osu.Dependencies.Get<BeatmapManager>().Import(temp);
 
                     BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+
+                    var beatmapInfo = setToUpdate.Beatmaps.First(b => b.RulesetID == 0);
                     Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
                     BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
 
                     string oldMd5Hash = beatmapToUpdate.BeatmapInfo.MD5Hash;
 
-                    using (var stream = new MemoryStream())
-                    {
-                        using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                        {
-                            beatmapToUpdate.HitObjects.Clear();
-                            beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
+                    beatmapToUpdate.HitObjects.Clear();
+                    beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
 
-                            new LegacyBeatmapEncoder(beatmapToUpdate).Encode(writer);
-                        }
-
-                        stream.Seek(0, SeekOrigin.Begin);
-
-                        manager.UpdateFile(setToUpdate, fileToUpdate, stream);
-                    }
+                    manager.Save(beatmapInfo, beatmapToUpdate);
 
                     // Check that the old file reference has been removed
                     Assert.That(manager.QueryBeatmapSet(s => s.ID == setToUpdate.ID).Files.All(f => f.ID != fileToUpdate.ID));
