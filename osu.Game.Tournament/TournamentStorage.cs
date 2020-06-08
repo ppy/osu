@@ -31,7 +31,7 @@ namespace osu.Game.Tournament
         public readonly TournamentVideoStorage VideoStorage;
 
         public TournamentStorage(GameHost host)
-            : base(host.Storage, string.Empty)
+            : base(host.Storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
             this.host = host;
 
@@ -40,11 +40,10 @@ namespace osu.Game.Tournament
 
             if (!string.IsNullOrEmpty(currentTournament))
             {
-                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory("tournaments" + Path.DirectorySeparatorChar + currentTournament));
+                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(currentTournament));
             }
             else
             {
-                // Migrating old storage format to the new one.
                 migrate();
                 Logger.Log("Migrating files from old storage to new.");
             }
@@ -55,8 +54,8 @@ namespace osu.Game.Tournament
 
         private void migrate()
         {
-            const string default_path = "tournaments/default";
-            var source = new DirectoryInfo(GetFullPath("tournament"));
+            const string default_path = "default";
+            var source = new DirectoryInfo(host.Storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(GetFullPath(default_path));
 
             Directory.CreateDirectory(destination.FullName);
@@ -64,7 +63,7 @@ namespace osu.Game.Tournament
             if (host.Storage.Exists("bracket.json"))
             {
                 Logger.Log("Migrating bracket to default tournament storage.");
-                var bracketFile = new System.IO.FileInfo(GetFullPath(string.Empty) + Path.DirectorySeparatorChar + GetFiles(string.Empty, "bracket.json").First());
+                var bracketFile = new System.IO.FileInfo(host.Storage.GetFullPath("bracket.json"));
                 attemptOperation(() => bracketFile.CopyTo(Path.Combine(destination.FullName, bracketFile.Name), true));
             }
 
