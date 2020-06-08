@@ -4,10 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
@@ -18,8 +15,6 @@ namespace osu.Game.Screens.Select
         public Action PreviousRandom { get; set; }
 
         private bool rewindSearch;
-
-        public FooterButtonRandom() { }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
