@@ -17,22 +17,9 @@ namespace osu.Game.Screens.Select
         public Action NextRandom { get; set; }
         public Action PreviousRandom { get; set; }
 
-        private readonly SpriteText secondaryText;
         private bool rewindSearch;
 
-        public FooterButtonRandom()
-        {
-            TextContainer.Add(secondaryText = new OsuSpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = @"rewind",
-                Alpha = 0,
-            });
-
-            // force both text sprites to always be present to avoid width flickering while they're being swapped out
-            SpriteText.AlwaysPresent = secondaryText.AlwaysPresent = true;
-        }
+        public FooterButtonRandom() { }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -53,20 +40,6 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        private void updateText()
-        {
-            if (rewindSearch)
-            {
-                SpriteText.FadeOut(120, Easing.InQuad);
-                secondaryText.FadeIn(120, Easing.InQuad);
-            }
-            else
-            {
-                SpriteText.FadeIn(120, Easing.InQuad);
-                secondaryText.FadeOut(120, Easing.InQuad);
-            }
-        }
-
         public override bool OnPressed(GlobalAction action)
         {
             rewindSearch = action == GlobalAction.SelectPreviousRandom;
@@ -76,7 +49,6 @@ namespace osu.Game.Screens.Select
                 return false;
             }
 
-            updateText();
             Click();
             return true;
         }
@@ -86,7 +58,6 @@ namespace osu.Game.Screens.Select
             if (action == GlobalAction.SelectPreviousRandom)
             {
                 rewindSearch = false;
-                updateText();
             }
         }
     }
