@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Menu
 
                 using (BeginDelayedSequence(0, true))
                 {
-                    welcomeText.ResizeHeightTo(welcomeText.Height*2, 500, Easing.In);
+                    welcomeText.ResizeHeightTo(welcomeText.Height * 2, 500, Easing.In);
                     welcomeText.FadeIn(remainingTime());
                     welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), remainingTime(), Easing.Out).OnComplete(_ =>
                     {
