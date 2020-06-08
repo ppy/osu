@@ -71,10 +71,6 @@ namespace osu.Game.Screens.Menu
         private class WelcomeIntroSequence : Container
         {
             private Sprite welcomeText;
-            private LogoVisualisation visualizer;
-            private Container elementContainer;
-            private Container circleContainer;
-            private Circle blackCircle;
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
@@ -90,12 +86,12 @@ namespace osu.Game.Screens.Menu
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            elementContainer = new Container
+                            new Container
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    visualizer = new LogoVisualisation
+                                    new LogoVisualisation
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
@@ -104,12 +100,12 @@ namespace osu.Game.Screens.Menu
                                         AccentColour = Color4.DarkBlue,
                                         Size = new Vector2(0.96f)
                                     },
-                                    circleContainer = new Container
+                                    new Container
                                     {
                                         AutoSizeAxes = Axes.Both,
                                         Children = new Drawable[]
                                         {
-                                            blackCircle = new Circle
+                                            new Circle
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
