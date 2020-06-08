@@ -13,17 +13,6 @@ using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament
 {
-    internal class TournamentVideoStorage : NamespacedResourceStore<byte[]>
-    {
-        public TournamentVideoStorage(Storage storage)
-            : base(new StorageBackedResourceStore(storage), "videos")
-        {
-            AddExtension("m4v");
-            AddExtension("avi");
-            AddExtension("mp4");
-        }
-    }
-
     internal class TournamentStorage : WrappedStorage
     {
         private readonly GameHost host;
@@ -72,9 +61,10 @@ namespace osu.Game.Tournament
             ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_path));
             storageConfig.Set(StorageConfig.CurrentTournament, default_path);
             storageConfig.Save();
+            deleteRecursive(source);
         }
 
-        private void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
+        private void copyRecursive(DirectoryInfo source, DirectoryInfo destination)
         {
             // based off example code https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo
 
@@ -85,8 +75,24 @@ namespace osu.Game.Tournament
 
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
-                copyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
+                copyRecursive(dir, destination.CreateSubdirectory(dir.Name));
             }
+        }
+
+        private void deleteRecursive(DirectoryInfo target)
+        {
+            foreach (System.IO.FileInfo fi in target.GetFiles())
+            {
+                attemptOperation(() => fi.Delete());
+            }
+
+            foreach (DirectoryInfo dir in target.GetDirectories())
+            {
+                attemptOperation(() => dir.Delete(true));
+            }
+
+            if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
+                attemptOperation(target.Delete);
         }
 
         private void attemptOperation(Action action, int attempts = 10)
@@ -106,6 +112,16 @@ namespace osu.Game.Tournament
 
                 Thread.Sleep(250);
             }
+        }
+    }
+    internal class TournamentVideoStorage : NamespacedResourceStore<byte[]>
+    {
+        public TournamentVideoStorage(Storage storage)
+            : base(new StorageBackedResourceStore(storage), "videos")
+        {
+            AddExtension("m4v");
+            AddExtension("avi");
+            AddExtension("mp4");
         }
     }
 }
