@@ -14,25 +14,26 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
         public void FindCheese(List<TaikoDifficultyHitObject> difficultyHitObjects)
         {
-            this.hitObjects = difficultyHitObjects;
+            hitObjects = difficultyHitObjects;
             findRolls(3);
             findRolls(4);
-            findTLTap(0, true);
-            findTLTap(1, true);
-            findTLTap(0, false);
-            findTLTap(1, false);
+            findTlTap(0, true);
+            findTlTap(1, true);
+            findTlTap(0, false);
+            findTlTap(1, false);
         }
 
         private void findRolls(int patternLength)
         {
             List<TaikoDifficultyHitObject> history = new List<TaikoDifficultyHitObject>();
 
-            int repititionStart = 0;
+            int repetitionStart = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 history.Add(hitObjects[i]);
                 if (history.Count < 2 * patternLength) continue;
+
                 if (history.Count > 2 * patternLength) history.RemoveAt(0);
 
                 bool isRepeat = true;
@@ -47,43 +48,41 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
 
                 if (!isRepeat)
                 {
-                    repititionStart = i - 2 * patternLength;
+                    repetitionStart = i - 2 * patternLength;
                 }
 
-                int repeatedLength = i - repititionStart;
+                int repeatedLength = i - repetitionStart;
 
                 if (repeatedLength >= roll_min_repetitions)
                 {
-                    // Console.WriteLine("Found Roll Cheese.\tStart: " + repititionStart + "\tEnd: " + i);
-                    for (int j = repititionStart; j < i; j++)
+                    for (int j = repetitionStart; j < i; j++)
                     {
-                        (hitObjects[i]).StaminaCheese = true;
+                        hitObjects[i].StaminaCheese = true;
                     }
                 }
             }
         }
 
-        private void findTLTap(int parity, bool kat)
+        private void findTlTap(int parity, bool kat)
         {
-            int tl_length = -2;
+            int tlLength = -2;
 
             for (int i = parity; i < hitObjects.Count; i += 2)
             {
                 if (kat == hitObjects[i].IsKat)
                 {
-                    tl_length += 2;
+                    tlLength += 2;
                 }
                 else
                 {
-                    tl_length = -2;
+                    tlLength = -2;
                 }
 
-                if (tl_length >= tl_min_repetitions)
+                if (tlLength >= tl_min_repetitions)
                 {
-                    // Console.WriteLine("Found TL Cheese.\tStart: " + (i - tl_length) + "\tEnd: " + i);
-                    for (int j = i - tl_length; j < i; j++)
+                    for (int j = i - tlLength; j < i; j++)
                     {
-                        (hitObjects[i]).StaminaCheese = true;
+                        hitObjects[i].StaminaCheese = true;
                     }
                 }
             }

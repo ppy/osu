@@ -20,9 +20,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double rhythmSkillMultiplier = 0.15;
-        private const double colourSkillMultiplier = 0.01;
-        private const double staminaSkillMultiplier = 0.02;
+        private const double rhythm_skill_multiplier = 0.014;
+        private const double colour_skill_multiplier = 0.01;
+        private const double stamina_skill_multiplier = 0.02;
+
+        private readonly TaikoDifficultyHitObjectRhythm[] commonRhythms =
+        {
+            new TaikoDifficultyHitObjectRhythm(1, 1, 0.0, true),
+            new TaikoDifficultyHitObjectRhythm(2, 1, 0.3, false),
+            new TaikoDifficultyHitObjectRhythm(1, 2, 0.5, false),
+            new TaikoDifficultyHitObjectRhythm(3, 1, 0.3, false),
+            new TaikoDifficultyHitObjectRhythm(1, 3, 0.35, false),
+            new TaikoDifficultyHitObjectRhythm(3, 2, 0.6, false),
+            new TaikoDifficultyHitObjectRhythm(2, 3, 0.4, false),
+            new TaikoDifficultyHitObjectRhythm(5, 4, 0.5, false),
+            new TaikoDifficultyHitObjectRhythm(4, 5, 0.7, false)
+        };
 
         public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -32,6 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private double simpleColourPenalty(double staminaDifficulty, double colorDifficulty)
         {
             if (colorDifficulty <= 0) return 0.79 - 0.25;
+
             return 0.79 - Math.Atan(staminaDifficulty / colorDifficulty - 12) / Math.PI / 2;
         }
 
@@ -46,25 +60,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double rescale(double sr)
         {
-            if (sr <= 1) return sr;
-            sr -= 1;
-            sr = 1.6 * Math.Pow(sr, 0.7);
-            sr += 1;
-            return sr;
+            if (sr < 0) return sr;
+
+            return 10.43 * Math.Log(sr / 8 + 1);
         }
 
-        private double combinedDifficulty(double staminaPenalty, Skill colour, Skill rhythm, Skill stamina1, Skill stamina2)
+        private double locallyCombinedDifficulty(double staminaPenalty, Skill colour, Skill rhythm, Skill stamina1, Skill stamina2)
         {
-
             double difficulty = 0;
             double weight = 1;
             List<double> peaks = new List<double>();
 
             for (int i = 0; i < colour.StrainPeaks.Count; i++)
             {
-                double colourPeak = colour.StrainPeaks[i] * colourSkillMultiplier;
-                double rhythmPeak = rhythm.StrainPeaks[i] * rhythmSkillMultiplier;
-                double staminaPeak = (stamina1.StrainPeaks[i] + stamina2.StrainPeaks[i]) * staminaSkillMultiplier * staminaPenalty;
+                double colourPeak = colour.StrainPeaks[i] * colour_skill_multiplier;
+                double rhythmPeak = rhythm.StrainPeaks[i] * rhythm_skill_multiplier;
+                double staminaPeak = (stamina1.StrainPeaks[i] + stamina2.StrainPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
                 peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
             }
 
@@ -82,21 +93,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double staminaRating = (skills[2].DifficultyValue() + skills[3].DifficultyValue()) * staminaSkillMultiplier;
-            double colourRating = skills[0].DifficultyValue() * colourSkillMultiplier;
-            double rhythmRating = skills[1].DifficultyValue() * rhythmSkillMultiplier;
+            double colourRating = skills[0].DifficultyValue() * colour_skill_multiplier;
+            double rhythmRating = skills[1].DifficultyValue() * rhythm_skill_multiplier;
+            double staminaRating = (skills[2].DifficultyValue() + skills[3].DifficultyValue()) * stamina_skill_multiplier;
 
             double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
             staminaRating *= staminaPenalty;
 
-            double combinedRating = combinedDifficulty(staminaPenalty, skills[0], skills[1], skills[2], skills[3]);
-
-            // Console.WriteLine("colour\t" + colourRating);
-            // Console.WriteLine("rhythm\t" + rhythmRating);
-            // Console.WriteLine("stamina\t" + staminaRating);
+            double combinedRating = locallyCombinedDifficulty(staminaPenalty, skills[0], skills[1], skills[2], skills[3]);
             double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
-            // Console.WriteLine("combinedRating\t" + combinedRating);
-            // Console.WriteLine("separatedRating\t" + separatedRating);
             double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
             starRating = rescale(starRating);
 
@@ -111,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 RhythmStrain = rhythmRating,
                 ColourStrain = colourRating,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
+                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
                 Skills = skills
             };
@@ -120,18 +125,23 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
-            var rhythm = new TaikoDifficultyHitObjectRhythm();
 
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
             {
                 // Check for negative durations
                 if (beatmap.HitObjects[i].StartTime > beatmap.HitObjects[i - 1].StartTime && beatmap.HitObjects[i - 1].StartTime > beatmap.HitObjects[i - 2].StartTime)
-                    taikoDifficultyHitObjects.Add(new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, rhythm));
+                {
+                    taikoDifficultyHitObjects.Add(
+                        new TaikoDifficultyHitObject(
+                            beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i, commonRhythms
+                        )
+                    );
+                }
             }
 
             new StaminaCheeseDetector().FindCheese(taikoDifficultyHitObjects);
-            for (int i = 0; i < taikoDifficultyHitObjects.Count; i++)
-                yield return taikoDifficultyHitObjects[i];
+            foreach (var hitobject in taikoDifficultyHitObjects)
+                yield return hitobject;
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
@@ -149,10 +159,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModEasy(),
             new TaikoModHardRock(),
         };
-
-        /*
-        protected override DifficultyAttributes VirtualCalculate(IBeatmap beatmap, Mod[] mods, double clockRate)
-            => taikoCalculate(beatmap, mods, clockRate);
-        */
     }
 }
