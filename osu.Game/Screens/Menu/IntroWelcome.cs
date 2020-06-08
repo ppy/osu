@@ -127,7 +127,10 @@ namespace osu.Game.Screens.Menu
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Scale = new Vector2(0.5f),
+                        Scale = new Vector2(0.3f),
+                        Width = 750,
+                        Height = 78,
+                        Alpha = 0,
                         Texture = textures.Get(@"Welcome/welcome_text@2x")
                     },
                 };
@@ -139,10 +142,11 @@ namespace osu.Game.Screens.Menu
 
                 double remainingTime() => delay_step_two - TransformDelay;
 
-                using (BeginDelayedSequence(250, true))
+                using (BeginDelayedSequence(0, true))
                 {
-                    welcomeText.FadeIn(700);
-                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.5f), remainingTime(), Easing.Out).OnComplete(_ =>
+                    welcomeText.ResizeHeightTo(welcomeText.Height*2, 500, Easing.In);
+                    welcomeText.FadeIn(remainingTime());
+                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), remainingTime(), Easing.Out).OnComplete(_ =>
                     {
                         elementContainer.Remove(visualizer);
                         circleContainer.Remove(blackCircle);
