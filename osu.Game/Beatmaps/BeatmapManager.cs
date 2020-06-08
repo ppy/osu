@@ -79,6 +79,8 @@ namespace osu.Game.Beatmaps
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => beatmapHidden.Value = new WeakReference<BeatmapInfo>(b);
             beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
+            beatmaps.ItemRemoved += removeWorkingCache;
+            beatmaps.ItemUpdated += removeWorkingCache;
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
         }
@@ -206,9 +208,7 @@ namespace osu.Game.Beatmaps
                 UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
             }
 
-            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
-            if (working != null)
-                workingCache.Remove(working);
+            removeWorkingCache(info);
         }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
@@ -408,6 +408,24 @@ namespace osu.Game.Beatmaps
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
+        }
+
+        private void removeWorkingCache(BeatmapSetInfo info)
+        {
+            if (info.Beatmaps == null) return;
+
+            foreach (var b in info.Beatmaps)
+                removeWorkingCache(b);
+        }
+
+        private void removeWorkingCache(BeatmapInfo info)
+        {
+            lock (workingCache)
+            {
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                if (working != null)
+                    workingCache.Remove(working);
+            }
         }
 
         public void Dispose()
