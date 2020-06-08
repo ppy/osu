@@ -429,19 +429,8 @@ namespace osu.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 item.Hash = computeHash(item);
-
-                PreUpdate(item);
-
                 ModelStore.Update(item);
             }
-        }
-
-        /// <summary>
-        /// Perform any final actions before the update to database executes.
-        /// </summary>
-        /// <param name="item">The <typeparamref name="TModel"/> that is being updated.</param>
-        protected virtual void PreUpdate(TModel item)
-        {
         }
 
         /// <summary>
