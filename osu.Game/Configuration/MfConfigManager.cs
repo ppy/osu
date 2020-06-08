@@ -24,6 +24,9 @@ namespace osu.Game.Configuration
             Set(MfSetting.TrianglesEnabled, true);
             Set(MfSetting.SongSelectBgBlur, 0.2f, 0f, 1f);
 
+            //Intro Settings
+            Set(MfSetting.IntroLoadDirectToSongSelect, false);
+
             //Gameplay Settings
             Set(MfSetting.SamplePlaybackGain, 1f, 0f, 20f);
 
@@ -58,6 +61,7 @@ namespace osu.Game.Configuration
         MvisEnableBrick,
         MvisEnableBgTriangles,
         SamplePlaybackGain,
-        SongSelectBgBlur
+        SongSelectBgBlur,
+        IntroLoadDirectToSongSelect
     }
 }

@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Menu
 
         private MainMenu mainMenu;
 
+        protected BeatmapSetInfo setInfo = null;
+
         [Resolved]
         private AudioManager audio { get; set; }
 
@@ -68,8 +70,6 @@ namespace osu.Game.Screens.Menu
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
             seeya = audio.Samples.Get(@"seeya");
-
-            BeatmapSetInfo setInfo = null;
 
             if (!MenuMusic.Value)
             {

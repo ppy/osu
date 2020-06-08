@@ -15,6 +15,8 @@ namespace osu.Game.Configuration
         CirclesCN,
         [Description("三角(中文)")]
         TrianglesCN,
+        [Description("略过开场")]
+        SkippedIntro,
         [Description("随机")]
         Random
     }
