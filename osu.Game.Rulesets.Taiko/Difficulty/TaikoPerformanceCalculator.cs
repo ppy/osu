@@ -78,10 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             strainValue *= Math.Pow(0.985, countMiss);
 
-            // Combo scaling
-            if (Attributes.MaxCombo > 0)
-                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
-
             if (mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
 

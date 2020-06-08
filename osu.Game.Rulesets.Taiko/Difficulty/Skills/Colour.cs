@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -16,106 +15,100 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
 
-        private bool prevIsKat = false;
+        private NoteColour prevNoteColour = NoteColour.None;
 
         private int currentMonoLength = 1;
-        private List<int> monoHistory = new List<int>();
-        private readonly int mono_history_max_length = 5;
-        private int monoHistoryLength = 0;
+        private readonly List<int> monoHistory = new List<int>();
+        private const int mono_history_max_length = 5;
 
         private double sameParityPenalty()
         {
             return 0.0;
         }
 
-        private double repititionPenalty(int notesSince)
+        private double repetitionPenalty(int notesSince)
         {
-            double d = notesSince;
-            return Math.Atan(d / 30) / (Math.PI / 2);
+            double n = notesSince;
+            return Math.Min(1.0, 0.032 * n);
         }
 
-        private double patternLengthPenalty(int patternLength)
+        private double repetitionPenalties()
         {
-            double shortPatternPenalty = Math.Min(0.25 * patternLength, 1.0);
-            double longPatternPenalty = Math.Max(Math.Min(2.5 - 0.15 * patternLength, 1.0), 0.0);
-            return Math.Min(shortPatternPenalty, longPatternPenalty);
+            double penalty = 1.0;
+
+            monoHistory.Add(currentMonoLength);
+
+            if (monoHistory.Count > mono_history_max_length)
+                monoHistory.RemoveAt(0);
+
+            for (int l = 2; l <= mono_history_max_length / 2; l++)
+            {
+                for (int start = monoHistory.Count - l - 1; start >= 0; start--)
+                {
+                    bool samePattern = true;
+
+                    for (int i = 0; i < l; i++)
+                    {
+                        if (monoHistory[start + i] != monoHistory[monoHistory.Count - l + i])
+                        {
+                            samePattern = false;
+                        }
+                    }
+
+                    if (samePattern) // Repetition found!
+                    {
+                        int notesSince = 0;
+                        for (int i = start; i < monoHistory.Count; i++) notesSince += monoHistory[i];
+                        penalty *= repetitionPenalty(notesSince);
+                        break;
+                    }
+                }
+            }
+
+            return penalty;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            double objectDifficulty = 0.0;
-
-            if (current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000)
+            if (!(current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000))
             {
-
-                TaikoDifficultyHitObject currentHO = (TaikoDifficultyHitObject)current;
-
-                if (currentHO.IsKat == prevIsKat)
-                {
-                    currentMonoLength += 1;
-                }
-
-                else
-                {
-
-                    objectDifficulty = 1.0;
-
-                    if (monoHistoryLength > 0 && (monoHistory[monoHistoryLength - 1] + currentMonoLength) % 2 == 0)
-                    {
-                        objectDifficulty *= sameParityPenalty();
-                    }
-
-                    monoHistory.Add(currentMonoLength);
-                    monoHistoryLength += 1;
-
-                    if (monoHistoryLength > mono_history_max_length)
-                    {
-                        monoHistory.RemoveAt(0);
-                        monoHistoryLength -= 1;
-                    }
-
-                    for (int l = 2; l <= mono_history_max_length / 2; l++)
-                    {
-                        for (int start = monoHistoryLength - l - 1; start >= 0; start--)
-                        {
-                            bool samePattern = true;
-
-                            for (int i = 0; i < l; i++)
-                            {
-                                if (monoHistory[start + i] != monoHistory[monoHistoryLength - l + i])
-                                {
-                                    samePattern = false;
-                                }
-                            }
-
-                            if (samePattern) // Repitition found!
-                            {
-                                int notesSince = 0;
-                                for (int i = start; i < monoHistoryLength; i++) notesSince += monoHistory[i];
-                                objectDifficulty *= repititionPenalty(notesSince);
-                                break;
-                            }
-                        }
-                    }
-
-                    currentMonoLength = 1;
-                    prevIsKat = currentHO.IsKat;
-
-                }
-
+                prevNoteColour = NoteColour.None;
+                return 0.0;
             }
 
-            /*
-            string path = @"out.txt";
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                if (((TaikoDifficultyHitObject)current).IsKat) sw.WriteLine("k    " + Math.Min(1.25, returnVal) * returnMultiplier);
-                else sw.WriteLine("d    " + Math.Min(1.25, returnVal) * returnMultiplier);
-            }
-            */
+            TaikoDifficultyHitObject hitObject = (TaikoDifficultyHitObject)current;
 
-            return objectDifficulty;
+            double objectStrain = 0.0;
+
+            NoteColour noteColour = hitObject.IsKat ? NoteColour.Ka : NoteColour.Don;
+
+            if (noteColour == NoteColour.Don && prevNoteColour == NoteColour.Ka ||
+                noteColour == NoteColour.Ka && prevNoteColour == NoteColour.Don)
+            {
+                objectStrain = 1.0;
+
+                if (monoHistory.Count < 2)
+                    objectStrain = 0.0;
+                else if ((monoHistory[^1] + currentMonoLength) % 2 == 0)
+                    objectStrain *= sameParityPenalty();
+
+                objectStrain *= repetitionPenalties();
+                currentMonoLength = 1;
+            }
+            else
+            {
+                currentMonoLength += 1;
+            }
+
+            prevNoteColour = noteColour;
+            return objectStrain;
         }
 
+        private enum NoteColour
+        {
+            Don,
+            Ka,
+            None
+        }
     }
 }
