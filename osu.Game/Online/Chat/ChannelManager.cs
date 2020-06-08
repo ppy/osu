@@ -86,7 +86,7 @@ namespace osu.Game.Online.Chat
                 return;
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
-                                   ?? new Channel(user);
+                                   ?? JoinChannel(new Channel(user));
         }
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
@@ -140,7 +140,7 @@ namespace osu.Game.Online.Chat
                 target.AddLocalEcho(message);
 
                 // if this is a PM and the first message, we need to do a special request to create the PM channel
-                if (target.Type == ChannelType.PM && !target.Joined.Value)
+                if (target.Type == ChannelType.PM && target.Id == 0)
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
@@ -356,26 +356,35 @@ namespace osu.Game.Online.Chat
             // ensure we are joined to the channel
             if (!channel.Joined.Value)
             {
+                channel.Joined.Value = true;
+
                 switch (channel.Type)
                 {
                     case ChannelType.Multiplayer:
                         // join is implicit. happens when you join a multiplayer game.
                         // this will probably change in the future.
-                        channel.Joined.Value = true;
                         joinChannel(channel, fetchInitialMessages);
                         return channel;
 
-                    case ChannelType.Private:
-                        // can't do this yet.
+                    case ChannelType.PM:
+                        var createRequest = new CreateChannelRequest(channel);
+                        createRequest.Success += resChannel =>
+                        {
+                            if (resChannel.ChannelID.HasValue)
+                            {
+                                channel.Id = resChannel.ChannelID.Value;
+
+                                handleChannelMessages(resChannel.RecentMessages);
+                                channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
+                            }
+                        };
+
+                        api.Queue(createRequest);
                         break;
 
                     default:
                         var req = new JoinChannelRequest(channel, api.LocalUser.Value);
-                        req.Success += () =>
-                        {
-                            channel.Joined.Value = true;
-                            joinChannel(channel, fetchInitialMessages);
-                        };
+                        req.Success += () => joinChannel(channel, fetchInitialMessages);
                         req.Failure += ex => LeaveChannel(channel);
                         api.Queue(req);
                         return channel;
