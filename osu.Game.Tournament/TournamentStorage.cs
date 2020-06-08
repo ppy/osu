@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Threading;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -114,6 +113,7 @@ namespace osu.Game.Tournament
             }
         }
     }
+    
     internal class TournamentVideoStorage : NamespacedResourceStore<byte[]>
     {
         public TournamentVideoStorage(Storage storage)
