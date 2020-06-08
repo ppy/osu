@@ -20,7 +20,6 @@ namespace osu.Game.Tournament.Configuration
             base.InitialiseDefaults();
             Set(StorageConfig.CurrentTournament, string.Empty);
         }
-
     }
 
     public enum StorageConfig

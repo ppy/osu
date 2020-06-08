@@ -19,8 +19,6 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Logging;
-using osu.Game.Tournament.Configuration;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
@@ -62,7 +60,7 @@ namespace osu.Game.Tournament
 
             Textures.AddStore(new TextureLoaderStore(tournamentStorage.VideoStorage));
 
-            this.storage = tournamentStorage;
+            storage = tournamentStorage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
