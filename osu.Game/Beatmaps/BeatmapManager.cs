@@ -201,6 +201,8 @@ namespace osu.Game.Beatmaps
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     new LegacyBeatmapEncoder(beatmapContent).Encode(sw);
 
+                stream.Seek(0, SeekOrigin.Begin);
+
                 UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
             }
 
