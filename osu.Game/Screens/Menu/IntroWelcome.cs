@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
                 welcome?.Play();
                 pianoReverb?.Play();
 
-                Scheduler.AddDelayed(delegate
+                Scheduler.AddDelayed(() =>
                 {
                     StartTrack();
                     PrepareMenuLoad();
@@ -146,16 +146,7 @@ namespace osu.Game.Screens.Menu
                 {
                     welcomeText.ResizeHeightTo(welcomeText.Height * 2, 500, Easing.In);
                     welcomeText.FadeIn(remainingTime());
-                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), remainingTime(), Easing.Out).OnComplete(_ =>
-                    {
-                        elementContainer.Remove(visualizer);
-                        circleContainer.Remove(blackCircle);
-                        elementContainer.Remove(circleContainer);
-                        Remove(welcomeText);
-                        visualizer.Dispose();
-                        blackCircle.Dispose();
-                        welcomeText.Dispose();
-                    });
+                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), remainingTime(), Easing.Out).OnComplete(_ => Expire());
                 }
             }
         }
