@@ -7,7 +7,6 @@ using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -47,7 +46,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (MenuVoice.Value && !MenuMusic.Value)
+            if (MenuVoice.Value && !UsingThemedIntro)
                 welcome = audio.Samples.Get(@"welcome");
         }
 
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(MenuMusic.Value && !(Track is TrackVirtual) ? Track : null),
+                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
