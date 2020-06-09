@@ -203,7 +203,14 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                using (ContextFactory.GetForWrite())
+                {
+                    var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+
+                    stream.Seek(0, SeekOrigin.Begin);
+                    UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                }
             }
 
             var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
@@ -258,9 +265,9 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
-        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
-            if (!base.CanUndelete(existing, import))
+            if (!base.CanReuseExisting(existing, import))
                 return false;
 
             var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
