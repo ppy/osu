@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                         // arbitrary write to non-hashed file
                         using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.mp3").First()).AppendText())
-                            sw.WriteLine("text");
+                            await sw.WriteLineAsync("text");
 
                         using (var zip = ZipArchive.Create())
                         {
