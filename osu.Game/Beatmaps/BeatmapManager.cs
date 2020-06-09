@@ -203,7 +203,14 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                using (ContextFactory.GetForWrite())
+                {
+                    var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+
+                    stream.Seek(0, SeekOrigin.Begin);
+                    UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                }
             }
 
             var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
