@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.Select
 
                 if (mods.All(m => m.GetType() != autoType))
                 {
-                    Mods.Value = mods.Append(auto).ToArray();
+                    Mods.Value = mods.Where(m => !m.IncompatibleMods.Contains(typeof(ModAutoplay))).Append(auto).ToArray();
                     removeAutoModOnResume = true;
                 }
             }
