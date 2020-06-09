@@ -10,7 +10,7 @@ using osu.Game.IO;
 using System.IO;
 using osu.Game.Tournament.Configuration;
 
-namespace osu.Game.Tournament
+namespace osu.Game.Tournament.IO
 {
     internal class TournamentStorage : WrappedStorage
     {

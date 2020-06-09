@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
+using osu.Game.Tournament.IO;
 
 namespace osu.Game.Tournament.Components
 {
