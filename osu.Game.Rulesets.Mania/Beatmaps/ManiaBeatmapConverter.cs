@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
             else
             {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasDuration) / beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
@@ -175,7 +176,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     break;
                 }
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                 {
                     conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
@@ -231,7 +232,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 var pattern = new Pattern();
 
-                if (HitObject is IHasEndTime endTimeData)
+                if (HitObject is IHasDuration endTimeData)
                 {
                     pattern.Add(new HoldNote
                     {
@@ -239,7 +240,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         Duration = endTimeData.Duration,
                         Column = column,
                         Samples = HitObject.Samples,
-                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? defaultNodeSamples
                     });
                 }
                 else if (HitObject is IHasXPosition)
@@ -254,6 +255,16 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 return pattern;
             }
+
+            /// <remarks>
+            /// osu!mania-specific beatmaps in stable only play samples at the start of the hold note.
+            /// </remarks>
+            private List<IList<HitSampleInfo>> defaultNodeSamples
+                => new List<IList<HitSampleInfo>>
+                {
+                    HitObject.Samples,
+                    new List<HitSampleInfo>()
+                };
         }
     }
 }
