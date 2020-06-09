@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -18,19 +19,52 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneTimeshiftResultsScreen : ScreenTestScene
     {
+        private bool roomsReceived;
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            roomsReceived = false;
+            bindHandler();
+        });
+
         [Test]
         public void TestShowResultsWithScore()
         {
             createResults(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+            AddWaitStep("wait for display", 5);
         }
 
         [Test]
         public void TestShowResultsNullScore()
         {
             createResults(null);
+            AddWaitStep("wait for display", 5);
+        }
+
+        [Test]
+        public void TestShowResultsNullScoreWithDelay()
+        {
+            AddStep("bind delayed handler", () => bindHandler(3000));
+            createResults(null);
+            AddUntilStep("wait for rooms to be received", () => roomsReceived);
+            AddWaitStep("wait for display", 5);
         }
 
         private void createResults(ScoreInfo score)
+        {
+            AddStep("load results", () =>
+            {
+                LoadScreen(new TimeshiftResultsScreen(score, 1, new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                }));
+            });
+
+        }
+
+        private void bindHandler(double delay = 0)
         {
             var roomScores = new List<RoomScore>();
 
@@ -61,26 +95,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             }
 
-            AddStep("bind request handler", () => ((DummyAPIAccess)API).HandleRequest = request =>
+            ((DummyAPIAccess)API).HandleRequest = request =>
             {
                 switch (request)
                 {
                     case GetRoomPlaylistScoresRequest r:
-                        r.TriggerSuccess(new RoomPlaylistScores { Scores = roomScores });
+                        if (delay == 0)
+                            success();
+                        else
+                        {
+                            Task.Run(async () =>
+                            {
+                                await Task.Delay(TimeSpan.FromMilliseconds(delay));
+                                Schedule(success);
+                            });
+                        }
+
+                        void success()
+                        {
+                            r.TriggerSuccess(new RoomPlaylistScores { Scores = roomScores });
+                            roomsReceived = true;
+                        }
+
                         break;
                 }
-            });
-
-            AddStep("load results", () =>
-            {
-                LoadScreen(new TimeshiftResultsScreen(score, 1, new PlaylistItem
-                {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
-                }));
-            });
-
-            AddWaitStep("wait for display", 10);
+            };
         }
     }
 }
