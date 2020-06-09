@@ -589,6 +589,33 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestAutoplayViaCtrlEnterOverridesSelectedAutomationMods()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("select another automation mod", () => SelectedMods.Value = SelectedMods.Value.Append(new OsuModRelax()).ToArray());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.Enter);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay enabled", () => songSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
         public void TestHideSetSelectsCorrectBeatmap()
         {
             int? previousID = null;
