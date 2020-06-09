@@ -12,17 +12,16 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Skinning;
-using osu.Game.Online.API;
-using osu.Game.Users;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Menu
 {
+    /// <summary>
+    /// A visualiser that reacts to music coming from beatmaps.
+    /// </summary>
     public class LogoVisualisation : Drawable, IHasAccentColour
     {
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
@@ -71,9 +70,6 @@ namespace osu.Game.Screens.Menu
         private IShader shader;
         private readonly Texture texture;
 
-        private Bindable<User> user;
-        private Bindable<Skin> skin;
-
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
@@ -81,15 +77,10 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
-            user = api.LocalUser.GetBoundCopy();
-            skin = skinManager.CurrentSkin.GetBoundCopy();
-
-            user.ValueChanged += _ => updateColour();
-            skin.BindValueChanged(_ => updateColour(), true);
         }
 
         private void updateAmplitudes()
@@ -116,16 +107,6 @@ namespace osu.Game.Screens.Menu
             }
 
             indexOffset = (indexOffset + index_change) % bars_per_visualiser;
-        }
-
-        private void updateColour()
-        {
-            Color4 defaultColour = Color4.White.Opacity(0.2f);
-
-            if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
-            else
-                AccentColour = defaultColour;
         }
 
         protected override void LoadComplete()

@@ -207,6 +207,8 @@ namespace osu.Game.Screens.Multi.Match
                 Ruleset.Value = item.Ruleset.Value;
         }
 
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet) => Schedule(updateWorkingBeatmap);
+
         private void updateWorkingBeatmap()
         {
             var beatmap = SelectedItem.Value?.Beatmap.Value;
@@ -215,17 +217,6 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-        }
-
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
-        {
-            Schedule(() =>
-            {
-                if (Beatmap.Value != beatmapManager.DefaultBeatmap)
-                    return;
-
-                updateWorkingBeatmap();
-            });
         }
 
         private void onStart()
