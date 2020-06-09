@@ -61,7 +61,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 }));
             });
-
         }
 
         private void bindHandler(double delay = 0)
