@@ -20,6 +20,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK;
