@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
-                        Text = $"Played on {score.Date.ToLocalTime():g}"
+                        Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}"
                     }
                 }
             };
