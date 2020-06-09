@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
                 foreach (var obj in content.OfType<DrawableHitObject>())
                 {
-                    if (!(obj.HitObject is IHasEndTime endTime))
+                    if (!(obj.HitObject is IHasDuration endTime))
                         continue;
 
                     foreach (var nested in obj.NestedHitObjects)

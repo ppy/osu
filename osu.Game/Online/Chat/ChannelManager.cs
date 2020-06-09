@@ -86,19 +86,13 @@ namespace osu.Game.Online.Chat
                 return;
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
-                                   ?? new Channel(user);
+                                   ?? JoinChannel(new Channel(user));
         }
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
             if (!(e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel))
                 JoinChannel(e.NewValue);
-
-            if (e.NewValue?.MessagesLoaded == false)
-            {
-                // let's fetch a small number of messages to bring us up-to-date with the backlog.
-                fetchInitalMessages(e.NewValue);
-            }
         }
 
         /// <summary>
@@ -146,7 +140,7 @@ namespace osu.Game.Online.Chat
                 target.AddLocalEcho(message);
 
                 // if this is a PM and the first message, we need to do a special request to create the PM channel
-                if (target.Type == ChannelType.PM && !target.Joined.Value)
+                if (target.Type == ChannelType.PM && target.Id == 0)
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
@@ -240,7 +234,6 @@ namespace osu.Game.Online.Chat
                     }
 
                     JoinChannel(channel);
-                    CurrentChannel.Value = channel;
                     break;
 
                 case "help":
@@ -275,7 +268,7 @@ namespace osu.Game.Online.Chat
 
                     // join any channels classified as "defaults"
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                        JoinChannel(ch);
+                        joinChannel(ch);
                 }
             };
             req.Failure += error =>
@@ -296,7 +289,7 @@ namespace osu.Game.Online.Chat
         /// <param name="channel">The channel </param>
         private void fetchInitalMessages(Channel channel)
         {
-            if (channel.Id <= 0) return;
+            if (channel.Id <= 0 || channel.MessagesLoaded) return;
 
             var fetchInitialMsgReq = new GetMessagesRequest(channel);
             fetchInitialMsgReq.Success += messages =>
@@ -351,9 +344,10 @@ namespace osu.Game.Online.Chat
         /// Joins a channel if it has not already been joined.
         /// </summary>
         /// <param name="channel">The channel to join.</param>
-        /// <param name="alreadyJoined">Whether the channel has already been joined server-side. Will skip a join request.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
-        public Channel JoinChannel(Channel channel, bool alreadyJoined = false)
+        public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
+
+        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false)
         {
             if (channel == null) return null;
 
@@ -362,20 +356,44 @@ namespace osu.Game.Online.Chat
             // ensure we are joined to the channel
             if (!channel.Joined.Value)
             {
-                if (alreadyJoined)
-                    channel.Joined.Value = true;
-                else
+                channel.Joined.Value = true;
+
+                switch (channel.Type)
                 {
-                    switch (channel.Type)
-                    {
-                        case ChannelType.Public:
-                            var req = new JoinChannelRequest(channel, api.LocalUser.Value);
-                            req.Success += () => JoinChannel(channel, true);
-                            req.Failure += ex => LeaveChannel(channel);
-                            api.Queue(req);
-                            return channel;
-                    }
+                    case ChannelType.Multiplayer:
+                        // join is implicit. happens when you join a multiplayer game.
+                        // this will probably change in the future.
+                        joinChannel(channel, fetchInitialMessages);
+                        return channel;
+
+                    case ChannelType.PM:
+                        var createRequest = new CreateChannelRequest(channel);
+                        createRequest.Success += resChannel =>
+                        {
+                            if (resChannel.ChannelID.HasValue)
+                            {
+                                channel.Id = resChannel.ChannelID.Value;
+
+                                handleChannelMessages(resChannel.RecentMessages);
+                                channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
+                            }
+                        };
+
+                        api.Queue(createRequest);
+                        break;
+
+                    default:
+                        var req = new JoinChannelRequest(channel, api.LocalUser.Value);
+                        req.Success += () => joinChannel(channel, fetchInitialMessages);
+                        req.Failure += ex => LeaveChannel(channel);
+                        api.Queue(req);
+                        return channel;
                 }
+            }
+            else
+            {
+                if (fetchInitialMessages)
+                    fetchInitalMessages(channel);
             }
 
             if (CurrentChannel.Value == null)
@@ -420,7 +438,8 @@ namespace osu.Game.Online.Chat
                     foreach (var channel in updates.Presence)
                     {
                         // we received this from the server so should mark the channel already joined.
-                        JoinChannel(channel, true);
+                        channel.Joined.Value = true;
+                        joinChannel(channel);
                     }
 
                     //todo: handle left channels
