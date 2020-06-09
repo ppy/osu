@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Menu
 
         protected void PrepareMenuLoad() => LoadComponentAsync(mainMenu = new MainMenu());
 
-        protected void LoadMenu()
+        protected virtual void LoadMenu()
         {
             beatmap.Return();
 

@@ -50,20 +50,20 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected override void LoadComplete()
+        public override void OnSuspending(IScreen next)
         {
-            base.LoadComplete();
+            this.FadeOut(300);
+            base.OnSuspending(next);
+        }
+
+        protected override void LoadMenu()
+        {
+            base.LoadMenu();
 
             if (!MenuMusic.Value && setInfo != null && LoadDirectToSongSelect.Value )
             {
                 game?.PresentBeatmap(setInfo);
             }
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            this.FadeOut(300);
-            base.OnSuspending(next);
         }
     }
 }
