@@ -20,7 +20,7 @@ using osuTK.Input;
 namespace osu.Game.Tournament
 {
     [Cached(typeof(TournamentGameBase))]
-    public abstract class TournamentGameBase : OsuGameBase
+    public class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
 
