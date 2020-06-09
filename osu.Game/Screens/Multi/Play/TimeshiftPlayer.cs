@@ -98,21 +98,17 @@ namespace osu.Game.Screens.Multi.Play
 
         protected override ScoreInfo CreateScore()
         {
-            submitScore();
-            return base.CreateScore();
-        }
-
-        private void submitScore()
-        {
             var score = base.CreateScore();
-
             score.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
 
             Debug.Assert(token != null);
 
             var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
+            request.Success += s => score.OnlineScoreID = s.ID;
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
+
+            return score;
         }
 
         protected override void Dispose(bool isDisposing)
