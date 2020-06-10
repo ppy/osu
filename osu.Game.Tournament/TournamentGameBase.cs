@@ -228,6 +228,7 @@ namespace osu.Game.Tournament
 
             API.Queue(req);
         }
+
         protected override void LoadComplete()
         {
             MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
