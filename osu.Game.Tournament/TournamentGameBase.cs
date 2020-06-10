@@ -150,11 +150,8 @@ namespace osu.Game.Tournament
                     ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
             }
 
-            if (ladder == null)
-                ladder = new LadderInfo();
-
-            if (ladder.Ruleset.Value == null)
-                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
+            ladder ??= new LadderInfo();
+            ladder.Ruleset.Value ??= RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
 
