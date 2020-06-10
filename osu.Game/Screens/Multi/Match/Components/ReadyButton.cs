@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -52,24 +53,14 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void updateSelectedItem(PlaylistItem item)
         {
-            hasBeatmap = false;
-
-            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
-            if (beatmapId == null)
-                return;
-
-            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId) != null;
+            hasBeatmap = findBeatmap(expr => beatmaps.QueryBeatmap(expr));
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
             if (weakSet.NewValue.TryGetTarget(out var set))
             {
-                int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
-                if (beatmapId == null)
-                    return;
-
-                if (set.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
+                if (findBeatmap(expr => set.Beatmaps.AsQueryable().FirstOrDefault(expr)))
                     Schedule(() => hasBeatmap = true);
             }
         }
@@ -78,13 +69,20 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             if (weakSet.NewValue.TryGetTarget(out var set))
             {
-                int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
-                if (beatmapId == null)
-                    return;
-
-                if (set.Beatmaps.Any(b => b.OnlineBeatmapID == beatmapId))
+                if (findBeatmap(expr => set.Beatmaps.AsQueryable().FirstOrDefault(expr)))
                     Schedule(() => hasBeatmap = false);
             }
+        }
+
+        private bool findBeatmap(Func<Expression<Func<BeatmapInfo, bool>>, BeatmapInfo> expression)
+        {
+            int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
+            string checksum = SelectedItem.Value?.Beatmap.Value?.MD5Hash;
+
+            if (beatmapId == null || checksum == null)
+                return false;
+
+            return expression(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum) != null;
         }
 
         protected override void Update()
