@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Select
         {
             rewindSearch = action == GlobalAction.SelectPreviousRandom;
 
-            if (action != GlobalAction.SelectNextRandom && !rewindSearch)
+            if (action != GlobalAction.SelectNextRandom && action != GlobalAction.SelectPreviousRandom)
             {
                 return false;
             }
