@@ -19,9 +19,6 @@ namespace osu.Game.Tournament.Tests
                 Depth = 10
             }, AddInternal);
 
-            MenuCursorContainer.Cursor.AlwaysPresent = true;
-            MenuCursorContainer.Cursor.Alpha = 0;
-
             // Have to construct this here, rather than in the constructor, because
             // we depend on some dependencies to be loaded within OsuGameBase.load().
             Add(new TestBrowser());
