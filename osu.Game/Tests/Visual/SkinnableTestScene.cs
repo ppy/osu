@@ -23,8 +23,6 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class SkinnableTestScene : OsuGridTestScene
     {
-        private readonly Ruleset ruleset;
-
         private Skin metricsSkin;
         private Skin defaultSkin;
         private Skin specialSkin;
@@ -33,14 +31,11 @@ namespace osu.Game.Tests.Visual
         protected SkinnableTestScene()
             : base(2, 3)
         {
-            ruleset = CreateRulesetForSkinProvider();
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SkinManager skinManager)
         {
-            Ruleset.Value = ruleset.RulesetInfo;
-
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
@@ -110,7 +105,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(mainProvider, beatmap))
+                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,

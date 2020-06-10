@@ -24,20 +24,9 @@ namespace osu.Game.Tests.Visual
 
         protected OsuConfigManager LocalConfig;
 
-        private readonly Ruleset ruleset;
-
-        protected PlayerTestScene()
-        {
-            ruleset = CreatePlayerRuleset();
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            // There are test scenes using current value of the ruleset bindable
-            // on their BDLs (example in TestSceneSliderSnaking's BDL)
-            Ruleset.Value = ruleset.RulesetInfo;
-
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
             LocalConfig.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;
         }
@@ -58,7 +47,7 @@ namespace osu.Game.Tests.Visual
 
             action?.Invoke();
 
-            AddStep(ruleset.Description, LoadPlayer);
+            AddStep(CreatePlayerRuleset().Description, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -68,6 +57,7 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer()
         {
+            var ruleset = Ruleset.Value.CreateInstance();
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);

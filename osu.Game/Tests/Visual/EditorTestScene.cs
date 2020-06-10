@@ -19,7 +19,6 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Ruleset.Value = CreateEditorRuleset().RulesetInfo;
             Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
         }
 
