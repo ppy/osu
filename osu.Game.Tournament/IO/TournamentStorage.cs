@@ -33,7 +33,6 @@ namespace osu.Game.Tournament.IO
             }
             else
             {
-                Logger.Log("Migrating files from old storage to new.");
                 Migrate();
                 storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
                 storageConfig.Save();
