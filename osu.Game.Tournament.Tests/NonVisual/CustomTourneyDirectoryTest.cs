@@ -79,6 +79,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         {
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration)))
             {
+                // Recreate the old setup that uses "tournament" as the base path.
                 string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestMigration), "tournament");
 
                 string videosPath = Path.Combine(basePath, "videos");
