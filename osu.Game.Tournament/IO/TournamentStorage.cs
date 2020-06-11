@@ -17,6 +17,7 @@ namespace osu.Game.Tournament.IO
         internal readonly TournamentVideoResourceStore VideoStore;
         internal readonly Storage ConfigurationStorage;
         private const string default_tournament = "default";
+        private const string config_directory = "config";
 
         public TournamentStorage(GameHost host)
             : base(host.Storage.GetStorageForDirectory("tournaments"), string.Empty)
@@ -39,7 +40,7 @@ namespace osu.Game.Tournament.IO
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
             }
 
-            ConfigurationStorage = UnderlyingStorage.GetStorageForDirectory("config");
+            ConfigurationStorage = UnderlyingStorage.GetStorageForDirectory(config_directory);
 
             VideoStore = new TournamentVideoResourceStore(this);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
@@ -49,9 +50,13 @@ namespace osu.Game.Tournament.IO
         {
             var source = new DirectoryInfo(host.Storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(GetFullPath(default_tournament));
+            var cfgDestination = new DirectoryInfo(GetFullPath(default_tournament + Path.DirectorySeparatorChar + config_directory));
 
             if (!destination.Exists)
                 destination.Create();
+            
+            if (!cfgDestination.Exists)
+                destination.CreateSubdirectory(config_directory);
 
             if (host.Storage.Exists("bracket.json"))
             {
@@ -65,6 +70,13 @@ namespace osu.Game.Tournament.IO
                 Logger.Log("Migrating drawings to default tournament storage.");
                 var drawingsFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings.txt"));
                 moveFile(drawingsFile, destination);
+            }
+
+            if (host.Storage.Exists("drawings.ini"))
+            {
+                Logger.Log("Migrating drawing configuration to default tournament storage.");
+                var drawingsConfigFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings.ini"));
+                moveFile(drawingsConfigFile, cfgDestination);
             }
 
             if (host.Storage.Exists("drawings_results.txt"))
