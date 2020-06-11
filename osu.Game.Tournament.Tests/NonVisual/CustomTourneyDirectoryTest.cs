@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 {
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<TournamentStorage>();
-                    var defaultStorage = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestDefaultDirectory), "tournaments", "default");
+                    var defaultStorage = Path.Combine(tournamentBasePath(nameof(TestDefaultDirectory)), "default");
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorage));
                 }
                 finally
@@ -107,7 +107,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     var storage = osu.Dependencies.Get<TournamentStorage>();
 
-                    var migratedPath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestMigration), "tournaments", "default");
+                    var migratedPath = Path.Combine(tournamentBasePath(nameof(TestMigration)), "default");
 
                     videosPath = Path.Combine(migratedPath, "videos");
                     modsPath = Path.Combine(migratedPath, "mods");
@@ -151,8 +151,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
-
-        private string oldPath => Path.Combine(RuntimeInfo.StartupDirectory, "tournament");
         private string tournamentBasePath(string testInstance) => Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance, "tournaments");
     }
 }
