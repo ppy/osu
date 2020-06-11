@@ -11,7 +11,7 @@ using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament.IO
 {
-    internal class TournamentStorage : WrappedStorage
+    public class TournamentStorage : WrappedStorage
     {
         private readonly GameHost host;
         internal readonly TournamentVideoResourceStore VideoStore;
