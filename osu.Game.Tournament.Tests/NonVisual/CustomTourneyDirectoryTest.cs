@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -48,7 +47,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         {
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestCustomDirectory)))
             {
-                string osuDesktopStorage = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestCustomDirectory));
+                string osuDesktopStorage = basePath(nameof(TestCustomDirectory));
                 const string custom_tournament = "custom";
 
                 // need access before the game has constructed its own storage yet.
@@ -80,23 +79,34 @@ namespace osu.Game.Tournament.Tests.NonVisual
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration)))
             {
                 // Recreate the old setup that uses "tournament" as the base path.
-                string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestMigration), "tournament");
+                string osuRoot = basePath(nameof(TestMigration));
 
-                string videosPath = Path.Combine(basePath, "videos");
-                string modsPath = Path.Combine(basePath, "mods");
-                string flagsPath = Path.Combine(basePath, "flags");
+                // Define all the paths for the old scenario
+                string oldPath = Path.Combine(osuRoot, "tournament");
+                string videosPath = Path.Combine(oldPath, "videos");
+                string modsPath = Path.Combine(oldPath, "mods");
+                string flagsPath = Path.Combine(oldPath, "flags");
 
                 Directory.CreateDirectory(videosPath);
                 Directory.CreateDirectory(modsPath);
                 Directory.CreateDirectory(flagsPath);
 
-                string bracketFile = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestMigration), "bracket.json");
+                // Define testing files corresponding to the specific file migrations that are needed
+                string bracketFile = Path.Combine(osuRoot, "bracket.json");
+
+                string drawingsConfig = Path.Combine(osuRoot, "drawings.ini");
+                string drawingsFile = Path.Combine(osuRoot, "drawings.txt");
+                string drawingsResult = Path.Combine(osuRoot, "drawings_results.txt");
+
+                // Define sample files to test recursive copying
                 string videoFile = Path.Combine(videosPath, "video.mp4");
                 string modFile = Path.Combine(modsPath, "mod.png");
                 string flagFile = Path.Combine(flagsPath, "flag.png");
 
                 File.WriteAllText(bracketFile, "{}");
-
+                File.WriteAllText(drawingsConfig, "test");
+                File.WriteAllText(drawingsFile, "test");
+                File.WriteAllText(drawingsResult, "test");
                 File.WriteAllText(videoFile, "test");
                 File.WriteAllText(modFile, "test");
                 File.WriteAllText(flagFile, "test");
@@ -118,7 +128,13 @@ namespace osu.Game.Tournament.Tests.NonVisual
                     flagFile = Path.Combine(flagsPath, "flag.png");
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(migratedPath));
-                    Assert.That(storage.GetFiles(".", "bracket.json").Single(), Is.EqualTo("bracket.json"));
+
+                    Assert.True(storage.Exists("bracket.json"));
+                    Assert.True(storage.Exists("drawings.txt"));
+                    Assert.True(storage.Exists("drawings_results.txt"));
+
+                    Assert.True(storage.ConfigurationStorage.Exists("drawings.ini"));
+
                     Assert.True(storage.Exists(videoFile));
                     Assert.True(storage.Exists(modFile));
                     Assert.True(storage.Exists(flagFile));
@@ -128,7 +144,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
                     // Cleaning up after ourselves.
                     host.Storage.Delete("tournament.ini");
                     host.Storage.DeleteDirectory("tournaments");
-
                     host.Exit();
                 }
             }
@@ -151,6 +166,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
-        private string tournamentBasePath(string testInstance) => Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance, "tournaments");
+
+        private string basePath(string testInstance) => Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance);
+
+        private string tournamentBasePath(string testInstance) => Path.Combine(basePath(testInstance), "tournaments");
     }
 }

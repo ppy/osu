@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.IO
 
             if (!destination.Exists)
                 destination.Create();
-            
+
             if (!cfgDestination.Exists)
                 destination.CreateSubdirectory(config_directory);
 
