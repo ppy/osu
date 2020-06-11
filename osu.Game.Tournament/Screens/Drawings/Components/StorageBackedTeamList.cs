@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
@@ -14,9 +14,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
     {
         private const string teams_filename = "drawings.txt";
 
-        private readonly Storage storage;
+        private readonly TournamentStorage storage;
 
-        public StorageBackedTeamList(Storage storage)
+        public StorageBackedTeamList(TournamentStorage storage)
         {
             this.storage = storage;
         }
