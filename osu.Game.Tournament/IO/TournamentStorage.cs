@@ -54,8 +54,21 @@ namespace osu.Game.Tournament.IO
             {
                 Logger.Log("Migrating bracket to default tournament storage.");
                 var bracketFile = new System.IO.FileInfo(host.Storage.GetFullPath("bracket.json"));
-                attemptOperation(() => bracketFile.CopyTo(Path.Combine(destination.FullName, bracketFile.Name), true));
-                bracketFile.Delete();
+                moveFile(bracketFile, destination);
+            }
+
+            if (host.Storage.Exists("drawings.txt"))
+            {
+                Logger.Log("Migrating drawings to default tournament storage.");
+                var drawingsFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings.txt"));
+                moveFile(drawingsFile, destination);
+            }
+
+            if (host.Storage.Exists("drawings_results.txt"))
+            {
+                Logger.Log("Migrating drawings results to default tournament storage.");
+                var drawingsResultsFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings_results.txt"));
+                moveFile(drawingsResultsFile, destination);
             }
 
             if (source.Exists)
@@ -95,6 +108,12 @@ namespace osu.Game.Tournament.IO
 
             if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
                 attemptOperation(target.Delete);
+        }
+
+        private void moveFile(System.IO.FileInfo file, DirectoryInfo destination)
+        {
+            attemptOperation(() => file.CopyTo(Path.Combine(destination.FullName, file.Name), true));
+            file.Delete();
         }
 
         private void attemptOperation(Action action, int attempts = 10)
