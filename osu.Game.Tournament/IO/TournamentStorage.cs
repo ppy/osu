@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.IO
     internal class TournamentStorage : WrappedStorage
     {
         private readonly GameHost host;
-        public readonly TournamentVideoStorage VideoStorage;
+        internal readonly TournamentVideoStorage VideoStorage;
         private const string default_tournament = "default";
 
         public TournamentStorage(GameHost host)
