@@ -15,6 +15,7 @@ namespace osu.Game.Tournament.IO
     {
         private readonly GameHost host;
         internal readonly TournamentVideoResourceStore VideoStore;
+        internal readonly Storage ConfigurationStorage;
         private const string default_tournament = "default";
 
         public TournamentStorage(GameHost host)
@@ -37,6 +38,8 @@ namespace osu.Game.Tournament.IO
                 storageConfig.Save();
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
             }
+
+            ConfigurationStorage = UnderlyingStorage.GetStorageForDirectory("config");
 
             VideoStore = new TournamentVideoResourceStore(this);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
