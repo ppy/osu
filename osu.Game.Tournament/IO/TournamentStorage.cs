@@ -15,15 +15,16 @@ namespace osu.Game.Tournament.IO
     internal class TournamentStorage : WrappedStorage
     {
         private readonly GameHost host;
-        private readonly TournamentStorageManager storageConfig;
         public readonly TournamentVideoStorage VideoStorage;
+        private const string default_tournament = "default";
 
         public TournamentStorage(GameHost host)
             : base(host.Storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
             this.host = host;
 
-            storageConfig = new TournamentStorageManager(host.Storage);
+            TournamentStorageManager storageConfig = new TournamentStorageManager(host.Storage);
+
             var currentTournament = storageConfig.Get<string>(StorageConfig.CurrentTournament);
 
             if (!string.IsNullOrEmpty(currentTournament))
@@ -32,35 +33,39 @@ namespace osu.Game.Tournament.IO
             }
             else
             {
-                migrate();
                 Logger.Log("Migrating files from old storage to new.");
+                Migrate();
+                storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
+                storageConfig.Save();
+                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
             }
 
             VideoStorage = new TournamentVideoStorage(this);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
         }
 
-        private void migrate()
+        internal void Migrate()
         {
-            const string default_path = "default";
             var source = new DirectoryInfo(host.Storage.GetFullPath("tournament"));
-            var destination = new DirectoryInfo(GetFullPath(default_path));
+            var destination = new DirectoryInfo(GetFullPath(default_tournament));
 
-            Directory.CreateDirectory(destination.FullName);
+            if (!destination.Exists)
+                destination.Create();
 
             if (host.Storage.Exists("bracket.json"))
             {
                 Logger.Log("Migrating bracket to default tournament storage.");
                 var bracketFile = new System.IO.FileInfo(host.Storage.GetFullPath("bracket.json"));
                 attemptOperation(() => bracketFile.CopyTo(Path.Combine(destination.FullName, bracketFile.Name), true));
+                bracketFile.Delete();
             }
 
-            Logger.Log("Migrating other assets to default tournament storage.");
-            copyRecursive(source, destination);
-            ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_path));
-            storageConfig.Set(StorageConfig.CurrentTournament, default_path);
-            storageConfig.Save();
-            deleteRecursive(source);
+            if (source.Exists)
+            {
+                Logger.Log("Migrating tournament assets to default tournament storage.");
+                copyRecursive(source, destination);
+                deleteRecursive(source);
+            }
         }
 
         private void copyRecursive(DirectoryInfo source, DirectoryInfo destination)
@@ -113,7 +118,7 @@ namespace osu.Game.Tournament.IO
             }
         }
     }
-    
+
     internal class TournamentVideoStorage : NamespacedResourceStore<byte[]>
     {
         public TournamentVideoStorage(Storage storage)
