@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
@@ -115,17 +114,6 @@ namespace osu.Game.Tournament.IO
 
                 Thread.Sleep(250);
             }
-        }
-    }
-
-    internal class TournamentVideoResourceStore : NamespacedResourceStore<byte[]>
-    {
-        public TournamentVideoResourceStore(Storage storage)
-            : base(new StorageBackedResourceStore(storage), "videos")
-        {
-            AddExtension("m4v");
-            AddExtension("avi");
-            AddExtension("mp4");
         }
     }
 }
