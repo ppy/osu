@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)
         {
-            var stream = storage.VideoStorage.GetStream($@"{filename}");
+            var stream = storage.VideoStore.GetStream($@"{filename}");
 
             if (stream != null)
             {

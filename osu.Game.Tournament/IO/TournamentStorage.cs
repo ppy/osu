@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.IO
     internal class TournamentStorage : WrappedStorage
     {
         private readonly GameHost host;
-        internal readonly TournamentVideoStorage VideoStorage;
+        internal readonly TournamentVideoResourceStore VideoStore;
         private const string default_tournament = "default";
 
         public TournamentStorage(GameHost host)
@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.IO
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
             }
 
-            VideoStorage = new TournamentVideoStorage(this);
+            VideoStore = new TournamentVideoResourceStore(this);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
         }
 
@@ -118,9 +118,9 @@ namespace osu.Game.Tournament.IO
         }
     }
 
-    internal class TournamentVideoStorage : NamespacedResourceStore<byte[]>
+    internal class TournamentVideoResourceStore : NamespacedResourceStore<byte[]>
     {
-        public TournamentVideoStorage(Storage storage)
+        public TournamentVideoResourceStore(Storage storage)
             : base(new StorageBackedResourceStore(storage), "videos")
         {
             AddExtension("m4v");

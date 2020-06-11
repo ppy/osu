@@ -56,7 +56,7 @@ namespace osu.Game.Tournament
 
             dependencies.CacheAs(storage = new TournamentStorage(Host));
 
-            Textures.AddStore(new TextureLoaderStore(storage.VideoStorage));
+            Textures.AddStore(new TextureLoaderStore(storage.VideoStore));
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
