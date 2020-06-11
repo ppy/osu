@@ -293,4 +293,3 @@ namespace osu.Game.Tests.NonVisual
         }
     }
 }
-
