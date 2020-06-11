@@ -130,6 +130,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                                 SelectedItem = { BindTarget = SelectedItem }
                                                                             }
                                                                         },
+                                                                        null,
                                                                         new Drawable[]
                                                                         {
                                                                             new TriangleButton
@@ -139,6 +140,12 @@ namespace osu.Game.Screens.Multi.Match
                                                                                 Action = showBeatmapResults
                                                                             }
                                                                         }
+                                                                    },
+                                                                    RowDimensions = new[]
+                                                                    {
+                                                                        new Dimension(),
+                                                                        new Dimension(GridSizeMode.Absolute, 5),
+                                                                        new Dimension(GridSizeMode.AutoSize)
                                                                     }
                                                                 }
                                                             },
