@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
@@ -36,9 +35,7 @@ namespace osu.Game.Tournament
 
         private LadderInfo ladder;
 
-        private Storage storage;
-
-        private TournamentStorage tournamentStorage;
+        private TournamentStorage storage;
 
         private DependencyContainer dependencies;
 
@@ -57,11 +54,9 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            dependencies.CacheAs(tournamentStorage = new TournamentStorage(Host));
+            dependencies.CacheAs(storage = new TournamentStorage(Host));
 
-            Textures.AddStore(new TextureLoaderStore(tournamentStorage.VideoStorage));
-
-            storage = tournamentStorage;
+            Textures.AddStore(new TextureLoaderStore(storage.VideoStorage));
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
