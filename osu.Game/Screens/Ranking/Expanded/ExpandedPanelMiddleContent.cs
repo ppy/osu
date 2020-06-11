@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         private void load()
         {
             var beatmap = score.Beatmap;
-            var metadata = beatmap.Metadata;
+            var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             var creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
