@@ -607,10 +607,7 @@ namespace osu.Game.Screens.Select
 
             // todo: remove the need for this.
             foreach (var b in beatmapSet.Beatmaps)
-            {
-                if (b.Metadata == null)
-                    b.Metadata = beatmapSet.Metadata;
-            }
+                b.Metadata ??= beatmapSet.Metadata;
 
             var set = new CarouselBeatmapSet(beatmapSet)
             {

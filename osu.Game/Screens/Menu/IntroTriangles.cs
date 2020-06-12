@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (MenuVoice.Value && !MenuMusic.Value)
+            if (MenuVoice.Value && !UsingThemedIntro)
                 welcome = audio.Samples.Get(@"Intro/lazer/welcome");
         }
 
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(MenuMusic.Value ? Track : null),
+                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
