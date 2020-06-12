@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new Drawable[]
                     {
-                        Content = new Container { Margin = new MarginPadding { Top = 5 } }
+                        Content = new Container { Padding = new MarginPadding { Top = 5 } }
                     }
                 }
             };
