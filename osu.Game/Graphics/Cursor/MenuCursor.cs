@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.Cursor
                 activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             }
 
-            if (shouldRotateCursor(e) && cursorRotate.Value)
+            if (shouldRotateCursor(e))
             {
                 // if cursor is already rotating don't reset its rotate origin
                 if (dragRotationState != DragRotationState.Rotating)
@@ -126,7 +126,7 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
         }
 
-        private static bool shouldRotateCursor(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right);
+        private bool shouldRotateCursor(MouseEvent e) => cursorRotate.Value && (e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right));
 
         private static bool anyMainButtonPressed(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Middle) || e.IsPressed(MouseButton.Right);
 
