@@ -25,6 +25,9 @@ namespace osu.Game.Screens.Multi
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
+
+        public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>();
+
         public IBindableList<Room> Rooms => rooms;
 
         public double TimeBetweenListingPolls
@@ -62,7 +65,11 @@ namespace osu.Game.Screens.Multi
 
             InternalChildren = new Drawable[]
             {
-                listingPollingComponent = new ListingPollingComponent { RoomsReceived = onListingReceived },
+                listingPollingComponent = new ListingPollingComponent
+                {
+                    InitialRoomsReceived = { BindTarget = InitialRoomsReceived },
+                    RoomsReceived = onListingReceived
+                },
                 selectionPollingComponent = new SelectionPollingComponent { RoomReceived = onSelectedRoomReceived }
             };
         }
@@ -262,6 +269,8 @@ namespace osu.Game.Screens.Multi
         {
             public Action<List<Room>> RoomsReceived;
 
+            public readonly Bindable<bool> InitialRoomsReceived = new Bindable<bool>();
+
             [Resolved]
             private IAPIProvider api { get; set; }
 
@@ -273,6 +282,8 @@ namespace osu.Game.Screens.Multi
             {
                 currentFilter.BindValueChanged(_ =>
                 {
+                    InitialRoomsReceived.Value = false;
+
                     if (IsLoaded)
                         PollImmediately();
                 });
@@ -292,6 +303,7 @@ namespace osu.Game.Screens.Multi
 
                 pollReq.Success += result =>
                 {
+                    InitialRoomsReceived.Value = true;
                     RoomsReceived?.Invoke(result);
                     tcs.SetResult(true);
                 };

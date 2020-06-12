@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Menu
         private readonly Container logoBeatContainer;
         private readonly Container logoAmplitudeContainer;
         private readonly Container logoHoverContainer;
-        private readonly LogoVisualisation visualizer;
+        private readonly MenuLogoVisualisation visualizer;
 
         private readonly IntroSequence intro;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Menu
                                             AutoSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                visualizer = new LogoVisualisation
+                                                visualizer = new MenuLogoVisualisation
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Origin = Anchor.Centre,
