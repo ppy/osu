@@ -141,6 +141,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             public readonly BindableList<Room> Rooms = new BindableList<Room>();
+
+            public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
+
             IBindableList<Room> IRoomManager.Rooms => Rooms;
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
