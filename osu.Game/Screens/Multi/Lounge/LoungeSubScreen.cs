@@ -22,11 +22,15 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected readonly FilterControl Filter;
 
+        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
+
         private readonly Container content;
         private readonly LoadingLayer loadingLayer;
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
+
+        private bool joiningRoom;
 
         public LoungeSubScreen()
         {
@@ -71,6 +75,14 @@ namespace osu.Game.Screens.Multi.Lounge
                     },
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
+            initialRoomsReceived.BindValueChanged(onInitialRoomsReceivedChanged, true);
         }
 
         protected override void UpdateAfterChildren()
@@ -126,12 +138,29 @@ namespace osu.Game.Screens.Multi.Lounge
 
         private void joinRequested(Room room)
         {
-            loadingLayer.Show();
+            joiningRoom = true;
+            updateLoadingLayer();
+
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
+                joiningRoom = false;
+                updateLoadingLayer();
+            }, _ =>
+            {
+                joiningRoom = false;
+                updateLoadingLayer();
+            });
+        }
+
+        private void onInitialRoomsReceivedChanged(ValueChangedEvent<bool> received) => updateLoadingLayer();
+
+        private void updateLoadingLayer()
+        {
+            if (joiningRoom || !initialRoomsReceived.Value)
+                loadingLayer.Show();
+            else
                 loadingLayer.Hide();
-            }, _ => loadingLayer.Hide());
         }
 
         /// <summary>

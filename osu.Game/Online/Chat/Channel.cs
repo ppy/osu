@@ -84,7 +84,8 @@ namespace osu.Game.Online.Chat
         public long? LastReadId;
 
         /// <summary>
-        /// Signalles if the current user joined this channel or not. Defaults to false.
+        /// Signals if the current user joined this channel or not. Defaults to false.
+        /// Note that this does not guarantee a join has completed. Check Id > 0 for confirmation.
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
 
