@@ -10,7 +10,6 @@ using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
-using osuTK.Input;
 using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
@@ -59,7 +58,7 @@ namespace osu.Desktop
             try
             {
                 using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString()?.Split('"')[1].Replace("osu!.exe", "");
 
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
@@ -122,21 +121,27 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            if (host.Window is DesktopGameWindow desktopWindow)
+            switch (host.Window)
             {
-                desktopWindow.CursorState |= CursorState.Hidden;
+                // Legacy osuTK DesktopGameWindow
+                case DesktopGameWindow desktopGameWindow:
+                    desktopGameWindow.CursorState |= CursorState.Hidden;
+                    desktopGameWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                    desktopGameWindow.Title = Name;
+                    desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
+                    break;
 
-                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
-                desktopWindow.Title = Name;
-
-                desktopWindow.FileDrop += fileDrop;
+                // SDL2 DesktopWindow
+                case DesktopWindow desktopWindow:
+                    desktopWindow.CursorState.Value |= CursorState.Hidden;
+                    desktopWindow.Title = Name;
+                    desktopWindow.DragDrop += f => fileDrop(new[] { f });
+                    break;
             }
         }
 
-        private void fileDrop(object sender, FileDropEventArgs e)
+        private void fileDrop(string[] filePaths)
         {
-            var filePaths = e.FileNames;
-
             var firstExtension = Path.GetExtension(filePaths.First());
 
             if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;

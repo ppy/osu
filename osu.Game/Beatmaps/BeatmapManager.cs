@@ -79,6 +79,8 @@ namespace osu.Game.Beatmaps
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => beatmapHidden.Value = new WeakReference<BeatmapInfo>(b);
             beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
+            beatmaps.ItemRemoved += removeWorkingCache;
+            beatmaps.ItemUpdated += removeWorkingCache;
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
         }
@@ -203,12 +205,17 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                using (ContextFactory.GetForWrite())
+                {
+                    var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+
+                    stream.Seek(0, SeekOrigin.Begin);
+                    UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                }
             }
 
-            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
-            if (working != null)
-                workingCache.Remove(working);
+            removeWorkingCache(info);
         }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
@@ -239,8 +246,7 @@ namespace osu.Game.Beatmaps
 
                 if (working == null)
                 {
-                    if (beatmapInfo.Metadata == null)
-                        beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
+                    beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
                     workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
                         new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
@@ -258,9 +264,9 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
-        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
-            if (!base.CanUndelete(existing, import))
+            if (!base.CanReuseExisting(existing, import))
                 return false;
 
             var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
@@ -408,6 +414,24 @@ namespace osu.Game.Beatmaps
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
+        }
+
+        private void removeWorkingCache(BeatmapSetInfo info)
+        {
+            if (info.Beatmaps == null) return;
+
+            foreach (var b in info.Beatmaps)
+                removeWorkingCache(b);
+        }
+
+        private void removeWorkingCache(BeatmapInfo info)
+        {
+            lock (workingCache)
+            {
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                if (working != null)
+                    workingCache.Remove(working);
+            }
         }
 
         public void Dispose()
