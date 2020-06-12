@@ -34,6 +34,7 @@ namespace osu.Game.Tournament.IPC
 
         private int lastBeatmapId;
         private ScheduledDelegate scheduled;
+        private GetBeatmapRequest beatmapLookupRequest;
 
         public Storage Storage { get; private set; }
 
@@ -77,6 +78,8 @@ namespace osu.Game.Tournament.IPC
 
                                 if (lastBeatmapId != beatmapId)
                                 {
+                                    beatmapLookupRequest?.Cancel();
+
                                     lastBeatmapId = beatmapId;
 
                                     var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
@@ -85,9 +88,9 @@ namespace osu.Game.Tournament.IPC
                                         Beatmap.Value = existing.BeatmapInfo;
                                     else
                                     {
-                                        var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
-                                        req.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
-                                        API.Queue(req);
+                                        beatmapLookupRequest = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
+                                        beatmapLookupRequest.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
+                                        API.Queue(beatmapLookupRequest);
                                     }
                                 }
 

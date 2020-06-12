@@ -47,8 +47,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             this.storage = storage;
 
-            if (TeamList == null)
-                TeamList = new StorageBackedTeamList(storage);
+            TeamList ??= new StorageBackedTeamList(storage);
 
             if (!TeamList.Teams.Any())
             {
