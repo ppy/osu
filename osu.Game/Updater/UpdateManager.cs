@@ -39,10 +39,9 @@ namespace osu.Game.Updater
 
             Schedule(() => Task.Run(CheckForUpdateAsync));
 
-            // Query last version only *once*, so the user can re-check for updates, in case they closed the notification or else.
-            var lastVersion = config.Get<string>(OsuSetting.Version);
-
             var version = game.Version;
+
+            var lastVersion = config.Get<string>(OsuSetting.Version);
 
             if (game.IsDeployedBuild && version != lastVersion)
             {
