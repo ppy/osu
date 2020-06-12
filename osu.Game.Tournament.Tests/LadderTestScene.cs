@@ -24,8 +24,7 @@ namespace osu.Game.Tournament.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (Ladder.Ruleset.Value == null)
-                Ladder.Ruleset.Value = rulesetStore.AvailableRulesets.First();
+            Ladder.Ruleset.Value ??= rulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(Ladder.Ruleset);
         }

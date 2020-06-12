@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Multi
                     X = -18,
                     Children = new Drawable[]
                     {
-                        new PlaylistDownloadButton(item.Beatmap.Value.BeatmapSet)
+                        new PlaylistDownloadButton(item)
                         {
                             Size = new Vector2(50, 30)
                         },
@@ -212,9 +212,15 @@ namespace osu.Game.Screens.Multi
 
         private class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet)
-                : base(beatmapSet)
+            private readonly PlaylistItem playlistItem;
+
+            [Resolved]
+            private BeatmapManager beatmapManager { get; set; }
+
+            public PlaylistDownloadButton(PlaylistItem playlistItem)
+                : base(playlistItem.Beatmap.Value.BeatmapSet)
             {
+                this.playlistItem = playlistItem;
                 Alpha = 0;
             }
 
@@ -223,11 +229,26 @@ namespace osu.Game.Screens.Multi
                 base.LoadComplete();
 
                 State.BindValueChanged(stateChanged, true);
+                FinishTransforms(true);
             }
 
             private void stateChanged(ValueChangedEvent<DownloadState> state)
             {
-                this.FadeTo(state.NewValue == DownloadState.LocallyAvailable ? 0 : 1, 500);
+                switch (state.NewValue)
+                {
+                    case DownloadState.LocallyAvailable:
+                        // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
+                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
+                            State.Value = DownloadState.NotDownloaded;
+                        else
+                            this.FadeTo(0, 500);
+
+                        break;
+
+                    default:
+                        this.FadeTo(1, 500);
+                        break;
+                }
             }
         }
 
