@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
     {
         private const int radius = 350;
 
-        private LogoVisualisation visualisation;
+        private MenuLogoVisualisation visualisation;
         private Container circularContainer;
         private readonly CircularProgress progressGlow;
         Track track;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects
 
             AddRangeInternal(new Drawable[]
             {
-                visualisation = new LogoVisualisation
+                visualisation = new MenuLogoVisualisation
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
