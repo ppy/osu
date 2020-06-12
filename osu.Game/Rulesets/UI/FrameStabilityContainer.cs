@@ -181,8 +181,7 @@ namespace osu.Game.Rulesets.UI
         private void setClock()
         {
             // in case a parent gameplay clock isn't available, just use the parent clock.
-            if (parentGameplayClock == null)
-                parentGameplayClock = Clock;
+            parentGameplayClock ??= Clock;
 
             Clock = GameplayClock;
             ProcessCustomClock = false;

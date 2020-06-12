@@ -14,7 +14,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
     {
         private readonly TeamScore score;
 
-        public bool ShowScore { set => score.FadeTo(value ? 1 : 0, 200); }
+        public bool ShowScore
+        {
+            set => score.FadeTo(value ? 1 : 0, 200);
+        }
 
         public TeamDisplay(TournamentTeam team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin)
             : base(team)
