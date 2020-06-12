@@ -35,7 +35,6 @@ namespace osu.Desktop.Updater
             notificationOverlay = notification;
 
             Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
-            Schedule(() => Task.Run(CheckForUpdateAsync));
         }
 
         protected override async Task InternalCheckForUpdateAsync() => await checkForUpdateAsync();

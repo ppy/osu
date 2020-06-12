@@ -28,8 +28,6 @@ namespace osu.Game.Updater
         private void load(OsuGameBase game)
         {
             version = game.Version;
-
-            Schedule(() => Task.Run(CheckForUpdateAsync));
         }
 
         protected override async Task InternalCheckForUpdateAsync()
