@@ -429,7 +429,6 @@ namespace osu.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 item.Hash = computeHash(item);
-
                 ModelStore.Update(item);
             }
         }

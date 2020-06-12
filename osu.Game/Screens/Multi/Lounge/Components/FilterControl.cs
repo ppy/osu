@@ -34,8 +34,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (filter == null)
-                filter = new Bindable<FilterCriteria>();
+            filter ??= new Bindable<FilterCriteria>();
         }
 
         protected override void LoadComplete()
