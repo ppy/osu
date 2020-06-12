@@ -24,8 +24,6 @@ namespace osu.Game.Updater
                                          // only implementations will actually check for updates.
                                          GetType() != typeof(UpdateManager);
 
-        private string lastVersion;
-
         [Resolved]
         private OsuConfigManager config { get; set; }
 
@@ -42,7 +40,7 @@ namespace osu.Game.Updater
             Schedule(() => Task.Run(CheckForUpdateAsync));
 
             // Query last version only *once*, so the user can re-check for updates, in case they closed the notification or else.
-            lastVersion ??= config.Get<string>(OsuSetting.Version);
+            var lastVersion = config.Get<string>(OsuSetting.Version);
 
             var version = game.Version;
 
