@@ -37,7 +37,7 @@ namespace osu.Game.Tournament
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
