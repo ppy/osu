@@ -20,7 +20,9 @@ namespace osu.Game.Updater
         /// <summary>
         /// Whether this UpdateManager should be or is capable of checking for updates.
         /// </summary>
-        public bool CanCheckForUpdate => game.IsDeployedBuild;
+        public bool CanCheckForUpdate => game.IsDeployedBuild &&
+                                         // only implementations will actually check for updates.
+                                         GetType() != typeof(UpdateManager);
 
         private string lastVersion;
 
