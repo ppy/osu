@@ -44,12 +44,22 @@ namespace osu.Game.Updater
             config.Set(OsuSetting.Version, game.Version);
         }
 
+        private readonly object updateTaskLock = new object();
+
+        private Task updateCheckTask;
+
         public async Task CheckForUpdateAsync()
         {
             if (!CanCheckForUpdate)
                 return;
 
-            await PerformUpdateCheck();
+            lock (updateTaskLock)
+                updateCheckTask ??= PerformUpdateCheck();
+
+            await updateCheckTask;
+
+            lock (updateTaskLock)
+                updateCheckTask = null;
         }
 
         protected virtual Task PerformUpdateCheck()
