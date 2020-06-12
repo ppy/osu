@@ -1,11 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -15,7 +14,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
@@ -176,7 +174,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                         // arbitrary write to non-hashed file
                         using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.mp3").First()).AppendText())
-                            sw.WriteLine("text");
+                            await sw.WriteLineAsync("text");
 
                         using (var zip = ZipArchive.Create())
                         {
@@ -337,7 +335,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var breakTemp = TestResources.GetTestBeatmapForImport();
 
                     MemoryStream brokenOsu = new MemoryStream();
-                    MemoryStream brokenOsz = new MemoryStream(File.ReadAllBytes(breakTemp));
+                    MemoryStream brokenOsz = new MemoryStream(await File.ReadAllBytesAsync(breakTemp));
 
                     File.Delete(breakTemp);
 
@@ -653,7 +651,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     using (var resourceForkFile = File.CreateText(resourceForkFilePath))
                     {
-                        resourceForkFile.WriteLine("adding content so that it's not empty");
+                        await resourceForkFile.WriteLineAsync("adding content so that it's not empty");
                     }
 
                     try
@@ -730,23 +728,17 @@ namespace osu.Game.Tests.Beatmaps.IO
                     await osu.Dependencies.Get<BeatmapManager>().Import(temp);
 
                     BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+
+                    var beatmapInfo = setToUpdate.Beatmaps.First(b => b.RulesetID == 0);
                     Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
                     BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
 
-                    using (var stream = new MemoryStream())
-                    {
-                        using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                        {
-                            beatmapToUpdate.HitObjects.Clear();
-                            beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
+                    string oldMd5Hash = beatmapToUpdate.BeatmapInfo.MD5Hash;
 
-                            new LegacyBeatmapEncoder(beatmapToUpdate).Encode(writer);
-                        }
+                    beatmapToUpdate.HitObjects.Clear();
+                    beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
 
-                        stream.Seek(0, SeekOrigin.Begin);
-
-                        manager.UpdateFile(setToUpdate, fileToUpdate, stream);
-                    }
+                    manager.Save(beatmapInfo, beatmapToUpdate);
 
                     // Check that the old file reference has been removed
                     Assert.That(manager.QueryBeatmapSet(s => s.ID == setToUpdate.ID).Files.All(f => f.ID != fileToUpdate.ID));
@@ -755,6 +747,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
                     Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
                     Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
+                    Assert.That(updatedBeatmap.BeatmapInfo.MD5Hash, Is.Not.EqualTo(oldMd5Hash));
                 }
                 finally
                 {

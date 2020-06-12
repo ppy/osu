@@ -4,12 +4,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi;
@@ -22,6 +28,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneDrawableRoomPlaylist : OsuManualInputManagerTestScene
     {
         private TestPlaylist playlist;
+
+        private BeatmapManager manager;
+        private RulesetStore rulesets;
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host, AudioManager audio)
+        {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+
+            manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
+        }
 
         [Test]
         public void TestNonEditableNonSelectable()
@@ -182,6 +200,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
         }
 
+        [Test]
+        public void TestDownloadButtonHiddenInitiallyWhenBeatmapExists()
+        {
+            createPlaylist(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
+
+            AddAssert("download button hidden", () => !playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+        }
+
+        [Test]
+        public void TestDownloadButtonVisibleInitiallyWhenBeatmapDoesNotExist()
+        {
+            var byOnlineId = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            byOnlineId.BeatmapSet.OnlineBeatmapSetID = 1337; // Some random ID that does not exist locally.
+
+            var byChecksum = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            byChecksum.MD5Hash = "1337"; // Some random checksum that does not exist locally.
+
+            createPlaylist(byOnlineId, byChecksum);
+
+            AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().All(d => d.IsPresent));
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index), offset));
 
@@ -221,6 +261,39 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         ID = i,
                         Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RequiredMods =
+                        {
+                            new OsuModHardRock(),
+                            new OsuModDoubleTime(),
+                            new OsuModAutoplay()
+                        }
+                    });
+                }
+            });
+
+            AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
+        }
+
+        private void createPlaylist(params BeatmapInfo[] beatmaps)
+        {
+            AddStep("create playlist", () =>
+            {
+                Child = playlist = new TestPlaylist(false, false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500, 300)
+                };
+
+                int index = 0;
+
+                foreach (var b in beatmaps)
+                {
+                    playlist.Items.Add(new PlaylistItem
+                    {
+                        ID = index++,
+                        Beatmap = { Value = b },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
                         {
