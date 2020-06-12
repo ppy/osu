@@ -30,7 +30,7 @@ namespace osu.Game.Updater
             version = game.Version;
         }
 
-        protected override async Task InternalCheckForUpdateAsync()
+        protected override async Task PerformUpdateCheck()
         {
             try
             {
