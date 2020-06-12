@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Menu
 {
     public class IntroWelcome : IntroScreen
     {
-        protected override string BeatmapHash => "64E00D7022195959BFA3109D09C2E2276C8F12F486B91FCF6175583E973B48F2";
+        protected override string BeatmapHash => "64e00d7022195959bfa3109d09c2e2276c8f12f486b91fcf6175583e973b48f2";
         protected override string BeatmapFile => "welcome.osz";
         private const double delay_step_two = 2142;
         private SampleChannel welcome;
