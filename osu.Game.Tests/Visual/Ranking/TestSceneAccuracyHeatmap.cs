@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Ranking
             /// <summary>
             /// Full size of the heatmap.
             /// </summary>
-            private const float size = 100;
+            private const float size = 130;
 
             /// <summary>
             /// Size of the inner circle containing the "hit" points, relative to <see cref="size"/>.
