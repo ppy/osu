@@ -108,8 +108,7 @@ namespace osu.Game.Online.Chat
         /// <param name="target">An optional target channel. If null, <see cref="CurrentChannel"/> will be used.</param>
         public void PostMessage(string text, bool isAction = false, Channel target = null)
         {
-            if (target == null)
-                target = CurrentChannel.Value;
+            target ??= CurrentChannel.Value;
 
             if (target == null)
                 return;
@@ -192,8 +191,7 @@ namespace osu.Game.Online.Chat
         /// <param name="target">An optional target channel. If null, <see cref="CurrentChannel"/> will be used.</param>
         public void PostCommand(string text, Channel target = null)
         {
-            if (target == null)
-                target = CurrentChannel.Value;
+            target ??= CurrentChannel.Value;
 
             if (target == null)
                 return;
@@ -396,8 +394,7 @@ namespace osu.Game.Online.Chat
                     fetchInitalMessages(channel);
             }
 
-            if (CurrentChannel.Value == null)
-                CurrentChannel.Value = channel;
+            CurrentChannel.Value ??= channel;
 
             return channel;
         }
