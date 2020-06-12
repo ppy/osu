@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneCompletionCancellation : TestPlayerTestScene
+    public class TestSceneCompletionCancellation : OsuPlayerTestScene
     {
         private Track track;
 
