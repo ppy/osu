@@ -167,15 +167,15 @@ namespace osu.Game.Tests.Visual.Ranking
                     for (int c = 0; c < cols; c++)
                     {
                         Vector2 pos = new Vector2(c * point_size, r * point_size);
-                        HitType type = HitType.Hit;
+                        HitPointType pointType = HitPointType.Hit;
 
                         if (Vector2.Distance(pos, centre) > size * inner_portion / 2)
-                            type = HitType.Miss;
+                            pointType = HitPointType.Miss;
 
-                        allPoints.Add(new HitPoint(pos, type)
+                        allPoints.Add(new HitPoint(pos, pointType)
                         {
                             Size = new Vector2(point_size),
-                            Colour = type == HitType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
+                            Colour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
                         });
                     }
                 }
@@ -216,11 +216,11 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class HitPoint : Circle
         {
-            private readonly HitType type;
+            private readonly HitPointType pointType;
 
-            public HitPoint(Vector2 position, HitType type)
+            public HitPoint(Vector2 position, HitPointType pointType)
             {
-                this.type = type;
+                this.pointType = pointType;
 
                 Position = position;
                 Alpha = 0;
@@ -230,12 +230,12 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 if (Alpha < 1)
                     Alpha += 0.1f;
-                else if (type == HitType.Hit)
+                else if (pointType == HitPointType.Hit)
                     Colour = ((Color4)Colour).Lighten(0.1f);
             }
         }
 
-        private enum HitType
+        private enum HitPointType
         {
             Hit,
             Miss
