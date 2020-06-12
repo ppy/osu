@@ -25,7 +25,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneHitObjectSamples : TestPlayerTestScene
+    public class TestSceneHitObjectSamples : OsuPlayerTestScene
     {
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 

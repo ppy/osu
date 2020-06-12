@@ -12,7 +12,7 @@ using osu.Game.Rulesets;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [HeadlessTest] // we alter unsafe properties on the game host to test inactive window state.
-    public class TestScenePauseWhenInactive : TestPlayerTestScene
+    public class TestScenePauseWhenInactive : OsuPlayerTestScene
     {
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
