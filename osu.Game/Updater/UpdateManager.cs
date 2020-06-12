@@ -39,6 +39,18 @@ namespace osu.Game.Updater
 
             Schedule(() => Task.Run(CheckForUpdateAsync));
 
+            // Query last version only *once*, so the user can re-check for updates, in case they closed the notification or else.
+            lastVersion ??= config.Get<string>(OsuSetting.Version);
+
+            var version = game.Version;
+
+            if (game.IsDeployedBuild && version != lastVersion)
+            {
+                // only show a notification if we've previously saved a version to the config file (ie. not the first run).
+                if (!string.IsNullOrEmpty(lastVersion))
+                    Notifications.Post(new UpdateCompleteNotification(version));
+            }
+
             // debug / local compilations will reset to a non-release string.
             // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
             config.Set(OsuSetting.Version, game.Version);
@@ -62,23 +74,7 @@ namespace osu.Game.Updater
                 updateCheckTask = null;
         }
 
-        protected virtual Task PerformUpdateCheck()
-        {
-            // Query last version only *once*, so the user can re-check for updates, in case they closed the notification or else.
-            lastVersion ??= config.Get<string>(OsuSetting.Version);
-
-            var version = game.Version;
-
-            if (version != lastVersion)
-            {
-                // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-                if (!string.IsNullOrEmpty(lastVersion))
-                    Notifications.Post(new UpdateCompleteNotification(version));
-            }
-
-            // we aren't doing any async in this method, so we return a completed task instead.
-            return Task.CompletedTask;
-        }
+        protected virtual Task PerformUpdateCheck() => Task.CompletedTask;
 
         private class UpdateCompleteNotification : SimpleNotification
         {
