@@ -10,7 +10,6 @@ using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
-using osuTK.Input;
 using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
@@ -129,22 +128,20 @@ namespace osu.Desktop
                     desktopGameWindow.CursorState |= CursorState.Hidden;
                     desktopGameWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                     desktopGameWindow.Title = Name;
-                    desktopGameWindow.FileDrop += fileDrop;
+                    desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
                     break;
 
                 // SDL2 DesktopWindow
                 case DesktopWindow desktopWindow:
                     desktopWindow.CursorState.Value |= CursorState.Hidden;
                     desktopWindow.Title = Name;
-                    desktopWindow.FileDrop += fileDrop;
+                    desktopWindow.DragDrop += f => fileDrop(new[] { f });
                     break;
             }
         }
 
-        private void fileDrop(object sender, FileDropEventArgs e)
+        private void fileDrop(string[] filePaths)
         {
-            var filePaths = e.FileNames;
-
             var firstExtension = Path.GetExtension(filePaths.First());
 
             if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
