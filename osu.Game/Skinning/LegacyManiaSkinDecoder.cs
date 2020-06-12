@@ -111,11 +111,11 @@ namespace osu.Game.Skinning
                         HandleColours(currentConfig, line);
                         break;
 
+                    // Custom sprite paths
                     case string _ when pair.Key.StartsWith("NoteImage"):
-                        currentConfig.ImageLookups[pair.Key] = pair.Value;
-                        break;
-
                     case string _ when pair.Key.StartsWith("KeyImage"):
+                    case string _ when pair.Key.StartsWith("Hit"):
+                    case "BottomStageImage":
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }
