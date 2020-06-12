@@ -19,12 +19,20 @@ namespace osu.Game.Tests.Visual.Ranking
     {
         public TestSceneTimingDistributionGraph()
         {
-            Add(new TimingDistributionGraph(createNormalDistribution())
+            Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(400, 130)
-            });
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4Extensions.FromHex("#333")
+                },
+                new TimingDistributionGraph(createNormalDistribution())
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(400, 130)
+                }
+            };
         }
 
         private TimingDistribution createNormalDistribution()
