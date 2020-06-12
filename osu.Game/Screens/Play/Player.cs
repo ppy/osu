@@ -78,6 +78,8 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api { get; set; }
 
         private SampleChannel sampleRestart;
+        
+        private SampleChannel samplePause;
 
         public BreakOverlay BreakOverlay;
 
@@ -161,6 +163,9 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
+            
+            samplePause = audio.Samples.Get(@"Gameplay/pause-loop");
+            samplePause.Looping = true;
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -407,7 +412,11 @@ namespace osu.Game.Screens.Play
             if (canPause)
                 Pause();
             else
+            {
+                samplePause?.Stop();
+                Logger.LogPrint(@"_______sample stopped in performUserRequestedExit");
                 this.Exit();
+            }
         }
 
         /// <summary>
@@ -416,6 +425,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Restart()
         {
+            Logger.LogPrint(@"_______sample stopped in Restart");
+            samplePause?.Stop();
             sampleRestart?.Play();
             RestartRequested?.Invoke();
 
@@ -564,6 +575,8 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
+
+            samplePause?.Play();
         }
 
         public void Resume()
@@ -583,6 +596,8 @@ namespace osu.Game.Screens.Play
             {
                 GameplayClockContainer.Start();
                 IsResuming = false;
+                Logger.LogPrint(@"_______sample stopped in Resume");
+                samplePause?.Stop();
             }
         }
 
