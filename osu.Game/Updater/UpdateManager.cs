@@ -49,10 +49,10 @@ namespace osu.Game.Updater
             if (!CanCheckForUpdate)
                 return;
 
-            await InternalCheckForUpdateAsync();
+            await PerformUpdateCheck();
         }
 
-        protected virtual Task InternalCheckForUpdateAsync()
+        protected virtual Task PerformUpdateCheck()
         {
             // Query last version only *once*, so the user can re-check for updates, in case they closed the notification or else.
             lastVersion ??= config.Get<string>(OsuSetting.Version);
