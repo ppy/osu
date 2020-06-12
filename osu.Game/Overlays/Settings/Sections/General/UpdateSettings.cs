@@ -19,6 +19,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         protected override string Header => "Updates";
 
+        private SettingsButton checkForUpdatesButton;
+
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuConfigManager config, OsuGame game)
         {
@@ -29,11 +31,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
             });
 
             // We should only display the button for UpdateManagers that do check for updates
-            Add(new SettingsButton
+            Add(checkForUpdatesButton = new SettingsButton
             {
                 Text = "Check for updates",
-                Action = () => Schedule(() => Task.Run(updateManager.CheckForUpdateAsync)),
-                Enabled = { Value = updateManager.CanCheckForUpdate }
+                Action = () =>
+                {
+                    checkForUpdatesButton.Enabled.Value = false;
+                    Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(t => Schedule(() => checkForUpdatesButton.Enabled.Value = true));
+                }
             });
 
             if (RuntimeInfo.IsDesktop)
