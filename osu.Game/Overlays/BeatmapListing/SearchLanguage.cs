@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(0)]
         Any,
 
-        [Order(11)]
+        [Order(13)]
         Other,
 
         [Order(1)]
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(2)]
         Chinese,
 
-        [Order(10)]
+        [Order(12)]
         Instrumental,
 
         [Order(7)]
@@ -42,6 +42,12 @@ namespace osu.Game.Overlays.BeatmapListing
         Spanish,
 
         [Order(5)]
-        Italian
+        Italian,
+
+        [Order(10)]
+        Russian,
+
+        [Order(11)]
+        Polish
     }
 }
