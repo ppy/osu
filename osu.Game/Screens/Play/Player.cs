@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
             
             samplePause = audio.Samples.Get(@"Gameplay/pause-loop");
-            samplePause.Looping = true;
+            if(samplePause != null) { samplePause.Looping = true; } 
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
