@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
@@ -21,6 +22,8 @@ namespace osu.Game.Tournament.IPC
 {
     public class FileBasedIPC : MatchIPCInfo
     {
+        public Storage IPCStorage { get; private set; }
+
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
@@ -36,22 +39,22 @@ namespace osu.Game.Tournament.IPC
         [Resolved]
         private StableInfo stableInfo { get; set; }
 
+        [Resolved]
+        private Storage tournamentStorage { get; set; }
+
         private int lastBeatmapId;
         private ScheduledDelegate scheduled;
         private GetBeatmapRequest beatmapLookupRequest;
 
-        public Storage IPCStorage { get; private set; }
-
-        [Resolved]
-        private Storage tournamentStorage { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            LocateStableStorage();
+            var stablePath = stableInfo.StablePath ?? findStablePath();
+            initialiseIPCStorage(stablePath);
         }
 
-        public Storage LocateStableStorage()
+        [CanBeNull]
+        private Storage initialiseIPCStorage(string path)
         {
             scheduled?.Cancel();
 
@@ -59,8 +62,6 @@ namespace osu.Game.Tournament.IPC
 
             try
             {
-                var path = findStablePath();
-
                 if (string.IsNullOrEmpty(path))
                     return null;
 
@@ -159,13 +160,37 @@ namespace osu.Game.Tournament.IPC
             return IPCStorage;
         }
 
+        public bool SetIPCLocation(string path)
+        {
+            if (!ipcFileExistsInDirectory(path))
+                return false;
+
+            var newStorage = initialiseIPCStorage(stableInfo.StablePath = path);
+            if (newStorage == null)
+                return false;
+
+            stableInfo.SaveChanges();
+            return true;
+        }
+
+        public bool AutoDetectIPCLocation()
+        {
+            var autoDetectedPath = findStablePath();
+            if (string.IsNullOrEmpty(autoDetectedPath))
+                return false;
+
+            var newStorage = initialiseIPCStorage(stableInfo.StablePath = autoDetectedPath);
+            if (newStorage == null)
+                return false;
+
+            stableInfo.SaveChanges();
+            return true;
+        }
+
         private static bool ipcFileExistsInDirectory(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
         private string findStablePath()
         {
-            if (!string.IsNullOrEmpty(stableInfo.StablePath))
-                return stableInfo.StablePath;
-
             string stableInstallPath = string.Empty;
 
             try
@@ -183,10 +208,7 @@ namespace osu.Game.Tournament.IPC
                     stableInstallPath = r.Invoke();
 
                     if (stableInstallPath != null)
-                    {
-                        SetIPCLocation(stableInstallPath);
                         return stableInstallPath;
-                    }
                 }
 
                 return null;
@@ -195,18 +217,6 @@ namespace osu.Game.Tournament.IPC
             {
                 Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
             }
-        }
-
-        public bool SetIPCLocation(string path)
-        {
-            if (!ipcFileExistsInDirectory(path))
-                return false;
-
-            stableInfo.StablePath = path;
-            LocateStableStorage();
-            stableInfo.SaveChanges();
-
-            return true;
         }
 
         private string findFromEnvVar()

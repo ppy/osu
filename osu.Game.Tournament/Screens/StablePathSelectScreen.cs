@@ -156,9 +156,8 @@ namespace osu.Game.Tournament.Screens
         protected virtual void AutoDetect()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-            fileBasedIpc?.LocateStableStorage();
 
-            if (fileBasedIpc?.IPCStorage == null)
+            if (!fileBasedIpc?.AutoDetectIPCLocation() ?? true)
             {
                 overlay = new DialogOverlay();
                 overlay.Push(new IPCErrorDialog("Failed to auto detect", "An osu! stable cutting-edge installation could not be auto detected.\nPlease try and manually point to the directory."));
