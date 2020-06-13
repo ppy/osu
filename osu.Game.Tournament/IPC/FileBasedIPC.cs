@@ -162,7 +162,7 @@ namespace osu.Game.Tournament.IPC
 
         public bool SetIPCLocation(string path)
         {
-            if (!ipcFileExistsInDirectory(path))
+            if (path == null || !ipcFileExistsInDirectory(path))
                 return false;
 
             var newStorage = initialiseIPCStorage(stableInfo.StablePath = path);
@@ -173,22 +173,11 @@ namespace osu.Game.Tournament.IPC
             return true;
         }
 
-        public bool AutoDetectIPCLocation()
-        {
-            var autoDetectedPath = findStablePath();
-            if (string.IsNullOrEmpty(autoDetectedPath))
-                return false;
-
-            var newStorage = initialiseIPCStorage(stableInfo.StablePath = autoDetectedPath);
-            if (newStorage == null)
-                return false;
-
-            stableInfo.SaveChanges();
-            return true;
-        }
+        public bool AutoDetectIPCLocation() => SetIPCLocation(findStablePath());
 
         private static bool ipcFileExistsInDirectory(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
 
+        [CanBeNull]
         private string findStablePath()
         {
             string stableInstallPath = string.Empty;
