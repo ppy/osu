@@ -259,22 +259,12 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.TargetColumn.Value + 1]));
 
                 case LegacyManiaSkinConfigurationLookups.Hit0:
-                    return SkinUtils.As<TValue>(getManiaImage(existing, "Hit0"));
-
                 case LegacyManiaSkinConfigurationLookups.Hit50:
-                    return SkinUtils.As<TValue>(getManiaImage(existing, "Hit50"));
-
                 case LegacyManiaSkinConfigurationLookups.Hit100:
-                    return SkinUtils.As<TValue>(getManiaImage(existing, "Hit100"));
-
                 case LegacyManiaSkinConfigurationLookups.Hit200:
-                    return SkinUtils.As<TValue>(getManiaImage(existing, "Hit200"));
-
                 case LegacyManiaSkinConfigurationLookups.Hit300:
-                    return SkinUtils.As<TValue>(getManiaImage(existing, "Hit300"));
-
                 case LegacyManiaSkinConfigurationLookups.Hit300g:
-                    return SkinUtils.As<TValue>(getManiaImage(existing, "Hit300g"));
+                    return SkinUtils.As<TValue>(getManiaImage(existing, maniaLookup.Lookup.ToString()));
             }
 
             return null;
