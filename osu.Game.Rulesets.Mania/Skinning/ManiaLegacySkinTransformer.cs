@@ -78,8 +78,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (!isLegacySkin.Value || !hasKeyTexture.Value)
-                return null;
 
             switch (component)
             {
@@ -87,6 +85,9 @@ namespace osu.Game.Rulesets.Mania.Skinning
                     return getResult(resultComponent.Component);
 
                 case ManiaSkinComponent maniaComponent:
+                    if (!isLegacySkin.Value || !hasKeyTexture.Value)
+                        return null;
+
                     switch (maniaComponent.Component)
                     {
                         case ManiaSkinComponents.ColumnBackground:
