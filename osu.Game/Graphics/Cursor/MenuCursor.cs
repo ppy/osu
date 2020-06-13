@@ -126,7 +126,7 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
         }
 
-        private bool shouldKeepRotating(MouseEvent e) => cursorRotate.Value && (e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Right));
+        private bool shouldKeepRotating(MouseEvent e) => cursorRotate.Value && (anyMainButtonPressed(e));
 
         private static bool anyMainButtonPressed(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Middle) || e.IsPressed(MouseButton.Right);
 
