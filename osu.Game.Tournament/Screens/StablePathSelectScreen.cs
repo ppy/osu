@@ -36,7 +36,8 @@ namespace osu.Game.Tournament.Screens
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
-            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
+            var initialStorage = (ipc as FileBasedIPC)?.IPCStorage ?? storage;
+            var initialPath = new DirectoryInfo(initialStorage.GetFullPath(string.Empty)).Parent?.FullName;
 
             AddRangeInternal(new Drawable[]
             {
