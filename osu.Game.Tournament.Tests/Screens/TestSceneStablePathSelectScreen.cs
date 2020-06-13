@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Tournament.Screens;
-using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
@@ -15,7 +14,7 @@ namespace osu.Game.Tournament.Tests.Screens
 
         private class StablePathSelectTestScreen : StablePathSelectScreen
         {
-            protected override void ChangePath(Storage storage)
+            protected override void ChangePath()
             {
                 Expire();
             }

@@ -108,7 +108,7 @@ namespace osu.Game.Tournament.Screens
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
                                                 Text = "Select stable path",
-                                                Action = () => ChangePath(storage)
+                                                Action = ChangePath
                                             },
                                             new TriangleButton
                                             {
@@ -135,7 +135,7 @@ namespace osu.Game.Tournament.Screens
             });
         }
 
-        protected virtual void ChangePath(Storage storage)
+        protected virtual void ChangePath()
         {
             var target = directorySelector.CurrentDirectory.Value.FullName;
             var fileBasedIpc = ipc as FileBasedIPC;
