@@ -14,7 +14,9 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Play
 {
@@ -88,23 +90,25 @@ namespace osu.Game.Screens.Multi.Play
             return false;
         }
 
-        protected override ScoreInfo CreateScore()
+        protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            submitScore();
-            return base.CreateScore();
+            Debug.Assert(roomId.Value != null);
+            return new TimeshiftResultsScreen(score, roomId.Value.Value, playlistItem);
         }
 
-        private void submitScore()
+        protected override ScoreInfo CreateScore()
         {
             var score = base.CreateScore();
-
             score.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
 
             Debug.Assert(token != null);
 
             var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
+            request.Success += s => score.OnlineScoreID = s.ID;
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
+
+            return score;
         }
 
         protected override void Dispose(bool isDisposing)

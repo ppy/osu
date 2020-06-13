@@ -4,11 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -52,10 +50,10 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(Bindable<WorkingBeatmap> working)
+        private void load()
         {
-            var beatmap = working.Value.BeatmapInfo;
-            var metadata = beatmap.Metadata;
+            var beatmap = score.Beatmap;
+            var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             var creator = metadata.Author?.Username;
 
             var topStatistics = new List<StatisticDisplay>
@@ -211,7 +209,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
-                        Text = $"Played on {score.Date.ToLocalTime():g}"
+                        Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}"
                     }
                 }
             };

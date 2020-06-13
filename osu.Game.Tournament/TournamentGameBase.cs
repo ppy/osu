@@ -2,34 +2,25 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
-using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
 {
     [Cached(typeof(TournamentGameBase))]
-    public abstract class TournamentGameBase : OsuGameBase
+    public class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
 
@@ -40,11 +31,7 @@ namespace osu.Game.Tournament
         private TournamentStorage tournamentStorage;
 
         private DependencyContainer dependencies;
-
-        private Bindable<Size> windowSize;
         private FileBasedIPC ipc;
-
-        private Drawable heightWarning;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -52,7 +39,7 @@ namespace osu.Game.Tournament
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage, FrameworkConfigManager frameworkConfig)
+        private void load(Storage storage)
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
@@ -62,83 +49,12 @@ namespace osu.Game.Tournament
 
             this.storage = storage;
 
-            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
-            windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
-            {
-                var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
-
-                heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
-            }), true);
-
             readBracket();
 
             ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
             dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
-
-            AddRange(new[]
-            {
-                new Container
-                {
-                    CornerRadius = 10,
-                    Depth = float.MinValue,
-                    Position = new Vector2(5),
-                    Masking = true,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = OsuColour.Gray(0.2f),
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new TourneyButton
-                        {
-                            Text = "Save Changes",
-                            Width = 140,
-                            Height = 50,
-                            Padding = new MarginPadding
-                            {
-                                Top = 10,
-                                Left = 10,
-                            },
-                            Margin = new MarginPadding
-                            {
-                                Right = 10,
-                                Bottom = 10,
-                            },
-                            Action = SaveChanges,
-                        },
-                    }
-                },
-                heightWarning = new Container
-                {
-                    Masking = true,
-                    CornerRadius = 5,
-                    Depth = float.MinValue,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Color4.Red,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new TournamentSpriteText
-                        {
-                            Text = "Please make the window wider",
-                            Font = OsuFont.Torus.With(weight: FontWeight.Bold),
-                            Colour = Color4.White,
-                            Padding = new MarginPadding(20)
-                        }
-                    }
-                },
-            });
         }
 
         private void readBracket()
@@ -150,11 +66,8 @@ namespace osu.Game.Tournament
                     ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
             }
 
-            if (ladder == null)
-                ladder = new LadderInfo();
-
-            if (ladder.Ruleset.Value == null)
-                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
+            ladder ??= new LadderInfo();
+            ladder.Ruleset.Value ??= RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
 
@@ -316,6 +229,8 @@ namespace osu.Game.Tournament
         protected override void LoadComplete()
         {
             MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
+
+            // we don't want to show the menu cursor as it would appear on stream output.
             MenuCursorContainer.Cursor.Alpha = 0;
 
             base.LoadComplete();
