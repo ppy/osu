@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api { get; set; }
 
         private SampleChannel sampleRestart;
-        
+
         private SampleChannel samplePause;
 
         public BreakOverlay BreakOverlay;
@@ -163,9 +163,9 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
-            
+
             samplePause = audio.Samples.Get(@"Gameplay/pause-loop");
-            if(samplePause != null) { samplePause.Looping = true; } 
+            if (samplePause != null) { samplePause.Looping = true; }
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
