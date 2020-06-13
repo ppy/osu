@@ -251,32 +251,36 @@ namespace osu.Game.Screens.Ranking
 
         private void UpdateRankTexts(ScoreInfo s)
         {
-                switch ( s.Rank )
-                {
-                    case ScoreRank.X:
-                    case ScoreRank.XH:
-                        texts.Text = RandomTextXH();
-                        break;
+            if ( s == null )
+            {
+                texts.Text = "";
+                return;
+            };
 
-                    case ScoreRank.S:
-                    case ScoreRank.SH:
-                        texts.Text = RandomTextS();
-                        break;
+            switch ( s.Rank )
+            {
+                case ScoreRank.X:
+                case ScoreRank.XH:
+                    texts.Text = RandomTextXH();
+                    break;
+                case ScoreRank.S:
+                case ScoreRank.SH:
+                    texts.Text = RandomTextS();
+                    break;
 
-                    case ScoreRank.A:
-                        texts.Text = "快要到了, 继续努力!";
-                        break;
+                case ScoreRank.A:
+                    texts.Text = "快要到了, 继续努力!";
+                    break;
+                case ScoreRank.B:
+                case ScoreRank.C:
+                case ScoreRank.D:
+                    texts.Text = "加油, 你一定能行!";
+                    break;
 
-                    case ScoreRank.B:
-                    case ScoreRank.C:
-                    case ScoreRank.D:
-                        texts.Text = "加油, 你一定能行!";
-                        break;
-
-                    default:
-                        texts.Text = "???";
-                        break;
-                }
+                default:
+                    texts.Text = "???";
+                    break;
+            }
         }
         private string RandomTextXH() //基于Disclaimer
         {
