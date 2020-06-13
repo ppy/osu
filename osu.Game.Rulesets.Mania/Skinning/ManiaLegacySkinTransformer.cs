@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private readonly ManiaBeatmap beatmap;
 
         /// <summary>
-        /// Mapping of <see cref="HitResult"/> to ther corresponding
+        /// Mapping of <see cref="HitResult"/> to their corresponding
         /// <see cref="LegacyManiaSkinConfigurationLookups"/> value.
         /// </summary>
         private static readonly IReadOnlyDictionary<HitResult, LegacyManiaSkinConfigurationLookups> hitresult_mapping
@@ -129,11 +129,11 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         private Drawable getResult(HitResult result)
         {
-            string image = GetConfig<ManiaSkinConfigurationLookup, string>(
+            string filename = GetConfig<ManiaSkinConfigurationLookup, string>(
                 new ManiaSkinConfigurationLookup(hitresult_mapping[result])
             )?.Value ?? default_hitresult_skin_filenames[result];
 
-            return this.GetAnimation(image, true, true);
+            return this.GetAnimation(filename, true, true);
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);
