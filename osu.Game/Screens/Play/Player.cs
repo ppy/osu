@@ -414,7 +414,6 @@ namespace osu.Game.Screens.Play
             else
             {
                 samplePause?.Stop();
-                Logger.LogPrint(@"_______sample stopped in performUserRequestedExit");
                 this.Exit();
             }
         }
@@ -425,8 +424,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Restart()
         {
-            Logger.LogPrint(@"_______sample stopped in Restart");
-            samplePause?.Stop();
             sampleRestart?.Play();
             RestartRequested?.Invoke();
 
@@ -596,7 +593,7 @@ namespace osu.Game.Screens.Play
             {
                 GameplayClockContainer.Start();
                 IsResuming = false;
-                Logger.LogPrint(@"_______sample stopped in Resume");
+
                 samplePause?.Stop();
             }
         }
