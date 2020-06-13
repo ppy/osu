@@ -259,8 +259,6 @@ namespace osu.Game.Screens.Play
                     Breaks = working.Beatmap.Breaks
                 }
             });
-
-            HealthProcessor.IsBreakTime.BindTo(breakTracker.IsBreakTime);
         }
 
         private void addOverlayComponents(Container target, WorkingBeatmap working)

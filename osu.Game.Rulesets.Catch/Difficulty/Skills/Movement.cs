@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
 
-            if (lastPlayerPosition == null)
-                lastPlayerPosition = catchCurrent.LastNormalizedPosition;
+            lastPlayerPosition ??= catchCurrent.LastNormalizedPosition;
 
             float playerPosition = Math.Clamp(
                 lastPlayerPosition.Value,

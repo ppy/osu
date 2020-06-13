@@ -1,0 +1,30 @@
+{
+  "Mappings": [{
+    "StartTime": 1000.0,
+    "Objects": [{
+      "StartTime": 1000.0,
+      "EndTime": 2750.0,
+      "Column": 1,
+      "NodeSamples": [
+        ["normal-hitnormal"],
+        ["soft-hitnormal"],
+        ["drum-hitnormal"]
+      ]
+    }, {
+      "StartTime": 1875.0,
+      "EndTime": 2750.0,
+      "Column": 0,
+      "NodeSamples": [
+        ["soft-hitnormal"],
+        ["drum-hitnormal"]
+      ]
+    }]
+  }, {
+    "StartTime": 3750.0,
+    "Objects": [{
+      "StartTime": 3750.0,
+      "EndTime": 3750.0,
+      "Column": 3
+    }]
+  }]
+}
