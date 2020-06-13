@@ -60,6 +60,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "启动后直接进入选歌界面",
+                    TooltipText = "仅在开场样式为\"略过动画\"且关闭主题音乐时生效",
+                    Bindable = config.GetBindable<bool>(MfSetting.IntroLoadDirectToSongSelect)
+                },
             };
         }
 

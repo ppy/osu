@@ -61,7 +61,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private DrawableSlider slider;
 
         [SetUpSteps]
-        public override void SetUpSteps() { }
+        public override void SetUpSteps()
+        {
+        }
 
         [TestCase(0)]
         [TestCase(1)]
@@ -132,10 +134,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPositionChange(16600, sliderRepeat, positionDecreased);
         }
 
-        private void retrieveDrawableSlider(int index) => AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
-        {
-            slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index);
-        });
+        private void retrieveDrawableSlider(int index) =>
+            AddStep($"retrieve {(index + 1).ToOrdinalWords()} slider", () =>
+                slider = (DrawableSlider)Player.DrawableRuleset.Playfield.AllHitObjects.ElementAt(index));
 
         private void ensureSnakingIn(double startTime) => checkPositionChange(startTime, sliderEnd, positionIncreased);
         private void ensureNoSnakingIn(double startTime) => checkPositionChange(startTime, sliderEnd, positionRemainsSame);
