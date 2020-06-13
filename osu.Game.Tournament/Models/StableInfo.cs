@@ -14,8 +14,14 @@ namespace osu.Game.Tournament.Models
     [Serializable]
     public class StableInfo
     {
+        /// <summary>
+        /// Path to the IPC directory used by the stable (cutting-edge) install.
+        /// </summary>
         public string StablePath { get; set; }
 
+        /// <summary>
+        /// Fired whenever stable info is successfully saved to file.
+        /// </summary>
         public event Action OnStableInfoSaved;
 
         private const string config_path = "tournament/stable.json";
