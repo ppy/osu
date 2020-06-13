@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Final rate", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
 
-        [SettingSource("Adjust Pitch", "Should pitch be adjusted with speed")]
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
@@ -55,9 +55,8 @@ namespace osu.Game.Rulesets.Mods
         {
             this.track = track;
 
-            track.AddAdjustment(AdjustPitch.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, SpeedChange);
-
             FinalRate.TriggerChange();
+            AdjustPitch.TriggerChange();
         }
 
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
@@ -85,9 +84,12 @@ namespace osu.Game.Rulesets.Mods
         private void updatePitchAdjustment(ValueChangedEvent<bool> value)
         {
             // remove existing old adjustment
-            track.RemoveAdjustment(value.OldValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, SpeedChange);
+            track.RemoveAdjustment(adjustmentForPitchSetting(value.OldValue), SpeedChange);
 
-            track.AddAdjustment(value.NewValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, SpeedChange);
+            track.AddAdjustment(adjustmentForPitchSetting(value.NewValue), SpeedChange);
         }
+
+        private AdjustableProperty adjustmentForPitchSetting(bool value)
+            => value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
     }
 }
