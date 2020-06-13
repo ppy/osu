@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Ranking
 
             public override bool HandlePositionalInput => HandleScroll();
 
-            public override bool HandleNonPositionalInput => HandleScroll();
+            //public override bool HandleNonPositionalInput => HandleScroll();
         }
     }
 }

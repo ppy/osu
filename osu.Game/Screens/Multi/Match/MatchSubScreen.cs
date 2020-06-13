@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                             new TriangleButton
                                                                             {
                                                                                 RelativeSizeAxes = Axes.X,
-                                                                                Text = "Show beatmap results",
+                                                                                Text = "显示该谱面的排行榜",
                                                                                 Action = showBeatmapResults
                                                                             }
                                                                         }
