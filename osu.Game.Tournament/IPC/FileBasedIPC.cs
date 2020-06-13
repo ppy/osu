@@ -182,7 +182,7 @@ namespace osu.Game.Tournament.IPC
         /// <returns>Whether an IPC directory was successfully auto-detected.</returns>
         public bool AutoDetectIPCLocation() => SetIPCLocation(findStablePath());
 
-        private static bool ipcFileExistsInDirectory(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
+        private static bool ipcFileExistsInDirectory(string p) => p != null && File.Exists(Path.Combine(p, "ipc.txt"));
 
         [CanBeNull]
         private string findStablePath()
