@@ -48,6 +48,9 @@ namespace osu.Game.Overlays.BeatmapListing
         Russian,
 
         [Order(11)]
-        Polish
+        Polish,
+
+        [Order(14)]
+        Unspecified
     }
 }
