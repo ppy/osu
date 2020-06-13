@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
+using System.IO;
+using Newtonsoft.Json;
+using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.Models
 {
@@ -12,6 +14,43 @@ namespace osu.Game.Tournament.Models
     [Serializable]
     public class StableInfo
     {
-        public Bindable<string> StablePath = new Bindable<string>(string.Empty);
+        public string StablePath { get; set; }
+
+        public event Action OnStableInfoSaved;
+
+        private const string config_path = "tournament/stable.json";
+
+        private readonly Storage storage;
+
+        public StableInfo(Storage storage)
+        {
+            this.storage = storage;
+
+            if (!storage.Exists(config_path))
+                return;
+
+            using (Stream stream = storage.GetStream(config_path, FileAccess.Read, FileMode.Open))
+            using (var sr = new StreamReader(stream))
+            {
+                JsonConvert.PopulateObject(sr.ReadToEnd(), this);
+            }
+        }
+
+        public void SaveChanges()
+        {
+            using (var stream = storage.GetStream(config_path, FileAccess.Write, FileMode.Create))
+            using (var sw = new StreamWriter(stream))
+            {
+                sw.Write(JsonConvert.SerializeObject(this,
+                    new JsonSerializerSettings
+                    {
+                        Formatting = Formatting.Indented,
+                        NullValueHandling = NullValueHandling.Ignore,
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                    }));
+            }
+
+            OnStableInfoSaved?.Invoke();
+        }
     }
 }
