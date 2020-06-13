@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens
@@ -31,9 +30,6 @@ namespace osu.Game.Tournament.Screens
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
 
-        [Resolved]
-        private StableInfo stableInfo { get; set; }
-
         private DirectorySelector directorySelector;
         private DialogOverlay overlay;
 
@@ -41,11 +37,6 @@ namespace osu.Game.Tournament.Screens
         private void load(Storage storage, OsuColour colours)
         {
             var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
-
-            if (!string.IsNullOrEmpty(stableInfo.StablePath))
-            {
-                initialPath = new DirectoryInfo(host.GetStorage(stableInfo.StablePath).GetFullPath(string.Empty)).Parent?.FullName;
-            }
 
             AddRangeInternal(new Drawable[]
             {
