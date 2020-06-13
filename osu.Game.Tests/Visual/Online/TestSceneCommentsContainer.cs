@@ -64,6 +64,21 @@ namespace osu.Game.Tests.Visual.Online
                 () => commentsContainer.ChildrenOfType<CommentsShowMoreButton>().Single().Alpha == 1);
         }
 
+        [Test]
+        public void TestMultipleLoads()
+        {
+            var comments = exampleComments;
+            int topLevelCommentCount = exampleComments.Comments.Count(comment => comment.IsTopLevel);
+
+            AddStep("hide container", () => commentsContainer.Hide());
+            setUpCommentsResponse(comments);
+            AddRepeatStep("show comments multiple times",
+                () => commentsContainer.ShowComments(CommentableType.Beatmapset, 456), 2);
+            AddStep("show container", () => commentsContainer.Show());
+            AddUntilStep("comment count is correct",
+                () => commentsContainer.ChildrenOfType<DrawableComment>().Count() == topLevelCommentCount);
+        }
+
         private void setUpCommentsResponse(CommentBundle commentBundle)
             => AddStep("set up response", () =>
             {
