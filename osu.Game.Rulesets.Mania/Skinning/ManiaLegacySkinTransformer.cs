@@ -78,7 +78,6 @@ namespace osu.Game.Rulesets.Mania.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
-
             switch (component)
             {
                 case GameplaySkinComponent<HitResult> resultComponent:
