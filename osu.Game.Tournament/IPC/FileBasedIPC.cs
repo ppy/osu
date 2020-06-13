@@ -39,9 +39,6 @@ namespace osu.Game.Tournament.IPC
         [Resolved]
         private StableInfo stableInfo { get; set; }
 
-        [Resolved]
-        private Storage tournamentStorage { get; set; }
-
         private int lastBeatmapId;
         private ScheduledDelegate scheduled;
         private GetBeatmapRequest beatmapLookupRequest;
