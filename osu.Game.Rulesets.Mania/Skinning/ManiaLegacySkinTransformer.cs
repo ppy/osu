@@ -24,31 +24,31 @@ namespace osu.Game.Rulesets.Mania.Skinning
         /// Mapping of <see cref="HitResult"/> to ther corresponding
         /// <see cref="LegacyManiaSkinConfigurationLookups"/> value.
         /// </summary>
-        private static readonly IReadOnlyDictionary<HitResult, LegacyManiaSkinConfigurationLookups> componentMapping
+        private static readonly IReadOnlyDictionary<HitResult, LegacyManiaSkinConfigurationLookups> hitresult_mapping
             = new Dictionary<HitResult, LegacyManiaSkinConfigurationLookups>
-        {
-            { HitResult.Perfect, LegacyManiaSkinConfigurationLookups.Hit300g },
-            { HitResult.Great, LegacyManiaSkinConfigurationLookups.Hit300 },
-            { HitResult.Good, LegacyManiaSkinConfigurationLookups.Hit200 },
-            { HitResult.Ok, LegacyManiaSkinConfigurationLookups.Hit100 },
-            { HitResult.Meh, LegacyManiaSkinConfigurationLookups.Hit50 },
-            { HitResult.Miss, LegacyManiaSkinConfigurationLookups.Hit0 }
-        };
+            {
+                { HitResult.Perfect, LegacyManiaSkinConfigurationLookups.Hit300g },
+                { HitResult.Great, LegacyManiaSkinConfigurationLookups.Hit300 },
+                { HitResult.Good, LegacyManiaSkinConfigurationLookups.Hit200 },
+                { HitResult.Ok, LegacyManiaSkinConfigurationLookups.Hit100 },
+                { HitResult.Meh, LegacyManiaSkinConfigurationLookups.Hit50 },
+                { HitResult.Miss, LegacyManiaSkinConfigurationLookups.Hit0 }
+            };
 
         /// <summary>
         /// Mapping of <see cref="HitResult"/> to their corresponding
         /// default filenames.
         /// </summary>
-        private static readonly IReadOnlyDictionary<HitResult, string> defaultName
+        private static readonly IReadOnlyDictionary<HitResult, string> default_hitresult_skin_filenames
             = new Dictionary<HitResult, string>
-        {
-            { HitResult.Perfect, "mania-hit300g" },
-            { HitResult.Great, "mania-hit300" },
-            { HitResult.Good, "mania-hit200" },
-            { HitResult.Ok, "mania-hit100" },
-            { HitResult.Meh, "mania-hit50" },
-            { HitResult.Miss, "mania-hit0" }
-        };
+            {
+                { HitResult.Perfect, "mania-hit300g" },
+                { HitResult.Great, "mania-hit300" },
+                { HitResult.Good, "mania-hit200" },
+                { HitResult.Ok, "mania-hit100" },
+                { HitResult.Meh, "mania-hit50" },
+                { HitResult.Miss, "mania-hit0" }
+            };
 
         private Lazy<bool> isLegacySkin;
 
@@ -129,8 +129,8 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private Drawable getResult(HitResult result)
         {
             string image = GetConfig<ManiaSkinConfigurationLookup, string>(
-                new ManiaSkinConfigurationLookup(componentMapping[result])
-            )?.Value ?? defaultName[result];
+                new ManiaSkinConfigurationLookup(hitresult_mapping[result])
+            )?.Value ?? default_hitresult_skin_filenames[result];
 
             return this.GetAnimation(image, true, true);
         }
