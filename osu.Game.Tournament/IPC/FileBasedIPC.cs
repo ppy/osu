@@ -157,6 +157,11 @@ namespace osu.Game.Tournament.IPC
             return IPCStorage;
         }
 
+        /// <summary>
+        /// Manually sets the path to the directory used for inter-process communication with a cutting-edge install.
+        /// </summary>
+        /// <param name="path">Path to the IPC directory</param>
+        /// <returns>Whether the supplied path was a valid IPC directory.</returns>
         public bool SetIPCLocation(string path)
         {
             if (path == null || !ipcFileExistsInDirectory(path))
@@ -170,6 +175,11 @@ namespace osu.Game.Tournament.IPC
             return true;
         }
 
+        /// <summary>
+        /// Tries to automatically detect the path to the directory used for inter-process communication
+        /// with a cutting-edge install.
+        /// </summary>
+        /// <returns>Whether an IPC directory was successfully auto-detected.</returns>
         public bool AutoDetectIPCLocation() => SetIPCLocation(findStablePath());
 
         private static bool ipcFileExistsInDirectory(string p) => File.Exists(Path.Combine(p, "ipc.txt"));
