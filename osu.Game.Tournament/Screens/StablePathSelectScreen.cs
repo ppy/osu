@@ -15,34 +15,36 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 using osuTK;
 
 namespace osu.Game.Tournament.Screens
 {
     public class StablePathSelectScreen : TournamentScreen
     {
-        private DirectorySelector directorySelector;
-
         [Resolved]
-        private MatchIPCInfo ipc { get; set; }
-
-        private DialogOverlay overlay;
+        private GameHost host { get; set; }
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
         [Resolved]
-        private GameHost host { get; set; }
+        private MatchIPCInfo ipc { get; set; }
+
+        [Resolved]
+        private StableInfo stableInfo { get; set; }
+
+        private DirectorySelector directorySelector;
+        private DialogOverlay overlay;
 
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuColour colours)
         {
-            var fileBasedIpc = ipc as FileBasedIPC;
             var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
 
-            if (!string.IsNullOrEmpty(fileBasedIpc?.StableInfo.StablePath.Value))
+            if (!string.IsNullOrEmpty(stableInfo.StablePath))
             {
-                initialPath = new DirectoryInfo(host.GetStorage(fileBasedIpc.StableInfo.StablePath.Value).GetFullPath(string.Empty)).Parent?.FullName;
+                initialPath = new DirectoryInfo(host.GetStorage(stableInfo.StablePath).GetFullPath(string.Empty)).Parent?.FullName;
             }
 
             AddRangeInternal(new Drawable[]

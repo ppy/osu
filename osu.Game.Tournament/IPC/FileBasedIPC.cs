@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
@@ -34,13 +33,12 @@ namespace osu.Game.Tournament.IPC
         [Resolved]
         private LadderInfo ladder { get; set; }
 
+        [Resolved]
+        private StableInfo stableInfo { get; set; }
+
         private int lastBeatmapId;
         private ScheduledDelegate scheduled;
         private GetBeatmapRequest beatmapLookupRequest;
-
-        public StableInfo StableInfo { get; private set; }
-
-        public const string STABLE_CONFIG = "tournament/stable.json";
 
         public Storage IPCStorage { get; private set; }
 
@@ -165,8 +163,8 @@ namespace osu.Game.Tournament.IPC
 
         private string findStablePath()
         {
-            if (!string.IsNullOrEmpty(readStableConfig()))
-                return StableInfo.StablePath.Value;
+            if (!string.IsNullOrEmpty(stableInfo.StablePath))
+                return stableInfo.StablePath;
 
             string stableInstallPath = string.Empty;
 
@@ -204,41 +202,11 @@ namespace osu.Game.Tournament.IPC
             if (!ipcFileExistsInDirectory(path))
                 return false;
 
-            StableInfo.StablePath.Value = path;
-
-            using (var stream = tournamentStorage.GetStream(STABLE_CONFIG, FileAccess.Write, FileMode.Create))
-            using (var sw = new StreamWriter(stream))
-            {
-                sw.Write(JsonConvert.SerializeObject(StableInfo,
-                    new JsonSerializerSettings
-                    {
-                        Formatting = Formatting.Indented,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Ignore,
-                    }));
-            }
-
+            stableInfo.StablePath = path;
             LocateStableStorage();
+            stableInfo.SaveChanges();
+
             return true;
-        }
-
-        private string readStableConfig()
-        {
-            if (StableInfo == null)
-                StableInfo = new StableInfo();
-
-            if (tournamentStorage.Exists(FileBasedIPC.STABLE_CONFIG))
-            {
-                using (Stream stream = tournamentStorage.GetStream(FileBasedIPC.STABLE_CONFIG, FileAccess.Read, FileMode.Open))
-                using (var sr = new StreamReader(stream))
-                {
-                    StableInfo = JsonConvert.DeserializeObject<StableInfo>(sr.ReadToEnd());
-                }
-
-                return StableInfo.StablePath.Value;
-            }
-
-            return null;
         }
 
         private string findFromEnvVar()
