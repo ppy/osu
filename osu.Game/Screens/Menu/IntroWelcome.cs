@@ -22,17 +22,15 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_two = 2142;
         private SampleChannel welcome;
         private SampleChannel pianoReverb;
+        protected override string SeeyaSampleName => "Intro/Welcome/seeya";
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            Seeya = audio.Samples.Get(@"Intro/welcome/seeya");
-
             if (MenuVoice.Value)
-            {
-                welcome = audio.Samples.Get(@"Intro/welcome/welcome");
-                pianoReverb = audio.Samples.Get(@"Intro/welcome/welcome_piano");
-            }
+                welcome = audio.Samples.Get(@"Intro/Welcome/welcome");
+
+            pianoReverb = audio.Samples.Get(@"Intro/Welcome/welcome_piano");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -126,7 +124,7 @@ namespace osu.Game.Screens.Menu
                         Width = 750,
                         Height = 78,
                         Alpha = 0,
-                        Texture = textures.Get(@"Welcome/welcome_text@2x")
+                        Texture = textures.Get(@"Welcome/welcome_text")
                     },
                 };
             }
@@ -135,13 +133,11 @@ namespace osu.Game.Screens.Menu
             {
                 base.LoadComplete();
 
-                double remainingTime() => delay_step_two - TransformDelay;
-
                 using (BeginDelayedSequence(0, true))
                 {
                     welcomeText.ResizeHeightTo(welcomeText.Height * 2, 500, Easing.In);
-                    welcomeText.FadeIn(remainingTime());
-                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), remainingTime(), Easing.Out).OnComplete(_ => Expire());
+                    welcomeText.FadeIn(delay_step_two);
+                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), delay_step_two, Easing.Out).OnComplete(_ => Expire());
                 }
             }
         }
