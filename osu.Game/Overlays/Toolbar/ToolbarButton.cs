@@ -78,9 +78,8 @@ namespace osu.Game.Overlays.Toolbar
                 HoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(180),
+                    Colour = OsuColour.Gray(80).Opacity(0),
                     Blending = BlendingParameters.Additive,
-                    Alpha = 0,
                 },
                 Flow = new FillFlowContainer
                 {
@@ -146,14 +145,14 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
-            HoverBackground.FadeIn(200);
+            HoverBackground.FadeColour(OsuColour.Gray(80).Opacity(180), 200);
             tooltipContainer.FadeIn(100);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            HoverBackground.FadeOut(200);
+            HoverBackground.FadeColour(OsuColour.Gray(80).Opacity(0), 200);
             tooltipContainer.FadeOut(100);
         }
     }
