@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Mvis.UI
     {
         public OsuSpriteText timeCurrent;
         public OsuSpriteText timeTotal;
+        public float FontSize = 19;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -27,17 +28,20 @@ namespace osu.Game.Screens.Mvis.UI
             {
                 timeCurrent = new OsuSpriteText
                 {
+                    Font = OsuFont.GetFont(size: FontSize),
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                 },
                 new OsuSpriteText
                 {
+                    Font = OsuFont.GetFont(size: FontSize),
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                     Text = "/",
                 },
                 timeTotal = new OsuSpriteText
                 {
+                    Font = OsuFont.GetFont(size: FontSize),
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                 }
