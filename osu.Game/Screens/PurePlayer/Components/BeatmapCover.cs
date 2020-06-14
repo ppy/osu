@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.PurePlayer.Components
 {
@@ -31,6 +33,12 @@ namespace osu.Game.Screens.PurePlayer.Components
 
             AddRangeInternal(new Drawable[]
             {
+                new Box
+                {
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
+                },
                 coverContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
