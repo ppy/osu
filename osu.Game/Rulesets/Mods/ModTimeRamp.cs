@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mods
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
             FinalRate.BindValueChanged(val => applyAdjustment(1), true);
 
-            AdjustPitch.BindValueChanged(updatePitchAdjustment, false);
+            AdjustPitch.BindValueChanged(updatePitchAdjustment);
         }
 
         public void ApplyToTrack(Track track)
