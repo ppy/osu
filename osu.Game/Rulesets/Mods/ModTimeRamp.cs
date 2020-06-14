@@ -46,9 +46,8 @@ namespace osu.Game.Rulesets.Mods
         protected ModTimeRamp()
         {
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
-            FinalRate.BindValueChanged(val => applyAdjustment(1), true);
-
-            AdjustPitch.BindValueChanged(updatePitchAdjustment);
+            FinalRate.BindValueChanged(val => applyRateAdjustment(1), true);
+            AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
         public void ApplyToTrack(Track track)
@@ -71,17 +70,17 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
+            applyRateAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
         }
 
         /// <summary>
         /// Adjust the rate along the specified ramp
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
-        private void applyAdjustment(double amount) =>
+        private void applyRateAdjustment(double amount) =>
             SpeedChange.Value = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
 
-        private void updatePitchAdjustment(ValueChangedEvent<bool> value)
+        private void applyPitchAdjustment(ValueChangedEvent<bool> value)
         {
             // remove existing old adjustment
             track.RemoveAdjustment(adjustmentForPitchSetting(value.OldValue), SpeedChange);
