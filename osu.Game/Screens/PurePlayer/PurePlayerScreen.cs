@@ -5,32 +5,30 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Bindables;
 using osu.Game.Overlays.Music;
 using osu.Framework.Audio.Track;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.PurePlayer.Components;
 using osu.Game.Screens.Mvis.UI;
-using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens
 {
     public class PurePlayerScreen : ScreenWithBeatmapBackground
     {
         private const float StandardWidth = 0.8f;
-        private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
 
         private Track Track;
         private bool AllowCursor = true;
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
+        public override bool HideOverlaysOnEnter => true;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -42,7 +40,9 @@ namespace osu.Game.Screens
         private PlaylistOverlay playlist;
 
         private PurePlayer.Components.SongProgressBar progressBarContainer;
-        private BottomBarSwitchButton loopToggleButton;
+        private MusicPanelSwitchableButton loopToggleButton;
+        private MusicPanelSwitchableButton togglePauseButton;
+        private BindableBool TrackRunning = new BindableBool();
 
         public PurePlayerScreen()
         {
@@ -82,65 +82,130 @@ namespace osu.Game.Screens
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black.Opacity(0.5f)),
                                 },
-                                new MusicControllerPanel
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4.Black.Opacity(0.5f),
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new Drawable[]
-                                            {
-                                                new MusicControllerButton
-                                                {
-                                                    ButtonIcon = FontAwesome.Solid.StepBackward,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Width = 0.333f,
-                                                    Action = () => musicController?.PreviousTrack(),
-                                                },
-                                                new MusicControllerButton
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    NoIcon = true,
-                                                    Width = 0.333f,
-                                                    ExtraDrawable = new BottomBarSongProgressInfo
-                                                    {
-                                                        FontSize = 30,
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Anchor = Anchor.Centre,
-                                                        Origin = Anchor.Centre,
-                                                    },
-                                                    Action = () => TogglePause(),
-                                                },
-                                                new MusicControllerButton
-                                                {
-                                                    ButtonIcon = FontAwesome.Solid.StepForward,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Width = 0.333f,
-                                                    Action = () => musicController?.NextTrack(),
-                                                }
-                                            }
-                                        },
-                                    }
-                                },
                                 new AuthorTextFillFlow
                                 {
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
                                     Margin = new MarginPadding{ Bottom = 10 },
+                                },
+                                new MusicControllerPanel
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    d = new Container
+                                    {
+                                        Alpha = 0,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = Color4.Black.Opacity(0.5f),
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Children = new Drawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Width = 0.333f,
+                                                        Children = new Drawable[]
+                                                        {
+                                                            new MusicPanelHoldToConfirmButton
+                                                            {
+                                                                TooltipText = "上一首/退出",
+                                                                ButtonIcon = FontAwesome.Solid.StepBackward,
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Anchor = Anchor.TopCentre,
+                                                                Origin = Anchor.TopCentre,
+                                                                Height = 1f,
+                                                                ConfirmAction = () => this.Exit(),
+                                                                Action = () => musicController?.PreviousTrack(),
+                                                            },
+                                                        }
+                                                    },
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Width = 0.333f,
+                                                        Children = new Drawable[]
+                                                        {
+                                                            togglePauseButton = new MusicPanelSwitchableButton
+                                                            {
+                                                                ActivateColor = Colour4.White,
+                                                                InActivateColor = Colour4.White.Opacity(0.5f),
+                                                                TooltipText = "切换暂停",
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Anchor = Anchor.TopCentre,
+                                                                Origin = Anchor.TopCentre,
+                                                                NoIcon = true,
+                                                                Height = 0.5f,
+                                                                ExtraDrawable = new BottomBarSongProgressInfo
+                                                                {
+                                                                    FontSize = 30,
+                                                                    AutoSizeAxes = Axes.Both,
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
+                                                                },
+                                                                Action = () => TogglePause(),
+                                                            },
+                                                            new GridContainer
+                                                            {
+                                                                Anchor = Anchor.BottomCentre,
+                                                                Origin = Anchor.BottomCentre,
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Height = 0.5f,
+                                                                RowDimensions = new[]
+                                                                {
+                                                                    new Dimension(),
+                                                                },
+                                                                Content = new[]
+                                                                {
+                                                                    new Drawable[]
+                                                                    {
+                                                                        //Left
+                                                                        loopToggleButton = new MusicPanelSwitchableButton
+                                                                        {
+                                                                            TooltipText = "单曲循环",
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            ButtonIcon = FontAwesome.Solid.Undo,
+                                                                            Action = () => Beatmap.Value.Track.Looping = loopToggleButton.Value.Value,
+
+                                                                        },
+                                                                        //Right
+                                                                        new MusicPanelSwitchableButton
+                                                                        {
+                                                                            TooltipText = "歌曲列表",
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            ButtonIcon = FontAwesome.Solid.Atom,
+                                                                            Action = () => playlist.ToggleVisibility(),
+                                                                        }
+                                                                    },
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    new MusicPanelButton
+                                                    {
+                                                        TooltipText = "下一首",
+                                                        ButtonIcon = FontAwesome.Solid.StepForward,
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Width = 0.333f,
+                                                        Action = () => musicController?.NextTrack(),
+                                                    }
+                                                }
+                                            },
+                                        }
+                                    }
                                 },
                             }
                         },
@@ -148,7 +213,7 @@ namespace osu.Game.Screens
                         {
                             Name = "Music Control Container",
                             RelativeSizeAxes = Axes.X,
-                            Height = 30,
+                            Height = 15,
                             Width = StandardWidth,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -158,55 +223,11 @@ namespace osu.Game.Screens
                                 {
                                     Masking = true,
                                     RelativeSizeAxes = Axes.Both,
-                                    Width = 0.7f,
                                     Child = progressBarContainer = new PurePlayer.Components.SongProgressBar
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                     },
                                 },
-                                new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.3f,
-                                    Spacing = new Vector2(5),
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    Children = new Drawable[]
-                                    {
-                                        new BottomBarButton()
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            ButtonIcon = FontAwesome.Solid.ArrowLeft,
-                                            Action = () => this.Exit(),
-                                            TooltipText = "退出",
-                                        },
-                                        loopToggleButton = new BottomBarSwitchButton()
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            ButtonIcon = FontAwesome.Solid.Undo,
-                                            Action = () => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value,
-                                            TooltipText = "单曲循环",
-                                        },
-                                        new BottomBarButton()
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            ButtonIcon = FontAwesome.Solid.User,
-                                            Action = () => game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo),
-                                            TooltipText = "在选歌界面中查看",
-                                        },
-                                        new BottomBarSwitchButton()
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            ButtonIcon = FontAwesome.Solid.Atom,
-                                            Action = () => playlist.ToggleVisibility(),
-                                            TooltipText = "侧边栏",
-                                        },
-                                    }
-                                }
                             }
                         },
                         new Container
@@ -236,13 +257,14 @@ namespace osu.Game.Screens
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
+            AllowBack = true;
             if ( musicController != null )
                 playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
 
             progressBarContainer.progressBar.OnSeek = SeekTo;
             Beatmap.BindValueChanged(b => UpdateComponentsFromBeatmap(b.NewValue));
-            loopToggleButton.ToggleableValue.BindValueChanged( l => Beatmap.Value.Track.Looping = l.NewValue );
+            loopToggleButton.Value.BindValueChanged( l => Beatmap.Value.Track.Looping = l.NewValue );
+            togglePauseButton.Value.BindTo(TrackRunning);
         }
 
         protected override void Update()
@@ -251,10 +273,12 @@ namespace osu.Game.Screens
 
             if (Track?.IsDummyDevice == false)
             {
+                TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
             }
             else
             {
+                TrackRunning.Value = false;
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
             }
@@ -274,16 +298,15 @@ namespace osu.Game.Screens
 
         public override void OnEntering(IScreen last)
         {
-             base.OnEntering(last);
-             UpdateComponentsFromBeatmap(Beatmap.Value);
-             this.FadeInFromZero(300);
-             game?.Toolbar.Hide();
+            base.OnEntering(last);
+            UpdateComponentsFromBeatmap(Beatmap.Value);
+            this.FadeInFromZero(300);
         }
 
         public override bool OnExiting(IScreen next)
         {
+            Beatmap.Value.Track.Looping = false;
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
-            game?.Toolbar.Show();
             this.FadeOut(300);
             return base.OnExiting(next);
         }

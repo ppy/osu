@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Container<Drawable> Content => content;
 
-        private readonly Container content;
+        protected readonly Container content;
         private readonly Box hover;
 
         public OsuAnimatedButton()

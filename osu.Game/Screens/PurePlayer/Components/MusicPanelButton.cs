@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -9,11 +8,10 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osu.Framework.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.PurePlayer.Components
 {
-    public class MusicControllerButton : OsuAnimatedButton
+    public class MusicPanelButton : OsuAnimatedButton
     {
         protected FillFlowContainer contentFillFlow;
         private Box flashBox;
@@ -22,12 +20,17 @@ namespace osu.Game.Screens.PurePlayer.Components
         public Drawable ExtraDrawable;
         public bool NoIcon;
 
-        public MusicControllerButton()
+        public MusicPanelButton()
         {
-            CornerRadius = 12.5f;
-            Masking = true;
+            content.FadeEdgeEffectTo(Colour4.Black.Opacity(0));
             Children = new Drawable[]
             {
+                flashBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.Black.Opacity(0.5f),
+                    Alpha = 0,
+                },
                 contentFillFlow = new FillFlowContainer
                 {
                     Margin = new MarginPadding{ Left = 15, Right = 15 },
@@ -46,12 +49,6 @@ namespace osu.Game.Screens.PurePlayer.Components
                             Icon = ButtonIcon,
                         },
                     }
-                },
-                flashBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                    Alpha = 0,
                 },
             };
         }
@@ -79,7 +76,7 @@ namespace osu.Game.Screens.PurePlayer.Components
 
         protected override void OnMouseUp(Framework.Input.Events.MouseUpEvent e)
         {
-            flashBox.FadeOut(1000, Easing.OutQuint);
+            flashBox.FadeOut(300, Easing.OutQuint);
             base.OnMouseUp(e);
         }
 
