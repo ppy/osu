@@ -21,7 +21,8 @@ namespace osu.Game.Screens.Mvis.UI
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
-        public BottomBarSongProgressInfo()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Spacing = new Vector2(5);
             Children = new Drawable[]
@@ -52,7 +53,7 @@ namespace osu.Game.Screens.Mvis.UI
         {
             base.LoadComplete();
 
-            b.ValueChanged += _  => UpdateEndTime();
+            b.BindValueChanged( _ => UpdateEndTime() );
 
             UpdateEndTime();
         }

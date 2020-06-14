@@ -5,39 +5,30 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Framework.Bindables;
-using osu.Framework.Input.Events;
 using osu.Game.Overlays.Music;
 using osu.Framework.Audio.Track;
-using osu.Game.Input.Bindings;
-using osu.Framework.Input.Bindings;
-using osu.Game.Configuration;
-using osu.Game.Screens.Mvis.SideBar;
-using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.PurePlayer.Components;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Screens.Mvis.UI;
+using osu.Game.Screens.Mvis.BottomBar.Buttons;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Screens
 {
     public class PurePlayerScreen : ScreenWithBeatmapBackground
     {
-        private const float DURATION = 750;
         private const float StandardWidth = 0.8f;
         private static readonly Vector2 BOTTOMPANEL_SIZE = new Vector2(TwoLayerButton.SIZE_EXTENDED.X, 50);
 
         private Track Track;
         private bool AllowCursor = true;
-        private bool AllowBack = true;
+        private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
 
@@ -51,6 +42,7 @@ namespace osu.Game.Screens
         private PlaylistOverlay playlist;
 
         private PurePlayer.Components.SongProgressBar progressBarContainer;
+        private BottomBarSwitchButton loopToggleButton;
 
         public PurePlayerScreen()
         {
@@ -85,6 +77,11 @@ namespace osu.Game.Screens
                             Children = new Drawable[]
                             {
                                 new BeatmapCover(),
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black.Opacity(0.5f)),
+                                },
                                 new MusicControllerPanel
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -115,6 +112,7 @@ namespace osu.Game.Screens
                                                     RelativeSizeAxes = Axes.Both,
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
+                                                    NoIcon = true,
                                                     Width = 0.333f,
                                                     ExtraDrawable = new BottomBarSongProgressInfo
                                                     {
@@ -138,23 +136,77 @@ namespace osu.Game.Screens
                                         },
                                     }
                                 },
+                                new AuthorTextFillFlow
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    Margin = new MarginPadding{ Bottom = 10 },
+                                },
                             }
                         },
-                        new CircularContainer
+                        new Container
                         {
-                            Name = "Progress Bar Container",
-                            Masking = true,
+                            Name = "Music Control Container",
                             RelativeSizeAxes = Axes.X,
-                            Height = 7.5f,
-                            Width = StandardWidth * 0.9f,
+                            Height = 30,
+                            Width = StandardWidth,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                progressBarContainer = new PurePlayer.Components.SongProgressBar
+                                new CircularContainer
+                                {
+                                    Masking = true,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.7f,
+                                    Child = progressBarContainer = new PurePlayer.Components.SongProgressBar
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                },
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                },
+                                    Width = 0.3f,
+                                    Spacing = new Vector2(5),
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Children = new Drawable[]
+                                    {
+                                        new BottomBarButton()
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            ButtonIcon = FontAwesome.Solid.ArrowLeft,
+                                            Action = () => this.Exit(),
+                                            TooltipText = "退出",
+                                        },
+                                        loopToggleButton = new BottomBarSwitchButton()
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            ButtonIcon = FontAwesome.Solid.Undo,
+                                            Action = () => Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value,
+                                            TooltipText = "单曲循环",
+                                        },
+                                        new BottomBarButton()
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            ButtonIcon = FontAwesome.Solid.User,
+                                            Action = () => game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo),
+                                            TooltipText = "在选歌界面中查看",
+                                        },
+                                        new BottomBarSwitchButton()
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            ButtonIcon = FontAwesome.Solid.Atom,
+                                            Action = () => playlist.ToggleVisibility(),
+                                            TooltipText = "侧边栏",
+                                        },
+                                    }
+                                }
                             }
                         },
                         new Container
@@ -165,11 +217,11 @@ namespace osu.Game.Screens
                             Height = 0.4f,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Padding = new MarginPadding{Bottom = 10},
                             Children = new Drawable[]
                             {
                                 playlist = new PlaylistOverlay
                                 {
+                                    TakeFocusOnPopIn = false,
                                     NoResizeOnPopIn = true,
                                     playlist_height = 1,
                                     RelativeSizeAxes = Axes.Both,
@@ -188,24 +240,21 @@ namespace osu.Game.Screens
             if ( musicController != null )
                 playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
 
-            playlist.Show();
             progressBarContainer.progressBar.OnSeek = SeekTo;
-            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            Beatmap.BindValueChanged(b => UpdateComponentsFromBeatmap(b.NewValue));
+            loopToggleButton.ToggleableValue.BindValueChanged( l => Beatmap.Value.Track.Looping = l.NewValue );
         }
 
         protected override void Update()
         {
             base.Update();
 
-            Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             if (Track?.IsDummyDevice == false)
             {
-                //TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
             }
             else
             {
-                //TrackRunning.Value = false;
                 progressBarContainer.progressBar.CurrentTime = 0;
                 progressBarContainer.progressBar.EndTime = 1;
             }
@@ -226,9 +275,11 @@ namespace osu.Game.Screens
         public override void OnEntering(IScreen last)
         {
              base.OnEntering(last);
+             UpdateComponentsFromBeatmap(Beatmap.Value);
              this.FadeInFromZero(300);
              game?.Toolbar.Hide();
         }
+
         public override bool OnExiting(IScreen next)
         {
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
@@ -242,14 +293,15 @@ namespace osu.Game.Screens
             musicController?.SeekTo(position);
         }
 
-        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> b)
+        private void UpdateComponentsFromBeatmap(WorkingBeatmap B)
         {
-            //Background.Beatmap = b.NewValue;
-            //Background.BlurAmount.Value = 25;
+            Background.Beatmap = B;
+            Background.BlurAmount.Value = 25;
 
             this.Schedule(() =>
             {
-                progressBarContainer.progressBar.EndTime = b.NewValue.Track.Length;
+                Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
+                progressBarContainer.progressBar.EndTime = B.Track.Length;
             });
         }
     }

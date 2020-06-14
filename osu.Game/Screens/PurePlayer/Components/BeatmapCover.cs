@@ -36,18 +36,7 @@ namespace osu.Game.Screens.PurePlayer.Components
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black.Opacity(0.5f)),
-                },
-                new AuthorTextFillFlow
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Margin = new MarginPadding{ Bottom = 10 },
-                },
+                }
             });
         }
 

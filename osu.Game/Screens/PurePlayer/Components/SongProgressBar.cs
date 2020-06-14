@@ -26,7 +26,7 @@ namespace osu.Game.Screens.PurePlayer.Components
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
-                    FillColour = colour.Yellow,
+                    FillColour = colour.GrayC,
                     BackgroundColour = colour.GrayC.Opacity(0.5f),
                     Alpha = idle_alpha,
                 },

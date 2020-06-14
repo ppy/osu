@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Menu
         private Screen songSelect;
 
         private Screen mvisScreen;
+        private Screen purePlayerScreen;
 
         private MenuSideFlashes sideFlashes;
 
@@ -105,6 +106,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMvisButton = onMvis,
+                            OnPurePlayerButton = onPurePlayer,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
                         }
@@ -142,6 +144,7 @@ namespace osu.Game.Screens.Menu
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             LoadComponentAsync(mvisScreen = new MvisScreen());
+            LoadComponentAsync(purePlayerScreen = new PurePlayerScreen());
             preloadSongSelect();
         }
 
@@ -167,6 +170,8 @@ namespace osu.Game.Screens.Menu
         private void onSolo() => this.Push(consumeSongSelect());
 
         private void onMvis() => this.Push( new MvisScreen() );
+
+        private void onPurePlayer() => this.Push( new PurePlayerScreen() );
 
         private Screen consumeSongSelect()
         {

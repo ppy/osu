@@ -212,11 +212,6 @@ namespace osu.Game.Screens
                                                             Margin = new MarginPadding { Right = 5 },
                                                             Children = new Drawable[]
                                                             {
-                                                                new BottomBarButton()
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.User,
-                                                                    Action = () => this.Push(new PurePlayerScreen()),
-                                                                },
                                                                 loopToggleButton = new BottomBarSwitchButton()
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
