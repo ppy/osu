@@ -80,15 +80,15 @@ namespace osu.Game.Rulesets.Mods
         private void applyRateAdjustment(double amount) =>
             SpeedChange.Value = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
 
-        private void applyPitchAdjustment(ValueChangedEvent<bool> value)
+        private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {
             // remove existing old adjustment
-            track.RemoveAdjustment(adjustmentForPitchSetting(value.OldValue), SpeedChange);
+            track.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
 
-            track.AddAdjustment(adjustmentForPitchSetting(value.NewValue), SpeedChange);
+            track.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
         }
 
-        private AdjustableProperty adjustmentForPitchSetting(bool value)
-            => value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
+        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
     }
 }
