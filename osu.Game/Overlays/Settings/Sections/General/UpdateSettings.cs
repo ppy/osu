@@ -30,16 +30,18 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
-            // We should only display the button for UpdateManagers that do check for updates
-            Add(checkForUpdatesButton = new SettingsButton
+            if (updateManager.CanCheckForUpdate)
             {
-                Text = "Check for updates",
-                Action = () =>
+                Add(checkForUpdatesButton = new SettingsButton
                 {
-                    checkForUpdatesButton.Enabled.Value = false;
-                    Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(t => Schedule(() => checkForUpdatesButton.Enabled.Value = true));
-                }
-            });
+                    Text = "Check for updates",
+                    Action = () =>
+                    {
+                        checkForUpdatesButton.Enabled.Value = false;
+                        Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(t => Schedule(() => checkForUpdatesButton.Enabled.Value = true));
+                    }
+                });
+            }
 
             if (RuntimeInfo.IsDesktop)
             {
