@@ -2,11 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -28,6 +32,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private const int timing_distribution_centre_bin_index = timing_distribution_bins;
 
         private TimingDistribution timingDistribution;
+        private readonly List<HitOffset> hitOffsets = new List<HitOffset>();
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
@@ -39,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             base.ApplyBeatmap(beatmap);
         }
 
+        private OsuHitCircleJudgementResult lastCircleResult;
+
         protected override void OnResultApplied(JudgementResult result)
         {
             base.OnResultApplied(result);
@@ -47,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             {
                 int binOffset = (int)(result.TimeOffset / timingDistribution.BinSize);
                 timingDistribution.Bins[timing_distribution_centre_bin_index + binOffset]++;
+
+                addHitOffset(result);
             }
         }
 
@@ -58,7 +67,38 @@ namespace osu.Game.Rulesets.Osu.Scoring
             {
                 int binOffset = (int)(result.TimeOffset / timingDistribution.BinSize);
                 timingDistribution.Bins[timing_distribution_centre_bin_index + binOffset]--;
+
+                removeHitOffset(result);
             }
+        }
+
+        private void addHitOffset(JudgementResult result)
+        {
+            if (!(result is OsuHitCircleJudgementResult circleResult))
+                return;
+
+            if (lastCircleResult == null)
+            {
+                lastCircleResult = circleResult;
+                return;
+            }
+
+            if (circleResult.HitPosition != null)
+            {
+                Debug.Assert(circleResult.Radius != null);
+                hitOffsets.Add(new HitOffset(lastCircleResult.HitCircle.StackedEndPosition, circleResult.HitCircle.StackedEndPosition, circleResult.HitPosition.Value, circleResult.Radius.Value));
+            }
+
+            lastCircleResult = circleResult;
+        }
+
+        private void removeHitOffset(JudgementResult result)
+        {
+            if (!(result is OsuHitCircleJudgementResult circleResult))
+                return;
+
+            if (hitOffsets.Count > 0 && circleResult.HitPosition != null)
+                hitOffsets.RemoveAt(hitOffsets.Count - 1);
         }
 
         protected override void Reset(bool storeResults)
@@ -66,9 +106,28 @@ namespace osu.Game.Rulesets.Osu.Scoring
             base.Reset(storeResults);
 
             timingDistribution.Bins.AsSpan().Clear();
+            hitOffsets.Clear();
         }
 
-        protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new OsuJudgementResult(hitObject, judgement);
+        public override void PopulateScore(ScoreInfo score)
+        {
+            base.PopulateScore(score);
+
+            score.ExtraStatistics["timing_distribution"] = timingDistribution;
+            score.ExtraStatistics["hit_offsets"] = hitOffsets;
+        }
+
+        protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement)
+        {
+            switch (hitObject)
+            {
+                case HitCircle _:
+                    return new OsuHitCircleJudgementResult(hitObject, judgement);
+
+                default:
+                    return new OsuJudgementResult(hitObject, judgement);
+            }
+        }
 
         public override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
