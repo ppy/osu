@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Toolbar
         protected ConstrainedIconContainer IconContainer;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private readonly Box FlashBackground;
+        private readonly Box flashBackground;
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Toolbar
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
-                FlashBackground = new Box
+                flashBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Transparent,
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnClick(ClickEvent e)
         {
-            FlashBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
+            flashBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
             tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
