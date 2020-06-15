@@ -11,6 +11,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
@@ -18,6 +19,36 @@ namespace osu.Game.Rulesets.Mania.Skinning
     {
         private readonly ISkin source;
         private readonly ManiaBeatmap beatmap;
+
+        /// <summary>
+        /// Mapping of <see cref="HitResult"/> to their corresponding
+        /// <see cref="LegacyManiaSkinConfigurationLookups"/> value.
+        /// </summary>
+        private static readonly IReadOnlyDictionary<HitResult, LegacyManiaSkinConfigurationLookups> hitresult_mapping
+            = new Dictionary<HitResult, LegacyManiaSkinConfigurationLookups>
+            {
+                { HitResult.Perfect, LegacyManiaSkinConfigurationLookups.Hit300g },
+                { HitResult.Great, LegacyManiaSkinConfigurationLookups.Hit300 },
+                { HitResult.Good, LegacyManiaSkinConfigurationLookups.Hit200 },
+                { HitResult.Ok, LegacyManiaSkinConfigurationLookups.Hit100 },
+                { HitResult.Meh, LegacyManiaSkinConfigurationLookups.Hit50 },
+                { HitResult.Miss, LegacyManiaSkinConfigurationLookups.Hit0 }
+            };
+
+        /// <summary>
+        /// Mapping of <see cref="HitResult"/> to their corresponding
+        /// default filenames.
+        /// </summary>
+        private static readonly IReadOnlyDictionary<HitResult, string> default_hitresult_skin_filenames
+            = new Dictionary<HitResult, string>
+            {
+                { HitResult.Perfect, "mania-hit300g" },
+                { HitResult.Great, "mania-hit300" },
+                { HitResult.Good, "mania-hit200" },
+                { HitResult.Ok, "mania-hit100" },
+                { HitResult.Meh, "mania-hit50" },
+                { HitResult.Miss, "mania-hit0" }
+            };
 
         private Lazy<bool> isLegacySkin;
 
@@ -50,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             switch (component)
             {
                 case GameplaySkinComponent<HitResult> resultComponent:
-                    return getResult(resultComponent);
+                    return getResult(resultComponent.Component);
 
                 case ManiaSkinComponent maniaComponent:
                     if (!isLegacySkin.Value || !hasKeyTexture.Value)
@@ -95,30 +126,13 @@ namespace osu.Game.Rulesets.Mania.Skinning
             return null;
         }
 
-        private Drawable getResult(GameplaySkinComponent<HitResult> resultComponent)
+        private Drawable getResult(HitResult result)
         {
-            switch (resultComponent.Component)
-            {
-                case HitResult.Miss:
-                    return this.GetAnimation("mania-hit0", true, true);
+            string filename = GetConfig<ManiaSkinConfigurationLookup, string>(
+                new ManiaSkinConfigurationLookup(hitresult_mapping[result])
+            )?.Value ?? default_hitresult_skin_filenames[result];
 
-                case HitResult.Meh:
-                    return this.GetAnimation("mania-hit50", true, true);
-
-                case HitResult.Ok:
-                    return this.GetAnimation("mania-hit100", true, true);
-
-                case HitResult.Good:
-                    return this.GetAnimation("mania-hit200", true, true);
-
-                case HitResult.Great:
-                    return this.GetAnimation("mania-hit300", true, true);
-
-                case HitResult.Perfect:
-                    return this.GetAnimation("mania-hit300g", true, true);
-            }
-
-            return null;
+            return this.GetAnimation(filename, true, true);
         }
 
         public Texture GetTexture(string componentName) => source.GetTexture(componentName);

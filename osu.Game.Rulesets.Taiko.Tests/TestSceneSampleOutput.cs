@@ -6,7 +6,6 @@ using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
@@ -14,13 +13,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
     /// Taiko has some interesting rules for legacy mappings.
     /// </summary>
     [HeadlessTest]
-    public class TestSceneSampleOutput : PlayerTestScene
+    public class TestSceneSampleOutput : TestSceneTaikoPlayer
     {
-        public TestSceneSampleOutput()
-            : base(new TaikoRuleset())
-        {
-        }
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
