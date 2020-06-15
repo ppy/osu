@@ -251,8 +251,9 @@ namespace osu.Game.Screens.Play
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
-            // we always want to apply the same real-time offset, so it should be adjusted by the playback rate to achieve this.
-            public override double CurrentTime => SourceTime + Offset * Rate;
+            // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
+            // base implementation already adds offset at 1.0 rate, so we only add the difference from that here.
+            public override double CurrentTime => base.CurrentTime + Offset * (Rate - 1);
 
             public HardwareCorrectionOffsetClock(IClock source, bool processSource = true)
                 : base(source, processSource)
