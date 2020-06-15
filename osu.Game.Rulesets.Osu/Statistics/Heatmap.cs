@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Osu.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -29,10 +31,13 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private const float rotation = 45;
         private const float point_size = 4;
 
+        private readonly IReadOnlyList<HitOffset> offsets;
         private Container<HitPoint> allPoints;
 
-        public Heatmap()
+        public Heatmap(IReadOnlyList<HitOffset> offsets)
         {
+            this.offsets = offsets;
+
             Size = new Vector2(size);
         }
 
@@ -122,6 +127,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
                     });
                 }
             }
+
+            foreach (var o in offsets)
+                AddPoint(o.Position1, o.Position2, o.HitPosition, o.Radius);
         }
 
         public void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)

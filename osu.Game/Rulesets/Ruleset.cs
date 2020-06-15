@@ -23,6 +23,7 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
 {
@@ -208,5 +209,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
+
+        public virtual IEnumerable<StatisticContainer> CreateStatistics(ScoreInfo score) => Enumerable.Empty<StatisticContainer>();
     }
 }

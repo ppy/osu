@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Statistics;
 using osuTK;
 using osuTK.Graphics;
@@ -38,7 +40,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Position = new Vector2(500, 300),
                 },
-                heatmap = new Heatmap
+                heatmap = new Heatmap(new List<HitOffset>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
