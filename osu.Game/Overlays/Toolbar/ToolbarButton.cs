@@ -62,6 +62,7 @@ namespace osu.Game.Overlays.Toolbar
         protected ConstrainedIconContainer IconContainer;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
+        private readonly Box FlashBackground;
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
@@ -78,7 +79,14 @@ namespace osu.Game.Overlays.Toolbar
                 HoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(0),
+                    Colour = OsuColour.Gray(80).Opacity(180),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                },
+                FlashBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Transparent,
                     Blending = BlendingParameters.Additive,
                 },
                 Flow = new FillFlowContainer
@@ -138,21 +146,21 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnClick(ClickEvent e)
         {
-            HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
+            FlashBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
             tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            HoverBackground.FadeColour(OsuColour.Gray(80).Opacity(180), 200);
+            HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            HoverBackground.FadeColour(OsuColour.Gray(80).Opacity(0), 200);
+            HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);
         }
     }
