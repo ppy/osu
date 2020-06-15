@@ -165,16 +165,16 @@ namespace osu.Game.Input.Bindings
         SelectNext,
 
         // Song select keybindings
-        [Description("Toggle mod selection overlay")]
+        [Description("Toggle Mod Select")]
         ToggleModSelection,
 
-        [Description("Select a random beatmap")]
+        [Description("Random")]
         SelectNextRandom,
 
-        [Description("Select the last random beatmap")]
+        [Description("Rewind")]
         SelectPreviousRandom,
 
-        [Description("Toggle beatmap options overlay")]
+        [Description("Beatmap Options")]
         ToggleBeatmapOptions,
     }
 }
