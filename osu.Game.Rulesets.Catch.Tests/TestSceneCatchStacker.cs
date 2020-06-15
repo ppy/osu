@@ -4,18 +4,12 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatchStacker : PlayerTestScene
+    public class TestSceneCatchStacker : TestSceneCatchPlayer
     {
-        public TestSceneCatchStacker()
-            : base(new CatchRuleset())
-        {
-        }
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
