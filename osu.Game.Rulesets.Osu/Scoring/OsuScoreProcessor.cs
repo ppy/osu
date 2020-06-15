@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -62,11 +61,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
             }
         }
 
-        public override void PopulateScore(ScoreInfo score)
-        {
-            base.PopulateScore(score);
-        }
-
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);
@@ -77,17 +71,5 @@ namespace osu.Game.Rulesets.Osu.Scoring
         protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new OsuJudgementResult(hitObject, judgement);
 
         public override HitWindows CreateHitWindows() => new OsuHitWindows();
-    }
-
-    public class TimingDistribution
-    {
-        public readonly int[] Bins;
-        public readonly double BinSize;
-
-        public TimingDistribution(int binCount, double binSize)
-        {
-            Bins = new int[binCount];
-            BinSize = binSize;
-        }
     }
 }
