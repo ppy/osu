@@ -8,7 +8,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class SubmitRoomScoreRequest : APIRequest
+    public class SubmitRoomScoreRequest : APIRequest<RoomScore>
     {
         private readonly int scoreId;
         private readonly int roomId;
