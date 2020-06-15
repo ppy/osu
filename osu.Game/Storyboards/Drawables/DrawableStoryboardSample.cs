@@ -51,7 +51,7 @@ namespace osu.Game.Storyboards.Drawables
                 LifetimeStart = sampleInfo.StartTime;
                 LifetimeEnd = double.MaxValue;
             }
-            else if (Time.Current - Time.Elapsed < sampleInfo.StartTime)
+            else if (Time.Current - Time.Elapsed <= sampleInfo.StartTime)
             {
                 // We've passed the start time of the sample. We only play the sample if we're within an allowable range
                 // from the sample's start, to reduce layering if we've been fast-forwarded far into the future
