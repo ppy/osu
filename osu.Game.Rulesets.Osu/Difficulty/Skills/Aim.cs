@@ -153,20 +153,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // there exists a submap of length sectionCount that can be FC'd in timeThresholdBase seconds.
         private static double calculateFcTimeTp(HitProbabilities mapHitProbs, int sectionCount)
         {
-            if (mapHitProbs.IsEmpty(sectionCount))
-                return 0;
-
-            double maxFcTime = mapHitProbs.MinExpectedTimeForCount(tp_min, sectionCount);
+            double maxFcTime = mapHitProbs.MinExpectedTimeForSectionCount(tp_min, sectionCount);
 
             if (maxFcTime <= time_threshold_base)
                 return tp_min;
 
-            double minFcTime = mapHitProbs.MinExpectedTimeForCount(tp_max, sectionCount);
+            double minFcTime = mapHitProbs.MinExpectedTimeForSectionCount(tp_max, sectionCount);
 
             if (minFcTime >= time_threshold_base)
                 return tp_max;
 
-            double fcTimeMinusThreshold(double tp) => mapHitProbs.MinExpectedTimeForCount(tp, sectionCount) - time_threshold_base;
+            double fcTimeMinusThreshold(double tp) => mapHitProbs.MinExpectedTimeForSectionCount(tp, sectionCount) - time_threshold_base;
             return Bisection.FindRoot(fcTimeMinusThreshold, tp_min, tp_max, time_precision, max_iterations);
         }
 
