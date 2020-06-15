@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.PurePlayer.Components
 {
-    public class SongProgressBar : Container
+    public class SongProgressBar : CircularContainer
     {
         protected const float idle_alpha = 0.5f;
         public ProgressBar progressBar;
@@ -19,6 +19,7 @@ namespace osu.Game.Screens.PurePlayer.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            Masking = true;
             Children = new Drawable[]
             {
                 progressBar = new HoverableProgressBar

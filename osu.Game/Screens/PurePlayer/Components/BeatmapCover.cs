@@ -7,10 +7,7 @@ using osu.Game.Screens.Mvis.UI.Objects;
 using System.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
-using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Screens.PurePlayer.Components
 {
@@ -56,9 +53,9 @@ namespace osu.Game.Screens.PurePlayer.Components
 
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> value)
         {
-            var b = value.NewValue;
+            ChangeCoverTask?.Cancel();
 
-            LoadComponentAsync(new BeatmapBackground(b)
+            LoadComponentAsync(new BeatmapBackground(value.NewValue)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -73,7 +70,6 @@ namespace osu.Game.Screens.PurePlayer.Components
                 coverContainer.Add(cover);
 
                 this.Schedule(() => cover?.FadeIn(300));
-                this.Schedule(() => oldCover?.FadeIn(300));
                 oldCover = null;
             },
             (ChangeCoverTask = new CancellationTokenSource()).Token);

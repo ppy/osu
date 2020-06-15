@@ -13,9 +13,9 @@ using osu.Game.Overlays.Music;
 using osu.Framework.Audio.Track;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.PurePlayer.Components;
-using osu.Game.Screens.Mvis.UI;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Bindables;
+using osu.Game.Screens.Mvis.UI;
 
 namespace osu.Game.Screens
 {
@@ -209,26 +209,13 @@ namespace osu.Game.Screens
                                 },
                             }
                         },
-                        new Container
+                        progressBarContainer = new PurePlayer.Components.SongProgressBar
                         {
-                            Name = "Music Control Container",
                             RelativeSizeAxes = Axes.X,
                             Height = 15,
                             Width = StandardWidth,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Children = new Drawable[]
-                            {
-                                new CircularContainer
-                                {
-                                    Masking = true,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = progressBarContainer = new PurePlayer.Components.SongProgressBar
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                    },
-                                },
-                            }
                         },
                         new Container
                         {
