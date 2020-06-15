@@ -29,6 +29,8 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
+using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -186,5 +188,17 @@ namespace osu.Game.Rulesets.Osu
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
+
+        public override IEnumerable<StatisticContainer> CreateStatistics(ScoreInfo score) => new[]
+        {
+            new StatisticContainer("Timing Distribution")
+            {
+                Child = new TimingDistributionGraph((TimingDistribution)score.ExtraStatistics.GetValueOrDefault("timing_distribution"))
+            },
+            new StatisticContainer("Accuracy Heatmap")
+            {
+                Child = new Heatmap((List<HitOffset>)score.ExtraStatistics.GetValueOrDefault("hit_offsets"))
+            },
+        };
     }
 }
