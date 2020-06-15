@@ -64,10 +64,12 @@ namespace osu.Game.Updater
             if (!CanCheckForUpdate)
                 return;
 
-            lock (updateTaskLock)
-                updateCheckTask ??= PerformUpdateCheck();
+            Task waitTask;
 
-            await updateCheckTask;
+            lock (updateTaskLock)
+                waitTask = (updateCheckTask ??= PerformUpdateCheck());
+
+            await waitTask;
 
             lock (updateTaskLock)
                 updateCheckTask = null;
