@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -125,6 +126,15 @@ namespace osu.Game.Tests.Visual
         [Resolved]
         protected AudioManager Audio { get; private set; }
 
+        /// <summary>
+        /// Creates the ruleset to be used for this test scene.
+        /// </summary>
+        /// <remarks>
+        /// When testing against ruleset-specific components, this method must be overriden to their corresponding ruleset.
+        /// </remarks>
+        [CanBeNull]
+        protected virtual Ruleset CreateRuleset() => null;
+
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
@@ -136,7 +146,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Ruleset.Value = rulesets.AvailableRulesets.First();
+            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)
