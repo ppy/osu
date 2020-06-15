@@ -9,21 +9,28 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Testing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Testing
 {
-    public class TestSceneRulesetTestScene : OsuTestScene, IRulesetTestScene
+    /// <summary>
+    /// A test scene ensuring the dependencies for the
+    /// provided ruleset below are cached at the base implementation.
+    /// </summary>
+    [HeadlessTest]
+    public class TestSceneRulesetDependencies : OsuTestScene
     {
+        protected override Ruleset CreateRuleset() => new TestRuleset();
+
         [Test]
         public void TestRetrieveTexture()
         {
@@ -45,8 +52,6 @@ namespace osu.Game.Tests.Testing
                 Dependencies.Get<TestRulesetConfigManager>() != null);
         }
 
-        public Ruleset CreateRuleset() => new TestRuleset();
-
         private class TestRuleset : Ruleset
         {
             public override string Description => string.Empty;
@@ -62,19 +67,29 @@ namespace osu.Game.Tests.Testing
             public override IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(TestResources.GetStore(), @"Resources");
             public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new TestRulesetConfigManager();
 
-            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
+            public override IEnumerable<Mod> GetModsFor(ModType type) => Array.Empty<Mod>();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => null;
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => null;
+            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => null;
         }
 
         private class TestRulesetConfigManager : IRulesetConfigManager
         {
-            public void Load() => throw new NotImplementedException();
-            public bool Save() => throw new NotImplementedException();
-            public TrackedSettings CreateTrackedSettings() => throw new NotImplementedException();
-            public void LoadInto(TrackedSettings settings) => throw new NotImplementedException();
-            public void Dispose() => throw new NotImplementedException();
+            public void Load()
+            {
+            }
+
+            public bool Save() => true;
+
+            public TrackedSettings CreateTrackedSettings() => new TrackedSettings();
+
+            public void LoadInto(TrackedSettings settings)
+            {
+            }
+
+            public void Dispose()
+            {
+            }
         }
     }
 }
