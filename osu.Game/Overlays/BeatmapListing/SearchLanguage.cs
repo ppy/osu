@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(0)]
         Any,
 
-        [Order(13)]
-        Other,
+        [Order(14)]
+        Unspecified,
 
         [Order(1)]
         English,
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(11)]
         Polish,
 
-        [Order(14)]
-        Unspecified
+        [Order(13)]
+        Other
     }
 }
