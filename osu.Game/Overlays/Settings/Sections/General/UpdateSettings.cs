@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
-            if (updateManager.CanCheckForUpdate)
+            if (updateManager?.CanCheckForUpdate == true)
             {
                 Add(checkForUpdatesButton = new SettingsButton
                 {
