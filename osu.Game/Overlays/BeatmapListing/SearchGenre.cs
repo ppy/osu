@@ -20,6 +20,10 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [Description("Hip Hop")]
         HipHop = 9,
-        Electronic = 10
+        Electronic = 10,
+        Metal = 11,
+        Classical = 12,
+        Folk = 13,
+        Jazz = 14
     }
 }

@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -25,6 +26,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private PlacementBlueprint currentPlacement;
 
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         private InputManager inputManager;
 

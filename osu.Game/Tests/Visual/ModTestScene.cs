@@ -14,11 +14,6 @@ namespace osu.Game.Tests.Visual
     {
         protected sealed override bool HasCustomSteps => true;
 
-        protected ModTestScene(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
-
         private ModTestData currentTestData;
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>
