@@ -86,7 +86,8 @@ namespace osu.Game.Overlays.Toolbar
                 flashBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Transparent,
+                    Alpha = 0,
+                    Colour = Color4.White.Opacity(100),
                     Blending = BlendingParameters.Additive,
                 },
                 Flow = new FillFlowContainer
@@ -146,7 +147,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnClick(ClickEvent e)
         {
-            flashBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
+            flashBackground.FadeOutFromOne(800, Easing.OutQuint);
             tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
