@@ -35,7 +35,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
 using osu.Game.Skinning;
@@ -43,6 +42,8 @@ using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
@@ -360,7 +361,7 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        public void PresentScore(ScoreInfo score)
+        public void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
@@ -392,9 +393,19 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
+                Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
-                screen.Push(new ReplayPlayerLoader(databasedScore));
+                switch (presentType)
+                {
+                    case ScorePresentType.Gameplay:
+                        screen.Push(new ReplayPlayerLoader(databasedScore));
+                        break;
+
+                    case ScorePresentType.Results:
+                        screen.Push(new SoloResultsScreen(databasedScore.ScoreInfo));
+                        break;
+                }
             }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
@@ -1001,5 +1012,11 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
+    }
+
+    public enum ScorePresentType
+    {
+        Results,
+        Gameplay
     }
 }
