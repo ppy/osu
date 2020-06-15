@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -22,16 +20,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneSliderSelectionBlueprint : SelectionBlueprintTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(SliderSelectionBlueprint),
-            typeof(SliderCircleSelectionBlueprint),
-            typeof(SliderBodyPiece),
-            typeof(SliderCircle),
-            typeof(PathControlPointVisualiser),
-            typeof(PathControlPointPiece)
-        };
-
         private Slider slider;
         private DrawableSlider drawableObject;
         private TestSliderBlueprint blueprint;

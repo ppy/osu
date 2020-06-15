@@ -28,8 +28,15 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        private const float bleed_top = FilterControl.HEIGHT;
-        private const float bleed_bottom = Footer.HEIGHT;
+        /// <summary>
+        /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
+        /// </summary>
+        public float BleedTop { get; set; }
+
+        /// <summary>
+        /// Height of the area below the carousel that should be treated as visible due to transparency of elements in front of it.
+        /// </summary>
+        public float BleedBottom { get; set; }
 
         /// <summary>
         /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
@@ -47,6 +54,11 @@ namespace osu.Game.Screens.Select
         /// The currently selected beatmap set.
         /// </summary>
         public BeatmapSetInfo SelectedBeatmapSet => selectedBeatmapSet?.BeatmapSet;
+
+        /// <summary>
+        /// A function to optionally decide on a recommended difficulty from a beatmap set.
+        /// </summary>
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
 
         private CarouselBeatmapSet selectedBeatmapSet;
 
@@ -116,7 +128,13 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
+
         private CarouselRoot root;
+
+        private IBindable<WeakReference<BeatmapSetInfo>> itemUpdated;
+        private IBindable<WeakReference<BeatmapSetInfo>> itemRemoved;
+        private IBindable<WeakReference<BeatmapInfo>> itemHidden;
+        private IBindable<WeakReference<BeatmapInfo>> itemRestored;
 
         public BeatmapCarousel()
         {
@@ -148,15 +166,19 @@ namespace osu.Game.Screens.Select
             RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
-            beatmaps.ItemAdded += beatmapAdded;
-            beatmaps.ItemRemoved += beatmapRemoved;
-            beatmaps.BeatmapHidden += beatmapHidden;
-            beatmaps.BeatmapRestored += beatmapRestored;
+            itemUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+            itemUpdated.BindValueChanged(beatmapUpdated);
+            itemRemoved = beatmaps.ItemRemoved.GetBoundCopy();
+            itemRemoved.BindValueChanged(beatmapRemoved);
+            itemHidden = beatmaps.BeatmapHidden.GetBoundCopy();
+            itemHidden.BindValueChanged(beatmapHidden);
+            itemRestored = beatmaps.BeatmapRestored.GetBoundCopy();
+            itemRestored.BindValueChanged(beatmapRestored);
 
             loadBeatmapSets(GetLoadableBeatmaps());
         }
 
-        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.AllButFiles);
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -195,7 +217,7 @@ namespace osu.Game.Screens.Select
             // without this, during a large beatmap import it is impossible to navigate the carousel.
             applyActiveCriteria(false, alwaysResetScrollPosition: false);
 
-            //check if we can/need to maintain our current selection.
+            // check if we can/need to maintain our current selection.
             if (previouslySelectedID != null)
                 select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == previouslySelectedID) ?? newSet);
 
@@ -211,6 +233,9 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection was made, False if it wasn't.</returns>
         public bool SelectBeatmap(BeatmapInfo beatmap, bool bypassFilters = true)
         {
+            // ensure that any pending events from BeatmapManager have been run before attempting a selection.
+            Scheduler.Update();
+
             if (beatmap?.Hidden != false)
                 return false;
 
@@ -367,17 +392,17 @@ namespace osu.Game.Screens.Select
         /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
         /// </remarks>
         /// </summary>
-        private float visibleHalfHeight => (DrawHeight + bleed_bottom + bleed_top) / 2;
+        private float visibleHalfHeight => (DrawHeight + BleedBottom + BleedTop) / 2;
 
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => scroll.Current + DrawHeight + bleed_bottom;
+        private float visibleBottomBound => scroll.Current + DrawHeight + BleedBottom;
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => scroll.Current - bleed_top;
+        private float visibleUpperBound => scroll.Current - BleedTop;
 
         public void FlushPendingFilterOperations()
         {
@@ -546,26 +571,34 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= beatmapAdded;
-                beatmaps.ItemRemoved -= beatmapRemoved;
-                beatmaps.BeatmapHidden -= beatmapHidden;
-                beatmaps.BeatmapRestored -= beatmapRestored;
-            }
-
             // aggressively dispose "off-screen" items to reduce GC pressure.
             foreach (var i in Items)
                 i.Dispose();
         }
 
-        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
+        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var item))
+                RemoveBeatmapSet(item);
+        }
 
-        private void beatmapAdded(BeatmapSetInfo item) => UpdateBeatmapSet(item);
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var item))
+                UpdateBeatmapSet(item);
+        }
 
-        private void beatmapRestored(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void beatmapRestored(ValueChangedEvent<WeakReference<BeatmapInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var b))
+                UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        }
 
-        private void beatmapHidden(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void beatmapHidden(ValueChangedEvent<WeakReference<BeatmapInfo>> weakItem)
+        {
+            if (weakItem.NewValue.TryGetTarget(out var b))
+                UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        }
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
@@ -574,12 +607,12 @@ namespace osu.Game.Screens.Select
 
             // todo: remove the need for this.
             foreach (var b in beatmapSet.Beatmaps)
-            {
-                if (b.Metadata == null)
-                    b.Metadata = beatmapSet.Metadata;
-            }
+                b.Metadata ??= beatmapSet.Metadata;
 
-            var set = new CarouselBeatmapSet(beatmapSet);
+            var set = new CarouselBeatmapSet(beatmapSet)
+            {
+                GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
+            };
 
             foreach (var c in set.Beatmaps)
             {
@@ -632,7 +665,11 @@ namespace osu.Game.Screens.Select
                         case DrawableCarouselBeatmap beatmap:
                         {
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
-                                scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
+                                // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
+                                // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
+                                // then reapply the top semi-transparent area (because carousel's screen space starts below it)
+                                // and finally add half of the panel's own height to achieve vertical centering of the panel itself
+                                scrollTarget = currentY - visibleHalfHeight + BleedTop + beatmap.DrawHeight / 2;
 
                             void performMove(float y, float? startY = null)
                             {

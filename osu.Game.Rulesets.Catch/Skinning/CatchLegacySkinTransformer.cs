@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
     {
         private readonly ISkin source;
 
-        public CatchLegacySkinTransformer(ISkinSource source)
+        public CatchLegacySkinTransformer(ISkin source)
         {
             this.source = source;
         }
@@ -65,6 +65,15 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
         public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source.GetConfig<TLookup, TValue>(lookup);
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
+            {
+                case CatchSkinColour colour:
+                    return source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+            }
+
+            return source.GetConfig<TLookup, TValue>(lookup);
+        }
     }
 }

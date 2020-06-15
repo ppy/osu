@@ -1,44 +1,76 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Menus
 {
     [TestFixture]
-    public class TestSceneToolbar : OsuTestScene
+    public class TestSceneToolbar : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ToolbarButton),
-            typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetTabButton),
-            typeof(ToolbarNotificationButton),
-        };
+        private Toolbar toolbar;
 
-        public TestSceneToolbar()
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            var toolbar = new Toolbar { State = { Value = Visibility.Visible } };
+            Child = toolbar = new Toolbar { State = { Value = Visibility.Visible } };
+        });
+
+        [Test]
+        public void TestNotificationCounter()
+        {
             ToolbarNotificationButton notificationButton = null;
 
-            AddStep("create toolbar", () =>
-            {
-                Add(toolbar);
-                notificationButton = toolbar.Children.OfType<FillFlowContainer>().Last().Children.OfType<ToolbarNotificationButton>().First();
-            });
-
-            void setNotifications(int count) => AddStep($"set notification count to {count}", () => notificationButton.NotificationCount.Value = count);
+            AddStep("retrieve notification button", () => notificationButton = toolbar.ChildrenOfType<ToolbarNotificationButton>().Single());
 
             setNotifications(1);
             setNotifications(2);
             setNotifications(3);
             setNotifications(0);
             setNotifications(144);
+
+            void setNotifications(int count)
+                => AddStep($"set notification count to {count}",
+                    () => notificationButton.NotificationCount.Value = count);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestRulesetSwitchingShortcut(bool toolbarHidden)
+        {
+            ToolbarRulesetSelector rulesetSelector = null;
+
+            if (toolbarHidden)
+                AddStep("hide toolbar", () => toolbar.Hide());
+
+            AddStep("retrieve ruleset selector", () => rulesetSelector = toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single());
+
+            for (int i = 0; i < 4; i++)
+            {
+                var expected = rulesets.AvailableRulesets.ElementAt(i);
+                var numberKey = Key.Number1 + i;
+
+                AddStep($"switch to ruleset {i} via shortcut", () =>
+                {
+                    InputManager.PressKey(Key.ControlLeft);
+                    InputManager.PressKey(numberKey);
+
+                    InputManager.ReleaseKey(Key.ControlLeft);
+                    InputManager.ReleaseKey(numberKey);
+                });
+
+                AddUntilStep("ruleset switched", () => rulesetSelector.Current.Value.Equals(expected));
+            }
         }
     }
 }

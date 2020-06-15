@@ -38,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private EditorBeatmap editorBeatmap { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         public SliderSelectionBlueprint(DrawableSlider slider)
             : base(slider)
         {
@@ -92,7 +95,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private int? placementControlPointIndex;
 
-        protected override bool OnDragStart(DragStartEvent e) => placementControlPointIndex != null;
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (placementControlPointIndex != null)
+            {
+                changeHandler?.BeginChange();
+                return true;
+            }
+
+            return false;
+        }
 
         protected override void OnDrag(DragEvent e)
         {
@@ -103,7 +115,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            placementControlPointIndex = null;
+            if (placementControlPointIndex != null)
+            {
+                placementControlPointIndex = null;
+                changeHandler?.EndChange();
+            }
         }
 
         private BindableList<PathControlPoint> controlPoints => HitObject.Path.ControlPoints;
@@ -174,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
         };
 
-        public override Vector2 SelectionPoint => ((DrawableSlider)DrawableObject).HeadCircle.ScreenSpaceDrawQuad.Centre;
+        public override Vector2 ScreenSpaceSelectionPoint => ((DrawableSlider)DrawableObject).HeadCircle.ScreenSpaceDrawQuad.Centre;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BodyPiece.ReceivePositionalInputAt(screenSpacePos);
 

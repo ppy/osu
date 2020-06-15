@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
+        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Menu
             };
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
-            buttons.OnDirect = () => direct?.ToggleVisibility();
+            buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
             buttons.OnChart = () => rankings?.ShowSpotlights();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Menu
 
             (Background as BackgroundScreenDefault)?.Next();
 
-            //we may have consumed our preloaded instance, so let's make another.
+            // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
             if (Beatmap.Value.Track != null && music?.IsUserPaused != true)

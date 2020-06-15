@@ -26,21 +26,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CarouselItem),
-            typeof(CarouselGroup),
-            typeof(CarouselGroupEagerSelect),
-            typeof(CarouselBeatmap),
-            typeof(CarouselBeatmapSet),
-
-            typeof(DrawableCarouselItem),
-            typeof(CarouselItemState),
-
-            typeof(DrawableCarouselBeatmap),
-            typeof(DrawableCarouselBeatmapSet),
-        };
-
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
         private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
 
@@ -52,6 +37,35 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        [Test]
+        public void TestRecommendedSelection()
+        {
+            loadBeatmaps();
+
+            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.LastOrDefault());
+
+            // check recommended was selected
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(1, 3);
+
+            // change away from recommended
+            advanceSelection(direction: -1, diff: true);
+            waitForSelection(1, 2);
+
+            // next set, check recommended
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(2, 3);
+
+            // next set, check recommended
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(3, 3);
+
+            // go back to first set and ensure user selection was retained
+            advanceSelection(direction: -1, diff: false);
+            advanceSelection(direction: -1, diff: false);
+            waitForSelection(1, 2);
         }
 
         /// <summary>

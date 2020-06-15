@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,12 +11,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
+using osu.Game.Screens.Multi.Ranking;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
@@ -49,6 +54,8 @@ namespace osu.Game.Screens.Multi.Match
 
         private LeaderboardChatDisplay leaderboardChatDisplay;
         private MatchSettingsOverlay settingsOverlay;
+
+        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         public MatchSubScreen(Room room)
         {
@@ -110,10 +117,36 @@ namespace osu.Game.Screens.Multi.Match
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Padding = new MarginPadding { Horizontal = 5 },
-                                                                Child = new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                Child = new GridContainer
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    SelectedItem = { BindTarget = SelectedItem }
+                                                                    Content = new[]
+                                                                    {
+                                                                        new Drawable[]
+                                                                        {
+                                                                            new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                            {
+                                                                                RelativeSizeAxes = Axes.Both,
+                                                                                SelectedItem = { BindTarget = SelectedItem }
+                                                                            }
+                                                                        },
+                                                                        null,
+                                                                        new Drawable[]
+                                                                        {
+                                                                            new TriangleButton
+                                                                            {
+                                                                                RelativeSizeAxes = Axes.X,
+                                                                                Text = "Show beatmap results",
+                                                                                Action = showBeatmapResults
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    RowDimensions = new[]
+                                                                    {
+                                                                        new Dimension(),
+                                                                        new Dimension(GridSizeMode.Absolute, 5),
+                                                                        new Dimension(GridSizeMode.AutoSize)
+                                                                    }
                                                                 }
                                                             },
                                                             new Container
@@ -160,6 +193,9 @@ namespace osu.Game.Screens.Multi.Match
             };
         }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -181,7 +217,8 @@ namespace osu.Game.Screens.Multi.Match
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
             SelectedItem.Value = playlist.FirstOrDefault();
 
-            beatmapManager.ItemAdded += beatmapAdded;
+            managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(beatmapUpdated);
         }
 
         public override bool OnExiting(IScreen next)
@@ -204,6 +241,8 @@ namespace osu.Game.Screens.Multi.Match
                 Ruleset.Value = item.Ruleset.Value;
         }
 
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet) => Schedule(updateWorkingBeatmap);
+
         private void updateWorkingBeatmap()
         {
             var beatmap = SelectedItem.Value?.Beatmap.Value;
@@ -214,34 +253,24 @@ namespace osu.Game.Screens.Multi.Match
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
-        private void beatmapAdded(BeatmapSetInfo model) => Schedule(() =>
-        {
-            if (Beatmap.Value != beatmapManager.DefaultBeatmap)
-                return;
-
-            updateWorkingBeatmap();
-        });
-
         private void onStart()
         {
             switch (type.Value)
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer?.Start(() => new TimeshiftPlayer(SelectedItem.Value)
+                    multiplayer?.Push(new PlayerLoader(() => new TimeshiftPlayer(SelectedItem.Value)
                     {
                         Exited = () => leaderboardChatDisplay.RefreshScores()
-                    });
+                    }));
                     break;
             }
         }
 
-        protected override void Dispose(bool isDisposing)
+        private void showBeatmapResults()
         {
-            base.Dispose(isDisposing);
-
-            if (beatmapManager != null)
-                beatmapManager.ItemAdded -= beatmapAdded;
+            Debug.Assert(roomId.Value != null);
+            multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, SelectedItem.Value, false));
         }
     }
 }

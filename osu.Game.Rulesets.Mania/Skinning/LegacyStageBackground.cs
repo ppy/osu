@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
             base.Update();
 
             if (leftSprite?.Height > 0)
-                leftSprite.Scale = new Vector2(DrawHeight / leftSprite.Height);
+                leftSprite.Scale = new Vector2(1, DrawHeight / leftSprite.Height);
 
             if (rightSprite?.Height > 0)
-                rightSprite.Scale = new Vector2(DrawHeight / rightSprite.Height);
+                rightSprite.Scale = new Vector2(1, DrawHeight / rightSprite.Height);
         }
     }
 }
