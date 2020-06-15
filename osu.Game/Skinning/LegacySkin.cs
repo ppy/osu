@@ -257,6 +257,14 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.RightLineWidth:
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.TargetColumn.Value + 1]));
+
+                case LegacyManiaSkinConfigurationLookups.Hit0:
+                case LegacyManiaSkinConfigurationLookups.Hit50:
+                case LegacyManiaSkinConfigurationLookups.Hit100:
+                case LegacyManiaSkinConfigurationLookups.Hit200:
+                case LegacyManiaSkinConfigurationLookups.Hit300:
+                case LegacyManiaSkinConfigurationLookups.Hit300g:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, maniaLookup.Lookup.ToString()));
             }
 
             return null;
