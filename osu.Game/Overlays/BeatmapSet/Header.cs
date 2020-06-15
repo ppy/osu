@@ -15,8 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
-using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, //To better lineup with the font
+                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
                                                     },
                                                 }
                                             },
@@ -264,7 +264,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             if (BeatmapSet.Value == null) return;
 
-            if (BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false)
+            if ((BeatmapSet.Value.OnlineInfo.Availability?.DownloadDisabled ?? false) && State.Value != DownloadState.LocallyAvailable)
             {
                 downloadButtonsContainer.Clear();
                 return;
@@ -274,10 +274,11 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new PanelDownloadButton(BeatmapSet.Value)
+                    downloadButtonsContainer.Child = new BeatmapPanelDownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
-                        RelativeSizeAxes = Axes.Y
+                        RelativeSizeAxes = Axes.Y,
+                        SelectedBeatmap = { BindTarget = Picker.Beatmap }
                     };
                     break;
 

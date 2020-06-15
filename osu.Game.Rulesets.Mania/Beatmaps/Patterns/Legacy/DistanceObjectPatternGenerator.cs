@@ -472,15 +472,23 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         /// <param name="time">The time to retrieve the sample info list from.</param>
         /// <returns></returns>
-        private IList<HitSampleInfo> sampleInfoListAt(double time)
+        private IList<HitSampleInfo> sampleInfoListAt(double time) => nodeSamplesAt(time)?.First() ?? HitObject.Samples;
+
+        /// <summary>
+        /// Retrieves the list of node samples that occur at time greater than or equal to <paramref name="time"/>.
+        /// </summary>
+        /// <param name="time">The time to retrieve node samples at.</param>
+        private List<IList<HitSampleInfo>> nodeSamplesAt(double time)
         {
-            if (!(HitObject is IHasCurve curveData))
-                return HitObject.Samples;
+            if (!(HitObject is IHasPathWithRepeats curveData))
+                return null;
 
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-            return curveData.NodeSamples[index];
+
+            // avoid slicing the list & creating copies, if at all possible.
+            return index == 0 ? curveData.NodeSamples : curveData.NodeSamples.Skip(index).ToList();
         }
 
         /// <summary>
@@ -505,16 +513,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
             {
-                var holdNote = new HoldNote
+                newObject = new HoldNote
                 {
                     StartTime = startTime,
-                    Column = column,
                     Duration = endTime - startTime,
-                    Head = { Samples = sampleInfoListAt(startTime) },
-                    Tail = { Samples = sampleInfoListAt(endTime) }
+                    Column = column,
+                    Samples = HitObject.Samples,
+                    NodeSamples = nodeSamplesAt(startTime)
                 };
-
-                newObject = holdNote;
             }
 
             pattern.Add(newObject);

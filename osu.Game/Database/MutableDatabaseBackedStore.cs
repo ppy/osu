@@ -16,7 +16,14 @@ namespace osu.Game.Database
     public abstract class MutableDatabaseBackedStore<T> : DatabaseBackedStore
         where T : class, IHasPrimaryKey, ISoftDelete
     {
-        public event Action<T> ItemAdded;
+        /// <summary>
+        /// Fired when an item was added or updated.
+        /// </summary>
+        public event Action<T> ItemUpdated;
+
+        /// <summary>
+        /// Fired when an item was removed.
+        /// </summary>
         public event Action<T> ItemRemoved;
 
         protected MutableDatabaseBackedStore(IDatabaseContextFactory contextFactory, Storage storage = null)
@@ -41,7 +48,7 @@ namespace osu.Game.Database
                 context.Attach(item);
             }
 
-            ItemAdded?.Invoke(item);
+            ItemUpdated?.Invoke(item);
         }
 
         /// <summary>
@@ -53,8 +60,7 @@ namespace osu.Game.Database
             using (var usage = ContextFactory.GetForWrite())
                 usage.Context.Update(item);
 
-            ItemRemoved?.Invoke(item);
-            ItemAdded?.Invoke(item);
+            ItemUpdated?.Invoke(item);
         }
 
         /// <summary>
@@ -91,7 +97,7 @@ namespace osu.Game.Database
                 item.DeletePending = false;
             }
 
-            ItemAdded?.Invoke(item);
+            ItemUpdated?.Invoke(item);
             return true;
         }
 

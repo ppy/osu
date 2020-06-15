@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -17,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         // Must be set to update IsHovered as it's used in relax mdo to detect osu hit objects.
         public override bool HandlePositionalInput => true;
+
+        protected override float SamplePlaybackPosition => HitObject.X / OsuPlayfield.BASE_SIZE.X;
 
         /// <summary>
         /// Whether this <see cref="DrawableOsuHitObject"/> can be hit.

@@ -53,7 +53,11 @@ namespace osu.Game.Beatmaps
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
-        public override string ToString() => $"{Artist} - {Title} ({Author})";
+        public override string ToString()
+        {
+            string author = Author == null ? string.Empty : $"({Author})";
+            return $"{Artist} - {Title} {author}".Trim();
+        }
 
         [JsonIgnore]
         public string[] SearchableTerms => new[]

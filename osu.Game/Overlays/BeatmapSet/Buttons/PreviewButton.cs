@@ -11,7 +11,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons

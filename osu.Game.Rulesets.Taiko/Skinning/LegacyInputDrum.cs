@@ -20,36 +20,41 @@ namespace osu.Game.Rulesets.Taiko.Skinning
     {
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
+        private Container content;
 
         public LegacyInputDrum()
         {
-            Size = new Vector2(180, 200);
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            Children = new Drawable[]
+            Child = content = new Container
             {
-                new Sprite
+                Size = new Vector2(180, 200),
+                Children = new Drawable[]
                 {
-                    Texture = skin.GetTexture("taiko-bar-left")
-                },
-                left = new LegacyHalfDrum(false)
-                {
-                    Name = "Left Half",
-                    RelativeSizeAxes = Axes.Both,
-                    RimAction = TaikoAction.LeftRim,
-                    CentreAction = TaikoAction.LeftCentre
-                },
-                right = new LegacyHalfDrum(true)
-                {
-                    Name = "Right Half",
-                    RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.TopRight,
-                    Scale = new Vector2(-1, 1),
-                    RimAction = TaikoAction.RightRim,
-                    CentreAction = TaikoAction.RightCentre
+                    new Sprite
+                    {
+                        Texture = skin.GetTexture("taiko-bar-left")
+                    },
+                    left = new LegacyHalfDrum(false)
+                    {
+                        Name = "Left Half",
+                        RelativeSizeAxes = Axes.Both,
+                        RimAction = TaikoAction.LeftRim,
+                        CentreAction = TaikoAction.LeftCentre
+                    },
+                    right = new LegacyHalfDrum(true)
+                    {
+                        Name = "Right Half",
+                        RelativeSizeAxes = Axes.Both,
+                        Origin = Anchor.TopRight,
+                        Scale = new Vector2(-1, 1),
+                        RimAction = TaikoAction.RightRim,
+                        CentreAction = TaikoAction.RightCentre
+                    }
                 }
             };
 
@@ -60,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             const float ratio = 1.6f;
 
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
-            float negativeScaleAdjust = Width / ratio;
+            float negativeScaleAdjust = content.Width / ratio;
 
             if (skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
             {
@@ -76,6 +81,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                 left.Rim.Position = new Vector2(8, taiko_bar_y + 23) * ratio;
                 right.Rim.Position = new Vector2(negativeScaleAdjust - 53, taiko_bar_y + 23) * ratio;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
+            // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
+            content.Scale = new Vector2(DrawHeight / content.Size.Y);
         }
 
         /// <summary>

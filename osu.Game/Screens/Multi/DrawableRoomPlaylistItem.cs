@@ -21,7 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Multi
                     X = -18,
                     Children = new Drawable[]
                     {
-                        new PlaylistDownloadButton(item.Beatmap.Value.BeatmapSet)
+                        new PlaylistDownloadButton(item)
                         {
                             Size = new Vector2(50, 30)
                         },
@@ -210,11 +210,17 @@ namespace osu.Game.Screens.Multi
             return true;
         }
 
-        private class PlaylistDownloadButton : PanelDownloadButton
+        private class PlaylistDownloadButton : BeatmapPanelDownloadButton
         {
-            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            private readonly PlaylistItem playlistItem;
+
+            [Resolved]
+            private BeatmapManager beatmapManager { get; set; }
+
+            public PlaylistDownloadButton(PlaylistItem playlistItem)
+                : base(playlistItem.Beatmap.Value.BeatmapSet)
             {
+                this.playlistItem = playlistItem;
                 Alpha = 0;
             }
 
@@ -223,11 +229,26 @@ namespace osu.Game.Screens.Multi
                 base.LoadComplete();
 
                 State.BindValueChanged(stateChanged, true);
+                FinishTransforms(true);
             }
 
             private void stateChanged(ValueChangedEvent<DownloadState> state)
             {
-                this.FadeTo(state.NewValue == DownloadState.LocallyAvailable ? 0 : 1, 500);
+                switch (state.NewValue)
+                {
+                    case DownloadState.LocallyAvailable:
+                        // Perform a local query of the beatmap by beatmap checksum, and reset the state if not matching.
+                        if (beatmapManager.QueryBeatmap(b => b.MD5Hash == playlistItem.Beatmap.Value.MD5Hash) == null)
+                            State.Value = DownloadState.NotDownloaded;
+                        else
+                            this.FadeTo(0, 500);
+
+                        break;
+
+                    default:
+                        this.FadeTo(1, 500);
+                        break;
+                }
             }
         }
 

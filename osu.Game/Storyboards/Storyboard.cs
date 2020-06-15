@@ -19,19 +19,26 @@ namespace osu.Game.Storyboards
 
         public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
 
+        /// <summary>
+        /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
+        /// </summary>
+        private int minimumLayerDepth;
+
         public Storyboard()
         {
             layers.Add("Video", new StoryboardLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
             layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
             layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
-            layers.Add("Foreground", new StoryboardLayer("Foreground", 0));
+            layers.Add("Foreground", new StoryboardLayer("Foreground", minimumLayerDepth = 0));
+
+            layers.Add("Overlay", new StoryboardLayer("Overlay", int.MinValue));
         }
 
         public StoryboardLayer GetLayer(string name)
         {
             if (!layers.TryGetValue(name, out var layer))
-                layers[name] = layer = new StoryboardLayer(name, layers.Values.Min(l => l.Depth) - 1);
+                layers[name] = layer = new StoryboardLayer(name, --minimumLayerDepth);
 
             return layer;
         }
@@ -46,9 +53,6 @@ namespace osu.Game.Storyboards
                 var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
                 if (backgroundPath == null)
                     return false;
-
-                if (GetLayer("Video").Elements.Any())
-                    return true;
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }

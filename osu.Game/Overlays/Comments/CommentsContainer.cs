@@ -12,6 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Threading;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Comments
@@ -30,6 +31,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; }
 
         private GetCommentsRequest request;
+        private ScheduledDelegate scheduledCommentsLoad;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
@@ -152,8 +154,9 @@ namespace osu.Game.Overlays.Comments
 
             request?.Cancel();
             loadCancellation?.Cancel();
+            scheduledCommentsLoad?.Cancel();
             request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
-            request.Success += onSuccess;
+            request.Success += res => scheduledCommentsLoad = Schedule(() => onSuccess(res));
             api.PerformAsync(request);
         }
 

@@ -68,8 +68,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (!Items.Contains(channel))
                 AddItem(channel);
 
-            if (Current.Value == null)
-                Current.Value = channel;
+            Current.Value ??= channel;
         }
 
         /// <summary>

@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private void bindEvents(DrawableOsuHitObject drawableObject)
         {
             drawableObject.HitObject.PositionBindable.BindValueChanged(_ => scheduleRefresh());
-            drawableObject.HitObject.DefaultsApplied += scheduleRefresh;
+            drawableObject.HitObject.DefaultsApplied += _ => scheduleRefresh();
         }
 
         private void scheduleRefresh()
@@ -135,8 +135,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 fp.Alpha = 0;
                 fp.Scale = new Vector2(1.5f * osuEnd.Scale);
 
-                if (firstTransformStartTime == null)
-                    firstTransformStartTime = fadeInTime;
+                firstTransformStartTime ??= fadeInTime;
 
                 fp.AnimationStartTime = fadeInTime;
 
