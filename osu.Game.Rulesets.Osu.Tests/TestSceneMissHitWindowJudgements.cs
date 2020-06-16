@@ -19,10 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneMissHitWindowJudgements : ModTestScene
     {
-        public TestSceneMissHitWindowJudgements()
-            : base(new OsuRuleset())
-        {
-        }
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
         [Test]
         public void TestMissViaEarlyHit()
