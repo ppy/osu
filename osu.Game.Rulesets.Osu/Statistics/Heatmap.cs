@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Osu.Scoring;
 using osuTK;
 using osuTK.Graphics;
@@ -18,12 +19,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
     public class Heatmap : CompositeDrawable
     {
         /// <summary>
-        /// Full size of the heatmap.
-        /// </summary>
-        private const float size = 130;
-
-        /// <summary>
-        /// Size of the inner circle containing the "hit" points, relative to <see cref="size"/>.
+        /// Size of the inner circle containing the "hit" points, relative to the size of this <see cref="Heatmap"/>.
         /// All other points outside of the inner circle are "miss" points.
         /// </summary>
         private const float inner_portion = 0.8f;
@@ -34,77 +30,106 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private readonly IReadOnlyList<HitOffset> offsets;
         private Container<HitPoint> allPoints;
 
+        private readonly LayoutValue sizeLayout = new LayoutValue(Invalidation.DrawSize);
+
         public Heatmap(IReadOnlyList<HitOffset> offsets)
         {
             this.offsets = offsets;
 
-            Size = new Vector2(size);
+            AddLayout(sizeLayout);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new Container
             {
-                new CircularContainer
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(inner_portion),
-                    Masking = true,
-                    BorderThickness = 2f,
-                    BorderColour = Color4.White,
-                    Child = new Box
+                    new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(inner_portion),
+                        Masking = true,
+                        BorderThickness = 2f,
+                        BorderColour = Color4.White,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4Extensions.FromHex("#202624")
+                        }
+                    },
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex("#202624")
-                    }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Box
+                        Masking = true,
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Y,
-                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                            Width = 1f,
-                            Rotation = -rotation,
-                            Alpha = 0.3f,
-                        },
-                        new Box
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Y,
-                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                            Width = 1f,
-                            Rotation = rotation
-                        },
-                        new Box
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Width = 10,
-                            Height = 2f,
-                        },
-                        new Box
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Y = -1,
-                            Width = 2f,
-                            Height = 10,
+                            new Box
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Y,
+                                Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
+                                Width = 1f,
+                                Rotation = -rotation,
+                                Alpha = 0.3f,
+                            },
+                            new Box
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Y,
+                                Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
+                                Width = 1f,
+                                Rotation = rotation
+                            },
+                            new Box
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Width = 10,
+                                Height = 2f,
+                            },
+                            new Box
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Y = -1,
+                                Width = 2f,
+                                Height = 10,
+                            }
                         }
+                    },
+                    allPoints = new Container<HitPoint>
+                    {
+                        RelativeSizeAxes = Axes.Both
                     }
-                },
-                allPoints = new Container<HitPoint> { RelativeSizeAxes = Axes.Both }
+                }
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            validateHitPoints();
+        }
+
+        private void validateHitPoints()
+        {
+            if (sizeLayout.IsValid)
+                return;
+
+            allPoints.Clear();
+
+            // Since the content is fit, both dimensions should have the same size.
+            float size = allPoints.DrawSize.X;
 
             Vector2 centre = new Vector2(size / 2);
             int rows = (int)Math.Ceiling(size / point_size);
@@ -130,15 +155,23 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             foreach (var o in offsets)
                 AddPoint(o.Position1, o.Position2, o.HitPosition, o.Radius);
+
+            sizeLayout.Validate();
         }
 
-        public void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
+        protected void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
         {
+            if (allPoints.Count == 0)
+                return;
+
             double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
             double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
             double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
 
             float normalisedDistance = Vector2.Distance(hitPoint, end) / radius;
+
+            // Since the content is fit, both dimensions should have the same size.
+            float size = allPoints.DrawSize.X;
 
             // Find the most relevant hit point.
             double minDist = double.PositiveInfinity;
