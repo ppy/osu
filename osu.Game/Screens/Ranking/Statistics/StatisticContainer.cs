@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             InternalChild = new GridContainer
             {
-                RelativeSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Both,
                 Content = new[]
                 {
                     new Drawable[]

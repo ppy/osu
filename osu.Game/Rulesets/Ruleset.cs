@@ -210,6 +210,6 @@ namespace osu.Game.Rulesets
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
 
-        public virtual IEnumerable<StatisticContainer> CreateStatistics(ScoreInfo score) => Enumerable.Empty<StatisticContainer>();
+        public virtual StatisticRow[] CreateStatistics(ScoreInfo score) => Array.Empty<StatisticRow>();
     }
 }
