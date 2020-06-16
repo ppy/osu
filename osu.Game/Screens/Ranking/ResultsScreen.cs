@@ -16,6 +16,7 @@ using osu.Game.Online.API;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
@@ -134,6 +135,11 @@ namespace osu.Game.Screens.Ranking
                     },
                 });
             }
+
+            AddInternal(new StatisticsPanel(Score)
+            {
+                RelativeSizeAxes = Axes.Both
+            });
         }
 
         protected override void LoadComplete()
