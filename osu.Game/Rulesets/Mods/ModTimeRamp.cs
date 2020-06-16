@@ -10,10 +10,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToTrack
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToTrack, IApplicableToSample
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
@@ -56,6 +57,11 @@ namespace osu.Game.Rulesets.Mods
 
             FinalRate.TriggerChange();
             AdjustPitch.TriggerChange();
+        }
+
+        public void ApplyToSample(SampleChannel sample)
+        {
+            sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
 
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
