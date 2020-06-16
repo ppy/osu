@@ -13,18 +13,18 @@ namespace osu.Game.Tournament.IO
 {
     public class TournamentStorage : WrappedStorage
     {
-        private readonly GameHost host;
+        private readonly Storage storage;
         internal readonly TournamentVideoResourceStore VideoStore;
         internal readonly Storage ConfigurationStorage;
         private const string default_tournament = "default";
         private const string config_directory = "config";
 
-        public TournamentStorage(GameHost host)
-            : base(host.Storage.GetStorageForDirectory("tournaments"), string.Empty)
+        public TournamentStorage(Storage storage)
+            : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
-            this.host = host;
+            this.storage = storage;
 
-            TournamentStorageManager storageConfig = new TournamentStorageManager(host.Storage);
+            TournamentStorageManager storageConfig = new TournamentStorageManager(storage);
 
             var currentTournament = storageConfig.Get<string>(StorageConfig.CurrentTournament);
 
@@ -48,7 +48,7 @@ namespace osu.Game.Tournament.IO
 
         internal void Migrate()
         {
-            var source = new DirectoryInfo(host.Storage.GetFullPath("tournament"));
+            var source = new DirectoryInfo(storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(GetFullPath(default_tournament));
             var cfgDestination = new DirectoryInfo(GetFullPath(default_tournament + Path.DirectorySeparatorChar + config_directory));
 
@@ -58,31 +58,31 @@ namespace osu.Game.Tournament.IO
             if (!cfgDestination.Exists)
                 destination.CreateSubdirectory(config_directory);
 
-            if (host.Storage.Exists("bracket.json"))
+            if (storage.Exists("bracket.json"))
             {
                 Logger.Log("Migrating bracket to default tournament storage.");
-                var bracketFile = new System.IO.FileInfo(host.Storage.GetFullPath("bracket.json"));
+                var bracketFile = new System.IO.FileInfo(storage.GetFullPath("bracket.json"));
                 moveFile(bracketFile, destination);
             }
 
-            if (host.Storage.Exists("drawings.txt"))
+            if (storage.Exists("drawings.txt"))
             {
                 Logger.Log("Migrating drawings to default tournament storage.");
-                var drawingsFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings.txt"));
+                var drawingsFile = new System.IO.FileInfo(storage.GetFullPath("drawings.txt"));
                 moveFile(drawingsFile, destination);
             }
 
-            if (host.Storage.Exists("drawings.ini"))
+            if (storage.Exists("drawings.ini"))
             {
                 Logger.Log("Migrating drawing configuration to default tournament storage.");
-                var drawingsConfigFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings.ini"));
+                var drawingsConfigFile = new System.IO.FileInfo(storage.GetFullPath("drawings.ini"));
                 moveFile(drawingsConfigFile, cfgDestination);
             }
 
-            if (host.Storage.Exists("drawings_results.txt"))
+            if (storage.Exists("drawings_results.txt"))
             {
                 Logger.Log("Migrating drawings results to default tournament storage.");
-                var drawingsResultsFile = new System.IO.FileInfo(host.Storage.GetFullPath("drawings_results.txt"));
+                var drawingsResultsFile = new System.IO.FileInfo(storage.GetFullPath("drawings_results.txt"));
                 moveFile(drawingsResultsFile, destination);
             }
 
