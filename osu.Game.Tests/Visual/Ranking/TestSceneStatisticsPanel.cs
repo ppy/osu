@@ -8,7 +8,7 @@ using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestScreenStatisticsPanel : OsuTestScene
+    public class TestSceneStatisticsPanel : OsuTestScene
     {
         [Test]
         public void TestScore()
