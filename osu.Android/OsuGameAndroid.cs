@@ -33,6 +33,7 @@ namespace osu.Android
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
                     {
                         versionName = packageInfo.LongVersionCode.ToString();
+                        // ensure we only read the trailing portion of long (the part we are interested in).
                         versionName = versionName.Substring(versionName.Length - 9);
                     }
                     else
