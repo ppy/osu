@@ -57,7 +57,7 @@ namespace osu.Game.Tournament.IO
 
             if (!cfgDestination.Exists)
                 destination.CreateSubdirectory(config_directory);
-            
+
             moveFileIfExists("bracket.json", destination);
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
@@ -77,7 +77,8 @@ namespace osu.Game.Tournament.IO
             {
                 Logger.Log($"Migrating {file} to default tournament storage.");
                 var fileInfo = new System.IO.FileInfo(storage.GetFullPath(file));
-                moveFile(fileInfo, destination);
+                attemptOperation(() => fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true));
+                fileInfo.Delete();
             }
         }
 
@@ -110,12 +111,6 @@ namespace osu.Game.Tournament.IO
 
             if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
                 attemptOperation(target.Delete);
-        }
-
-        private void moveFile(System.IO.FileInfo file, DirectoryInfo destination)
-        {
-            attemptOperation(() => file.CopyTo(Path.Combine(destination.FullName, file.Name), true));
-            file.Delete();
         }
 
         private void attemptOperation(Action action, int attempts = 10)
