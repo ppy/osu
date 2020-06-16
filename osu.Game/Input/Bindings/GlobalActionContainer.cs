@@ -50,6 +50,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
 
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Home }, GlobalAction.Home),
+
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
@@ -176,5 +178,7 @@ namespace osu.Game.Input.Bindings
         MvisToggleTrackLoop,
         [Description("在歌曲选择中打开")]
         MvisOpenInSongSelect,
+        [Description("返回主页")]
+        Home,
     }
 }

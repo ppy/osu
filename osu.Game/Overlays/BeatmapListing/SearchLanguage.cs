@@ -13,9 +13,9 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(0)]
         Any,
 
-        [Description("其他")]
-        [Order(11)]
-        Other,
+        [Description("未指定")]
+        [Order(14)]
+        Unspecified,
 
         [Description("英语")]
         [Order(1)]
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapListing
         Chinese,
 
         [Description("乐器")]
-        [Order(10)]
+        [Order(12)]
         Instrumental,
 
         [Description("韩语")]
@@ -55,6 +55,18 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [Description("意大利语")]
         [Order(5)]
-        Italian
+        Italian,
+
+        [Description("俄语")]
+        [Order(10)]
+        Russian,
+
+        [Description("波兰语")]
+        [Order(11)]
+        Polish,
+
+        [Description("其他")]
+        [Order(13)]
+        Other
     }
 }

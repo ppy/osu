@@ -77,6 +77,8 @@ namespace osu.Game.Tournament.Components
                 flow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
+                    // Todo: This is a hack for https://github.com/ppy/osu-framework/issues/3617 since this container is at the very edge of the screen and potentially initially masked away.
+                    Height = 1,
                     AutoSizeAxes = Axes.Y,
                     LayoutDuration = 500,
                     LayoutEasing = Easing.OutQuint,
