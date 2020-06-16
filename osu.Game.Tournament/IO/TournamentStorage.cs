@@ -57,40 +57,27 @@ namespace osu.Game.Tournament.IO
 
             if (!cfgDestination.Exists)
                 destination.CreateSubdirectory(config_directory);
-
-            if (storage.Exists("bracket.json"))
-            {
-                Logger.Log("Migrating bracket to default tournament storage.");
-                var bracketFile = new System.IO.FileInfo(storage.GetFullPath("bracket.json"));
-                moveFile(bracketFile, destination);
-            }
-
-            if (storage.Exists("drawings.txt"))
-            {
-                Logger.Log("Migrating drawings to default tournament storage.");
-                var drawingsFile = new System.IO.FileInfo(storage.GetFullPath("drawings.txt"));
-                moveFile(drawingsFile, destination);
-            }
-
-            if (storage.Exists("drawings.ini"))
-            {
-                Logger.Log("Migrating drawing configuration to default tournament storage.");
-                var drawingsConfigFile = new System.IO.FileInfo(storage.GetFullPath("drawings.ini"));
-                moveFile(drawingsConfigFile, cfgDestination);
-            }
-
-            if (storage.Exists("drawings_results.txt"))
-            {
-                Logger.Log("Migrating drawings results to default tournament storage.");
-                var drawingsResultsFile = new System.IO.FileInfo(storage.GetFullPath("drawings_results.txt"));
-                moveFile(drawingsResultsFile, destination);
-            }
+            
+            moveFileIfExists("bracket.json", destination);
+            moveFileIfExists("drawings.txt", destination);
+            moveFileIfExists("drawings_results.txt", destination);
+            moveFileIfExists("drawings.ini", cfgDestination);
 
             if (source.Exists)
             {
                 Logger.Log("Migrating tournament assets to default tournament storage.");
                 copyRecursive(source, destination);
                 deleteRecursive(source);
+            }
+        }
+
+        private void moveFileIfExists(string file, DirectoryInfo destination)
+        {
+            if (storage.Exists(file))
+            {
+                Logger.Log($"Migrating {file} to default tournament storage.");
+                var fileInfo = new System.IO.FileInfo(storage.GetFullPath(file));
+                moveFile(fileInfo, destination);
             }
         }
 
