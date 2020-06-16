@@ -120,9 +120,9 @@ namespace osu.Game.Screens.Menu
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Scale = new Vector2(0.3f),
-                        Width = 750,
-                        Height = 78,
+                        RelativeSizeAxes = Axes.X,
+                        Scale = new Vector2(0.1f),
+                        Height = 156,
                         Alpha = 0,
                         Texture = textures.Get(@"Welcome/welcome_text")
                     },
