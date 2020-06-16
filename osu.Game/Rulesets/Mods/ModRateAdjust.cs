@@ -2,18 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModRateAdjust : Mod, IApplicableToTrack
+    public abstract class ModRateAdjust : Mod, IApplicableToTrack, IApplicableToSample
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
         public virtual void ApplyToTrack(Track track)
         {
             track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
+        }
+
+        public virtual void ApplyToSample(SampleChannel sample)
+        {
+            sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
 
         public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";
