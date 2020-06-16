@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             // Todo: Not correct.
             RelativeSizeAxes = Axes.Both;
 
-            Container<StatisticContainer> statistics;
+            FillFlowContainer statisticRows;
 
             InternalChildren = new Drawable[]
             {
@@ -41,16 +41,26 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Left = ScorePanel.EXPANDED_WIDTH + 30 + 50,
                         Right = 50
                     },
-                    Child = statistics = new FillFlowContainer<StatisticContainer>
+                    Child = statisticRows = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
                         Spacing = new Vector2(30, 15),
                     }
                 }
             };
 
             foreach (var s in score.Ruleset.CreateInstance().CreateStatistics(score))
-                statistics.Add(s);
+            {
+                statisticRows.Add(new GridContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Content = new[] { s.Content },
+                    ColumnDimensions = s.ColumnDimensions,
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                });
+            }
         }
     }
 }

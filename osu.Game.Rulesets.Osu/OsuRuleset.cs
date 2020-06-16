@@ -29,6 +29,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -189,16 +190,36 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override IEnumerable<StatisticContainer> CreateStatistics(ScoreInfo score) => new[]
+        public override StatisticRow[] CreateStatistics(ScoreInfo score) => new[]
         {
-            new StatisticContainer("Timing Distribution")
+            new StatisticRow
             {
-                Child = new TimingDistributionGraph((TimingDistribution)score.ExtraStatistics.GetValueOrDefault("timing_distribution"))
-            },
-            new StatisticContainer("Accuracy Heatmap")
-            {
-                Child = new Heatmap((List<HitOffset>)score.ExtraStatistics.GetValueOrDefault("hit_offsets"))
-            },
+                Content = new Drawable[]
+                {
+                    new StatisticContainer("Timing Distribution")
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 130,
+                        Child = new TimingDistributionGraph((TimingDistribution)score.ExtraStatistics.GetValueOrDefault("timing_distribution"))
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    },
+                    new StatisticContainer("Accuracy Heatmap")
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new Heatmap((List<HitOffset>)score.ExtraStatistics.GetValueOrDefault("hit_offsets"))
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    },
+                },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 130),
+                }
+            }
         };
     }
 }
