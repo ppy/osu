@@ -288,7 +288,7 @@ namespace osu.Game.Overlays
                                     newBackground.MoveToX(0, 500, Easing.OutCubic);
                                     background.MoveToY(0, 500, Easing.OutCubic);
                                     break;
-                            
+
                                 case TrackChangeDirection.Prev:
                                     newBackground.Position = new Vector2(400, 0);
                                     newBackground.MoveToX(0, 500, Easing.OutCubic);

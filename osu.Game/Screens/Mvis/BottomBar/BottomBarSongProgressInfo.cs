@@ -14,30 +14,35 @@ namespace osu.Game.Screens.Mvis.UI
     {
         public OsuSpriteText timeCurrent;
         public OsuSpriteText timeTotal;
+        public float FontSize = 19;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
-        public BottomBarSongProgressInfo()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Spacing = new Vector2(5);
             Children = new Drawable[]
             {
                 timeCurrent = new OsuSpriteText
                 {
+                    Font = OsuFont.GetFont(size: FontSize),
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                 },
                 new OsuSpriteText
                 {
+                    Font = OsuFont.GetFont(size: FontSize),
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                     Text = "/",
                 },
                 timeTotal = new OsuSpriteText
                 {
+                    Font = OsuFont.GetFont(size: FontSize),
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                 }
@@ -48,7 +53,7 @@ namespace osu.Game.Screens.Mvis.UI
         {
             base.LoadComplete();
 
-            b.ValueChanged += _  => UpdateEndTime();
+            b.BindValueChanged( _ => UpdateEndTime() );
 
             UpdateEndTime();
         }
