@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -28,12 +31,17 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods)
         {
             channel = beatmap.Value.Skin.GetSample(sampleInfo);
 
             if (channel != null)
+            {
                 channel.Volume.Value = sampleInfo.Volume / 100.0;
+
+                foreach (var mod in mods.Value.OfType<IApplicableToSample>())
+                    mod.ApplyToSample(channel);
+            }
         }
 
         protected override void Update()
