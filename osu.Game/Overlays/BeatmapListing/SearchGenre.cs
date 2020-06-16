@@ -28,6 +28,14 @@ namespace osu.Game.Overlays.BeatmapListing
         [Description("嘻哈")]
         HipHop = 9,
         [Description("电子")]
-        Electronic = 10
+        Electronic = 10,
+        [Description("金属")]
+        Metal = 11,
+        [Description("古典")]
+        Classical = 12,
+        [Description("民歌")]
+        Folk = 13,
+        [Description("爵士")]
+        Jazz = 14
     }
 }

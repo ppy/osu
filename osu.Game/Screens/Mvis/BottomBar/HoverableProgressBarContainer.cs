@@ -5,7 +5,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.UI
 {
@@ -13,9 +12,6 @@ namespace osu.Game.Screens.Mvis.UI
     {
         protected const float idle_alpha = 0.5f;
         public ProgressBar progressBar;
-
-        [Resolved]
-        private MusicController musicController { get; set; }
 
         [Resolved]
         private OsuColour colour { get; set; }

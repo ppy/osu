@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.UI;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Mvis.UI.Objects;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osu.Game.Screens.Mvis.Objects.Helpers;
@@ -45,7 +44,6 @@ namespace osu.Game.Screens
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.

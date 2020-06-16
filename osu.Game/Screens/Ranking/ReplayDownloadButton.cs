@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Ranking
                 switch (State.Value)
                 {
                     case DownloadState.LocallyAvailable:
-                        game?.PresentScore(Model.Value);
+                        game?.PresentScore(Model.Value, ScorePresentType.Gameplay);
                         break;
 
                     case DownloadState.NotDownloaded:

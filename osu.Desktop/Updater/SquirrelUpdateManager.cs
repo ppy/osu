@@ -30,18 +30,16 @@ namespace osu.Desktop.Updater
         private static readonly Logger logger = Logger.GetLogger("updater");
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuGameBase game)
+        private void load(NotificationOverlay notification)
         {
             notificationOverlay = notification;
 
-            if (game.IsDeployedBuild)
-            {
-                Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
-                Schedule(() => Task.Run(() => checkForUpdateAsync()));
-            }
+            Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
         }
 
-        private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        protected override async Task PerformUpdateCheck() => await checkForUpdateAsync();
+
+        private async Task checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             // should we schedule a retry on completion of this check?
             bool scheduleRecheck = true;
@@ -83,7 +81,7 @@ namespace osu.Desktop.Updater
 
                         // could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         // try again without deltas.
-                        checkForUpdateAsync(false, notification);
+                        await checkForUpdateAsync(false, notification);
                         scheduleRecheck = false;
                     }
                     else
@@ -102,7 +100,7 @@ namespace osu.Desktop.Updater
                 if (scheduleRecheck)
                 {
                     // check again in 30 minutes.
-                    Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
+                    Scheduler.AddDelayed(async () => await checkForUpdateAsync(), 60000 * 30);
                 }
             }
         }
