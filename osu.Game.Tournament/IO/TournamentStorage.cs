@@ -11,7 +11,7 @@ using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament.IO
 {
-    public class TournamentStorage : WrappedStorage
+    public class TournamentStorage : MigratableStorage
     {
         private readonly Storage storage;
         internal readonly TournamentVideoResourceStore VideoStore;
@@ -52,8 +52,15 @@ namespace osu.Game.Tournament.IO
             var destination = new DirectoryInfo(GetFullPath(default_tournament));
             var cfgDestination = new DirectoryInfo(GetFullPath(default_tournament + Path.DirectorySeparatorChar + config_directory));
 
-            if (!destination.Exists)
-                destination.Create();
+            // if (!destination.Exists)
+            //     destination.Create();
+
+            if (source.Exists)
+            {
+                Logger.Log("Migrating tournament assets to default tournament storage.");
+                copyRecursive(source, destination);
+                deleteRecursive(source);
+            }
 
             if (!cfgDestination.Exists)
                 destination.CreateSubdirectory(config_directory);
@@ -62,13 +69,6 @@ namespace osu.Game.Tournament.IO
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
             moveFileIfExists("drawings.ini", cfgDestination);
-
-            if (source.Exists)
-            {
-                Logger.Log("Migrating tournament assets to default tournament storage.");
-                copyRecursive(source, destination);
-                deleteRecursive(source);
-            }
         }
 
         private void moveFileIfExists(string file, DirectoryInfo destination)
@@ -79,56 +79,6 @@ namespace osu.Game.Tournament.IO
                 var fileInfo = new System.IO.FileInfo(storage.GetFullPath(file));
                 attemptOperation(() => fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true));
                 fileInfo.Delete();
-            }
-        }
-
-        private void copyRecursive(DirectoryInfo source, DirectoryInfo destination)
-        {
-            // based off example code https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo
-
-            foreach (System.IO.FileInfo fi in source.GetFiles())
-            {
-                attemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
-            }
-
-            foreach (DirectoryInfo dir in source.GetDirectories())
-            {
-                copyRecursive(dir, destination.CreateSubdirectory(dir.Name));
-            }
-        }
-
-        private void deleteRecursive(DirectoryInfo target)
-        {
-            foreach (System.IO.FileInfo fi in target.GetFiles())
-            {
-                attemptOperation(() => fi.Delete());
-            }
-
-            foreach (DirectoryInfo dir in target.GetDirectories())
-            {
-                attemptOperation(() => dir.Delete(true));
-            }
-
-            if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
-                attemptOperation(target.Delete);
-        }
-
-        private void attemptOperation(Action action, int attempts = 10)
-        {
-            while (true)
-            {
-                try
-                {
-                    action();
-                    return;
-                }
-                catch (Exception)
-                {
-                    if (attempts-- == 0)
-                        throw;
-                }
-
-                Thread.Sleep(250);
             }
         }
     }
