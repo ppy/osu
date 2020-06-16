@@ -27,11 +27,14 @@ namespace osu.Game.Screens.Play
 
         protected override void GotoRanking()
         {
-            this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
+            this.Push(CreateResults(CreateScore()));
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 
-        protected override ScoreInfo CreateScore() => score.ScoreInfo;
+        // protected override ScoreInfo CreateScore()
+        // {
+        //     return score.ScoreInfo;
+        // }
     }
 }
