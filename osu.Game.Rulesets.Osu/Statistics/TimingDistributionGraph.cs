@@ -20,12 +20,6 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// </summary>
         private const float axis_points = 5;
 
-        /// <summary>
-        /// An amount to adjust the value of the axis points by, effectively insetting the axis in the graph.
-        /// Without an inset, the final data point will be placed halfway outside the graph.
-        /// </summary>
-        private const float axis_value_inset = 0.2f;
-
         private readonly TimingDistribution distribution;
 
         public TimingDistributionGraph(TimingDistribution distribution)
@@ -50,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Width = 0.8f,
                 Content = new[]
                 {
                     new Drawable[]
@@ -80,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // So our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
             int sideBins = (distribution.Bins.Length - 1) / 2;
             double maxValue = sideBins * distribution.BinSize;
-            double axisValueStep = maxValue / axis_points * (1 - axis_value_inset);
+            double axisValueStep = maxValue / axis_points;
 
             axisFlow.Add(new OsuSpriteText
             {
