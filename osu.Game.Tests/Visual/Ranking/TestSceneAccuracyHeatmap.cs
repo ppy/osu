@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private readonly Box background;
         private readonly Drawable object1;
         private readonly Drawable object2;
-        private readonly Heatmap heatmap;
+        private readonly TestHeatmap heatmap;
 
         public TestSceneAccuracyHeatmap()
         {
@@ -40,10 +40,11 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Position = new Vector2(500, 300),
                 },
-                heatmap = new Heatmap(new List<HitOffset>())
+                heatmap = new TestHeatmap(new List<HitOffset>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Size = new Vector2(130)
                 }
             };
         }
@@ -68,6 +69,17 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             heatmap.AddPoint(object2.Position, object1.Position, background.ToLocalSpace(e.ScreenSpaceMouseDownPosition), 50);
             return true;
+        }
+
+        private class TestHeatmap : Heatmap
+        {
+            public TestHeatmap(IReadOnlyList<HitOffset> offsets)
+                : base(offsets)
+            {
+            }
+
+            public new void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
+                => base.AddPoint(start, end, hitPoint, radius);
         }
 
         private class BorderCircle : CircularContainer
