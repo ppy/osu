@@ -9,9 +9,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class TestSceneEditor : EditorTestScene
     {
-        public TestSceneEditor()
-            : base(new OsuRuleset())
-        {
-        }
+        protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
     }
 }
