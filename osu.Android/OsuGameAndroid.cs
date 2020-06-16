@@ -38,7 +38,6 @@ namespace osu.Android
                     }
                     else
                     {
-
 #pragma warning disable CS0618 // Type or member is obsolete
                         // this is required else older SDKs will report missing method exception.
                         versionName = packageInfo.VersionCode.ToString();
