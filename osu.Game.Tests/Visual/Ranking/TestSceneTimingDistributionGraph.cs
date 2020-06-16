@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new TimingDistributionGraph(createNormalDistribution())
+                new TimingDistributionGraph(CreateNormalDistribution())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         }
 
-        private TimingDistribution createNormalDistribution()
+        public static TimingDistribution CreateNormalDistribution()
         {
             var distribution = new TimingDistribution(51, 5);
 
