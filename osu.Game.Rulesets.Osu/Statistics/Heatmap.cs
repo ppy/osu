@@ -153,8 +153,11 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 }
             }
 
-            foreach (var o in offsets)
-                AddPoint(o.Position1, o.Position2, o.HitPosition, o.Radius);
+            if (offsets?.Count > 0)
+            {
+                foreach (var o in offsets)
+                    AddPoint(o.Position1, o.Position2, o.HitPosition, o.Radius);
+            }
 
             sizeLayout.Validate();
         }

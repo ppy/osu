@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (distribution?.Bins == null || distribution.Bins.Length == 0)
+                return;
+
             int maxCount = distribution.Bins.Max();
 
             var bars = new Drawable[distribution.Bins.Length];
