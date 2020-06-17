@@ -26,13 +26,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new ScorePanel(score) // Todo: Temporary
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    State = PanelState.Expanded,
-                    X = 30
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
