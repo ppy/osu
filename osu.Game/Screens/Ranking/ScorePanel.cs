@@ -182,6 +182,40 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        private bool tracking;
+        private Vector2 lastNonTrackingPosition;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanel"/> should track the position of the tracking component created via <see cref="CreateTrackingComponent"/>.
+        /// </summary>
+        public bool Tracking
+        {
+            get => tracking;
+            set
+            {
+                if (tracking == value)
+                    return;
+
+                tracking = value;
+
+                if (tracking)
+                    lastNonTrackingPosition = Position;
+                else
+                    Position = lastNonTrackingPosition;
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Tracking && trackingComponent != null)
+            {
+                Vector2 topLeftPos = Parent.ToLocalSpace(trackingComponent.ScreenSpaceDrawQuad.TopLeft);
+                Position = topLeftPos - AnchorPosition + OriginPosition;
+            }
+        }
+
         private void updateState()
         {
             topLayerContent?.FadeOut(content_fade_duration).Expire();
@@ -248,5 +282,31 @@ namespace osu.Game.Screens.Ranking
             => base.ReceivePositionalInputAt(screenSpacePos)
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
+
+        private TrackingComponent trackingComponent;
+
+        public TrackingComponent CreateTrackingComponent() => trackingComponent ??= new TrackingComponent(this);
+
+        public class TrackingComponent : Drawable
+        {
+            public readonly ScorePanel Panel;
+
+            public TrackingComponent(ScorePanel panel)
+            {
+                Panel = panel;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                Size = Panel.DrawSize;
+            }
+
+            // In ScorePanelList, score panels are added _before_ the flow, but this means that input will be blocked by the scroll container.
+            // So by forwarding input events, we remove the need to consider the order in which input is handled.
+            protected override bool OnClick(ClickEvent e) => Panel.TriggerEvent(e);
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Panel.ReceivePositionalInputAt(screenSpacePos);
+        }
     }
 }

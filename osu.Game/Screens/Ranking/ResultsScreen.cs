@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -44,6 +46,9 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        private Container<ScorePanel> scorePanelContainer;
+        private ResultsScrollContainer scrollContainer;
+        private Container expandedPanelProxyContainer;
         private Drawable bottomPanel;
         private ScorePanelList panels;
 
@@ -58,6 +63,13 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load()
         {
+            scorePanelContainer = new Container<ScorePanel>
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+            };
+
             FillFlowContainer buttons;
 
             InternalChild = new GridContainer
@@ -67,26 +79,35 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        new ResultsScrollContainer
+                        new Container
                         {
-                            Child = new FillFlowContainer
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
+                                scorePanelContainer,
+                                scrollContainer = new ResultsScrollContainer
                                 {
-                                    panels = new ScorePanelList
+                                    Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Height = screen_height,
-                                        SelectedScore = { BindTarget = SelectedScore }
-                                    },
-                                    new StatisticsPanel(Score)
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = screen_height,
+                                        AutoSizeAxes = Axes.Y,
+                                        Children = new Drawable[]
+                                        {
+                                            panels = new ScorePanelList(scorePanelContainer)
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = screen_height,
+                                                SelectedScore = { BindTarget = SelectedScore }
+                                            },
+                                            new StatisticsPanel(Score)
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = screen_height,
+                                            }
+                                        }
                                     }
-                                }
+                                },
+                                expandedPanelProxyContainer = new Container { RelativeSizeAxes = Axes.Both }
                             }
                         }
                     },
@@ -173,6 +194,21 @@ namespace osu.Game.Screens.Ranking
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            ScorePanel expandedPanel = scorePanelContainer.Single(p => p.State == PanelState.Expanded);
+            expandedPanel.Tracking = false;
+            expandedPanel.Anchor = Anchor.Centre;
+            expandedPanel.Origin = Anchor.Centre;
+
+            scorePanelContainer.X = (float)Interpolation.Lerp(0, -DrawWidth / 2 + ScorePanel.EXPANDED_WIDTH / 2f, Math.Clamp(scrollContainer.Current / (screen_height * 0.8f), 0, 1));
+
+            if (expandedPanelProxyContainer.Count == 0)
+                expandedPanelProxyContainer.Add(expandedPanel.CreateProxy());
+        }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -205,22 +241,21 @@ namespace osu.Game.Screens.Ranking
                 {
                     // If the user is scrolling via mouse drag, follow the mouse 1:1.
                     base.OnUserScroll(value, false, distanceDecay);
+                    return;
+                }
+
+                float direction = Math.Sign(value - Target);
+                float target = Target + direction * screen_height;
+
+                if (target <= -screen_height / 2 || target >= ScrollableExtent + screen_height / 2)
+                {
+                    // If the user is already at either extent and scrolling in the clamped direction, we want to follow the default scroll exactly so that the bounces aren't too harsh.
+                    base.OnUserScroll(value, true, distanceDecay);
                 }
                 else
                 {
-                    float direction = Math.Sign(value - Target);
-                    float target = Target + direction * screen_height;
-
-                    if (target <= -screen_height / 2 || target >= ScrollableExtent + screen_height / 2)
-                    {
-                        // If the user is already at either extent and scrolling in the clamped direction, we want to follow the default scroll exactly so that the bounces aren't too harsh.
-                        base.OnUserScroll(value, true, distanceDecay);
-                    }
-                    else
-                    {
-                        // Otherwise, scroll one screen in the target direction.
-                        base.OnUserScroll(target, true, distanceDecay);
-                    }
+                    // Otherwise, scroll one screen in the target direction.
+                    base.OnUserScroll(target, true, distanceDecay);
                 }
             }
         }
