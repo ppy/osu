@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Ranking
     public abstract class ResultsScreen : OsuScreen
     {
         protected const float BACKGROUND_BLUR = 20;
+        private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -68,10 +69,24 @@ namespace osu.Game.Screens.Ranking
                     {
                         new ResultsScrollContainer
                         {
-                            Child = panels = new ScorePanelList
+                            Child = new FillFlowContainer
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                SelectedScore = { BindTarget = SelectedScore }
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    panels = new ScorePanelList
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = screen_height,
+                                        SelectedScore = { BindTarget = SelectedScore }
+                                    },
+                                    new StatisticsPanel(Score)
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = screen_height,
+                                    }
+                                }
                             }
                         }
                     },
@@ -135,11 +150,6 @@ namespace osu.Game.Screens.Ranking
                     },
                 });
             }
-
-            AddInternal(new StatisticsPanel(Score)
-            {
-                RelativeSizeAxes = Axes.Both
-            });
         }
 
         protected override void LoadComplete()
@@ -180,27 +190,38 @@ namespace osu.Game.Screens.Ranking
             return base.OnExiting(next);
         }
 
+        [Cached]
         private class ResultsScrollContainer : OsuScrollContainer
         {
-            private readonly Container content;
-
-            protected override Container<Drawable> Content => content;
-
             public ResultsScrollContainer()
             {
-                base.Content.Add(content = new Container
-                {
-                    RelativeSizeAxes = Axes.X
-                });
-
                 RelativeSizeAxes = Axes.Both;
                 ScrollbarVisible = false;
             }
 
-            protected override void Update()
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
             {
-                base.Update();
-                content.Height = Math.Max(768 - TwoLayerButton.SIZE_EXTENDED.Y, DrawHeight);
+                if (!animated)
+                {
+                    // If the user is scrolling via mouse drag, follow the mouse 1:1.
+                    base.OnUserScroll(value, false, distanceDecay);
+                }
+                else
+                {
+                    float direction = Math.Sign(value - Target);
+                    float target = Target + direction * screen_height;
+
+                    if (target <= -screen_height / 2 || target >= ScrollableExtent + screen_height / 2)
+                    {
+                        // If the user is already at either extent and scrolling in the clamped direction, we want to follow the default scroll exactly so that the bounces aren't too harsh.
+                        base.OnUserScroll(value, true, distanceDecay);
+                    }
+                    else
+                    {
+                        // Otherwise, scroll one screen in the target direction.
+                        base.OnUserScroll(target, true, distanceDecay);
+                    }
+                }
             }
         }
     }
