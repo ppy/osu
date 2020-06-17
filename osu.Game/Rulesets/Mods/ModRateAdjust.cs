@@ -8,7 +8,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModRateAdjust : Mod, IApplicableToTrack, IApplicableToSample
+    public abstract class ModRateAdjust : Mod, IApplicableToAudio
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
