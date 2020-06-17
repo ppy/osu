@@ -14,7 +14,7 @@ using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToTrack, IApplicableToSample
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToAudio
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
