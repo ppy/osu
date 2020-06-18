@@ -89,7 +89,11 @@ namespace osu.Game.Screens.Ranking
                                                 SelectedScore = { BindTarget = SelectedScore },
                                                 PostExpandAction = onExpandedPanelClicked
                                             },
-                                            statisticsPanel = new StatisticsPanel(Score) { RelativeSizeAxes = Axes.Both }
+                                            statisticsPanel = new StatisticsPanel
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Score = { BindTarget = SelectedScore }
+                                            }
                                         }
                                     }
                                 },
