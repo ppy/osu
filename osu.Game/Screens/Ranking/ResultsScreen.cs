@@ -219,6 +219,8 @@ namespace osu.Game.Screens.Ranking
                         });
                     }
                 }
+
+                Background.FadeTo(0.5f, 150);
             }
             else
             {
@@ -234,6 +236,8 @@ namespace osu.Game.Screens.Ranking
                         panel.MoveTo(new Vector2(scorePanelList.CurrentScrollPosition + StatisticsPanel.SIDE_PADDING, panel.GetTrackingPosition().Y), 150, Easing.OutQuint);
                     }
                 }
+
+                Background.FadeTo(0.1f, 150);
             }
         }
     }
