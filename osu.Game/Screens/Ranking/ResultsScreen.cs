@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Ranking
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 SelectedScore = { BindTarget = SelectedScore },
-                                                PostExpandAction = onExpandedPanelClicked
+                                                PostExpandAction = () => statisticsPanel.ToggleVisibility()
                                             },
                                             statisticsPanel = new StatisticsPanel
                                             {
@@ -174,6 +174,8 @@ namespace osu.Game.Screens.Ranking
 
             if (req != null)
                 api.Queue(req);
+
+            statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
         }
 
         /// <summary>
@@ -195,17 +197,23 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
+            if (statisticsPanel.State.Value == Visibility.Visible)
+            {
+                statisticsPanel.Hide();
+                return true;
+            }
+
             Background.FadeTo(1, 250);
 
             return base.OnExiting(next);
         }
 
-        private void onExpandedPanelClicked()
+        private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
         {
-            statisticsPanel.ToggleVisibility();
-
-            if (statisticsPanel.State.Value == Visibility.Hidden)
+            if (state.NewValue == Visibility.Hidden)
             {
+                Background.FadeTo(0.5f, 150);
+
                 foreach (var panel in scorePanelList.Panels)
                 {
                     if (panel.State == PanelState.Contracted)
@@ -219,11 +227,11 @@ namespace osu.Game.Screens.Ranking
                         });
                     }
                 }
-
-                Background.FadeTo(0.5f, 150);
             }
             else
             {
+                Background.FadeTo(0.1f, 150);
+
                 foreach (var panel in scorePanelList.Panels)
                 {
                     if (panel.State == PanelState.Contracted)
@@ -236,8 +244,6 @@ namespace osu.Game.Screens.Ranking
                         panel.MoveTo(new Vector2(scorePanelList.CurrentScrollPosition + StatisticsPanel.SIDE_PADDING, panel.GetTrackingPosition().Y), 150, Easing.OutQuint);
                     }
                 }
-
-                Background.FadeTo(0.1f, 150);
             }
         }
     }
