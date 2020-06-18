@@ -166,7 +166,9 @@ namespace osu.Game.Scoring
             }
         }
 
-        public Dictionary<string, object> ExtraStatistics = new Dictionary<string, object>();
+        [NotMapped]
+        [JsonIgnore]
+        public List<object> HitEvents = new List<object>();
 
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
