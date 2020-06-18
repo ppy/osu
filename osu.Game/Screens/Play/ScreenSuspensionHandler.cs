@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +10,10 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Play
 {
-    internal class ScreenSuspensionHandler : Component
+    /// <summary>
+    /// Ensures screen is not suspended / dimmed while gameplay is active.
+    /// </summary>
+    public class ScreenSuspensionHandler : Component
     {
         private readonly GameplayClockContainer gameplayClockContainer;
         private Bindable<bool> isPaused;
@@ -16,9 +21,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private GameHost host { get; set; }
 
-        public ScreenSuspensionHandler(GameplayClockContainer gameplayClockContainer)
+        public ScreenSuspensionHandler([NotNull] GameplayClockContainer gameplayClockContainer)
         {
-            this.gameplayClockContainer = gameplayClockContainer;
+            this.gameplayClockContainer = gameplayClockContainer ?? throw new ArgumentNullException(nameof(gameplayClockContainer));
         }
 
         protected override void LoadComplete()
