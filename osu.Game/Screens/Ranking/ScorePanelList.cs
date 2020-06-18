@@ -26,9 +26,15 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const float expanded_panel_spacing = 15;
 
+        public Action PostExpandAction;
+
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
+        public float CurrentScrollPosition => scroll.Current;
+
+        public IReadOnlyList<ScorePanel> Panels => panels;
         private readonly Container<ScorePanel> panels;
+
         private readonly Flow flow;
         private readonly Scroll scroll;
         private ScorePanel expandedPanel;
@@ -36,39 +42,27 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Creates a new <see cref="ScorePanelList"/>.
         /// </summary>
-        /// <param name="panelTarget">The target container in which <see cref="ScorePanel"/>s should reside.
-        /// <see cref="ScorePanel"/>s are set to track by default, but this allows
-        /// This should be placed _before_ the <see cref="ScorePanelList"/> in the hierarchy.
-        /// <remarks></remarks>
-        /// </param>
-        public ScorePanelList(Container<ScorePanel> panelTarget = null)
+        public ScorePanelList()
         {
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = scroll = new Scroll
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = flow = new Flow
+                HandleScroll = () => HandleScroll && expandedPanel?.IsHovered != true, // handle horizontal scroll only when not hovering the expanded panel.
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(panel_spacing, 0),
-                    AutoSizeAxes = Axes.Both,
+                    panels = new Container<ScorePanel> { RelativeSizeAxes = Axes.Both },
+                    flow = new Flow
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(panel_spacing, 0),
+                        AutoSizeAxes = Axes.Both,
+                    },
                 }
             };
-
-            if (panelTarget == null)
-            {
-                // To prevent 1-frame sizing issues, the panel container is added _before_ the scroll + flow containers
-                AddInternal(panels = new Container<ScorePanel>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1
-                });
-            }
-            else
-                panels = panelTarget;
         }
 
         protected override void LoadComplete()
@@ -76,6 +70,25 @@ namespace osu.Game.Screens.Ranking
             base.LoadComplete();
 
             SelectedScore.BindValueChanged(selectedScoreChanged, true);
+        }
+
+        private bool handleScroll = true;
+
+        public bool HandleScroll
+        {
+            get => handleScroll;
+            set
+            {
+                handleScroll = value;
+
+                foreach (var p in panels)
+                    p.CanExpand = value;
+
+                scroll.ScrollbarVisible = value;
+
+                if (!value)
+                    scroll.ScrollTo(CurrentScrollPosition, false);
+            }
         }
 
         /// <summary>
@@ -86,7 +99,8 @@ namespace osu.Game.Screens.Ranking
         {
             var panel = new ScorePanel(score)
             {
-                Tracking = true
+                Tracking = true,
+                PostExpandAction = () => PostExpandAction?.Invoke()
             }.With(p =>
             {
                 p.StateChanged += s =>
@@ -136,9 +150,6 @@ namespace osu.Game.Screens.Ranking
             // Find the panel corresponding to the new score.
             var expandedTrackingComponent = flow.SingleOrDefault(t => t.Panel.Score == score.NewValue);
             expandedPanel = expandedTrackingComponent?.Panel;
-
-            // handle horizontal scroll only when not hovering the expanded panel.
-            scroll.HandleScroll = () => expandedPanel?.IsHovered != true;
 
             if (expandedPanel == null)
                 return;

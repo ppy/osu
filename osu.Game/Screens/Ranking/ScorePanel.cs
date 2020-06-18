@@ -76,6 +76,18 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
+        public Action PostExpandAction;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanel"/> should track the position of the tracking component created via <see cref="CreateTrackingComponent"/>.
+        /// </summary>
+        public bool Tracking;
+
+        /// <summary>
+        /// Whether this <see cref="ScorePanel"/> can enter into an <see cref="PanelState.Expanded"/> state.
+        /// </summary>
+        public bool CanExpand = true;
+
         public readonly ScoreInfo Score;
 
         private Container content;
@@ -182,38 +194,18 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private bool tracking;
-        private Vector2 lastNonTrackingPosition;
-
-        /// <summary>
-        /// Whether this <see cref="ScorePanel"/> should track the position of the tracking component created via <see cref="CreateTrackingComponent"/>.
-        /// </summary>
-        public bool Tracking
-        {
-            get => tracking;
-            set
-            {
-                if (tracking == value)
-                    return;
-
-                tracking = value;
-
-                if (tracking)
-                    lastNonTrackingPosition = Position;
-                else
-                    Position = lastNonTrackingPosition;
-            }
-        }
-
         protected override void Update()
         {
             base.Update();
 
             if (Tracking && trackingComponent != null)
-            {
-                Vector2 topLeftPos = Parent.ToLocalSpace(trackingComponent.ScreenSpaceDrawQuad.TopLeft);
-                Position = topLeftPos - AnchorPosition + OriginPosition;
-            }
+                Position = GetTrackingPosition();
+        }
+
+        public Vector2 GetTrackingPosition()
+        {
+            Vector2 topLeftPos = Parent.ToLocalSpace(trackingComponent.ScreenSpaceDrawQuad.TopLeft);
+            return topLeftPos - AnchorPosition + OriginPosition;
         }
 
         private void updateState()
@@ -270,10 +262,28 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        public override Vector2 Size
+        {
+            get => base.Size;
+            set
+            {
+                base.Size = value;
+
+                if (trackingComponent != null)
+                    trackingComponent.Size = value;
+            }
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             if (State == PanelState.Contracted)
-                State = PanelState.Expanded;
+            {
+                if (CanExpand)
+                    State = PanelState.Expanded;
+                return true;
+            }
+
+            PostExpandAction?.Invoke();
 
             return true;
         }
@@ -296,17 +306,13 @@ namespace osu.Game.Screens.Ranking
                 Panel = panel;
             }
 
-            protected override void Update()
-            {
-                base.Update();
-                Size = Panel.DrawSize;
-            }
-
             // In ScorePanelList, score panels are added _before_ the flow, but this means that input will be blocked by the scroll container.
             // So by forwarding input events, we remove the need to consider the order in which input is handled.
             protected override bool OnClick(ClickEvent e) => Panel.TriggerEvent(e);
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Panel.ReceivePositionalInputAt(screenSpacePos);
+
+            public override bool IsPresent => Panel.IsPresent;
         }
     }
 }
