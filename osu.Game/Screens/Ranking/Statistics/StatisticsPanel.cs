@@ -10,6 +10,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 {
     public class StatisticsPanel : VisibilityContainer
     {
+        public const float SIDE_PADDING = 30;
+
         protected override bool StartHidden => true;
 
         public StatisticsPanel(ScoreInfo score)
@@ -24,8 +26,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding
                 {
-                    Left = ScorePanel.EXPANDED_WIDTH + 30 + 50,
-                    Right = 50
+                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 3,
+                    Right = SIDE_PADDING,
+                    Top = SIDE_PADDING,
+                    Bottom = 50 // Approximate padding to the bottom of the score panel.
                 },
                 Child = statisticRows = new FillFlowContainer
                 {

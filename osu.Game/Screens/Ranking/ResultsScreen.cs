@@ -227,7 +227,7 @@ namespace osu.Game.Screens.Ranking
                         scorePanelList.HandleScroll = false;
 
                         panel.Tracking = false;
-                        panel.MoveTo(new Vector2(scorePanelList.CurrentScrollPosition, panel.GetTrackingPosition().Y), 150, Easing.OutQuint);
+                        panel.MoveTo(new Vector2(scorePanelList.CurrentScrollPosition + StatisticsPanel.SIDE_PADDING, panel.GetTrackingPosition().Y), 150, Easing.OutQuint);
                     }
                 }
             }
