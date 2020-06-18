@@ -10,9 +10,12 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -70,6 +73,37 @@ namespace osu.Game.Tests.Gameplay
             AddUntilStep("sample playback succeeded", () => sample.LifetimeEnd < double.MaxValue);
         }
 
+        [Test]
+        public void TestSamplePlaybackWithRateMods()
+        {
+            GameplayClockContainer gameplayContainer = null;
+            TestDrawableStoryboardSample sample = null;
+
+            OsuModDoubleTime doubleTimeMod = null;
+
+            AddStep("create container", () =>
+            {
+                var beatmap = Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+                Add(gameplayContainer = new GameplayClockContainer(beatmap, new[] { doubleTimeMod = new OsuModDoubleTime() }, 0));
+
+                SelectedMods.Value = new[] { doubleTimeMod };
+                Beatmap.Value = new TestCustomSkinWorkingBeatmap(beatmap.Beatmap, gameplayContainer.GameplayClock, Audio);
+            });
+
+            AddStep("create storyboard sample", () =>
+            {
+                gameplayContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                {
+                    Clock = gameplayContainer.GameplayClock
+                });
+            });
+
+            AddStep("start", () => gameplayContainer.Start());
+
+            AddAssert("sample playback rate matches mod rates", () => sample.TestChannel.AggregateFrequency.Value == doubleTimeMod.SpeedChange.Value);
+        }
+
         private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, AudioManager audioManager)
@@ -98,6 +132,29 @@ namespace osu.Game.Tests.Gameplay
             public void Dispose()
             {
             }
+        }
+
+        private class TestCustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
+        {
+            private readonly AudioManager audio;
+
+            public TestCustomSkinWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock referenceClock, AudioManager audio)
+                : base(beatmap, null, referenceClock, audio)
+            {
+                this.audio = audio;
+            }
+
+            protected override ISkin GetSkin() => new TestSkin("test-sample", audio);
+        }
+
+        private class TestDrawableStoryboardSample : DrawableStoryboardSample
+        {
+            public TestDrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
+                : base(sampleInfo)
+            {
+            }
+
+            public SampleChannel TestChannel => Channel;
         }
     }
 }
