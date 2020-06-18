@@ -10,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osuTK;
 using osuTK.Graphics;
@@ -27,14 +29,16 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private const float rotation = 45;
         private const float point_size = 4;
 
-        private readonly IReadOnlyList<HitOffset> offsets;
         private Container<HitPoint> allPoints;
 
+        private readonly BeatmapInfo beatmap;
+        private readonly IReadOnlyList<HitEvent> hitEvents;
         private readonly LayoutValue sizeLayout = new LayoutValue(Invalidation.DrawSize);
 
-        public Heatmap(IReadOnlyList<HitOffset> offsets)
+        public Heatmap(BeatmapInfo beatmap, IReadOnlyList<HitEvent> hitEvents)
         {
-            this.offsets = offsets;
+            this.beatmap = beatmap;
+            this.hitEvents = hitEvents;
 
             AddLayout(sizeLayout);
         }
@@ -153,10 +157,18 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 }
             }
 
-            if (offsets?.Count > 0)
+            if (hitEvents.Count > 0)
             {
-                foreach (var o in offsets)
-                    AddPoint(o.Position1, o.Position2, o.HitPosition, o.Radius);
+                // Todo: This should probably not be done like this.
+                float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (beatmap.BaseDifficulty.CircleSize - 5) / 5) / 2;
+
+                foreach (var e in hitEvents)
+                {
+                    if (e.LastHitObject == null || e.CursorPosition == null)
+                        continue;
+
+                    AddPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.CursorPosition.Value, radius);
+                }
             }
 
             sizeLayout.Validate();

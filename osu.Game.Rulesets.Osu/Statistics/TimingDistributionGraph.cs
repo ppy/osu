@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,28 +18,51 @@ namespace osu.Game.Rulesets.Osu.Statistics
     public class TimingDistributionGraph : CompositeDrawable
     {
         /// <summary>
+        /// The number of bins on each side of the timing distribution.
+        /// </summary>
+        private const int timing_distribution_bins = 25;
+
+        /// <summary>
+        /// The total number of bins in the timing distribution, including bins on both sides and the centre bin at 0.
+        /// </summary>
+        private const int total_timing_distribution_bins = timing_distribution_bins * 2 + 1;
+
+        /// <summary>
+        /// The centre bin, with a timing distribution very close to/at 0.
+        /// </summary>
+        private const int timing_distribution_centre_bin_index = timing_distribution_bins;
+
+        /// <summary>
         /// The number of data points shown on the axis below the graph.
         /// </summary>
         private const float axis_points = 5;
 
-        private readonly TimingDistribution distribution;
+        private readonly List<HitEvent> hitEvents;
 
-        public TimingDistributionGraph(TimingDistribution distribution)
+        public TimingDistributionGraph(List<HitEvent> hitEvents)
         {
-            this.distribution = distribution;
+            this.hitEvents = hitEvents;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (distribution?.Bins == null || distribution.Bins.Length == 0)
+            if (hitEvents.Count == 0)
                 return;
 
-            int maxCount = distribution.Bins.Max();
+            int[] bins = new int[total_timing_distribution_bins];
+            double binSize = hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins;
 
-            var bars = new Drawable[distribution.Bins.Length];
+            foreach (var e in hitEvents)
+            {
+                int binOffset = (int)(e.TimeOffset / binSize);
+                bins[timing_distribution_centre_bin_index + binOffset]++;
+            }
+
+            int maxCount = bins.Max();
+            var bars = new Drawable[total_timing_distribution_bins];
             for (int i = 0; i < bars.Length; i++)
-                bars[i] = new Bar { Height = (float)distribution.Bins[i] / maxCount };
+                bars[i] = new Bar { Height = (float)bins[i] / maxCount };
 
             Container axisFlow;
 
@@ -71,10 +96,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 }
             };
 
-            // We know the total number of bins on each side of the centre ((n - 1) / 2), and the size of each bin.
-            // So our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
-            int sideBins = (distribution.Bins.Length - 1) / 2;
-            double maxValue = sideBins * distribution.BinSize;
+            // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
+            double maxValue = timing_distribution_bins * binSize;
             double axisValueStep = maxValue / axis_points;
 
             axisFlow.Add(new OsuSpriteText

@@ -8,8 +8,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Graphics;
 
@@ -40,7 +43,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Position = new Vector2(500, 300),
                 },
-                heatmap = new TestHeatmap(new List<HitOffset>())
+                heatmap = new TestHeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, new List<HitEvent>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -73,8 +76,8 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class TestHeatmap : Heatmap
         {
-            public TestHeatmap(IReadOnlyList<HitOffset> offsets)
-                : base(offsets)
+            public TestHeatmap(BeatmapInfo beatmap, List<HitEvent> events)
+                : base(beatmap, events)
             {
             }
 
