@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -112,6 +115,22 @@ namespace osu.Game.Tests.Visual.Ranking
                 base.LoadComplete();
 
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
+            }
+
+            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            {
+                var scores = new List<ScoreInfo>();
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+                    score.TotalScore += 10 - i;
+                    scores.Add(score);
+                }
+
+                scoresCallback?.Invoke(scores);
+
+                return null;
             }
         }
 
