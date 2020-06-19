@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
@@ -16,6 +18,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -44,7 +47,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
 
         [Test]
-        public void ResultsWithoutPlayer()
+        public void TestResultsWithoutPlayer()
         {
             TestResultsScreen screen = null;
             OsuScreenStack stack;
@@ -63,7 +66,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
-        public void ResultsWithPlayer()
+        public void TestResultsWithPlayer()
         {
             TestResultsScreen screen = null;
 
@@ -73,13 +76,31 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
-        public void ResultsForUnranked()
+        public void TestResultsForUnranked()
         {
             UnrankedSoloResultsScreen screen = null;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createUnrankedSoloResultsScreen()));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
+        [Test]
+        public void TestFetchScoresAfterShowingStatistics()
+        {
+            DelayedFetchResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo), 3000)));
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddStep("click expanded panel", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                InputManager.MoveMouseTo(expandedPanel);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for fetch", () => screen.FetchCompleted);
+            AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);
         }
 
         private class TestResultsContainer : Container
@@ -129,6 +150,42 @@ namespace osu.Game.Tests.Visual.Ranking
                 }
 
                 scoresCallback?.Invoke(scores);
+
+                return null;
+            }
+        }
+
+        private class DelayedFetchResultsScreen : TestResultsScreen
+        {
+            public bool FetchCompleted { get; private set; }
+
+            private readonly double delay;
+
+            public DelayedFetchResultsScreen(ScoreInfo score, double delay)
+                : base(score)
+            {
+                this.delay = delay;
+            }
+
+            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(delay));
+
+                    var scores = new List<ScoreInfo>();
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+                        score.TotalScore += 10 - i;
+                        scores.Add(score);
+                    }
+
+                    scoresCallback?.Invoke(scores);
+
+                    Schedule(() => FetchCompleted = true);
+                });
 
                 return null;
             }
