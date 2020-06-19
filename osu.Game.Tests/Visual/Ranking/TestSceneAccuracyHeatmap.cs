@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
@@ -20,13 +22,18 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneAccuracyHeatmap : OsuManualInputManagerTestScene
     {
-        private readonly Box background;
-        private readonly Drawable object1;
-        private readonly Drawable object2;
-        private readonly TestHeatmap heatmap;
+        private Box background;
+        private Drawable object1;
+        private Drawable object2;
+        private TestHeatmap heatmap;
+        private ScheduledDelegate automaticAdditionDelegate;
 
-        public TestSceneAccuracyHeatmap()
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
+            automaticAdditionDelegate?.Cancel();
+            automaticAdditionDelegate = null;
+
             Children = new[]
             {
                 background = new Box
@@ -41,7 +48,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 },
                 object2 = new BorderCircle
                 {
-                    Position = new Vector2(500, 300),
+                    Position = new Vector2(100, 300),
                 },
                 heatmap = new TestHeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, new List<HitEvent>())
                 {
@@ -50,22 +57,32 @@ namespace osu.Game.Tests.Visual.Ranking
                     Size = new Vector2(130)
                 }
             };
+        });
+
+        [Test]
+        public void TestManyHitPointsAutomatic()
+        {
+            AddStep("add scheduled delegate", () =>
+            {
+                automaticAdditionDelegate = Scheduler.AddDelayed(() =>
+                {
+                    var randomPos = new Vector2(
+                        RNG.NextSingle(object1.DrawPosition.X - object1.DrawSize.X / 2, object1.DrawPosition.X + object1.DrawSize.X / 2),
+                        RNG.NextSingle(object1.DrawPosition.Y - object1.DrawSize.Y / 2, object1.DrawPosition.Y + object1.DrawSize.Y / 2));
+
+                    // The background is used for ToLocalSpace() since we need to go _inside_ the DrawSizePreservingContainer (Content of TestScene).
+                    heatmap.AddPoint(object2.Position, object1.Position, randomPos, RNG.NextSingle(10, 500));
+                    InputManager.MoveMouseTo(background.ToScreenSpace(randomPos));
+                }, 1, true);
+            });
+
+            AddWaitStep("wait for some hit points", 10);
         }
 
-        protected override void LoadComplete()
+        [Test]
+        public void TestManualPlacement()
         {
-            base.LoadComplete();
-
-            Scheduler.AddDelayed(() =>
-            {
-                var randomPos = new Vector2(
-                    RNG.NextSingle(object1.DrawPosition.X - object1.DrawSize.X / 2, object1.DrawPosition.X + object1.DrawSize.X / 2),
-                    RNG.NextSingle(object1.DrawPosition.Y - object1.DrawSize.Y / 2, object1.DrawPosition.Y + object1.DrawSize.Y / 2));
-
-                // The background is used for ToLocalSpace() since we need to go _inside_ the DrawSizePreservingContainer (Content of TestScene).
-                heatmap.AddPoint(object2.Position, object1.Position, randomPos, RNG.NextSingle(10, 500));
-                InputManager.MoveMouseTo(background.ToScreenSpace(randomPos));
-            }, 1, true);
+            AddStep("return user input", () => InputManager.UseParentInput = true);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
