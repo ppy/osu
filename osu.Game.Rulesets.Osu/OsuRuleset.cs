@@ -192,29 +192,24 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override StatisticRow[] CreateStatistics(ScoreInfo score)
+        public override StatisticRow[] CreateStatistics(ScoreInfo score) => new[]
         {
-            var hitCircleEvents = score.HitEvents.Where(e => e.HitObject is HitCircle).ToList();
-
-            return new[]
+            new StatisticRow
             {
-                new StatisticRow
+                Columns = new[]
                 {
-                    Columns = new[]
+                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is HitCircle).ToList())
                     {
-                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(hitCircleEvents)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 130
-                        }),
-                        new StatisticItem("Accuracy Heatmap", new Heatmap(score)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 130
-                        }, new Dimension(GridSizeMode.Absolute, 130)),
-                    }
+                        RelativeSizeAxes = Axes.X,
+                        Height = 130
+                    }),
+                    new StatisticItem("Accuracy Heatmap", new Heatmap(score)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 130
+                    }, new Dimension(GridSizeMode.Absolute, 130)),
                 }
-            };
-        }
+            }
+        };
     }
 }
