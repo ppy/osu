@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -16,17 +17,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Statistics
 {
-    public class Heatmap : CompositeDrawable
+    public class AccuracyHeatmap : CompositeDrawable
     {
         /// <summary>
-        /// Size of the inner circle containing the "hit" points, relative to the size of this <see cref="Heatmap"/>.
+        /// Size of the inner circle containing the "hit" points, relative to the size of this <see cref="AccuracyHeatmap"/>.
         /// All other points outside of the inner circle are "miss" points.
         /// </summary>
         private const float inner_portion = 0.8f;
 
         /// <summary>
         /// Number of rows/columns of points.
-        /// 4px per point @ 128x128 size (the contents of the <see cref="Heatmap"/> are always square). 1024 total points.
+        /// 4px per point @ 128x128 size (the contents of the <see cref="AccuracyHeatmap"/> are always square). 1024 total points.
         /// </summary>
         private const int points_per_dimension = 32;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private readonly ScoreInfo score;
 
-        public Heatmap(ScoreInfo score)
+        public AccuracyHeatmap(ScoreInfo score)
         {
             this.score = score;
         }
@@ -170,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // Convert the above into the local search space.
             Vector2 localCentre = new Vector2(points_per_dimension) / 2;
             float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
-            double localAngle = finalAngle + 3 * Math.PI / 4; // The angle inside the heatmap on which the closest point lies.
+            double localAngle = finalAngle + Math.PI - MathUtils.DegreesToRadians(rotation); // The angle inside the heatmap on which the closest point lies.
             Vector2 localPoint = localCentre + localRadius * new Vector2((float)Math.Cos(localAngle), (float)Math.Sin(localAngle));
 
             // Find the most relevant hit point.
