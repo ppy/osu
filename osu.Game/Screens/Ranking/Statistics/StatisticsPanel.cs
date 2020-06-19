@@ -83,10 +83,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         AutoSizeAxes = Axes.Y,
                         Content = new[]
                         {
-                            row.Columns?.Select(c => new StatisticContainer(c.Name)
-                            {
-                                Child = c.Content
-                            }).Cast<Drawable>().ToArray()
+                            row.Columns?.Select(c => new StatisticContainer(c)).Cast<Drawable>().ToArray()
                         },
                         ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
                                                      .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
@@ -105,8 +102,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             }
         }
 
-        protected override void PopIn() => this.FadeIn();
+        protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
 
-        protected override void PopOut() => this.FadeOut();
+        protected override void PopOut() => this.FadeOut(150, Easing.OutQuint);
     }
 }

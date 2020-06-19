@@ -76,12 +76,11 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
-        public Action PostExpandAction;
 
         /// <summary>
-        /// Whether this <see cref="ScorePanel"/> can enter into an <see cref="PanelState.Expanded"/> state.
+        /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
-        public bool CanExpand = true;
+        public Action PostExpandAction;
 
         public readonly ScoreInfo Score;
 
@@ -250,6 +249,7 @@ namespace osu.Game.Screens.Ranking
             {
                 base.Size = value;
 
+                // Auto-size isn't used to avoid 1-frame issues and because the score panel is removed/re-added to the container.
                 if (trackingContainer != null)
                     trackingContainer.Size = value;
             }
@@ -259,8 +259,7 @@ namespace osu.Game.Screens.Ranking
         {
             if (State == PanelState.Contracted)
             {
-                if (CanExpand)
-                    State = PanelState.Expanded;
+                State = PanelState.Expanded;
                 return true;
             }
 
@@ -276,6 +275,15 @@ namespace osu.Game.Screens.Ranking
 
         private ScorePanelTrackingContainer trackingContainer;
 
+        /// <summary>
+        /// Creates a <see cref="ScorePanelTrackingContainer"/> which this <see cref="ScorePanel"/> can reside inside.
+        /// The <see cref="ScorePanelTrackingContainer"/> will track the size of this <see cref="ScorePanel"/>.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="ScorePanel"/> is immediately added as a child of the <see cref="ScorePanelTrackingContainer"/>.
+        /// </remarks>
+        /// <returns>The <see cref="ScorePanelTrackingContainer"/>.</returns>
+        /// <exception cref="InvalidOperationException">If a <see cref="ScorePanelTrackingContainer"/> already exists.</exception>
         public ScorePanelTrackingContainer CreateTrackingContainer()
         {
             if (trackingContainer != null)

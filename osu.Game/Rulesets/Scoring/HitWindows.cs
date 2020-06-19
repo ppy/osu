@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Retrieves the <see cref="HitResult"/> with the largest hit window that produces a successful hit.
         /// </summary>
         /// <returns>The lowest allowed successful <see cref="HitResult"/>.</returns>
-        public HitResult LowestSuccessfulHitResult()
+        protected HitResult LowestSuccessfulHitResult()
         {
             for (var result = HitResult.Meh; result <= HitResult.Perfect; ++result)
             {

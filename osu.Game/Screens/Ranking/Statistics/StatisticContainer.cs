@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics.CodeAnalysis;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,13 +12,16 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    internal class StatisticContainer : Container
+    /// <summary>
+    /// Wraps a <see cref="StatisticItem"/> to add a header and suitable layout for use in <see cref="ResultsScreen"/>.
+    /// </summary>
+    internal class StatisticContainer : CompositeDrawable
     {
-        protected override Container<Drawable> Content => content;
-
-        private readonly Container content;
-
-        public StatisticContainer(string name)
+        /// <summary>
+        /// Creates a new <see cref="StatisticContainer"/>.
+        /// </summary>
+        /// <param name="item">The <see cref="StatisticItem"/> to display.</param>
+        public StatisticContainer([NotNull] StatisticItem item)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -50,7 +54,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = name,
+                                    Text = item.Name,
                                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                                 }
                             }
@@ -58,11 +62,12 @@ namespace osu.Game.Screens.Ranking.Statistics
                     },
                     new Drawable[]
                     {
-                        content = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = 15 }
+                            Margin = new MarginPadding { Top = 15 },
+                            Child = item.Content
                         }
                     },
                 },

@@ -26,11 +26,12 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const float expanded_panel_spacing = 15;
 
+        /// <summary>
+        /// An action to be invoked if a <see cref="ScorePanel"/> is clicked while in an expanded state.
+        /// </summary>
         public Action PostExpandAction;
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
-
-        public float CurrentScrollPosition => scroll.Current;
 
         private readonly Flow flow;
         private readonly Scroll scroll;
@@ -47,16 +48,13 @@ namespace osu.Game.Screens.Ranking
             {
                 RelativeSizeAxes = Axes.Both,
                 HandleScroll = () => expandedPanel?.IsHovered != true, // handle horizontal scroll only when not hovering the expanded panel.
-                Children = new Drawable[]
+                Child = flow = new Flow
                 {
-                    flow = new Flow
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(panel_spacing, 0),
-                        AutoSizeAxes = Axes.Both,
-                    },
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(panel_spacing, 0),
+                    AutoSizeAxes = Axes.Both,
                 }
             };
         }
@@ -166,6 +164,10 @@ namespace osu.Game.Screens.Ranking
 
         private bool handleInput = true;
 
+        /// <summary>
+        /// Whether this <see cref="ScorePanelList"/> or any of the <see cref="ScorePanel"/>s contained should handle scroll or click input.
+        /// Setting to <c>false</c> will also hide the scrollbar.
+        /// </summary>
         public bool HandleInput
         {
             get => handleInput;
@@ -180,10 +182,24 @@ namespace osu.Game.Screens.Ranking
 
         public override bool PropagateNonPositionalInputSubTree => HandleInput && base.PropagateNonPositionalInputSubTree;
 
+        /// <summary>
+        /// Enumerates all <see cref="ScorePanel"/>s contained in this <see cref="ScorePanelList"/>.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<ScorePanel> GetScorePanels() => flow.Select(t => t.Panel);
 
+        /// <summary>
+        /// Finds the <see cref="ScorePanel"/> corresponding to a <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to find the corresponding <see cref="ScorePanel"/> for.</param>
+        /// <returns>The <see cref="ScorePanel"/>.</returns>
         public ScorePanel GetPanelForScore(ScoreInfo score) => flow.Single(t => t.Panel.Score == score).Panel;
 
+        /// <summary>
+        /// Detaches a <see cref="ScorePanel"/> from its <see cref="ScorePanelTrackingContainer"/>, allowing the panel to be moved elsewhere in the hierarchy.
+        /// </summary>
+        /// <param name="panel">The <see cref="ScorePanel"/> to detach.</param>
+        /// <exception cref="InvalidOperationException">If <paramref name="panel"/> is not a part of this <see cref="ScorePanelList"/>.</exception>
         public void Detach(ScorePanel panel)
         {
             var container = flow.FirstOrDefault(t => t.Panel == panel);
@@ -193,6 +209,11 @@ namespace osu.Game.Screens.Ranking
             container.Detach();
         }
 
+        /// <summary>
+        /// Attaches a <see cref="ScorePanel"/> to its <see cref="ScorePanelTrackingContainer"/> in this <see cref="ScorePanelList"/>.
+        /// </summary>
+        /// <param name="panel">The <see cref="ScorePanel"/> to attach.</param>
+        /// <exception cref="InvalidOperationException">If <paramref name="panel"/> is not a part of this <see cref="ScorePanelList"/>.</exception>
         public void Attach(ScorePanel panel)
         {
             var container = flow.FirstOrDefault(t => t.Panel == panel);
