@@ -11,6 +11,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuScoreProcessor : ScoreProcessor
     {
+        protected override HitEvent CreateHitEvent(JudgementResult result)
+            => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
+
         protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement)
         {
             switch (hitObject)

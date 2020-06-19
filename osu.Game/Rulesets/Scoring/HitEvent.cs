@@ -44,5 +44,7 @@ namespace osu.Game.Rulesets.Scoring
             LastHitObject = lastHitObject;
             PositionOffset = positionOffset;
         }
+
+        public HitEvent With(Vector2? positionOffset) => new HitEvent(TimeOffset, Result, HitObject, LastHitObject, positionOffset);
     }
 }
