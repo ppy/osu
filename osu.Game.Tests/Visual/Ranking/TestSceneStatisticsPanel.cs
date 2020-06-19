@@ -29,6 +29,12 @@ namespace osu.Game.Tests.Visual.Ranking
             loadPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo));
         }
 
+        [Test]
+        public void TestNullScore()
+        {
+            loadPanel(null);
+        }
+
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
             Child = new StatisticsPanel

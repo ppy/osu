@@ -62,6 +62,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             var newScore = score.NewValue;
 
+            if (newScore == null)
+                return;
+
             if (newScore.HitEvents == null || newScore.HitEvents.Count == 0)
                 content.Add(new MessagePlaceholder("Score has no statistics :("));
             else
