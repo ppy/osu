@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             int maxCount = bins.Max();
             var bars = new Drawable[total_timing_distribution_bins];
             for (int i = 0; i < bars.Length; i++)
-                bars[i] = new Bar { Height = (float)bins[i] / maxCount };
+                bars[i] = new Bar { Height = Math.Max(0.05f, (float)bins[i] / maxCount) };
 
             Container axisFlow;
 
