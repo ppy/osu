@@ -460,7 +460,7 @@ namespace osu.Game.Screens.Play
         {
             var score = new ScoreInfo
             {
-                Beatmap = Beatmap.Value.BeatmapInfo,
+                Beatmap = gameplayBeatmap.BeatmapInfo,
                 Ruleset = rulesetInfo,
                 Mods = Mods.Value.ToArray(),
             };
