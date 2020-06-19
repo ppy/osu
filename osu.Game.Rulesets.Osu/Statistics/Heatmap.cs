@@ -26,10 +26,15 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// </summary>
         private const float inner_portion = 0.8f;
 
-        private const float rotation = 45;
-        private const float point_size = 4;
+        /// <summary>
+        /// Number of rows/columns of points.
+        /// 4px per point @ 128x128 size (the contents of the <see cref="Heatmap"/> are always square). 1024 total points.
+        /// </summary>
+        private const int points_per_dimension = 32;
 
-        private Container<HitPoint> allPoints;
+        private const float rotation = 45;
+
+        private GridContainer pointGrid;
 
         private readonly BeatmapInfo beatmap;
         private readonly IReadOnlyList<HitEvent> hitEvents;
@@ -111,51 +116,38 @@ namespace osu.Game.Rulesets.Osu.Statistics
                             }
                         }
                     },
-                    allPoints = new Container<HitPoint>
+                    pointGrid = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both
                     }
                 }
             };
-        }
 
-        protected override void Update()
-        {
-            base.Update();
-            validateHitPoints();
-        }
+            Vector2 centre = new Vector2(points_per_dimension) / 2;
+            float innerRadius = centre.X * inner_portion;
 
-        private void validateHitPoints()
-        {
-            if (sizeLayout.IsValid)
-                return;
+            Drawable[][] points = new Drawable[points_per_dimension][];
 
-            allPoints.Clear();
-
-            // Since the content is fit, both dimensions should have the same size.
-            float size = allPoints.DrawSize.X;
-
-            Vector2 centre = new Vector2(size / 2);
-            int rows = (int)Math.Ceiling(size / point_size);
-            int cols = (int)Math.Ceiling(size / point_size);
-
-            for (int r = 0; r < rows; r++)
+            for (int r = 0; r < points_per_dimension; r++)
             {
-                for (int c = 0; c < cols; c++)
+                points[r] = new Drawable[points_per_dimension];
+
+                for (int c = 0; c < points_per_dimension; c++)
                 {
-                    Vector2 pos = new Vector2(c * point_size, r * point_size);
-                    HitPointType pointType = HitPointType.Hit;
+                    HitPointType pointType = Vector2.Distance(new Vector2(c, r), centre) <= innerRadius
+                        ? HitPointType.Hit
+                        : HitPointType.Miss;
 
-                    if (Vector2.Distance(pos, centre) > size * inner_portion / 2)
-                        pointType = HitPointType.Miss;
-
-                    allPoints.Add(new HitPoint(pos, pointType)
+                    var point = new HitPoint(pointType)
                     {
-                        Size = new Vector2(point_size),
                         Colour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
-                    });
+                    };
+
+                    points[r][c] = point;
                 }
             }
+
+            pointGrid.Content = points;
 
             if (hitEvents.Count > 0)
             {
@@ -170,41 +162,39 @@ namespace osu.Game.Rulesets.Osu.Statistics
                     AddPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.CursorPosition.Value, radius);
                 }
             }
-
-            sizeLayout.Validate();
         }
 
         protected void AddPoint(Vector2 start, Vector2 end, Vector2 hitPoint, float radius)
         {
-            if (allPoints.Count == 0)
+            if (pointGrid.Content.Length == 0)
                 return;
 
             double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
             double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
             double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
-
             float normalisedDistance = Vector2.Distance(hitPoint, end) / radius;
 
-            // Since the content is fit, both dimensions should have the same size.
-            float size = allPoints.DrawSize.X;
+            // Convert the above into the local search space.
+            Vector2 localCentre = new Vector2(points_per_dimension) / 2;
+            float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
+            double localAngle = finalAngle + 3 * Math.PI / 4; // The angle inside the heatmap on which the closest point lies.
+            Vector2 localPoint = localCentre + localRadius * new Vector2((float)Math.Cos(localAngle), (float)Math.Sin(localAngle));
 
             // Find the most relevant hit point.
             double minDist = double.PositiveInfinity;
             HitPoint point = null;
 
-            foreach (var p in allPoints)
+            for (int r = 0; r < points_per_dimension; r++)
             {
-                Vector2 localCentre = new Vector2(size / 2);
-                float localRadius = localCentre.X * inner_portion * normalisedDistance;
-                double localAngle = finalAngle + 3 * Math.PI / 4;
-                Vector2 localPoint = localCentre + localRadius * new Vector2((float)Math.Cos(localAngle), (float)Math.Sin(localAngle));
-
-                float dist = Vector2.Distance(p.DrawPosition + p.DrawSize / 2, localPoint);
-
-                if (dist < minDist)
+                for (int c = 0; c < points_per_dimension; c++)
                 {
-                    minDist = dist;
-                    point = p;
+                    float dist = Vector2.Distance(new Vector2(c, r), localPoint);
+
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        point = (HitPoint)pointGrid.Content[r][c];
+                    }
                 }
             }
 
@@ -216,11 +206,11 @@ namespace osu.Game.Rulesets.Osu.Statistics
         {
             private readonly HitPointType pointType;
 
-            public HitPoint(Vector2 position, HitPointType pointType)
+            public HitPoint(HitPointType pointType)
             {
                 this.pointType = pointType;
 
-                Position = position;
+                RelativeSizeAxes = Axes.Both;
                 Alpha = 0;
             }
 
