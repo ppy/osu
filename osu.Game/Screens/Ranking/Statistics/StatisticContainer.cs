@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    public class StatisticContainer : Container
+    internal class StatisticContainer : Container
     {
         protected override Container<Drawable> Content => content;
 

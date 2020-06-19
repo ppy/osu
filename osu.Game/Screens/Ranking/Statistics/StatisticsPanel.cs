@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -80,8 +81,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Content = new[] { row.Content },
-                        ColumnDimensions = row.ColumnDimensions,
+                        Content = new[] { row.Columns?.Select(c => c?.Content).ToArray() },
+                        ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0).Select(i => row.Columns[i]?.Dimension ?? new Dimension()).ToArray(),
                         RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                     });
                 }

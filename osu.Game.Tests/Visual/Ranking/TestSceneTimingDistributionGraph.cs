@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
@@ -25,7 +24,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new HitEventTimingDistributionGraph(new ScoreInfo { HitEvents = CreateDistributedHitEvents() })
+                new HitEventTimingDistributionGraph(CreateDistributedHitEvents())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
