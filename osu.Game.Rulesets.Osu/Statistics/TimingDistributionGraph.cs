@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// <summary>
         /// The number of bins on each side of the timing distribution.
         /// </summary>
-        private const int timing_distribution_bins = 25;
+        private const int timing_distribution_bins = 50;
 
         /// <summary>
         /// The total number of bins in the timing distribution, including bins on both sides and the centre bin at 0.
