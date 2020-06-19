@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osuTK;
@@ -20,6 +22,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         protected override bool StartHidden => true;
 
         private readonly Container content;
+        private readonly LoadingSpinner spinner;
 
         public StatisticsPanel()
         {
@@ -33,7 +36,11 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Top = SIDE_PADDING,
                     Bottom = 50 // Approximate padding to the bottom of the score panel.
                 },
-                Child = content = new Container { RelativeSizeAxes = Axes.Both },
+                Children = new Drawable[]
+                {
+                    content = new Container { RelativeSizeAxes = Axes.Both },
+                    spinner = new LoadingSpinner()
+                }
             };
         }
 
@@ -43,8 +50,12 @@ namespace osu.Game.Screens.Ranking.Statistics
             Score.BindValueChanged(populateStatistics, true);
         }
 
+        private CancellationTokenSource loadCancellation;
+
         private void populateStatistics(ValueChangedEvent<ScoreInfo> score)
         {
+            loadCancellation?.Cancel();
+
             foreach (var child in content)
                 child.FadeOut(150).Expire();
 
@@ -54,6 +65,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 content.Add(new MessagePlaceholder("Score has no statistics :("));
             else
             {
+                spinner.Show();
+
                 var rows = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -73,7 +86,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                content.Add(rows);
+                LoadComponentAsync(rows, d =>
+                {
+                    if (Score.Value != newScore)
+                        return;
+
+                    spinner.Hide();
+                    content.Add(d);
+                }, (loadCancellation = new CancellationTokenSource()).Token);
             }
         }
 
