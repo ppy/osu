@@ -35,14 +35,13 @@ namespace osu.Game.Storyboards.Drawables
         private void load(IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods)
         {
             Channel = beatmap.Value.Skin.GetSample(sampleInfo);
+            if (Channel == null)
+                return;
 
-            if (Channel != null)
-            {
-                Channel.Volume.Value = sampleInfo.Volume / 100.0;
+            Channel.Volume.Value = sampleInfo.Volume / 100.0;
 
-                foreach (var mod in mods.Value.OfType<IApplicableToSample>())
-                    mod.ApplyToSample(Channel);
-            }
+            foreach (var mod in mods.Value.OfType<IApplicableToSample>())
+                mod.ApplyToSample(Channel);
         }
 
         protected override void Update()
