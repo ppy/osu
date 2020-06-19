@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -47,6 +48,7 @@ namespace osu.Game.Screens.Ranking
         private StatisticsPanel statisticsPanel;
         private Drawable bottomPanel;
         private ScorePanelList scorePanelList;
+        private Container<ScorePanel> detachedPanelContainer;
 
         protected ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
@@ -89,11 +91,15 @@ namespace osu.Game.Screens.Ranking
                                                 SelectedScore = { BindTarget = SelectedScore },
                                                 PostExpandAction = () => statisticsPanel.ToggleVisibility()
                                             },
+                                            detachedPanelContainer = new Container<ScorePanel>
+                                            {
+                                                RelativeSizeAxes = Axes.Both
+                                            },
                                             statisticsPanel = new StatisticsPanel
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Score = { BindTarget = SelectedScore }
-                                            }
+                                            },
                                         }
                                     }
                                 },
@@ -169,7 +175,7 @@ namespace osu.Game.Screens.Ranking
             var req = FetchScores(scores => Schedule(() =>
             {
                 foreach (var s in scores)
-                    scorePanelList.AddScore(s);
+                    addScore(s);
             }));
 
             if (req != null)
@@ -208,42 +214,71 @@ namespace osu.Game.Screens.Ranking
             return base.OnExiting(next);
         }
 
+        private void addScore(ScoreInfo score)
+        {
+            var panel = scorePanelList.AddScore(score);
+
+            if (detachedPanel != null)
+                panel.Alpha = 0;
+        }
+
+        private ScorePanel detachedPanel;
+
         private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
         {
-            if (state.NewValue == Visibility.Hidden)
+            if (state.NewValue == Visibility.Visible)
             {
-                Background.FadeTo(0.5f, 150);
+                // Detach the panel in its original location, and move into the desired location in the local container.
+                var expandedPanel = scorePanelList.GetPanelForScore(SelectedScore.Value);
+                var screenSpacePos = expandedPanel.ScreenSpaceDrawQuad.TopLeft;
 
-                foreach (var panel in scorePanelList.Panels)
-                {
-                    if (panel.State == PanelState.Contracted)
-                        panel.FadeIn(150);
-                    else
-                    {
-                        panel.MoveTo(panel.GetTrackingPosition(), 150, Easing.OutQuint).OnComplete(p =>
-                        {
-                            scorePanelList.HandleScroll = true;
-                            p.Tracking = true;
-                        });
-                    }
-                }
-            }
-            else
-            {
+                // Detach and move into the local container.
+                scorePanelList.Detach(expandedPanel);
+                detachedPanelContainer.Add(expandedPanel);
+
+                // Move into its original location in the local container.
+                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos);
+                expandedPanel.MoveTo(origLocation);
+                expandedPanel.MoveToX(origLocation.X);
+
+                // Move into the final location.
+                expandedPanel.MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
+
+                // Hide contracted panels.
+                foreach (var contracted in scorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
+                    contracted.FadeOut(150, Easing.OutQuint);
+                scorePanelList.HandleInput = false;
+
+                // Dim background.
                 Background.FadeTo(0.1f, 150);
 
-                foreach (var panel in scorePanelList.Panels)
-                {
-                    if (panel.State == PanelState.Contracted)
-                        panel.FadeOut(150, Easing.OutQuint);
-                    else
-                    {
-                        scorePanelList.HandleScroll = false;
+                detachedPanel = expandedPanel;
+            }
+            else if (detachedPanel != null)
+            {
+                var screenSpacePos = detachedPanel.ScreenSpaceDrawQuad.TopLeft;
 
-                        panel.Tracking = false;
-                        panel.MoveTo(new Vector2(scorePanelList.CurrentScrollPosition + StatisticsPanel.SIDE_PADDING, panel.GetTrackingPosition().Y), 150, Easing.OutQuint);
-                    }
-                }
+                // Remove from the local container and re-attach.
+                detachedPanelContainer.Remove(detachedPanel);
+                scorePanelList.Attach(detachedPanel);
+
+                // Move into its original location in the attached container.
+                var origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos);
+                detachedPanel.MoveTo(origLocation);
+                detachedPanel.MoveToX(origLocation.X);
+
+                // Move into the final location.
+                detachedPanel.MoveToX(0, 150, Easing.OutQuint);
+
+                // Show contracted panels.
+                foreach (var contracted in scorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
+                    contracted.FadeIn(150, Easing.OutQuint);
+                scorePanelList.HandleInput = true;
+
+                // Un-dim background.
+                Background.FadeTo(0.5f, 150);
+
+                detachedPanel = null;
             }
         }
     }
