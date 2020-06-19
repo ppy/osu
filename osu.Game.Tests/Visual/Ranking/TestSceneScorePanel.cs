@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -102,39 +101,6 @@ namespace osu.Game.Tests.Visual.Ranking
             AddWaitStep("wait for transition", 10);
         }
 
-        [Test]
-        public void TestSceneTrackingScorePanel()
-        {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo) { Accuracy = 0.925, Rank = ScoreRank.A };
-
-            addPanelStep(score, PanelState.Contracted);
-
-            AddStep("enable tracking", () =>
-            {
-                panel.Anchor = Anchor.CentreLeft;
-                panel.Origin = Anchor.CentreLeft;
-                panel.Tracking = true;
-
-                Add(panel.CreateTrackingComponent().With(d =>
-                {
-                    d.Anchor = Anchor.Centre;
-                    d.Origin = Anchor.Centre;
-                }));
-            });
-
-            assertTracking(true);
-
-            AddStep("expand panel", () => panel.State = PanelState.Expanded);
-            AddWaitStep("wait for transition", 2);
-            assertTracking(true);
-
-            AddStep("stop tracking", () => panel.Tracking = false);
-            assertTracking(false);
-
-            AddStep("start tracking", () => panel.Tracking = true);
-            assertTracking(true);
-        }
-
         private void addPanelStep(ScoreInfo score, PanelState state = PanelState.Expanded) => AddStep("add panel", () =>
         {
             Child = panel = new ScorePanel(score)
@@ -144,9 +110,5 @@ namespace osu.Game.Tests.Visual.Ranking
                 State = state
             };
         });
-
-        private void assertTracking(bool tracking) => AddAssert($"{(tracking ? "is" : "is not")} tracking", () =>
-            Precision.AlmostEquals(panel.ScreenSpaceDrawQuad.TopLeft, panel.CreateTrackingComponent().ScreenSpaceDrawQuad.TopLeft) == tracking
-            && Precision.AlmostEquals(panel.ScreenSpaceDrawQuad.BottomRight, panel.CreateTrackingComponent().ScreenSpaceDrawQuad.BottomRight) == tracking);
     }
 }

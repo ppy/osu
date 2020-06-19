@@ -79,11 +79,6 @@ namespace osu.Game.Screens.Ranking
         public Action PostExpandAction;
 
         /// <summary>
-        /// Whether this <see cref="ScorePanel"/> should track the position of the tracking component created via <see cref="CreateTrackingComponent"/>.
-        /// </summary>
-        public bool Tracking;
-
-        /// <summary>
         /// Whether this <see cref="ScorePanel"/> can enter into an <see cref="PanelState.Expanded"/> state.
         /// </summary>
         public bool CanExpand = true;
@@ -194,20 +189,6 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (Tracking && trackingComponent != null)
-                Position = GetTrackingPosition();
-        }
-
-        public Vector2 GetTrackingPosition()
-        {
-            Vector2 topLeftPos = Parent.ToLocalSpace(trackingComponent.ScreenSpaceDrawQuad.TopLeft);
-            return topLeftPos - AnchorPosition + OriginPosition;
-        }
-
         private void updateState()
         {
             topLayerContent?.FadeOut(content_fade_duration).Expire();
@@ -269,8 +250,8 @@ namespace osu.Game.Screens.Ranking
             {
                 base.Size = value;
 
-                if (trackingComponent != null)
-                    trackingComponent.Size = value;
+                if (trackingContainer != null)
+                    trackingContainer.Size = value;
             }
         }
 
@@ -293,26 +274,14 @@ namespace osu.Game.Screens.Ranking
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private TrackingComponent trackingComponent;
+        private ScorePanelTrackingContainer trackingContainer;
 
-        public TrackingComponent CreateTrackingComponent() => trackingComponent ??= new TrackingComponent(this);
-
-        public class TrackingComponent : Drawable
+        public ScorePanelTrackingContainer CreateTrackingContainer()
         {
-            public readonly ScorePanel Panel;
+            if (trackingContainer != null)
+                throw new InvalidOperationException("A score panel container has already been created.");
 
-            public TrackingComponent(ScorePanel panel)
-            {
-                Panel = panel;
-            }
-
-            // In ScorePanelList, score panels are added _before_ the flow, but this means that input will be blocked by the scroll container.
-            // So by forwarding input events, we remove the need to consider the order in which input is handled.
-            protected override bool OnClick(ClickEvent e) => Panel.TriggerEvent(e);
-
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Panel.ReceivePositionalInputAt(screenSpacePos);
-
-            public override bool IsPresent => Panel.IsPresent;
+            return trackingContainer = new ScorePanelTrackingContainer(this);
         }
     }
 }
