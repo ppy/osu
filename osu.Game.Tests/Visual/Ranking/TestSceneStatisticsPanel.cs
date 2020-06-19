@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,7 +17,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                HitEvents = TestSceneTimingDistributionGraph.CreateDistributedHitEvents().Cast<object>().ToList(),
+                HitEvents = TestSceneTimingDistributionGraph.CreateDistributedHitEvents()
             };
 
             loadPanel(score);

@@ -2,17 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Layout;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -36,16 +33,11 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private GridContainer pointGrid;
 
-        private readonly BeatmapInfo beatmap;
-        private readonly IReadOnlyList<HitEvent> hitEvents;
-        private readonly LayoutValue sizeLayout = new LayoutValue(Invalidation.DrawSize);
+        private readonly ScoreInfo score;
 
-        public Heatmap(BeatmapInfo beatmap, IReadOnlyList<HitEvent> hitEvents)
+        public Heatmap(ScoreInfo score)
         {
-            this.beatmap = beatmap;
-            this.hitEvents = hitEvents;
-
-            AddLayout(sizeLayout);
+            this.score = score;
         }
 
         [BackgroundDependencyLoader]
@@ -149,18 +141,18 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             pointGrid.Content = points;
 
-            if (hitEvents.Count > 0)
+            if (score.HitEvents == null || score.HitEvents.Count == 0)
+                return;
+
+            // Todo: This should probably not be done like this.
+            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (score.Beatmap.BaseDifficulty.CircleSize - 5) / 5) / 2;
+
+            foreach (var e in score.HitEvents)
             {
-                // Todo: This should probably not be done like this.
-                float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (beatmap.BaseDifficulty.CircleSize - 5) / 5) / 2;
+                if (e.LastHitObject == null || e.PositionOffset == null)
+                    continue;
 
-                foreach (var e in hitEvents)
-                {
-                    if (e.LastHitObject == null || e.PositionOffset == null)
-                        continue;
-
-                    AddPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.PositionOffset.Value, radius);
-                }
+                AddPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.PositionOffset.Value, radius);
             }
         }
 

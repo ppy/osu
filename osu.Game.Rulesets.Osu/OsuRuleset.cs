@@ -29,7 +29,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
-using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
@@ -201,7 +200,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 130,
-                        Child = new TimingDistributionGraph(score.HitEvents.Cast<HitEvent>().ToList())
+                        Child = new TimingDistributionGraph(score)
                         {
                             RelativeSizeAxes = Axes.Both
                         }
@@ -209,7 +208,7 @@ namespace osu.Game.Rulesets.Osu
                     new StatisticContainer("Accuracy Heatmap")
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new Heatmap(score.Beatmap, score.HitEvents.Cast<HitEvent>().ToList())
+                        Child = new Heatmap(score)
                         {
                             RelativeSizeAxes = Axes.Both
                         }

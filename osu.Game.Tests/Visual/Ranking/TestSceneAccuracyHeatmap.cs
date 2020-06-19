@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,10 +9,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Graphics;
@@ -50,7 +48,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Position = new Vector2(100, 300),
                 },
-                heatmap = new TestHeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, new List<HitEvent>())
+                heatmap = new TestHeatmap(new ScoreInfo { Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -93,8 +91,8 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class TestHeatmap : Heatmap
         {
-            public TestHeatmap(BeatmapInfo beatmap, List<HitEvent> events)
-                : base(beatmap, events)
+            public TestHeatmap(ScoreInfo score)
+                : base(score)
             {
             }
 
