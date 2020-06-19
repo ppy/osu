@@ -10,10 +10,15 @@ namespace osu.Game.Rulesets.Osu.Judgements
 {
     public class OsuHitCircleJudgementResult : OsuJudgementResult
     {
+        /// <summary>
+        /// The <see cref="HitCircle"/>.
+        /// </summary>
         public HitCircle HitCircle => (HitCircle)HitObject;
 
-        public Vector2? HitPosition;
-        public float? Radius;
+        /// <summary>
+        /// The position of the player's cursor when <see cref="HitCircle"/> was hit.
+        /// </summary>
+        public Vector2? CursorPositionAtHit;
 
         public OsuHitCircleJudgementResult(HitObject hitObject, Judgement judgement)
             : base(hitObject, judgement)

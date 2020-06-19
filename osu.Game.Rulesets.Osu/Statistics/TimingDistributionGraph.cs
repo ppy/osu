@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Statistics
 {
@@ -37,23 +36,23 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// </summary>
         private const float axis_points = 5;
 
-        private readonly List<HitEvent> hitEvents;
+        private readonly ScoreInfo score;
 
-        public TimingDistributionGraph(List<HitEvent> hitEvents)
+        public TimingDistributionGraph(ScoreInfo score)
         {
-            this.hitEvents = hitEvents;
+            this.score = score;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (hitEvents.Count == 0)
+            if (score.HitEvents == null || score.HitEvents.Count == 0)
                 return;
 
             int[] bins = new int[total_timing_distribution_bins];
-            double binSize = hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins;
+            double binSize = score.HitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins;
 
-            foreach (var e in hitEvents)
+            foreach (var e in score.HitEvents)
             {
                 int binOffset = (int)(e.TimeOffset / binSize);
                 bins[timing_distribution_centre_bin_index + binOffset]++;
