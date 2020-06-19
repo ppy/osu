@@ -9,21 +9,21 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual.Ranking
+namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneAccuracyHeatmap : OsuManualInputManagerTestScene
     {
         private Box background;
         private Drawable object1;
         private Drawable object2;
-        private TestHeatmap heatmap;
+        private TestAccuracyHeatmap accuracyHeatmap;
         private ScheduledDelegate automaticAdditionDelegate;
 
         [SetUp]
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Position = new Vector2(100, 300),
                 },
-                heatmap = new TestHeatmap(new ScoreInfo { Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
+                accuracyHeatmap = new TestAccuracyHeatmap(new ScoreInfo { Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         RNG.NextSingle(object1.DrawPosition.Y - object1.DrawSize.Y / 2, object1.DrawPosition.Y + object1.DrawSize.Y / 2));
 
                     // The background is used for ToLocalSpace() since we need to go _inside_ the DrawSizePreservingContainer (Content of TestScene).
-                    heatmap.AddPoint(object2.Position, object1.Position, randomPos, RNG.NextSingle(10, 500));
+                    accuracyHeatmap.AddPoint(object2.Position, object1.Position, randomPos, RNG.NextSingle(10, 500));
                     InputManager.MoveMouseTo(background.ToScreenSpace(randomPos));
                 }, 1, true);
             });
@@ -85,13 +85,13 @@ namespace osu.Game.Tests.Visual.Ranking
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            heatmap.AddPoint(object2.Position, object1.Position, background.ToLocalSpace(e.ScreenSpaceMouseDownPosition), 50);
+            accuracyHeatmap.AddPoint(object2.Position, object1.Position, background.ToLocalSpace(e.ScreenSpaceMouseDownPosition), 50);
             return true;
         }
 
-        private class TestHeatmap : Heatmap
+        private class TestAccuracyHeatmap : AccuracyHeatmap
         {
-            public TestHeatmap(ScoreInfo score)
+            public TestAccuracyHeatmap(ScoreInfo score)
                 : base(score)
             {
             }
