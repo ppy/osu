@@ -21,7 +21,7 @@ namespace osu.Game.Storyboards.Drawables
 
         private readonly StoryboardSampleInfo sampleInfo;
 
-        protected SampleChannel Channel;
+        protected SampleChannel Channel { get; private set; }
 
         public override bool RemoveWhenNotAlive => false;
 
