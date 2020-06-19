@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override StatisticRow[] CreateStatistics(ScoreInfo score) => new[]
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score) => new[]
         {
             new StatisticRow
             {

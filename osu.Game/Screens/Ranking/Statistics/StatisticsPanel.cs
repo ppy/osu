@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Spacing = new Vector2(30, 15),
                 };
 
-                foreach (var row in newScore.Ruleset.CreateInstance().CreateStatistics(newScore))
+                foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore))
                 {
                     rows.Add(new GridContainer
                     {
