@@ -81,8 +81,15 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Content = new[] { row.Columns?.Select(c => c?.Content).ToArray() },
-                        ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0).Select(i => row.Columns[i]?.Dimension ?? new Dimension()).ToArray(),
+                        Content = new[]
+                        {
+                            row.Columns?.Select(c => new StatisticContainer(c.Name)
+                            {
+                                Child = c.Content
+                            }).Cast<Drawable>().ToArray()
+                        },
+                        ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
+                                                     .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
                         RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                     });
                 }
