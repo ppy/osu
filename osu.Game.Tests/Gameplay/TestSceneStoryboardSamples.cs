@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("start", () => gameplayContainer.Start());
 
-            AddAssert("sample playback rate matches mod rates", () => sample.TestChannel.AggregateFrequency.Value == expectedRate);
+            AddAssert("sample playback rate matches mod rates", () => sample.Channel.AggregateFrequency.Value == expectedRate);
         }
 
         private class TestSkin : LegacySkin
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Gameplay
             {
             }
 
-            public SampleChannel TestChannel => Channel;
+            public new SampleChannel Channel => base.Channel;
         }
     }
 }
