@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Gameplay
                     break;
 
                 case ModTimeRamp m:
-                    m.SpeedChange.Value = expectedRate;
+                    m.InitialRate.Value = m.FinalRate.Value = expectedRate;
                     break;
             }
 
