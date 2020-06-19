@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
             {
-                HitEvents = TestSceneTimingDistributionGraph.CreateDistributedHitEvents()
+                HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents()
             };
 
             loadPanel(score);

@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 130,
-                        Child = new TimingDistributionGraph(score)
+                        Child = new HitEventTimingDistributionGraph(score)
                         {
                             RelativeSizeAxes = Axes.Both
                         }
