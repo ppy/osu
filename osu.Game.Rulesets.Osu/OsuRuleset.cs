@@ -29,7 +29,9 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
+using System.Linq;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -190,36 +192,29 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override StatisticRow[] CreateStatistics(ScoreInfo score) => new[]
+        public override StatisticRow[] CreateStatistics(ScoreInfo score)
         {
-            new StatisticRow
+            var hitCircleEvents = score.HitEvents.Where(e => e.HitObject is HitCircle).ToList();
+
+            return new[]
             {
-                Content = new Drawable[]
+                new StatisticRow
                 {
-                    new StatisticContainer("Timing Distribution")
+                    Columns = new[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 130,
-                        Child = new HitEventTimingDistributionGraph(score)
+                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(hitCircleEvents)
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    },
-                    new StatisticContainer("Accuracy Heatmap")
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = new Heatmap(score)
+                            RelativeSizeAxes = Axes.X,
+                            Height = 130
+                        }),
+                        new StatisticItem("Accuracy Heatmap", new Heatmap(score)
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    },
-                },
-                ColumnDimensions = new[]
-                {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, 130),
+                            RelativeSizeAxes = Axes.X,
+                            Height = 130
+                        }, new Dimension(GridSizeMode.Absolute, 130)),
+                    }
                 }
-            }
-        };
+            };
+        }
     }
 }

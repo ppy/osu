@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,10 +11,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Scoring;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
+    /// <summary>
+    /// A graph which displays the distribution of hit timing in a series of <see cref="HitEvent"/>s.
+    /// </summary>
     public class HitEventTimingDistributionGraph : CompositeDrawable
     {
         /// <summary>
@@ -32,27 +36,31 @@ namespace osu.Game.Screens.Ranking.Statistics
         private const int timing_distribution_centre_bin_index = timing_distribution_bins;
 
         /// <summary>
-        /// The number of data points shown on the axis below the graph.
+        /// The number of data points shown on each side of the axis below the graph.
         /// </summary>
         private const float axis_points = 5;
 
-        private readonly ScoreInfo score;
+        private readonly IReadOnlyList<HitEvent> hitEvents;
 
-        public HitEventTimingDistributionGraph(ScoreInfo score)
+        /// <summary>
+        /// Creates a new <see cref="HitEventTimingDistributionGraph"/>.
+        /// </summary>
+        /// <param name="hitEvents">The <see cref="HitEvent"/>s to display the timing distribution of.</param>
+        public HitEventTimingDistributionGraph(IReadOnlyList<HitEvent> hitEvents)
         {
-            this.score = score;
+            this.hitEvents = hitEvents;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (score.HitEvents == null || score.HitEvents.Count == 0)
+            if (hitEvents == null || hitEvents.Count == 0)
                 return;
 
             int[] bins = new int[total_timing_distribution_bins];
-            double binSize = score.HitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins;
+            double binSize = hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins;
 
-            foreach (var e in score.HitEvents)
+            foreach (var e in hitEvents)
             {
                 int binOffset = (int)(e.TimeOffset / binSize);
                 bins[timing_distribution_centre_bin_index + binOffset]++;
@@ -67,6 +75,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             InternalChild = new GridContainer
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Width = 0.8f,
                 Content = new[]
