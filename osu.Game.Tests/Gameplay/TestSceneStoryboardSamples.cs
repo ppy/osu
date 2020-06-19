@@ -10,9 +10,8 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -73,26 +72,39 @@ namespace osu.Game.Tests.Gameplay
             AddUntilStep("sample playback succeeded", () => sample.LifetimeEnd < double.MaxValue);
         }
 
-        [Test]
-        public void TestSamplePlaybackWithRateMods()
+        [TestCase(typeof(OsuModDoubleTime), 1.5)]
+        [TestCase(typeof(OsuModHalfTime), 0.75)]
+        [TestCase(typeof(ModWindUp), 1.5)]
+        [TestCase(typeof(ModWindDown), 0.75)]
+        [TestCase(typeof(OsuModDoubleTime), 2)]
+        [TestCase(typeof(OsuModHalfTime), 0.5)]
+        [TestCase(typeof(ModWindUp), 2)]
+        [TestCase(typeof(ModWindDown), 0.5)]
+        public void TestSamplePlaybackWithRateMods(Type expectedMod, double expectedRate)
         {
             GameplayClockContainer gameplayContainer = null;
             TestDrawableStoryboardSample sample = null;
 
-            OsuModDoubleTime doubleTimeMod = null;
+            Mod testedMod = Activator.CreateInstance(expectedMod) as Mod;
 
-            AddStep("create container", () =>
+            switch (testedMod)
             {
-                var beatmap = Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                case ModRateAdjust m:
+                    m.SpeedChange.Value = expectedRate;
+                    break;
 
-                Add(gameplayContainer = new GameplayClockContainer(beatmap, new[] { doubleTimeMod = new OsuModDoubleTime() }, 0));
+                case ModTimeRamp m:
+                    m.SpeedChange.Value = expectedRate;
+                    break;
+            }
 
-                SelectedMods.Value = new[] { doubleTimeMod };
-                Beatmap.Value = new TestCustomSkinWorkingBeatmap(beatmap.Beatmap, gameplayContainer.GameplayClock, Audio);
-            });
-
-            AddStep("create storyboard sample", () =>
+            AddStep("setup storyboard sample", () =>
             {
+                Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, Audio);
+                SelectedMods.Value = new[] { testedMod };
+
+                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, SelectedMods.Value, 0));
+
                 gameplayContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
                     Clock = gameplayContainer.GameplayClock
@@ -101,7 +113,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("start", () => gameplayContainer.Start());
 
-            AddAssert("sample playback rate matches mod rates", () => sample.TestChannel.AggregateFrequency.Value == doubleTimeMod.SpeedChange.Value);
+            AddAssert("sample playback rate matches mod rates", () => sample.TestChannel.AggregateFrequency.Value == expectedRate);
         }
 
         private class TestSkin : LegacySkin
@@ -138,8 +150,8 @@ namespace osu.Game.Tests.Gameplay
         {
             private readonly AudioManager audio;
 
-            public TestCustomSkinWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock referenceClock, AudioManager audio)
-                : base(beatmap, null, referenceClock, audio)
+            public TestCustomSkinWorkingBeatmap(RulesetInfo ruleset, AudioManager audio)
+                : base(ruleset, null, audio)
             {
                 this.audio = audio;
             }
