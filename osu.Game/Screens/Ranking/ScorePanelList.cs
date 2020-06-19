@@ -211,6 +211,22 @@ namespace osu.Game.Screens.Ranking
             private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
                                                                                                                        .OrderByDescending(s => s.Panel.Score.TotalScore)
                                                                                                                        .ThenBy(s => s.Panel.Score.OnlineScoreID);
+
+            protected override int Compare(Drawable x, Drawable y)
+            {
+                var tX = (ScorePanelTrackingContainer)x;
+                var tY = (ScorePanelTrackingContainer)y;
+
+                int result = tY.Panel.Score.TotalScore.CompareTo(tX.Panel.Score.TotalScore);
+
+                if (result != 0)
+                    return result;
+
+                if (tX.Panel.Score.OnlineScoreID == null || tY.Panel.Score.OnlineScoreID == null)
+                    return base.Compare(x, y);
+
+                return tX.Panel.Score.OnlineScoreID.Value.CompareTo(tY.Panel.Score.OnlineScoreID.Value);
+            }
         }
 
         private class Scroll : OsuScrollContainer
