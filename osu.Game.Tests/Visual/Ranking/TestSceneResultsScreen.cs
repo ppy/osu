@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
@@ -18,6 +19,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Statistics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -83,6 +85,73 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("load results", () => Child = new TestResultsContainer(screen = createUnrankedSoloResultsScreen()));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
+        [Test]
+        public void TestShowHideStatistics()
+        {
+            TestResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+
+            AddStep("click expanded panel", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                InputManager.MoveMouseTo(expandedPanel);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("statistics shown", () => this.ChildrenOfType<StatisticsPanel>().Single().State.Value == Visibility.Visible);
+
+            AddUntilStep("expanded panel at the left of the screen", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                return expandedPanel.ScreenSpaceDrawQuad.TopLeft.X - screen.ScreenSpaceDrawQuad.TopLeft.X < 150;
+            });
+
+            AddStep("click expanded panel", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                InputManager.MoveMouseTo(expandedPanel);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("statistics hidden", () => this.ChildrenOfType<StatisticsPanel>().Single().State.Value == Visibility.Hidden);
+
+            AddUntilStep("expanded panel in centre of screen", () =>
+            {
+                var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                return Precision.AlmostEquals(expandedPanel.ScreenSpaceDrawQuad.Centre.X, screen.ScreenSpaceDrawQuad.Centre.X, 1);
+            });
+        }
+
+        [Test]
+        public void TestShowStatisticsAndClickOtherPanel()
+        {
+            TestResultsScreen screen = null;
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen()));
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+
+            ScorePanel expandedPanel = null;
+            ScorePanel contractedPanel = null;
+
+            AddStep("click expanded panel then contracted panel", () =>
+            {
+                expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
+                InputManager.MoveMouseTo(expandedPanel);
+                InputManager.Click(MouseButton.Left);
+
+                contractedPanel = this.ChildrenOfType<ScorePanel>().First(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X);
+                InputManager.MoveMouseTo(contractedPanel);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("statistics shown", () => this.ChildrenOfType<StatisticsPanel>().Single().State.Value == Visibility.Visible);
+
+            AddAssert("contracted panel still contracted", () => contractedPanel.State == PanelState.Contracted);
+            AddAssert("expanded panel still expanded", () => expandedPanel.State == PanelState.Expanded);
         }
 
         [Test]
