@@ -88,17 +88,17 @@ namespace osu.Game.Rulesets.Osu.Scoring
         public readonly HitObject LastHitObject;
 
         /// <summary>
-        /// The player's cursor position, if available, at the time of the event.
+        /// The player's position offset, if available, at the time of the event.
         /// </summary>
-        public readonly Vector2? CursorPosition;
+        public readonly Vector2? PositionOffset;
 
-        public HitEvent(double timeOffset, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, Vector2? cursorPosition)
+        public HitEvent(double timeOffset, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, Vector2? positionOffset)
         {
             TimeOffset = timeOffset;
             Result = result;
             HitObject = hitObject;
             LastHitObject = lastHitObject;
-            CursorPosition = cursorPosition;
+            PositionOffset = positionOffset;
         }
     }
 }
