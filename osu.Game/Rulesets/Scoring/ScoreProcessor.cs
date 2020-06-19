@@ -136,12 +136,6 @@ namespace osu.Game.Rulesets.Scoring
             lastHitObject = result.HitObject;
 
             updateScore();
-
-            OnResultApplied(result);
-        }
-
-        protected virtual void OnResultApplied(JudgementResult result)
-        {
         }
 
         protected virtual HitEvent CreateHitEvent(JudgementResult result)
@@ -174,12 +168,6 @@ namespace osu.Game.Rulesets.Scoring
             hitEvents.RemoveAt(hitEvents.Count - 1);
 
             updateScore();
-
-            OnResultReverted(result);
-        }
-
-        protected virtual void OnResultReverted(JudgementResult result)
-        {
         }
 
         private void updateScore()
