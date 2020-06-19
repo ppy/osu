@@ -7,12 +7,32 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
+    /// <summary>
+    /// An item to be displayed in a row of statistics inside the results screen.
+    /// </summary>
     public class StatisticItem
     {
+        /// <summary>
+        /// The name of this item.
+        /// </summary>
         public readonly string Name;
+
+        /// <summary>
+        /// The <see cref="Drawable"/> content to be displayed.
+        /// </summary>
         public readonly Drawable Content;
+
+        /// <summary>
+        /// The <see cref="Dimension"/> of this row. This can be thought of as the column dimension of an encompassing <see cref="GridContainer"/>.
+        /// </summary>
         public readonly Dimension Dimension;
 
+        /// <summary>
+        /// Creates a new <see cref="StatisticItem"/>, to be displayed inside a <see cref="StatisticRow"/> in the results screen.
+        /// </summary>
+        /// <param name="name">The name of this item.</param>
+        /// <param name="content">The <see cref="Drawable"/> content to be displayed.</param>
+        /// <param name="dimension">The <see cref="Dimension"/> of this row. This can be thought of as the column dimension of an encompassing <see cref="GridContainer"/>.</param>
         public StatisticItem([NotNull] string name, [NotNull] Drawable content, [CanBeNull] Dimension dimension = null)
         {
             Name = name;

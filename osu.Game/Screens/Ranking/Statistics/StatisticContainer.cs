@@ -19,9 +19,13 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         public StatisticContainer(string name)
         {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
             InternalChild = new GridContainer
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Content = new[]
                 {
                     new Drawable[]
@@ -56,12 +60,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         content = new Container
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                         }
                     },
                 },
                 RowDimensions = new[]
                 {
+                    new Dimension(GridSizeMode.AutoSize),
                     new Dimension(GridSizeMode.AutoSize),
                 }
             };
