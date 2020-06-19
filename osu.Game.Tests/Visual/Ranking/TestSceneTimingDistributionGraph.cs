@@ -7,16 +7,16 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public class TestSceneTimingDistributionGraph : OsuTestScene
+    public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
-        public TestSceneTimingDistributionGraph()
+        public TestSceneHitEventTimingDistributionGraph()
         {
             Children = new Drawable[]
             {
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new TimingDistributionGraph(new ScoreInfo { HitEvents = CreateDistributedHitEvents() })
+                new HitEventTimingDistributionGraph(new ScoreInfo { HitEvents = CreateDistributedHitEvents() })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

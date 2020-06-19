@@ -12,9 +12,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
 
-namespace osu.Game.Rulesets.Osu.Statistics
+namespace osu.Game.Screens.Ranking.Statistics
 {
-    public class TimingDistributionGraph : CompositeDrawable
+    public class HitEventTimingDistributionGraph : CompositeDrawable
     {
         /// <summary>
         /// The number of bins on each side of the timing distribution.
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private readonly ScoreInfo score;
 
-        public TimingDistributionGraph(ScoreInfo score)
+        public HitEventTimingDistributionGraph(ScoreInfo score)
         {
             this.score = score;
         }
