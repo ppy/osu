@@ -216,6 +216,6 @@ namespace osu.Game.Rulesets
         /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
         /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
         [NotNull]
-        public virtual StatisticRow[] CreateStatistics(ScoreInfo score) => Array.Empty<StatisticRow>();
+        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score) => Array.Empty<StatisticRow>();
     }
 }
