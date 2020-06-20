@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             }
         }
 
-        protected IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
-            => skin.GetManiaSkinConfig<T>(lookup, index ?? Column.Index);
+        protected IBindable<T> GetColumnSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
+            => skin.GetManiaSkinConfig<T>(lookup, Column.Index);
     }
 }
