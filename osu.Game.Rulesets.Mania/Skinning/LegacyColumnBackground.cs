@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string lightImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.LightImage, 0)?.Value
+            string lightImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LightImage)?.Value
                                 ?? "mania-stage-light";
 
             float leftLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)

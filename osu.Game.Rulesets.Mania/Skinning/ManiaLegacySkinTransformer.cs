@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private Drawable getResult(HitResult result)
         {
             string filename = this.GetManiaSkinConfig<string>(hitresult_mapping[result])?.Value
-                ?? default_hitresult_skin_filenames[result];
+                              ?? default_hitresult_skin_filenames[result];
 
             return this.GetAnimation(filename, true, true);
         }
