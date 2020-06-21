@@ -19,7 +19,7 @@ using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
 using osu.Game.Users;
 
-namespace osu.Game.Tests.Gameplay
+namespace osu.Game.Tests.Beatmaps
 {
     public abstract class HitObjectSampleTest : PlayerTestScene
     {
