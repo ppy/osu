@@ -40,14 +40,14 @@ namespace osu.Game.Tests.Beatmaps
         private readonly TestResourceStore beatmapSkinResourceStore = new TestResourceStore();
         private SkinSourceDependencyContainer dependencies;
         private IBeatmap currentTestBeatmap;
-        protected override bool HasCustomSteps => true;
+        protected sealed override bool HasCustomSteps => true;
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => new DependencyContainer(dependencies = new SkinSourceDependencyContainer(base.CreateChildDependencies(parent)));
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestBeatmap;
+        protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestBeatmap;
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        protected sealed override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
             => new TestWorkingBeatmap(beatmapInfo, beatmapSkinResourceStore, beatmap, storyboard, Clock, Audio);
 
         protected void CreateTestWithBeatmap(string filename)
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Beatmaps
         protected void AssertUserLookup(string name) => AddAssert($"\"{name}\" looked up from user skin",
             () => !beatmapSkinResourceStore.PerformedLookups.Contains(name) && userSkinResourceStore.PerformedLookups.Contains(name));
 
-        protected class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
+        private class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
         {
             public ISkinSource SkinSource;
 
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        protected class TestResourceStore : IResourceStore<byte[]>
+        private class TestResourceStore : IResourceStore<byte[]>
         {
             public readonly List<string> PerformedLookups = new List<string>();
 
