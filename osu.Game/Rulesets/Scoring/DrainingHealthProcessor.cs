@@ -101,8 +101,12 @@ namespace osu.Game.Rulesets.Scoring
             )));
 
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
+
+            // Add back a portion of the amount of HP to be drained, depending on the lenience requested.
             targetMinimumHealth += drainLenience * (1 - targetMinimumHealth);
-            targetMinimumHealth = Math.Min(1, targetMinimumHealth);
+
+            // Ensure the target HP is within an acceptable range.
+            targetMinimumHealth = Math.Clamp(targetMinimumHealth, 0, 1);
 
             base.ApplyBeatmap(beatmap);
         }
