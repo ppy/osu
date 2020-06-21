@@ -6,6 +6,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Gameplay
