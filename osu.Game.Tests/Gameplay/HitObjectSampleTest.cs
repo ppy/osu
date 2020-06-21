@@ -16,7 +16,6 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
-using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 using osu.Game.Users;
 
@@ -24,6 +23,8 @@ namespace osu.Game.Tests.Gameplay
 {
     public abstract class HitObjectSampleTest : PlayerTestScene
     {
+        protected abstract IResourceStore<byte[]> Resources { get; }
+
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
         private readonly BeatmapInfo beatmapInfo = new BeatmapInfo
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.Gameplay
 
                 AddStep($"load {filename}", () =>
                 {
-                    using (var reader = new LineBufferedReader(TestResources.OpenResource($"SampleLookups/{filename}")))
+                    using (var reader = new LineBufferedReader(Resources.GetStream($"Resources/SampleLookups/{filename}")))
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
                 });
             });

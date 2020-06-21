@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Gameplay
 {
@@ -12,6 +14,7 @@ namespace osu.Game.Tests.Gameplay
     public class TestSceneHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+        protected override IResourceStore<byte[]> Resources => TestResources.GetStore();
 
         /// <summary>
         /// Tests that a hitobject which provides no custom sample set retrieves samples from the user skin.
