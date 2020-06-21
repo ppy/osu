@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Scoring
         private double gameplayEndTime;
 
         private readonly double drainStartTime;
+        private readonly double drainLenience;
 
         private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
         private double targetMinimumHealth;
@@ -55,9 +56,14 @@ namespace osu.Game.Rulesets.Scoring
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
         /// </summary>
         /// <param name="drainStartTime">The time after which draining should begin.</param>
-        public DrainingHealthProcessor(double drainStartTime)
+        /// <param name="drainLenience">A lenience to apply to the default drain rate.<br />
+        /// A value of 0 uses the default drain rate.<br />
+        /// A value of 0.5 halves the drain rate.<br />
+        /// A value of 1 completely removes drain.</param>
+        public DrainingHealthProcessor(double drainStartTime, double drainLenience = 0)
         {
             this.drainStartTime = drainStartTime;
+            this.drainLenience = drainLenience;
         }
 
         protected override void Update()
@@ -95,6 +101,8 @@ namespace osu.Game.Rulesets.Scoring
             )));
 
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
+            targetMinimumHealth += drainLenience * (1 - targetMinimumHealth);
+            targetMinimumHealth = Math.Min(1, targetMinimumHealth);
 
             base.ApplyBeatmap(beatmap);
         }
