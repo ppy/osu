@@ -167,11 +167,28 @@ namespace osu.Game.Rulesets.Osu.Statistics
             double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
             float normalisedDistance = Vector2.Distance(hitPoint, end) / radius;
 
-            // Convert the above into the local search space.
+            // Consider two objects placed horizontally, with the start on the left and the end on the right.
+            // The above calculated the angle between {end, start}, and the angle between {end, hitPoint}, in the form:
+            //             +pi | 0
+            //     O --------- O ----->      Note: Math.Atan2 has a range (-pi <= theta <= +pi)
+            //             -pi | 0
+            // E.g. If the hit point was directly above end, it would have an angle pi/2.
+            //
+            // It also calculated the angle separating hitPoint from the line joining {start, end}, that is anti-clockwise in the form:
+            //               0 | pi
+            //     O --------- O ----->
+            //             2pi | pi
+            //
+            // However keep in mind that cos(0)=1 and cos(2pi)=1, whereas we actually want these values to appear on the left, so the x-coordinate needs to be inverted.
+            // Likewise sin(pi/2)=1 and sin(3pi/2)=-1, whereas we actually want these values to appear on the bottom/top respectively, so the y-coordinate also needs to be inverted.
+            //
+            // We also need to apply the anti-clockwise rotation.
+            var rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
+            var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
+
             Vector2 localCentre = new Vector2(points_per_dimension) / 2;
             float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
-            double localAngle = finalAngle + Math.PI - MathUtils.DegreesToRadians(rotation); // The angle inside the heatmap on which the closest point lies.
-            Vector2 localPoint = localCentre + localRadius * new Vector2((float)Math.Cos(localAngle), (float)Math.Sin(localAngle));
+            Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
 
             // Find the most relevant hit point.
             int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
