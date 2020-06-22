@@ -136,7 +136,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                     Assert.True(storage.Exists("drawings.txt"));
                     Assert.True(storage.Exists("drawings_results.txt"));
 
-                    Assert.True(storage.ConfigurationStorage.Exists("drawings.ini"));
+                    Assert.True(storage.Exists("drawings.ini"));
 
                     Assert.True(storage.Exists(videoFile));
                     Assert.True(storage.Exists(modFile));

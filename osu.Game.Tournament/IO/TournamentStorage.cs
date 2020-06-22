@@ -15,9 +15,7 @@ namespace osu.Game.Tournament.IO
     {
         private readonly Storage storage;
         internal readonly TournamentVideoResourceStore VideoStore;
-        internal readonly Storage ConfigurationStorage;
         private const string default_tournament = "default";
-        private const string config_directory = "config";
 
         public TournamentStorage(Storage storage)
             : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
@@ -40,8 +38,6 @@ namespace osu.Game.Tournament.IO
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
             }
 
-            ConfigurationStorage = UnderlyingStorage.GetStorageForDirectory(config_directory);
-
             VideoStore = new TournamentVideoResourceStore(this);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
         }
@@ -50,7 +46,6 @@ namespace osu.Game.Tournament.IO
         {
             var source = new DirectoryInfo(storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(GetFullPath(default_tournament));
-            var cfgDestination = new DirectoryInfo(GetFullPath(default_tournament + Path.DirectorySeparatorChar + config_directory));
 
             if (source.Exists)
             {
@@ -59,13 +54,11 @@ namespace osu.Game.Tournament.IO
                 deleteRecursive(source);
             }
 
-            if (!cfgDestination.Exists)
-                destination.CreateSubdirectory(config_directory);
 
             moveFileIfExists("bracket.json", destination);
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
-            moveFileIfExists("drawings.ini", cfgDestination);
+            moveFileIfExists("drawings.ini", destination);
         }
 
         private void moveFileIfExists(string file, DirectoryInfo destination)
