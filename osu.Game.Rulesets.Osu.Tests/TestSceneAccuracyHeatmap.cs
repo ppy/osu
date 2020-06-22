@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333"),
                 },
-                object2 = new BorderCircle
+                object1 = new BorderCircle
                 {
                     Position = new Vector2(256, 192),
                     Colour = Color4.Yellow,
                 },
-                object1 = new BorderCircle
+                object2 = new BorderCircle
                 {
                     Position = new Vector2(100, 300),
                 },
