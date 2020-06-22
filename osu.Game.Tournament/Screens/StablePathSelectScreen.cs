@@ -73,7 +73,7 @@ namespace osu.Game.Tournament.Screens
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Text = "Please select a new location",
+                                        Text = "选择一个新的位置",
                                         Font = OsuFont.Default.With(size: 40)
                                     },
                                 },
@@ -152,7 +152,7 @@ namespace osu.Game.Tournament.Screens
             if (!fileBasedIpc?.AutoDetectIPCLocation() ?? true)
             {
                 overlay = new DialogOverlay();
-                overlay.Push(new IPCErrorDialog("Failed to auto detect", "An osu! stable cutting-edge installation could not be auto detected.\nPlease try and manually point to the directory."));
+                overlay.Push(new IPCErrorDialog("自动检测失败", "无法检测到osu cutting-edge的安装位置.\n请尝试手动指定该位置."));
                 AddInternal(overlay);
             }
             else
