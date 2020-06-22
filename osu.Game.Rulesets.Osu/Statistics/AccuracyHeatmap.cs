@@ -74,41 +74,52 @@ namespace osu.Game.Rulesets.Osu.Statistics
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
                         Children = new Drawable[]
                         {
-                            new Box
+                            new Container
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Y,
-                                Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                Width = 1f,
-                                Rotation = -rotation,
-                                Alpha = 0.3f,
-                            },
-                            new Box
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Y,
-                                Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                Width = 1f,
-                                Rotation = rotation
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(1),
+                                Child = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Y,
+                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
+                                            Width = 1f,
+                                            Rotation = -rotation,
+                                            Alpha = 0.3f,
+                                        },
+                                        new Box
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Y,
+                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
+                                            Width = 1f,
+                                            Rotation = rotation
+                                        },
+                                    }
+                                },
                             },
                             new Box
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Width = 10,
-                                Height = 2f,
+                                Height = 2,
                             },
                             new Box
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                Y = -1,
-                                Width = 2f,
+                                Width = 2,
                                 Height = 10,
                             }
                         }
