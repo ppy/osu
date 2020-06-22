@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score) => new[]
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
             new StatisticRow
             {
@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu
                         RelativeSizeAxes = Axes.X,
                         Height = 130
                     }),
-                    new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score)
+                    new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 130

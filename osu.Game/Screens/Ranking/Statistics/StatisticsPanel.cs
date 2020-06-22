@@ -1,14 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -21,6 +25,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
 
         protected override bool StartHidden => true;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;
@@ -71,37 +78,47 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 spinner.Show();
 
-                var rows = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(30, 15),
-                };
+                var localCancellationSource = loadCancellation = new CancellationTokenSource();
+                IBeatmap playableBeatmap = null;
 
-                foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore))
+                // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
+                Task.Run(() =>
                 {
-                    rows.Add(new GridContainer
+                    playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.Beatmap).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods ?? Array.Empty<Mod>());
+                }, loadCancellation.Token).ContinueWith(t =>
+                {
+                    var rows = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Content = new[]
+                        RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(30, 15),
+                    };
+
+                    foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
+                    {
+                        rows.Add(new GridContainer
                         {
-                            row.Columns?.Select(c => new StatisticContainer(c)).Cast<Drawable>().ToArray()
-                        },
-                        ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
-                                                     .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
-                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
-                    });
-                }
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Content = new[]
+                            {
+                                row.Columns?.Select(c => new StatisticContainer(c)).Cast<Drawable>().ToArray()
+                            },
+                            ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
+                                                         .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                        });
+                    }
 
-                LoadComponentAsync(rows, d =>
-                {
-                    if (Score.Value != newScore)
-                        return;
+                    LoadComponentAsync(rows, d =>
+                    {
+                        if (Score.Value != newScore)
+                            return;
 
-                    spinner.Hide();
-                    content.Add(d);
-                }, (loadCancellation = new CancellationTokenSource()).Token);
+                        spinner.Hide();
+                        content.Add(d);
+                    }, localCancellationSource.Token);
+                }, localCancellationSource.Token);
             }
         }
 

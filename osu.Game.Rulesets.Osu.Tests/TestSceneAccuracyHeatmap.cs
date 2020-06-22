@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333"),
                 },
-                object1 = new BorderCircle
+                object2 = new BorderCircle
                 {
                     Position = new Vector2(256, 192),
                     Colour = Color4.Yellow,
                 },
-                object2 = new BorderCircle
+                object1 = new BorderCircle
                 {
                     Position = new Vector2(100, 300),
                 },
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private class TestAccuracyHeatmap : AccuracyHeatmap
         {
             public TestAccuracyHeatmap(ScoreInfo score)
-                : base(score)
+                : base(score, new TestBeatmap(new OsuRuleset().RulesetInfo))
             {
             }
 
