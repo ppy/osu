@@ -69,62 +69,46 @@ namespace osu.Game.Screens.Menu
         private class WelcomeIntroSequence : Container
         {
             private Sprite welcomeText;
+            private Container scaleContainer;
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
                 Origin = Anchor.Centre;
                 Anchor = Anchor.Centre;
+
                 Children = new Drawable[]
                 {
-                    new Container
+                    scaleContainer = new Container
                     {
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new Container
+                            new LogoVisualisation
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Children = new Drawable[]
-                                {
-                                    new LogoVisualisation
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Alpha = 0.5f,
-                                        AccentColour = Color4.DarkBlue,
-                                        Size = new Vector2(0.96f)
-                                    },
-                                    new Container
-                                    {
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new Drawable[]
-                                        {
-                                            new Circle
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Size = new Vector2(480),
-                                                Colour = Color4.Black
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Alpha = 0.5f,
+                                AccentColour = Color4.DarkBlue,
+                                Size = new Vector2(0.96f)
+                            },
+                            new Circle
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(480),
+                                Colour = Color4.Black
+                            },
+                            welcomeText = new Sprite
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Texture = textures.Get(@"Intro/Welcome/welcome_text")
+                            },
                         }
-                    },
-                    welcomeText = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.X,
-                        Scale = new Vector2(0.1f),
-                        Height = 156,
-                        Alpha = 0,
-                        Texture = textures.Get(@"Intro/Welcome/welcome_text")
                     },
                 };
             }
@@ -135,9 +119,10 @@ namespace osu.Game.Screens.Menu
 
                 using (BeginDelayedSequence(0, true))
                 {
-                    welcomeText.ResizeHeightTo(welcomeText.Height * 2, 500, Easing.In);
-                    welcomeText.FadeIn(delay_step_two);
-                    welcomeText.ScaleTo(welcomeText.Scale + new Vector2(0.1f), delay_step_two, Easing.Out).OnComplete(_ => Expire());
+                    scaleContainer.ScaleTo(0.9f).ScaleTo(1, delay_step_two).OnComplete(_ => Expire());
+                    scaleContainer.FadeInFromZero(1800);
+
+                    welcomeText.ScaleTo(new Vector2(1, 0)).ScaleTo(Vector2.One, 400, Easing.Out);
                 }
             }
         }
