@@ -78,10 +78,13 @@ namespace osu.Game.Tournament.Tests.NonVisual
         {
             using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration)))
             {
-                // Recreate the old setup that uses "tournament" as the base path.
                 string osuRoot = basePath(nameof(TestMigration));
+                string configFile = Path.Combine(osuRoot, "tournament.ini");
 
-                // Define all the paths for the old scenario
+                if (File.Exists(configFile))
+                    File.Delete(configFile);
+
+                // Recreate the old setup that uses "tournament" as the base path.
                 string oldPath = Path.Combine(osuRoot, "tournament");
                 string videosPath = Path.Combine(oldPath, "videos");
                 string modsPath = Path.Combine(oldPath, "mods");
@@ -141,7 +144,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 }
                 finally
                 {
-                    // Cleaning up after ourselves.
                     host.Storage.Delete("tournament.ini");
                     host.Storage.DeleteDirectory("tournaments");
                     host.Exit();
