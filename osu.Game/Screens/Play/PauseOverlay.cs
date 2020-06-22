@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Logging;
-
+using SharpCompress.Common;
 
 namespace osu.Game.Screens.Play
 {
@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Play
                 {
                     Looping = true,
                 });
-                pauseLoop?.VolumeTo(0.0f);
                 pauseLoop?.Play();
             }
         }
@@ -58,7 +57,7 @@ namespace osu.Game.Screens.Play
         protected override void PopOut()
         {
             base.PopOut();
-            pauseLoop?.VolumeTo(0.0f);
+            pauseLoop.VolumeTo(0.0f);
         }
 
 
