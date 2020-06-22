@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 Task.Run(() =>
                 {
                     playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.Beatmap).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods ?? Array.Empty<Mod>());
-                }, loadCancellation.Token).ContinueWith(t =>
+                }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
                 {
                     var rows = new FillFlowContainer
                     {
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         spinner.Hide();
                         content.Add(d);
                     }, localCancellationSource.Token);
-                }, localCancellationSource.Token);
+                }), localCancellationSource.Token);
             }
         }
 
