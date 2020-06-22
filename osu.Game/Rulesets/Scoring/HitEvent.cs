@@ -34,10 +34,10 @@ namespace osu.Game.Rulesets.Scoring
         public readonly HitObject LastHitObject;
 
         /// <summary>
-        /// A position offset, if available, at the time of the event.
+        /// A position, if available, at the time of the event.
         /// </summary>
         [CanBeNull]
-        public readonly Vector2? PositionOffset;
+        public readonly Vector2? Position;
 
         /// <summary>
         /// Creates a new <see cref="HitEvent"/>.
@@ -46,14 +46,14 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="HitResult"/>.</param>
         /// <param name="hitObject">The <see cref="HitObject"/> that triggered the event.</param>
         /// <param name="lastHitObject">The previous <see cref="HitObject"/>.</param>
-        /// <param name="positionOffset">A positional offset.</param>
-        public HitEvent(double timeOffset, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? positionOffset)
+        /// <param name="position">A position corresponding to the event.</param>
+        public HitEvent(double timeOffset, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
         {
             TimeOffset = timeOffset;
             Result = result;
             HitObject = hitObject;
             LastHitObject = lastHitObject;
-            PositionOffset = positionOffset;
+            Position = position;
         }
 
         /// <summary>
