@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         /// <summary>
         /// Number of rows/columns of points.
-        /// 4px per point @ 128x128 size (the contents of the <see cref="AccuracyHeatmap"/> are always square). 1024 total points.
+        /// ~4px per point @ 128x128 size (the contents of the <see cref="AccuracyHeatmap"/> are always square). 1089 total points.
         /// </summary>
-        private const int points_per_dimension = 32;
+        private const int points_per_dimension = 33;
 
         private const float rotation = 45;
 
