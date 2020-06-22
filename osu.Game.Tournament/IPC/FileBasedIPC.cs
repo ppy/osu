@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
@@ -187,32 +186,13 @@ namespace osu.Game.Tournament.IPC
         [CanBeNull]
         private string findStablePath()
         {
-            string stableInstallPath = string.Empty;
+            var stableInstallPath = findFromEnvVar() ??
+                                    findFromRegistry() ??
+                                    findFromLocalAppData() ??
+                                    findFromDotFolder();
 
-            try
-            {
-                List<Func<string>> stableFindMethods = new List<Func<string>>
-                {
-                    findFromEnvVar,
-                    findFromRegistry,
-                    findFromLocalAppData,
-                    findFromDotFolder
-                };
-
-                foreach (var r in stableFindMethods)
-                {
-                    stableInstallPath = r.Invoke();
-
-                    if (stableInstallPath != null)
-                        return stableInstallPath;
-                }
-
-                return null;
-            }
-            finally
-            {
-                Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
-            }
+            Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
+            return stableInstallPath;
         }
 
         private string findFromEnvVar()
