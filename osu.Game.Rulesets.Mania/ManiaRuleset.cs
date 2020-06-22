@@ -320,7 +320,7 @@ namespace osu.Game.Rulesets.Mania
                     new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents)
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 130
+                        Height = 250
                     }),
                 }
             }

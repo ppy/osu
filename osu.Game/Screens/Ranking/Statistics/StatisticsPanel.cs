@@ -98,11 +98,17 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         rows.Add(new GridContainer
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Content = new[]
                             {
-                                row.Columns?.Select(c => new StatisticContainer(c)).Cast<Drawable>().ToArray()
+                                row.Columns?.Select(c => new StatisticContainer(c)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                }).Cast<Drawable>().ToArray()
                             },
                             ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
                                                          .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),

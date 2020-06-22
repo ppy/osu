@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Taiko
                     new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is Hit).ToList())
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 130
+                        Height = 250
                     }),
                 }
             }
