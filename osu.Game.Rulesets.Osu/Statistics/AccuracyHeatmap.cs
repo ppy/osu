@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -175,25 +174,10 @@ namespace osu.Game.Rulesets.Osu.Statistics
             Vector2 localPoint = localCentre + localRadius * new Vector2((float)Math.Cos(localAngle), (float)Math.Sin(localAngle));
 
             // Find the most relevant hit point.
-            double minDist = double.PositiveInfinity;
-            HitPoint point = null;
+            int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
+            int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
 
-            for (int r = 0; r < points_per_dimension; r++)
-            {
-                for (int c = 0; c < points_per_dimension; c++)
-                {
-                    float dist = Vector2.Distance(new Vector2(c, r), localPoint);
-
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        point = (HitPoint)pointGrid.Content[r][c];
-                    }
-                }
-            }
-
-            Debug.Assert(point != null);
-            point.Increment();
+            ((HitPoint)pointGrid.Content[r][c]).Increment();
         }
 
         private class HitPoint : Circle
