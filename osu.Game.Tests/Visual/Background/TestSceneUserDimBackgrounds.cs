@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -27,6 +28,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
@@ -186,9 +188,15 @@ namespace osu.Game.Tests.Visual.Background
         public void TestTransition()
         {
             performFullSetup();
+
             FadeAccessibleResults results = null;
-            AddStep("Transition to Results", () => player.Push(results =
-                new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
+
+            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
+            {
+                User = new User { Username = "osu!" },
+                Beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+            })));
+
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
             AddUntilStep("Screen is undimmed, original background retained", () =>
                 songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());

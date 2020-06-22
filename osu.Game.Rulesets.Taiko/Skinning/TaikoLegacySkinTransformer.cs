@@ -6,23 +6,20 @@ using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning
 {
-    public class TaikoLegacySkinTransformer : ISkin
+    public class TaikoLegacySkinTransformer : LegacySkinTransformer
     {
-        private readonly ISkinSource source;
-
         public TaikoLegacySkinTransformer(ISkinSource source)
+            : base(source)
         {
-            this.source = source;
         }
 
-        public Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             if (!(component is TaikoSkinComponent taikoComponent))
                 return null;
@@ -100,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning
                     return null;
             }
 
-            return source.GetDrawableComponent(component);
+            return Source.GetDrawableComponent(component);
         }
 
         private string getHitName(TaikoSkinComponents component)
@@ -120,11 +117,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning
             throw new ArgumentOutOfRangeException(nameof(component), "Invalid result type");
         }
 
-        public Texture GetTexture(string componentName) => source.GetTexture(componentName);
+        public override SampleChannel GetSample(ISampleInfo sampleInfo) => Source.GetSample(new LegacyTaikoSampleInfo(sampleInfo));
 
-        public SampleChannel GetSample(ISampleInfo sampleInfo) => source.GetSample(new LegacyTaikoSampleInfo(sampleInfo));
-
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source.GetConfig<TLookup, TValue>(lookup);
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Source.GetConfig<TLookup, TValue>(lookup);
 
         private class LegacyTaikoSampleInfo : ISampleInfo
         {

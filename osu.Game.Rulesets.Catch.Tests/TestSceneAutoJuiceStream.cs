@@ -12,13 +12,8 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneAutoJuiceStream : PlayerTestScene
+    public class TestSceneAutoJuiceStream : TestSceneCatchPlayer
     {
-        public TestSceneAutoJuiceStream()
-            : base(new CatchRuleset())
-        {
-        }
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
