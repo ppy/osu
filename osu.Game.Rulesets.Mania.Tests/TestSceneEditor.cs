@@ -15,8 +15,9 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         private readonly Bindable<ManiaScrollingDirection> direction = new Bindable<ManiaScrollingDirection>();
 
+        protected override Ruleset CreateEditorRuleset() => new ManiaRuleset();
+
         public TestSceneEditor()
-            : base(new ManiaRuleset())
         {
             AddStep("upwards scroll", () => direction.Value = ManiaScrollingDirection.Up);
             AddStep("downwards scroll", () => direction.Value = ManiaScrollingDirection.Down);
