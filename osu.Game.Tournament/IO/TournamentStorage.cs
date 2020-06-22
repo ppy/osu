@@ -52,9 +52,6 @@ namespace osu.Game.Tournament.IO
             var destination = new DirectoryInfo(GetFullPath(default_tournament));
             var cfgDestination = new DirectoryInfo(GetFullPath(default_tournament + Path.DirectorySeparatorChar + config_directory));
 
-            // if (!destination.Exists)
-            //     destination.Create();
-
             if (source.Exists)
             {
                 Logger.Log("Migrating tournament assets to default tournament storage.");

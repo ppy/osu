@@ -53,7 +53,7 @@ namespace osu.Game.IO
         {
             // based off example code https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo
             if (!destination.Exists)
-            Directory.CreateDirectory(destination.FullName);
+                Directory.CreateDirectory(destination.FullName);
 
             foreach (System.IO.FileInfo fi in source.GetFiles())
             {

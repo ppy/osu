@@ -55,8 +55,6 @@ namespace osu.Game.IO
             {
                 if (destination.GetFiles().Length > 0 || destination.GetDirectories().Length > 0)
                     throw new ArgumentException("Destination provided already has files or directories present", nameof(newLocation));
-
-                deleteRecursive(destination);
             }
 
             copyRecursive(source, destination);
