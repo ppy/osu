@@ -153,10 +153,10 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle))
             {
-                if (e.LastHitObject == null || e.PositionOffset == null)
+                if (e.LastHitObject == null || e.Position == null)
                     continue;
 
-                AddPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.PositionOffset.Value, radius);
+                AddPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.Position.Value, radius);
             }
         }
 
