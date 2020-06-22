@@ -58,7 +58,11 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return;
 
             int[] bins = new int[total_timing_distribution_bins];
+
             double binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
+
+            // Prevent div-by-0 by enforcing a minimum bin size
+            binSize = Math.Max(1, binSize);
 
             foreach (var e in hitEvents)
             {

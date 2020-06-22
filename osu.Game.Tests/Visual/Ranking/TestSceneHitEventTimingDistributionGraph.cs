@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -15,7 +17,25 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
-        public TestSceneHitEventTimingDistributionGraph()
+        [Test]
+        public void TestManyDistributedEvents()
+        {
+            createTest(CreateDistributedHitEvents());
+        }
+
+        [Test]
+        public void TestZeroTimeOffset()
+        {
+            createTest(Enumerable.Range(0, 100).Select(_ => new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
+        }
+
+        [Test]
+        public void TestNoEvents()
+        {
+            createTest(new List<HitEvent>());
+        }
+
+        private void createTest(List<HitEvent> events) => AddStep("create test", () =>
         {
             Children = new Drawable[]
             {
@@ -24,14 +44,14 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new HitEventTimingDistributionGraph(CreateDistributedHitEvents())
+                new HitEventTimingDistributionGraph(events)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(400, 130)
+                    Size = new Vector2(600, 130)
                 }
             };
-        }
+        });
 
         public static List<HitEvent> CreateDistributedHitEvents()
         {
