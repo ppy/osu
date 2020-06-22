@@ -10,14 +10,13 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Storyboards;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneCompletionCancellation : PlayerTestScene
+    public class TestSceneCompletionCancellation : OsuPlayerTestScene
     {
         private Track track;
 
@@ -28,11 +27,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             (int)((Screens.Play.Player.RESULTS_DISPLAY_DELAY / TimePerAction) * 2);
 
         protected override bool AllowFail => false;
-
-        public TestSceneCompletionCancellation()
-            : base(new OsuRuleset())
-        {
-        }
 
         [SetUpSteps]
         public override void SetUpSteps()
