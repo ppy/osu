@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Menu
                         Scale = new Vector2(0.1f),
                         Height = 156,
                         Alpha = 0,
-                        Texture = textures.Get(@"Welcome/welcome_text")
+                        Texture = textures.Get(@"Intro/Welcome/welcome_text")
                     },
                 };
             }
