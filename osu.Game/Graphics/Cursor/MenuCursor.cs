@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osuTK.Input;
 using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Cursor
@@ -74,23 +73,17 @@ namespace osu.Game.Graphics.Cursor
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             // only trigger animation for main mouse buttons
-            if (e.Button <= MouseButton.Right)
-            {
-                activeCursor.Scale = new Vector2(1);
-                activeCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
+            activeCursor.Scale = new Vector2(1);
+            activeCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
 
-                activeCursor.AdditiveLayer.Alpha = 0;
-                activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
-            }
+            activeCursor.AdditiveLayer.Alpha = 0;
+            activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
 
-            if (shouldKeepRotating(e))
+            if (cursorRotate.Value && dragRotationState != DragRotationState.Rotating)
             {
                 // if cursor is already rotating don't reset its rotate origin
-                if (dragRotationState != DragRotationState.Rotating)
-                {
-                    dragRotationState = DragRotationState.DragStarted;
-                    positionMouseDown = e.MousePosition;
-                }
+                dragRotationState = DragRotationState.DragStarted;
+                positionMouseDown = e.MousePosition;
             }
 
             return base.OnMouseDown(e);
@@ -98,17 +91,16 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (!anyMainButtonPressed(e))
+            if (!e.HasAnyButtonPressed)
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 activeCursor.ScaleTo(1, 500, Easing.OutElastic);
-            }
 
-            if (!shouldKeepRotating(e))
-            {
-                if (dragRotationState == DragRotationState.Rotating)
+                if (dragRotationState != DragRotationState.NotDragging)
+                {
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
-                dragRotationState = DragRotationState.NotDragging;
+                    dragRotationState = DragRotationState.NotDragging;
+                }
             }
 
             base.OnMouseUp(e);
@@ -125,10 +117,6 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
         }
-
-        private bool shouldKeepRotating(MouseEvent e) => cursorRotate.Value && (anyMainButtonPressed(e));
-
-        private static bool anyMainButtonPressed(MouseEvent e) => e.IsPressed(MouseButton.Left) || e.IsPressed(MouseButton.Middle) || e.IsPressed(MouseButton.Right);
 
         public class Cursor : Container
         {
