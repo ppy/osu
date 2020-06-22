@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu
             {
                 Columns = new[]
                 {
-                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is HitCircle).ToList())
+                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList())
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 130
