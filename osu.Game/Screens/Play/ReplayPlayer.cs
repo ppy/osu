@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Play
             var baseScore = base.CreateScore();
 
             // Since the replay score doesn't contain statistics, we'll pass them through here.
-            // We also have to pass in the beatmap to get the post-mod-application version.
-            score.ScoreInfo.Beatmap = baseScore.Beatmap;
             score.ScoreInfo.HitEvents = baseScore.HitEvents;
 
             return score.ScoreInfo;

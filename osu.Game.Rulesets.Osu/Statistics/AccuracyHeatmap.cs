@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -35,10 +36,12 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private GridContainer pointGrid;
 
         private readonly ScoreInfo score;
+        private readonly IBeatmap playableBeatmap;
 
-        public AccuracyHeatmap(ScoreInfo score)
+        public AccuracyHeatmap(ScoreInfo score, IBeatmap playableBeatmap)
         {
             this.score = score;
+            this.playableBeatmap = playableBeatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -146,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 return;
 
             // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (score.Beatmap.BaseDifficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) / 2;
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle))
             {

@@ -214,8 +214,9 @@ namespace osu.Game.Rulesets
         /// Creates the statistics for a <see cref="ScoreInfo"/> to be displayed in the results screen.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
+        /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
         /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
         [NotNull]
-        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score) => Array.Empty<StatisticRow>();
+        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
     }
 }
