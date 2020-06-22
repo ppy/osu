@@ -30,7 +30,6 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
 using System.Linq;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
@@ -201,13 +200,19 @@ namespace osu.Game.Rulesets.Osu
                     new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList())
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 130
+                        Height = 250
                     }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
                     new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 130
-                    }, new Dimension(GridSizeMode.Absolute, 130)),
+                        Height = 250
+                    }),
                 }
             }
         };
