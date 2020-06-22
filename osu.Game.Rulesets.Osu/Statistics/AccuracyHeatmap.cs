@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private const float rotation = 45;
 
+        private BufferedContainer bufferedGrid;
         private GridContainer pointGrid;
 
         private readonly ScoreInfo score;
@@ -112,10 +113,16 @@ namespace osu.Game.Rulesets.Osu.Statistics
                             }
                         }
                     },
-                    pointGrid = new GridContainer
+                    bufferedGrid = new BufferedContainer
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                        CacheDrawnFrameBuffer = true,
+                        BackgroundColour = Color4Extensions.FromHex("#202624").Opacity(0),
+                        Child = pointGrid = new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    },
                 }
             };
 
@@ -198,6 +205,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
             int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
 
             ((HitPoint)pointGrid.Content[r][c]).Increment();
+
+            bufferedGrid.ForceRedraw();
         }
 
         private class HitPoint : Circle
