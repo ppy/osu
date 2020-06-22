@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             var rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
-            Vector2 localCentre = new Vector2(points_per_dimension) / 2;
+            Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;
             float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
             Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
 
