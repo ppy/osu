@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -21,6 +22,7 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
@@ -36,6 +38,8 @@ namespace osu.Game.Tests.Visual
         protected Bindable<IReadOnlyList<Mod>> SelectedMods;
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
+
+        private DrawableRulesetDependencies rulesetDependencies;
 
         private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
@@ -65,7 +69,13 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new OsuScreenDependencies(false, base.CreateChildDependencies(parent));
+            var baseDependencies = base.CreateChildDependencies(parent);
+
+            var providedRuleset = CreateRuleset();
+            if (providedRuleset != null)
+                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
+
+            Dependencies = new OsuScreenDependencies(false, baseDependencies);
 
             Beatmap = Dependencies.Beatmap;
             Beatmap.SetDefault();
@@ -125,6 +135,15 @@ namespace osu.Game.Tests.Visual
         [Resolved]
         protected AudioManager Audio { get; private set; }
 
+        /// <summary>
+        /// Creates the ruleset to be used for this test scene.
+        /// </summary>
+        /// <remarks>
+        /// When testing against ruleset-specific components, this method must be overriden to their corresponding ruleset.
+        /// </remarks>
+        [CanBeNull]
+        protected virtual Ruleset CreateRuleset() => null;
+
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
@@ -136,12 +155,14 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Ruleset.Value = rulesets.AvailableRulesets.First();
+            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            rulesetDependencies?.Dispose();
 
             if (Beatmap?.Value.TrackLoaded == true)
                 Beatmap.Value.Track.Stop();
