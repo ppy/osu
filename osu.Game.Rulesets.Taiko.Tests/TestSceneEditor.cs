@@ -9,9 +9,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
     [TestFixture]
     public class TestSceneEditor : EditorTestScene
     {
-        public TestSceneEditor()
-            : base(new TaikoRuleset())
-        {
-        }
+        protected override Ruleset CreateEditorRuleset() => new TaikoRuleset();
     }
 }
