@@ -331,7 +331,7 @@ namespace osu.Game.Screens.Select
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        this.FadeOut(transition_duration);
+                        this.Hide();
                         return;
                     }
 
