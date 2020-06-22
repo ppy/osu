@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Threading;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
@@ -50,10 +48,9 @@ namespace osu.Game.Tournament.IO
             if (source.Exists)
             {
                 Logger.Log("Migrating tournament assets to default tournament storage.");
-                copyRecursive(source, destination);
-                deleteRecursive(source);
+                CopyRecursive(source, destination);
+                DeleteRecursive(source);
             }
-
 
             moveFileIfExists("bracket.json", destination);
             moveFileIfExists("drawings.txt", destination);
@@ -67,7 +64,7 @@ namespace osu.Game.Tournament.IO
             {
                 Logger.Log($"Migrating {file} to default tournament storage.");
                 var fileInfo = new System.IO.FileInfo(storage.GetFullPath(file));
-                attemptOperation(() => fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true));
+                AttemptOperation(() => fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true));
                 fileInfo.Delete();
             }
         }
