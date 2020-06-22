@@ -127,6 +127,8 @@ namespace osu.Game.Screens.Play
 
         private GameplayBeatmap gameplayBeatmap;
 
+        private ScreenSuspensionHandler screenSuspension;
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -181,6 +183,7 @@ namespace osu.Game.Screens.Play
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
+            AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
             dependencies.CacheAs(gameplayBeatmap);
 
@@ -633,12 +636,16 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(IScreen next)
         {
+            screenSuspension?.Expire();
+
             fadeOut();
             base.OnSuspending(next);
         }
 
         public override bool OnExiting(IScreen next)
         {
+            screenSuspension?.Expire();
+
             if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
                 // proceed to result screen if beatmap already finished playing
