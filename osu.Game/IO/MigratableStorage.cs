@@ -10,7 +10,7 @@ using osu.Framework.Platform;
 namespace osu.Game.IO
 {
     /// <summary>
-    /// A <see cref="WrappedStorage"/> that is migratable to different locations. 
+    /// A <see cref="WrappedStorage"/> that is migratable to different locations.
     /// </summary>
     public abstract class MigratableStorage : WrappedStorage
     {
