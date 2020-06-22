@@ -14,9 +14,13 @@ namespace osu.Game.IO
     public abstract class MigratableStorage : WrappedStorage
     {
 
-        virtual protected string[] IGNORE_DIRECTORIES { get; set; } = Array.Empty<string>();
+        internal static readonly string[] IGNORE_DIRECTORIES = { "cache" };
 
-        virtual protected string[] IGNORE_FILES { get; set; } = Array.Empty<string>();
+        internal static readonly string[] IGNORE_FILES =
+        {
+            "framework.ini",
+            "storage.ini"
+        };
 
         public MigratableStorage(Storage storage, string subPath = null)
             : base(storage, subPath)
