@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 return;
             }
 
-            drawingsConfig = new DrawingsConfigManager(storage.ConfigurationStorage);
+            drawingsConfig = new DrawingsConfigManager(storage);
 
             InternalChildren = new Drawable[]
             {
