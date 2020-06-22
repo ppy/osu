@@ -236,13 +236,11 @@ namespace osu.Game.Screens.Ranking
                 scorePanelList.Detach(expandedPanel);
                 detachedPanelContainer.Add(expandedPanel);
 
-                // Move into its original location in the local container.
+                // Move into its original location in the local container first, then to the final location.
                 var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos);
-                expandedPanel.MoveTo(origLocation);
-                expandedPanel.MoveToX(origLocation.X);
-
-                // Move into the final location.
-                expandedPanel.MoveToX(StatisticsPanel.SIDE_PADDING, 150, Easing.OutQuint);
+                expandedPanel.MoveTo(origLocation)
+                             .Then()
+                             .MoveTo(new Vector2(StatisticsPanel.SIDE_PADDING, origLocation.Y), 150, Easing.OutQuint);
 
                 // Hide contracted panels.
                 foreach (var contracted in scorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
@@ -262,13 +260,11 @@ namespace osu.Game.Screens.Ranking
                 detachedPanelContainer.Remove(detachedPanel);
                 scorePanelList.Attach(detachedPanel);
 
-                // Move into its original location in the attached container.
+                // Move into its original location in the attached container first, then to the final location.
                 var origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos);
-                detachedPanel.MoveTo(origLocation);
-                detachedPanel.MoveToX(origLocation.X);
-
-                // Move into the final location.
-                detachedPanel.MoveToX(0, 150, Easing.OutQuint);
+                detachedPanel.MoveTo(origLocation)
+                             .Then()
+                             .MoveTo(new Vector2(0, origLocation.Y), 150, Easing.OutQuint);
 
                 // Show contracted panels.
                 foreach (var contracted in scorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
