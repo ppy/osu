@@ -30,7 +30,7 @@ namespace osu.Game.Tournament.IO
             }
             else
             {
-                Migrate();
+                migrate();
                 storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
                 storageConfig.Save();
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
@@ -40,7 +40,7 @@ namespace osu.Game.Tournament.IO
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
         }
 
-        internal void Migrate()
+        private void migrate()
         {
             var source = new DirectoryInfo(storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(GetFullPath(default_tournament));
