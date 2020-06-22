@@ -238,13 +238,19 @@ namespace osu.Game.Tournament.IPC
         {
             Logger.Log("Trying to find stable in registry");
 
-            string stableInstallPath;
+            try
+            {
+                string stableInstallPath;
 
-            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
-            if (ipcFileExistsInDirectory(stableInstallPath))
-                return stableInstallPath;
+                if (ipcFileExistsInDirectory(stableInstallPath))
+                    return stableInstallPath;
+            }
+            catch
+            {
+            }
 
             return null;
         }
