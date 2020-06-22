@@ -3,8 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -57,14 +55,14 @@ namespace osu.Game.IO
                     throw new ArgumentException("Destination provided already has files or directories present", nameof(newLocation));
             }
 
-            copyRecursive(source, destination);
+            CopyRecursive(source, destination);
 
             ChangeTargetStorage(host.GetStorage(newLocation));
 
             storageConfig.Set(StorageConfig.FullPath, newLocation);
             storageConfig.Save();
 
-            deleteRecursive(source);
+            DeleteRecursive(source);
         }
     }
 }

@@ -5,15 +5,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Configuration;
 
 namespace osu.Game.IO
 {
     public abstract class MigratableStorage : WrappedStorage
     {
-
         internal static readonly string[] IGNORE_DIRECTORIES = { "cache" };
 
         internal static readonly string[] IGNORE_FILES =
@@ -22,19 +19,19 @@ namespace osu.Game.IO
             "storage.ini"
         };
 
-        public MigratableStorage(Storage storage, string subPath = null)
+        protected MigratableStorage(Storage storage, string subPath = null)
             : base(storage, subPath)
         {
         }
 
-        protected void deleteRecursive(DirectoryInfo target, bool topLevelExcludes = true)
+        protected void DeleteRecursive(DirectoryInfo target, bool topLevelExcludes = true)
         {
             foreach (System.IO.FileInfo fi in target.GetFiles())
             {
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                attemptOperation(() => fi.Delete());
+                AttemptOperation(() => fi.Delete());
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
@@ -42,14 +39,14 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
                     continue;
 
-                attemptOperation(() => dir.Delete(true));
+                AttemptOperation(() => dir.Delete(true));
             }
 
             if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
-                attemptOperation(target.Delete);
+                AttemptOperation(target.Delete);
         }
 
-        protected void copyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
+        protected void CopyRecursive(DirectoryInfo source, DirectoryInfo destination, bool topLevelExcludes = true)
         {
             // based off example code https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo
             if (!destination.Exists)
@@ -60,7 +57,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
                     continue;
 
-                attemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
+                AttemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
             }
 
             foreach (DirectoryInfo dir in source.GetDirectories())
@@ -68,7 +65,7 @@ namespace osu.Game.IO
                 if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
                     continue;
 
-                copyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
+                CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
             }
         }
 
@@ -77,7 +74,7 @@ namespace osu.Game.IO
         /// </summary>
         /// <param name="action">The action to perform.</param>
         /// <param name="attempts">The number of attempts (250ms wait between each).</param>
-        protected static void attemptOperation(Action action, int attempts = 10)
+        protected static void AttemptOperation(Action action, int attempts = 10)
         {
             while (true)
             {
