@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
@@ -13,12 +14,9 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneEditorChangeStates : EditorTestScene
     {
-        public TestSceneEditorChangeStates()
-            : base(new OsuRuleset())
-        {
-        }
-
         private EditorBeatmap editorBeatmap;
+
+        protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
         public override void SetUpSteps()
         {

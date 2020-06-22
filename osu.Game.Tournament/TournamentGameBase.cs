@@ -47,6 +47,8 @@ namespace osu.Game.Tournament
 
             ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
+            dependencies.CacheAs(new StableInfo(storage));
+
             dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
         }
