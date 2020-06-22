@@ -63,6 +63,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         private void populateStatistics(ValueChangedEvent<ScoreInfo> score)
         {
             loadCancellation?.Cancel();
+            loadCancellation = null;
 
             foreach (var child in content)
                 child.FadeOut(150).Expire();
@@ -131,5 +132,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
 
         protected override void PopOut() => this.FadeOut(150, Easing.OutQuint);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            loadCancellation?.Cancel();
+
+            base.Dispose(isDisposing);
+        }
     }
 }
