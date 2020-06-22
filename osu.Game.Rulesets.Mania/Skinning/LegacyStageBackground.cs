@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class LegacyStageBackground : LegacyManiaElement
+    public class LegacyStageBackground : CompositeDrawable
     {
         private Drawable leftSprite;
         private Drawable rightSprite;
@@ -22,10 +23,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            string leftImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.LeftStageImage)?.Value
+            string leftImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LeftStageImage)?.Value
                                ?? "mania-stage-left";
 
-            string rightImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.RightStageImage)?.Value
+            string rightImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.RightStageImage)?.Value
                                 ?? "mania-stage-right";
 
             InternalChildren = new[]
