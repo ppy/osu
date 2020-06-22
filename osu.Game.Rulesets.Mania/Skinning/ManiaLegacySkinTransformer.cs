@@ -3,11 +3,8 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
@@ -15,9 +12,8 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
-    public class ManiaLegacySkinTransformer : ISkin
+    public class ManiaLegacySkinTransformer : LegacySkinTransformer
     {
-        private readonly ISkin source;
         private readonly ManiaBeatmap beatmap;
 
         /// <summary>
@@ -59,23 +55,23 @@ namespace osu.Game.Rulesets.Mania.Skinning
         private Lazy<bool> hasKeyTexture;
 
         public ManiaLegacySkinTransformer(ISkinSource source, IBeatmap beatmap)
+            : base(source)
         {
-            this.source = source;
             this.beatmap = (ManiaBeatmap)beatmap;
 
-            source.SourceChanged += sourceChanged;
+            Source.SourceChanged += sourceChanged;
             sourceChanged();
         }
 
         private void sourceChanged()
         {
-            isLegacySkin = new Lazy<bool>(() => source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
-            hasKeyTexture = new Lazy<bool>(() => source.GetAnimation(
+            isLegacySkin = new Lazy<bool>(() => Source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
+            hasKeyTexture = new Lazy<bool>(() => Source.GetAnimation(
                 this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value
                 ?? "mania-key1", true, true) != null);
         }
 
-        public Drawable GetDrawableComponent(ISkinComponent component)
+        public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
@@ -133,16 +129,12 @@ namespace osu.Game.Rulesets.Mania.Skinning
             return this.GetAnimation(filename, true, true);
         }
 
-        public Texture GetTexture(string componentName) => source.GetTexture(componentName);
-
-        public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
-
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
-                return source.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
+                return Source.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
 
-            return source.GetConfig<TLookup, TValue>(lookup);
+            return Source.GetConfig<TLookup, TValue>(lookup);
         }
     }
 }
