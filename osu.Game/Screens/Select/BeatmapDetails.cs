@@ -331,7 +331,13 @@ namespace osu.Game.Screens.Select
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        this.Hide();
+                        if (Height > 0)
+                        {
+                            this.FadeOut(transition_duration);
+                            return;
+                        }
+
+                        Hide();
                         return;
                     }
 
