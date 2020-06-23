@@ -3,18 +3,12 @@
 
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NUnit.Framework.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Game.Graphics;
 using osuTK.Graphics;
-using osu.Framework.Logging;
-using SharpCompress.Common;
 
 namespace osu.Game.Screens.Play
 {
@@ -37,16 +31,17 @@ namespace osu.Game.Screens.Play
             AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
 
             var sampleChannel = audio.Samples.Get(@"Gameplay/pause-loop");
+
             if (sampleChannel != null)
             {
-                AddInternal(pauseLoop = new DrawableSample(sampleChannel)
+                pauseLoop = new DrawableSample(sampleChannel)
                 {
                     Looping = true,
-                });
+                };
+                AddInternal(pauseLoop);
                 pauseLoop?.Play();
             }
         }
-
 
         protected override void PopIn()
         {
@@ -57,9 +52,7 @@ namespace osu.Game.Screens.Play
         protected override void PopOut()
         {
             base.PopOut();
-            pauseLoop.VolumeTo(0.0f);
+            pauseLoop?.VolumeTo(0.0f);
         }
-
-
     }
 }

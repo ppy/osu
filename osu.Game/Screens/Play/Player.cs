@@ -5,13 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -80,7 +78,7 @@ namespace osu.Game.Screens.Play
         private IAPIProvider api { get; set; }
 
         private SampleChannel sampleRestart;
-        
+
         public BreakOverlay BreakOverlay;
 
         private BreakTracker breakTracker;
@@ -412,9 +410,7 @@ namespace osu.Game.Screens.Play
             if (canPause)
                 Pause();
             else
-            {
                 this.Exit();
-            }
         }
 
         /// <summary>
@@ -567,20 +563,19 @@ namespace osu.Game.Screens.Play
                 DrawableRuleset.CancelResume();
                 IsResuming = false;
             }
+
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
-          
         }
 
         public void Resume()
         {
             if (!canResume) return;
 
-
             IsResuming = true;
             PauseOverlay.Hide();
-            
+
             // breaks and time-based conditions may allow instant resume.
             if (breakTracker.IsBreakTime.Value)
                 completeResume();
@@ -671,9 +666,7 @@ namespace osu.Game.Screens.Play
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             GameplayClockContainer?.StopUsingBeatmapClock();
 
-
             fadeOut();
-
             return base.OnExiting(next);
         }
 
@@ -718,12 +711,7 @@ namespace osu.Game.Screens.Play
             Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
         }
-        
 
         #endregion
-
     }
-
-
-
 }
