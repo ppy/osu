@@ -25,7 +25,7 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Ranking
 {
     [TestFixture]
-    public class TestSceneResultsScreen : ScreenTestScene
+    public class TestSceneResultsScreen : OsuManualInputManagerTestScene
     {
         private BeatmapManager beatmaps;
 
