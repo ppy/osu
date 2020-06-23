@@ -211,6 +211,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Calculates the movement time, effective distance and other details for the movement from obj1 to obj2.
         /// </summary>
+        /// <param name="objMinus2">Object that that was three objects before current</param>
+        /// <param name="obj0">Prevprev object</param>
+        /// <param name="obj1">Previous object</param>
+        /// <param name="obj2">Current object</param>
+        /// <param name="obj3">Next object</param>
+        /// <param name="tapStrain">Current object tap strain</param>
+        /// <param name="noteDensity">Current object visual note density</param>
+        /// <param name="clockRate">Clock rate</param>
+        /// <param name="hidden">Are we calculating hidden mod?</param>
+        /// <returns>List of movements related to current object</returns>
         public static List<OsuMovement> ExtractMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
                                                         Vector<double> tapStrain, double clockRate,
                                                         bool hidden = false, double noteDensity = 0, OsuHitObject objMinus2 = null)
