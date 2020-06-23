@@ -63,7 +63,7 @@ namespace osu.Game.Tournament
                         },
                         new TourneyButton
                         {
-                            Text = "Save Changes",
+                            Text = "保存更改",
                             Width = 140,
                             Height = 50,
                             Padding = new MarginPadding
