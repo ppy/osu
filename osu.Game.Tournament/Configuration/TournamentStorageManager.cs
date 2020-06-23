@@ -14,12 +14,6 @@ namespace osu.Game.Tournament.Configuration
             : base(storage)
         {
         }
-
-        protected override void InitialiseDefaults()
-        {
-            base.InitialiseDefaults();
-            Set(StorageConfig.CurrentTournament, string.Empty);
-        }
     }
 
     public enum StorageConfig
