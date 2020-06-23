@@ -14,7 +14,7 @@ namespace osu.Game.Tournament.IO
         private readonly Storage storage;
         internal readonly TournamentVideoResourceStore VideoStore;
         private const string default_tournament = "default";
-        
+
         public TournamentStorage(Storage storage)
             : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
@@ -60,13 +60,13 @@ namespace osu.Game.Tournament.IO
 
         private void moveFileIfExists(string file, DirectoryInfo destination)
         {
-            if (storage.Exists(file))
-            {
-                Logger.Log($"Migrating {file} to default tournament storage.");
-                var fileInfo = new System.IO.FileInfo(storage.GetFullPath(file));
-                AttemptOperation(() => fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true));
-                fileInfo.Delete();
-            }
+            if (!storage.Exists(file))
+                return;
+
+            Logger.Log($"Migrating {file} to default tournament storage.");
+            var fileInfo = new System.IO.FileInfo(storage.GetFullPath(file));
+            AttemptOperation(() => fileInfo.CopyTo(Path.Combine(destination.FullName, fileInfo.Name), true));
+            fileInfo.Delete();
         }
     }
 }
