@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
             double fadeOutTime = exit_delay;
             // we also handle the exit transition.
             if (MenuVoice.Value)
-                seeya.Play();
+                seeya?.Play();
             else
                 fadeOutTime = 500;
 
