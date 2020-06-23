@@ -99,7 +99,7 @@ namespace osu.Game.Tournament.Screens
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
-                                                Text = "Select stable path",
+                                                Text = "确定",
                                                 Action = ChangePath
                                             },
                                             new TriangleButton
@@ -107,7 +107,7 @@ namespace osu.Game.Tournament.Screens
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
-                                                Text = "Auto detect",
+                                                Text = "自动检测",
                                                 Action = AutoDetect
                                             },
                                         }
@@ -136,7 +136,7 @@ namespace osu.Game.Tournament.Screens
             if (!fileBasedIpc?.SetIPCLocation(target) ?? true)
             {
                 overlay = new DialogOverlay();
-                overlay.Push(new IPCErrorDialog("This is an invalid IPC Directory", "Select a directory that contains an osu! stable cutting edge installation and make sure it has an empty ipc.txt file in it."));
+                overlay.Push(new IPCErrorDialog("无效的IPC目录", "请确保该目录下包含osu! stable的cutting-edge版本并且拥有一个空的ipc.txt"));
                 AddInternal(overlay);
                 Logger.Log("Folder is not an osu! stable CE directory");
                 return;
