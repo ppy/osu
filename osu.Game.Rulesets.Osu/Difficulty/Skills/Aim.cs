@@ -62,11 +62,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculates attributes related to aiming difficulty.
         /// </summary>
-        public static (double, double, double[], double[], double[], double, double[], double[])
-            CalculateAimAttributes(List<OsuHitObject> hitObjects,
-                                   double clockRate,
-                                   List<Vector<double>> strainHistory,
-                                   List<double> noteDensities)
+        public static AimAttributes CalculateAimAttributes(List<OsuHitObject> hitObjects,
+                                                           double clockRate,
+                                                           List<Vector<double>> strainHistory,
+                                                           List<double> noteDensities)
         {
             List<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
             List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
@@ -84,7 +83,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var (cheeseLevels, cheeseFactors) = calculateCheeseLevelsCheeseFactors(movements, fcProbTp);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTp);
 
-            return (fcProbTp, hiddenFactor, comboTps, missTps, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors);
+            return new AimAttributes
+            {
+                FcProbabilityThroughput = fcProbTp,
+                HiddenFactor = hiddenFactor,
+                ComboThroughputs = comboTps,
+                MissThroughputs = missTps,
+                MissCounts = missCounts,
+                CheeseNoteCount = cheeseNoteCount,
+                CheeseLevels = cheeseLevels,
+                CheeseFactors = cheeseFactors
+            };
         }
 
         /// <summary>
