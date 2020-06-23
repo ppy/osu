@@ -83,6 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var o in args.OldItems)
                             SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+
                         break;
                 }
             };
@@ -251,6 +252,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Deselected -= onBlueprintDeselected;
 
             SelectionBlueprints.Remove(blueprint);
+
+            if (movementBlueprint == blueprint)
+                finishSelectionMovement();
         }
 
         protected virtual void AddBlueprintFor(HitObject hitObject)
