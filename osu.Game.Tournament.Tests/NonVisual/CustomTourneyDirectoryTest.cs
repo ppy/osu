@@ -18,11 +18,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
     [TestFixture]
     public class CustomTourneyDirectoryTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-        }
-
         [Test]
         public void TestDefaultDirectory()
         {
