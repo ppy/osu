@@ -6,7 +6,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.IO
 {
-    internal class TournamentVideoResourceStore : NamespacedResourceStore<byte[]>
+    public class TournamentVideoResourceStore : NamespacedResourceStore<byte[]>
     {
         public TournamentVideoResourceStore(Storage storage)
             : base(new StorageBackedResourceStore(storage), "videos")

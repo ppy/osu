@@ -12,7 +12,7 @@ namespace osu.Game.Tournament.IO
     public class TournamentStorage : MigratableStorage
     {
         private readonly Storage storage;
-        internal readonly TournamentVideoResourceStore VideoStore;
+        public TournamentVideoResourceStore VideoStore { get; }
         private const string default_tournament = "default";
 
         public TournamentStorage(Storage storage)
