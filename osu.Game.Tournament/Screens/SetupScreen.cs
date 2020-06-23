@@ -15,6 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 
@@ -31,10 +32,16 @@ namespace osu.Game.Tournament.Screens
         private MatchIPCInfo ipc { get; set; }
 
         [Resolved]
+        private StableInfo stableInfo { get; set; }
+
+        [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private TournamentSceneManager sceneManager { get; set; }
 
         private Bindable<Size> windowSize;
 
@@ -53,6 +60,7 @@ namespace osu.Game.Tournament.Screens
             };
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
+            stableInfo.OnStableInfoSaved += () => Schedule(reload);
             reload();
         }
 
@@ -62,21 +70,16 @@ namespace osu.Game.Tournament.Screens
         private void reload()
         {
             var fileBasedIpc = ipc as FileBasedIPC;
-
             fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
                 {
                     Label = "当前的IPC源",
-                    ButtonText = "刷新",
-                    Action = () =>
-                    {
-                        fileBasedIpc?.LocateStableStorage();
-                        reload();
-                    },
-                    Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "未找到",
-                    Failing = fileBasedIpc?.Storage == null,
-                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果找不到源，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其注册为默认的osu！安装目录。"
+                    ButtonText = "更改",
+                    Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
+                    Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "未找到",
+                    Failing = fileBasedIpc?.IPCStorage == null,
+                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果没找到，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其设置为默认的osu！安装目录。"
                 },
                 new ActionableInfo
                 {

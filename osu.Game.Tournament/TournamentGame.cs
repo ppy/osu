@@ -97,7 +97,7 @@ namespace osu.Game.Tournament
                         },
                         new TournamentSpriteText
                         {
-                            Text = "Please make the window wider",
+                            Text = "窗口太窄了, 拉宽一些",
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                             Colour = Color4.White,
                             Padding = new MarginPadding(20)
