@@ -39,24 +39,27 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                welcome?.Play();
-                pianoReverb?.Play();
-
-                Scheduler.AddDelayed(() =>
-                {
-                    StartTrack();
-                    PrepareMenuLoad();
-
-                    logo.ScaleTo(1);
-                    logo.FadeIn();
-
-                    Scheduler.Add(LoadMenu);
-                }, delay_step_two);
-
                 LoadComponentAsync(new WelcomeIntroSequence
                 {
                     RelativeSizeAxes = Axes.Both
-                }, AddInternal);
+                }, intro =>
+                {
+                    AddInternal(intro);
+
+                    welcome?.Play();
+                    pianoReverb?.Play();
+
+                    Scheduler.AddDelayed(() =>
+                    {
+                        StartTrack();
+                        PrepareMenuLoad();
+
+                        logo.ScaleTo(1);
+                        logo.FadeIn();
+
+                        Scheduler.Add(LoadMenu);
+                    }, delay_step_two);
+                });
             }
         }
 
