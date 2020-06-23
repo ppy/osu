@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Containers
         private TimingControlPoint lastTimingPoint;
 
         /// <summary>
-        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, TrackAmplitudes)"/>.
+        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
         /// This allows for adding easing to animations that may be synchronised to the beat.
         /// </summary>
         protected double EarlyActivationMilliseconds;
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Containers
 
         private TimingControlPoint defaultTiming;
         private EffectControlPoint defaultEffect;
-        private TrackAmplitudes defaultAmplitudes;
+        private ChannelAmplitudes defaultAmplitudes;
 
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.Containers
                 OmitFirstBarLine = false
             };
 
-            defaultAmplitudes = new TrackAmplitudes
+            defaultAmplitudes = new ChannelAmplitudes
             {
                 FrequencyAmplitudes = new float[256],
                 LeftChannel = 0,
@@ -137,7 +137,7 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
         }
     }
