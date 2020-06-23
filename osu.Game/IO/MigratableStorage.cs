@@ -14,21 +14,21 @@ namespace osu.Game.IO
     /// </summary>
     public abstract class MigratableStorage : WrappedStorage
     {
-        internal virtual string[] IGNORE_DIRECTORIES { get; }
-        internal virtual string[] IGNORE_FILES { get; }
+        internal virtual string[] IgnoreDirectories => new string[] { };
+        internal virtual string[] IgnoreFiles => new string[] { };
 
         protected MigratableStorage(Storage storage, string subPath = null)
             : base(storage, subPath)
         {
         }
 
-        abstract public void Migrate(string newLocation);
+        public abstract void Migrate(string newLocation);
 
         protected void DeleteRecursive(DirectoryInfo target, bool topLevelExcludes = true)
         {
             foreach (System.IO.FileInfo fi in target.GetFiles())
             {
-                if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
+                if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
                     continue;
 
                 AttemptOperation(() => fi.Delete());
@@ -36,7 +36,7 @@ namespace osu.Game.IO
 
             foreach (DirectoryInfo dir in target.GetDirectories())
             {
-                if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
+                if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
                     continue;
 
                 AttemptOperation(() => dir.Delete(true));
@@ -54,7 +54,7 @@ namespace osu.Game.IO
 
             foreach (System.IO.FileInfo fi in source.GetFiles())
             {
-                if (topLevelExcludes && IGNORE_FILES.Contains(fi.Name))
+                if (topLevelExcludes && IgnoreFiles.Contains(fi.Name))
                     continue;
 
                 AttemptOperation(() => fi.CopyTo(Path.Combine(destination.FullName, fi.Name), true));
@@ -62,7 +62,7 @@ namespace osu.Game.IO
 
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
-                if (topLevelExcludes && IGNORE_DIRECTORIES.Contains(dir.Name))
+                if (topLevelExcludes && IgnoreDirectories.Contains(dir.Name))
                     continue;
 
                 CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);

@@ -14,25 +14,13 @@ namespace osu.Game.IO
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
 
-        internal override string[] IGNORE_DIRECTORIES
-        {
-            get
-            {
-                return new string[] { "cache" };
-            }
-        }
+        internal override string[] IgnoreDirectories => new[] { "cache" };
 
-        internal override string[] IGNORE_FILES
+        internal override string[] IgnoreFiles => new[]
         {
-            get
-            {
-                return new string[]
-                {
-                    "framework.ini",
-                    "storage.ini"
-                };
-            }
-        }
+            "framework.ini",
+            "storage.ini"
+        };
 
         public OsuStorage(GameHost host)
             : base(host.Storage, string.Empty)
@@ -53,7 +41,7 @@ namespace osu.Game.IO
             Logger.Storage = UnderlyingStorage.GetStorageForDirectory("logs");
         }
 
-        override public void Migrate(string newLocation)
+        public override void Migrate(string newLocation)
         {
             var source = new DirectoryInfo(GetFullPath("."));
             var destination = new DirectoryInfo(newLocation);

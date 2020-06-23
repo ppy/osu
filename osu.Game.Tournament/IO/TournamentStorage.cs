@@ -40,7 +40,7 @@ namespace osu.Game.Tournament.IO
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
         }
 
-        override public void Migrate(string newLocation)
+        public override void Migrate(string newLocation)
         {
             var source = new DirectoryInfo(storage.GetFullPath("tournament"));
             var destination = new DirectoryInfo(newLocation);
