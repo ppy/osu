@@ -14,6 +14,26 @@ namespace osu.Game.IO
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
 
+        internal override string[] IGNORE_DIRECTORIES
+        {
+            get
+            {
+                return new string[] { "cache" };
+            }
+        }
+
+        internal override string[] IGNORE_FILES
+        {
+            get
+            {
+                return new string[]
+                {
+                    "framework.ini",
+                    "storage.ini"
+                };
+            }
+        }
+
         public OsuStorage(GameHost host)
             : base(host.Storage, string.Empty)
         {

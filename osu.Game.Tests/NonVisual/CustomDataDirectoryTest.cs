@@ -126,6 +126,7 @@ namespace osu.Game.Tests.NonVisual
                 {
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
+                    var osuStorage = storage as OsuStorage;
 
                     // ensure we perform a save
                     host.Dependencies.Get<FrameworkConfigManager>().Save();
@@ -151,13 +152,13 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(!host.Storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
-                    foreach (var file in MigratableStorage.IGNORE_FILES)
+                    foreach (var file in osuStorage.IGNORE_FILES)
                     {
                         Assert.That(host.Storage.Exists(file), Is.True);
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
-                    foreach (var dir in MigratableStorage.IGNORE_DIRECTORIES)
+                    foreach (var dir in osuStorage.IGNORE_DIRECTORIES)
                     {
                         Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
                         Assert.That(storage.ExistsDirectory(dir), Is.False);
