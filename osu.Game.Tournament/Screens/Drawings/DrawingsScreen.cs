@@ -12,9 +12,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
-using osu.Game.Tournament.IO;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osuTK;
@@ -36,12 +36,12 @@ namespace osu.Game.Tournament.Screens.Drawings
 
         private Task writeOp;
 
-        private TournamentStorage storage;
+        private Storage storage;
 
         public ITeamList TeamList;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, TournamentStorage storage)
+        private void load(TextureStore textures, Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 

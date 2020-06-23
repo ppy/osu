@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Tournament.IO;
@@ -18,7 +19,6 @@ namespace osu.Game.Tournament.Components
         private readonly string filename;
         private readonly bool drawFallbackGradient;
         private Video video;
-
         private ManualClock manualClock;
 
         public TourneyVideo(string filename, bool drawFallbackGradient = false)
@@ -28,9 +28,10 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(TournamentStorage storage)
+        private void load(Storage storage)
         {
-            var stream = storage.VideoStore.GetStream(filename);
+            var tournamentStorage = storage as TournamentStorage;
+            var stream = tournamentStorage.VideoStore.GetStream(filename);
 
             if (stream != null)
             {
