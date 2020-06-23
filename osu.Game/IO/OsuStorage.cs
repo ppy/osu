@@ -53,7 +53,7 @@ namespace osu.Game.IO
             Logger.Storage = UnderlyingStorage.GetStorageForDirectory("logs");
         }
 
-        public void Migrate(string newLocation)
+        override public void Migrate(string newLocation)
         {
             var source = new DirectoryInfo(GetFullPath("."));
             var destination = new DirectoryInfo(newLocation);

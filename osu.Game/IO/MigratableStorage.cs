@@ -16,11 +16,13 @@ namespace osu.Game.IO
     {
         internal virtual string[] IGNORE_DIRECTORIES { get; }
         internal virtual string[] IGNORE_FILES { get; }
-        
+
         protected MigratableStorage(Storage storage, string subPath = null)
             : base(storage, subPath)
         {
         }
+
+        abstract public void Migrate(string newLocation);
 
         protected void DeleteRecursive(DirectoryInfo target, bool topLevelExcludes = true)
         {
