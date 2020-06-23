@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Both
                 }, intro =>
                 {
+                    intro.LogoVisualisation.AddAmplitudeSource(pianoReverb);
+
                     AddInternal(intro);
 
                     welcome?.Play();
@@ -74,6 +76,8 @@ namespace osu.Game.Screens.Menu
             private Sprite welcomeText;
             private Container scaleContainer;
 
+            public LogoVisualisation LogoVisualisation { get; private set; }
+
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
@@ -89,7 +93,7 @@ namespace osu.Game.Screens.Menu
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            new LogoVisualisation
+                            LogoVisualisation = new LogoVisualisation
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
