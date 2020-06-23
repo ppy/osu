@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             textureAnimation.Seek(0);
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             // assume that if the animation is playing on its own, it's independent from the beat and doesn't need to be touched.
             if (textureAnimation.FrameCount == 0 || textureAnimation.IsPlaying)
