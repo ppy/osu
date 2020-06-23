@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Placeholders;
@@ -127,6 +128,12 @@ namespace osu.Game.Screens.Ranking.Statistics
                     }, localCancellationSource.Token);
                 }), localCancellationSource.Token);
             }
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            ToggleVisibility();
+            return true;
         }
 
         protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
