@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 
@@ -98,7 +99,7 @@ namespace osu.Game.Screens.Menu
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
-        private readonly float[] temporalAmplitudes = new float[256];
+        private readonly float[] temporalAmplitudes = new float[ChannelAmplitudes.AMPLITUDES_SIZE];
 
         private void updateAmplitudes()
         {
@@ -117,7 +118,7 @@ namespace osu.Game.Screens.Menu
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {
-                float targetAmplitude = Magnitude * (temporalAmplitudes[(i + indexOffset) % bars_per_visualiser]) * (effect?.KiaiMode == true ? 1 : 0.5f);
+                float targetAmplitude = (temporalAmplitudes[(i + indexOffset) % bars_per_visualiser]) * (effect?.KiaiMode == true ? 1 : 0.5f);
                 if (targetAmplitude > frequencyAmplitudes[i])
                     frequencyAmplitudes[i] = targetAmplitude;
             }
@@ -156,7 +157,7 @@ namespace osu.Game.Screens.Menu
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes;
+            var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes.Span;
 
             for (int i = 0; i < amplitudes.Length; i++)
             {

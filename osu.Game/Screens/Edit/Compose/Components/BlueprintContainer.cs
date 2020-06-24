@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var o in args.OldItems)
                             SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+
                         break;
                 }
             };
@@ -250,6 +252,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Deselected -= onBlueprintDeselected;
 
             SelectionBlueprints.Remove(blueprint);
+
+            if (movementBlueprint == blueprint)
+                finishSelectionMovement();
         }
 
         protected virtual void AddBlueprintFor(HitObject hitObject)
@@ -320,10 +325,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             foreach (var blueprint in SelectionBlueprints)
             {
-                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint))
-                    blueprint.Select();
-                else
-                    blueprint.Deselect();
+                // only run when utmost necessary to avoid unnecessary rect computations.
+                bool isValidForSelection() => blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.ScreenSpaceSelectionPoint);
+
+                switch (blueprint.State)
+                {
+                    case SelectionState.NotSelected:
+                        if (isValidForSelection())
+                            blueprint.Select();
+                        break;
+
+                    case SelectionState.Selected:
+                        // if the editor is playing, we generally don't want to deselect objects even if outside the selection area.
+                        if (!editorClock.IsRunning && !isValidForSelection())
+                            blueprint.Deselect();
+                        break;
+                }
             }
         }
 
