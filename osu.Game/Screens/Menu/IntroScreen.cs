@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Menu
 
         private SampleChannel seeya;
 
+        protected virtual string SeeyaSampleName => "Intro/seeya";
+
         private LeasedBindable<WorkingBeatmap> beatmap;
 
         private MainMenu mainMenu;
@@ -72,7 +74,7 @@ namespace osu.Game.Screens.Menu
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            seeya = audio.Samples.Get(@"Intro/seeya");
+            seeya = audio.Samples.Get(SeeyaSampleName);
 
             BeatmapSetInfo setInfo = null;
 
