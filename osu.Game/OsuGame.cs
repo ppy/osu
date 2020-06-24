@@ -315,29 +315,13 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
-        public void SelectBeatmap(int beatmapId)
-        {
-            var map = GetBeatmapFromId(beatmapId);
-            bool findPredicate(BeatmapInfo b) => b.OnlineBeatmapID == beatmapId;
+        public void SelectBeatmap(int beatmapId) => PresentBeatmap(GetBeatmapFromId(beatmapId).BeatmapSet, b => b.OnlineBeatmapID == beatmapId);
+        
+        public void SelectBeatmapSet(int setId) => PresentBeatmap(GetBeatmapSetFromId(setId).BeatmapSet);
 
-            PresentBeatmap(map.BeatmapSet, findPredicate);
-        }
+        public BeatmapInfo GetBeatmapFromId(int beatmapId) => BeatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId);
 
-        public void SelectBeatmapSet(int setId)
-        {
-            var map = GetBeatmapSetFromId(setId);
-            PresentBeatmap(map.BeatmapSet);
-        }
-
-        public BeatmapInfo GetBeatmapFromId(int beatmapId)
-        {
-            return BeatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId);
-        }
-
-        public BeatmapInfo GetBeatmapSetFromId(int setId)
-        {
-            return BeatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineBeatmapSetID == setId);
-        }
+        public BeatmapInfo GetBeatmapSetFromId(int setId) => BeatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineBeatmapSetID == setId);
 
         public int GetBeatmapIdFromLink(LinkDetails link)
         {
