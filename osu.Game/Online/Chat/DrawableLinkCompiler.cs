@@ -26,9 +26,11 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public List<Drawable> Parts;
 
-        private OsuGame game;
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
-        private BeatmapManager beatmapManager;
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
 
         public LinkDetails Link;
 
@@ -41,7 +43,7 @@ namespace osu.Game.Online.Chat
             Parts = parts.ToList();
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, OsuGame game, BeatmapManager beatmapManager)
         {
             IdleColour = colours.Blue;
