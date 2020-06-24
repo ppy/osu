@@ -38,13 +38,13 @@ namespace osu.Game.Screens.Play
                 {
                     Looping = true,
                 });
-                pauseLoop?.Play();
             }
         }
 
         protected override void PopIn()
         {
             base.PopIn();
+            pauseLoop?.Play();
             pauseLoop?.VolumeTo(1.0f, 400, Easing.InQuint);
         }
 
@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
             pauseLoop?.VolumeTo(0.0f);
+            pauseLoop?.Stop();
         }
     }
 }
