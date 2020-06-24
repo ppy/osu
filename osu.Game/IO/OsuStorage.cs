@@ -14,9 +14,9 @@ namespace osu.Game.IO
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
 
-        internal override string[] IgnoreDirectories => new[] { "cache" };
+        public override string[] IgnoreDirectories => new[] { "cache" };
 
-        internal override string[] IgnoreFiles => new[]
+        public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
             "storage.ini"
