@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -27,6 +28,8 @@ namespace osu.Game.Online.Chat
 
         private OsuGame game;
 
+        private BeatmapManager beatmapManager;
+
         public LinkDetails Link;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
@@ -39,46 +42,99 @@ namespace osu.Game.Online.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuGame game)
+        private void load(OsuColour colours, OsuGame game, BeatmapManager beatmapManager)
         {
             IdleColour = colours.Blue;
             this.game = game;
+            this.beatmapManager = beatmapManager;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
+
+        private BeatmapInfo getBeatmapFromLink(LinkDetails link)
+        {
+            var id = getBeatmapIdFromLink(link);
+            if (id.Type == StoreId.IdType.Beatmap)
+                return beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == id.Id);
+            else
+                return beatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineBeatmapSetID == id.Id);
+        }
+
+        private StoreId getBeatmapIdFromLink(LinkDetails link)
+        {
+            if (link.Action == LinkAction.OpenBeatmap && link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                return new StoreId(beatmapId, StoreId.IdType.Beatmap);
+            if (link.Action == LinkAction.OpenBeatmapSet && int.TryParse(link.Argument, out int setId))
+                return new StoreId(setId, StoreId.IdType.BeatmapSet);
+            return new StoreId(0, StoreId.IdType.Beatmap);
+        }
+
+        private class StoreId
+        {
+            public int Id { get; private set; }
+            public IdType Type { get; private set; }
+            public StoreId(int Id, IdType Type)
+            {
+                this.Id = Id;
+                this.Type = Type;
+            }
+
+            public enum IdType
+            {
+                Beatmap,
+                BeatmapSet
+            }
+        }
 
         public MenuItem[] ContextMenuItems
         {
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
+                var map = getBeatmapFromLink(Link);
 
                 switch (Link.Action)
                 {
                     case LinkAction.OpenBeatmap:
-                        int beatmapId = 0;
-                        var nullableBeatmapId = game?.GetBeatmapIdFromLink(Link);
-
-                        if (nullableBeatmapId != null)
+                        items.Add(new OsuMenuItem("Go to beatmap", MenuItemType.Highlighted)
                         {
-                            OsuMenuItem goToBeatmap;
-                            beatmapId = (int)nullableBeatmapId;
-
-                            if (game?.GetBeatmapFromId(beatmapId) != null)
-                                goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => game?.SelectBeatmap(beatmapId));
-                            else
+                            Action =
                             {
-                                goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted);
-                                goToBeatmap.Action.Disabled = true;
+                                Value = () => game?.PresentBeatmap(map.BeatmapSet, b => b.OnlineBeatmapID == map.OnlineBeatmapID), // Add go to difficutly here
+                                Disabled = map == null
                             }
+                        });
 
-                            items.Add(goToBeatmap);
-                        }
+                        items.Add(new OsuMenuItem("Details", MenuItemType.Standard)
+                        {
+                            Action =
+                            {
+                                Value = () => game?.ShowBeatmap(getBeatmapIdFromLink(Link).Id)
+                            }
+                        });
 
-                        items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => game?.ShowBeatmap(beatmapId)));
                         return items.ToArray();
 
                     case LinkAction.OpenBeatmapSet:
+                        items.Add(new OsuMenuItem("Go to beatmap set", MenuItemType.Highlighted)
+                        {
+                            Action =
+                            {
+                                Value = () => game?.PresentBeatmap(map.BeatmapSet),
+                                Disabled = map == null
+                            }
+                        });
+
+                        items.Add(new OsuMenuItem("Details", MenuItemType.Standard)
+                        {
+                            Action =
+                            {
+                                Value = () => game?.ShowBeatmapSet(getBeatmapIdFromLink(Link).Id)
+                            }
+                        });
+
+
+                        /*
                         int setId = 0;
                         var nullableSetId = game?.GetBeatmapSetIdFromLink(Link);
 
@@ -99,6 +155,7 @@ namespace osu.Game.Online.Chat
                         }
 
                         items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => game?.ShowBeatmapSet(setId)));
+                        */
                         return items.ToArray();
 
                     default:

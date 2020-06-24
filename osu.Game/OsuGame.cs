@@ -234,14 +234,12 @@ namespace osu.Game
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    int beatmapId = GetBeatmapIdFromLink(link);
-                    if (beatmapId != 0)
+                    if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
                         ShowBeatmap(beatmapId);
                     break;
 
                 case LinkAction.OpenBeatmapSet:
-                    int setId = GetBeatmapSetIdFromLink(link);
-                    if (setId != 0)
+                    if (int.TryParse(link.Argument, out int setId))
                         ShowBeatmapSet(setId);
                     break;
 
@@ -298,6 +296,12 @@ namespace osu.Game
         });
 
         /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
+
+        /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
@@ -308,36 +312,6 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
-
-        /// <summary>
-        /// Show a beatmap set as an overlay.
-        /// </summary>
-        /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
-
-        public void SelectBeatmap(int beatmapId) => PresentBeatmap(GetBeatmapFromId(beatmapId).BeatmapSet, b => b.OnlineBeatmapID == beatmapId);
-
-        public void SelectBeatmapSet(int setId) => PresentBeatmap(GetBeatmapSetFromId(setId).BeatmapSet);
-
-        public BeatmapInfo GetBeatmapFromId(int beatmapId) => BeatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId);
-
-        public BeatmapInfo GetBeatmapSetFromId(int setId) => BeatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineBeatmapSetID == setId);
-
-        public int GetBeatmapIdFromLink(LinkDetails link)
-        {
-            if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
-                return beatmapId;
-
-            return 0;
-        }
-
-        public int GetBeatmapSetIdFromLink(LinkDetails link)
-        {
-            if (int.TryParse(link.Argument, out int setId))
-                return setId;
-
-            return 0;
-        }
 
         /// <summary>
         /// Present a beatmap at song select immediately.
