@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -38,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
+
+        /// <summary>
+        /// The highest count of any point currently being displayed.
+        /// </summary>
+        protected float PeakValue { get; private set; }
 
         public AccuracyHeatmap(ScoreInfo score, IBeatmap playableBeatmap)
         {
@@ -152,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                         ? HitPointType.Hit
                         : HitPointType.Miss;
 
-                    var point = new HitPoint(pointType)
+                    var point = new HitPoint(pointType, this)
                     {
                         Colour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
                     };
@@ -215,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
             int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
 
-            ((HitPoint)pointGrid.Content[r][c]).Increment();
+            PeakValue = Math.Max(PeakValue, ((HitPoint)pointGrid.Content[r][c]).Increment());
 
             bufferedGrid.ForceRedraw();
         }
@@ -223,21 +229,56 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private class HitPoint : Circle
         {
             private readonly HitPointType pointType;
+            private readonly AccuracyHeatmap heatmap;
 
-            public HitPoint(HitPointType pointType)
+            public override bool IsPresent => count > 0;
+
+            public HitPoint(HitPointType pointType, AccuracyHeatmap heatmap)
             {
                 this.pointType = pointType;
+                this.heatmap = heatmap;
 
                 RelativeSizeAxes = Axes.Both;
-                Alpha = 0;
+                Alpha = 1;
             }
 
-            public void Increment()
+            private int count;
+
+            /// <summary>
+            /// Increment the value of this point by one.
+            /// </summary>
+            /// <returns>The value after incrementing.</returns>
+            public int Increment()
             {
-                if (Alpha < 1)
-                    Alpha += 0.1f;
-                else if (pointType == HitPointType.Hit)
-                    Colour = ((Color4)Colour).Lighten(0.1f);
+                return ++count;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                // the point at which alpha is saturated and we begin to adjust colour lightness.
+                const float lighten_cutoff = 0.95f;
+
+                // the amount of lightness to attribute regardless of relative value to peak point.
+                const float non_relative_portion = 0.2f;
+
+                float amount = 0;
+
+                // give some amount of alpha regardless of relative count
+                amount += non_relative_portion * Math.Min(1, count / 10f);
+
+                // add relative portion
+                amount += (1 - non_relative_portion) * (count / heatmap.PeakValue);
+
+                // apply easing
+                amount = (float)Interpolation.ApplyEasing(Easing.OutQuint, Math.Min(1, amount));
+
+                Debug.Assert(amount <= 1);
+
+                Alpha = Math.Min(amount / lighten_cutoff, 1);
+                if (pointType == HitPointType.Hit)
+                    Colour = ((Color4)Colour).Lighten(Math.Max(0, amount - lighten_cutoff));
             }
         }
 
