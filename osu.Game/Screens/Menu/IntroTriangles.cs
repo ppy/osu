@@ -218,11 +218,11 @@ namespace osu.Game.Screens.Menu
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
 
-                        lazerLogo.TransformTo(nameof(LazerLogo.Highlight), 0.6f, logo_scale_duration * 0.4f, Easing.OutCirc).Then()
-                                 .TransformTo(nameof(LazerLogo.Highlight), 1f, logo_scale_duration * 0.4f);
+                        lazerLogo.TransformTo(nameof(LazerLogo.OutlineHighlight), 0.6f, logo_scale_duration * 0.4f, Easing.OutCirc).Then()
+                                 .TransformTo(nameof(LazerLogo.OutlineHighlight), 1f, logo_scale_duration * 0.4f);
 
-                        lazerLogo.TransformTo(nameof(LazerLogo.Animation), 0.4f, logo_scale_duration * 0.5f, Easing.OutQuart).Then()
-                                 .TransformTo(nameof(LazerLogo.Animation), 1f, logo_scale_duration * 0.4f);
+                        lazerLogo.TransformTo(nameof(LazerLogo.Outline), 0.4f, logo_scale_duration * 0.5f, Easing.OutQuart).Then()
+                                 .TransformTo(nameof(LazerLogo.Outline), 1f, logo_scale_duration * 0.4f);
 
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
@@ -265,18 +265,18 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
-                private HueAnimation highlight, animation;
+                private HueAnimation outlineHighlight, outline;
 
-                public float Highlight
+                public float OutlineHighlight
                 {
-                    get => highlight.AnimationProgress;
-                    set => highlight.AnimationProgress = value;
+                    get => outlineHighlight.AnimationProgress;
+                    set => outlineHighlight.AnimationProgress = value;
                 }
 
-                public float Animation
+                public float Outline
                 {
-                    get => animation.AnimationProgress;
-                    set => animation.AnimationProgress = value;
+                    get => outline.AnimationProgress;
+                    set => outline.AnimationProgress = value;
                 }
 
                 public LazerLogo()
@@ -291,13 +291,13 @@ namespace osu.Game.Screens.Menu
 
                     InternalChildren = new Drawable[]
                     {
-                        highlight = new HueAnimation
+                        outlineHighlight = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(lazer_logo_texture),
                             Colour = OsuColour.Gray(0.6f).Opacity(0.8f),
                         },
-                        animation = new HueAnimation
+                        outline = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(lazer_logo_texture),
