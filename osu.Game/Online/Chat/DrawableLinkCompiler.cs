@@ -66,17 +66,19 @@ namespace osu.Game.Online.Chat
                 return new StoreId(beatmapId, StoreId.IdType.Beatmap);
             if (link.Action == LinkAction.OpenBeatmapSet && int.TryParse(link.Argument, out int setId))
                 return new StoreId(setId, StoreId.IdType.BeatmapSet);
+
             return new StoreId(0, StoreId.IdType.Beatmap);
         }
 
         private class StoreId
         {
-            public int Id { get; private set; }
-            public IdType Type { get; private set; }
-            public StoreId(int Id, IdType Type)
+            public int Id { get; }
+            public IdType Type { get; }
+
+            public StoreId(int id, IdType type)
             {
-                this.Id = Id;
-                this.Type = Type;
+                Id = id;
+                Type = type;
             }
 
             public enum IdType
@@ -133,29 +135,6 @@ namespace osu.Game.Online.Chat
                             }
                         });
 
-
-                        /*
-                        int setId = 0;
-                        var nullableSetId = game?.GetBeatmapSetIdFromLink(Link);
-
-                        if (nullableSetId != null)
-                        {
-                            OsuMenuItem goToBeatmapSet;
-                            setId = (int)nullableSetId;
-
-                            if (game?.GetBeatmapSetFromId(setId) != null)
-                                goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => game?.SelectBeatmapSet(setId));
-                            else
-                            {
-                                goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted);
-                                goToBeatmapSet.Action.Disabled = true;
-                            }
-
-                            items.Add(goToBeatmapSet);
-                        }
-
-                        items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => game?.ShowBeatmapSet(setId)));
-                        */
                         return items.ToArray();
 
                     default:
