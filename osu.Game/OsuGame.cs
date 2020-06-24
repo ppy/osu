@@ -298,12 +298,6 @@ namespace osu.Game
         });
 
         /// <summary>
-        /// Show a beatmap set as an overlay.
-        /// </summary>
-        /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
-
-        /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
@@ -315,8 +309,14 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
+        /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
+
         public void SelectBeatmap(int beatmapId) => PresentBeatmap(GetBeatmapFromId(beatmapId).BeatmapSet, b => b.OnlineBeatmapID == beatmapId);
-        
+
         public void SelectBeatmapSet(int setId) => PresentBeatmap(GetBeatmapSetFromId(setId).BeatmapSet);
 
         public BeatmapInfo GetBeatmapFromId(int beatmapId) => BeatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId);
