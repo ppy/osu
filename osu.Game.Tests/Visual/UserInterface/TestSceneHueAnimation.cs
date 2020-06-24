@@ -13,13 +13,15 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneHueAnimation : OsuTestScene
     {
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             HueAnimation anim;
 
             Add(anim = new HueAnimation
             {
-                Texture = textures.Get("Intro/Triangles/logo-triangles.png"),
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                Texture = textures.Get("Intro/Triangles/logo-triangles"),
                 Colour = Colour4.White,
             });
 

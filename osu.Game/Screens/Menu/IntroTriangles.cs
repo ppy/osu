@@ -293,11 +293,13 @@ namespace osu.Game.Screens.Menu
                     {
                         highlight = new HueAnimation
                         {
+                            RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(lazer_logo_texture),
                             Colour = OsuColour.Gray(0.6f).Opacity(0.8f),
                         },
                         animation = new HueAnimation
                         {
+                            RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(lazer_logo_texture),
                             Colour = Color4.White.Opacity(0.8f),
                         },

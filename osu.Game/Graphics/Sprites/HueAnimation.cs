@@ -8,17 +8,11 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osuTK;
 
 namespace osu.Game.Graphics.Sprites
 {
     public class HueAnimation : Sprite
     {
-        public HueAnimation()
-        {
-            Size = new Vector2(960);
-        }
-
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
