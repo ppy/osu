@@ -59,9 +59,16 @@ namespace osu.Game.Online.Chat
 
                         if (Game?.GetBeatmapIdFromLink(Link) != null)
                         {
+                            OsuMenuItem goToBeatmap;
                             beatmapId = (int)Game?.GetBeatmapIdFromLink(Link);
                             if (Game?.GetBeatmapFromId(beatmapId) != null)
-                                items.Add(new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => Game?.SelectBeatmap(beatmapId)));
+                                goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => Game?.SelectBeatmap(beatmapId));
+                            else
+                            {
+                                goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted);
+                                goToBeatmap.Action.Disabled = true;
+                            }
+                            items.Add(goToBeatmap);
                         }
 
                         items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => Game?.ShowBeatmap(beatmapId)));
@@ -72,9 +79,16 @@ namespace osu.Game.Online.Chat
 
                         if (Game?.GetBeatmapSetIdFromLink(Link) != null)
                         {
+                            OsuMenuItem goToBeatmapSet;
                             setId = (int)Game?.GetBeatmapSetIdFromLink(Link);
                             if (Game?.GetBeatmapSetFromId(setId) != null)
-                                items.Add(new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => Game?.SelectBeatmapSet(setId)));
+                                goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => Game?.SelectBeatmapSet(setId));
+                            else
+                            {
+                                goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted);
+                                goToBeatmapSet.Action.Disabled = true;
+                            }
+                            items.Add(goToBeatmapSet);
                         }
 
                         items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => Game?.ShowBeatmapSet(setId)));
