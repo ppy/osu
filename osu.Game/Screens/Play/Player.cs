@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Play
 
         public bool LoadedBeatmapSuccessfully => DrawableRuleset?.Objects.Any() == true;
 
-        protected GameplayClockContainer GameplayClockContainer { get; private set; }
+        public GameplayClockContainer GameplayClockContainer { get; private set; }
 
         public DimmableStoryboard DimmableStoryboard { get; private set; }
 
