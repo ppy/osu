@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Sprites
 
         private class HueAnimationDrawNode : SpriteDrawNode
         {
-            protected new HueAnimation Source => (HueAnimation)base.Source;
+            private HueAnimation source => (HueAnimation)base.Source;
 
             private float progress;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Sprites
             {
                 base.ApplyState();
 
-                progress = Source.animationProgress;
+                progress = source.animationProgress;
             }
 
             protected override void Blit(Action<TexturedVertex2D> vertexAction)
