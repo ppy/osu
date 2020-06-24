@@ -1,10 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -15,12 +18,16 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// An invisible drawable that brings multiple <see cref="Drawable"/> pieces together to form a consumable clickable link.
     /// </summary>
-    public class DrawableLinkCompiler : OsuHoverContainer
+    public class DrawableLinkCompiler : OsuHoverContainer, IHasContextMenu
     {
         /// <summary>
         /// Each word part of a chat link (split for word-wrap support).
         /// </summary>
         public List<Drawable> Parts;
+
+        public OsuGame Game;
+
+        public LinkDetails Link;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
@@ -38,6 +45,34 @@ namespace osu.Game.Online.Chat
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                switch (Link.Action)
+                {
+                    case LinkAction.OpenBeatmap:
+                        int beatmapId = (int)Game?.GetBeatmapIdFromLink(Link);
+                        if (Game?.GetBeatmapFromId(beatmapId) != null)
+                            items.Add(new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => Game?.SelectBeatmap(beatmapId)));
+                        items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => Game?.ShowBeatmap(beatmapId)));
+                        return items.ToArray();
+
+                    case LinkAction.OpenBeatmapSet:
+                        int setId = (int)Game?.GetBeatmapSetIdFromLink(Link);
+                        if (Game?.GetBeatmapSetFromId(setId) != null)
+                            items.Add(new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => Game?.SelectBeatmapSet(setId)));
+                        items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => Game?.ShowBeatmapSet(setId)));
+                        return items.ToArray();
+
+                    default:
+                        return Array.Empty<MenuItem>();
+                }
+            }
+        }
 
         private class LinkHoverSounds : HoverClickSounds
         {

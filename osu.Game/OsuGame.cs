@@ -234,12 +234,14 @@ namespace osu.Game
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                    int beatmapId = GetBeatmapIdFromLink(link);
+                    if (beatmapId != 0)
                         ShowBeatmap(beatmapId);
-                    break;
+                    return;
 
                 case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(link.Argument, out int setId))
+                    int setId = GetBeatmapSetIdFromLink(link);
+                    if (setId != 0)
                         ShowBeatmapSet(setId);
                     break;
 
@@ -312,6 +314,51 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
+
+        public void SelectBeatmap(int beatmapId)
+        {
+            var map = GetBeatmapFromId(beatmapId);
+            bool findPredicate(BeatmapInfo b) => b.OnlineBeatmapID == beatmapId;
+
+            PresentBeatmap(map.BeatmapSet, findPredicate);
+        }
+
+        public void SelectBeatmapSet(int setId)
+        {
+            var map = GetBeatmapSetFromId(setId);
+            PresentBeatmap(map.BeatmapSet);
+        }
+
+        public BeatmapInfo GetBeatmapFromId(int beatmapId)
+        {
+            return BeatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId);
+        }
+
+        public BeatmapInfo GetBeatmapSetFromId(int setId)
+        {
+            return BeatmapManager.QueryBeatmap(b => b.BeatmapSet.OnlineBeatmapSetID == setId);
+        }
+
+        public int GetBeatmapIdFromLink(LinkDetails link)
+        {
+            if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                return beatmapId;
+
+            return 0;
+        }
+
+        public int GetBeatmapSetIdFromLink(LinkDetails link)
+        {
+            if (int.TryParse(link.Argument, out int setId))
+                return setId;
+
+            return 0;
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+        }
 
         /// <summary>
         /// Present a beatmap at song select immediately.
