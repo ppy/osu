@@ -22,11 +22,9 @@ namespace osu.Game.Tournament.IO
 
             TournamentStorageManager storageConfig = new TournamentStorageManager(storage);
 
-            var currentTournament = storageConfig.Get<string>(StorageConfig.CurrentTournament);
-
-            if (!string.IsNullOrEmpty(currentTournament))
+            if (storage.Exists("tournament.ini"))
             {
-                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(currentTournament));
+                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
             }
             else
             {
