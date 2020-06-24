@@ -72,7 +72,6 @@ namespace osu.Game.Graphics.Containers
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText,
                 Link = link,
-                Game = game,
                 Action = () =>
                 {
                     if (action != null)
