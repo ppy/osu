@@ -10,7 +10,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Tournament.Configuration;
-using osu.Game.Tournament.IO;
 using osu.Game.Tests;
 
 namespace osu.Game.Tournament.Tests.NonVisual
@@ -26,7 +25,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 try
                 {
                     var osu = loadOsu(host);
-                    var storage = osu.Dependencies.Get<TournamentStorage>();
+                    var storage = osu.Dependencies.Get<Storage>();
                     var defaultStorage = Path.Combine(tournamentBasePath(nameof(TestDefaultDirectory)), "default");
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorage));
                 }
@@ -57,7 +56,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 {
                     var osu = loadOsu(host);
 
-                    storage = osu.Dependencies.Get<TournamentStorage>();
+                    storage = osu.Dependencies.Get<Storage>();
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(tournamentBasePath(nameof(TestCustomDirectory)), "custom")));
                 }
@@ -113,7 +112,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 {
                     var osu = loadOsu(host);
 
-                    var storage = osu.Dependencies.Get<TournamentStorage>();
+                    var storage = osu.Dependencies.Get<Storage>();
 
                     var migratedPath = Path.Combine(tournamentBasePath(nameof(TestMigration)), "default");
 
