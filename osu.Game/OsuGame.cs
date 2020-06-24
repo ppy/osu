@@ -237,7 +237,7 @@ namespace osu.Game
                     int beatmapId = GetBeatmapIdFromLink(link);
                     if (beatmapId != 0)
                         ShowBeatmap(beatmapId);
-                    return;
+                    break;
 
                 case LinkAction.OpenBeatmapSet:
                     int setId = GetBeatmapSetIdFromLink(link);
