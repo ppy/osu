@@ -31,14 +31,6 @@ namespace osu.Game.Tournament.Tests
         {
             Ladder.Ruleset.Value ??= rulesetStore.AvailableRulesets.First();
 
-            Ruleset.BindTo(Ladder.Ruleset);
-            Dependencies.CacheAs(new StableInfo(storage));
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
             TournamentMatch match = CreateSampleMatch();
 
             Ladder.Rounds.Add(match.Round.Value);
@@ -47,6 +39,9 @@ namespace osu.Game.Tournament.Tests
             Ladder.Teams.Add(match.Team2.Value);
 
             Ladder.CurrentMatch.Value = match;
+
+            Ruleset.BindTo(Ladder.Ruleset);
+            Dependencies.CacheAs(new StableInfo(storage));
         }
 
         public static TournamentMatch CreateSampleMatch() => new TournamentMatch
@@ -55,6 +50,7 @@ namespace osu.Game.Tournament.Tests
             {
                 Value = new TournamentTeam
                 {
+                    Acronym = { Value = "JPN" },
                     FlagName = { Value = "JP" },
                     FullName = { Value = "Japan" },
                     LastYearPlacing = { Value = 10 },
@@ -128,6 +124,7 @@ namespace osu.Game.Tournament.Tests
             {
                 Value = new TournamentTeam
                 {
+                    Acronym = { Value = "USA" },
                     FlagName = { Value = "US" },
                     FullName = { Value = "United States" },
                     Players =
