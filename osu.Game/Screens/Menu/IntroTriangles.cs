@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -137,7 +138,7 @@ namespace osu.Game.Screens.Menu
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Child = lazerLogo = new LazerLogo()
+                        Child = lazerLogo = new LazerLogo
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
@@ -216,7 +217,13 @@ namespace osu.Game.Screens.Menu
 
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
-                        lazerLogo.Start(logo_1, logo_scale_duration);
+
+                        lazerLogo.TransformTo(nameof(LazerLogo.Highlight), 0.6f, logo_scale_duration * 0.4f, Easing.OutCirc).Then()
+                                 .TransformTo(nameof(LazerLogo.Highlight), 1f, logo_scale_duration * 0.4f);
+
+                        lazerLogo.TransformTo(nameof(LazerLogo.Animation), 0.4f, logo_scale_duration * 0.5f, Easing.OutQuart).Then()
+                                 .TransformTo(nameof(LazerLogo.Animation), 1f, logo_scale_duration * 0.4f);
+
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
 
@@ -258,20 +265,42 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
-                private readonly Stream videoStream;
+                private HueAnimation highlight, animation;
 
-                public LazerLogo(Stream videoStream)
+                public float Highlight
                 {
-                    this.videoStream = videoStream;
+                    get => highlight.AnimationProgress;
+                    set => highlight.AnimationProgress = value;
+                }
+
+                public float Animation
+                {
+                    get => animation.AnimationProgress;
+                    set => animation.AnimationProgress = value;
+                }
+
+                public LazerLogo()
+                {
                     Size = new Vector2(960);
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(TextureStore textures)
                 {
-                    InternalChild = new Video(videoStream)
+                    const string lazer_logo_texture = @"Intro/Triangles/logo-triangles";
+
+                    InternalChildren = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        highlight = new HueAnimation
+                        {
+                            Texture = textures.Get(lazer_logo_texture),
+                            Colour = OsuColour.Gray(0.6f).Opacity(0.8f),
+                        },
+                        animation = new HueAnimation
+                        {
+                            Texture = textures.Get(lazer_logo_texture),
+                            Colour = Color4.White.Opacity(0.8f),
+                        },
                     };
                 }
             }
