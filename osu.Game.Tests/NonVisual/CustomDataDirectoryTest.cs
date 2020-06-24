@@ -152,16 +152,19 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(!host.Storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
-                    foreach (var file in osuStorage?.IgnoreFiles ?? Array.Empty<string>())
+                    if (osuStorage != null)
                     {
-                        Assert.That(host.Storage.Exists(file), Is.True);
-                        Assert.That(storage.Exists(file), Is.False);
-                    }
+                        foreach (var file in osuStorage.IgnoreFiles)
+                        {
+                            Assert.That(host.Storage.Exists(file), Is.True);
+                            Assert.That(storage.Exists(file), Is.False);
+                        }
 
-                    foreach (var dir in osuStorage?.IgnoreDirectories ?? Array.Empty<string>())
-                    {
-                        Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
-                        Assert.That(storage.ExistsDirectory(dir), Is.False);
+                        foreach (var dir in osuStorage.IgnoreDirectories)
+                        {
+                            Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
+                            Assert.That(storage.ExistsDirectory(dir), Is.False);
+                        }
                     }
 
                     Assert.That(new StreamReader(host.Storage.GetStream("storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
