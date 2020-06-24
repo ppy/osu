@@ -57,11 +57,12 @@ namespace osu.Game.Online.Chat
                 {
                     case LinkAction.OpenBeatmap:
                         int beatmapId = 0;
+                        var nullableBeatmapId = game?.GetBeatmapIdFromLink(Link);
 
-                        if (game?.GetBeatmapIdFromLink(Link) != null)
+                        if (nullableBeatmapId != null)
                         {
                             OsuMenuItem goToBeatmap;
-                            beatmapId = (int)game?.GetBeatmapIdFromLink(Link);
+                            beatmapId = (int)nullableBeatmapId;
 
                             if (game?.GetBeatmapFromId(beatmapId) != null)
                                 goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => game?.SelectBeatmap(beatmapId));
@@ -79,11 +80,12 @@ namespace osu.Game.Online.Chat
 
                     case LinkAction.OpenBeatmapSet:
                         int setId = 0;
+                        var nullableSetId = game?.GetBeatmapSetIdFromLink(Link);
 
-                        if (game?.GetBeatmapSetIdFromLink(Link) != null)
+                        if (nullableSetId != null)
                         {
                             OsuMenuItem goToBeatmapSet;
-                            setId = (int)game?.GetBeatmapSetIdFromLink(Link);
+                            setId = (int)nullableSetId;
 
                             if (game?.GetBeatmapSetFromId(setId) != null)
                                 goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => game?.SelectBeatmapSet(setId));
