@@ -34,7 +34,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods, Player player)
+        private void load(IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods)
         {
             Channel = beatmap.Value.Skin.GetSample(sampleInfo);
             if (Channel == null)
@@ -44,8 +44,6 @@ namespace osu.Game.Storyboards.Drawables
 
             foreach (var mod in mods.Value.OfType<IApplicableToSample>())
                 mod.ApplyToSample(Channel);
-
-            Channel.AddAdjustment(AdjustableProperty.Frequency, player.GameplayClockContainer.UserPlaybackRate);
         }
 
         protected override void Update()
