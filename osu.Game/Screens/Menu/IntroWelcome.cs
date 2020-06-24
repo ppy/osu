@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Screens.Backgrounds;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
@@ -23,6 +24,13 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel pianoReverb;
         protected override string SeeyaSampleName => "Intro/Welcome/seeya";
+
+        protected override BackgroundScreen CreateBackground() => background = new BackgroundScreenDefault(false)
+        {
+            Alpha = 0,
+        };
+
+        private BackgroundScreenDefault background;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -44,6 +52,8 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Both
                 }, intro =>
                 {
+                    PrepareMenuLoad();
+
                     intro.LogoVisualisation.AddAmplitudeSource(pianoReverb);
 
                     AddInternal(intro);
@@ -54,21 +64,24 @@ namespace osu.Game.Screens.Menu
                     Scheduler.AddDelayed(() =>
                     {
                         StartTrack();
-                        PrepareMenuLoad();
+
+                        const float fade_in_time = 200;
 
                         logo.ScaleTo(1);
-                        logo.FadeIn();
+                        logo.FadeIn(fade_in_time);
 
-                        Scheduler.Add(LoadMenu);
+                        background.FadeIn(fade_in_time);
+
+                        LoadMenu();
                     }, delay_step_two);
                 });
             }
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnResuming(IScreen last)
         {
-            this.FadeOut(300);
-            base.OnSuspending(next);
+            base.OnResuming(last);
+            background.FadeOut(100);
         }
 
         private class WelcomeIntroSequence : Container
