@@ -61,6 +61,7 @@ namespace osu.Game.Online.Chat
                         {
                             OsuMenuItem goToBeatmap;
                             beatmapId = (int)Game?.GetBeatmapIdFromLink(Link);
+
                             if (Game?.GetBeatmapFromId(beatmapId) != null)
                                 goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => Game?.SelectBeatmap(beatmapId));
                             else
@@ -68,6 +69,7 @@ namespace osu.Game.Online.Chat
                                 goToBeatmap = new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted);
                                 goToBeatmap.Action.Disabled = true;
                             }
+
                             items.Add(goToBeatmap);
                         }
 
@@ -81,6 +83,7 @@ namespace osu.Game.Online.Chat
                         {
                             OsuMenuItem goToBeatmapSet;
                             setId = (int)Game?.GetBeatmapSetIdFromLink(Link);
+
                             if (Game?.GetBeatmapSetFromId(setId) != null)
                                 goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => Game?.SelectBeatmapSet(setId));
                             else
@@ -88,6 +91,7 @@ namespace osu.Game.Online.Chat
                                 goToBeatmapSet = new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted);
                                 goToBeatmapSet.Action.Disabled = true;
                             }
+
                             items.Add(goToBeatmapSet);
                         }
 
