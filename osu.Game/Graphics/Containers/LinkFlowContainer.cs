@@ -67,8 +67,7 @@ namespace osu.Game.Graphics.Containers
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
-            DrawableLinkCompiler context;
-            AddInternal(context = new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
+            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText,
