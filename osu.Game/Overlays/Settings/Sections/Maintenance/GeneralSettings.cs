@@ -35,8 +35,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Text = "Import beatmaps from stable",
                     Action = () =>
                     {
-                        importBeatmapsButton.Enabled.Value = false;
-                        beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                        dialogOverlay?.Push(new ImportBeatmapsConfirmationDialog(() =>
+                        {
+                            importBeatmapsButton.Enabled.Value = false;
+                            beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                        }));
                     }
                 });
             }
