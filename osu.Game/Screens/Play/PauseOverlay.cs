@@ -34,11 +34,10 @@ namespace osu.Game.Screens.Play
 
             if (sampleChannel != null)
             {
-                pauseLoop = new DrawableSample(sampleChannel)
+                AddInternal(pauseLoop = new DrawableSample(sampleChannel)
                 {
                     Looping = true,
-                };
-                AddInternal(pauseLoop);
+                });
                 pauseLoop?.Play();
             }
         }
