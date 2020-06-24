@@ -355,11 +355,6 @@ namespace osu.Game
             return 0;
         }
 
-        protected override void LoadAsyncComplete()
-        {
-            base.LoadAsyncComplete();
-        }
-
         /// <summary>
         /// Present a beatmap at song select immediately.
         /// The user should have already requested this interactively.
