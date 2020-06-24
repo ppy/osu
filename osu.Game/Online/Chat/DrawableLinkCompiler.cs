@@ -55,16 +55,28 @@ namespace osu.Game.Online.Chat
                 switch (Link.Action)
                 {
                     case LinkAction.OpenBeatmap:
-                        int beatmapId = (int)Game?.GetBeatmapIdFromLink(Link);
-                        if (Game?.GetBeatmapFromId(beatmapId) != null)
-                            items.Add(new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => Game?.SelectBeatmap(beatmapId)));
+                        int beatmapId = 0;
+
+                        if (Game?.GetBeatmapIdFromLink(Link) != null)
+                        {
+                            beatmapId = (int)Game?.GetBeatmapIdFromLink(Link);
+                            if (Game?.GetBeatmapFromId(beatmapId) != null)
+                                items.Add(new OsuMenuItem("Go To Beatmap", MenuItemType.Highlighted, () => Game?.SelectBeatmap(beatmapId)));
+                        }
+
                         items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => Game?.ShowBeatmap(beatmapId)));
                         return items.ToArray();
 
                     case LinkAction.OpenBeatmapSet:
-                        int setId = (int)Game?.GetBeatmapSetIdFromLink(Link);
-                        if (Game?.GetBeatmapSetFromId(setId) != null)
-                            items.Add(new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => Game?.SelectBeatmapSet(setId)));
+                        int setId = 0;
+
+                        if (Game?.GetBeatmapSetIdFromLink(Link) != null)
+                        {
+                            setId = (int)Game?.GetBeatmapSetIdFromLink(Link);
+                            if (Game?.GetBeatmapSetFromId(setId) != null)
+                                items.Add(new OsuMenuItem("Go To Beatmapset", MenuItemType.Highlighted, () => Game?.SelectBeatmapSet(setId)));
+                        }
+
                         items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => Game?.ShowBeatmapSet(setId)));
                         return items.ToArray();
 
