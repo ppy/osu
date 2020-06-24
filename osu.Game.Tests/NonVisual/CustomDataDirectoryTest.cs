@@ -126,7 +126,7 @@ namespace osu.Game.Tests.NonVisual
                 {
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
-                    var osuStorage = storage as OsuStorage;
+                    var osuStorage = storage as MigratableStorage;
 
                     // ensure we perform a save
                     host.Dependencies.Get<FrameworkConfigManager>().Save();
@@ -152,19 +152,18 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(!host.Storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
-                    if (osuStorage != null)
-                    {
-                        foreach (var file in osuStorage.IgnoreFiles)
-                        {
-                            Assert.That(host.Storage.Exists(file), Is.True);
-                            Assert.That(storage.Exists(file), Is.False);
-                        }
+                    Assert.That(osuStorage, Is.Not.Null);
 
-                        foreach (var dir in osuStorage.IgnoreDirectories)
-                        {
-                            Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
-                            Assert.That(storage.ExistsDirectory(dir), Is.False);
-                        }
+                    foreach (var file in osuStorage.IgnoreFiles)
+                    {
+                        Assert.That(host.Storage.Exists(file), Is.True);
+                        Assert.That(storage.Exists(file), Is.False);
+                    }
+
+                    foreach (var dir in osuStorage.IgnoreDirectories)
+                    {
+                        Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
+                        Assert.That(storage.ExistsDirectory(dir), Is.False);
                     }
 
                     Assert.That(new StreamReader(host.Storage.GetStream("storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
