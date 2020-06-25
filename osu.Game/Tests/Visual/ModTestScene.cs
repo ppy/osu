@@ -21,19 +21,6 @@ namespace osu.Game.Tests.Visual
             AddStep("set test data", () => currentTestData = testData);
         });
 
-        public override void TearDownSteps()
-        {
-            AddUntilStep("test passed", () =>
-            {
-                if (currentTestData == null)
-                    return true;
-
-                return currentTestData.PassCondition?.Invoke() ?? false;
-            });
-
-            base.TearDownSteps();
-        }
-
         protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestData?.Beatmap ?? base.CreateBeatmap(ruleset);
 
         protected sealed override TestPlayer CreatePlayer(Ruleset ruleset)
