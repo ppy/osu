@@ -35,6 +35,18 @@ namespace osu.Game.Screens.Multi.Components
             }
         }
 
+        private bool showLine = true;
+
+        public bool ShowLine
+        {
+            get => showLine;
+            set
+            {
+                showLine = value;
+                line.Alpha = value ? 1 : 0;
+            }
+        }
+
         protected string Details
         {
             set => details.Text = value;
