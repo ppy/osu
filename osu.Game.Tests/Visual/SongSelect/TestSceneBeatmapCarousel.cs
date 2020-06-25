@@ -17,11 +17,12 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneBeatmapCarousel : OsuTestScene
+    public class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
     {
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
@@ -37,6 +38,43 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        [Test]
+        public void TestKeyRepeat()
+        {
+            loadBeatmaps();
+            advanceSelection(false);
+
+            AddStep("press down arrow", () => InputManager.PressKey(Key.Down));
+
+            BeatmapInfo selection = null;
+
+            checkSelectionIterating(true);
+
+            AddStep("press up arrow", () => InputManager.PressKey(Key.Up));
+
+            checkSelectionIterating(true);
+
+            AddStep("release down arrow", () => InputManager.ReleaseKey(Key.Down));
+
+            checkSelectionIterating(true);
+
+            AddStep("release up arrow", () => InputManager.ReleaseKey(Key.Up));
+
+            checkSelectionIterating(false);
+
+            void checkSelectionIterating(bool isIterating)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    AddStep("store selection", () => selection = carousel.SelectedBeatmap);
+                    if (isIterating)
+                        AddUntilStep("selection changed", () => carousel.SelectedBeatmap != selection);
+                    else
+                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmap == selection);
+                }
+            }
         }
 
         [Test]
