@@ -32,15 +32,16 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        public LinkDetails Link;
+        private LinkDetails link;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
         protected override HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
-        public DrawableLinkCompiler(IEnumerable<Drawable> parts)
+        public DrawableLinkCompiler(IEnumerable<Drawable> parts, LinkDetails link)
         {
             Parts = parts.ToList();
+            this.link = link;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -95,16 +96,16 @@ namespace osu.Game.Online.Chat
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
-                var map = getBeatmapFromLink(Link);
+                var map = getBeatmapFromLink(link);
 
-                switch (Link.Action)
+                switch (link.Action)
                 {
                     case LinkAction.OpenBeatmap:
                         items.Add(new OsuMenuItem("Go to beatmap", MenuItemType.Highlighted)
                         {
                             Action =
                             {
-                                Value = () => game?.PresentBeatmap(map.BeatmapSet, b => b.OnlineBeatmapID == map.OnlineBeatmapID), // Add go to difficutly here
+                                Value = () => game?.PresentBeatmap(map.BeatmapSet, b => b.OnlineBeatmapID == map.OnlineBeatmapID),
                                 Disabled = map == null
                             }
                         });
@@ -113,7 +114,7 @@ namespace osu.Game.Online.Chat
                         {
                             Action =
                             {
-                                Value = () => game?.ShowBeatmap(getBeatmapIdFromLink(Link).Id)
+                                Value = () => game?.ShowBeatmap(getBeatmapIdFromLink(link).Id)
                             }
                         });
 
@@ -133,7 +134,7 @@ namespace osu.Game.Online.Chat
                         {
                             Action =
                             {
-                                Value = () => game?.ShowBeatmapSet(getBeatmapIdFromLink(Link).Id)
+                                Value = () => game?.ShowBeatmapSet(getBeatmapIdFromLink(link).Id)
                             }
                         });
 
