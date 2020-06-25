@@ -19,6 +19,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -527,7 +528,7 @@ namespace osu.Game.Screens.Select
             endRepeatSelection();
 
             lastRepeatSource = source;
-            Scheduler.Add(repeatDelegate = new ScheduledDelegate(action, Time.Current, repeat_interval));
+            Scheduler.Add(repeatDelegate = this.BeginKeyRepeat(Scheduler, action));
         }
 
         private void endRepeatSelection(object source = null)
