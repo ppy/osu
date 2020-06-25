@@ -94,45 +94,56 @@ namespace osu.Game.Screens.Multi.Match
                                         {
                                             new Container
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Top = 65 },
-                                                Child = new GridContainer
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Margin = new MarginPadding { Top = 10 },
+                                                Child = new OverlinedParticipants(Direction.Horizontal)
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Content = new[]
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    ShowLine = false
+                                                }
+                                            }
+                                        },
+                                        new Drawable[]
+                                        {
+                                            new GridContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Content = new[]
+                                                {
+                                                    new Drawable[]
                                                     {
-                                                        new Drawable[]
+                                                        new Container
                                                         {
-                                                            new Container
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Padding = new MarginPadding { Right = 5 },
+                                                            Child = new OverlinedPlaylist(true) // Temporarily always allow selection
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
-                                                                Padding = new MarginPadding { Right = 5 },
-                                                                Child = new OverlinedPlaylist(true) // Temporarily always allow selection
-                                                                {
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                    SelectedItem = { BindTarget = SelectedItem }
-                                                                }
-                                                            },
-                                                            new Container
-                                                            {
-                                                                RelativeSizeAxes = Axes.Both,
-                                                                Padding = new MarginPadding { Horizontal = 5 },
-                                                                Child = leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
-                                                            },
-                                                            new Container
-                                                            {
-                                                                RelativeSizeAxes = Axes.Both,
-                                                                Padding = new MarginPadding { Left = 5 },
-                                                                Child = new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
+                                                                SelectedItem = { BindTarget = SelectedItem }
                                                             }
                                                         },
-                                                    }
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Padding = new MarginPadding { Horizontal = 5 },
+                                                            Child = leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
+                                                        },
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Padding = new MarginPadding { Left = 5 },
+                                                            Child = new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
+                                                        }
+                                                    },
                                                 }
                                             }
                                         }
                                     },
                                     RowDimensions = new[]
                                     {
+                                        new Dimension(GridSizeMode.AutoSize),
                                         new Dimension(GridSizeMode.AutoSize),
                                         new Dimension(),
                                     }
