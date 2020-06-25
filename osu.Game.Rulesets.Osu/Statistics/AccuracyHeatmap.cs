@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
 
+        private const float line_thickness = 2;
+
         /// <summary>
         /// The highest count of any point currently being displayed.
         /// </summary>
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(inner_portion),
                         Masking = true,
-                        BorderThickness = 2f,
+                        BorderThickness = line_thickness,
                         BorderColour = Color4.White,
                         Child = new Box
                         {
@@ -98,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                             Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Y,
                                             Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = 1f,
+                                            Width = line_thickness,
                                             Rotation = -rotation,
                                             Alpha = 0.3f,
                                         },
@@ -108,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                             Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Y,
                                             Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = 1f,
+                                            Width = line_thickness,
                                             Rotation = rotation
                                         },
                                     }
