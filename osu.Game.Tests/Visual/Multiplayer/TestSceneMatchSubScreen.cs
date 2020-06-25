@@ -59,6 +59,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestLoadSimpleMatch()
+        {
+            AddStep("set room properties", () =>
+            {
+                Room.RoomID.Value = 1;
+                Room.Name.Value = "my awesome room";
+                Room.Host.Value = new User { Id = 2, Username = "peppy" };
+                Room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                });
+            });
+        }
+
+        [Test]
         public void TestPlaylistItemSelectedOnCreate()
         {
             AddStep("set room properties", () =>

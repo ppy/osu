@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -52,8 +51,8 @@ namespace osu.Game.Screens.Multi.Match
 
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        private LeaderboardChatDisplay leaderboardChatDisplay;
         private MatchSettingsOverlay settingsOverlay;
+        private OverlinedLeaderboard leaderboard;
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
@@ -87,7 +86,10 @@ namespace osu.Game.Screens.Multi.Match
                                     RelativeSizeAxes = Axes.Both,
                                     Content = new[]
                                     {
-                                        new Drawable[] { new Components.Header() },
+                                        new Drawable[]
+                                        {
+                                            new Components.Header()
+                                        },
                                         new Drawable[]
                                         {
                                             new Container
@@ -96,12 +98,6 @@ namespace osu.Game.Screens.Multi.Match
                                                 Padding = new MarginPadding { Top = 65 },
                                                 Child = new GridContainer
                                                 {
-                                                    ColumnDimensions = new[]
-                                                    {
-                                                        new Dimension(minSize: 160),
-                                                        new Dimension(minSize: 360),
-                                                        new Dimension(minSize: 400),
-                                                    },
                                                     RelativeSizeAxes = Axes.Both,
                                                     Content = new[]
                                                     {
@@ -111,49 +107,23 @@ namespace osu.Game.Screens.Multi.Match
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Padding = new MarginPadding { Right = 5 },
-                                                                Child = new OverlinedParticipants(Direction.Vertical) { RelativeSizeAxes = Axes.Both }
-                                                            },
-                                                            new Container
-                                                            {
-                                                                RelativeSizeAxes = Axes.Both,
-                                                                Padding = new MarginPadding { Horizontal = 5 },
-                                                                Child = new GridContainer
+                                                                Child = new OverlinedPlaylist(true) // Temporarily always allow selection
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    Content = new[]
-                                                                    {
-                                                                        new Drawable[]
-                                                                        {
-                                                                            new OverlinedPlaylist(true) // Temporarily always allow selection
-                                                                            {
-                                                                                RelativeSizeAxes = Axes.Both,
-                                                                                SelectedItem = { BindTarget = SelectedItem }
-                                                                            }
-                                                                        },
-                                                                        null,
-                                                                        new Drawable[]
-                                                                        {
-                                                                            new TriangleButton
-                                                                            {
-                                                                                RelativeSizeAxes = Axes.X,
-                                                                                Text = "Show beatmap results",
-                                                                                Action = showBeatmapResults
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    RowDimensions = new[]
-                                                                    {
-                                                                        new Dimension(),
-                                                                        new Dimension(GridSizeMode.Absolute, 5),
-                                                                        new Dimension(GridSizeMode.AutoSize)
-                                                                    }
+                                                                    SelectedItem = { BindTarget = SelectedItem }
                                                                 }
                                                             },
                                                             new Container
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
+                                                                Padding = new MarginPadding { Horizontal = 5 },
+                                                                Child = leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
+                                                            },
+                                                            new Container
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
                                                                 Padding = new MarginPadding { Left = 5 },
-                                                                Child = leaderboardChatDisplay = new LeaderboardChatDisplay()
+                                                                Child = new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
                                                             }
                                                         },
                                                     }
@@ -261,7 +231,7 @@ namespace osu.Game.Screens.Multi.Match
                 case GameTypeTimeshift _:
                     multiplayer?.Push(new PlayerLoader(() => new TimeshiftPlayer(SelectedItem.Value)
                     {
-                        Exited = () => leaderboardChatDisplay.RefreshScores()
+                        Exited = () => leaderboard.RefreshScores()
                     }));
                     break;
             }
