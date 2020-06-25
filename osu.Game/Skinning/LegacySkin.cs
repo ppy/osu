@@ -271,15 +271,7 @@ namespace osu.Game.Skinning
         }
 
         private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
-        {
-            if (!source.CustomColours.TryGetValue(lookup, out var col))
-                return null;
-
-            if (col.A <= 0 || col.A >= 1)
-                col.A = 1;
-
-            return new Bindable<Color4>(col);
-        }
+            => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         private IBindable<string> getManiaImage(LegacyManiaSkinConfiguration source, string lookup)
             => source.ImageLookups.TryGetValue(lookup, out var image) ? new Bindable<string>(image) : null;
