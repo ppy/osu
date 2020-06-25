@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -118,10 +119,36 @@ namespace osu.Game.Screens.Multi.Match
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                             Padding = new MarginPadding { Right = 5 },
-                                                            Child = new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                            Child = new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
-                                                                SelectedItem = { BindTarget = SelectedItem }
+                                                                Content = new[]
+                                                                {
+                                                                    new Drawable[]
+                                                                    {
+                                                                        new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            SelectedItem = { BindTarget = SelectedItem }
+                                                                        }
+                                                                    },
+                                                                    null,
+                                                                    new Drawable[]
+                                                                    {
+                                                                        new TriangleButton
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            Text = "Show beatmap results",
+                                                                            Action = showBeatmapResults
+                                                                        }
+                                                                    }
+                                                                },
+                                                                RowDimensions = new[]
+                                                                {
+                                                                    new Dimension(),
+                                                                    new Dimension(GridSizeMode.Absolute, 5),
+                                                                    new Dimension(GridSizeMode.AutoSize)
+                                                                }
                                                             }
                                                         },
                                                         new Container
