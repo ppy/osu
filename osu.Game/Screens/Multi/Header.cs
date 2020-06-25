@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Multi
 {
     public class Header : Container
     {
-        public const float HEIGHT = 100;
+        public const float HEIGHT = 80;
 
         public Header(ScreenStack stack)
         {
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Multi
                         title = new MultiHeaderTitle
                         {
                             Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Origin = Anchor.BottomLeft,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
