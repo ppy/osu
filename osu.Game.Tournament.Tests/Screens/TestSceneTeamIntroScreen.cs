@@ -9,7 +9,7 @@ using osu.Game.Tournament.Screens.TeamIntro;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamIntroScreen : LadderTestScene
+    public class TestSceneTeamIntroScreen : TournamentTestScene
     {
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();
