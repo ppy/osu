@@ -98,9 +98,10 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
+                                            EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
                                             Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness,
+                                            Width = line_thickness / 2,
                                             Rotation = -rotation,
                                             Alpha = 0.3f,
                                         },
@@ -108,9 +109,10 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
+                                            EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
                                             Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness,
+                                            Width = line_thickness / 2, // adjust for edgesmoothness
                                             Rotation = rotation
                                         },
                                     }
@@ -121,13 +123,15 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Width = 10,
-                                Height = 2,
+                                EdgeSmoothness = new Vector2(1),
+                                Height = line_thickness / 2, // adjust for edgesmoothness
                             },
                             new Box
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                Width = 2,
+                                EdgeSmoothness = new Vector2(1),
+                                Width = line_thickness / 2, // adjust for edgesmoothness
                                 Height = 10,
                             }
                         }
