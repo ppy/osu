@@ -32,7 +32,7 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        private LinkDetails link;
+        private readonly LinkDetails link;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
