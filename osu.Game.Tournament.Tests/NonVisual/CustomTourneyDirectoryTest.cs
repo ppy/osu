@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     storage = osu.Dependencies.Get<Storage>();
 
-                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(tournamentBasePath(nameof(TestCustomDirectory)), "custom")));
+                    Assert.That(storage.GetFullPath("."), Is.EqualTo(Path.Combine(tournamentBasePath(nameof(TestCustomDirectory)), custom_tournament)));
                 }
                 finally
                 {
@@ -80,6 +80,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                 // Recreate the old setup that uses "tournament" as the base path.
                 string oldPath = Path.Combine(osuRoot, "tournament");
+                
                 string videosPath = Path.Combine(oldPath, "videos");
                 string modsPath = Path.Combine(oldPath, "mods");
                 string flagsPath = Path.Combine(oldPath, "flags");
