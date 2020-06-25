@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -64,11 +63,6 @@ namespace osu.Game.Screens.Multi
             {
                 if (screen.NewValue is IMultiplayerSubScreen multiScreen)
                     title.Screen = multiScreen;
-
-                if (breadcrumbs.Items.Any() && screen.NewValue == breadcrumbs.Items.First())
-                    breadcrumbs.FadeOut(500, Easing.OutQuint);
-                else
-                    breadcrumbs.FadeIn(500, Easing.OutQuint);
             };
 
             breadcrumbs.Current.TriggerChange();
