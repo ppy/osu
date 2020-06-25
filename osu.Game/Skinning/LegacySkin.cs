@@ -275,7 +275,7 @@ namespace osu.Game.Skinning
             if (!source.CustomColours.TryGetValue(lookup, out var col))
                 return null;
 
-            if (col.A == 0)
+            if (col.A <= 0 || col.A >= 255)
                 col.A = 1;
 
             return new Bindable<Color4>(col);
