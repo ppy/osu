@@ -84,9 +84,9 @@ namespace osu.Game.Screens.Multi.Components
                                 new OsuSpriteText
                                 {
                                     Text = title,
-                                    Font = OsuFont.GetFont(size: 14)
+                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold)
                                 },
-                                details = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                details = new OsuSpriteText { Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold) },
                             }
                         },
                     },
