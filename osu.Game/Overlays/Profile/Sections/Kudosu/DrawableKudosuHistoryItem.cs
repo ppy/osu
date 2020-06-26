@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addPostLink();
                             return;
                     }
+
                     break;
 
                 case KudosuSource.DenyKudosu:
@@ -38,6 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addPostLink();
                             return;
                     }
+
                     break;
 
                 case KudosuSource.Delete:
@@ -48,6 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addPostLink();
                             return;
                     }
+
                     break;
 
                 case KudosuSource.Restore:
@@ -58,6 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addPostLink();
                             return;
                     }
+
                     break;
 
                 case KudosuSource.Vote:
@@ -73,6 +77,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addPostLink();
                             return;
                     }
+
                     break;
 
                 case KudosuSource.Recalculate:
@@ -88,6 +93,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addPostLink();
                             return;
                     }
+
                     break;
 
                 case KudosuSource.Forum:
@@ -102,19 +108,20 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             return;
 
                         case KudosuAction.Reset:
-                            AddText($"Kudosu reset by ");
+                            AddText("Kudosu reset by ");
                             addGiverLink();
-                            AddText($" for the post ");
+                            AddText(" for the post ");
                             addPostLink();
                             return;
 
                         case KudosuAction.Revoke:
-                            AddText($"Denied kudosu by ");
+                            AddText("Denied kudosu by ");
                             addGiverLink();
-                            AddText($" for the post ");
+                            AddText(" for the post ");
                             addPostLink();
                             return;
                     }
+
                     break;
             }
 

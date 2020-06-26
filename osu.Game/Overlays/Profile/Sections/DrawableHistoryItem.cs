@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected LinkFlowContainer Content { get; private set; }
 
-        public DrawableHistoryItem(T item)
+        protected DrawableHistoryItem(T item)
         {
             Item = item;
         }
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 },
                 Content = new[]
                 {
-                    new Drawable[]
+                    new[]
                     {
                         CreateLeftContent(),
                         Content = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: FONT_SIZE))
