@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private FailingLayer layer;
 
-        private Bindable<bool> enabledHUD = new Bindable<bool>();
+        private readonly Bindable<bool> enabledHUD = new Bindable<bool>();
 
         [Resolved]
         private OsuConfigManager config { get; set; }
