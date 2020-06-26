@@ -3,13 +3,8 @@
 
 using System;
 using System.Linq;
-using Humanizer;
-using NUnit.Framework.Internal;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
@@ -39,7 +34,9 @@ namespace osu.Game.Screens.Play
             {
                 Looping = true,
             });
-
+            // PopIn is called before updating the skin, and when a sample is updated, its "playing" value is reset
+            // the sample must be played again(and if it plays when it shouldn't, the volume will be at 0)
+            pauseLoop.OnSkinChanged += () => pauseLoop.Play();
         }
 
         protected override void PopIn()
@@ -55,9 +52,9 @@ namespace osu.Game.Screens.Play
         protected override void PopOut()
         {
             base.PopOut();
-            pauseLoop?.Stop(); 
+
+            pauseLoop?.Stop();
             pauseLoop?.TransformBindableTo(pauseLoop.Volume, 0.0f);
         }
-
     }
 }
