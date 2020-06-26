@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class DrawableHistoryItem<T> : CompositeDrawable
     {
-        protected const int FONT_SIZE = 14;
+        private const int font_size = 14;
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected readonly T Item;
 
-        protected LinkFlowContainer Content { get; private set; }
+        private LinkFlowContainer linkFlow;
 
         protected DrawableHistoryItem(T item)
         {
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     new[]
                     {
                         CreateLeftContent(),
-                        Content = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: FONT_SIZE))
+                        linkFlow = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: font_size))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Profile.Sections
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Colour = ColourProvider.Foreground1,
-                            Font = OsuFont.GetFont(size: FONT_SIZE),
+                            Font = OsuFont.GetFont(size: font_size),
                         }
                     }
                 }
@@ -90,9 +90,9 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected virtual Drawable CreateLeftContent() => Empty();
 
-        private void addText(string text, Color4 colour) => Content.AddText(text, t =>
+        private void addText(string text, Color4 colour) => linkFlow.AddText(text, t =>
         {
-            t.Font = OsuFont.GetFont(size: FONT_SIZE, weight: FontWeight.SemiBold);
+            t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
             t.Colour = colour;
         });
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected void AddColoredText(string text, Color4 colour) => addText(text, colour);
 
         protected void AddLink(string title, LinkAction action, string url, FontWeight fontWeight = FontWeight.Regular)
-            => Content.AddLink(title, action, getLinkArgument(url), creationParameters: t => t.Font = getLinkFont(fontWeight));
+            => linkFlow.AddLink(title, action, getLinkArgument(url), creationParameters: t => t.Font = getLinkFont(fontWeight));
 
         protected void AddUserLink(string username, string url)
             => AddLink(username, LinkAction.OpenUserProfile, url, FontWeight.Bold);
@@ -109,6 +109,6 @@ namespace osu.Game.Overlays.Profile.Sections
         private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{API.Endpoint}{url}").Argument;
 
         private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
-            => OsuFont.GetFont(size: FONT_SIZE, weight: fontWeight, italics: true);
+            => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);
     }
 }
