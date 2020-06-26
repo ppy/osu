@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Play.HUD
             boxes.Colour = color.Red;
 
             fadePlayfieldWhenHealthLowSetting = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
-            fadePlayfieldWhenHealthLow.BindValueChanged(e => TryToFade(fade_time, Easing.OutQuint, e.NewValue), true);
-            ShowHealth.BindValueChanged(e => TryToFade(fade_time, Easing.OutQuint, e.NewValue), true);
+            fadePlayfieldWhenHealthLow.BindValueChanged(_ => updateState(), true);
+            ShowHealth.BindValueChanged(_ => updateState(), true);
         }
 
         protected override void LoadComplete()
@@ -108,26 +108,10 @@ namespace osu.Game.Screens.Play.HUD
                 fadePlayfieldWhenHealthLow.Value = false;
         }
 
-        /// <summary>
-        /// Tries to fade based on "Fade playfield when health is low" setting
-        /// </summary>
-        /// <param name="fadeDuration">Duration of the fade</param>
-        /// <param name="easing">Type of easing</param>
-        /// <param name="fadeIn">True when you want to fade in, false when you want to fade out</param>
-        public void TryToFade(float fadeDuration, Easing easing, bool fadeIn)
+        private void updateState()
         {
-            if (ShowHealth.Value)
-            {
-                if (fadeIn)
-                {
-                    if (fadePlayfieldWhenHealthLow.Value)
-                        this.FadeIn(fadeDuration, easing);
-                }
-                else
-                    this.FadeOut(fadeDuration, easing);
-            }
-            else
-                this.FadeOut(fadeDuration, easing);
+            var showLayer = fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
+            this.FadeTo(showLayer ? 1 : 0, fade_time, Easing.OutQuint);
         }
 
         protected override void Update()
