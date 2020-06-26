@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
             // start all elements hidden
             hideTargets.ForEach(d => d.Hide());
 
-            FailingLayer.HUDEnabled.BindTo(ShowHealthbar);
+            FailingLayer.ShowHealth.BindTo(ShowHealthbar);
         }
 
         public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
