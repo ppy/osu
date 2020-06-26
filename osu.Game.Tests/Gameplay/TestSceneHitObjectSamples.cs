@@ -6,6 +6,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 
@@ -167,5 +168,64 @@ namespace osu.Game.Tests.Gameplay
 
             AssertBeatmapLookup(expected_sample);
         }
+
+        /// <summary>
+        /// Tests that when a custom sample bank is used, both the normal and additional sounds will be looked up.
+        /// </summary>
+        [Test]
+        public void TestHitObjectCustomSampleBank()
+        {
+            string[] expectedSamples =
+            {
+                "normal-hitnormal2",
+                "normal-hitwhistle2"
+            };
+
+            SetupSkins(expectedSamples[0], expectedSamples[1]);
+
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample-bank.osu");
+
+            AssertBeatmapLookup(expectedSamples[0]);
+            AssertUserLookup(expectedSamples[1]);
+        }
+
+        /// <summary>
+        /// Tests that when a custom sample bank is used, but <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> is disabled,
+        /// only the additional sound will be looked up.
+        /// </summary>
+        [Test]
+        public void TestHitObjectCustomSampleBankWithoutLayered()
+        {
+            const string expected_sample = "normal-hitwhistle2";
+            const string unwanted_sample = "normal-hitnormal2";
+
+            SetupSkins(expected_sample, unwanted_sample);
+            disableLayeredHitSounds();
+
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample-bank.osu");
+
+            AssertBeatmapLookup(expected_sample);
+            AssertNoLookup(unwanted_sample);
+        }
+
+        /// <summary>
+        /// Tests that when a normal sample bank is used and <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> is disabled,
+        /// the normal sound will be looked up anyway.
+        /// </summary>
+        [Test]
+        public void TestHitObjectNormalSampleBankWithoutLayered()
+        {
+            const string expected_sample = "normal-hitnormal";
+
+            SetupSkins(expected_sample, expected_sample);
+            disableLayeredHitSounds();
+
+            CreateTestWithBeatmap("hitobject-beatmap-sample.osu");
+
+            AssertBeatmapLookup(expected_sample);
+        }
+
+        private void disableLayeredHitSounds()
+            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[GlobalSkinConfiguration.LayeredHitSounds.ToString()] = "0");
     }
 }

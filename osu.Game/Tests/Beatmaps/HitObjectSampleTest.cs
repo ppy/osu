@@ -24,6 +24,10 @@ namespace osu.Game.Tests.Beatmaps
     public abstract class HitObjectSampleTest : PlayerTestScene
     {
         protected abstract IResourceStore<byte[]> Resources { get; }
+        protected LegacySkin Skin { get; private set; }
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; }
 
         private readonly SkinInfo userSkinInfo = new SkinInfo();
 
@@ -64,6 +68,9 @@ namespace osu.Game.Tests.Beatmaps
                 {
                     using (var reader = new LineBufferedReader(Resources.GetStream($"Resources/SampleLookups/{filename}")))
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+
+                    // populate ruleset for beatmap converters that require it to be present.
+                    currentTestBeatmap.BeatmapInfo.Ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.RulesetID);
                 });
             });
         }
@@ -91,7 +98,7 @@ namespace osu.Game.Tests.Beatmaps
                 };
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
-                dependencies.SkinSource = new SkinProvidingContainer(new LegacySkin(userSkinInfo, userSkinResourceStore, Audio));
+                dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, userSkinResourceStore, Audio));
             });
         }
 
@@ -100,6 +107,9 @@ namespace osu.Game.Tests.Beatmaps
 
         protected void AssertUserLookup(string name) => AddAssert($"\"{name}\" looked up from user skin",
             () => !beatmapSkinResourceStore.PerformedLookups.Contains(name) && userSkinResourceStore.PerformedLookups.Contains(name));
+
+        protected void AssertNoLookup(string name) => AddAssert($"\"{name}\" not looked up",
+            () => !beatmapSkinResourceStore.PerformedLookups.Contains(name) && !userSkinResourceStore.PerformedLookups.Contains(name));
 
         private class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
         {
