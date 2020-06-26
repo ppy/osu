@@ -103,7 +103,12 @@ namespace osu.Game.Beatmaps.Formats
 
             try
             {
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
+                byte alpha = split.Length == 4 ? byte.Parse(split[3]) : (byte)255;
+
+                if (alpha == 0)
+                    alpha = 255;
+
+                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), alpha);
             }
             catch
             {
