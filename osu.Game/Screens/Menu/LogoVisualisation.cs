@@ -13,7 +13,11 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
 
@@ -65,6 +69,11 @@ namespace osu.Game.Screens.Menu
 
         public Color4 AccentColour { get; set; }
 
+        /// <summary>
+        /// The relative movement of bars based on input amplification. Defaults to 1.
+        /// </summary>
+        public float Magnitude { get; set; } = 1;
+
         private readonly float[] frequencyAmplitudes = new float[256];
 
         private IShader shader;
@@ -76,6 +85,13 @@ namespace osu.Game.Screens.Menu
             Blending = BlendingParameters.Additive;
         }
 
+        private readonly List<IHasAmplitudes> amplitudeSources = new List<IHasAmplitudes>();
+
+        public void AddAmplitudeSource(IHasAmplitudes amplitudeSource)
+        {
+            amplitudeSources.Add(amplitudeSource);
+        }
+
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
@@ -83,27 +99,28 @@ namespace osu.Game.Screens.Menu
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
+        private readonly float[] temporalAmplitudes = new float[ChannelAmplitudes.AMPLITUDES_SIZE];
+
         private void updateAmplitudes()
         {
-            var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
-            var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
+            var effect = beatmap.Value.BeatmapLoaded && beatmap.Value.TrackLoaded
+                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(beatmap.Value.Track.CurrentTime)
+                : null;
 
-            float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes;
+            for (int i = 0; i < temporalAmplitudes.Length; i++)
+                temporalAmplitudes[i] = 0;
+
+            if (beatmap.Value.TrackLoaded)
+                addAmplitudesFromSource(beatmap.Value.Track);
+
+            foreach (var source in amplitudeSources)
+                addAmplitudesFromSource(source);
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {
-                if (track?.IsRunning ?? false)
-                {
-                    float targetAmplitude = (temporalAmplitudes?[(i + indexOffset) % bars_per_visualiser] ?? 0) * (effect?.KiaiMode == true ? 1 : 0.5f);
-                    if (targetAmplitude > frequencyAmplitudes[i])
-                        frequencyAmplitudes[i] = targetAmplitude;
-                }
-                else
-                {
-                    int index = (i + index_change) % bars_per_visualiser;
-                    if (frequencyAmplitudes[index] > frequencyAmplitudes[i])
-                        frequencyAmplitudes[i] = frequencyAmplitudes[index];
-                }
+                float targetAmplitude = (temporalAmplitudes[(i + indexOffset) % bars_per_visualiser]) * (effect?.KiaiMode == true ? 1 : 0.5f);
+                if (targetAmplitude > frequencyAmplitudes[i])
+                    frequencyAmplitudes[i] = targetAmplitude;
             }
 
             indexOffset = (indexOffset + index_change) % bars_per_visualiser;
@@ -135,6 +152,19 @@ namespace osu.Game.Screens.Menu
         }
 
         protected override DrawNode CreateDrawNode() => new VisualisationDrawNode(this);
+
+        private void addAmplitudesFromSource([NotNull] IHasAmplitudes source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+
+            var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes.Span;
+
+            for (int i = 0; i < amplitudes.Length; i++)
+            {
+                if (i < temporalAmplitudes.Length)
+                    temporalAmplitudes[i] += amplitudes[i];
+            }
+        }
 
         private class VisualisationDrawNode : DrawNode
         {
