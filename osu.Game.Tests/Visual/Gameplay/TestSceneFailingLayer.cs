@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private FailingLayer layer;
 
-        private readonly Bindable<bool> enabledHUD = new Bindable<bool>();
+        private readonly Bindable<bool> showHealth = new Bindable<bool>();
 
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -27,10 +27,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Child = layer = new FailingLayer();
                 layer.BindHealthProcessor(new DrainingHealthProcessor(1));
-                layer.HUDEnabled.BindTo(enabledHUD);
+                layer.ShowHealth.BindTo(showHealth);
             });
 
-            AddStep("enable HUDOverlay", () => enabledHUD.Value = true);
+            AddStep("show health", () => showHealth.Value = true);
             AddStep("enable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
             AddUntilStep("layer is visible", () => layer.IsPresent);
         }
@@ -80,19 +80,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
 
-            AddStep("disable HUDOverlay", () => enabledHUD.Value = false);
+            AddStep("don't show health", () => showHealth.Value = false);
             AddStep("disable FadePlayfieldWhenHealthLow", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, false));
             AddUntilStep("layer fade is invisible", () => !layer.IsPresent);
 
-            AddStep("disable HUDOverlay", () => enabledHUD.Value = false);
+            AddStep("don't show health", () => showHealth.Value = false);
             AddStep("enable FadePlayfieldWhenHealthLow", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
             AddUntilStep("layer fade is invisible", () => !layer.IsPresent);
 
-            AddStep("enable HUDOverlay", () => enabledHUD.Value = true);
+            AddStep("show health", () => showHealth.Value = true);
             AddStep("disable FadePlayfieldWhenHealthLow", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, false));
             AddUntilStep("layer fade is invisible", () => !layer.IsPresent);
 
-            AddStep("enable HUDOverlay", () => enabledHUD.Value = true);
+            AddStep("show health", () => showHealth.Value = true);
             AddStep("enable FadePlayfieldWhenHealthLow", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
             AddUntilStep("layer fade is visible", () => layer.IsPresent);
         }
