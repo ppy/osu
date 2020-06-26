@@ -25,8 +25,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     {
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from kudosu deny repeal of modding post ");
-                            addPostLink();
-                            break;
+                            return;
                     }
 
                     break;
@@ -36,8 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     {
                         case KudosuAction.Reset:
                             addTextWithAmount("Denied ", "from modding post ");
-                            addPostLink();
-                            break;
+                            return;
                     }
 
                     break;
@@ -47,8 +45,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     {
                         case KudosuAction.Reset:
                             addTextWithAmount("Lost ", "from modding post deletion of ");
-                            addPostLink();
-                            break;
+                            return;
                     }
 
                     break;
@@ -58,8 +55,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     {
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from modding post restoration of ");
-                            addPostLink();
-                            break;
+                            return;
                     }
 
                     break;
@@ -69,13 +65,11 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     {
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from obtaining votes in modding post of ");
-                            addPostLink();
-                            break;
+                            return;
 
                         case KudosuAction.Reset:
                             addTextWithAmount("Lost ", "from losing votes in modding post of ");
-                            addPostLink();
-                            break;
+                            return;
                     }
 
                     break;
@@ -85,13 +79,11 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     {
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from votes recalculation in modding post of ");
-                            addPostLink();
-                            break;
+                            return;
 
                         case KudosuAction.Reset:
                             addTextWithAmount("Lost ", "from votes recalculation in modding post of ");
-                            addPostLink();
-                            break;
+                            return;
                     }
 
                     break;
@@ -101,46 +93,47 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            addTextWithAmount("Received ", "from ");
+                            addTextWithAmount("Received ", "from ", false);
                             addGiverLink();
                             AddText(" for a post at ");
-                            addPostLink();
-                            break;
+                            createPostLink();
+                            return;
 
                         case KudosuAction.Reset:
                             AddText("Kudosu reset by ");
                             addGiverLink();
                             AddText(" for the post ");
-                            addPostLink();
-                            break;
+                            createPostLink();
+                            return;
 
                         case KudosuAction.Revoke:
                             AddText("Denied kudosu by ");
                             addGiverLink();
                             AddText(" for the post ");
-                            addPostLink();
-                            break;
+                            createPostLink();
+                            return;
                     }
 
                     break;
-
-                default:
-                    addTextWithAmount("Unknown event (", "change) ");
-                    break;
             }
+
+            addTextWithAmount("Unknown event (", "change)", false);
         }
 
-        private void addPostLink() => AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url);
+        private void createPostLink() => AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url);
 
         private void addGiverLink() => AddUserLink(Item.Giver?.Username, Item.Giver?.Url);
 
-        private void addTextWithAmount(string prefix, string suffix)
+        private void addTextWithAmount(string prefix, string suffix, bool addPostLink = true)
         {
             string amount = $"{Math.Abs(Item.Amount)} kudosu";
 
-            AddText($"{prefix}");
+            AddText(prefix);
             AddColoredText($"{amount} ", ColourProvider.Light1);
             AddText(suffix);
+
+            if (addPostLink)
+                createPostLink();
         }
     }
 }
