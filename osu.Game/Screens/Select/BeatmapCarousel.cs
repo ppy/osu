@@ -513,8 +513,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private const double repeat_interval = 120;
-
         private ScheduledDelegate repeatDelegate;
         private object lastRepeatSource;
 
