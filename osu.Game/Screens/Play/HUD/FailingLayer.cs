@@ -75,7 +75,8 @@ namespace osu.Game.Screens.Play.HUD
             boxes.Colour = color.Red;
 
             configEnabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
-            enabled.BindValueChanged(e => TryToFade(fade_time, Easing.OutQuint, e.NewValue ? true : false), true);
+            enabled.BindValueChanged(e => TryToFade(fade_time, Easing.OutQuint, e.NewValue), true);
+            HUDEnabled.BindValueChanged(e => TryToFade(fade_time, Easing.OutQuint, e.NewValue), true);
         }
 
         protected override void LoadComplete()

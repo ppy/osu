@@ -171,13 +171,11 @@ namespace osu.Game.Screens.Play
                 if (healthBar.NewValue)
                 {
                     HealthDisplay.FadeIn(fade_duration, fade_easing);
-                    FailingLayer.TryToFade(fade_duration, fade_easing, true);
                     topScoreContainer.MoveToY(30, fade_duration, fade_easing);
                 }
                 else
                 {
                     HealthDisplay.FadeOut(fade_duration, fade_easing);
-                    FailingLayer.TryToFade(fade_duration, fade_easing, false);
                     topScoreContainer.MoveToY(0, fade_duration, fade_easing);
                 }
             }, true);
