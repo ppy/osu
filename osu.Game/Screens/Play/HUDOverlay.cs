@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Diagnostics.Runtime.Interop;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -153,6 +154,8 @@ namespace osu.Game.Screens.Play
 
             // start all elements hidden
             hideTargets.ForEach(d => d.Hide());
+
+            FailingLayer.HUDEnabled.BindTo(ShowHealthbar);
         }
 
         public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
@@ -168,11 +171,13 @@ namespace osu.Game.Screens.Play
                 if (healthBar.NewValue)
                 {
                     HealthDisplay.FadeIn(fade_duration, fade_easing);
+                    FailingLayer.TryToFade(fade_duration, fade_easing, true);
                     topScoreContainer.MoveToY(30, fade_duration, fade_easing);
                 }
                 else
                 {
                     HealthDisplay.FadeOut(fade_duration, fade_easing);
+                    FailingLayer.TryToFade(fade_duration, fade_easing, false);
                     topScoreContainer.MoveToY(0, fade_duration, fade_easing);
                 }
             }, true);
