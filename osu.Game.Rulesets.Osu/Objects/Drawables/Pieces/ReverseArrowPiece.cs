@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             };
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!drawableRepeat.IsHit)
                 Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
