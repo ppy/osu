@@ -166,8 +166,16 @@ namespace osu.Game.Screens.Multi
                 var r = listing[i];
                 r.Position.Value = i;
 
-                update(r, r);
-                addRoom(r);
+                try
+                {
+                    update(r, r);
+                    addRoom(r);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Failed to update room: {r.Name.Value}.");
+                    rooms.Remove(r);
+                }
             }
 
             RoomsUpdated?.Invoke();
