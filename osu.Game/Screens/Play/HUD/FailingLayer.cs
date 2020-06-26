@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public double LowHealthThreshold = 0.20f;
 
+        /// <summary>
+        /// Whether the current player health should be shown on screen.
+        /// </summary>
         public readonly Bindable<bool> ShowHealth = new Bindable<bool>();
 
         private readonly Bindable<bool> fadePlayfieldWhenHealthLow = new Bindable<bool>();
