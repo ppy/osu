@@ -232,6 +232,12 @@ namespace osu.Game.Tests.Visual.Online
                     Username = @"Username11",
                     Url = @"https://osu.ppy.sh/u/1234"
                 }
+            },
+            new APIKudosuHistory
+            {
+                Amount = 32,
+                CreatedAt = new DateTimeOffset(new DateTime(2019, 8, 11)),
+                Source = (KudosuSource)8
             }
         };
     }

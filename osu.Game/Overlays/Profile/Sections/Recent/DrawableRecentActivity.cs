@@ -78,78 +78,78 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 case RecentActivityType.Achievement:
                     addUserLink();
                     AddText($" unlocked the \"{Item.Achievement.Name}\" medal!");
-                    return;
+                    break;
 
                 case RecentActivityType.BeatmapPlaycount:
                     addBeatmapLink();
                     AddText($" has been played {Item.Count} times!");
-                    return;
+                    break;
 
                 case RecentActivityType.BeatmapsetApprove:
                     addBeatmapsetLink();
                     AddText($" has been {Item.Approval.ToString().ToLowerInvariant()}!");
-                    return;
+                    break;
 
                 case RecentActivityType.BeatmapsetDelete:
                     addBeatmapsetLink();
                     AddText(" has been deleted.");
-                    return;
+                    break;
 
                 case RecentActivityType.BeatmapsetRevive:
                     addBeatmapsetLink();
                     AddText(" has been revived from eternal slumber by ");
                     addUserLink();
-                    return;
+                    break;
 
                 case RecentActivityType.BeatmapsetUpdate:
                     addUserLink();
                     AddText(" has updated the beatmap ");
                     addBeatmapsetLink();
-                    return;
+                    break;
 
                 case RecentActivityType.BeatmapsetUpload:
                     addUserLink();
                     AddText(" has submitted a new beatmap ");
                     addBeatmapsetLink();
-                    return;
+                    break;
 
                 case RecentActivityType.Medal:
                     // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
-                    return;
+                    break;
 
                 case RecentActivityType.Rank:
                     addUserLink();
                     AddText($" achieved rank #{Item.Rank} on ");
                     addBeatmapLink();
                     AddText($" ({getRulesetName()})");
-                    return;
+                    break;
 
                 case RecentActivityType.RankLost:
                     addUserLink();
                     AddText(" has lost first place on ");
                     addBeatmapLink();
                     AddText($" ({getRulesetName()})");
-                    return;
+                    break;
 
                 case RecentActivityType.UserSupportAgain:
                     addUserLink();
                     AddText(" has once again chosen to support osu! - thanks for your generosity!");
-                    return;
+                    break;
 
                 case RecentActivityType.UserSupportFirst:
                     addUserLink();
                     AddText(" has become an osu!supporter - thanks for your generosity!");
-                    return;
+                    break;
 
                 case RecentActivityType.UserSupportGift:
                     addUserLink();
                     AddText(" has received the gift of osu!supporter!");
-                    return;
+                    break;
 
                 case RecentActivityType.UsernameChange:
                     AddText($"{Item.User?.PreviousUsername} has changed their username to ");
                     addUserLink();
-                    return;
+                    break;
             }
         }
 

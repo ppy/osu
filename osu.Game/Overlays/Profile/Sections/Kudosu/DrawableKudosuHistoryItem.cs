@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from kudosu deny repeal of modding post ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         case KudosuAction.Reset:
                             addTextWithAmount("Denied ", "from modding post ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         case KudosuAction.Reset:
                             addTextWithAmount("Lost ", "from modding post deletion of ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from modding post restoration of ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
@@ -70,12 +70,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from obtaining votes in modding post of ");
                             addPostLink();
-                            return;
+                            break;
 
                         case KudosuAction.Reset:
                             addTextWithAmount("Lost ", "from losing votes in modding post of ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
@@ -86,12 +86,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         case KudosuAction.Give:
                             addTextWithAmount("Received ", "from votes recalculation in modding post of ");
                             addPostLink();
-                            return;
+                            break;
 
                         case KudosuAction.Reset:
                             addTextWithAmount("Lost ", "from votes recalculation in modding post of ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
@@ -105,27 +105,29 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             addGiverLink();
                             AddText(" for a post at ");
                             addPostLink();
-                            return;
+                            break;
 
                         case KudosuAction.Reset:
                             AddText("Kudosu reset by ");
                             addGiverLink();
                             AddText(" for the post ");
                             addPostLink();
-                            return;
+                            break;
 
                         case KudosuAction.Revoke:
                             AddText("Denied kudosu by ");
                             addGiverLink();
                             AddText(" for the post ");
                             addPostLink();
-                            return;
+                            break;
                     }
 
                     break;
-            }
 
-            addTextWithAmount("Unknown event (", "change) ");
+                default:
+                    addTextWithAmount("Unknown event (", "change) ");
+                    break;
+            }
         }
 
         private void addPostLink() => AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url);
