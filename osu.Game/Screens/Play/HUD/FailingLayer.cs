@@ -18,10 +18,15 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
-    /// An overlay layer on top of the playfield which fades to red when the current player health falls below a certain threshold defined by <see cref="LowHealthThreshold"/>.
+    /// An overlay layer on top of the playfield which fades to red when the current player health falls below a certain threshold defined by <see cref="low_health_threshold"/>.
     /// </summary>
     public class FailingLayer : HealthDisplay
     {
+        /// <summary>
+        /// Whether the current player health should be shown on screen.
+        /// </summary>
+        public readonly Bindable<bool> ShowHealth = new Bindable<bool>();
+
         private const float max_alpha = 0.4f;
         private const int fade_time = 400;
         private const float gradient_size = 0.3f;
@@ -29,12 +34,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
         /// </summary>
-        public double LowHealthThreshold = 0.20f;
-
-        /// <summary>
-        /// Whether the current player health should be shown on screen.
-        /// </summary>
-        public readonly Bindable<bool> ShowHealth = new Bindable<bool>();
+        private const double low_health_threshold = 0.20f;
 
         private readonly Bindable<bool> fadePlayfieldWhenHealthLow = new Bindable<bool>();
         private readonly Container boxes;
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
-            double target = Math.Clamp(max_alpha * (1 - Current.Value / LowHealthThreshold), 0, max_alpha);
+            double target = Math.Clamp(max_alpha * (1 - Current.Value / low_health_threshold), 0, max_alpha);
 
             boxes.Alpha = (float)Interpolation.Lerp(boxes.Alpha, target, Clock.ElapsedFrameTime * 0.01f);
 
