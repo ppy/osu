@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -142,6 +143,8 @@ namespace osu.Game.Screens.Multi
             joinedRoom = null;
         }
 
+        private readonly List<int> roomsFailedUpdate = new List<int>();
+
         /// <summary>
         /// Invoked when the listing of all <see cref="Room"/>s is received from the server.
         /// </summary>
@@ -173,7 +176,14 @@ namespace osu.Game.Screens.Multi
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, $"Failed to update room: {r.Name.Value}.");
+                    Debug.Assert(r.RoomID.Value != null);
+
+                    if (!roomsFailedUpdate.Contains(r.RoomID.Value.Value))
+                    {
+                        Logger.Error(ex, $"Failed to update room: {r.Name.Value}.");
+                        roomsFailedUpdate.Add(r.RoomID.Value.Value);
+                    }
+
                     rooms.Remove(r);
                 }
             }
