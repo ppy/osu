@@ -1,14 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -17,85 +15,37 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class DrawableRecentActivity : CompositeDrawable
+    public class DrawableRecentActivity : DrawableHistoryItem<APIRecentActivity>
     {
-        private const int font_size = 14;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private readonly APIRecentActivity activity;
-
-        private LinkFlowContainer content;
-
         public DrawableRecentActivity(APIRecentActivity activity)
+            : base(activity)
         {
-            this.activity = activity;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        protected override DateTimeOffset GetDate() => Item.CreatedAt;
+
+        protected override Drawable CreateLeftContent() => new Container
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            AddInternal(new GridContainer
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Child = createIcon().With(icon =>
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                ColumnDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.Absolute, size: 28),
-                    new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize)
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize)
-                },
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = createIcon().With(icon =>
-                            {
-                                icon.Anchor = Anchor.Centre;
-                                icon.Origin = Anchor.Centre;
-                            })
-                        },
-                        content = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: font_size))
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        },
-                        new DrawableDate(activity.CreatedAt)
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Colour = colourProvider.Foreground1,
-                            Font = OsuFont.GetFont(size: font_size),
-                        }
-                    }
-                }
-            });
+                icon.Anchor = Anchor.Centre;
+                icon.Origin = Anchor.Centre;
+            })
+        };
 
-            createMessage();
-        }
+        protected override float LeftContentSize() => 28;
 
         private Drawable createIcon()
         {
-            switch (activity.Type)
+            switch (Item.Type)
             {
                 case RecentActivityType.Rank:
-                    return new UpdateableRank(activity.ScoreRank)
+                    return new UpdateableRank(Item.ScoreRank)
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 11,
@@ -104,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 case RecentActivityType.Achievement:
-                    return new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
+                    return new DelayedLoadWrapper(new MedalIcon(Item.Achievement.Slug)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -122,106 +72,97 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             }
         }
 
-        private void createMessage()
+        protected override void CreateMessage()
         {
-            switch (activity.Type)
+            switch (Item.Type)
             {
                 case RecentActivityType.Achievement:
                     addUserLink();
-                    addText($" unlocked the \"{activity.Achievement.Name}\" medal!");
-                    break;
+                    AddText($" unlocked the \"{Item.Achievement.Name}\" medal!");
+                    return;
 
                 case RecentActivityType.BeatmapPlaycount:
                     addBeatmapLink();
-                    addText($" has been played {activity.Count} times!");
-                    break;
+                    AddText($" has been played {Item.Count} times!");
+                    return;
 
                 case RecentActivityType.BeatmapsetApprove:
                     addBeatmapsetLink();
-                    addText($" has been {activity.Approval.ToString().ToLowerInvariant()}!");
-                    break;
+                    AddText($" has been {Item.Approval.ToString().ToLowerInvariant()}!");
+                    return;
 
                 case RecentActivityType.BeatmapsetDelete:
                     addBeatmapsetLink();
-                    addText(" has been deleted.");
-                    break;
+                    AddText(" has been deleted.");
+                    return;
 
                 case RecentActivityType.BeatmapsetRevive:
                     addBeatmapsetLink();
-                    addText(" has been revived from eternal slumber by ");
+                    AddText(" has been revived from eternal slumber by ");
                     addUserLink();
-                    break;
+                    return;
 
                 case RecentActivityType.BeatmapsetUpdate:
                     addUserLink();
-                    addText(" has updated the beatmap ");
+                    AddText(" has updated the beatmap ");
                     addBeatmapsetLink();
-                    break;
+                    return;
 
                 case RecentActivityType.BeatmapsetUpload:
                     addUserLink();
-                    addText(" has submitted a new beatmap ");
+                    AddText(" has submitted a new beatmap ");
                     addBeatmapsetLink();
-                    break;
+                    return;
 
                 case RecentActivityType.Medal:
                     // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
-                    break;
+                    return;
 
                 case RecentActivityType.Rank:
                     addUserLink();
-                    addText($" achieved rank #{activity.Rank} on ");
+                    AddText($" achieved rank #{Item.Rank} on ");
                     addBeatmapLink();
-                    addText($" ({getRulesetName()})");
-                    break;
+                    AddText($" ({getRulesetName()})");
+                    return;
 
                 case RecentActivityType.RankLost:
                     addUserLink();
-                    addText(" has lost first place on ");
+                    AddText(" has lost first place on ");
                     addBeatmapLink();
-                    addText($" ({getRulesetName()})");
-                    break;
+                    AddText($" ({getRulesetName()})");
+                    return;
 
                 case RecentActivityType.UserSupportAgain:
                     addUserLink();
-                    addText(" has once again chosen to support osu! - thanks for your generosity!");
-                    break;
+                    AddText(" has once again chosen to support osu! - thanks for your generosity!");
+                    return;
 
                 case RecentActivityType.UserSupportFirst:
                     addUserLink();
-                    addText(" has become an osu!supporter - thanks for your generosity!");
-                    break;
+                    AddText(" has become an osu!supporter - thanks for your generosity!");
+                    return;
 
                 case RecentActivityType.UserSupportGift:
                     addUserLink();
-                    addText(" has received the gift of osu!supporter!");
-                    break;
+                    AddText(" has received the gift of osu!supporter!");
+                    return;
 
                 case RecentActivityType.UsernameChange:
-                    addText($"{activity.User?.PreviousUsername} has changed their username to ");
+                    AddText($"{Item.User?.PreviousUsername} has changed their username to ");
                     addUserLink();
-                    break;
+                    return;
             }
         }
 
         private string getRulesetName() =>
-            rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == activity.Mode)?.Name ?? activity.Mode;
+            rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == Item.Mode)?.Name ?? Item.Mode;
 
-        private void addUserLink()
-            => content.AddLink(activity.User?.Username, LinkAction.OpenUserProfile, getLinkArgument(activity.User?.Url), creationParameters: t => t.Font = getLinkFont(FontWeight.Bold));
+        private void addUserLink() => AddUserLink(Item.User?.Username, Item.User?.Url);
 
         private void addBeatmapLink()
-            => content.AddLink(activity.Beatmap?.Title, LinkAction.OpenBeatmap, getLinkArgument(activity.Beatmap?.Url), creationParameters: t => t.Font = getLinkFont());
+            => AddLink(Item.Beatmap?.Title, LinkAction.OpenBeatmap, Item.Beatmap?.Url);
 
         private void addBeatmapsetLink()
-            => content.AddLink(activity.Beatmapset?.Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset?.Url), creationParameters: t => t.Font = getLinkFont());
-
-        private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.Endpoint}{url}").Argument;
-
-        private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
-            => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);
-
-        private void addText(string text)
-            => content.AddText(text, t => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold));
+            => AddLink(Item.Beatmapset?.Title, LinkAction.OpenBeatmapSet, Item.Beatmapset?.Url);
     }
 }
