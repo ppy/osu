@@ -526,7 +526,7 @@ namespace osu.Game.Screens.Select
             endRepeatSelection();
 
             lastRepeatSource = source;
-            Scheduler.Add(repeatDelegate = this.BeginKeyRepeat(Scheduler, action));
+            repeatDelegate = this.BeginKeyRepeat(Scheduler, action);
         }
 
         private void endRepeatSelection(object source = null)
