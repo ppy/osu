@@ -483,9 +483,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (!(HitObject is IHasPathWithRepeats curveData))
                 return null;
 
-            double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
-
-            int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
+            // mathematically speaking this could be done by calculating (time - HitObject.StartTime) / SegmentDuration
+            // however, floating-point operations can introduce inaccuracies - therefore resort to iterated addition
+            // (all callers use this method to calculate repeat point times, so this way is consistent and deterministic)
+            int index = 0;
+            for (double nodeTime = HitObject.StartTime; nodeTime < time; nodeTime += SegmentDuration)
+                index += 1;
 
             // avoid slicing the list & creating copies, if at all possible.
             return index == 0 ? curveData.NodeSamples : curveData.NodeSamples.Skip(index).ToList();
