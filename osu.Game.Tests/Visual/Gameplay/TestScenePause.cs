@@ -174,9 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromGameplay()
         {
-            AddStep("exit", () => Player.Exit());
-            confirmPaused();
-
+            // an externally triggered exit should immediately exit, skipping all pause logic.
             AddStep("exit", () => Player.Exit());
             confirmExited();
         }

@@ -60,6 +60,9 @@ namespace osu.Game.Screens
                 case IntroSequence.SkippedIntro:
                     return new IntroSkipped();
 
+                case IntroSequence.Welcome:
+                    return new IntroWelcome();
+
                 default:
                     return new IntroTriangles();
             }
