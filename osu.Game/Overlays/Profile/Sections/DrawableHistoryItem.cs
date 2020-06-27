@@ -25,12 +25,14 @@ namespace osu.Game.Overlays.Profile.Sections
         protected OverlayColourProvider ColourProvider { get; private set; }
 
         protected readonly T Item;
+        private readonly (string name, Action action)[] properties;
 
         private LinkFlowContainer linkFlow;
 
         protected DrawableHistoryItem(T item)
         {
             Item = item;
+            properties = GetProperties();
         }
 
         [BackgroundDependencyLoader]
@@ -79,26 +81,60 @@ namespace osu.Game.Overlays.Profile.Sections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CreateMessage();
+            handleString(GetString());
         }
+
+        protected abstract (string name, Action action)[] GetProperties();
 
         protected abstract DateTimeOffset GetDate();
 
-        protected abstract void CreateMessage();
+        protected abstract string GetString();
 
         protected virtual float LeftContentSize() => 0;
 
         protected virtual Drawable CreateLeftContent() => Empty();
 
-        private void addText(string text, Color4 colour) => linkFlow.AddText(text, t =>
+        private void handleString(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return;
+
+            if (!s.Contains(':'))
+            {
+                AddText(s);
+                return;
+            }
+
+            var variableIndex = s.IndexOf(':');
+
+            AddText(s.Substring(0, variableIndex));
+
+            var trimmed = handleVariable(s.Substring(variableIndex + 1));
+
+            handleString(trimmed);
+        }
+
+        private string handleVariable(string s)
+        {
+            foreach (var (name, action) in properties)
+            {
+                if (s.StartsWith(name))
+                {
+                    action.Invoke();
+                    return s.Substring(name.Length);
+                }
+            }
+
+            return s;
+        }
+
+        protected void AddText(string text) => linkFlow.AddText(text, t => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold));
+
+        protected void AddColoredText(string text, Color4 colour) => linkFlow.AddText(text, t =>
         {
             t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
             t.Colour = colour;
         });
-
-        protected void AddText(string text) => addText(text, Color4.White);
-
-        protected void AddColoredText(string text, Color4 colour) => addText(text, colour);
 
         protected void AddLink(string title, LinkAction action, string url, FontWeight fontWeight = FontWeight.Regular)
             => linkFlow.AddLink(title, action, getLinkArgument(url), creationParameters: t => t.Font = getLinkFont(fontWeight));

@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         protected override DateTimeOffset GetDate() => Item.CreatedAt;
 
-        protected override void CreateMessage()
+        protected override string GetString()
         {
             switch (Item.Source)
             {
@@ -24,8 +24,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            addTextWithAmount("Received ", "from kudosu deny repeal of modding post ");
-                            return;
+                            return "Received :amount from kudosu deny repeal of modding post :post";
                     }
 
                     break;
@@ -34,8 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Reset:
-                            addTextWithAmount("Denied ", "from modding post ");
-                            return;
+                            return "Denied :amount from modding post :post";
                     }
 
                     break;
@@ -44,8 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Reset:
-                            addTextWithAmount("Lost ", "from modding post deletion of ");
-                            return;
+                            return "Lost :amount from modding post deletion of :post";
                     }
 
                     break;
@@ -54,8 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            addTextWithAmount("Received ", "from modding post restoration of ");
-                            return;
+                            return "Received: amount from modding post restoration of :post";
                     }
 
                     break;
@@ -64,12 +60,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            addTextWithAmount("Received ", "from obtaining votes in modding post of ");
-                            return;
+                            return "Received :amount from obtaining votes in modding post of :post";
 
                         case KudosuAction.Reset:
-                            addTextWithAmount("Lost ", "from losing votes in modding post of ");
-                            return;
+                            return "Lost :amount from losing votes in modding post of :post";
                     }
 
                     break;
@@ -78,12 +72,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            addTextWithAmount("Received ", "from votes recalculation in modding post of ");
-                            return;
+                            return "Received :amount from votes recalculation in modding post of :post";
 
                         case KudosuAction.Reset:
-                            addTextWithAmount("Lost ", "from votes recalculation in modding post of ");
-                            return;
+                            return "Lost :amount from votes recalculation in modding post of :post";
                     }
 
                     break;
@@ -93,47 +85,26 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            addTextWithAmount("Received ", "from ", false);
-                            addGiverLink();
-                            AddText(" for a post at ");
-                            createPostLink();
-                            return;
+                            return "Received :amount from :giver for a post at :post";
 
                         case KudosuAction.Reset:
-                            AddText("Kudosu reset by ");
-                            addGiverLink();
-                            AddText(" for the post ");
-                            createPostLink();
-                            return;
+                            return "Kudosu reset by :giver for the post :post";
 
                         case KudosuAction.Revoke:
-                            AddText("Denied kudosu by ");
-                            addGiverLink();
-                            AddText(" for the post ");
-                            createPostLink();
-                            return;
+                            return "Denied kudosu by :giver for the post :post";
                     }
 
                     break;
             }
 
-            addTextWithAmount("Unknown event (", "change)", false);
+            return "Unknown event(:amount change)";
         }
 
-        private void createPostLink() => AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url);
-
-        private void addGiverLink() => AddUserLink(Item.Giver?.Username, Item.Giver?.Url);
-
-        private void addTextWithAmount(string prefix, string suffix, bool addPostLink = true)
+        protected override (string name, Action action)[] GetProperties() => new (string, Action)[]
         {
-            string amount = $"{Math.Abs(Item.Amount)} kudosu";
-
-            AddText(prefix);
-            AddColoredText($"{amount} ", ColourProvider.Light1);
-            AddText(suffix);
-
-            if (addPostLink)
-                createPostLink();
-        }
+            ("amount", () => AddColoredText($"{Math.Abs(Item.Amount)} kudosu", ColourProvider.Light1)),
+            ("giver", () => AddUserLink(Item.Giver?.Username, Item.Giver?.Url)),
+            ("post", () => AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url))
+        };
     }
 }

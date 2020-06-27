@@ -71,97 +71,71 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             }
         }
 
-        protected override void CreateMessage()
+        protected override string GetString()
         {
             switch (Item.Type)
             {
                 case RecentActivityType.Achievement:
-                    addUserLink();
-                    AddText($" unlocked the \"{Item.Achievement.Name}\" medal!");
-                    break;
+                    return ":user unlocked the \":achievement\" medal!";
 
                 case RecentActivityType.BeatmapPlaycount:
-                    addBeatmapLink();
-                    AddText($" has been played {Item.Count} times!");
-                    break;
+                    return ":beatmap has been played :count times!";
 
                 case RecentActivityType.BeatmapsetApprove:
-                    addBeatmapsetLink();
-                    AddText($" has been {Item.Approval.ToString().ToLowerInvariant()}!");
-                    break;
+                    return ":beatmapset has been :approval!";
 
                 case RecentActivityType.BeatmapsetDelete:
-                    addBeatmapsetLink();
-                    AddText(" has been deleted.");
-                    break;
+                    return ":beatmapset has been deleted.";
 
                 case RecentActivityType.BeatmapsetRevive:
-                    addBeatmapsetLink();
-                    AddText(" has been revived from eternal slumber by ");
-                    addUserLink();
-                    break;
+                    return ":beatmapset has been revived from eternal slumber by :user.";
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    addUserLink();
-                    AddText(" has updated the beatmap ");
-                    addBeatmapsetLink();
-                    break;
+                    return ":user has updated the beatmap \":beatmapset\"";
 
                 case RecentActivityType.BeatmapsetUpload:
-                    addUserLink();
-                    AddText(" has submitted a new beatmap ");
-                    addBeatmapsetLink();
-                    break;
+                    return ":user has submitted a new beatmap \":beatmapset\"";
 
                 case RecentActivityType.Medal:
                     // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
                     break;
 
                 case RecentActivityType.Rank:
-                    addUserLink();
-                    AddText($" achieved rank #{Item.Rank} on ");
-                    addBeatmapLink();
-                    AddText($" ({getRulesetName()})");
-                    break;
+                    return ":user achieved rank #:rank on :beatmap (:mode)";
 
                 case RecentActivityType.RankLost:
-                    addUserLink();
-                    AddText(" has lost first place on ");
-                    addBeatmapLink();
-                    AddText($" ({getRulesetName()})");
-                    break;
+                    return ":user has lost first place on :beatmap (:mode)";
 
                 case RecentActivityType.UserSupportAgain:
-                    addUserLink();
-                    AddText(" has once again chosen to support osu! - thanks for your generosity!");
-                    break;
+                    return ":user has once again chosen to support osu! - thanks for your generosity!";
 
                 case RecentActivityType.UserSupportFirst:
-                    addUserLink();
-                    AddText(" has become an osu!supporter - thanks for your generosity!");
-                    break;
+                    return ":user has become an osu!supporter - thanks for your generosity!";
 
                 case RecentActivityType.UserSupportGift:
-                    addUserLink();
-                    AddText(" has received the gift of osu!supporter!");
-                    break;
+                    return ":user has received the gift of osu!supporter!";
 
                 case RecentActivityType.UsernameChange:
-                    AddText($"{Item.User?.PreviousUsername} has changed their username to ");
-                    addUserLink();
-                    break;
+                    return ":previousUsername has changed their username to :user";
             }
+
+            return string.Empty;
         }
+
+        protected override (string name, Action action)[] GetProperties() => new (string, Action)[]
+        {
+            ("achievement", () => AddText($"{Item.Achievement.Name}")),
+            ("user", () => AddUserLink(Item.User?.Username, Item.User?.Url)),
+            ("beatmapset", () => AddLink(Item.Beatmapset?.Title, LinkAction.OpenBeatmapSet, Item.Beatmapset?.Url)),
+            ("beatmap", () => AddLink(Item.Beatmap?.Title, LinkAction.OpenBeatmap, Item.Beatmap?.Url)),
+            ("previousUsername", () => AddText($"{Item.User?.PreviousUsername}")),
+            ("rank", () => AddText($"{Item.Rank}")),
+            ("count", () => AddText($"{Item.Count}")),
+            ("mode", () => AddText($"{getRulesetName()}")),
+            ("approval", () => AddText($"{Item.Approval.ToString().ToLowerInvariant()}"))
+        };
 
         private string getRulesetName() =>
             rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == Item.Mode)?.Name ?? Item.Mode;
-
-        private void addUserLink() => AddUserLink(Item.User?.Username, Item.User?.Url);
-
-        private void addBeatmapLink()
-            => AddLink(Item.Beatmap?.Title, LinkAction.OpenBeatmap, Item.Beatmap?.Url);
-
-        private void addBeatmapsetLink()
-            => AddLink(Item.Beatmapset?.Title, LinkAction.OpenBeatmapSet, Item.Beatmapset?.Url);
     }
 }
