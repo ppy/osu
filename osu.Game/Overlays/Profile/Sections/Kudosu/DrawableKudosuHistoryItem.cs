@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            return "Received :amount from kudosu deny repeal of modding post :post";
+                            return "Received {amount} from kudosu deny repeal of modding post {post}";
                     }
 
                     break;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Reset:
-                            return "Denied :amount from modding post :post";
+                            return "Denied {amount} from modding post {post}";
                     }
 
                     break;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Reset:
-                            return "Lost :amount from modding post deletion of :post";
+                            return "Lost {amount} from modding post deletion of {post}";
                     }
 
                     break;
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            return "Received: amount from modding post restoration of :post";
+                            return "Received {amount} from modding post restoration of {post}";
                     }
 
                     break;
@@ -60,10 +60,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            return "Received :amount from obtaining votes in modding post of :post";
+                            return "Received {amount} from obtaining votes in modding post of {post}";
 
                         case KudosuAction.Reset:
-                            return "Lost :amount from losing votes in modding post of :post";
+                            return "Lost {amount} from losing votes in modding post of {post}";
                     }
 
                     break;
@@ -72,10 +72,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            return "Received :amount from votes recalculation in modding post of :post";
+                            return "Received {amount} from votes recalculation in modding post of {post}";
 
                         case KudosuAction.Reset:
-                            return "Lost :amount from votes recalculation in modding post of :post";
+                            return "Lost {amount} from votes recalculation in modding post of {post}";
                     }
 
                     break;
@@ -85,26 +85,37 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     switch (Item.Action)
                     {
                         case KudosuAction.Give:
-                            return "Received :amount from :giver for a post at :post";
+                            return "Received {amount} from {giver} for a post at {post}";
 
                         case KudosuAction.Reset:
-                            return "Kudosu reset by :giver for the post :post";
+                            return "Kudosu reset by {giver} for the post {post}";
 
                         case KudosuAction.Revoke:
-                            return "Denied kudosu by :giver for the post :post";
+                            return "Denied kudosu by {giver} for the post {post}";
                     }
 
                     break;
             }
 
-            return "Unknown event(:amount change)";
+            return "Unknown event({amount} change)";
         }
 
-        protected override (string name, Action action)[] GetProperties() => new (string, Action)[]
+        protected override void HandleVariable(string name)
         {
-            ("amount", () => AddColoredText($"{Math.Abs(Item.Amount)} kudosu", ColourProvider.Light1)),
-            ("giver", () => AddUserLink(Item.Giver?.Username, Item.Giver?.Url)),
-            ("post", () => AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url))
-        };
+            switch (name)
+            {
+                case "amount":
+                    AddColoredText($"{Math.Abs(Item.Amount)} kudosu", ColourProvider.Light1);
+                    return;
+
+                case "giver":
+                    AddUserLink(Item.Giver?.Username, Item.Giver?.Url);
+                    return;
+
+                case "post":
+                    AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url);
+                    return;
+            }
+        }
     }
 }

@@ -25,14 +25,12 @@ namespace osu.Game.Overlays.Profile.Sections
         protected OverlayColourProvider ColourProvider { get; private set; }
 
         protected readonly T Item;
-        private readonly (string name, Action action)[] properties;
 
         private LinkFlowContainer linkFlow;
 
         protected DrawableHistoryItem(T item)
         {
             Item = item;
-            properties = GetProperties();
         }
 
         [BackgroundDependencyLoader]
@@ -84,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections
             handleString(GetString());
         }
 
-        protected abstract (string name, Action action)[] GetProperties();
+        protected abstract void HandleVariable(string name);
 
         protected abstract DateTimeOffset GetDate();
 
@@ -99,33 +97,19 @@ namespace osu.Game.Overlays.Profile.Sections
             if (string.IsNullOrEmpty(s))
                 return;
 
-            if (!s.Contains(':'))
+            if (!s.Contains('{'))
             {
                 AddText(s);
                 return;
             }
 
-            var variableIndex = s.IndexOf(':');
+            var variableIndex = s.IndexOf('{');
+            var variableEndIndex = s.IndexOf('}');
+            var variableName = s.Substring(variableIndex + 1, variableEndIndex - variableIndex - 1);
 
             AddText(s.Substring(0, variableIndex));
-
-            var trimmed = handleVariable(s.Substring(variableIndex + 1));
-
-            handleString(trimmed);
-        }
-
-        private string handleVariable(string s)
-        {
-            foreach (var (name, action) in properties)
-            {
-                if (s.StartsWith(name))
-                {
-                    action.Invoke();
-                    return s.Substring(name.Length);
-                }
-            }
-
-            return s;
+            HandleVariable(variableName);
+            handleString(s.Substring(variableEndIndex + 1));
         }
 
         protected void AddText(string text) => linkFlow.AddText(text, t => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold));

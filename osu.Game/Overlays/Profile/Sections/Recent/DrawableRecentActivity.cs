@@ -76,64 +76,93 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (Item.Type)
             {
                 case RecentActivityType.Achievement:
-                    return ":user unlocked the \":achievement\" medal!";
+                    return "{user} unlocked the \"{achievement}\" medal!";
 
                 case RecentActivityType.BeatmapPlaycount:
-                    return ":beatmap has been played :count times!";
+                    return "{beatmap} has been played {count} times!";
 
                 case RecentActivityType.BeatmapsetApprove:
-                    return ":beatmapset has been :approval!";
+                    return "{beatmapset} has been {approval}!";
 
                 case RecentActivityType.BeatmapsetDelete:
-                    return ":beatmapset has been deleted.";
+                    return "{beatmapset} has been deleted.";
 
                 case RecentActivityType.BeatmapsetRevive:
-                    return ":beatmapset has been revived from eternal slumber by :user.";
+                    return "{beatmapset} has been revived from eternal slumber by {user}.";
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    return ":user has updated the beatmap \":beatmapset\"";
+                    return "{user} has updated the beatmap \"{beatmapset}\"";
 
                 case RecentActivityType.BeatmapsetUpload:
-                    return ":user has submitted a new beatmap \":beatmapset\"";
+                    return "{user} has submitted a new beatmap \"{beatmapset}\"";
 
                 case RecentActivityType.Medal:
                     // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
                     break;
 
                 case RecentActivityType.Rank:
-                    return ":user achieved rank #:rank on :beatmap (:mode)";
+                    return "{user} achieved rank #{rank} on {beatmap} ({mode})";
 
                 case RecentActivityType.RankLost:
-                    return ":user has lost first place on :beatmap (:mode)";
+                    return "{user} has lost first place on {beatmap} ({mode})";
 
                 case RecentActivityType.UserSupportAgain:
-                    return ":user has once again chosen to support osu! - thanks for your generosity!";
+                    return "{user} has once again chosen to support osu! - thanks for your generosity!";
 
                 case RecentActivityType.UserSupportFirst:
-                    return ":user has become an osu!supporter - thanks for your generosity!";
+                    return "{user} has become an osu!supporter - thanks for your generosity!";
 
                 case RecentActivityType.UserSupportGift:
-                    return ":user has received the gift of osu!supporter!";
+                    return "{user} has received the gift of osu!supporter!";
 
                 case RecentActivityType.UsernameChange:
-                    return ":previousUsername has changed their username to :user";
+                    return "{previousUsername} has changed their username to {user}";
             }
 
             return string.Empty;
         }
 
-        protected override (string name, Action action)[] GetProperties() => new (string, Action)[]
+        protected override void HandleVariable(string name)
         {
-            ("achievement", () => AddText($"{Item.Achievement.Name}")),
-            ("user", () => AddUserLink(Item.User?.Username, Item.User?.Url)),
-            ("beatmapset", () => AddLink(Item.Beatmapset?.Title, LinkAction.OpenBeatmapSet, Item.Beatmapset?.Url)),
-            ("beatmap", () => AddLink(Item.Beatmap?.Title, LinkAction.OpenBeatmap, Item.Beatmap?.Url)),
-            ("previousUsername", () => AddText($"{Item.User?.PreviousUsername}")),
-            ("rank", () => AddText($"{Item.Rank}")),
-            ("count", () => AddText($"{Item.Count}")),
-            ("mode", () => AddText($"{getRulesetName()}")),
-            ("approval", () => AddText($"{Item.Approval.ToString().ToLowerInvariant()}"))
-        };
+            switch (name)
+            {
+                case "achievement":
+                    AddText($"{Item.Achievement.Name}");
+                    return;
+
+                case "user":
+                    AddUserLink(Item.User?.Username, Item.User?.Url);
+                    return;
+
+                case "beatmapset":
+                    AddLink(Item.Beatmapset?.Title, LinkAction.OpenBeatmapSet, Item.Beatmapset?.Url);
+                    return;
+
+                case "beatmap":
+                    AddLink(Item.Beatmap?.Title, LinkAction.OpenBeatmap, Item.Beatmap?.Url);
+                    return;
+
+                case "previousUsername":
+                    AddText($"{Item.User?.PreviousUsername}");
+                    return;
+
+                case "rank":
+                    AddText($"{Item.Rank}");
+                    return;
+
+                case "count":
+                    AddText($"{Item.Count}");
+                    return;
+
+                case "mode":
+                    AddText($"{getRulesetName()}");
+                    return;
+
+                case "approval":
+                    AddText($"{Item.Approval.ToString().ToLowerInvariant()}");
+                    return;
+            }
+        }
 
         private string getRulesetName() =>
             rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == Item.Mode)?.Name ?? Item.Mode;
