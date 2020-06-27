@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         [TestCase("convert-samples")]
         [TestCase("mania-samples")]
+        [TestCase("slider-convert-samples")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<SampleConvertValue> CreateConvertValue(HitObject hitObject)
