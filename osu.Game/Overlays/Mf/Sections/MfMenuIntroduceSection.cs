@@ -186,6 +186,8 @@ namespace osu.Game.Overlays.MfMenu
             t.AddParagraph("如果你觉得下面的某个功能很赞, 您可以前往");
             t.AddParagraph("该项目的主页点个Star以支持原作者, 或者帮助其完善和发展。");
             t.NewParagraph();
+            t.AddLink("osu!下物件的高潮闪光(Kiai Flash) → pr7316[Open]","https://github.com/ppy/osu/pull/7316");
+            t.NewParagraph();
             t.AddLink("osu!下的Mirror Mod → pr7334[Open]","https://github.com/ppy/osu/pull/7334");
             t.NewParagraph();
             t.AddLink("osu!tau模式 → Altenhh/tau (1.0.6)","https://github.com/Altenhh/tau");

@@ -286,6 +286,10 @@ namespace osu.Game.Screens
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
+            track.RestartPoint = 0;
+
             UpdateComponentsFromBeatmap(Beatmap.Value);
             this.FadeInFromZero(300);
         }
