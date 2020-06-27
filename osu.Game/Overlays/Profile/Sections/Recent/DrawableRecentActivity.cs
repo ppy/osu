@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (name)
             {
                 case "achievement":
-                    AddText($"{Item.Achievement.Name}");
+                    AddText(Item.Achievement.Name);
                     return;
 
                 case "user":
@@ -143,23 +143,23 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     return;
 
                 case "previousUsername":
-                    AddText($"{Item.User?.PreviousUsername}");
+                    AddText(Item.User?.PreviousUsername);
                     return;
 
                 case "rank":
-                    AddText($"{Item.Rank}");
+                    AddText(Item.Rank.ToString());
                     return;
 
                 case "count":
-                    AddText($"{Item.Count}");
+                    AddText(Item.Count.ToString());
                     return;
 
                 case "mode":
-                    AddText($"{getRulesetName()}");
+                    AddText(getRulesetName());
                     return;
 
                 case "approval":
-                    AddText($"{Item.Approval.ToString().ToLowerInvariant()}");
+                    AddText(Item.Approval.ToString().ToLowerInvariant());
                     return;
             }
         }
