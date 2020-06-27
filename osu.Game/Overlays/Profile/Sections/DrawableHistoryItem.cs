@@ -121,11 +121,11 @@ namespace osu.Game.Overlays.Profile.Sections
             t.Colour = colour;
         });
 
-        protected void AddLink(string title, LinkAction action, string url, FontWeight fontWeight = FontWeight.Regular)
-            => linkFlow.AddLink(title, action, getLinkArgument(url), creationParameters: t => t.Font = getLinkFont(fontWeight));
+        protected void AddLink(string title, LinkAction action, string url, bool useArgument = true, FontWeight fontWeight = FontWeight.Regular)
+            => linkFlow.AddLink(title, action, useArgument ? getLinkArgument(url) : url, creationParameters: t => t.Font = getLinkFont(fontWeight));
 
         protected void AddUserLink(string username, string url)
-            => AddLink(username, LinkAction.OpenUserProfile, url, FontWeight.Bold);
+            => AddLink(username, LinkAction.OpenUserProfile, url, true, FontWeight.Bold);
 
         private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{API.Endpoint}{url}").Argument;
 

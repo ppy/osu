@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     return;
 
                 case "post":
-                    AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url);
+                    AddLink(Item.Post.Title, LinkAction.External, Item.Post.Url, false);
                     return;
             }
         }
