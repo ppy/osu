@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Menu
         protected IBindable<bool> MenuVoice { get; private set; }
 
         protected IBindable<bool> MenuMusic { get; private set; }
-        private IBindable<bool> menuMusicLoop { get; set; }
+        private IBindable<bool> menuMusicLoop;
 
         private WorkingBeatmap initialBeatmap;
 
