@@ -4,11 +4,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -31,8 +33,8 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeStart = sampleInfo.StartTime;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods)
+        [BackgroundDependencyLoader(true)]
+        private void load(IBindable<WorkingBeatmap> beatmap, IBindable<IReadOnlyList<Mod>> mods, GameplayBeatmap gameplayBeatmap)
         {
             Channel = beatmap.Value.Skin.GetSample(sampleInfo);
             if (Channel == null)
@@ -42,6 +44,9 @@ namespace osu.Game.Storyboards.Drawables
 
             foreach (var mod in mods.Value.OfType<IApplicableToSample>())
                 mod.ApplyToSample(Channel);
+
+            if (gameplayBeatmap != null)
+                Channel.AddAdjustment(AdjustableProperty.Frequency, gameplayBeatmap.UserPlaybackRate);
         }
 
         protected override void Update()
