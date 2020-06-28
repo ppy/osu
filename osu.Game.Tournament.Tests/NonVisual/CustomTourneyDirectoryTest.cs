@@ -80,7 +80,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                 // Recreate the old setup that uses "tournament" as the base path.
                 string oldPath = Path.Combine(osuRoot, "tournament");
-                
+
                 string videosPath = Path.Combine(oldPath, "videos");
                 string modsPath = Path.Combine(oldPath, "mods");
                 string flagsPath = Path.Combine(oldPath, "flags");

@@ -11,16 +11,17 @@ namespace osu.Game.Tournament.IO
 {
     public class TournamentStorage : MigratableStorage
     {
-        private readonly Storage storage;
-        public TournamentVideoResourceStore VideoStore { get; }
         private const string default_tournament = "default";
+        private readonly Storage storage;
+        private readonly TournamentStorageManager storageConfig;
+        public TournamentVideoResourceStore VideoStore { get; }
 
         public TournamentStorage(Storage storage)
             : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
             this.storage = storage;
 
-            TournamentStorageManager storageConfig = new TournamentStorageManager(storage);
+            storageConfig = new TournamentStorageManager(storage);
 
             if (storage.Exists("tournament.ini"))
             {
@@ -29,8 +30,6 @@ namespace osu.Game.Tournament.IO
             else
             {
                 Migrate(GetFullPath(default_tournament));
-                storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
-                storageConfig.Save();
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
             }
 
@@ -54,6 +53,8 @@ namespace osu.Game.Tournament.IO
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
             moveFileIfExists("drawings.ini", destination);
+            storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
+            storageConfig.Save();
         }
 
         private void moveFileIfExists(string file, DirectoryInfo destination)
