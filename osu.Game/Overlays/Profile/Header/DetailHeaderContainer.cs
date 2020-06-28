@@ -19,9 +19,6 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class DetailHeaderContainer : CompositeDrawable
     {
-        private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private OverlinedInfoContainer medalInfo;
-        private OverlinedInfoContainer ppInfo;
         private OverlinedInfoContainer detailGlobalRank;
         private OverlinedInfoContainer detailCountryRank;
         private FillFlowContainer fillFlow;
@@ -83,55 +80,6 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
-                                    Children = new Drawable[]
-                                    {
-                                        new OverlinedTotalPlayTime
-                                        {
-                                            User = { BindTarget = User }
-                                        },
-                                        medalInfo = new OverlinedInfoContainer
-                                        {
-                                            Title = "奖章数",
-                                            LineColour = colours.GreenLight,
-                                        },
-                                        ppInfo = new OverlinedInfoContainer
-                                        {
-                                            Title = "pp",
-                                            LineColour = colours.Red,
-                                        },
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5),
-                                    Children = new[]
-                                    {
-                                        scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),
-                                        scoreRankInfos[ScoreRank.X] = new ScoreRankInfo(ScoreRank.X),
-                                        scoreRankInfos[ScoreRank.SH] = new ScoreRankInfo(ScoreRank.SH),
-                                        scoreRankInfos[ScoreRank.S] = new ScoreRankInfo(ScoreRank.S),
-                                        scoreRankInfos[ScoreRank.A] = new ScoreRankInfo(ScoreRank.A),
-                                    }
-                                }
-                            }
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding { Right = 130 },
                             Children = new Drawable[]
                             {
@@ -170,19 +118,13 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";
-
-            foreach (var scoreRankInfo in scoreRankInfos)
-                scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
-
             detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
 
-        private class ScoreRankInfo : CompositeDrawable
+        public class ScoreRankInfo : CompositeDrawable
         {
             private readonly OsuSpriteText rankCount;
 
