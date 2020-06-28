@@ -40,7 +40,6 @@ namespace osu.Game.Screens.Menu
         protected IBindable<bool> MenuVoice { get; private set; }
 
         protected IBindable<bool> MenuMusic { get; private set; }
-        private IBindable<bool> menuMusicLoop;
 
         private WorkingBeatmap initialBeatmap;
 
@@ -74,8 +73,6 @@ namespace osu.Game.Screens.Menu
 
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
-            menuMusicLoop = config.GetBindable<bool>(OsuSetting.MenuMusicLoop);
-
             seeya = audio.Samples.Get(SeeyaSampleName);
 
             BeatmapSetInfo setInfo = null;
@@ -152,12 +149,8 @@ namespace osu.Game.Screens.Menu
         protected void StartTrack()
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (!UsingThemedIntro)
-                return;
-
-            Track.Restart();
-            if (menuMusicLoop.Value)
-                Track.Looping = true;
+            if (UsingThemedIntro)
+                Track.Restart();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
