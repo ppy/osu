@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Sprites
 
         private class HueAnimationDrawNode : SpriteDrawNode
         {
-            private HueAnimation source => (HueAnimation)base.Source;
+            private HueAnimation source => (HueAnimation)Source;
 
             private float progress;
 
