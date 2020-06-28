@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Multi
             joinedRoom = null;
         }
 
-        private readonly List<int> roomsFailedUpdate = new List<int>();
+        private readonly HashSet<int> ignoredRooms = new HashSet<int>();
 
         /// <summary>
         /// Invoked when the listing of all <see cref="Room"/>s is received from the server.
@@ -166,25 +166,26 @@ namespace osu.Game.Screens.Multi
                     continue;
                 }
 
-                var r = listing[i];
-                r.Position.Value = i;
+                var room = listing[i];
+
+                Debug.Assert(room.RoomID.Value != null);
+
+                if (ignoredRooms.Contains(room.RoomID.Value.Value))
+                    continue;
+
+                room.Position.Value = i;
 
                 try
                 {
-                    update(r, r);
-                    addRoom(r);
+                    update(room, room);
+                    addRoom(room);
                 }
                 catch (Exception ex)
                 {
-                    Debug.Assert(r.RoomID.Value != null);
+                    Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
 
-                    if (!roomsFailedUpdate.Contains(r.RoomID.Value.Value))
-                    {
-                        Logger.Error(ex, $"Failed to update room: {r.Name.Value}.");
-                        roomsFailedUpdate.Add(r.RoomID.Value.Value);
-                    }
-
-                    rooms.Remove(r);
+                    ignoredRooms.Add(room.RoomID.Value.Value);
+                    rooms.Remove(room);
                 }
             }
 
