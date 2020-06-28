@@ -25,7 +25,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneStoryboardSamples : OsuTestScene
+    public class TestSceneStoryboardSamples : ScreenTestScene
     {
         [Test]
         public void TestRetrieveTopLevelSample()
@@ -114,6 +114,39 @@ namespace osu.Game.Tests.Gameplay
             AddStep("start", () => gameplayContainer.Start());
 
             AddAssert("sample playback rate matches mod rates", () => sample.Channel.AggregateFrequency.Value == expectedRate);
+        }
+
+        [TestCase(1.0)]
+        [TestCase(1.5)]
+        [TestCase(0.5)]
+        public void TestSamplePlaybackWithUserPlaybackRate(double expectedRate)
+        {
+            TestPlayer player = null;
+            TestDrawableStoryboardSample sample = null;
+
+            AddStep("create player", () =>
+            {
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                Beatmap.Value = new TestCustomSkinWorkingBeatmap(Ruleset.Value, Audio);
+
+                player = new TestPlayer();
+
+                LoadScreen(player);
+            });
+
+            AddUntilStep("player loaded", () => player.IsLoaded);
+
+            AddStep("create sample", () =>
+            {
+                player.GameplayClockContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                {
+                    Clock = player.GameplayClockContainer.GameplayClock
+                });
+
+                player.GameplayClockContainer.UserPlaybackRate.Value = expectedRate;
+            });
+
+            AddAssert("sample playback rate matches user playback rate", () => sample.Channel.AggregateFrequency.Value == expectedRate);
         }
 
         private class TestSkin : LegacySkin
