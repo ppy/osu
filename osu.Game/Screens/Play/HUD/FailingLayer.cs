@@ -36,10 +36,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         private const double low_health_threshold = 0.20f;
 
-        private readonly Bindable<bool> fadePlayfieldWhenHealthLow = new Bindable<bool>();
         private readonly Container boxes;
 
-        private Bindable<bool> fadePlayfieldWhenHealthLowSetting;
+        private Bindable<bool> fadePlayfieldWhenHealthLow;
         private HealthProcessor healthProcessor;
 
         public FailingLayer()
@@ -78,15 +77,15 @@ namespace osu.Game.Screens.Play.HUD
         {
             boxes.Colour = color.Red;
 
-            fadePlayfieldWhenHealthLowSetting = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
-            fadePlayfieldWhenHealthLow.BindValueChanged(_ => updateState(), true);
-            ShowHealth.BindValueChanged(_ => updateState(), true);
+            fadePlayfieldWhenHealthLow = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
+            fadePlayfieldWhenHealthLow.BindValueChanged(_ => updateState());
+            ShowHealth.BindValueChanged(_ => updateState());
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateBindings();
+            updateState();
         }
 
         public override void BindHealthProcessor(HealthProcessor processor)
@@ -94,26 +93,13 @@ namespace osu.Game.Screens.Play.HUD
             base.BindHealthProcessor(processor);
 
             healthProcessor = processor;
-            updateBindings();
-        }
-
-        private void updateBindings()
-        {
-            if (LoadState < LoadState.Ready)
-                return;
-
-            fadePlayfieldWhenHealthLow.UnbindBindings();
-
-            // Don't display ever if the ruleset is not using a draining health display.
-            if (healthProcessor is DrainingHealthProcessor)
-                fadePlayfieldWhenHealthLow.BindTo(fadePlayfieldWhenHealthLowSetting);
-            else
-                fadePlayfieldWhenHealthLow.Value = false;
+            updateState();
         }
 
         private void updateState()
         {
-            var showLayer = fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
+            // Don't display ever if the ruleset is not using a draining health display.
+            var showLayer = healthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
             this.FadeTo(showLayer ? 1 : 0, fade_time, Easing.OutQuint);
         }
 
