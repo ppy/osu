@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             lastObjectHit = result.IsHit;
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             kiaiMode = effectPoint.KiaiMode;
         }
