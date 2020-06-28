@@ -55,6 +55,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
             Set(OsuSetting.MenuVoice, true);
+            Set(OsuSetting.MenuMusicLoop, true);
             Set(OsuSetting.MenuMusic, true);
 
             Set(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
@@ -191,6 +192,7 @@ namespace osu.Game.Configuration
         AudioOffset,
         VolumeInactive,
         MenuMusic,
+        MenuMusicLoop,
         MenuVoice,
         CursorRotation,
         MenuParallax,

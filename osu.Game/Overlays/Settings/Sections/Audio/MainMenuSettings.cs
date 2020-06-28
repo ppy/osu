@@ -28,6 +28,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     LabelText = "osu! music theme",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "loop the music theme",
+                    Bindable = config.GetBindable<bool>(OsuSetting.MenuMusicLoop)
+                },
                 new SettingsDropdown<IntroSequence>
                 {
                     LabelText = "Intro sequence",
