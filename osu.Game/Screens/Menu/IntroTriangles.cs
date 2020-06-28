@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -218,11 +217,14 @@ namespace osu.Game.Screens.Menu
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
 
-                        lazerLogo.TransformTo(nameof(LazerLogo.OutlineHighlight), 0.6f, logo_scale_duration * 0.4f, Easing.OutCirc).Then()
-                                 .TransformTo(nameof(LazerLogo.OutlineHighlight), 1f, logo_scale_duration * 0.4f);
+                        const double highlight_duration = logo_scale_duration / 1.4;
 
-                        lazerLogo.TransformTo(nameof(LazerLogo.Outline), 0.4f, logo_scale_duration * 0.5f, Easing.OutQuart).Then()
-                                 .TransformTo(nameof(LazerLogo.Outline), 1f, logo_scale_duration * 0.4f);
+                        //Since we only have one texture, roughly align it by changing the timing
+                        lazerLogo.Outline = -0.4f;
+                        lazerLogo.TransformTo(nameof(LazerLogo.Outline), 1f, highlight_duration * 1.4);
+
+                        lazerLogo.OutlineHighlight = 0f;
+                        lazerLogo.TransformTo(nameof(LazerLogo.OutlineHighlight), 1f, highlight_duration);
 
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
@@ -295,13 +297,13 @@ namespace osu.Game.Screens.Menu
                         {
                             RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(lazer_logo_texture),
-                            Colour = OsuColour.Gray(0.6f).Opacity(0.8f),
+                            Colour = OsuColour.Gray(0.8f),
                         },
                         outline = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
                             Texture = textures.Get(lazer_logo_texture),
-                            Colour = Color4.White.Opacity(0.8f),
+                            Colour = OsuColour.Gray(0.6f * 0.8f),
                         },
                     };
                 }
