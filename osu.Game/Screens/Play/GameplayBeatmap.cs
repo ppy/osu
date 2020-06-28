@@ -16,14 +16,9 @@ namespace osu.Game.Screens.Play
     {
         public readonly IBeatmap PlayableBeatmap;
 
-        private readonly GameplayClockContainer gameplayClockContainer;
-
-        public GameplayBeatmap(IBeatmap playableBeatmap, GameplayClockContainer gameplayClockContainer = null)
+        public GameplayBeatmap(IBeatmap playableBeatmap)
         {
             PlayableBeatmap = playableBeatmap;
-
-            if (gameplayClockContainer != null)
-                this.gameplayClockContainer = gameplayClockContainer;
         }
 
         public BeatmapInfo BeatmapInfo
@@ -50,7 +45,7 @@ namespace osu.Game.Screens.Play
 
         public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
 
-        public BindableNumber<double> UserPlaybackRate => gameplayClockContainer.UserPlaybackRate;
+        public BindableNumber<double> UserPlaybackRate { get; } = new BindableNumber<double>();
 
         public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
     }

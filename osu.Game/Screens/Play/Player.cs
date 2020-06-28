@@ -180,7 +180,8 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
 
-            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap, GameplayClockContainer));
+            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap) { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } });
+
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
             dependencies.CacheAs(gameplayBeatmap);
@@ -518,7 +519,7 @@ namespace osu.Game.Screens.Play
             FailOverlay.Show();
         }
 
-        #endregion
+        #endregion Fail Logic
 
         #region Pause Logic
 
@@ -589,7 +590,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        #endregion
+        #endregion Pause Logic
 
         #region Screen Logic
 
@@ -706,6 +707,6 @@ namespace osu.Game.Screens.Play
             storyboardReplacesBackground.Value = false;
         }
 
-        #endregion
+        #endregion Screen Logic
     }
 }
