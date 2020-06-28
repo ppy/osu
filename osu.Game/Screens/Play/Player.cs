@@ -519,7 +519,7 @@ namespace osu.Game.Screens.Play
             FailOverlay.Show();
         }
 
-        #endregion Fail Logic
+        #endregion
 
         #region Pause Logic
 
@@ -590,7 +590,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        #endregion Pause Logic
+        #endregion
 
         #region Screen Logic
 
@@ -707,6 +707,6 @@ namespace osu.Game.Screens.Play
             storyboardReplacesBackground.Value = false;
         }
 
-        #endregion Screen Logic
+        #endregion
     }
 }
