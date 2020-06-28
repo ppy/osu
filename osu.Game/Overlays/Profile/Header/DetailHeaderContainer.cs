@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -27,6 +26,8 @@ namespace osu.Game.Overlays.Profile.Header
         public readonly Bindable<User> User = new Bindable<User>();
 
         private bool expanded = true;
+        private ComponentContainer rankGraphContainer;
+        private ComponentContainer rankInfoContainer;
 
         public bool Expanded
         {
@@ -59,11 +60,6 @@ namespace osu.Game.Overlays.Profile.Header
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
                 fillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -71,44 +67,73 @@ namespace osu.Game.Overlays.Profile.Header
                     AutoSizeDuration = 200,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = 35, Bottom = 35 },
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 20),
                     Children = new Drawable[]
                     {
                         new Container
                         {
+                            CornerRadius = 25,
+                            Masking = true,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Right = 130 },
                             Children = new Drawable[]
                             {
-                                rankGraph = new RankGraph
+                                new Box
                                 {
+                                    Depth = float.MaxValue,
+                                    Colour = colourProvider.Background4,
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new FillFlowContainer
+                                rankGraphContainer = new ComponentContainer
                                 {
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 130,
-                                    Anchor = Anchor.TopRight,
-                                    Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Horizontal = 10 },
-                                    Spacing = new Vector2(0, 20),
-                                    Children = new Drawable[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child =  new Container
                                     {
-                                        detailGlobalRank = new OverlinedInfoContainer(true, 110)
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = rankGraph = new RankGraph
                                         {
-                                            Title = "全球排名",
-                                            LineColour = colourProvider.Highlight1,
-                                        },
-                                        detailCountryRank = new OverlinedInfoContainer(false, 110)
-                                        {
-                                            Title = "国内/地区排名",
-                                            LineColour = colourProvider.Highlight1,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Both,
                                         },
                                     }
-                                }
+                                },
+                                rankInfoContainer = new ComponentContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colourProvider.Background6,
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Vertical,
+                                            Padding = new MarginPadding(25),
+                                            Spacing = new Vector2(0, 10),
+                                            Children = new Drawable[]
+                                            {
+                                                detailGlobalRank = new OverlinedInfoContainer(true, 110)
+                                                {
+                                                    Title = "全球排名",
+                                                    LineColour = Colour4.Black.Opacity(0),
+                                                },
+                                                detailCountryRank = new OverlinedInfoContainer(false, 110)
+                                                {
+                                                    Title = "国内/地区排名",
+                                                    LineColour = Colour4.Black.Opacity(0),
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
                             }
                         },
                     }
@@ -122,6 +147,13 @@ namespace osu.Game.Overlays.Profile.Header
             detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
             rankGraph.Statistics.Value = user?.Statistics;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            rankGraphContainer.Padding = new MarginPadding{ Left = 25, Right = rankInfoContainer.Width + 25 };
         }
 
         public class ScoreRankInfo : CompositeDrawable
