@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Skinning
 {
@@ -28,7 +29,17 @@ namespace osu.Game.Skinning
 
         public Texture GetTexture(string componentName) => Source.GetTexture(componentName);
 
-        public virtual SampleChannel GetSample(ISampleInfo sampleInfo) => Source.GetSample(sampleInfo);
+        public virtual SampleChannel GetSample(ISampleInfo sampleInfo)
+        {
+            if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
+                return Source.GetSample(sampleInfo);
+
+            var playLayeredHitSounds = GetConfig<GlobalSkinConfiguration, bool>(GlobalSkinConfiguration.LayeredHitSounds);
+            if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
+                return new SampleChannelVirtual();
+
+            return Source.GetSample(sampleInfo);
+        }
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
     }
