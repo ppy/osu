@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Menu
                 welcome = audio.Samples.Get(@"Intro/Welcome/welcome");
 
             pianoReverb = audio.Samples.Get(@"Intro/Welcome/welcome_piano");
+
+            Track.Looping = true;
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

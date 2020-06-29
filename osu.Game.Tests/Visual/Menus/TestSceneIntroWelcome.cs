@@ -11,5 +11,18 @@ namespace osu.Game.Tests.Visual.Menus
     public class TestSceneIntroWelcome : IntroTestScene
     {
         protected override IScreen CreateScreen() => new IntroWelcome();
+
+        public TestSceneIntroWelcome()
+        {
+            AddAssert("check if menu music loops", () =>
+            {
+                var menu = IntroStack?.CurrentScreen as MainMenu;
+
+                if (menu == null)
+                    return false;
+
+                return menu.Track.Looping;
+            });
+        }
     }
 }
