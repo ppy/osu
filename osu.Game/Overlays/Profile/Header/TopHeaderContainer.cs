@@ -36,6 +36,8 @@ namespace osu.Game.Overlays.Profile.Header
         private PlayerStatBox medalInfo;
         private PlayerStatBox ppInfo;
         private PlayerStatBox levelInfo;
+        private OsuScrollContainer scoreRankInfoScroll;
+        private OsuScrollContainer userNameScroll;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -147,11 +149,10 @@ namespace osu.Game.Overlays.Profile.Header
                                             Height = 0.3f,
                                             Anchor = Anchor.BottomCentre,
                                             Origin = Anchor.BottomCentre,
-                                            Child = new OsuScrollContainer(Direction.Horizontal)
+                                            Child = scoreRankInfoScroll = new OsuScrollContainer(Direction.Horizontal)
                                             {
                                                 ScrollbarVisible = false,
                                                 RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding{ Horizontal = 20 },
                                                 Child = new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
@@ -186,7 +187,8 @@ namespace osu.Game.Overlays.Profile.Header
                                             Direction = FillDirection.Vertical,
                                             Padding = new MarginPadding{ Horizontal = 20, Top = 60 },//将Top设为60以临时对付对齐问题, 需要修复
                                             Spacing = new Vector2(10),
-                                            AutoSizeAxes = Axes.Both,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Children = new Drawable[]
@@ -212,42 +214,48 @@ namespace osu.Game.Overlays.Profile.Header
                                                         supporterTag = new SupporterIcon
                                                         {
                                                             Height = 20,
-                                                            Margin = new MarginPadding { Top = 5 },
                                                             Anchor = Anchor.BottomRight,
                                                             Origin = Anchor.BottomRight,
                                                         },
                                                     }
                                                 },
-                                                new FillFlowContainer
+                                                userNameScroll = new OsuScrollContainer(Direction.Horizontal)
                                                 {
-                                                    Name = "User Name FillFlow",
-                                                    Spacing = new Vector2(7.5f),
-                                                    Direction = FillDirection.Horizontal,
-                                                    AutoSizeAxes = Axes.Both,
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Children = new Drawable[]
+                                                    ScrollbarVisible = false,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Height = 35,
+                                                    Child = new FillFlowContainer
                                                     {
-                                                        userFlag = new UpdateableFlag
+                                                        Name = "User Name FillFlow",
+                                                        Spacing = new Vector2(7.5f),
+                                                        Direction = FillDirection.Horizontal,
+                                                        AutoSizeAxes = Axes.Both,
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Children = new Drawable[]
                                                         {
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            Size = new Vector2(30, 20),
-                                                            ShowPlaceholderOnNull = false,
-                                                        },
-                                                        usernameText = new OsuSpriteText
-                                                        {
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
-                                                        },
-                                                        openUserExternally = new ExternalLinkButton
-                                                        {
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            Margin = new MarginPadding { Left = 5 },
-                                                        },
-                                                    }
+                                                            userFlag = new UpdateableFlag
+                                                            {
+                                                                Anchor = Anchor.Centre,
+                                                                Origin = Anchor.Centre,
+                                                                Size = new Vector2(30, 20),
+                                                                ShowPlaceholderOnNull = false,
+                                                            },
+                                                            usernameText = new OsuSpriteText
+                                                            {
+                                                                Anchor = Anchor.Centre,
+                                                                Origin = Anchor.Centre,
+                                                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                                            },
+                                                            openUserExternally = new ExternalLinkButton
+                                                            {
+                                                                Anchor = Anchor.Centre,
+                                                                Origin = Anchor.Centre,
+                                                            },
+                                                        }
+                                                    },
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -295,6 +303,12 @@ namespace osu.Game.Overlays.Profile.Header
                     },
                 }
             };
+
+            userNameScroll.ScrollContent.Anchor = Anchor.Centre;
+            userNameScroll.ScrollContent.Origin = Anchor.Centre;
+
+            scoreRankInfoScroll.ScrollContent.Anchor = Anchor.Centre;
+            scoreRankInfoScroll.ScrollContent.Origin = Anchor.Centre;
 
             User.BindValueChanged(user => updateUser(user.NewValue));
         }
