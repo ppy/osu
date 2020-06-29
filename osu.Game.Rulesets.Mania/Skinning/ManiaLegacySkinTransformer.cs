@@ -9,6 +9,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Skinning;
 using System.Collections.Generic;
+using osu.Framework.Audio.Sample;
+using osu.Game.Audio;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Skinning
 {
@@ -127,6 +130,15 @@ namespace osu.Game.Rulesets.Mania.Skinning
                               ?? default_hitresult_skin_filenames[result];
 
             return this.GetAnimation(filename, true, true);
+        }
+
+        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        {
+            // layered hit sounds never play in mania
+            if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample && legacySample.IsLayered)
+                return new SampleChannelVirtual();
+
+            return Source.GetSample(sampleInfo);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)

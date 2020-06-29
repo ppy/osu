@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
@@ -61,6 +62,9 @@ namespace osu.Game.Rulesets.Scoring
         private double rollingMaxBaseScore;
         private double baseScore;
         private double bonusScore;
+
+        private readonly List<HitEvent> hitEvents = new List<HitEvent>();
+        private HitObject lastHitObject;
 
         private double scoreMultiplier = 1;
 
@@ -129,8 +133,19 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
+            hitEvents.Add(CreateHitEvent(result));
+            lastHitObject = result.HitObject;
+
             updateScore();
         }
+
+        /// <summary>
+        /// Creates the <see cref="HitEvent"/> that describes a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/> to describe.</param>
+        /// <returns>The <see cref="HitEvent"/>.</returns>
+        protected virtual HitEvent CreateHitEvent(JudgementResult result)
+            => new HitEvent(result.TimeOffset, result.Type, result.HitObject, lastHitObject, null);
 
         protected sealed override void RevertResultInternal(JudgementResult result)
         {
@@ -153,6 +168,10 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore -= result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
+
+            Debug.Assert(hitEvents.Count > 0);
+            lastHitObject = hitEvents[^1].LastHitObject;
+            hitEvents.RemoveAt(hitEvents.Count - 1);
 
             updateScore();
         }
@@ -208,6 +227,8 @@ namespace osu.Game.Rulesets.Scoring
             base.Reset(storeResults);
 
             scoreResultCounts.Clear();
+            hitEvents.Clear();
+            lastHitObject = null;
 
             if (storeResults)
             {
@@ -248,6 +269,8 @@ namespace osu.Game.Rulesets.Scoring
 
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 score.Statistics[result] = GetStatistic(result);
+
+            score.HitEvents = new List<HitEvent>(hitEvents);
         }
 
         /// <summary>

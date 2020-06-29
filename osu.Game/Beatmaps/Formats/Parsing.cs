@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Formats
     /// </summary>
     public static class Parsing
     {
-        public const int MAX_COORDINATE_VALUE = 65536;
+        public const int MAX_COORDINATE_VALUE = 131072;
 
         public const double MAX_PARSE_VALUE = int.MaxValue;
 

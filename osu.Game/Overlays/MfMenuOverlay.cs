@@ -61,8 +61,11 @@ namespace osu.Game.Overlays
             foreach (var o in SectionsOrder)
             {
                 var sec = Sections.FirstOrDefault(s => s.SectionId == o);
-                tabControl.AddItem(sec);
-                sectionContainer.Add(sec);
+                this.Schedule(() =>
+                {
+                    tabControl.AddItem(sec);
+                    sectionContainer.Add(sec);
+                });
             }
 
             tabControl.Current.BindValueChanged(OnSelectedTabTypeChanged);

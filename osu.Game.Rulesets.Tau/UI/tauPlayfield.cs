@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Tau.UI
                 ShowVisualisation.TriggerChange();
             }
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 if (effectPoint.KiaiMode)
                 {

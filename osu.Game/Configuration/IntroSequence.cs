@@ -9,6 +9,8 @@ namespace osu.Game.Configuration
     {
         [Description("圆周")]
         Circles,
+        [Description("怀旧")]
+        Welcome,
         [Description("三角")]
         Triangles,
         [Description("圆周(中文)")]

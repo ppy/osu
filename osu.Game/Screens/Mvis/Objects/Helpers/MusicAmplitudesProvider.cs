@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Mvis.UI.Objects.Helpers
             base.Update();
 
             var track = Beatmap.Value?.Track;
-            OnAmplitudesUpdate(track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256]);
+            OnAmplitudesUpdate(track?.CurrentAmplitudes.FrequencyAmplitudes.Span.ToArray() ?? new float[256]);
             IsKiai.Value = Beatmap.Value?.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? 0).KiaiMode ?? false;
         }
 

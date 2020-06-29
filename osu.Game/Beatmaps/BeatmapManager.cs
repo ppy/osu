@@ -240,6 +240,9 @@ namespace osu.Game.Beatmaps
                 beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
             }
 
+            if (beatmapInfo == null)
+                return DefaultBeatmap;
+
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);

@@ -23,6 +23,7 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
 {
@@ -208,5 +209,14 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
+
+        /// <summary>
+        /// Creates the statistics for a <see cref="ScoreInfo"/> to be displayed in the results screen.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
+        /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
+        /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
+        [NotNull]
+        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
     }
 }
