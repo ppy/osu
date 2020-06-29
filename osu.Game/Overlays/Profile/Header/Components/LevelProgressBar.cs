@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 levelProgressBar = new Bar
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BackgroundColour = Color4.Black,
+                    BackgroundColour = colourProvider.Background6,
                     Direction = BarDirection.LeftToRight,
                     AccentColour = colourProvider.Highlight1
                 },
