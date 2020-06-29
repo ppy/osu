@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Header
                 },
                 new Container
                 {
-                    Padding = new MarginPadding(Height * 0.1f),
+                    Padding = new MarginPadding {Vertical = Height * 0.1f, Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
                     RelativeSizeAxes = Axes.Both,
                     Child = new GridContainer
                     {
