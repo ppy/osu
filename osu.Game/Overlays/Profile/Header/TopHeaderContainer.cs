@@ -15,6 +15,7 @@ using osu.Game.Users;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -146,20 +147,26 @@ namespace osu.Game.Overlays.Profile.Header
                                             Height = 0.3f,
                                             Anchor = Anchor.BottomCentre,
                                             Origin = Anchor.BottomCentre,
-                                            Child = new FillFlowContainer
+                                            Child = new OsuScrollContainer(Direction.Horizontal)
                                             {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Spacing = new Vector2(5),
-                                                Children = new[]
+                                                ScrollbarVisible = false,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding{ Horizontal = 20 },
+                                                Child = new FillFlowContainer
                                                 {
-                                                    scoreRankInfos[ScoreRank.XH] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.XH),
-                                                    scoreRankInfos[ScoreRank.X] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.X),
-                                                    scoreRankInfos[ScoreRank.SH] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.SH),
-                                                    scoreRankInfos[ScoreRank.S] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.S),
-                                                    scoreRankInfos[ScoreRank.A] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.A),
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Spacing = new Vector2(5),
+                                                    Children = new[]
+                                                    {
+                                                        scoreRankInfos[ScoreRank.XH] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.XH),
+                                                        scoreRankInfos[ScoreRank.X] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.X),
+                                                        scoreRankInfos[ScoreRank.SH] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.SH),
+                                                        scoreRankInfos[ScoreRank.S] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.S),
+                                                        scoreRankInfos[ScoreRank.A] = new DetailHeaderContainer.ScoreRankInfo(ScoreRank.A),
+                                                    }
                                                 }
                                             }
                                         },
