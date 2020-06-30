@@ -166,6 +166,10 @@ namespace osu.Game.Scoring
             }
         }
 
+        [NotMapped]
+        [JsonIgnore]
+        public List<HitEvent> HitEvents { get; set; }
+
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
