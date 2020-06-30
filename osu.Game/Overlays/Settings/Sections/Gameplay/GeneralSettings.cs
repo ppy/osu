@@ -76,6 +76,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Score display mode",
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Disable Win key during gameplay",
+                    Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
                 }
             };
         }
