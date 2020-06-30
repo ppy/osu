@@ -30,6 +30,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             set => line.Colour = value;
         }
 
+        public float LineAlpha
+        {
+            set => line.Alpha = value;
+        }
+
         public OverlinedInfoContainer(bool big = false, int minimumWidth = 60)
         {
             AutoSizeAxes = Axes.Both;

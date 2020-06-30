@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -24,10 +25,16 @@ namespace osu.Game.Overlays.Profile.Header
         private RankGraph rankGraph;
 
         public readonly Bindable<User> User = new Bindable<User>();
+        public readonly BindableBool DetailsVisible = new BindableBool(true);
 
         private bool expanded = true;
         private ComponentContainer rankGraphContainer;
         private ComponentContainer rankInfoContainer;
+        private FillFlowContainer expandedInfoFillFlow;
+        private FillFlowContainer hiddenInfoFillFlow;
+        private OverlinedInfoContainer hiddenDetailGlobal;
+        private OverlinedInfoContainer hiddenDetailCountry;
+        private OsuClickableContainer toggleFoldButton;
 
         public bool Expanded
         {
@@ -42,11 +49,16 @@ namespace osu.Game.Overlays.Profile.Header
                 fillFlow.ClearTransforms();
 
                 if (expanded)
-                    fillFlow.AutoSizeAxes = Axes.Y;
+                {
+                    expandedInfoFillFlow.FadeIn(300, Easing.OutQuint);
+                    hiddenInfoFillFlow.FadeOut(300, Easing.OutQuint);
+                    toggleFoldButton.TooltipText = "折叠";
+                }
                 else
                 {
-                    fillFlow.AutoSizeAxes = Axes.None;
-                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
+                    expandedInfoFillFlow.FadeOut(300, Easing.OutQuint);
+                    hiddenInfoFillFlow.FadeIn(300, Easing.OutQuint);
+                    toggleFoldButton.TooltipText = "展开";
                 }
             }
         }
@@ -63,7 +75,7 @@ namespace osu.Game.Overlays.Profile.Header
                 fillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
+                    AutoSizeAxes = Axes.Y,
                     AutoSizeDuration = 200,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
@@ -102,6 +114,9 @@ namespace osu.Game.Overlays.Profile.Header
                                 },
                                 rankInfoContainer = new ComponentContainer
                                 {
+                                    Name = "Rank Info Container",
+                                    AutoSizeDuration = 200,
+                                    AutoSizeEasing = Easing.OutQuint,
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
@@ -112,7 +127,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = colourProvider.Background6,
                                         },
-                                        new FillFlowContainer
+                                        expandedInfoFillFlow = new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Vertical,
@@ -123,14 +138,46 @@ namespace osu.Game.Overlays.Profile.Header
                                                 detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                                 {
                                                     Title = "全球排名",
-                                                    LineColour = Colour4.Black.Opacity(0),
+                                                    LineAlpha = 0,
                                                 },
                                                 detailCountryRank = new OverlinedInfoContainer(false, 110)
                                                 {
                                                     Title = "国内/地区排名",
-                                                    LineColour = Colour4.Black.Opacity(0),
+                                                    LineAlpha = 0,
                                                 },
                                             }
+                                        },
+                                        hiddenInfoFillFlow = new FillFlowContainer
+                                        {
+                                            Name = "Hidden Info Container",
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Alpha = 0,
+                                            LayoutDuration = 200,
+                                            LayoutEasing = Easing.OutQuint,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Padding = new MarginPadding(25),
+                                            Spacing = new Vector2(10),
+                                            Children = new[]
+                                            {
+                                                hiddenDetailGlobal = new OverlinedInfoContainer
+                                                {
+                                                    Title = "全球排名",
+                                                    LineAlpha = 0
+                                                },
+                                                hiddenDetailCountry = new OverlinedInfoContainer
+                                                {
+                                                    Title = "国家/地区排名",
+                                                    LineAlpha = 0
+                                                },
+                                            }
+                                        },
+                                        toggleFoldButton = new OsuClickableContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Action = () => DetailsVisible.Toggle(),
+                                            TooltipText = expanded ? "折叠" : "展开"
                                         }
                                     }
                                 },
@@ -145,6 +192,9 @@ namespace osu.Game.Overlays.Profile.Header
         {
             detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+
+            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
+            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
