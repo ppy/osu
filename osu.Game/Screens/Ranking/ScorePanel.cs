@@ -76,6 +76,12 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
+
+        /// <summary>
+        /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
+        /// </summary>
+        public Action PostExpandAction;
+
         public readonly ScoreInfo Score;
 
         private Container content;
@@ -236,10 +242,28 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        public override Vector2 Size
+        {
+            get => base.Size;
+            set
+            {
+                base.Size = value;
+
+                // Auto-size isn't used to avoid 1-frame issues and because the score panel is removed/re-added to the container.
+                if (trackingContainer != null)
+                    trackingContainer.Size = value;
+            }
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             if (State == PanelState.Contracted)
+            {
                 State = PanelState.Expanded;
+                return true;
+            }
+
+            PostExpandAction?.Invoke();
 
             return true;
         }
@@ -248,5 +272,24 @@ namespace osu.Game.Screens.Ranking
             => base.ReceivePositionalInputAt(screenSpacePos)
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
+
+        private ScorePanelTrackingContainer trackingContainer;
+
+        /// <summary>
+        /// Creates a <see cref="ScorePanelTrackingContainer"/> which this <see cref="ScorePanel"/> can reside inside.
+        /// The <see cref="ScorePanelTrackingContainer"/> will track the size of this <see cref="ScorePanel"/>.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="ScorePanel"/> is immediately added as a child of the <see cref="ScorePanelTrackingContainer"/>.
+        /// </remarks>
+        /// <returns>The <see cref="ScorePanelTrackingContainer"/>.</returns>
+        /// <exception cref="InvalidOperationException">If a <see cref="ScorePanelTrackingContainer"/> already exists.</exception>
+        public ScorePanelTrackingContainer CreateTrackingContainer()
+        {
+            if (trackingContainer != null)
+                throw new InvalidOperationException("A score panel container has already been created.");
+
+            return trackingContainer = new ScorePanelTrackingContainer(this);
+        }
     }
 }
