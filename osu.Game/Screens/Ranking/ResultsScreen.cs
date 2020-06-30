@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,6 +17,7 @@ using osu.Game.Online.API;
 using osu.Game.Scoring;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
@@ -23,6 +25,7 @@ namespace osu.Game.Screens.Ranking
     public abstract class ResultsScreen : OsuScreen
     {
         protected const float BACKGROUND_BLUR = 20;
+        private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -42,8 +45,10 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        private StatisticsPanel statisticsPanel;
         private Drawable bottomPanel;
-        private ScorePanelList panels;
+        private ScorePanelList scorePanelList;
+        private Container<ScorePanel> detachedPanelContainer;
 
         protected ResultsScreen(ScoreInfo score, bool allowRetry = true)
         {
@@ -65,12 +70,39 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        new ResultsScrollContainer
+                        new Container
                         {
-                            Child = panels = new ScorePanelList
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                SelectedScore = { BindTarget = SelectedScore }
+                                new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarVisible = false,
+                                    Child = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = screen_height,
+                                        Children = new Drawable[]
+                                        {
+                                            scorePanelList = new ScorePanelList
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                SelectedScore = { BindTarget = SelectedScore },
+                                                PostExpandAction = () => statisticsPanel.ToggleVisibility()
+                                            },
+                                            detachedPanelContainer = new Container<ScorePanel>
+                                            {
+                                                RelativeSizeAxes = Axes.Both
+                                            },
+                                            statisticsPanel = new StatisticsPanel
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Score = { BindTarget = SelectedScore }
+                                            },
+                                        }
+                                    }
+                                },
                             }
                         }
                     },
@@ -118,7 +150,7 @@ namespace osu.Game.Screens.Ranking
             };
 
             if (Score != null)
-                panels.AddScore(Score);
+                scorePanelList.AddScore(Score);
 
             if (player != null && allowRetry)
             {
@@ -143,11 +175,13 @@ namespace osu.Game.Screens.Ranking
             var req = FetchScores(scores => Schedule(() =>
             {
                 foreach (var s in scores)
-                    panels.AddScore(s);
+                    addScore(s);
             }));
 
             if (req != null)
                 api.Queue(req);
+
+            statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
         }
 
         /// <summary>
@@ -169,32 +203,78 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
+            if (statisticsPanel.State.Value == Visibility.Visible)
+            {
+                statisticsPanel.Hide();
+                return true;
+            }
+
             Background.FadeTo(1, 250);
 
             return base.OnExiting(next);
         }
 
-        private class ResultsScrollContainer : OsuScrollContainer
+        private void addScore(ScoreInfo score)
         {
-            private readonly Container content;
+            var panel = scorePanelList.AddScore(score);
 
-            protected override Container<Drawable> Content => content;
+            if (detachedPanel != null)
+                panel.Alpha = 0;
+        }
 
-            public ResultsScrollContainer()
+        private ScorePanel detachedPanel;
+
+        private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
+        {
+            if (state.NewValue == Visibility.Visible)
             {
-                base.Content.Add(content = new Container
-                {
-                    RelativeSizeAxes = Axes.X
-                });
+                // Detach the panel in its original location, and move into the desired location in the local container.
+                var expandedPanel = scorePanelList.GetPanelForScore(SelectedScore.Value);
+                var screenSpacePos = expandedPanel.ScreenSpaceDrawQuad.TopLeft;
 
-                RelativeSizeAxes = Axes.Both;
-                ScrollbarVisible = false;
+                // Detach and move into the local container.
+                scorePanelList.Detach(expandedPanel);
+                detachedPanelContainer.Add(expandedPanel);
+
+                // Move into its original location in the local container first, then to the final location.
+                var origLocation = detachedPanelContainer.ToLocalSpace(screenSpacePos);
+                expandedPanel.MoveTo(origLocation)
+                             .Then()
+                             .MoveTo(new Vector2(StatisticsPanel.SIDE_PADDING, origLocation.Y), 150, Easing.OutQuint);
+
+                // Hide contracted panels.
+                foreach (var contracted in scorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
+                    contracted.FadeOut(150, Easing.OutQuint);
+                scorePanelList.HandleInput = false;
+
+                // Dim background.
+                Background.FadeTo(0.1f, 150);
+
+                detachedPanel = expandedPanel;
             }
-
-            protected override void Update()
+            else if (detachedPanel != null)
             {
-                base.Update();
-                content.Height = Math.Max(768 - TwoLayerButton.SIZE_EXTENDED.Y, DrawHeight);
+                var screenSpacePos = detachedPanel.ScreenSpaceDrawQuad.TopLeft;
+
+                // Remove from the local container and re-attach.
+                detachedPanelContainer.Remove(detachedPanel);
+                scorePanelList.Attach(detachedPanel);
+
+                // Move into its original location in the attached container first, then to the final location.
+                var origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos);
+                detachedPanel.MoveTo(origLocation)
+                             .Then()
+                             .MoveTo(new Vector2(0, origLocation.Y), 150, Easing.OutQuint);
+
+                // Show contracted panels.
+                foreach (var contracted in scorePanelList.GetScorePanels().Where(p => p.State == PanelState.Contracted))
+                    contracted.FadeIn(150, Easing.OutQuint);
+                scorePanelList.HandleInput = true;
+
+                // Un-dim background.
+                Background.FadeTo(0.5f, 150);
+
+                detachedPanel = null;
             }
         }
     }
