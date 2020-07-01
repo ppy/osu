@@ -28,19 +28,16 @@ namespace osu.Game.Tournament.IO
                 ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
             }
             else
-            {
-                Migrate(GetFullPath(default_tournament));
-                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(default_tournament));
-            }
+                Migrate(UnderlyingStorage.GetStorageForDirectory(default_tournament));
 
             VideoStore = new TournamentVideoResourceStore(this);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
         }
 
-        public override void Migrate(string newLocation)
+        public override void Migrate(Storage newStorage)
         {
             var source = new DirectoryInfo(storage.GetFullPath("tournament"));
-            var destination = new DirectoryInfo(newLocation);
+            var destination = new DirectoryInfo(newStorage.GetFullPath("."));
 
             if (source.Exists)
             {
@@ -53,6 +50,7 @@ namespace osu.Game.Tournament.IO
             moveFileIfExists("drawings.txt", destination);
             moveFileIfExists("drawings_results.txt", destination);
             moveFileIfExists("drawings.ini", destination);
+            ChangeTargetStorage(newStorage);
             storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
             storageConfig.Save();
         }

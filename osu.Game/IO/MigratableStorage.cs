@@ -22,7 +22,36 @@ namespace osu.Game.IO
         {
         }
 
-        public abstract void Migrate(string newLocation);
+        /// <summary>
+        /// A general purpose migration method to move the storage to a different location.
+        /// <param name="newStorage">The target storage of the migration.</param>
+        /// </summary>
+        public virtual void Migrate(Storage newStorage)
+        {
+            var source = new DirectoryInfo(GetFullPath("."));
+            var destination = new DirectoryInfo(newStorage.GetFullPath("."));
+
+            // using Uri is the easiest way to check equality and contains (https://stackoverflow.com/a/7710620)
+            var sourceUri = new Uri(source.FullName + Path.DirectorySeparatorChar);
+            var destinationUri = new Uri(destination.FullName + Path.DirectorySeparatorChar);
+
+            if (sourceUri == destinationUri)
+                throw new ArgumentException("Destination provided is already the current location", nameof(newStorage));
+
+            if (sourceUri.IsBaseOf(destinationUri))
+                throw new ArgumentException("Destination provided is inside the source", nameof(newStorage));
+
+            // ensure the new location has no files present, else hard abort
+            if (destination.Exists)
+            {
+                if (destination.GetFiles().Length > 0 || destination.GetDirectories().Length > 0)
+                    throw new ArgumentException("Destination provided already has files or directories present", nameof(newStorage));
+            }
+
+            CopyRecursive(source, destination);
+            ChangeTargetStorage(newStorage);
+            DeleteRecursive(source);
+        }
 
         protected void DeleteRecursive(DirectoryInfo target, bool topLevelExcludes = true)
         {
