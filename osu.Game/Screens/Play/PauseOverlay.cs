@@ -44,17 +44,17 @@ namespace osu.Game.Screens.Play
             base.PopIn();
 
             //SkinnableSound only plays a sound if its aggregate volume is > 0, so the volume must be turned up before playing it
-            pauseLoop?.TransformBindableTo(pauseLoop.Volume, 0.00001);
-            pauseLoop?.TransformBindableTo(pauseLoop.Volume, 1.0f, 400, Easing.InQuint);
-            pauseLoop?.Play();
+            pauseLoop.TransformBindableTo(pauseLoop.Volume, 0.00001);
+            pauseLoop.TransformBindableTo(pauseLoop.Volume, 1.0f, 400, Easing.InQuint);
+            pauseLoop.Play();
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            pauseLoop?.Stop();
-            pauseLoop?.TransformBindableTo(pauseLoop.Volume, 0.0f);
+            pauseLoop.Stop();
+            pauseLoop.TransformBindableTo(pauseLoop.Volume, 0.0f);
         }
     }
 }
