@@ -7,8 +7,6 @@ using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
@@ -18,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : Skill
+    public static class Aim
     {
         /// <summary>
         /// We want to find a throughput level at which the probability of FC = prob_threshold
@@ -92,6 +90,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Converts hit objects into movements.
         /// </summary>
+        /// <param name="hitObjects">List of all map hit objects</param>
+        /// <param name="strainHistory">List of all hit objects' tap strain</param>
+        /// <param name="noteDensities">List of all hit objects' visual note densities</param>
+        /// <param name="clockRate">Clock rate</param>
+        /// <param name="hidden">Are we calculating hidden mod?</param>
+        /// <returns>List of all movements</returns>
         private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory,
                                                          bool hidden = false, List<double> noteDensities = null)
         {
@@ -284,14 +288,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return fcProb;
-        }
-
-        protected override double SkillMultiplier => 0;
-        protected override double StrainDecayBase => 0;
-
-        protected override double StrainValueOf(DifficultyHitObject current)
-        {
-            throw new NotImplementedException();
         }
     }
 }
