@@ -36,16 +36,16 @@ namespace osu.Game.IO
             var destinationUri = new Uri(destination.FullName + Path.DirectorySeparatorChar);
 
             if (sourceUri == destinationUri)
-                throw new ArgumentException("Destination provided is already the current location", nameof(newStorage));
+                throw new ArgumentException("Destination provided is already the current location", destination.FullName);
 
             if (sourceUri.IsBaseOf(destinationUri))
-                throw new ArgumentException("Destination provided is inside the source", nameof(newStorage));
+                throw new ArgumentException("Destination provided is inside the source", destination.FullName);
 
             // ensure the new location has no files present, else hard abort
             if (destination.Exists)
             {
                 if (destination.GetFiles().Length > 0 || destination.GetDirectories().Length > 0)
-                    throw new ArgumentException("Destination provided already has files or directories present", nameof(newStorage));
+                    throw new ArgumentException("Destination provided already has files or directories present", destination.FullName);
             }
 
             CopyRecursive(source, destination);
