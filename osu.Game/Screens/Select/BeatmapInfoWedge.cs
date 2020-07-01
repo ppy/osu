@@ -155,7 +155,6 @@ namespace osu.Game.Screens.Select
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 CacheDrawnFrameBuffer = true;
-                RedrawOnScale = false;
 
                 RelativeSizeAxes = Axes.Both;
 
