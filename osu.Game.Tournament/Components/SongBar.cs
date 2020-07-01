@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -66,6 +67,9 @@ namespace osu.Game.Tournament.Components
             }
         }
 
+        // Todo: This is a hack for https://github.com/ppy/osu-framework/issues/3617 since this container is at the very edge of the screen and potentially initially masked away.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -77,8 +81,6 @@ namespace osu.Game.Tournament.Components
                 flow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    // Todo: This is a hack for https://github.com/ppy/osu-framework/issues/3617 since this container is at the very edge of the screen and potentially initially masked away.
-                    Height = 1,
                     AutoSizeAxes = Axes.Y,
                     LayoutDuration = 500,
                     LayoutEasing = Easing.OutQuint,
