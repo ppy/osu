@@ -34,7 +34,17 @@ namespace osu.Game.IO
             var customStoragePath = storageConfig.Get<string>(StorageConfig.FullPath);
 
             if (!string.IsNullOrEmpty(customStoragePath))
-                ChangeTargetStorage(host.GetStorage(customStoragePath));
+            {
+                try
+                {
+                    ChangeTargetStorage(host.GetStorage(customStoragePath));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Couldn't use custom storage path ({customStoragePath}): {ex}. Using default path.", LoggingTarget.Runtime, LogLevel.Error);
+                    ChangeTargetStorage(defaultStorage);
+                }
+            }
         }
 
         protected override void ChangeTargetStorage(Storage newStorage)
