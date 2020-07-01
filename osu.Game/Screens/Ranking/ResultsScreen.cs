@@ -79,6 +79,11 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
+                                    statisticsPanel = new StatisticsPanel
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Score = { BindTarget = SelectedScore }
+                                    },
                                     scorePanelList = new ScorePanelList
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -88,11 +93,6 @@ namespace osu.Game.Screens.Ranking
                                     detachedPanelContainer = new Container<ScorePanel>
                                     {
                                         RelativeSizeAxes = Axes.Both
-                                    },
-                                    statisticsPanel = new StatisticsPanel
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Score = { BindTarget = SelectedScore }
                                     },
                                 }
                             }
