@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
                 Looping = true,
             });
             // PopIn is called before updating the skin, and when a sample is updated, its "playing" value is reset
-            // the sample must be played again(and if it plays when it shouldn't, the volume will be at 0)
+            // the sample must be played again
             pauseLoop.OnSkinChanged += () => pauseLoop.Play();
         }
 
