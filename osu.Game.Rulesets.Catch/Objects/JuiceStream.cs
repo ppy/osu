@@ -7,7 +7,6 @@ using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -80,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             {
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
-                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X,
                             });
                         }
                     }
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
+                            X = X + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
 
@@ -108,14 +107,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = Samples,
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
+                            X = X + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
                 }
             }
         }
 
-        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
+        public float EndX => X + this.CurvePositionAt(1).X;
 
         public double Duration
         {
