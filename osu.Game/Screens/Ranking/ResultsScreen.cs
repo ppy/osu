@@ -70,41 +70,33 @@ namespace osu.Game.Screens.Ranking
                 {
                     new Drawable[]
                     {
-                        new Container
+                        new VerticalScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            ScrollbarVisible = false,
+                            Child = new Container
                             {
-                                new OsuScrollContainer
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ScrollbarVisible = false,
-                                    Child = new Container
+                                    statisticsPanel = new StatisticsPanel
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = screen_height,
-                                        Children = new Drawable[]
-                                        {
-                                            scorePanelList = new ScorePanelList
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                SelectedScore = { BindTarget = SelectedScore },
-                                                PostExpandAction = () => statisticsPanel.ToggleVisibility()
-                                            },
-                                            detachedPanelContainer = new Container<ScorePanel>
-                                            {
-                                                RelativeSizeAxes = Axes.Both
-                                            },
-                                            statisticsPanel = new StatisticsPanel
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Score = { BindTarget = SelectedScore }
-                                            },
-                                        }
-                                    }
-                                },
+                                        RelativeSizeAxes = Axes.Both,
+                                        Score = { BindTarget = SelectedScore }
+                                    },
+                                    scorePanelList = new ScorePanelList
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        SelectedScore = { BindTarget = SelectedScore },
+                                        PostExpandAction = () => statisticsPanel.ToggleVisibility()
+                                    },
+                                    detachedPanelContainer = new Container<ScorePanel>
+                                    {
+                                        RelativeSizeAxes = Axes.Both
+                                    },
+                                }
                             }
-                        }
+                        },
                     },
                     new[]
                     {
@@ -275,6 +267,24 @@ namespace osu.Game.Screens.Ranking
                 Background.FadeTo(0.5f, 150);
 
                 detachedPanel = null;
+            }
+        }
+
+        private class VerticalScrollContainer : OsuScrollContainer
+        {
+            protected override Container<Drawable> Content => content;
+
+            private readonly Container content;
+
+            public VerticalScrollContainer()
+            {
+                base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                content.Height = Math.Max(screen_height, DrawHeight);
             }
         }
     }
