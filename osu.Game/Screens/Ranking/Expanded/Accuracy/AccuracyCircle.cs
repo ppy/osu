@@ -193,16 +193,24 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding { Vertical = -15, Horizontal = -20 },
                     Children = new[]
                     {
-                        new RankBadge(1f, score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X),
-                        new RankBadge(0.95f, score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S),
-                        new RankBadge(0.9f, ScoreRank.A),
-                        new RankBadge(0.8f, ScoreRank.B),
-                        new RankBadge(0.7f, ScoreRank.C),
-                        new RankBadge(0.35f, ScoreRank.D),
+                        new RankBadge(1f, getRank(ScoreRank.X)),
+                        new RankBadge(0.95f, getRank(ScoreRank.S)),
+                        new RankBadge(0.9f, getRank(ScoreRank.A)),
+                        new RankBadge(0.8f, getRank(ScoreRank.B)),
+                        new RankBadge(0.7f, getRank(ScoreRank.C)),
+                        new RankBadge(0.35f, getRank(ScoreRank.D)),
                     }
                 },
                 rankText = new RankText(score.Rank)
             };
+        }
+
+        private ScoreRank getRank(ScoreRank rank)
+        {
+            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, score.Accuracy);
+
+            return rank;
         }
 
         protected override void LoadComplete()
