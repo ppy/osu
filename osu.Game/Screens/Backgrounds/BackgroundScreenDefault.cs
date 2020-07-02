@@ -21,9 +21,6 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 7;
-
-        private string backgroundName;
-
         private Bindable<User> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
@@ -76,6 +73,7 @@ namespace osu.Game.Screens.Backgrounds
         private Background createBackground()
         {
             Background newBackground;
+            string backgroundName;
 
             switch (introSequence.Value)
             {
