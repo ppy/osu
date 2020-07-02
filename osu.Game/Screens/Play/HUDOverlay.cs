@@ -262,7 +262,10 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected virtual FailingLayer CreateFailingLayer() => new FailingLayer();
+        protected virtual FailingLayer CreateFailingLayer() => new FailingLayer
+        {
+            ShowHealth = { BindTarget = ShowHealthbar }
+        };
 
         protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {

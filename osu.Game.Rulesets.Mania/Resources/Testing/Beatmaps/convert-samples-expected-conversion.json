@@ -9,7 +9,8 @@
         ["normal-hitnormal"],
         ["soft-hitnormal"],
         ["drum-hitnormal"]
-      ]
+      ],
+      "Samples": ["drum-hitnormal"]
     }, {
       "StartTime": 1875.0,
       "EndTime": 2750.0,
@@ -17,14 +18,16 @@
       "NodeSamples": [
         ["soft-hitnormal"],
         ["drum-hitnormal"]
-      ]
+      ],
+      "Samples": ["drum-hitnormal"]
     }]
   }, {
     "StartTime": 3750.0,
     "Objects": [{
       "StartTime": 3750.0,
       "EndTime": 3750.0,
-      "Column": 3
+      "Column": 3,
+      "Samples": ["normal-hitnormal"]
     }]
   }]
 }
