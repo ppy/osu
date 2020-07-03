@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using NUnit.Framework.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
@@ -44,8 +46,8 @@ namespace osu.Game.Screens.Play
             base.PopIn();
 
             //SkinnableSound only plays a sound if its aggregate volume is > 0, so the volume must be turned up before playing it
-            pauseLoop.TransformBindableTo(pauseLoop.Volume, 0.00001);
-            pauseLoop.TransformBindableTo(pauseLoop.Volume, 1.0f, 400, Easing.InQuint);
+            pauseLoop.VolumeTo(0.00001f);
+            pauseLoop.VolumeTo(1.0f, 400, Easing.InQuint);
             pauseLoop.Play();
         }
 
@@ -53,8 +55,9 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
 
-            pauseLoop.Stop();
-            pauseLoop.TransformBindableTo(pauseLoop.Volume, 0.0f);
+            var transformSeq = pauseLoop.VolumeTo(0.0f, 190, Easing.OutQuad );
+            transformSeq.Finally(_ => pauseLoop.Stop());
+
         }
     }
 }
