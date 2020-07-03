@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Backgrounds
             switch (introSequence.Value)
             {
                 case IntroSequence.Welcome:
-                    backgroundName = "Menu/menu-background-welcome";
+                    backgroundName = "Intro/Welcome/menu-background";
                     break;
 
                 default:
