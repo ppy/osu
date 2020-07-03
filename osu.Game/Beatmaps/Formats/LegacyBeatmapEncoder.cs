@@ -218,7 +218,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case 2:
-                    position.X = ((IHasXPosition)hitObject).X * 512;
+                    position.X = ((IHasXPosition)hitObject).X;
                     break;
 
                 case 3:
