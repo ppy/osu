@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 base.Update();
 
-                Scale = new Vector2(Parent.ChildSize.X / CatchPlayfield.BASE_WIDTH);
+                Scale = new Vector2(Parent.ChildSize.X / CatchPlayfield.WIDTH);
                 Size = Vector2.Divide(Vector2.One, Scale);
             }
         }
