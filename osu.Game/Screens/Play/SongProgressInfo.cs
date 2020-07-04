@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
@@ -26,6 +28,8 @@ namespace osu.Game.Screens.Play
 
         private const int margin = 10;
 
+        private Bindable<double> overlayDim = new Bindable<double>();
+
         public double StartTime
         {
             set => startTime = value;
@@ -39,8 +43,9 @@ namespace osu.Game.Screens.Play
         private GameplayClock gameplayClock;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
+        private void load(OsuColour colours, GameplayClock clock, OsuConfigManager config)
         {
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
             if (clock != null)
                 gameplayClock = clock;
 
@@ -52,6 +57,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
+                    Alpha = 1 - (float) overlayDim.Value,
                     Margin = new MarginPadding
                     {
                         Left = margin,
@@ -63,6 +69,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomCentre,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
+                    Alpha = 1 - (float) overlayDim.Value,
                 },
                 timeLeft = new OsuSpriteText
                 {
@@ -70,6 +77,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomRight,
                     Colour = colours.BlueLighter,
                     Font = OsuFont.Numeric,
+                    Alpha = 1 - (float) overlayDim.Value,
                     Margin = new MarginPadding
                     {
                         Right = margin,

@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
@@ -43,6 +45,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private double maxHitWindow;
 
+        private Bindable<double> overlayDim = new Bindable<double>();
+
         public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
             : base(hitWindows)
         {
@@ -52,8 +56,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
             InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
@@ -61,6 +66,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(spacing, 0),
                 Margin = new MarginPadding(2),
+                Alpha = 1 - (float)overlayDim.Value,
                 Children = new Drawable[]
                 {
                     judgementsContainer = new Container
@@ -76,6 +82,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.y1 | alignment,
                         Origin = Anchor.y1 | alignment,
+                        Alpha = 1 - (float)overlayDim.Value,
                         Children = new Drawable[]
                         {
                             colourBarsEarly = new Container
@@ -85,6 +92,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
+                                Alpha = 1 - (float)overlayDim.Value,
                             },
                             colourBarsLate = new Container
                             {
@@ -92,6 +100,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = alignment,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
+                                Alpha = 1 - (float)overlayDim.Value,
                             },
                             new SpriteIcon
                             {

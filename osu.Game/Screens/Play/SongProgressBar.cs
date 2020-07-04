@@ -10,6 +10,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
+using osu.Framework.Bindables;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
@@ -22,6 +25,14 @@ namespace osu.Game.Screens.Play
         private readonly Container handleContainer;
 
         private bool showHandle;
+        private Bindable<double> overlayDim = new Bindable<double>();
+
+        [BackgroundDependencyLoader]
+        private void load (OsuConfigManager config)
+        {
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
+            fill.Alpha = 1 - (float)overlayDim.Value;
+        }
 
         public bool ShowHandle
         {
@@ -115,7 +126,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     Name = "Handle box",
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White
+                                    Colour = Color4.White,
                                 }
                             }
                         }

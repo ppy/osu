@@ -14,6 +14,8 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -43,6 +45,8 @@ namespace osu.Game.Screens.Play.HUD
         private const double glow_fade_time = 500;
 
         private readonly Container fill;
+
+        private Bindable<double> overlayDim = new Bindable<double>();
 
         public Color4 AccentColour
         {
@@ -98,10 +102,13 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             AccentColour = colours.BlueLighter;
             GlowColour = colours.BlueDarker;
+
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
+            fill.Alpha = 1 - (float)overlayDim.Value;
         }
 
         public void Flash(JudgementResult result)

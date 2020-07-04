@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -16,9 +19,21 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box fill;
         private readonly Box background;
 
+        private Bindable<double> overlayDim = new Bindable<double>();
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
+        }
+
         public Color4 FillColour
         {
-            set => fill.FadeColour(value, 150, Easing.OutQuint);
+            set
+            {
+                fill.FadeColour(value, 150, Easing.OutQuint);
+                fill.Alpha = 1 - (float)overlayDim.Value;
+            }
         }
 
         public Color4 BackgroundColour

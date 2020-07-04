@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -13,13 +15,20 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override double RollingDuration => 750;
 
+        private Bindable<double> overlayDim = new Bindable<double>();
+
         public SimpleComboCounter()
         {
             Current.Value = DisplayedCount = 0;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours, OsuConfigManager config)
+        {
+            AccentColour = colours.BlueLighter;
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
+            DisplayedCountSpriteText.Alpha = 1 - (float)overlayDim.Value;
+        }
 
         protected override string FormatCount(int count)
         {

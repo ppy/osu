@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Reflection.Emit;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -21,6 +22,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Background dim",
                     Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsSlider<double>
+                {
+                    LabelText = "Overlay Dim",
+                    Bindable = config.GetBindable<double>(OsuSetting.OverlayDim),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },

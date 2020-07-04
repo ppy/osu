@@ -15,6 +15,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Layout;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Play
 {
@@ -30,6 +32,8 @@ namespace osu.Game.Screens.Play
         public int ColumnCount => columns?.Children.Count ?? 0;
 
         private int progress;
+
+        private static Bindable<double> overlayDim = new Bindable<double>();
 
         public int Progress
         {
@@ -114,6 +118,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Position = new Vector2(x, 0),
                     State = ColumnState.Dimmed,
+                    //HERE
                 });
             }
 
@@ -230,12 +235,14 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuConfigManager config)
             {
+                overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
                 drawableRows.AddRange(Enumerable.Range(0, (int)cubeCount).Select(r => new Box
                 {
                     Size = new Vector2(cube_size),
                     Position = new Vector2(0, r * WIDTH + padding),
+                    Alpha = 1 - (float)overlayDim.Value,
                 }));
 
                 Children = drawableRows;

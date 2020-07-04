@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
@@ -13,6 +15,8 @@ namespace osu.Game.Graphics.UserInterface
     public class PercentageCounter : RollingCounter<double>
     {
         protected override double RollingDuration => 750;
+
+        private Bindable<double> overlayDim = new Bindable<double>();
 
         private float epsilon => 1e-10f;
 
@@ -28,7 +32,12 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours, OsuConfigManager config)
+        {
+            AccentColour = colours.BlueLighter;
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
+            DisplayedCountSpriteText.Alpha = 1 - (float)overlayDim.Value;
+        }
 
         protected override string FormatCount(double count) => count.FormatAccuracy();
 

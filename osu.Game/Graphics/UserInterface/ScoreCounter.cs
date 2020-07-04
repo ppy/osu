@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -10,8 +13,9 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
-
         public bool UseCommaSeparator;
+
+        private Bindable<double> overlayDim = new Bindable<double>();
 
         /// <summary>
         /// How many leading zeroes the counter has.
@@ -25,11 +29,16 @@ namespace osu.Game.Graphics.UserInterface
         public ScoreCounter(uint leading = 0)
         {
             DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
+            Console.WriteLine(overlayDim.Value);
             LeadingZeroes = leading;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
+        private void load(OsuColour colours, OsuConfigManager config) {
+            AccentColour = colours.BlueLighter;
+            overlayDim.BindTo(config.GetBindable<double>(OsuSetting.OverlayDim));
+            DisplayedCountSpriteText.Alpha = 1 - (float)overlayDim.Value;
+        }
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
