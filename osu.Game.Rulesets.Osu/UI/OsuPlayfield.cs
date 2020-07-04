@@ -4,6 +4,8 @@
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
+using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -26,10 +28,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
+        private readonly DrawablePool<DrawableOsuJudgement> judgementPool;
+
         public OsuPlayfield()
         {
             InternalChildren = new Drawable[]
             {
+                judgementPool = new DrawablePool<DrawableOsuJudgement>(20),
                 followPoints = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -91,12 +96,17 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
+            DrawableOsuJudgement explosion = judgementPool.Get(doj =>
             {
-                Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
-                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale)
-            };
+                if (doj.Result != null)
+                    Logger.Log("reused!");
+                doj.Result = result;
+                doj.JudgedObject = judgedObject;
+
+                doj.Origin = Anchor.Centre;
+                doj.Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition;
+                doj.Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale);
+            });
 
             judgementLayer.Add(explosion);
         }
