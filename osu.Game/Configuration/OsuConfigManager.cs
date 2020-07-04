@@ -81,6 +81,7 @@ namespace osu.Game.Configuration
             // Gameplay
             Set(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+            Set(OsuSetting.OverlayDim, 0, 0, 1, 0.01);
             Set(OsuSetting.LightenDuringBreaks, true);
 
             Set(OsuSetting.HitLighting, true);
@@ -175,6 +176,7 @@ namespace osu.Game.Configuration
         GameplayCursorSize,
         AutoCursorSize,
         DimLevel,
+        OverlayDim,
         BlurLevel,
         LightenDuringBreaks,
         ShowStoryboard,
