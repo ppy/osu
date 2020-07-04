@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
         {
             double fcTime = double.PositiveInfinity;
 
-            var sectionData = sections.Select(x => x.Evaluate(tp)).ToArray(); 
+            var sectionData = sections.Select(x => x.Evaluate(tp)).ToArray();
 
             for (int i = 0; i <= sections.Count - sectionCount; i++)
             {

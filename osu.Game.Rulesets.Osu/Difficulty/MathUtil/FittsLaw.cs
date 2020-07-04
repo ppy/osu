@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
 
             return SpecialFunctions.Erf(2.066 / d * (Exp2(mt * tp) - 1) / Math.Sqrt(2));
         }
- 
+
         // calculated using python:
         // import numpy as np
         // x=np.linspace(0,1,1000)
