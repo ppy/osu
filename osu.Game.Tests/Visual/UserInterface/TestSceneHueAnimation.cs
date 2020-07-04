@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
-                Texture = textures.Get("Intro/Triangles/logo-triangles"),
+                Texture = textures.Get("Intro/Triangles/logo-background"),
                 Colour = Colour4.White,
             });
 
