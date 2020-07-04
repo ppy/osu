@@ -25,7 +25,7 @@ namespace osu.Desktop.Windows
             winKeyEnabled.ValueChanged += toggleWinKey;
 
             disableWinKey = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey);
-            disableWinKey.BindValueChanged(t => winKeyEnabled.TriggerChange());
+            disableWinKey.BindValueChanged(t => winKeyEnabled.TriggerChange(), true);
         }
 
         private void toggleWinKey(ValueChangedEvent<bool> e)
