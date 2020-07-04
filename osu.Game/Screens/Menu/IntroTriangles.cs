@@ -217,14 +217,8 @@ namespace osu.Game.Screens.Menu
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
 
-                        const double highlight_duration = logo_scale_duration / 1.4;
-
-                        //Since we only have one texture, roughly align it by changing the timing
-                        lazerLogo.Outline = -0.4f;
-                        lazerLogo.TransformTo(nameof(LazerLogo.Outline), 1f, highlight_duration * 1.4);
-
-                        lazerLogo.OutlineHighlight = 0f;
-                        lazerLogo.TransformTo(nameof(LazerLogo.OutlineHighlight), 1f, highlight_duration);
+                        lazerLogo.TransformTo(nameof(LazerLogo.Background), 1f, logo_scale_duration);
+                        lazerLogo.TransformTo(nameof(LazerLogo.Highlight), 1f, logo_scale_duration);
 
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
@@ -267,18 +261,18 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
-                private HueAnimation outlineHighlight, outline;
+                private HueAnimation highlight, background;
 
-                public float OutlineHighlight
+                public float Highlight
                 {
-                    get => outlineHighlight.AnimationProgress;
-                    set => outlineHighlight.AnimationProgress = value;
+                    get => highlight.AnimationProgress;
+                    set => highlight.AnimationProgress = value;
                 }
 
-                public float Outline
+                public float Background
                 {
-                    get => outline.AnimationProgress;
-                    set => outline.AnimationProgress = value;
+                    get => background.AnimationProgress;
+                    set => background.AnimationProgress = value;
                 }
 
                 public LazerLogo()
@@ -289,21 +283,22 @@ namespace osu.Game.Screens.Menu
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
-                    const string lazer_logo_texture = @"Intro/Triangles/logo-triangles";
+                    const string lazer_logo_background = @"Intro/Triangles/logo-background";
+                    const string lazer_logo_highlight = @"Intro/Triangles/logo-highlight";
 
                     InternalChildren = new Drawable[]
                     {
-                        outlineHighlight = new HueAnimation
+                        highlight = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(lazer_logo_texture),
-                            Colour = OsuColour.Gray(0.8f),
+                            Texture = textures.Get(lazer_logo_highlight),
+                            Colour = OsuColour.Gray(1f),
                         },
-                        outline = new HueAnimation
+                        background = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(lazer_logo_texture),
-                            Colour = OsuColour.Gray(0.6f * 0.8f),
+                            Texture = textures.Get(lazer_logo_background),
+                            Colour = OsuColour.Gray(0.6f),
                         },
                     };
                 }
