@@ -29,7 +29,6 @@ namespace osu.Game.Graphics.UserInterface
         public ScoreCounter(uint leading = 0)
         {
             DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
-            Console.WriteLine(overlayDim.Value);
             LeadingZeroes = leading;
         }
 
