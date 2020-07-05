@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText usernameText;
         private ExternalLinkButton openUserExternally;
         private UpdateableFlag userFlag;
-        private FillFlowContainer userStats;
+        private ComponentContainer userStats;
         private readonly Dictionary<ScoreRank, DetailHeaderContainer.ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, DetailHeaderContainer.ScoreRankInfo>();
 
         private PlayerStatBox medalInfo;
@@ -287,20 +287,11 @@ namespace osu.Game.Overlays.Profile.Header
                                         }
                                     }
                                 },
-                                new ComponentContainer
+                                userStats = new ComponentContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Child = userStats = new FillFlowContainer
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Padding = new MarginPadding(15),
-                                        Spacing = new Vector2(0, 2)
-                                    }
                                 }
                             }
                         }
@@ -329,14 +320,86 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new UserStatsLine("Ranked谱面总分", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("准确率", user.Statistics.DisplayAccuracy));
-                userStats.Add(new UserStatsLine("游玩次数", user.Statistics.PlayCount.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("总分", user.Statistics.TotalScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("总连击", user.Statistics.TotalHits.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("最大连击", user.Statistics.MaxCombo.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("回放被观看次数", user.Statistics.ReplaysWatched.ToString("#,##0")));
-                
+                userStats.Add(new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            Height = (float)2/3,
+                            Child =new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(),
+                                    new Dimension(),
+                                    new Dimension(),
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new PlayerStatBox
+                                        {
+                                            Icon = FontAwesome.Regular.Map,
+                                            Title = "Ranked谱面总分",
+                                            ContentText = user.Statistics.RankedScore.ToString("#,##0")
+                                        },
+                                        new PlayerStatBox
+                                        {
+                                            Icon = FontAwesome.Regular.CheckCircle,
+                                            Title = "准确率",
+                                            ContentText = user.Statistics.DisplayAccuracy
+                                        },
+                                        new PlayerStatBox
+                                        {
+                                            Icon = FontAwesome.Solid.PlayCircle,
+                                            Title = "游玩次数",
+                                            ContentText = user.Statistics.DisplayAccuracy
+                                        },
+                                    },
+                                    new Drawable[]
+                                    {
+                                        new PlayerStatBox
+                                        {
+                                            Icon = FontAwesome.Regular.FileVideo,
+                                            Title = "回放被观看次数",
+                                            ContentText = user.Statistics.ReplaysWatched.ToString("#,##0")
+                                        },
+                                        new PlayerStatBox
+                                        {
+                                            Icon = FontAwesome.Regular.Compass,
+                                            Title = "总连击",
+                                            ContentText = user.Statistics.TotalHits.ToString("#,##0")
+                                        },
+                                        new PlayerStatBox
+                                        {
+                                            Icon = FontAwesome.Regular.WindowMaximize,
+                                            Title = "最大连击",
+                                            ContentText = user.Statistics.MaxCombo.ToString("#,##0")
+                                        },
+                                    },
+                                }
+                            }
+                        },
+                        new PlayerStatBox
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Height = (float)1/3,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Icon = FontAwesome.Regular.Calendar,
+                            Title = "总分",
+                            ContentText = user.Statistics.TotalScore.ToString("#,##0")
+                        },
+                    }
+                });
+
                 foreach (var scoreRankInfo in scoreRankInfos)
                     scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
