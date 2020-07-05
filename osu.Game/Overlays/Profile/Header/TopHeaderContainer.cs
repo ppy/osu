@@ -16,6 +16,7 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -79,69 +80,67 @@ namespace osu.Game.Overlays.Profile.Header
                                         new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Height = 0.6f,
+                                            Height = 0.65f,
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                             Masking = true,
                                             CornerRadius = 25f,
-                                            Child = new GridContainer
+                                            Children = new Drawable[]
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                ColumnDimensions = new[]
+                                                new GridContainer
                                                 {
-                                                    new Dimension(),
-                                                    new Dimension(),
-                                                    new Dimension(),
-                                                    new Dimension(),
-                                                },
-                                                Content = new[]
-                                                {
-                                                    new Drawable[]
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    ColumnDimensions = new[]
                                                     {
-                                                        new OverlinedTotalPlayTime
-                                                        {
-                                                            User = { BindTarget = User }
-                                                        },
+                                                        new Dimension(),
+                                                        new Dimension(),
                                                     },
-                                                    new Drawable[]
+                                                    Content = new[]
                                                     {
-                                                        medalInfo = new PlayerStatBox
+                                                        new Drawable[]
                                                         {
-                                                            Title = "奖章数"
-                                                        },
-                                                    },
-                                                    new Drawable[]
-                                                    {
-                                                        ppInfo = new PlayerStatBox
-                                                        {
-                                                            Title = "pp"
-                                                        }
-                                                    },
-                                                    new Drawable[]
-                                                    {
-                                                        new Container
-                                                        {
-                                                            Name = "Level Bar Area",
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            Children = new Drawable[]
+                                                            new OverlinedTotalPlayTime
                                                             {
-                                                                levelInfo = new PlayerStatBox
+                                                                User = { BindTarget = User }
+                                                            },
+                                                            medalInfo = new PlayerStatBox
+                                                            {
+                                                                Icon = FontAwesome.Solid.Medal,
+                                                                Title = "奖章数"
+                                                            },
+                                                        },
+                                                        new Drawable[]
+                                                        {
+                                                            ppInfo = new PlayerStatBox(0)
+                                                            {
+                                                                IconDescription = "PP",
+                                                                Title = "pp"
+                                                            },
+                                                            new Container
+                                                            {
+                                                                Name = "Level Bar Area",
+                                                                RelativeSizeAxes = Axes.Both,
+                                                                Children = new Drawable[]
                                                                 {
-                                                                    Title = "经验"
-                                                                },
-                                                                new LevelProgressBar
-                                                                {
-                                                                    Anchor = Anchor.BottomCentre,
-                                                                    Origin = Anchor.BottomCentre,
-                                                                    RelativeSizeAxes = Axes.X,
-                                                                    Height = 6f,
-                                                                    User = { BindTarget = User }
+                                                                    levelInfo = new PlayerStatBox(0)
+                                                                    {
+                                                                        IconDescription = "EXP",
+                                                                        Title = "经验"
+                                                                    },
                                                                 }
-                                                            }
+                                                            },
                                                         },
                                                     }
+                                                },
+                                                new LevelProgressBar
+                                                {
+                                                    Anchor = Anchor.BottomCentre,
+                                                    Origin = Anchor.BottomCentre,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Height = 4.5f,
+                                                    User = { BindTarget = User }
                                                 }
-                                            },
+                                            }
                                         },
                                         new ComponentContainer
                                         {

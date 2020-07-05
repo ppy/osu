@@ -1,7 +1,9 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -12,10 +14,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private OsuSpriteText title;
         private OsuSpriteText content;
+        private SpriteIcon icon;
+        private OsuSpriteText iconDescription;
         public string ContentText{ set => content.Text = value; }
         public string Title{ set => title.Text = value; }
+        public IconUsage Icon{ set => icon.Icon = value; }
+        public string IconDescription{ set => iconDescription.Text = value; }
 
-        public PlayerStatBox()
+        public PlayerStatBox(float IconSize = 25)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -27,19 +33,42 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Padding = new MarginPadding{ Horizontal = 15 },
-                Children = new Drawable[]
+                Child = new FillFlowContainer
                 {
-                    title = new OsuSpriteText
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Spacing = new Vector2(2.5f),
+                    Children = new Drawable[]
                     {
-                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
-                    },
-                    content = new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light)
-                    },
-                }
+                        icon = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(IconSize)
+                        },
+                        iconDescription = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.Numeric.With(size: 25)
+                        },
+                        title = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
+                        },
+                        content = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light)
+                        },
+                    }
+                },
             };
         }
     }

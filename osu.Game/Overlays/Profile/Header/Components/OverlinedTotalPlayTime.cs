@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
@@ -35,6 +36,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             InternalChild = info = new PlayerStatBox
             {
+                Icon = FontAwesome.Regular.Clock,
                 Title = "总游玩时间",
             };
 
