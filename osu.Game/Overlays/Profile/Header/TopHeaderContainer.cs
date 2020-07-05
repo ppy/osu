@@ -360,7 +360,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         {
                                             Icon = FontAwesome.Solid.PlayCircle,
                                             Title = "游玩次数",
-                                            ContentText = user.Statistics.DisplayAccuracy
+                                            ContentText = user.Statistics.PlayCount.ToString("#,##0")
                                         },
                                     },
                                     new Drawable[]
