@@ -87,50 +87,55 @@ namespace osu.Game.Overlays.Profile.Header
                                             CornerRadius = 25f,
                                             Children = new Drawable[]
                                             {
-                                                new GridContainer
+                                                new Container
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    ColumnDimensions = new[]
+                                                    Padding = new MarginPadding{ Bottom = 4.5f },
+                                                    Child = new GridContainer
                                                     {
-                                                        new Dimension(),
-                                                        new Dimension(),
-                                                    },
-                                                    Content = new[]
-                                                    {
-                                                        new Drawable[]
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        ColumnDimensions = new[]
                                                         {
-                                                            new OverlinedTotalPlayTime
-                                                            {
-                                                                User = { BindTarget = User }
-                                                            },
-                                                            medalInfo = new PlayerStatBox
-                                                            {
-                                                                Icon = FontAwesome.Solid.Medal,
-                                                                Title = "奖章数"
-                                                            },
+                                                            new Dimension(),
+                                                            new Dimension(),
                                                         },
-                                                        new Drawable[]
+                                                        Content = new[]
                                                         {
-                                                            ppInfo = new PlayerStatBox(0)
+                                                            new Drawable[]
                                                             {
-                                                                IconDescription = "PP",
-                                                                Title = "pp"
-                                                            },
-                                                            new Container
-                                                            {
-                                                                Name = "Level Bar Area",
-                                                                RelativeSizeAxes = Axes.Both,
-                                                                Children = new Drawable[]
+                                                                new OverlinedTotalPlayTime
                                                                 {
-                                                                    levelInfo = new PlayerStatBox(0)
-                                                                    {
-                                                                        IconDescription = "EXP",
-                                                                        Title = "经验"
-                                                                    },
-                                                                }
+                                                                    User = { BindTarget = User }
+                                                                },
+                                                                medalInfo = new PlayerStatBox
+                                                                {
+                                                                    Icon = FontAwesome.Solid.Medal,
+                                                                    Title = "奖章数"
+                                                                },
                                                             },
-                                                        },
-                                                    }
+                                                            new Drawable[]
+                                                            {
+                                                                ppInfo = new PlayerStatBox(0)
+                                                                {
+                                                                    IconDescription = "PP",
+                                                                    Title = "pp"
+                                                                },
+                                                                new Container
+                                                                {
+                                                                    Name = "Level Bar Area",
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        levelInfo = new PlayerStatBox(0)
+                                                                        {
+                                                                            IconDescription = "EXP",
+                                                                            Title = "经验"
+                                                                        },
+                                                                    }
+                                                                },
+                                                            },
+                                                        }
+                                                    },
                                                 },
                                                 new LevelProgressBar
                                                 {
