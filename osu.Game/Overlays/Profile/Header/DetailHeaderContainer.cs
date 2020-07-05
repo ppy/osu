@@ -138,12 +138,10 @@ namespace osu.Game.Overlays.Profile.Header
                                                 detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                                 {
                                                     Title = "全球排名",
-                                                    LineAlpha = 0,
                                                 },
                                                 detailCountryRank = new OverlinedInfoContainer(false, 110)
                                                 {
                                                     Title = "国内/地区排名",
-                                                    LineAlpha = 0,
                                                 },
                                             }
                                         },
@@ -157,19 +155,17 @@ namespace osu.Game.Overlays.Profile.Header
                                             LayoutEasing = Easing.OutQuint,
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
-                                            Padding = new MarginPadding(25),
+                                            Padding = new MarginPadding{Horizontal = 25, Vertical = 15},
                                             Spacing = new Vector2(10),
                                             Children = new[]
                                             {
-                                                hiddenDetailGlobal = new OverlinedInfoContainer
+                                                hiddenDetailGlobal = new OverlinedInfoContainer(false, 60, FillDirection.Horizontal)
                                                 {
                                                     Title = "全球排名",
-                                                    LineAlpha = 0
                                                 },
-                                                hiddenDetailCountry = new OverlinedInfoContainer
+                                                hiddenDetailCountry = new OverlinedInfoContainer(false, 60, FillDirection.Horizontal)
                                                 {
                                                     Title = "国家/地区排名",
-                                                    LineAlpha = 0
                                                 },
                                             }
                                         },
