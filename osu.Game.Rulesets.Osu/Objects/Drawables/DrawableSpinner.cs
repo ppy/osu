@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             float targetScale = relativeCircleScale + (1 - relativeCircleScale) * Progress;
             Disc.Scale = new Vector2((float)Interpolation.Lerp(Disc.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
 
-            symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, Disc.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
+            symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, Disc.RotationAbsolute / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
         }
 
         protected override void UpdateInitialTransforms()
