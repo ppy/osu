@@ -38,6 +38,7 @@ namespace osu.Desktop.Windows
                 {
                     case 0x09 when lParam.Flags == 32: // alt + tab
                     case 0x1b when lParam.Flags == 32: // alt + esc
+                    case 0x1b when (getKeyState(0x11) & 0x8000) != 0: //ctrl + esc
                     case 0x5B: // left windows key
                     case 0x5C: // right windows key
                         return 1;
@@ -78,5 +79,8 @@ namespace osu.Desktop.Windows
 
         [DllImport(@"user32.dll", EntryPoint = @"CallNextHookEx")]
         private static extern int callNextHookEx(int hHook, int nCode, int wParam, ref KdDllHookStruct lParam);
+
+        [DllImport(@"user32.dll", EntryPoint = @"GetKeyState")]
+        private static extern int getKeyState(int vkey);
     }
 }
