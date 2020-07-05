@@ -195,12 +195,6 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            if (statisticsPanel.State.Value == Visibility.Visible)
-            {
-                statisticsPanel.Hide();
-                return true;
-            }
-
             Background.FadeTo(1, 250);
 
             return base.OnExiting(next);

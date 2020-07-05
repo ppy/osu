@@ -9,9 +9,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Placeholders;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -19,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    public class StatisticsPanel : VisibilityContainer
+    public class StatisticsPanel : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SIDE_PADDING = 30;
 
@@ -132,8 +134,24 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override bool OnClick(ClickEvent e)
         {
-            ToggleVisibility();
+            State.Value = Visibility.Hidden;
             return true;
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
+                    State.Value = Visibility.Hidden;
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
