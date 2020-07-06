@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public PlayerStatBox(float IconSize = 25)
         {
+            Masking = true;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
