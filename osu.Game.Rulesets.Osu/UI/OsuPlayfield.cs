@@ -1,18 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -28,13 +33,12 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
 
-        private readonly DrawablePool<DrawableOsuJudgement> judgementPool;
+        private readonly IDictionary<HitResult, DrawablePool<DrawableOsuJudgement>> poolDictionary = new Dictionary<HitResult, DrawablePool<DrawableOsuJudgement>>();
 
         public OsuPlayfield()
         {
             InternalChildren = new Drawable[]
             {
-                judgementPool = new DrawablePool<DrawableOsuJudgement>(20),
                 followPoints = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -59,6 +63,13 @@ namespace osu.Game.Rulesets.Osu.UI
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+
+            var hitWindows = new OsuHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+                poolDictionary.Add(result, new DrawableJudgementPool(result));
+
+            AddRangeInternal(poolDictionary.Values);
         }
 
         public override void Add(DrawableHitObject h)
@@ -96,16 +107,15 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            DrawableOsuJudgement explosion = judgementPool.Get(doj =>
+            var osuObject = (OsuHitObject)judgedObject.HitObject;
+
+            DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj =>
             {
-                if (doj.Result != null)
-                    Logger.Log("reused!");
-                doj.Result = result;
                 doj.JudgedObject = judgedObject;
 
-                doj.Origin = Anchor.Centre;
-                doj.Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition;
-                doj.Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale);
+                // todo: move to JudgedObject property?
+                doj.Position = osuObject.StackedEndPosition;
+                doj.Scale = new Vector2(osuObject.Scale);
             });
 
             judgementLayer.Add(explosion);
@@ -116,6 +126,27 @@ namespace osu.Game.Rulesets.Osu.UI
         private class ApproachCircleProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable approachCircleProxy) => AddInternal(approachCircleProxy);
+        }
+
+        private class DrawableJudgementPool : DrawablePool<DrawableOsuJudgement>
+        {
+            private readonly HitResult result;
+
+            public DrawableJudgementPool(HitResult result)
+                : base(10)
+            {
+                this.result = result;
+            }
+
+            protected override DrawableOsuJudgement CreateNewDrawable()
+            {
+                var judgement = base.CreateNewDrawable();
+
+                // just a placeholder to initialise the correct drawable hierarchy for this pool.
+                judgement.Result = new JudgementResult(new HitObject(), new Judgement()) { Type = result };
+
+                return judgement;
+            }
         }
     }
 }
