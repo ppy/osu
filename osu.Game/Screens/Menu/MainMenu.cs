@@ -332,13 +332,11 @@ namespace osu.Game.Screens.Menu
 
                 var buttons = new List<PopupDialogButton>();
 
-                BodyText = $"osu! encountered an error when trying to use the custom storage path ('{storage.CustomStoragePath}').\n\n";
 
                 switch (error)
                 {
                     case OsuStorageError.NotAccessible:
-                        BodyText += $"The default storage path ('{storage.DefaultStoragePath}') is currently being used because the custom storage path is not accessible.\n\n"
-                                    + "Is it on a removable device that is not currently connected?";
+                        BodyText = $"The specified osu! data location (\"{storage.CustomStoragePath}\") is not accessible. If it is on external storage, please reconnect the device and try again.";
 
                         buttons.AddRange(new PopupDialogButton[]
                         {
@@ -353,31 +351,30 @@ namespace osu.Game.Screens.Menu
                             },
                             new PopupDialogOkButton
                             {
-                                Text = "Use the default path from now on",
+                                Text = "Reset to default location",
                                 Action = storage.ResetCustomStoragePath
                             },
                             new PopupDialogCancelButton
                             {
-                                Text = "Only use the default path for this session",
+                                Text = "Use default location for this session",
                             },
                         });
                         break;
 
                     case OsuStorageError.AccessibleButEmpty:
-                        BodyText += "The custom storage path is currently being used but is empty.\n\n"
-                                    + "Have you moved the files elsewhere?";
+                        BodyText = $"The specified osu! data location (\"{storage.CustomStoragePath}\") is empty. If you have moved the files, please close osu! and move them back.";
 
                         // Todo: Provide the option to search for the files similar to migration.
                         buttons.AddRange(new PopupDialogButton[]
                         {
                             new PopupDialogOkButton
                             {
-                                Text = "Reset to default",
+                                Text = "Reset to default location",
                                 Action = storage.ResetCustomStoragePath
                             },
                             new PopupDialogCancelButton
                             {
-                                Text = "Keep using the custom path"
+                                Text = "Start fresh at specified location"
                             }
                         });
 
