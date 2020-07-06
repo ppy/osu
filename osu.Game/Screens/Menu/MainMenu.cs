@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -15,6 +16,7 @@ using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -171,6 +173,9 @@ namespace osu.Game.Screens.Menu
             return s;
         }
 
+        [Resolved]
+        private Storage storage { get; set; }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -187,6 +192,9 @@ namespace osu.Game.Screens.Menu
                     Track.Start();
                 }
             }
+
+            if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
+                dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
         }
 
         private bool exitConfirmed;
@@ -306,6 +314,77 @@ namespace osu.Game.Screens.Menu
                         Action = cancel
                     },
                 };
+            }
+        }
+
+        private class StorageErrorDialog : PopupDialog
+        {
+            [Resolved]
+            private DialogOverlay dialogOverlay { get; set; }
+
+            [Resolved]
+            private OsuGameBase osuGame { get; set; }
+
+            public StorageErrorDialog(OsuStorage storage, OsuStorageError error)
+            {
+                HeaderText = "osu! storage error";
+                Icon = FontAwesome.Solid.ExclamationTriangle;
+
+                var buttons = new List<PopupDialogButton>();
+
+                BodyText = $"osu! encountered an error when trying to use the custom storage path ('{storage.CustomStoragePath}').\n\n";
+
+                switch (error)
+                {
+                    case OsuStorageError.NotAccessible:
+                        BodyText += $"The default storage path ('{storage.DefaultStoragePath}') is currently being used because the custom storage path is not accessible.\n\n"
+                                    + "Is it on a removable device that is not currently connected?";
+
+                        buttons.AddRange(new PopupDialogButton[]
+                        {
+                            new PopupDialogOkButton
+                            {
+                                Text = "Try again",
+                                Action = () =>
+                                {
+                                    if (!storage.TryChangeToCustomStorage(out var nextError))
+                                        dialogOverlay.Push(new StorageErrorDialog(storage, nextError));
+                                }
+                            },
+                            new PopupDialogOkButton
+                            {
+                                Text = "Use the default path from now on",
+                                Action = storage.ResetCustomStoragePath
+                            },
+                            new PopupDialogCancelButton
+                            {
+                                Text = "Only use the default path for this session",
+                            },
+                        });
+                        break;
+
+                    case OsuStorageError.AccessibleButEmpty:
+                        BodyText += "The custom storage path is currently being used but is empty.\n\n"
+                                    + "Have you moved the files elsewhere?";
+
+                        // Todo: Provide the option to search for the files similar to migration.
+                        buttons.AddRange(new PopupDialogButton[]
+                        {
+                            new PopupDialogOkButton
+                            {
+                                Text = "Reset to default",
+                                Action = storage.ResetCustomStoragePath
+                            },
+                            new PopupDialogCancelButton
+                            {
+                                Text = "Keep using the custom path"
+                            }
+                        });
+
+                        break;
+                }
+
+                Buttons = buttons;
             }
         }
     }
