@@ -82,7 +82,7 @@ namespace osu.Game.Graphics
 
         public object TooltipContent => Date;
 
-        private class DateTooltip : VisibilityContainer, ITooltip
+        public class DateTooltip : VisibilityContainer, ITooltip
         {
             private readonly OsuSpriteText dateText, timeText;
             private readonly Box background;

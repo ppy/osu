@@ -156,9 +156,11 @@ namespace osu.Game.Overlays.News
             }
         }
 
-        private class DateContainer : CircularContainer, IHasTooltip
+        private class DateContainer : CircularContainer, IHasCustomTooltip
         {
-            public string TooltipText => date.ToString("d MMMM yyyy hh:mm:ss UTCz");
+            public ITooltip GetCustomTooltip() => new DrawableDate.DateTooltip();
+
+            public object TooltipContent => date;
 
             private readonly DateTimeOffset date;
 
