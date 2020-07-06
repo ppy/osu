@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(0, 20),
                 Children = new[]
                 {
-                    new NewsCard(new NewsPost
+                    new NewsCard(new APINewsPost
                     {
                         Title = "This post has an image which starts with \"/\" and has many authors!",
                         Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                         FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
                         PublishedAt = DateTime.Now
                     }),
-                    new NewsCard(new NewsPost
+                    new NewsCard(new APINewsPost
                     {
                         Title = "This post has a full-url image!",
                         Preview = "boom",

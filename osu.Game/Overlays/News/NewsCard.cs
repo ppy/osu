@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.News
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        private readonly NewsPost post;
+        private readonly APINewsPost post;
 
         private Box background;
         private TextFlowContainer main;
 
-        public NewsCard(NewsPost post)
+        public NewsCard(APINewsPost post)
         {
             this.post = post;
         }
