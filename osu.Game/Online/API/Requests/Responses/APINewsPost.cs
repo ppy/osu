@@ -21,10 +21,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public string FirstImage { get; set; }
 
         [JsonProperty("published_at")]
-        public DateTime PublishedAt { get; set; }
+        public DateTimeOffset PublishedAt { get; set; }
 
         [JsonProperty("updated_at")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
 
         [JsonProperty("slug")]
         public string Slug { get; set; }

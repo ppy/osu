@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
                         Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                         Author = "someone, someone1, someone2, someone3, someone4",
                         FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
-                        PublishedAt = DateTime.Now
+                        PublishedAt = DateTimeOffset.Now
                     }),
                     new NewsCard(new APINewsPost
                     {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
                         Preview = "boom",
                         Author = "user",
                         FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
-                        PublishedAt = DateTime.Now
+                        PublishedAt = DateTimeOffset.Now
                     })
                 }
             });

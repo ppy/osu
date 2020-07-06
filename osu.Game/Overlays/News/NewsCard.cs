@@ -160,9 +160,9 @@ namespace osu.Game.Overlays.News
         {
             public string TooltipText => date.ToString("d MMMM yyyy hh:mm:ss UTCz");
 
-            private readonly DateTime date;
+            private readonly DateTimeOffset date;
 
-            public DateContainer(DateTime date)
+            public DateContainer(DateTimeOffset date)
             {
                 this.date = date;
             }
