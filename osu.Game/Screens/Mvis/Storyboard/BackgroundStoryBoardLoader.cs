@@ -6,26 +6,23 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Screens.Play;
 
-namespace osu.Game.Screens.Mvis
+namespace osu.Game.Screens.Mvis.Storyboard
 {
-    public class BackgroundStoryBoard : Container
+    public class BackgroundStoryBoardLoader : Container
     {
         private const float DURATION = 750;
         public Container sbContainer;
         public ClockContainer sbClock;
         private CancellationTokenSource ChangeSB;
-        private ScheduledDelegate scheduledDisplaySB;
-        private DimmableStoryboard dimmableStoryboard;
         private BindableBool EnableSB = new BindableBool();
         ///<summary>
         ///用于内部确定故事版是否已加载
         ///</summary>
         private BindableBool SBLoaded = new BindableBool();
+
         ///<summary>
         ///用于对外提供该BindableBool用于检测故事版功能是否已经准备好了
         ///</summary>
@@ -48,11 +45,17 @@ namespace osu.Game.Screens.Mvis
         /// </summary>
         private Task LoadSBTask;
 
+        private readonly Func<BackgroundStoryboardContainer> createSB;
+
+        private BackgroundStoryboardContainer SBContainer;
+
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
 
-        public BackgroundStoryBoard()
+        public BackgroundStoryBoardLoader()
         {
+            this.createSB = () => new BackgroundStoryboardContainer();
+
             RelativeSizeAxes = Axes.Both;
             Child = sbContainer = new Container
             {
@@ -69,7 +72,6 @@ namespace osu.Game.Screens.Mvis
         protected override void LoadComplete()
         {
             EnableSB.ValueChanged += _ => UpdateVisuals();
-            dimmableStoryboard?.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
         }
 
         protected override void Update()
@@ -106,24 +108,19 @@ namespace osu.Game.Screens.Mvis
         {
             try
             {
+                SBContainer = createSB();
+
+                sbClock?.FadeOut(DURATION, Easing.OutQuint);
+                sbClock?.Expire();
+
                 LoadSBTask = LoadComponentAsync(new ClockContainer(beatmap, 0)
                 {
                     Name = "ClockContainer",
                     Alpha = 0,
-                    Child = dimmableStoryboard = new DimmableStoryboard(beatmap.Storyboard)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Name = "Storyboard"
-                    }
+                    Child = new BackgroundStoryboardContainer(),
                 }, newsbClock =>
                 {
-                    sbClock?.FadeOut(DURATION, Easing.OutQuint);
-                    sbClock?.Expire();
-
                     sbClock = newsbClock;
-
-                    dimmableStoryboard.IgnoreUserSettings.Value = true;
-                    dimmableStoryboard.EnableUserDim.Value = false;
 
                     sbContainer.Add(sbClock);
 
@@ -137,6 +134,8 @@ namespace osu.Game.Screens.Mvis
                     SBLoaded.Value = true;
                     IsReady.Value = true;
                     NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
+
+                    UpdateVisuals();
 
                     Logger.Log($"Load Storyboard for Beatmap \"{beatmap.BeatmapSetInfo}\" complete!");
                 }, (ChangeSB = new CancellationTokenSource()).Token);
@@ -152,36 +151,11 @@ namespace osu.Game.Screens.Mvis
 
         public void CancelAllTasks()
         {
-            scheduledDisplaySB?.Cancel();
-            scheduledDisplaySB = null;
-
             ChangeSB?.Cancel();
 
             LoadSBTask = null;
             LoadSBAsyncTask = null;
             LogTask = null;
-        }
-
-        private void displayWhenLoaded()
-        {
-            try
-            {
-                if ( !IsReady.Value )
-                {
-                    scheduledDisplaySB?.Cancel();
-                    scheduledDisplaySB = null;
-                    return;
-                }
-
-                if ( scheduledDisplaySB != null )
-                    return;
-
-                scheduledDisplaySB = Scheduler.AddDelayed( () => UpdateVisuals() , 0);
-            }
-            finally
-            {
-                Schedule(displayWhenLoaded);
-            }
         }
 
         public void UpdateStoryBoardAsync( float displayDelay = 0 )
@@ -193,14 +167,6 @@ namespace osu.Game.Screens.Mvis
             IsReady.Value = false;
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
-
-            var lastdimmableSB = dimmableStoryboard;
-
-            lastdimmableSB?.FadeOut(DURATION, Easing.OutQuint);
-            sbClock?.FadeOut(DURATION, Easing.OutQuint);
-
-            lastdimmableSB?.Expire();
-            sbClock?.Expire();
 
             if ( !EnableSB.Value )
             {
@@ -215,8 +181,6 @@ namespace osu.Game.Screens.Mvis
                     Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
 
                     storyboardReplacesBackground.Value = false;
-
-                    this.Delay(displayDelay).Schedule(displayWhenLoaded);
 
                     LogTask = Task.Run( () => 
                     {
