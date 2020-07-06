@@ -6,7 +6,7 @@ using System;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class NewsPost
+    public class APINewsPost
     {
         [JsonProperty(@"id")]
         public long Id { get; set; }
