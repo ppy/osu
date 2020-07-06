@@ -8,31 +8,31 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class APINewsPost
     {
-        [JsonProperty(@"id")]
+        [JsonProperty("id")]
         public long Id { get; set; }
 
-        [JsonProperty(@"author")]
+        [JsonProperty("author")]
         public string Author { get; set; }
 
-        [JsonProperty(@"edit_url")]
+        [JsonProperty("edit_url")]
         public string EditUrl { get; set; }
 
-        [JsonProperty(@"first_image")]
+        [JsonProperty("first_image")]
         public string FirstImage { get; set; }
 
-        [JsonProperty(@"published_at")]
+        [JsonProperty("published_at")]
         public DateTime PublishedAt { get; set; }
 
-        [JsonProperty(@"updated_at")]
+        [JsonProperty("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
-        [JsonProperty(@"slug")]
+        [JsonProperty("slug")]
         public string Slug { get; set; }
 
-        [JsonProperty(@"title")]
+        [JsonProperty("title")]
         public string Title { get; set; }
 
-        [JsonProperty(@"preview")]
+        [JsonProperty("preview")]
         public string Preview { get; set; }
     }
 }
