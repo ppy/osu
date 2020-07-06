@@ -385,10 +385,7 @@ namespace osu.Game.Screens
                         break;
                 }
             };
-            bgSB.storyboardReplacesBackground.ValueChanged += _ =>
-            {
-                Background.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
-            };
+            bgSB.storyboardReplacesBackground.BindValueChanged(v => Background.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value);
 
             inputManager = GetContainingInputManager();
             dimBox.ScaleTo(1.1f);
