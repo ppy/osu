@@ -31,8 +31,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatcherArea(BeatmapDifficulty difficulty = null)
         {
-            Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
-            Child = MovableCatcher = new Catcher(this, difficulty) { X = CatchPlayfield.CENTER_X };
+            RelativeSizeAxes = Axes.X;
+            Height = CATCHER_SIZE;
+            Child = MovableCatcher = new Catcher(this, difficulty);
+        }
+
+        public static float GetCatcherSize(BeatmapDifficulty difficulty)
+        {
+            return CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
         }
 
         public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)

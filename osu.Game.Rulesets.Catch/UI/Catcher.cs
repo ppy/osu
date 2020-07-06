@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
         /// </summary>
-        public const double BASE_SPEED = 1.0;
+        public const double BASE_SPEED = 1.0 / 512;
 
         public Container ExplodingFruitTarget;
 
@@ -103,6 +103,9 @@ namespace osu.Game.Rulesets.Catch.UI
         public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
+
+            RelativePositionAxes = Axes.X;
+            X = 0.5f;
 
             Origin = Anchor.TopCentre;
 
@@ -206,8 +209,8 @@ namespace osu.Game.Rulesets.Catch.UI
             var halfCatchWidth = catchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-            var catchObjectPosition = fruit.X;
-            var catcherPosition = Position.X;
+            var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
+            var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
             var validCatch =
                 catchObjectPosition >= catcherPosition - halfCatchWidth &&
@@ -221,7 +224,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var target = fruit.HyperDashTarget;
                 var timeDifference = target.StartTime - fruit.StartTime;
-                double positionDifference = target.X - catcherPosition;
+                double positionDifference = target.X * CatchPlayfield.BASE_WIDTH - catcherPosition;
                 var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
                 SetHyperDashState(Math.Abs(velocity), target.X);
@@ -328,7 +331,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void UpdatePosition(float position)
         {
-            position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
+            position = Math.Clamp(position, 0, 1);
 
             if (position == X)
                 return;

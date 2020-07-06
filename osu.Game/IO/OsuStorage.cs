@@ -24,12 +24,12 @@ namespace osu.Game.IO
             "storage.ini"
         };
 
-        public OsuStorage(GameHost host, Storage defaultStorage)
-            : base(defaultStorage, string.Empty)
+        public OsuStorage(GameHost host)
+            : base(host.Storage, string.Empty)
         {
             this.host = host;
 
-            storageConfig = new StorageConfigManager(defaultStorage);
+            storageConfig = new StorageConfigManager(host.Storage);
 
             var customStoragePath = storageConfig.Get<string>(StorageConfig.FullPath);
 

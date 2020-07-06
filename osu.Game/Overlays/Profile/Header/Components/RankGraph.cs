@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class RankGraph : Container, IHasCustomTooltip
     {
-        private const float secondary_textsize = 0;
+        private const float secondary_textsize = 13;
         private const float padding = 10;
         private const float fade_duration = 150;
         private const int ranked_days = 88;

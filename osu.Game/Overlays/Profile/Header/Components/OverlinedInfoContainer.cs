@@ -3,13 +3,16 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class OverlinedInfoContainer : CompositeDrawable
     {
+        private readonly Circle line;
         private readonly OsuSpriteText title;
         private readonly OsuSpriteText content;
         public string Title
@@ -22,15 +25,26 @@ namespace osu.Game.Overlays.Profile.Header.Components
             set => content.Text = value;
         }
 
-        public OverlinedInfoContainer(bool big = false, int minimumWidth = 60, FillDirection direction = FillDirection.Vertical)
+        public Color4 LineColour
+        {
+            set => line.Colour = value;
+        }
+
+        public OverlinedInfoContainer(bool big = false, int minimumWidth = 60)
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = new FillFlowContainer
             {
-                Direction = direction,
+                Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    line = new Circle
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Margin = new MarginPadding { Bottom = 2 }
+                    },
                     title = new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: big ? 22 : 20, weight: FontWeight.Bold)
@@ -41,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     new Container // Add a minimum size to the FillFlowContainer
                     {
-                        Width = (direction == FillDirection.Vertical) ? minimumWidth : 0,
+                        Width = minimumWidth,
                     }
                 }
             };

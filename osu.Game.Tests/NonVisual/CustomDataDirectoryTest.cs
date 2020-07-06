@@ -127,9 +127,6 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
-                    // Store the current storage's path. We'll need to refer to this for assertions in the original directory after the migration completes.
-                    string originalDirectory = storage.GetFullPath(".");
-
                     // ensure we perform a save
                     host.Dependencies.Get<FrameworkConfigManager>().Save();
 
@@ -148,25 +145,25 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
 
                     // ensure cache was not moved
-                    Assert.That(Directory.Exists(Path.Combine(originalDirectory, "cache")));
+                    Assert.That(host.Storage.ExistsDirectory("cache"));
 
                     // ensure nested cache was moved
-                    Assert.That(!Directory.Exists(Path.Combine(originalDirectory, "test-nested", "cache")));
+                    Assert.That(!host.Storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
                     foreach (var file in OsuStorage.IGNORE_FILES)
                     {
-                        Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
+                        Assert.That(host.Storage.Exists(file), Is.True);
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
                     foreach (var dir in OsuStorage.IGNORE_DIRECTORIES)
                     {
-                        Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
+                        Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
                         Assert.That(storage.ExistsDirectory(dir), Is.False);
                     }
 
-                    Assert.That(new StreamReader(Path.Combine(originalDirectory, "storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
+                    Assert.That(new StreamReader(host.Storage.GetStream("storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
                 }
                 finally
                 {

@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile
 
         public Bindable<User> User = new Bindable<User>();
 
-        //private CentreHeaderContainer centreHeaderContainer;
+        private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
         public ProfileHeader()
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile
             TabControl.AddItem("信息");
             TabControl.AddItem("摸图");
 
-            detailHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
+            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
         protected override Drawable CreateBackground() =>
@@ -59,6 +59,11 @@ namespace osu.Game.Overlays.Profile
             Children = new Drawable[]
             {
                 new TopHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+                centreHeaderContainer = new CentreHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },

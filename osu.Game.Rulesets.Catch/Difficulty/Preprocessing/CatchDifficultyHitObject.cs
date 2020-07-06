@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 
@@ -32,8 +33,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
             var scalingFactor = normalized_hitobject_radius / halfCatcherWidth;
 
-            NormalizedPosition = BaseObject.X * scalingFactor;
-            LastNormalizedPosition = LastObject.X * scalingFactor;
+            NormalizedPosition = BaseObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
+            LastNormalizedPosition = LastObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
 
             // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
             StrainTime = Math.Max(40, DeltaTime);

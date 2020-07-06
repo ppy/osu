@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         [TestCase("convert-samples")]
         [TestCase("mania-samples")]
-        [TestCase("slider-convert-samples")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<SampleConvertValue> CreateConvertValue(HitObject hitObject)
@@ -30,16 +29,13 @@ namespace osu.Game.Rulesets.Mania.Tests
                 StartTime = hitObject.StartTime,
                 EndTime = hitObject.GetEndTime(),
                 Column = ((ManiaHitObject)hitObject).Column,
-                Samples = getSampleNames(hitObject.Samples),
-                NodeSamples = getNodeSampleNames((hitObject as HoldNote)?.NodeSamples)
+                NodeSamples = getSampleNames((hitObject as HoldNote)?.NodeSamples)
             };
         }
 
-        private IList<string> getSampleNames(IList<HitSampleInfo> hitSampleInfo)
-            => hitSampleInfo.Select(sample => sample.LookupNames.First()).ToList();
-
-        private IList<IList<string>> getNodeSampleNames(List<IList<HitSampleInfo>> hitSampleInfo)
-            => hitSampleInfo?.Select(getSampleNames)
+        private IList<IList<string>> getSampleNames(List<IList<HitSampleInfo>> hitSampleInfo)
+            => hitSampleInfo?.Select(samples =>
+                                (IList<string>)samples.Select(sample => sample.LookupNames.First()).ToList())
                             .ToList();
 
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
@@ -55,19 +51,14 @@ namespace osu.Game.Rulesets.Mania.Tests
         public double StartTime;
         public double EndTime;
         public int Column;
-        public IList<string> Samples;
         public IList<IList<string>> NodeSamples;
 
         public bool Equals(SampleConvertValue other)
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
-               && samplesEqual(Samples, other.Samples)
-               && nodeSamplesEqual(NodeSamples, other.NodeSamples);
+               && samplesEqual(NodeSamples, other.NodeSamples);
 
-        private static bool samplesEqual(ICollection<string> firstSampleList, ICollection<string> secondSampleList)
-            => firstSampleList.SequenceEqual(secondSampleList);
-
-        private static bool nodeSamplesEqual(ICollection<IList<string>> firstSampleList, ICollection<IList<string>> secondSampleList)
+        private static bool samplesEqual(ICollection<IList<string>> firstSampleList, ICollection<IList<string>> secondSampleList)
         {
             if (firstSampleList == null && secondSampleList == null)
                 return true;

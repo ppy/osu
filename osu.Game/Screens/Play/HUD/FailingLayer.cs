@@ -18,15 +18,10 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
-    /// An overlay layer on top of the playfield which fades to red when the current player health falls below a certain threshold defined by <see cref="low_health_threshold"/>.
+    /// An overlay layer on top of the playfield which fades to red when the current player health falls below a certain threshold defined by <see cref="LowHealthThreshold"/>.
     /// </summary>
     public class FailingLayer : HealthDisplay
     {
-        /// <summary>
-        /// Whether the current player health should be shown on screen.
-        /// </summary>
-        public readonly Bindable<bool> ShowHealth = new Bindable<bool>();
-
         private const float max_alpha = 0.4f;
         private const int fade_time = 400;
         private const float gradient_size = 0.3f;
@@ -34,11 +29,12 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The threshold under which the current player life should be considered low and the layer should start fading in.
         /// </summary>
-        private const double low_health_threshold = 0.20f;
+        public double LowHealthThreshold = 0.20f;
 
+        private readonly Bindable<bool> enabled = new Bindable<bool>();
         private readonly Container boxes;
 
-        private Bindable<bool> fadePlayfieldWhenHealthLow;
+        private Bindable<bool> configEnabled;
         private HealthProcessor healthProcessor;
 
         public FailingLayer()
@@ -77,15 +73,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             boxes.Colour = color.Red;
 
-            fadePlayfieldWhenHealthLow = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
-            fadePlayfieldWhenHealthLow.BindValueChanged(_ => updateState());
-            ShowHealth.BindValueChanged(_ => updateState());
+            configEnabled = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow);
+            enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0, fade_time, Easing.OutQuint), true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateState();
+            updateBindings();
         }
 
         public override void BindHealthProcessor(HealthProcessor processor)
@@ -93,19 +88,26 @@ namespace osu.Game.Screens.Play.HUD
             base.BindHealthProcessor(processor);
 
             healthProcessor = processor;
-            updateState();
+            updateBindings();
         }
 
-        private void updateState()
+        private void updateBindings()
         {
+            if (LoadState < LoadState.Ready)
+                return;
+
+            enabled.UnbindBindings();
+
             // Don't display ever if the ruleset is not using a draining health display.
-            var showLayer = healthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
-            this.FadeTo(showLayer ? 1 : 0, fade_time, Easing.OutQuint);
+            if (healthProcessor is DrainingHealthProcessor)
+                enabled.BindTo(configEnabled);
+            else
+                enabled.Value = false;
         }
 
         protected override void Update()
         {
-            double target = Math.Clamp(max_alpha * (1 - Current.Value / low_health_threshold), 0, max_alpha);
+            double target = Math.Clamp(max_alpha * (1 - Current.Value / LowHealthThreshold), 0, max_alpha);
 
             boxes.Alpha = (float)Interpolation.Lerp(boxes.Alpha, target, Clock.ElapsedFrameTime * 0.01f);
 

@@ -29,7 +29,6 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Mvis.Storyboard;
 
 namespace osu.Game.Screens
 {
@@ -79,7 +78,7 @@ namespace osu.Game.Screens
         private BottomBarOverlayLockSwitchButton lockButton;
         private BottomBarSwitchButton songProgressButton;
         private Track Track;
-        private BackgroundStoryBoardLoader bgSB;
+        private BackgroundStoryBoard bgSB;
         private BgTrianglesContainer bgTriangles;
         private LoadingSpinner loadingSpinner;
         private BottomBarSongProgressInfo progressInfo;
@@ -89,7 +88,6 @@ namespace osu.Game.Screens
         private BindableFloat ContentAlpha = new BindableFloat();
         private bool OverlaysHidden = false;
         public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
-
         public MvisScreen()
         {
             InternalChildren = new Drawable[]
@@ -273,7 +271,7 @@ namespace osu.Game.Screens
                             Children = new Drawable[]
                             {
                                 bgTriangles = new BgTrianglesContainer(),
-                                bgSB = new BackgroundStoryBoardLoader(),
+                                bgSB = new BackgroundStoryBoard(),
                                 dimBox = new Box
                                 {
                                     Name = "Dim Box",
@@ -387,7 +385,10 @@ namespace osu.Game.Screens
                         break;
                 }
             };
-            bgSB.storyboardReplacesBackground.BindValueChanged(v => Background.StoryboardReplacesBackground.Value = v.NewValue);
+            bgSB.storyboardReplacesBackground.ValueChanged += _ =>
+            {
+                Background.StoryboardReplacesBackground.Value = bgSB.storyboardReplacesBackground.Value;
+            };
 
             inputManager = GetContainingInputManager();
             dimBox.ScaleTo(1.1f);

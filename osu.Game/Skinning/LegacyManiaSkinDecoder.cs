@@ -115,7 +115,6 @@ namespace osu.Game.Skinning
                     case string _ when pair.Key.StartsWith("NoteImage"):
                     case string _ when pair.Key.StartsWith("KeyImage"):
                     case string _ when pair.Key.StartsWith("Hit"):
-                    case string _ when pair.Key.StartsWith("Stage"):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }

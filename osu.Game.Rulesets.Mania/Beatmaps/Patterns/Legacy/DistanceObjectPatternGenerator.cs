@@ -483,8 +483,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (!(HitObject is IHasPathWithRepeats curveData))
                 return null;
 
-            // mathematically speaking this should be a whole number always, but floating-point arithmetic is not so kind
-            var index = (int)Math.Round(SegmentDuration == 0 ? 0 : (time - HitObject.StartTime) / SegmentDuration, MidpointRounding.AwayFromZero);
+            double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
+
+            int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
 
             // avoid slicing the list & creating copies, if at all possible.
             return index == 0 ? curveData.NodeSamples : curveData.NodeSamples.Skip(index).ToList();

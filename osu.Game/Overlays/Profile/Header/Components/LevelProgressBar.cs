@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -22,6 +21,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public string TooltipText { get; }
 
         private Bar levelProgressBar;
+        private OsuSpriteText levelProgressText;
 
         public LevelProgressBar()
         {
@@ -33,13 +33,24 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             InternalChildren = new Drawable[]
             {
-                levelProgressBar = new Bar
+                new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BackgroundColour = colourProvider.Background6,
-                    Direction = BarDirection.LeftToRight,
-                    AccentColour = colourProvider.Highlight1
+                    Masking = true,
+                    Child = levelProgressBar = new Bar
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        BackgroundColour = Color4.Black,
+                        Direction = BarDirection.LeftToRight,
+                        AccentColour = colourProvider.Highlight1
+                    }
                 },
+                levelProgressText = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.TopRight,
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
+                }
             };
 
             User.BindValueChanged(user => updateProgress(user.NewValue));
@@ -48,6 +59,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateProgress(User user)
         {
             levelProgressBar.Length = user?.Statistics?.Level.Progress / 100f ?? 0;
+            levelProgressText.Text = user?.Statistics?.Level.Progress.ToString("0'%'");
         }
     }
 }

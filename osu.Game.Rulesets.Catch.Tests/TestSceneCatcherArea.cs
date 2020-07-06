@@ -76,8 +76,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 RelativeSizeAxes = Axes.Both,
                 Child = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.TopLeft,
                     CreateDrawableRepresentation = ((DrawableRuleset<CatchHitObject>)catchRuleset.CreateInstance().CreateDrawableRulesetWith(new CatchBeatmap())).CreateDrawableRepresentation
                 },
             });
