@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Menu
 
                     buttons.AddRange(new PopupDialogButton[]
                     {
-                        new PopupDialogOkButton
+                        new PopupDialogCancelButton
                         {
                             Text = "Try again",
                             Action = () =>
@@ -41,14 +41,14 @@ namespace osu.Game.Screens.Menu
                                     dialogOverlay.Push(new StorageErrorDialog(storage, nextError));
                             }
                         },
+                        new PopupDialogCancelButton
+                        {
+                            Text = "Use default location until restart",
+                        },
                         new PopupDialogOkButton
                         {
                             Text = "Reset to default location",
                             Action = storage.ResetCustomStoragePath
-                        },
-                        new PopupDialogCancelButton
-                        {
-                            Text = "Use default location for this session",
                         },
                     });
                     break;
