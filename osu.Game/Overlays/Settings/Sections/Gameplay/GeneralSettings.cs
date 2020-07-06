@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -76,13 +77,17 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Score display mode",
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Disable Win key during gameplay",
-                    Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
                 }
             };
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                Add(new SettingsCheckbox
+                {
+                    LabelText = "Disable Windows key during gameplay",
+                    Bindable = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
+                });
+            }
         }
     }
 }
