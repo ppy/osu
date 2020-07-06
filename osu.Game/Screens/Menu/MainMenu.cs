@@ -332,7 +332,6 @@ namespace osu.Game.Screens.Menu
 
                 var buttons = new List<PopupDialogButton>();
 
-
                 switch (error)
                 {
                     case OsuStorageError.NotAccessible:
@@ -367,15 +366,15 @@ namespace osu.Game.Screens.Menu
                         // Todo: Provide the option to search for the files similar to migration.
                         buttons.AddRange(new PopupDialogButton[]
                         {
+                            new PopupDialogCancelButton
+                            {
+                                Text = "Start fresh at specified location"
+                            },
                             new PopupDialogOkButton
                             {
                                 Text = "Reset to default location",
                                 Action = storage.ResetCustomStoragePath
                             },
-                            new PopupDialogCancelButton
-                            {
-                                Text = "Start fresh at specified location"
-                            }
                         });
 
                         break;
