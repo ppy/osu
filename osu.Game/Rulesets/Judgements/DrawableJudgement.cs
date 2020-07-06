@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Judgements
         public DrawableJudgement()
         {
             Size = new Vector2(judgement_size);
+            Origin = Anchor.Centre;
         }
 
         protected virtual void ApplyHitAnimations()
