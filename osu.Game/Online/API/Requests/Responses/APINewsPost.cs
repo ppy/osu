@@ -3,6 +3,7 @@
 
 using Newtonsoft.Json;
 using System;
+using System.Net;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -11,8 +12,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("id")]
         public long Id { get; set; }
 
+        private string author;
+
         [JsonProperty("author")]
-        public string Author { get; set; }
+        public string Author
+        {
+            get => author;
+            set => author = WebUtility.HtmlDecode(value);
+        }
 
         [JsonProperty("edit_url")]
         public string EditUrl { get; set; }
@@ -29,10 +36,22 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("slug")]
         public string Slug { get; set; }
 
+        private string title;
+
         [JsonProperty("title")]
-        public string Title { get; set; }
+        public string Title
+        {
+            get => title;
+            set => title = WebUtility.HtmlDecode(value);
+        }
+
+        private string preview;
 
         [JsonProperty("preview")]
-        public string Preview { get; set; }
+        public string Preview
+        {
+            get => preview;
+            set => preview = WebUtility.HtmlDecode(value);
+        }
     }
 }
