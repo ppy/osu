@@ -62,6 +62,9 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private AudioManager audio { get; set; }
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
         /// </summary>
@@ -152,6 +155,17 @@ namespace osu.Game.Screens.Menu
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
                 Track.Restart();
+        }
+
+        protected void RandomBeatmaps()
+        {
+            var sets = beatmapManager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+
+            if (sets.Count > 0)
+            {
+                setInfo = beatmapManager.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+                initialBeatmap = beatmapManager.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+            }
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

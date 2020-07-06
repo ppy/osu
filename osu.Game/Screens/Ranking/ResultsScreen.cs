@@ -82,110 +82,102 @@ namespace osu.Game.Screens.Ranking
                     Child = new MfBgTriangles(0.5f, false, 5f),
                 },
                 new GridContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Content = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
+                    new Drawable[]
                     {
-                        new Drawable[]
+                        new VerticalScrollContainer
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            ScrollbarVisible = false,
+                            Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new OsuScrollContainer
+                                    statisticsPanel = new StatisticsPanel
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        ScrollbarVisible = false,
-                                        Child = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = screen_height,
-                                            Children = new Drawable[]
-                                            {
-                                                scorePanelList = new ScorePanelList
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    SelectedScore = { BindTarget = SelectedScore },
-                                                    PostExpandAction = () => statisticsPanel.ToggleVisibility()
-                                                },
-                                                detachedPanelContainer = new Container<ScorePanel>
-                                                {
-                                                    RelativeSizeAxes = Axes.Both
-                                                },
-                                                statisticsPanel = new StatisticsPanel
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Score = { BindTarget = SelectedScore }
-                                                },
-                                            }
-                                        }
+                                        Score = { BindTarget = SelectedScore }
                                     },
-                                }
-                            },
-                        },
-                        new[]
-                        {
-                            bottomPanel = new BottomPanel
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                RelativeSizeAxes = Axes.X,
-                                Height = TwoLayerButton.SIZE_EXTENDED.Y,
-                                Alpha = 0,
-                                Children = new Drawable[]
-                                {
-                                    colorBox = new Box
+                                    scorePanelList = new ScorePanelList
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex("#333")
+                                        SelectedScore = { BindTarget = SelectedScore },
+                                        PostExpandAction = () => statisticsPanel.ToggleVisibility()
                                     },
-                                    new Container
+                                    detachedPanelContainer = new Container<ScorePanel>
                                     {
-                                        Name = "Base Container",
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
-                                        {
-                                            texts = new OsuSpriteText
-                                            {
-                                                Name = "Texts Fillflow",
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Margin = new MarginPadding{ Top = 10 },
-                                                Y = -10,
-                                            },
-                                            buttons = new FillFlowContainer
-                                            {
-                                                Anchor = Anchor.BottomCentre,
-                                                Origin = Anchor.BottomCentre,
-                                                AutoSizeAxes = Axes.Both,
-                                                Margin = new MarginPadding{ Bottom = 10f },
-                                                Spacing = new Vector2(5),
-                                                Direction = FillDirection.Horizontal,
-                                                Children = new Drawable[]
-                                                {
-                                                    new ReplayDownloadButton(null)
-                                                    {
-                                                        Score = { BindTarget = SelectedScore },
-                                                        Width = 300
-                                                    },
-                                                }
-                                            }
-                                        }
+                                        RelativeSizeAxes = Axes.Both
                                     },
                                 }
                             }
-                        }
+                        },
                     },
-                    RowDimensions = new[]
+                    new[]
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize)
+                        bottomPanel = new BottomPanel
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = TwoLayerButton.SIZE_EXTENDED.Y,
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                colorBox = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#333")
+                                },
+                                new Container
+                                {
+                                    Name = "Base Container",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.X,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        texts = new OsuSpriteText
+                                        {
+                                            Name = "Texts Fillflow",
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Margin = new MarginPadding{ Top = 10 },
+                                            Y = -10,
+                                        },
+                                        buttons = new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                            AutoSizeAxes = Axes.Both,
+                                            Margin = new MarginPadding{ Bottom = 10f },
+                                            Spacing = new Vector2(5),
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                new ReplayDownloadButton(null)
+                                                {
+                                                    Score = { BindTarget = SelectedScore },
+                                                    Width = 300
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                            }
+                        }
                     }
                 },
+                RowDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize)
+                }
+            },
             };
 
             if (Score != null)
@@ -423,6 +415,24 @@ namespace osu.Game.Screens.Ranking
                 Background.FadeTo(0.5f, 150);
 
                 detachedPanel = null;
+            }
+        }
+
+        private class VerticalScrollContainer : OsuScrollContainer
+        {
+            protected override Container<Drawable> Content => content;
+
+            private readonly Container content;
+
+            public VerticalScrollContainer()
+            {
+                base.Content.Add(content = new Container { RelativeSizeAxes = Axes.X });
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                content.Height = Math.Max(screen_height, DrawHeight);
             }
         }
     }

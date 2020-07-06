@@ -1,0 +1,21 @@
+{
+  "Mappings": [{
+    "StartTime": 8470.0,
+    "Objects": [{
+      "StartTime": 8470.0,
+      "EndTime": 8470.0,
+      "Column": 0,
+      "Samples": ["normal-hitnormal", "normal-hitclap"]
+    }, {
+      "StartTime": 8626.470587768974,
+      "EndTime": 8626.470587768974,
+      "Column": 1,
+      "Samples": ["normal-hitnormal"]
+    }, {
+      "StartTime": 8782.941175537948,
+      "EndTime": 8782.941175537948,
+      "Column": 2,
+      "Samples": ["normal-hitnormal", "normal-hitclap"]
+    }]
+  }]
+}
