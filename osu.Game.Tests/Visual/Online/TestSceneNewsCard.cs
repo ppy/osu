@@ -39,9 +39,9 @@ namespace osu.Game.Tests.Visual.Online
                     }),
                     new NewsCard(new APINewsPost
                     {
-                        Title = "This post has a full-url image!",
-                        Preview = "boom",
-                        Author = "user",
+                        Title = "This post has a full-url image! (HTML entity: &amp;)",
+                        Preview = "boom (HTML entity: &amp;)",
+                        Author = "user (HTML entity: &amp;)",
                         FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
                         PublishedAt = DateTimeOffset.Now
                     })
