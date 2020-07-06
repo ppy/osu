@@ -83,7 +83,7 @@ namespace osu.Game.IO
             {
                 Storage userStorage = host.GetStorage(CustomStoragePath);
 
-                if (!userStorage.GetFiles(".").Any())
+                if (!userStorage.ExistsDirectory(".") || !userStorage.GetFiles(".").Any())
                     error = OsuStorageError.AccessibleButEmpty;
 
                 ChangeTargetStorage(userStorage);
