@@ -82,7 +82,16 @@ namespace osu.Game.Screens.Menu
 
             BeatmapSetInfo setInfo = null;
 
-            if (!MenuMusic.Value) RandomBeatmaps();
+            if (!MenuMusic.Value)
+            {
+                var sets = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+
+                if (sets.Count > 0)
+                {
+                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+                }
+            }
 
             // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
             if (setInfo == null)
