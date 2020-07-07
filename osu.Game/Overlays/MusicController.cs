@@ -129,7 +129,11 @@ namespace osu.Game.Overlays
             seekDelegate = Schedule(() =>
             {
                 if (!beatmap.Disabled)
+                {
                     current?.Track.Seek(position);
+                    if (!IsUserPaused)
+                        current?.Track.Start();
+                }
             });
         }
 
