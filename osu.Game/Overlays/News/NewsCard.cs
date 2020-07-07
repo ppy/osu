@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.News
                     new OsuSpriteText
                     {
                         Text = date.ToString("d MMM yyyy").ToUpper(),
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Margin = new MarginPadding
                         {
                             Horizontal = 20,
