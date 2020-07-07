@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Tau.Mods
         {
             static void adjustFadeIn(TauHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
-            foreach (var d in drawables.OfType<DrawabletauHitObject>())
+            foreach (var d in drawables.OfType<DrawableTauHitObject>())
             {
                 adjustFadeIn(d.HitObject);
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 
         protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawabletauHitObject d))
+            if (!(drawable is DrawableTauHitObject d))
                 return;
 
             var h = d.HitObject;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Tau.Mods
             // future proofing yet again.
             switch (drawable)
             {
-                case DrawabletauHitObject beat:
+                case DrawableTauHitObject beat:
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
                         beat.FadeOut(fadeOutDuration);
 

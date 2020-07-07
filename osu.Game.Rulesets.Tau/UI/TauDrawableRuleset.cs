@@ -17,9 +17,9 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Tau.UI
 {
     [Cached]
-    public class DrawabletauRuleset : DrawableRuleset<TauHitObject>
+    public class DrawableTauRuleset : DrawableRuleset<TauHitObject>
     {
-        public DrawabletauRuleset(TauRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableTauRuleset(TauRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Tau.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TauFramedReplayInputHandler(replay);
 
-        public override DrawableHitObject<TauHitObject> CreateDrawableRepresentation(TauHitObject h) => new DrawabletauHitObject(h);
+        public override DrawableHitObject<TauHitObject> CreateDrawableRepresentation(TauHitObject h) => new DrawableTauHitObject(h);
 
         protected override PassThroughInputManager CreateInputManager() => new TauInputManager(Ruleset?.RulesetInfo);
 

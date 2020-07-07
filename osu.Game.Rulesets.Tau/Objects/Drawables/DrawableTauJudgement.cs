@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         private SkinnableSprite lighting;
         private Bindable<Color4> lightingColour;
 
-        public DrawableTauJudgement(JudgementResult result, DrawabletauHitObject judgedObject)
+        public DrawableTauJudgement(JudgementResult result, DrawableTauHitObject judgedObject)
             : base(result, judgedObject)
         {
         }

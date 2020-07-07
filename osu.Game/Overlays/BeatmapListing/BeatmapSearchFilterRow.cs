@@ -91,7 +91,8 @@ namespace osu.Game.Overlays.BeatmapListing
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                ((FilterDropdown)Dropdown).AccentColour = colourProvider.Light2;
+                if (Dropdown is FilterDropdown fd)
+                    fd.AccentColour = colourProvider.Light2;
             }
 
             protected override Dropdown<T> CreateDropdown() => new FilterDropdown();
