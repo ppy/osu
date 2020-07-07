@@ -257,8 +257,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // txy : time difference of obj x and obj y
             // dxy : distance (normalized) from obj x to obj y
             // ipxy: index of performance of the movement from obj x to obj y
-            var pos1 = Vector<double>.Build.Dense(new[] { obj1.Position.X, (double)obj1.Position.Y });
-            var pos2 = Vector<double>.Build.Dense(new[] { obj2.Position.X, (double)obj2.Position.Y });
+            var pos1 = Vector<double>.Build.Dense(new[] { obj1.StackedPosition.X, (double)obj1.StackedPosition.Y });
+            var pos2 = Vector<double>.Build.Dense(new[] { obj2.StackedPosition.X, (double)obj2.StackedPosition.Y });
             var s12 = (pos2 - pos1) / (2 * obj2.Radius);
             double d12 = s12.L2Norm();
             double ip12 = FittsLaw.CalculateIp(d12, t12);
@@ -284,13 +284,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (objMinus2 != null)
             {
-                var posMinus2 = Vector<double>.Build.Dense(new[] { objMinus2.Position.X, (double)objMinus2.Position.Y });
+                var posMinus2 = Vector<double>.Build.Dense(new[] { objMinus2.StackedPosition.X, (double)objMinus2.StackedPosition.Y });
                 dMinus22 = ((pos2 - posMinus2) / (2 * obj2.Radius)).L2Norm();
             }
 
             if (obj0 != null)
             {
-                pos0 = Vector<double>.Build.Dense(new[] { obj0.Position.X, (double)obj0.Position.Y });
+                pos0 = Vector<double>.Build.Dense(new[] { obj0.StackedPosition.X, (double)obj0.StackedPosition.Y });
                 s01 = (pos1 - pos0) / (2 * obj2.Radius);
                 d01 = s01.L2Norm();
                 t01 = (obj1.StartTime - obj0.StartTime) / clockRate / 1000.0;
@@ -299,7 +299,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (obj3 != null)
             {
-                pos3 = Vector<double>.Build.Dense(new[] { obj3.Position.X, (double)obj3.Position.Y });
+                pos3 = Vector<double>.Build.Dense(new[] { obj3.StackedPosition.X, (double)obj3.StackedPosition.Y });
                 s23 = (pos3 - pos2) / (2 * obj2.Radius);
                 d23 = s23.L2Norm();
                 t23 = (obj3.StartTime - obj2.StartTime) / clockRate / 1000.0;

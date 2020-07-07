@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     strainHistory.Add(currStrain.PointwisePower(1.1 / 3) * 1.5);
 
-                    double distance = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
+                    double distance = (hitObjects[i].StackedPosition - hitObjects[i - 1].StackedPosition).Length / (2 * hitObjects[i].Radius);
                     double spacedBuff = calculateSpacedness(distance) * spaced_buff_factor;
 
                     double deltaTime = Math.Max((currTime - prevPrevTime) / clockRate, 0.01);
