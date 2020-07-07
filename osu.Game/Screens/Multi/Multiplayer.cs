@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Multi
                                         Child = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.5f), backgroundColour)
                                         },
                                     }
                                 }
