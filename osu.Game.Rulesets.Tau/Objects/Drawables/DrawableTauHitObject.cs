@@ -18,11 +18,12 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Tau.Objects.Drawables
 {
-    public class DrawabletauHitObject : DrawableHitObject<TauHitObject>, IKeyBindingHandler<TauAction>
+    public class DrawableTauHitObject : DrawableHitObject<TauHitObject>, IKeyBindingHandler<TauAction>
     {
         public Box Box;
+        public Box IntersectArea;
 
-        public Func<DrawabletauHitObject, bool> CheckValidation;
+        public Func<DrawableTauHitObject, bool> CheckValidation;
 
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         };
 
         /// <summary>
-        /// The action that caused this <see cref="DrawabletauHitObject"/> to be hit.
+        /// The action that caused this <see cref="DrawableTauHitObject"/> to be hit.
         /// </summary>
         public TauAction? HitAction { get; private set; }
 
@@ -42,28 +43,41 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        public DrawabletauHitObject(TauHitObject hitObject)
+        public DrawableTauHitObject(TauHitObject hitObject)
             : base(hitObject)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativePositionAxes = Axes.Both;
 
-            AddInternal(Box = new Box
-            {
-                EdgeSmoothness = new Vector2(1f),
-                RelativeSizeAxes = Axes.Both,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Alpha = 0.05f
-            });
+            AddRangeInternal(new Drawable[]
+                {
+                    Box = new Box
+                    {
+                        EdgeSmoothness = new Vector2(1f),
+                        RelativeSizeAxes = Axes.Both,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Alpha = 0.05f
+                    },
+                    IntersectArea = new Box
+                    {
+                        Size = new Vector2(10),
+                        RelativeSizeAxes = Axes.None,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    }
+                }
+            );
 
             Box.Rotation = hitObject.Angle;
 
             Position = Vector2.Zero;
         }
 
-        private Bindable<float> size = new Bindable<float>(10); // Change as you see fit.
+        private readonly Bindable<float> size = new Bindable<float>(10); // Change as you see fit.
 
         [BackgroundDependencyLoader(true)]
         private void load(TauRulesetConfigManager config)
