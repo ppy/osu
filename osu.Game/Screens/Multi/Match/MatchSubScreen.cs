@@ -115,6 +115,7 @@ namespace osu.Game.Screens.Multi.Match
                                                 {
                                                     new Drawable[]
                                                     {
+                                                        null,
                                                         new Container
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
@@ -151,19 +152,37 @@ namespace osu.Game.Screens.Multi.Match
                                                                 }
                                                             }
                                                         },
-                                                        new Container
+                                                        null,
+                                                        new GridContainer
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Padding = new MarginPadding { Horizontal = 5 },
-                                                            Child = leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
+                                                            Content = new[]
+                                                            {
+                                                                new Drawable[]
+                                                                {
+                                                                    leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
+                                                                },
+                                                                new Drawable[]
+                                                                {
+                                                                    new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
+                                                                }
+                                                            },
+                                                            RowDimensions = new[]
+                                                            {
+                                                                new Dimension(),
+                                                                new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 300),
+                                                            }
                                                         },
-                                                        new Container
-                                                        {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            Padding = new MarginPadding { Left = 5 },
-                                                            Child = new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
-                                                        }
+                                                        null
                                                     },
+                                                },
+                                                ColumnDimensions = new[]
+                                                {
+                                                    new Dimension(),
+                                                    new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
+                                                    new Dimension(),
+                                                    new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
+                                                    new Dimension(),
                                                 }
                                             }
                                         }
