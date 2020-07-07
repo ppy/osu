@@ -6,9 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -19,14 +16,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public string TooltipText { get; set; }
 
-        private PlayerStatBox info;
+        private OverlinedInfoContainer info;
 
         public OverlinedTotalPlayTime()
         {
-            RelativeSizeAxes = Axes.Both;
-
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            AutoSizeAxes = Axes.Both;
 
             TooltipText = "0 小时";
         }
@@ -34,10 +28,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            InternalChild = info = new PlayerStatBox
+            InternalChild = info = new OverlinedInfoContainer
             {
-                Icon = FontAwesome.Regular.Clock,
                 Title = "总游玩时间",
+                LineColour = colourProvider.Highlight1,
             };
 
             User.BindValueChanged(updateTime, true);
@@ -46,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateTime(ValueChangedEvent<User> user)
         {
             TooltipText = (user.NewValue?.Statistics?.PlayTime ?? 0) / 3600 + "小时";
-            info.ContentText = formatTime(user.NewValue?.Statistics?.PlayTime);
+            info.Content = formatTime(user.NewValue?.Statistics?.PlayTime);
         }
 
         private string formatTime(int? secondsNull)

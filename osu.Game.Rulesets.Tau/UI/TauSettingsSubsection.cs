@@ -29,19 +29,19 @@ namespace osu.Game.Rulesets.Tau.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Show Visualizer",
+                    LabelText = "显示歌曲高潮效果",
                     Bindable = config.GetBindable<bool>(TauRulesetSettings.ShowVisualizer)
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "Playfield dim",
+                    LabelText = "盘面背景暗化",
                     Bindable = config.GetBindable<float>(TauRulesetSettings.PlayfieldDim),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "Beat Size",
+                    LabelText = "方块大小",
                     Bindable = config.GetBindable<float>(TauRulesetSettings.BeatSize),
                     KeyboardStep = 1f
                 }

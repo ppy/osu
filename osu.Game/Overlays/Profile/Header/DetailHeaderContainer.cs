@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -19,22 +19,17 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class DetailHeaderContainer : CompositeDrawable
     {
+        private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
+        private OverlinedInfoContainer medalInfo;
+        private OverlinedInfoContainer ppInfo;
         private OverlinedInfoContainer detailGlobalRank;
         private OverlinedInfoContainer detailCountryRank;
         private FillFlowContainer fillFlow;
         private RankGraph rankGraph;
 
         public readonly Bindable<User> User = new Bindable<User>();
-        public readonly BindableBool DetailsVisible = new BindableBool(true);
 
         private bool expanded = true;
-        private ComponentContainer rankGraphContainer;
-        private ComponentContainer rankInfoContainer;
-        private FillFlowContainer expandedInfoFillFlow;
-        private FillFlowContainer hiddenInfoFillFlow;
-        private OverlinedInfoContainer hiddenDetailGlobal;
-        private OverlinedInfoContainer hiddenDetailCountry;
-        private OsuClickableContainer toggleFoldButton;
 
         public bool Expanded
         {
@@ -49,16 +44,11 @@ namespace osu.Game.Overlays.Profile.Header
                 fillFlow.ClearTransforms();
 
                 if (expanded)
-                {
-                    expandedInfoFillFlow.FadeIn(300, Easing.OutQuint);
-                    hiddenInfoFillFlow.FadeOut(300, Easing.OutQuint);
-                    toggleFoldButton.TooltipText = "折叠";
-                }
+                    fillFlow.AutoSizeAxes = Axes.Y;
                 else
                 {
-                    expandedInfoFillFlow.FadeOut(300, Easing.OutQuint);
-                    hiddenInfoFillFlow.FadeIn(300, Easing.OutQuint);
-                    toggleFoldButton.TooltipText = "展开";
+                    fillFlow.AutoSizeAxes = Axes.None;
+                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
                 }
             }
         }
@@ -72,111 +62,105 @@ namespace osu.Game.Overlays.Profile.Header
 
             InternalChildren = new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5,
+                },
                 fillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
                     AutoSizeDuration = 200,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Bottom = 35 },
+                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 20),
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            CornerRadius = 25,
-                            Masking = true,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
+                                new FillFlowContainer
                                 {
-                                    Depth = float.MaxValue,
-                                    Colour = colourProvider.Background4,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                rankGraphContainer = new ComponentContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child =  new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Child = rankGraph = new RankGraph
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                    }
-                                },
-                                rankInfoContainer = new ComponentContainer
-                                {
-                                    Name = "Rank Info Container",
-                                    AutoSizeDuration = 200,
-                                    AutoSizeEasing = Easing.OutQuint,
                                     AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(10, 0),
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        new OverlinedTotalPlayTime
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = colourProvider.Background6,
+                                            User = { BindTarget = User }
                                         },
-                                        expandedInfoFillFlow = new FillFlowContainer
+                                        medalInfo = new OverlinedInfoContainer
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Vertical,
-                                            Padding = new MarginPadding(25),
-                                            Spacing = new Vector2(0, 10),
-                                            Children = new Drawable[]
-                                            {
-                                                detailGlobalRank = new OverlinedInfoContainer(true, 110)
-                                                {
-                                                    Title = "全球排名",
-                                                },
-                                                detailCountryRank = new OverlinedInfoContainer(false, 110)
-                                                {
-                                                    Title = "国内/地区排名",
-                                                },
-                                            }
+                                            Title = "奖章数",
+                                            LineColour = colours.GreenLight,
                                         },
-                                        hiddenInfoFillFlow = new FillFlowContainer
+                                        ppInfo = new OverlinedInfoContainer
                                         {
-                                            Name = "Hidden Info Container",
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Alpha = 0,
-                                            LayoutDuration = 200,
-                                            LayoutEasing = Easing.OutQuint,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Padding = new MarginPadding{Horizontal = 25, Vertical = 15},
-                                            Spacing = new Vector2(10),
-                                            Children = new[]
-                                            {
-                                                hiddenDetailGlobal = new OverlinedInfoContainer(false, 60, FillDirection.Horizontal)
-                                                {
-                                                    Title = "全球排名",
-                                                },
-                                                hiddenDetailCountry = new OverlinedInfoContainer(false, 60, FillDirection.Horizontal)
-                                                {
-                                                    Title = "国家/地区排名",
-                                                },
-                                            }
+                                            Title = "pp",
+                                            LineColour = colours.Red,
                                         },
-                                        toggleFoldButton = new OsuClickableContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Action = () => DetailsVisible.Toggle(),
-                                            TooltipText = expanded ? "折叠" : "展开"
-                                        }
                                     }
                                 },
+                                new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5),
+                                    Children = new[]
+                                    {
+                                        scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),
+                                        scoreRankInfos[ScoreRank.X] = new ScoreRankInfo(ScoreRank.X),
+                                        scoreRankInfos[ScoreRank.SH] = new ScoreRankInfo(ScoreRank.SH),
+                                        scoreRankInfos[ScoreRank.S] = new ScoreRankInfo(ScoreRank.S),
+                                        scoreRankInfos[ScoreRank.A] = new ScoreRankInfo(ScoreRank.A),
+                                    }
+                                }
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Right = 130 },
+                            Children = new Drawable[]
+                            {
+                                rankGraph = new RankGraph
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    Width = 130,
+                                    Anchor = Anchor.TopRight,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding { Horizontal = 10 },
+                                    Spacing = new Vector2(0, 20),
+                                    Children = new Drawable[]
+                                    {
+                                        detailGlobalRank = new OverlinedInfoContainer(true, 110)
+                                        {
+                                            Title = "全球排名",
+                                            LineColour = colourProvider.Highlight1,
+                                        },
+                                        detailCountryRank = new OverlinedInfoContainer(false, 110)
+                                        {
+                                            Title = "国内/地区排名",
+                                            LineColour = colourProvider.Highlight1,
+                                        },
+                                    }
+                                }
                             }
                         },
                     }
@@ -186,23 +170,19 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
+            medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
+            ppInfo.Content = user?.Statistics?.PP?.ToString("#,##0") ?? "0";
+
+            foreach (var scoreRankInfo in scoreRankInfos)
+                scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
+
             detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
             detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
-
-            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
 
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            rankGraphContainer.Padding = new MarginPadding{ Left = 25, Right = rankInfoContainer.Width + 25 };
-        }
-
-        public class ScoreRankInfo : CompositeDrawable
+        private class ScoreRankInfo : CompositeDrawable
         {
             private readonly OsuSpriteText rankCount;
 

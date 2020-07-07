@@ -42,34 +42,25 @@ namespace osu.Game.Overlays.Dialog
             set => icon.Icon = value;
         }
 
-        private string headerText;
+        private string text;
 
         public string HeaderText
         {
-            get => headerText;
+            get => text;
             set
             {
-                if (headerText == value)
+                if (text == value)
                     return;
 
-                headerText = value;
+                text = value;
+
                 header.Text = value;
             }
         }
 
-        private string bodyText;
-
         public string BodyText
         {
-            get => bodyText;
-            set
-            {
-                if (bodyText == value)
-                    return;
-
-                bodyText = value;
-                body.Text = value;
-            }
+            set => body.Text = value;
         }
 
         public IEnumerable<PopupDialogButton> Buttons

@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi.Components
                     Direction = Direction,
                     AutoSizeAxes = AutoSizeAxes,
                     RelativeSizeAxes = RelativeSizeAxes,
-                    Spacing = Vector2.One
+                    Spacing = new Vector2(10)
                 };
 
                 for (int i = 0; i < RecentParticipants.Count; i++)

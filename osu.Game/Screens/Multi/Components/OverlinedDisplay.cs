@@ -35,18 +35,6 @@ namespace osu.Game.Screens.Multi.Components
             }
         }
 
-        private bool showLine = true;
-
-        public bool ShowLine
-        {
-            get => showLine;
-            set
-            {
-                showLine = value;
-                line.Alpha = value ? 1 : 0;
-            }
-        }
-
         protected string Details
         {
             set => details.Text = value;
@@ -84,12 +72,9 @@ namespace osu.Game.Screens.Multi.Components
                                 new OsuSpriteText
                                 {
                                     Text = title,
-                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold)
+                                    Font = OsuFont.GetFont(size: 18)
                                 },
-                                details = new OsuSpriteText
-                                {
-                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold)
-                                },
+                                details = new OsuSpriteText { Font = OsuFont.GetFont(size: 18) },
                             }
                         },
                     },
