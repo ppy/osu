@@ -250,6 +250,15 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.RightStageImage:
                     return SkinUtils.As<TValue>(getManiaImage(existing, "StageRight"));
 
+                case LegacyManiaSkinConfigurationLookups.BottomStageImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageBottom"));
+
+                case LegacyManiaSkinConfigurationLookups.LightImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageLight"));
+
+                case LegacyManiaSkinConfigurationLookups.HitTargetImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageHint"));
+
                 case LegacyManiaSkinConfigurationLookups.LeftLineWidth:
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.TargetColumn.Value]));

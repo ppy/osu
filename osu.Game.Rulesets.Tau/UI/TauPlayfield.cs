@@ -135,13 +135,13 @@ namespace osu.Game.Rulesets.Tau.UI
             playfieldBackground.FadeTo(PlayfieldDimLevel.Value, 100);
         }
 
-        public bool CheckIfWeCanValidate(DrawabletauHitObject obj) => cursor.CheckForValidation(obj);
+        public bool CheckIfWeCanValidate(DrawableTauHitObject obj) => cursor.CheckForValidation(obj);
 
         public override void Add(DrawableHitObject h)
         {
             base.Add(h);
 
-            var obj = (DrawabletauHitObject)h;
+            var obj = (DrawableTauHitObject)h;
             obj.CheckValidation = CheckIfWeCanValidate;
 
             obj.OnNewResult += onNewResult;
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Tau.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var tauObj = (DrawabletauHitObject)judgedObject;
+            var tauObj = (DrawableTauHitObject)judgedObject;
 
             var a = tauObj.HitObject.Angle * (float)(Math.PI / 180);
 

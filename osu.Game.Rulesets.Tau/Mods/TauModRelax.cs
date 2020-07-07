@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Tau.Mods
 {
     public class TauModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TauHitObject>
     {
-        public override string Description => @"你不用点击,只需移动,让你用来点击的手指放松一下";
-
         public void Update(Playfield playfield)
         {
             bool requiresHold = false;
@@ -26,7 +24,7 @@ namespace osu.Game.Rulesets.Tau.Mods
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                if (!(drawable is DrawabletauHitObject tauHit))
+                if (!(drawable is DrawableTauHitObject tauHit))
                     continue;
 
                 double time = tauHit.Clock.CurrentTime;
@@ -37,7 +35,7 @@ namespace osu.Game.Rulesets.Tau.Mods
                 if (tauHit.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime || tauHit.IsHit)
                     continue;
 
-                if (tauHit is DrawabletauHitObject)
+                if (tauHit is DrawableTauHitObject)
                 {
                     Debug.Assert(tauHit.HitObject.HitWindows != null);
 

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Tau
         public override string Description => "tau";
 
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) =>
-            new DrawabletauRuleset(this, beatmap, mods);
+            new DrawableTauRuleset(this, beatmap, mods);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) =>
             new TauBeatmapConverter(beatmap, this);
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Tau
 
         public override string ShortName => "tau";
 
-        public override string PlayingVerb => "Hitting beats";
+        public override string PlayingVerb => "正在搓盘子";
 
         public override RulesetSettingsSubsection CreateSettings() => new TauSettingsSubsection(this);
 
