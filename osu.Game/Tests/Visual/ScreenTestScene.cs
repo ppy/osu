@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Visual
         [SetUpSteps]
         public virtual void SetUpSteps() => addExitAllScreensStep();
 
-        // [TearDownSteps]
-        // public virtual void TearDownSteps() => addExitAllScreensStep();
+        [TearDownSteps]
+        public virtual void TearDownSteps() => addExitAllScreensStep();
 
         private void addExitAllScreensStep()
         {
