@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.News
 
         private class DateContainer : CircularContainer, IHasCustomTooltip
         {
-            public ITooltip GetCustomTooltip() => new DrawableDate.DateTooltip();
+            public ITooltip GetCustomTooltip() => new DateTooltip();
 
             public object TooltipContent => date;
 
