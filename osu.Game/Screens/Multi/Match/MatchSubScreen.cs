@@ -115,7 +115,6 @@ namespace osu.Game.Screens.Multi.Match
                                                 {
                                                     new Drawable[]
                                                     {
-                                                        null,
                                                         new Container
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
@@ -170,7 +169,7 @@ namespace osu.Game.Screens.Multi.Match
                                                             RowDimensions = new[]
                                                             {
                                                                 new Dimension(),
-                                                                new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 300),
+                                                                new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 240),
                                                             }
                                                         },
                                                         null
@@ -178,7 +177,6 @@ namespace osu.Game.Screens.Multi.Match
                                                 },
                                                 ColumnDimensions = new[]
                                                 {
-                                                    new Dimension(),
                                                     new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
                                                     new Dimension(),
                                                     new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
