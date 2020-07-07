@@ -8,7 +8,8 @@
       "NodeSamples": [
         ["normal-hitnormal"],
         []
-      ]
+      ],
+      "Samples": ["normal-hitnormal"]
     }]
   }, {
     "StartTime": 2000.0,
@@ -19,7 +20,8 @@
       "NodeSamples": [
         ["drum-hitnormal"],
         []
-      ]
+      ],
+      "Samples": ["drum-hitnormal"]
     }]
   }]
 }

@@ -12,6 +12,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -356,7 +357,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     Bank = bankInfo.Normal,
                     Name = HitSampleInfo.HIT_NORMAL,
                     Volume = bankInfo.Volume,
-                    CustomSampleBank = bankInfo.CustomSampleBank
+                    CustomSampleBank = bankInfo.CustomSampleBank,
+                    // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
+                    // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
+                    IsLayered = type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal)
                 }
             };
 
@@ -409,7 +413,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
-        internal class LegacyHitSampleInfo : HitSampleInfo
+        public class LegacyHitSampleInfo : HitSampleInfo
         {
             private int customSampleBank;
 
@@ -424,6 +428,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         Suffix = value.ToString();
                 }
             }
+
+            /// <summary>
+            /// Whether this hit sample is layered.
+            /// </summary>
+            /// <remarks>
+            /// Layered hit samples are automatically added in all modes (except osu!mania), but can be disabled
+            /// using the <see cref="GlobalSkinConfiguration.LayeredHitSounds"/> skin config option.
+            /// </remarks>
+            public bool IsLayered { get; set; }
         }
 
         private class FileHitSampleInfo : LegacyHitSampleInfo
