@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -9,15 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
@@ -202,6 +200,8 @@ namespace osu.Game.Screens.Menu
             purePlayerScreen = null;
             return s;
         }
+        [Resolved]
+        private Storage storage { get; set; }
 
         public override void OnEntering(IScreen last)
         {
@@ -219,6 +219,9 @@ namespace osu.Game.Screens.Menu
                     Track.Start();
                 }
             }
+
+            if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
+                dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
         }
 
         private bool exitConfirmed;
@@ -314,31 +317,6 @@ namespace osu.Game.Screens.Menu
 
             this.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        private class ConfirmExitDialog : PopupDialog
-        {
-            public ConfirmExitDialog(Action confirm, Action cancel)
-            {
-                HeaderText = "真的要退出吗?";
-                BodyText = "这是最后一次确认的机会了";
-
-                Icon = FontAwesome.Solid.ExclamationTriangle;
-
-                Buttons = new PopupDialogButton[]
-                {
-                    new PopupDialogOkButton
-                    {
-                        Text = @"再见",
-                        Action = confirm
-                    },
-                    new PopupDialogCancelButton
-                    {
-                        Text = @"再玩一会",
-                        Action = cancel
-                    },
-                };
-            }
         }
     }
 }
