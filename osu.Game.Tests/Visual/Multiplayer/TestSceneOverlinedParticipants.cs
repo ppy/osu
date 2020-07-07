@@ -22,12 +22,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create component", () =>
             {
-                Child = new OverlinedParticipants(Direction.Horizontal)
+                Child = new ParticipantsDisplay(Direction.Horizontal)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 500,
-                    AutoSizeAxes = Axes.Y,
                 };
             });
         }
@@ -37,7 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create component", () =>
             {
-                Child = new OverlinedParticipants(Direction.Vertical)
+                Child = new ParticipantsDisplay(Direction.Vertical)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

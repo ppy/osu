@@ -53,9 +53,10 @@ namespace osu.Game.Screens.Multi.Match
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         private MatchSettingsOverlay settingsOverlay;
-        private OverlinedLeaderboard leaderboard;
+        private MatchLeaderboard leaderboard;
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
+        private OverlinedHeader participantsHeader;
 
         public MatchSubScreen(Room room)
         {
@@ -85,11 +86,22 @@ namespace osu.Game.Screens.Multi.Match
                                 Child = new GridContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(),
+                                    },
                                     Content = new[]
                                     {
+                                        new Drawable[] { new Components.Header() },
                                         new Drawable[]
                                         {
-                                            new Components.Header()
+                                            participantsHeader = new OverlinedHeader("Participants")
+                                            {
+                                                ShowLine = false
+                                            }
                                         },
                                         new Drawable[]
                                         {
@@ -97,12 +109,10 @@ namespace osu.Game.Screens.Multi.Match
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Margin = new MarginPadding { Top = 10 },
-                                                Child = new OverlinedParticipants(Direction.Horizontal)
+                                                Margin = new MarginPadding { Top = 5 },
+                                                Child = new ParticipantsDisplay(Direction.Horizontal)
                                                 {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    ShowLine = false
+                                                    Details = { BindTarget = participantsHeader.Details }
                                                 }
                                             }
                                         },
@@ -126,9 +136,10 @@ namespace osu.Game.Screens.Multi.Match
                                                                 {
                                                                     new Drawable[]
                                                                     {
-                                                                        new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                        new DrawableRoomPlaylist(false, true) // Temporarily always allow selection
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
+                                                                            Items = { BindTarget = playlist },
                                                                             SelectedItem = { BindTarget = SelectedItem }
                                                                         }
                                                                     },
@@ -157,18 +168,16 @@ namespace osu.Game.Screens.Multi.Match
                                                             RelativeSizeAxes = Axes.Both,
                                                             Content = new[]
                                                             {
-                                                                new Drawable[]
-                                                                {
-                                                                    leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
-                                                                },
-                                                                new Drawable[]
-                                                                {
-                                                                    new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
-                                                                }
+                                                                new Drawable[] { new OverlinedHeader("Leaderboard"), },
+                                                                new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
+                                                                new Drawable[] { new OverlinedHeader("Chat"), },
+                                                                new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
                                                             },
                                                             RowDimensions = new[]
                                                             {
+                                                                new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(),
+                                                                new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 240),
                                                             }
                                                         },
@@ -185,12 +194,6 @@ namespace osu.Game.Screens.Multi.Match
                                             }
                                         }
                                     },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(),
-                                    }
                                 }
                             }
                         },
@@ -219,6 +222,7 @@ namespace osu.Game.Screens.Multi.Match
         }
 
         [Resolved]
+
         private IAPIProvider api { get; set; }
 
         protected override void LoadComplete()
