@@ -12,6 +12,8 @@ namespace osu.Game.Tests.Visual.Online
     {
         private TestNewsOverlay news;
 
+        protected override bool UseOnlineAPI => true;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

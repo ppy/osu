@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.News;
+using osu.Game.Overlays.News.Displays;
 
 namespace osu.Game.Overlays
 {
@@ -87,7 +88,7 @@ namespace osu.Game.Overlays
 
             if (current.NewValue == null)
             {
-                LoadDisplay(Empty());
+                LoadDisplay(new FrontpageDisplay());
                 return;
             }
 
