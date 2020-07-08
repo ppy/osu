@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override void PopIn()
         {
             this.MoveToY(0, transition_time, Easing.OutQuint);
-            this.FadeIn(transition_time / 2, Easing.OutQuint);
+            this.FadeIn(transition_time / 4, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Toolbar
             userButton.StateContainer?.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
-            this.FadeOut(transition_time);
+            this.FadeOut(transition_time, Easing.InQuint);
         }
     }
 }
