@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Storyboards;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
@@ -36,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private DrawableSpinner drawableSpinner;
+        private SpriteIcon spinnerSymbol => drawableSpinner.ChildrenOfType<SpriteIcon>().Single();
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -50,23 +52,38 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSpinnerRewindingRotation()
         {
             addSeekStep(5000);
-            AddAssert("is rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
+            AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.Rotation, 0, 100));
+            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
 
             addSeekStep(0);
-            AddAssert("is rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
+            AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, 0, 100));
+            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
         }
 
         [Test]
         public void TestSpinnerMiddleRewindingRotation()
         {
-            double estimatedRotation = 0;
+            double finalAbsoluteDiscRotation = 0, finalRelativeDiscRotation = 0, finalSpinnerSymbolRotation = 0;
 
             addSeekStep(5000);
-            AddStep("retrieve rotation", () => estimatedRotation = drawableSpinner.Disc.RotationAbsolute);
+            AddStep("retrieve disc relative rotation", () => finalRelativeDiscRotation = drawableSpinner.Disc.Rotation);
+            AddStep("retrieve disc absolute rotation", () => finalAbsoluteDiscRotation = drawableSpinner.Disc.RotationAbsolute);
+            AddStep("retrieve spinner symbol rotation", () => finalSpinnerSymbolRotation = spinnerSymbol.Rotation);
 
             addSeekStep(2500);
+            AddUntilStep("disc rotation rewound",
+                // we want to make sure that the rotation at time 2500 is in the same direction as at time 5000, but about half-way in.
+                () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, finalRelativeDiscRotation / 2, 100));
+            AddUntilStep("symbol rotation rewound",
+                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, 100));
+
             addSeekStep(5000);
-            AddAssert("is rotation absolute almost same", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, estimatedRotation, 100));
+            AddAssert("is disc rotation almost same",
+                () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, finalRelativeDiscRotation, 100));
+            AddAssert("is symbol rotation almost same",
+                () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, 100));
+            AddAssert("is disc rotation absolute almost same",
+                () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, finalAbsoluteDiscRotation, 100));
         }
 
         [Test]
