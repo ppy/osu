@@ -15,6 +15,11 @@ using osuTK;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Replays;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Scoring;
 using osu.Game.Storyboards;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
@@ -85,6 +90,44 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is disc rotation absolute almost same",
                 () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, finalAbsoluteDiscRotation, 100));
         }
+
+        [Test]
+        public void TestRotationDirection([Values(true, false)] bool clockwise)
+        {
+            if (clockwise)
+            {
+                AddStep("flip replay", () =>
+                {
+                    var drawableRuleset = this.ChildrenOfType<DrawableOsuRuleset>().Single();
+                    var score = drawableRuleset.ReplayScore;
+                    var scoreWithFlippedReplay = new Score
+                    {
+                        ScoreInfo = score.ScoreInfo,
+                        Replay = flipReplay(score.Replay)
+                    };
+                    drawableRuleset.SetReplayScore(scoreWithFlippedReplay);
+                });
+            }
+
+            addSeekStep(5000);
+
+            AddAssert("disc spin direction correct", () => clockwise ? drawableSpinner.Disc.Rotation > 0 : drawableSpinner.Disc.Rotation < 0);
+            AddAssert("spinner symbol direction correct", () => clockwise ? spinnerSymbol.Rotation > 0 : spinnerSymbol.Rotation < 0);
+        }
+
+        private Replay flipReplay(Replay scoreReplay) => new Replay
+        {
+            Frames = scoreReplay
+                     .Frames
+                     .Cast<OsuReplayFrame>()
+                     .Select(replayFrame =>
+                     {
+                         var flippedPosition = new Vector2(OsuPlayfield.BASE_SIZE.X - replayFrame.Position.X, replayFrame.Position.Y);
+                         return new OsuReplayFrame(replayFrame.Time, flippedPosition, replayFrame.Actions.ToArray());
+                     })
+                     .Cast<ReplayFrame>()
+                     .ToList()
+        };
 
         [Test]
         public void TestSpinPerMinuteOnRewind()
