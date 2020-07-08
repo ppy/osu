@@ -7,18 +7,18 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.News;
 
 namespace osu.Game.Overlays
 {
     public class NewsOverlay : FullscreenOverlay
     {
-        private NewsHeader header;
-
-        private Container<NewsContent> content;
-
         public readonly Bindable<string> Current = new Bindable<string>(null);
+
+        private Container content;
+        private LoadingLayer loading;
+        private OverlayScrollContainer scrollFlow;
 
         public NewsOverlay()
             : base(OverlayColourScheme.Purple)
@@ -26,18 +26,21 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
+            NewsHeader header;
+
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleDarkAlternative
+                    Colour = ColourProvider.Background5,
                 },
-                new OverlayScrollContainer
+                scrollFlow = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ScrollbarVisible = false,
                     Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
@@ -49,7 +52,7 @@ namespace osu.Game.Overlays
                             {
                                 ShowFrontPage = ShowFrontPage
                             },
-                            content = new Container<NewsContent>
+                            content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -57,31 +60,54 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
+                loading = new LoadingLayer(content),
             };
 
             header.Post.BindTo(Current);
-            Current.TriggerChange();
         }
 
-        private CancellationTokenSource loadContentCancellation;
-
-        protected void LoadAndShowContent(NewsContent newContent)
+        protected override void LoadComplete()
         {
-            content.FadeTo(0.2f, 300, Easing.OutQuint);
-
-            loadContentCancellation?.Cancel();
-
-            LoadComponentAsync(newContent, c =>
-            {
-                content.Child = c;
-                content.FadeIn(300, Easing.OutQuint);
-            }, (loadContentCancellation = new CancellationTokenSource()).Token);
+            base.LoadComplete();
+            Current.BindValueChanged(onCurrentChanged, true);
         }
 
         public void ShowFrontPage()
         {
             Current.Value = null;
             Show();
+        }
+
+        private CancellationTokenSource cancellationToken;
+
+        private void onCurrentChanged(ValueChangedEvent<string> current)
+        {
+            cancellationToken?.Cancel();
+            loading.Show();
+
+            if (current.NewValue == null)
+            {
+                LoadDisplay(Empty());
+                return;
+            }
+
+            LoadDisplay(Empty());
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            scrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded =>
+            {
+                content.Child = loaded;
+                loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }
