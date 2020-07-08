@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.News.Displays
         private IAPIProvider api { get; set; }
 
         private readonly FillFlowContainer content;
-        private readonly FrontPageShowMoreButton showMore;
+        private readonly ShowMoreButton showMore;
 
         private GetNewsRequest request;
         private Cursor lastCursor;
@@ -30,10 +30,9 @@ namespace osu.Game.Overlays.News.Displays
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding
             {
-                Top = 20,
-                Bottom = 10,
-                Left = 35,
-                Right = 55
+                Vertical = 20,
+                Left = 30,
+                Right = 50
             };
 
             InternalChild = new FillFlowContainer
@@ -53,13 +52,13 @@ namespace osu.Game.Overlays.News.Displays
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 10)
                     },
-                    showMore = new FrontPageShowMoreButton
+                    showMore = new ShowMoreButton
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding
                         {
-                            Vertical = 15
+                            Top = 15
                         },
                         Action = fetchPage,
                         Alpha = 0
@@ -115,19 +114,6 @@ namespace osu.Game.Overlays.News.Displays
             request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
-        }
-
-        private class FrontPageShowMoreButton : ShowMoreButton
-        {
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                Height = 20;
-
-                IdleColour = colourProvider.Background3;
-                HoverColour = colourProvider.Background2;
-                ChevronIconColour = colourProvider.Foreground1;
-            }
         }
     }
 }

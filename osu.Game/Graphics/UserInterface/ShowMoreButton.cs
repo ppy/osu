@@ -1,13 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 using System.Collections.Generic;
 
 namespace osu.Game.Graphics.UserInterface
@@ -15,14 +16,6 @@ namespace osu.Game.Graphics.UserInterface
     public class ShowMoreButton : LoadingButton
     {
         private const int duration = 200;
-
-        private Color4 chevronIconColour;
-
-        protected Color4 ChevronIconColour
-        {
-            get => chevronIconColour;
-            set => chevronIconColour = leftChevron.Colour = rightChevron.Colour = value;
-        }
 
         public string Text
         {
@@ -32,22 +25,26 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
-        private ChevronIcon leftChevron;
-        private ChevronIcon rightChevron;
         private SpriteText text;
         private Box background;
         private FillFlowContainer textContainer;
 
         public ShowMoreButton()
         {
-            Height = 30;
-            Width = 140;
+            AutoSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            IdleColour = colourProvider.Background2;
+            HoverColour = colourProvider.Background1;
         }
 
         protected override Drawable CreateContent() => new CircularContainer
         {
             Masking = true,
-            RelativeSizeAxes = Axes.Both,
+            AutoSizeAxes = Axes.Both,
             Children = new Drawable[]
             {
                 background = new Box
@@ -56,22 +53,28 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 textContainer = new FillFlowContainer
                 {
+                    AlwaysPresent = true,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(7),
+                    Margin = new MarginPadding
+                    {
+                        Horizontal = 20,
+                        Vertical = 5,
+                    },
                     Children = new Drawable[]
                     {
-                        leftChevron = new ChevronIcon(),
+                        new ChevronIcon(),
                         text = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                             Text = "show more".ToUpper(),
                         },
-                        rightChevron = new ChevronIcon(),
+                        new ChevronIcon()
                     }
                 }
             }
@@ -83,14 +86,18 @@ namespace osu.Game.Graphics.UserInterface
 
         private class ChevronIcon : SpriteIcon
         {
-            private const int icon_size = 8;
-
             public ChevronIcon()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Size = new Vector2(icon_size);
+                Size = new Vector2(8);
                 Icon = FontAwesome.Solid.ChevronDown;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Colour = colourProvider.Foreground1;
             }
         }
     }
