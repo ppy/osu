@@ -74,6 +74,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         /// <summary>
+        /// The total rotation performed on the spinner disc, disregarding the spin direction.
+        /// </summary>
+        /// <remarks>
+        /// This value is always non-negative and is monotonically increasing with time
+        /// (i.e. will only increase if time is passing forward, but can decrease during rewind).
+        /// </remarks>
+        /// <example>
+        /// If the spinner is spun 360 degrees clockwise and then 360 degrees counter-clockwise,
+        /// this property will return the value of 720 (as opposed to 0 for <see cref="Drawable.Rotation"/>).
+        /// </example>
+        public float RotationAbsolute;
+
+        /// <summary>
         /// Whether currently in the correct time range to allow spinning.
         /// </summary>
         private bool isSpinnableTime => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
@@ -88,7 +101,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private float lastAngle;
         private float currentRotation;
-        public float RotationAbsolute;
         private int completeTick;
 
         private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 360));
