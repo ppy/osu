@@ -203,13 +203,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = TournamentGame.TEXT_COLOUR,
+                                            Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
                                         },
                                         new TournamentSpriteText
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = seeding.ToString("#,0"),
+                                            Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
                                         },
                                     }
                                 },
