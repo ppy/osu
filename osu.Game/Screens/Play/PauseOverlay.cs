@@ -3,10 +3,8 @@
 
 using System;
 using System.Linq;
-using NUnit.Framework.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
@@ -55,9 +53,8 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
 
-            var transformSeq = pauseLoop.VolumeTo(0.0f, 190, Easing.OutQuad );
+            var transformSeq = pauseLoop.VolumeTo(0.0f, 190, Easing.OutQuad);
             transformSeq.Finally(_ => pauseLoop.Stop());
-
         }
     }
 }
