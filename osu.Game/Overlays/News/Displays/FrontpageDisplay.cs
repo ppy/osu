@@ -87,9 +87,7 @@ namespace osu.Game.Overlays.News.Displays
         {
             lastCursor = response.Cursor;
 
-            FillFlowContainer<NewsCard> flow;
-
-            flow = new FillFlowContainer<NewsCard>
+            var flow = new FillFlowContainer<NewsCard>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
