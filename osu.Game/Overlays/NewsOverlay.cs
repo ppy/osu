@@ -88,7 +88,7 @@ namespace osu.Game.Overlays
 
             if (current.NewValue == null)
             {
-                LoadDisplay(new FrontpageDisplay());
+                LoadDisplay(new FrontPageDisplay());
                 return;
             }
 

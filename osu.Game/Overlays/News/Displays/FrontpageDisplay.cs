@@ -13,18 +13,18 @@ using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
 {
-    public class FrontpageDisplay : CompositeDrawable
+    public class FrontPageDisplay : CompositeDrawable
     {
         [Resolved]
         private IAPIProvider api { get; set; }
 
         private readonly FillFlowContainer content;
-        private readonly FrontpageShowMoreButton showMore;
+        private readonly FrontPageShowMoreButton showMore;
 
         private GetNewsRequest request;
         private Cursor lastCursor;
 
-        public FrontpageDisplay()
+        public FrontPageDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.News.Displays
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 10)
                     },
-                    showMore = new FrontpageShowMoreButton
+                    showMore = new FrontPageShowMoreButton
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.News.Displays
             base.Dispose(isDisposing);
         }
 
-        private class FrontpageShowMoreButton : ShowMoreButton
+        private class FrontPageShowMoreButton : ShowMoreButton
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
