@@ -22,12 +22,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep(@"Show front page", () => news.ShowFrontPage());
             AddStep(@"Custom article", () => news.Current.Value = "Test Article 101");
 
-            AddStep(@"Article covers", () => news.LoadAndShowContent(new NewsCoverTest()));
+            AddStep(@"Article covers", () => news.LoadDisplay(new NewsCoverTest()));
         }
 
         private class TestNewsOverlay : NewsOverlay
         {
-            public new void LoadAndShowContent(NewsContent content) => base.LoadAndShowContent(content);
+            public void LoadDisplay(NewsContent content) => base.LoadDisplay(content);
         }
 
         private class NewsCoverTest : NewsContent
