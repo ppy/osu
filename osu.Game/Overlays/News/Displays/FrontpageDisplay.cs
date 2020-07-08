@@ -76,6 +76,8 @@ namespace osu.Game.Overlays.News.Displays
 
         private void fetchPage()
         {
+            request?.Cancel();
+
             request = new GetNewsRequest(lastCursor);
             request.Success += response => Schedule(() => createContent(response));
             api.PerformAsync(request);
