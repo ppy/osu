@@ -95,22 +95,22 @@ namespace osu.Game.Screens.Multi
                         {
                             new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 24),
                                 Text = "Multiplayer"
                             },
                             dot = new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 24),
                                 Text = "·"
                             },
                             pageTitle = new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 24),
                                 Text = "Lounge"
                             }
