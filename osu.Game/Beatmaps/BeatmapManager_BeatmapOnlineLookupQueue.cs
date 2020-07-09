@@ -183,6 +183,7 @@ namespace osu.Game.Beatmaps
             public void Dispose()
             {
                 cacheDownloadRequest?.Dispose();
+                updateScheduler?.Dispose();
             }
 
             [Serializable]
