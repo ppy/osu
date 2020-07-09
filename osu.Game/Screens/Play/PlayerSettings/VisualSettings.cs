@@ -14,9 +14,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerSliderBar<double> playfieldAreaDimSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
+        private readonly PlayerCheckbox showPlayfieldAreaToggle;
 
         public VisualSettings()
         {
@@ -40,11 +42,20 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 new OsuSpriteText
                 {
+                    Text = "Playfieldd area dim:"
+                },
+                playfieldAreaDimSliderBar = new PlayerSliderBar<double>
+                {
+                    DisplayAsPercentage = true
+                },
+                new OsuSpriteText
+                {
                     Text = "Toggles:"
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboard / Video" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" },
+                showPlayfieldAreaToggle = new PlayerCheckbox { LabelText = "Show playfield area" }
             };
         }
 
@@ -53,9 +64,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
+            playfieldAreaDimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.PlayfieldAreaDimLevel);
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
+            showPlayfieldAreaToggle.Current = config.GetBindable<bool>(OsuSetting.ShowPlayfieldArea);
         }
     }
 }
