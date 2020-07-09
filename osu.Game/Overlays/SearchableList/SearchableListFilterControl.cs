@@ -136,8 +136,6 @@ namespace osu.Game.Overlays.SearchableList
 
         private class FilterSearchTextBox : SearchTextBox
         {
-            protected override bool AllowCommit => true;
-
             [BackgroundDependencyLoader]
             private void load()
             {
