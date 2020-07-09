@@ -20,12 +20,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new ScreenStack(loungeScreen = new LoungeSubScreen
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f,
-            });
         }
 
         public override void SetUpSteps()
@@ -33,6 +27,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             base.SetUpSteps();
 
             AddStep("clear rooms", () => RoomManager.Rooms.Clear());
+            AddStep("push screen", () => LoadScreen(loungeScreen = new LoungeSubScreen
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Width = 0.5f,
+            }));
+
+            AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
         }
 
         private RoomsContainer roomsContainer => loungeScreen.ChildrenOfType<RoomsContainer>().First();
