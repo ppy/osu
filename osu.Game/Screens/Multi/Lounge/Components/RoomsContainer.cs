@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     {
                         if (room == selectedRoom.Value)
                         {
-                            JoinRequested?.Invoke(room);
+                            joinSelected();
                             return;
                         }
 
@@ -137,12 +137,23 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             selectedRoom.Value = room;
         }
 
-        #region Key selection logic
+        private void joinSelected()
+        {
+            if (selectedRoom.Value == null) return;
+
+            JoinRequested?.Invoke(selectedRoom.Value);
+        }
+
+        #region Key selection logic (shared with BeatmapCarousel)
 
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
+                case GlobalAction.Select:
+                    joinSelected();
+                    return true;
+
                 case GlobalAction.SelectNext:
                     beginRepeatSelection(() => selectNext(1), action);
                     return true;
