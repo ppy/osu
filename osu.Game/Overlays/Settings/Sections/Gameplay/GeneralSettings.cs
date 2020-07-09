@@ -76,7 +76,19 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Score display mode",
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
-                }
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show playfield area",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowPlayfieldArea)
+                },
+                new SettingsSlider<double>
+                {
+                    LabelText = "Playfield area dim",
+                    Bindable = config.GetBindable<double>(OsuSetting.PlayfieldAreaDimLevel),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
             };
         }
     }
