@@ -116,6 +116,13 @@ namespace osu.Game.Screens.Select
                             Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
                             Children = new Drawable[]
                             {
+                                new OsuTabControlCheckbox
+                                {
+                                    Text = "Show converted",
+                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                },
                                 sortTabs = new OsuTabControl<SortMode>
                                 {
                                     RelativeSizeAxes = Axes.X,
