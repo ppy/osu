@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// If the spinner is spun 360 degrees clockwise and then 360 degrees counter-clockwise,
         /// this property will return the value of 720 (as opposed to 0 for <see cref="Drawable.Rotation"/>).
         /// </example>
-        public float RotationAbsolute;
+        public float CumulativeRotation;
 
         /// <summary>
         /// Whether currently in the correct time range to allow spinning.
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private float currentRotation;
         private int completeTick;
 
-        private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 360));
+        private bool updateCompleteTick() => completeTick != (completeTick = (int)(CumulativeRotation / 360));
 
         private bool rotationTransferred;
 
@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             currentRotation += angle;
-            RotationAbsolute += Math.Abs(angle) * Math.Sign(Clock.ElapsedFrameTime);
+            CumulativeRotation += Math.Abs(angle) * Math.Sign(Clock.ElapsedFrameTime);
         }
     }
 }
