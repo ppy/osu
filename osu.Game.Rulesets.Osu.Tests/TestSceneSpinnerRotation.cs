@@ -58,11 +58,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             addSeekStep(5000);
             AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.Rotation, 0, 100));
-            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
+            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Disc.CumulativeRotation, 0, 100));
 
             addSeekStep(0);
             AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.Rotation, 0, 100));
-            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, 0, 100));
+            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Disc.CumulativeRotation, 0, 100));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(5000);
             AddStep("retrieve disc relative rotation", () => finalRelativeDiscRotation = drawableSpinner.Disc.Rotation);
-            AddStep("retrieve disc absolute rotation", () => finalAbsoluteDiscRotation = drawableSpinner.Disc.RotationAbsolute);
+            AddStep("retrieve disc absolute rotation", () => finalAbsoluteDiscRotation = drawableSpinner.Disc.CumulativeRotation);
             AddStep("retrieve spinner symbol rotation", () => finalSpinnerSymbolRotation = spinnerSymbol.Rotation);
 
             addSeekStep(2500);
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is symbol rotation almost same",
                 () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, 100));
             AddAssert("is disc rotation absolute almost same",
-                () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, finalAbsoluteDiscRotation, 100));
+                () => Precision.AlmostEquals(drawableSpinner.Disc.CumulativeRotation, finalAbsoluteDiscRotation, 100));
         }
 
         [Test]
