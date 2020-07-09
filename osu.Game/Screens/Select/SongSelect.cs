@@ -173,7 +173,6 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.X,
                             Height = FilterControl.HEIGHT,
                             FilterChanged = ApplyFilterToCarousel,
-                            Background = { Width = 2 },
                         },
                         new GridContainer // used for max width implementation
                         {
