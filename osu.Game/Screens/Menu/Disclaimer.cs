@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Solid.Poo,
+                    Icon = FontAwesome.Solid.Flask,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
