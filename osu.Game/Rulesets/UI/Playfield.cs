@@ -12,9 +12,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.UI
 
         private Bindable<bool> showPlayfieldArea;
         private Bindable<double> playfieldAreaDimLevel;
-        private Box playfieldArea;
+        private EditorPlayfieldBorder playfieldArea;
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -90,16 +89,16 @@ namespace osu.Game.Rulesets.UI
             playfieldAreaDimLevel.ValueChanged += _ => UpdateVisuals();
             UpdateVisuals();
         }
+
         protected virtual void UpdateVisuals()
         {
-            if(playfieldArea == null)
+            if (playfieldArea == null)
             {
                 if (showPlayfieldArea.Value)
                 {
-                    AddInternal(playfieldArea = new Box
+                    AddInternal(playfieldArea = new EditorPlayfieldBorder
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
                         Alpha = (float)playfieldAreaDimLevel.Value,
                     });
                 }
