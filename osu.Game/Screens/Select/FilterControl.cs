@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = "分类依据: ",
+                                    Text = "排序方式: ",
                                     Font = OsuFont.GetFont(size: 18),
                                     Margin = new MarginPadding(5),
                                     Anchor = Anchor.BottomRight,
