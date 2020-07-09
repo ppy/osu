@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -41,10 +42,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
             AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => Room == RoomManager.Rooms.First());
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
 
             AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
             AddAssert("first room joined", () => RoomManager.Rooms.First().Status.Value is JoinedRoomStatus);
+        }
+
+        [Test]
+        public void TestKeyboardNavigation()
+        {
+            AddRooms(3);
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+
+            press(Key.Up);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+
+            press(Key.Down);
+            press(Key.Down);
+            AddAssert("last room selected", () => checkRoomSelected(RoomManager.Rooms.Last()));
+
+            press(Key.Enter);
+            AddAssert("last room joined", () => RoomManager.Rooms.Last().Status.Value is JoinedRoomStatus);
+        }
+
+        private void press(Key down)
+        {
+            AddStep($"press {down}", () =>
+            {
+                InputManager.PressKey(down);
+                InputManager.ReleaseKey(down);
+            });
         }
 
         [Test]
@@ -79,6 +110,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
+
+        private bool checkRoomSelected(Room room) => Room == room;
 
         private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
 
