@@ -3,44 +3,46 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using System;
 
 namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        private const string front_page_string = "frontpage";
+        public const string FRONT_PAGE_STRING = "frontpage";
 
-        public readonly Bindable<string> Post = new Bindable<string>(null);
-
-        public Action ShowFrontPage;
+        public readonly Bindable<string> Post = new Bindable<string>(FRONT_PAGE_STRING);
 
         public NewsHeader()
         {
-            TabControl.AddItem(front_page_string);
-
-            Current.ValueChanged += e =>
-            {
-                if (e.NewValue == front_page_string)
-                    ShowFrontPage?.Invoke();
-            };
-
-            Post.ValueChanged += showPost;
+            TabControl.AddItem(FRONT_PAGE_STRING);
+            Current.Value = FRONT_PAGE_STRING;
+            Current.BindValueChanged(onCurrentChanged);
+            Post.BindValueChanged(onPostChanged, true);
         }
 
-        private void showPost(ValueChangedEvent<string> e)
-        {
-            if (e.OldValue != null)
-                TabControl.RemoveItem(e.OldValue);
+        public void SetFrontPage() => Post.Value = FRONT_PAGE_STRING;
 
-            if (e.NewValue != null)
+        public void SetArticle(string slug) => Post.Value = slug;
+
+        private void onCurrentChanged(ValueChangedEvent<string> current)
+        {
+            if (current.NewValue == FRONT_PAGE_STRING)
+                Post.Value = FRONT_PAGE_STRING;
+        }
+
+        private void onPostChanged(ValueChangedEvent<string> post)
+        {
+            if (post.OldValue != FRONT_PAGE_STRING)
+                TabControl.RemoveItem(post.OldValue);
+
+            if (post.NewValue != FRONT_PAGE_STRING)
             {
-                TabControl.AddItem(e.NewValue);
-                Current.Value = e.NewValue;
+                TabControl.AddItem(post.NewValue);
+                Current.Value = post.NewValue;
             }
             else
             {
-                Current.Value = front_page_string;
+                Current.Value = FRONT_PAGE_STRING;
             }
         }
 

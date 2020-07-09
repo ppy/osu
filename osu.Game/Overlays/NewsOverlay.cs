@@ -15,10 +15,9 @@ namespace osu.Game.Overlays
 {
     public class NewsOverlay : FullscreenOverlay
     {
-        public readonly Bindable<string> Current = new Bindable<string>(null);
-
         private Container content;
         private LoadingLayer loading;
+        private NewsHeader header;
         private OverlayScrollContainer scrollFlow;
 
         public NewsOverlay()
@@ -29,8 +28,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            NewsHeader header;
-
             Children = new Drawable[]
             {
                 new Box
@@ -49,10 +46,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new NewsHeader
-                            {
-                                ShowFrontPage = ShowFrontPage
-                            },
+                            header = new NewsHeader(),
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -63,30 +57,34 @@ namespace osu.Game.Overlays
                 },
                 loading = new LoadingLayer(content),
             };
-
-            header.Post.BindTo(Current);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Current.BindValueChanged(onCurrentChanged, true);
+            header.Post.BindValueChanged(onPostChanged, true);
         }
 
         public void ShowFrontPage()
         {
-            Current.Value = null;
+            header.SetFrontPage();
+            Show();
+        }
+
+        public void ShowArticle(string slug)
+        {
+            header.SetArticle(slug);
             Show();
         }
 
         private CancellationTokenSource cancellationToken;
 
-        private void onCurrentChanged(ValueChangedEvent<string> current)
+        private void onPostChanged(ValueChangedEvent<string> post)
         {
             cancellationToken?.Cancel();
             loading.Show();
 
-            if (current.NewValue == null)
+            if (post.NewValue == NewsHeader.FRONT_PAGE_STRING)
             {
                 LoadDisplay(new FrontPageDisplay());
                 return;
