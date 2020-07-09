@@ -23,6 +23,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private Color4 accentColour;
 
+        public const float HORIZONTAL_SPACING = 10;
+
         public virtual Color4 AccentColour
         {
             get => accentColour;
@@ -54,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControl()
         {
-            TabContainer.Spacing = new Vector2(10f, 0f);
+            TabContainer.Spacing = new Vector2(HORIZONTAL_SPACING, 0f);
 
             AddInternal(strip = new Box
             {

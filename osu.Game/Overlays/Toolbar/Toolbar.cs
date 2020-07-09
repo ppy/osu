@@ -36,9 +36,6 @@ namespace osu.Game.Overlays.Toolbar
         private float anim_time = 0;
         private bool OnLaunch = true;
 
-        private const float alpha_hovering = 0.8f;
-        private const float alpha_normal = 0.6f;
-
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
@@ -143,7 +140,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public class ToolbarBackground : Container
         {
-            private readonly Box solidBackground;
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
@@ -151,11 +147,10 @@ namespace osu.Game.Overlays.Toolbar
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    solidBackground = new Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.1f),
-                        Alpha = alpha_normal,
                     },
                     gradientBackground = new Box
                     {
@@ -171,14 +166,12 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnHover(HoverEvent e)
             {
-                solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
         }
@@ -186,8 +179,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override void PopIn()
         {
             this.MoveToY(0, transition_time, Easing.OutQuint);
-            this.FadeIn(transition_time / 2, Easing.OutQuint);
-            OnLaunch = false;
+            this.FadeIn(transition_time / 4, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -195,7 +187,7 @@ namespace osu.Game.Overlays.Toolbar
             userButton.StateContainer?.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
-            this.FadeOut(transition_time);
+            this.FadeOut(transition_time, Easing.InQuint);
         }
     }
 }
