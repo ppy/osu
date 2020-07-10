@@ -99,8 +99,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
-            Set(OsuSetting.ShowPlayfieldArea, false);
-            Set(OsuSetting.PlayfieldAreaDimLevel, 0.1, 0, 1, 0.01);
+            Set(OsuSetting.ShowPlayfieldBorder, false);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -231,7 +230,6 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
-        ShowPlayfieldArea,
-        PlayfieldAreaDimLevel
+        ShowPlayfieldBorder
     }
 }
