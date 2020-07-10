@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 {
                     case DownloadState.LocallyAvailable:
                         button.Enabled.Value = true;
-                        button.TooltipText = string.Empty;
+                        button.TooltipText = "前往该谱面";
                         break;
 
                     default:

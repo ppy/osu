@@ -291,8 +291,7 @@ namespace osu.Game.Screens.Menu
             // we may have consumed our preloaded instance, so let's make another.
             preloadScreens();
 
-            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
-                Beatmap.Value.Track.Start();
+            music.EnsurePlayingSomething();
         }
 
         public override bool OnExiting(IScreen next)

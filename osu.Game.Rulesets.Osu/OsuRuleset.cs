@@ -30,12 +30,14 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
 using System.Linq;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
 {
+    [ExcludeFromDynamicCompile]
     public class OsuRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);

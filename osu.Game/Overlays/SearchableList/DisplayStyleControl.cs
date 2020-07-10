@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
@@ -11,57 +10,27 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public class DisplayStyleControl<T> : Container
-        where T : struct, Enum
+    public class DisplayStyleControl : CompositeDrawable
     {
-        public readonly SlimEnumDropdown<T> Dropdown;
         public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
-
-        public override bool HandleNonPositionalInput => !DisplayStyle.Disabled;
 
         public DisplayStyleControl()
         {
             AutoSizeAxes = Axes.Both;
 
-            Children = new[]
+            InternalChild = new FillFlowContainer
             {
-                new FillFlowContainer
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(5f, 0f),
+                Direction = FillDirection.Horizontal,
+                Children = new[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Spacing = new Vector2(10f, 0f),
-                    Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
-                    {
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5f, 0f),
-                            Direction = FillDirection.Horizontal,
-                            Children = new[]
-                            {
-                                new DisplayStyleToggleButton(FontAwesome.Solid.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayStyleToggleButton(FontAwesome.Solid.ListUl, PanelDisplayStyle.List, DisplayStyle),
-                            },
-                        },
-                        Dropdown = new SlimEnumDropdown<T>
-                        {
-                            RelativeSizeAxes = Axes.None,
-                            Width = 160f,
-                        },
-                    },
+                    new DisplayStyleToggleButton(FontAwesome.Solid.ThLarge, PanelDisplayStyle.Grid, DisplayStyle),
+                    new DisplayStyleToggleButton(FontAwesome.Solid.ListUl, PanelDisplayStyle.List, DisplayStyle),
                 },
             };
 
             DisplayStyle.Value = PanelDisplayStyle.Grid;
-            DisplayStyle.DisabledChanged += disabled =>
-            {
-                if (disabled)
-                    Dropdown.Current.Disabled = true;
-                else
-                    Dropdown.Current.Disabled = false;
-            };
         }
 
         private class DisplayStyleToggleButton : OsuClickableContainer
@@ -90,12 +59,7 @@ namespace osu.Game.Overlays.SearchableList
 
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(new ValueChangedEvent<PanelDisplayStyle>(bindable.Value, bindable.Value));
-                Action = () =>
-                {
-                    if (bindable.Disabled) return;
-
-                    bindable.Value = this.style;
-                };
+                Action = () => bindable.Value = this.style;
             }
 
             private void Bindable_ValueChanged(ValueChangedEvent<PanelDisplayStyle> e)
