@@ -395,6 +395,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Check zzzzz is at bottom", () => carousel.BeatmapSets.Last().Metadata.AuthorString == "zzzzz");
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
             AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!"));
+            AddStep("Sort by date submitted", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Submitted }, false));
+            AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Submitted.Second.Equals(set_count));
         }
 
         [Test]
@@ -823,6 +825,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 ID = id,
                 OnlineBeatmapSetID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                Submitted = new DateTimeOffset(2020, 04, 26, 05, 12, Math.Min(59, id), 0, new TimeSpan()),
                 Metadata = new BeatmapMetadata
                 {
                     // Create random metadata, then we can check if sorting works based on these
