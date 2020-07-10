@@ -34,7 +34,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         RoomID = { Value = i },
                         Name = { Value = $"Room {i}" },
                         Host = { Value = new User { Username = "Host" } },
-                        EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) }
+                        EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
+                        Category = { Value = i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal }
                     };
 
                     if (ruleset != null)
