@@ -26,7 +26,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("clear rooms", () => RoomManager.Rooms.Clear());
             AddStep("push screen", () => LoadScreen(loungeScreen = new LoungeSubScreen
             {
                 Anchor = Anchor.Centre,
