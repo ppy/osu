@@ -63,22 +63,26 @@ namespace osu.Game.Graphics.UserInterface
                     background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
                     icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    TooltipText = "Download";
                     break;
 
                 case DownloadState.Downloading:
                     background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
                     icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    TooltipText = "Downloading...";
                     break;
 
                 case DownloadState.Downloaded:
                     background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
+                    TooltipText = "Importing";
                     break;
 
                 case DownloadState.LocallyAvailable:
                     background.FadeColour(colours.Green, 500, Easing.InOutExpo);
                     icon.MoveToX(-8, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(new Vector2(13), 500, Easing.InOutExpo);
+                    TooltipText = "Go to beatmap";
                     break;
             }
         }
