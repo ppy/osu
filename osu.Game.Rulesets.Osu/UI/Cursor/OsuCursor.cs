@@ -59,10 +59,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             if (!cursorExpand) return;
 
-            expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
+            expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 400, Easing.OutElasticHalf);
         }
 
-        public void Contract() => expandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
+        public void Contract() => expandTarget.ScaleTo(released_scale, 400, Easing.OutQuad);
 
         private class DefaultCursor : OsuCursorSprite
         {
