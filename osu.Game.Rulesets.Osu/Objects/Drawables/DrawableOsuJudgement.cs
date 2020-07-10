@@ -60,14 +60,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             lightingColour?.UnbindAll();
 
-            if (JudgedObject != null && lighting != null)
+            if (lighting != null)
             {
-                lightingColour = JudgedObject.AccentColour.GetBoundCopy();
-                lightingColour.BindValueChanged(colour => lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
-            }
-            else
-            {
-                lighting.Colour = Color4.White;
+                if (JudgedObject != null)
+                {
+                    lightingColour = JudgedObject.AccentColour.GetBoundCopy();
+                    lightingColour.BindValueChanged(colour => lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
+                }
+                else
+                {
+                    lighting.Colour = Color4.White;
+                }
             }
         }
 
