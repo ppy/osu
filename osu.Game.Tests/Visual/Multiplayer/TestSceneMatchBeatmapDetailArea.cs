@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Room.Playlist.Clear();
+            Room = new Room();
 
             Child = new MatchBeatmapDetailArea
             {

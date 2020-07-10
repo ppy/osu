@@ -14,6 +14,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi.Components;
@@ -95,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Room.Playlist.Clear();
+            Room = new Room();
         });
 
         [Test]
