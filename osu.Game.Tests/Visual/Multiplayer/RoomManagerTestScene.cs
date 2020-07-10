@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class RoomManagerTestScene : MultiplayerTestScene
+    public abstract class RoomManagerTestScene : MultiplayerTestScene
     {
         [Cached(Type = typeof(IRoomManager))]
         protected TestRoomManager RoomManager { get; } = new TestRoomManager();
