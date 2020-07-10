@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -48,7 +49,8 @@ namespace osu.Game.Screens.Multi
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
-        private readonly PlaylistItem item;
+        public readonly PlaylistItem Item;
+
         private readonly bool allowEdit;
         private readonly bool allowSelection;
 
@@ -57,8 +59,11 @@ namespace osu.Game.Screens.Multi
         public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection)
             : base(item)
         {
-            this.item = item;
+            Item = item;
+
+            // TODO: edit support should be moved out into a derived class
             this.allowEdit = allowEdit;
+
             this.allowSelection = allowSelection;
 
             beatmap.BindTo(item.Beatmap);
@@ -102,14 +107,14 @@ namespace osu.Game.Screens.Multi
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(item.Beatmap.ToString(), LinkAction.OpenBeatmap, item.Beatmap.Value.OnlineBeatmapID.ToString());
+            beatmapText.AddLink(Item.Beatmap.ToString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
 
             authorText.Clear();
 
-            if (item.Beatmap?.Value?.Metadata?.Author != null)
+            if (Item.Beatmap?.Value?.Metadata?.Author != null)
             {
                 authorText.AddText("mapped by ");
-                authorText.AddUserLink(item.Beatmap.Value?.Metadata.Author);
+                authorText.AddUserLink(Item.Beatmap.Value?.Metadata.Author);
             }
 
             modDisplay.Current.Value = requiredMods.ToArray();
@@ -180,28 +185,32 @@ namespace osu.Game.Screens.Multi
                         }
                     }
                 },
-                new Container
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     X = -18,
-                    Children = new Drawable[]
-                    {
-                        new PlaylistDownloadButton(item)
-                        {
-                            Size = new Vector2(50, 30)
-                        },
-                        new IconButton
-                        {
-                            Icon = FontAwesome.Solid.MinusSquare,
-                            Alpha = allowEdit ? 1 : 0,
-                            Action = () => RequestDeletion?.Invoke(Model),
-                        },
-                    }
+                    ChildrenEnumerable = CreateButtons()
                 }
             }
         };
+
+        protected virtual IEnumerable<Drawable> CreateButtons() =>
+            new Drawable[]
+            {
+                new PlaylistDownloadButton(Item)
+                {
+                    Size = new Vector2(50, 30)
+                },
+                new IconButton
+                {
+                    Icon = FontAwesome.Solid.MinusSquare,
+                    Alpha = allowEdit ? 1 : 0,
+                    Action = () => RequestDeletion?.Invoke(Model),
+                },
+            };
 
         protected override bool OnClick(ClickEvent e)
         {
