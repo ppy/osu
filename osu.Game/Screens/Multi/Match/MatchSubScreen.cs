@@ -224,7 +224,6 @@ namespace osu.Game.Screens.Multi.Match
         }
 
         [Resolved]
-
         private IAPIProvider api { get; set; }
 
         protected override void LoadComplete()
