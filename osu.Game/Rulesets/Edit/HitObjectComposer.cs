@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
@@ -108,7 +109,7 @@ namespace osu.Game.Rulesets.Edit
                                 drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
                                 {
                                     LayerBelowRuleset,
-                                    new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+                                    new PlayfieldBorder { RelativeSizeAxes = Axes.Both }
                                 }),
                                 drawableRulesetWrapper,
                                 // layers above playfield
