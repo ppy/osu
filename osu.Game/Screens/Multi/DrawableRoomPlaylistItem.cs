@@ -96,8 +96,6 @@ namespace osu.Game.Screens.Multi
 
         private ScheduledDelegate scheduledRefresh;
 
-        public FillFlowContainer ButtonsContainer { get; private set; }
-
         private void scheduleRefresh()
         {
             scheduledRefresh?.Cancel();
@@ -187,7 +185,7 @@ namespace osu.Game.Screens.Multi
                         }
                     }
                 },
-                ButtonsContainer = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
