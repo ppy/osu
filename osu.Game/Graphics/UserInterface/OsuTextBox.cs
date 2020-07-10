@@ -30,10 +30,10 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel caretMovedSample;
 
         /// <summary>
-        /// Whether to allow playing a different sample when inserting upper case text.
-        /// If set to false, same sample will be played for both letter cases.
+        /// Whether to allow playing a different samples based on the type of character.
+        /// If set to false, the same sample will be used for all characters.
         /// </summary>
-        protected virtual bool AllowUpperCaseSamples => true;
+        protected virtual bool AllowUniqueCharacterSamples => true;
 
         protected override float LeftRightPadding => 10;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnTextAdded(added);
 
-            if (added.Any(char.IsUpper) && AllowUpperCaseSamples)
+            if (added.Any(char.IsUpper) && AllowUniqueCharacterSamples)
                 capsTextAddedSample?.Play();
             else
                 textAddedSamples[RNG.Next(0, 3)]?.Play();
