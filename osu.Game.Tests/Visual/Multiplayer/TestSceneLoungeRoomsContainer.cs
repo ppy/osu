@@ -1,30 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Users;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomsContainer : MultiplayerTestScene
+    public class TestSceneLoungeRoomsContainer : RoomManagerTestScene
     {
-        [Cached(Type = typeof(IRoomManager))]
-        private TestRoomManager roomManager = new TestRoomManager();
-
         private RoomsContainer container;
 
         [BackgroundDependencyLoader]
@@ -39,34 +31,57 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         }
 
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddStep("clear rooms", () => roomManager.Rooms.Clear());
-        }
-
         [Test]
         public void TestBasicListChanges()
         {
-            addRooms(3);
+            AddRooms(3);
 
             AddAssert("has 3 rooms", () => container.Rooms.Count == 3);
-            AddStep("remove first room", () => roomManager.Rooms.Remove(roomManager.Rooms.FirstOrDefault()));
+            AddStep("remove first room", () => RoomManager.Rooms.Remove(RoomManager.Rooms.FirstOrDefault()));
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
             AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => Room == roomManager.Rooms.First());
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
 
             AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
+            AddAssert("first room joined", () => RoomManager.Rooms.First().Status.Value is JoinedRoomStatus);
+        }
+
+        [Test]
+        public void TestKeyboardNavigation()
+        {
+            AddRooms(3);
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+
+            press(Key.Up);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+
+            press(Key.Down);
+            press(Key.Down);
+            AddAssert("last room selected", () => checkRoomSelected(RoomManager.Rooms.Last()));
+
+            press(Key.Enter);
+            AddAssert("last room joined", () => RoomManager.Rooms.Last().Status.Value is JoinedRoomStatus);
+        }
+
+        private void press(Key down)
+        {
+            AddStep($"press {down}", () =>
+            {
+                InputManager.PressKey(down);
+                InputManager.ReleaseKey(down);
+            });
         }
 
         [Test]
         public void TestStringFiltering()
         {
-            addRooms(4);
+            AddRooms(4);
 
             AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
 
@@ -82,8 +97,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestRulesetFiltering()
         {
-            addRooms(2, new OsuRuleset().RulesetInfo);
-            addRooms(3, new CatchRuleset().RulesetInfo);
+            AddRooms(2, new OsuRuleset().RulesetInfo);
+            AddRooms(3, new CatchRuleset().RulesetInfo);
 
             AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
 
@@ -96,66 +111,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
 
-        private void addRooms(int count, RulesetInfo ruleset = null)
-        {
-            AddStep("add rooms", () =>
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var room = new Room
-                    {
-                        RoomID = { Value = i },
-                        Name = { Value = $"Room {i}" },
-                        Host = { Value = new User { Username = "Host" } },
-                        EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) }
-                    };
-
-                    if (ruleset != null)
-                    {
-                        room.Playlist.Add(new PlaylistItem
-                        {
-                            Ruleset = { Value = ruleset },
-                            Beatmap =
-                            {
-                                Value = new BeatmapInfo
-                                {
-                                    Metadata = new BeatmapMetadata()
-                                }
-                            }
-                        });
-                    }
-
-                    roomManager.Rooms.Add(room);
-                }
-            });
-        }
+        private bool checkRoomSelected(Room room) => Room == room;
 
         private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
-
-        private class TestRoomManager : IRoomManager
-        {
-            public event Action RoomsUpdated
-            {
-                add { }
-                remove { }
-            }
-
-            public readonly BindableList<Room> Rooms = new BindableList<Room>();
-
-            public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
-
-            IBindableList<Room> IRoomManager.Rooms => Rooms;
-
-            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
-
-            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            {
-            }
-
-            public void PartRoom()
-            {
-            }
-        }
 
         private class JoinedRoomStatus : RoomStatus
         {
