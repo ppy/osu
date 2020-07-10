@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Caching;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -28,24 +28,8 @@ namespace osu.Game.Rulesets.Judgements
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private readonly Cached drawableCache = new Cached();
-
-        private JudgementResult result;
-
-        public JudgementResult Result
-        {
-            get => result;
-            set
-            {
-                if (result?.Type == value.Type)
-                    return;
-
-                result = value;
-                drawableCache.Invalidate();
-            }
-        }
-
-        public DrawableHitObject JudgedObject;
+        public JudgementResult Result { get; private set; }
+        public DrawableHitObject JudgedObject { get; private set; }
 
         protected Container JudgementBody;
         protected SpriteText JudgementText;
@@ -68,14 +52,19 @@ namespace osu.Game.Rulesets.Judgements
         public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
             : this()
         {
-            Result = result;
-            JudgedObject = judgedObject;
+            Apply(result, judgedObject);
         }
 
         public DrawableJudgement()
         {
             Size = new Vector2(judgement_size);
             Origin = Anchor.Centre;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            prepareDrawables();
         }
 
         protected virtual void ApplyHitAnimations()
@@ -86,10 +75,10 @@ namespace osu.Game.Rulesets.Judgements
             this.Delay(FadeOutDelay).FadeOut(400);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
         {
-            prepareDrawables();
+            Result = result;
+            JudgedObject = judgedObject;
         }
 
         protected override void PrepareForUse()
@@ -98,8 +87,7 @@ namespace osu.Game.Rulesets.Judgements
 
             Debug.Assert(Result != null);
 
-            if (!drawableCache.IsValid)
-                prepareDrawables();
+            prepareDrawables();
 
             this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
             JudgementBody.ScaleTo(1);
@@ -129,9 +117,14 @@ namespace osu.Game.Rulesets.Judgements
             Expire(true);
         }
 
+        private HitResult? currentDrawableType;
+
         private void prepareDrawables()
         {
             var type = Result?.Type ?? HitResult.Perfect; //TODO: better default type from ruleset
+
+            if (type == currentDrawableType)
+                return;
 
             InternalChild = JudgementBody = new Container
             {
@@ -147,7 +140,7 @@ namespace osu.Game.Rulesets.Judgements
                 }, confineMode: ConfineMode.NoScaling)
             };
 
-            drawableCache.Validate();
+            currentDrawableType = type;
         }
     }
 }

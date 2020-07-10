@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj =>
             {
-                doj.JudgedObject = judgedObject;
+                doj.Apply(result, judgedObject);
 
                 // todo: move to JudgedObject property?
                 doj.Position = osuObject.StackedEndPosition;
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 var judgement = base.CreateNewDrawable();
 
                 // just a placeholder to initialise the correct drawable hierarchy for this pool.
-                judgement.Result = new JudgementResult(new HitObject(), new Judgement()) { Type = result };
+                judgement.Apply(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null);
 
                 return judgement;
             }
