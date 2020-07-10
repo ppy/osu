@@ -12,8 +12,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osu.Game.Configuration;
-using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -53,10 +51,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
-        private Bindable<bool> showPlayfieldArea;
-        private Bindable<double> playfieldAreaDimLevel;
-        private EditorPlayfieldBorder playfieldArea;
-
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -71,7 +65,7 @@ namespace osu.Game.Rulesets.UI
         private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             Cursor = CreateCursor();
 
@@ -81,38 +75,6 @@ namespace osu.Game.Rulesets.UI
                 Cursor.Hide();
 
                 AddInternal(Cursor);
-            }
-
-            showPlayfieldArea = config.GetBindable<bool>(OsuSetting.ShowPlayfieldArea);
-            playfieldAreaDimLevel = config.GetBindable<double>(OsuSetting.PlayfieldAreaDimLevel);
-            showPlayfieldArea.ValueChanged += _ => UpdateVisuals();
-            playfieldAreaDimLevel.ValueChanged += _ => UpdateVisuals();
-            UpdateVisuals();
-        }
-
-        protected virtual void UpdateVisuals()
-        {
-            if (playfieldArea == null)
-            {
-                if (showPlayfieldArea.Value)
-                {
-                    AddInternal(playfieldArea = new EditorPlayfieldBorder
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = (float)playfieldAreaDimLevel.Value,
-                    });
-                }
-            }
-            else
-            {
-                if (showPlayfieldArea.Value)
-                {
-                    playfieldArea.Alpha = (float)playfieldAreaDimLevel.Value;
-                }
-                else
-                {
-                    playfieldArea.Alpha = 0;
-                }
             }
         }
 

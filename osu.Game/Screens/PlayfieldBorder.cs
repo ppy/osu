@@ -6,14 +6,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Compose.Components
+namespace osu.Game.Screens
 {
     /// <summary>
     /// Provides a border around the playfield.
     /// </summary>
-    public class EditorPlayfieldBorder : CompositeDrawable
+    public class PlayfieldBorder : CompositeDrawable
     {
-        public EditorPlayfieldBorder()
+        public PlayfieldBorder()
         {
             RelativeSizeAxes = Axes.Both;
 
