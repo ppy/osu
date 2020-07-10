@@ -21,9 +21,11 @@ namespace osu.Game.Graphics
         private void load(MfConfigManager config, OsuColour colour)
         {
             config.BindWith(MfSetting.OptUI, Optui);
+        }
 
-            this.Show();
-
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Optui.BindValueChanged(UpdateIcons, true);
         }
 
