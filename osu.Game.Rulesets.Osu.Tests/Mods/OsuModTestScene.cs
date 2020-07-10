@@ -3,13 +3,10 @@
 
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Mania.Tests
+namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestScenePlayer : PlayerTestScene
+    public class OsuModTestScene : ModTestScene
     {
-        public TestScenePlayer()
-            : base(new ManiaRuleset())
-        {
-        }
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
     }
 }

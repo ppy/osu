@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/.idea.osu.Desktop/.idea/.idea.osu.Desktop.iml" filepath="$PROJECT_DIR$/.idea/.idea.osu.Desktop/.idea/.idea.osu.Desktop.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/.idea.osu.Desktop/riderModule.iml" filepath="$PROJECT_DIR$/.idea/.idea.osu.Desktop/riderModule.iml" />
     </modules>
   </component>

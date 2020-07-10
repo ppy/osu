@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -191,16 +193,24 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding { Vertical = -15, Horizontal = -20 },
                     Children = new[]
                     {
-                        new RankBadge(1f, ScoreRank.X),
-                        new RankBadge(0.95f, ScoreRank.S),
-                        new RankBadge(0.9f, ScoreRank.A),
-                        new RankBadge(0.8f, ScoreRank.B),
-                        new RankBadge(0.7f, ScoreRank.C),
-                        new RankBadge(0.35f, ScoreRank.D),
+                        new RankBadge(1f, getRank(ScoreRank.X)),
+                        new RankBadge(0.95f, getRank(ScoreRank.S)),
+                        new RankBadge(0.9f, getRank(ScoreRank.A)),
+                        new RankBadge(0.8f, getRank(ScoreRank.B)),
+                        new RankBadge(0.7f, getRank(ScoreRank.C)),
+                        new RankBadge(0.35f, getRank(ScoreRank.D)),
                     }
                 },
                 rankText = new RankText(score.Rank)
             };
+        }
+
+        private ScoreRank getRank(ScoreRank rank)
+        {
+            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, score.Accuracy);
+
+            return rank;
         }
 
         protected override void LoadComplete()
