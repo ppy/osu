@@ -79,16 +79,9 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show playfield area",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowPlayfieldArea)
-                },
-                new SettingsSlider<double>
-                {
-                    LabelText = "Playfield area dim",
-                    Bindable = config.GetBindable<double>(OsuSetting.PlayfieldAreaDimLevel),
-                    KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
-                },
+                    LabelText = "Show playfield border",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowPlayfieldBorder)
+                }
             };
         }
     }

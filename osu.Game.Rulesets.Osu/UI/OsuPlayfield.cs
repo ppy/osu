@@ -12,6 +12,10 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
+using osu.Framework.Bindables;
+using osu.Game.Screens;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -25,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.UI
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
+
+        private Bindable<bool> showPlayfieldBorder;
 
         public OsuPlayfield()
         {
@@ -54,6 +60,19 @@ namespace osu.Game.Rulesets.Osu.UI
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            showPlayfieldBorder = config.GetBindable<bool>(OsuSetting.ShowPlayfieldBorder);
+            if (showPlayfieldBorder.Value)
+            {
+                AddInternal(new PlayfieldBorder
+                {
+                    RelativeSizeAxes = Axes.Both
+                });
+            }
         }
 
         public override void Add(DrawableHitObject h)
