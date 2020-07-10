@@ -107,16 +107,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var osuObject = (OsuHitObject)judgedObject.HitObject;
-
-            DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj =>
-            {
-                doj.Apply(result, judgedObject);
-
-                // todo: move to JudgedObject property?
-                doj.Position = osuObject.StackedEndPosition;
-                doj.Scale = new Vector2(osuObject.Scale);
-            });
+            DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
 
             judgementLayer.Add(explosion);
         }
