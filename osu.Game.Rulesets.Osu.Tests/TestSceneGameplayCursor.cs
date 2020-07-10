@@ -69,16 +69,27 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class ClickingCursorContainer : OsuCursorContainer
         {
+            private bool pressed;
+
+            public bool Pressed
+            {
+                set
+                {
+                    if (value == pressed)
+                        return;
+
+                    pressed = value;
+                    if (value)
+                        OnPressed(OsuAction.LeftButton);
+                    else
+                        OnReleased(OsuAction.LeftButton);
+                }
+            }
+
             protected override void Update()
             {
                 base.Update();
-
-                double currentTime = Time.Current;
-
-                if (((int)(currentTime / 1000)) % 2 == 0)
-                    OnPressed(OsuAction.LeftButton);
-                else
-                    OnReleased(OsuAction.LeftButton);
+                Pressed = ((int)(Time.Current / 1000)) % 2 == 0;
             }
         }
 
