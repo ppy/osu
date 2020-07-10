@@ -135,8 +135,30 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
+        /// Ensures music is playing, no matter what, unless the user has explicitly paused.
+        /// This means that if the current beatmap has a virtual track (see <see cref="TrackVirtual"/>) a new beatmap will be selected.
+        /// </summary>
+        public void EnsurePlayingSomething()
+        {
+            if (IsUserPaused) return;
+
+            var track = current?.Track;
+
+            if (track == null || track is TrackVirtual)
+            {
+                if (beatmap.Disabled)
+                    return;
+
+                next();
+            }
+            else if (!IsPlaying)
+            {
+                Play();
+            }
+        }
+
+        /// <summary>
         /// Start playing the current track (if not already playing).
-        /// Will select the next valid track if the current track is null or <see cref="TrackVirtual"/>.
         /// </summary>
         /// <returns>Whether the operation was successful.</returns>
         public bool Play(bool restart = false)
@@ -145,14 +167,8 @@ namespace osu.Game.Overlays
 
             IsUserPaused = false;
 
-            if (track == null || track is TrackVirtual)
-            {
-                if (beatmap.Disabled)
-                    return false;
-
-                next();
-                return true;
-            }
+            if (track == null)
+                return false;
 
             if (restart)
                 track.Restart();
