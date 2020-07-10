@@ -5,7 +5,9 @@ using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing.Input;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
@@ -24,9 +26,34 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
+        private Drawable background;
+
         public TestSceneGameplayCursor()
         {
             gameplayBeatmap = new GameplayBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+
+            AddStep("change background colour", () =>
+            {
+                background?.Expire();
+
+                Add(background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                    Colour = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
+                });
+            });
+
+            AddSliderStep("circle size", 0f, 10f, 0f, val =>
+            {
+                config.Set(OsuSetting.AutoCursorSize, true);
+                gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = val;
+                Scheduler.AddOnce(recreate);
+            });
+
+            AddStep("test cursor container", recreate);
+
+            void recreate() => SetContents(() => new OsuInputManager(new OsuRuleset().RulesetInfo) { Child = new OsuCursorContainer() });
         }
 
         [TestCase(1, 1)]
