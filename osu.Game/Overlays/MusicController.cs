@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays
             managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(beatmapRemoved);
 
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal).OrderBy(_ => RNG.Next()));
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
         }
 
         protected override void LoadComplete()
@@ -135,6 +136,7 @@ namespace osu.Game.Overlays
 
         /// <summary>
         /// Start playing the current track (if not already playing).
+        /// Will select the next valid track if the current track is null or <see cref="TrackVirtual"/>.
         /// </summary>
         /// <returns>Whether the operation was successful.</returns>
         public bool Play(bool restart = false)
@@ -143,12 +145,12 @@ namespace osu.Game.Overlays
 
             IsUserPaused = false;
 
-            if (track == null)
+            if (track == null || track is TrackVirtual)
             {
                 if (beatmap.Disabled)
                     return false;
 
-                next(true);
+                next();
                 return true;
             }
 
@@ -228,10 +230,9 @@ namespace osu.Game.Overlays
         /// </summary>
         public void NextTrack() => Schedule(() => next());
 
-        private bool next(bool instant = false)
+        private bool next()
         {
-            if (!instant)
-                queuedDirection = TrackChangeDirection.Next;
+            queuedDirection = TrackChangeDirection.Next;
 
             var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
 
