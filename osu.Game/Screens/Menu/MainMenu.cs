@@ -260,8 +260,7 @@ namespace osu.Game.Screens.Menu
             // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            if (music?.IsUserPaused == false)
-                music.Play();
+            music.EnsurePlayingSomething();
         }
 
         public override bool OnExiting(IScreen next)

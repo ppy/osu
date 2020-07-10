@@ -126,8 +126,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
 
-            if (music?.IsUserPaused == false)
-                music.Play();
+            music.EnsurePlayingSomething();
 
             onReturning();
         }
