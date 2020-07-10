@@ -134,6 +134,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Content = new[]
                                                                 {
+                                                                    new Drawable[] { new OverlinedHeader("Playlist"), },
                                                                     new Drawable[]
                                                                     {
                                                                         new DrawableRoomPlaylist(false, true) // Temporarily always allow selection
@@ -156,6 +157,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 },
                                                                 RowDimensions = new[]
                                                                 {
+                                                                    new Dimension(GridSizeMode.AutoSize),
                                                                     new Dimension(),
                                                                     new Dimension(GridSizeMode.Absolute, 5),
                                                                     new Dimension(GridSizeMode.AutoSize)
