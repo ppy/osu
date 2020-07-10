@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.SearchableList
             base.Update();
 
             Height = filterContainer.Height;
-            DisplayStyleControl.Margin = new MarginPadding { Top = filterContainer.Height - 35, Right = SearchableListOverlay.WIDTH_PADDING };
+            rightFilterContainer.Margin = new MarginPadding { Top = filterContainer.Height - 30, Right = ContentHorizontalPadding };
         }
 
         private class FilterSearchTextBox : SearchTextBox
