@@ -77,14 +77,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     if (!string.IsNullOrEmpty(criteria.SearchString))
                         matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
-                    switch (criteria.SecondaryFilter)
-                    {
-                        default:
-                        case SecondaryFilter.Public:
-                            matchingFilter &= r.Room.Availability.Value == RoomAvailability.Public;
-                            break;
-                    }
-
                     r.MatchingFilter = matchingFilter;
                 }
             });

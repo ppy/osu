@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.IO.Network;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Lounge.Components;
 
@@ -9,39 +10,44 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetRoomsRequest : APIRequest<List<Room>>
     {
-        private readonly PrimaryFilter primaryFilter;
+        private readonly RoomStatusFilter statusFilter;
+        private readonly RoomCategoryFilter categoryFilter;
 
-        public GetRoomsRequest(PrimaryFilter primaryFilter)
+        public GetRoomsRequest(RoomStatusFilter statusFilter, RoomCategoryFilter categoryFilter)
         {
-            this.primaryFilter = primaryFilter;
+            this.statusFilter = statusFilter;
+            this.categoryFilter = categoryFilter;
         }
 
-        protected override string Target
+        protected override WebRequest CreateWebRequest()
         {
-            get
+            var req = base.CreateWebRequest();
+
+            switch (statusFilter)
             {
-                string target = "rooms";
+                case RoomStatusFilter.Owned:
+                    req.AddParameter("mode", "owned");
+                    break;
 
-                switch (primaryFilter)
-                {
-                    case PrimaryFilter.Open:
-                        break;
+                case RoomStatusFilter.Participated:
+                    req.AddParameter("mode", "participated");
+                    break;
 
-                    case PrimaryFilter.Owned:
-                        target += "/owned";
-                        break;
-
-                    case PrimaryFilter.Participated:
-                        target += "/participated";
-                        break;
-
-                    case PrimaryFilter.RecentlyEnded:
-                        target += "/ended";
-                        break;
-                }
-
-                return target;
+                case RoomStatusFilter.RecentlyEnded:
+                    req.AddParameter("mode", "ended");
+                    break;
             }
+
+            switch (categoryFilter)
+            {
+                case RoomCategoryFilter.Spotlight:
+                    req.AddParameter("category", "spotlight");
+                    break;
+            }
+
+            return req;
         }
+
+        protected override string Target => "rooms";
     }
 }
