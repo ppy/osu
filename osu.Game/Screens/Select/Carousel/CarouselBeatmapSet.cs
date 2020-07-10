@@ -69,6 +69,10 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case SortMode.Difficulty:
                     return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
+
+                case SortMode.Submitted:
+                    return DateTimeOffset.Compare(BeatmapSet.Submitted, otherSet.BeatmapSet.Submitted);
+
             }
         }
 

@@ -28,6 +28,9 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Rank Achieved")]
         RankAchieved,
 
+        [Description("Submitted")]
+        Submitted,
+
         [Description("Title")]
         Title
     }
