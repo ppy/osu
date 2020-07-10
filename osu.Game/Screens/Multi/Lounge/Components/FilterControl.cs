@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         Open,
 
         [Description("Recently Ended")]
-        RecentlyEnded,
+        Ended,
         Participated,
         Owned,
     }
