@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestSceneOverlinedPlaylist()
         {
+            Room = new Room { RoomID = { Value = 7 } };
+
             for (int i = 0; i < 10; i++)
             {
                 Room.Playlist.Add(new PlaylistItem
