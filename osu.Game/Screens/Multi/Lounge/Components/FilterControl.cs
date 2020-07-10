@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
         protected override RoomStatusFilter DefaultTab => RoomStatusFilter.Open;
-        protected override RoomCategoryFilter DefaultCategory => RoomCategoryFilter.Normal;
+        protected override RoomCategoryFilter DefaultCategory => RoomCategoryFilter.Any;
 
         protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
 
@@ -81,6 +81,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
     public enum RoomCategoryFilter
     {
+        Any,
         Normal,
         Spotlight
     }
