@@ -87,6 +87,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public MovingCursorInputManager()
             {
                 UseParentInput = false;
+                ShowVisualCursorGuide = false;
             }
 
             protected override void Update()
