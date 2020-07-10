@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,21 +21,23 @@ namespace osu.Game.Screens.Multi.Lounge
     {
         public override string Title => "Lounge";
 
-        protected readonly FilterControl Filter;
+        protected FilterControl Filter;
 
         private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
 
-        private readonly Container content;
-        private readonly LoadingLayer loadingLayer;
+        private Container content;
+        private LoadingLayer loadingLayer;
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
 
         private bool joiningRoom;
 
-        public LoungeSubScreen()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RoomsContainer roomsContainer;
+            OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
             {
@@ -50,7 +53,7 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.55f,
                             Children = new Drawable[]
                             {
-                                new OsuScrollContainer
+                                scrollContainer = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
@@ -70,6 +73,14 @@ namespace osu.Game.Screens.Multi.Lounge
                     },
                 },
             };
+
+            // scroll selected room into view on selection.
+            selectedRoom.BindValueChanged(val =>
+            {
+                var drawable = roomsContainer.Rooms.FirstOrDefault(r => r.Room == val.NewValue);
+                if (drawable != null)
+                    scrollContainer.ScrollIntoView(drawable);
+            });
         }
 
         protected override void LoadComplete()
