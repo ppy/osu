@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -11,6 +14,7 @@ using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -19,6 +23,18 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : BasicTextBox
     {
+        private readonly SampleChannel[] textAddedSamples = new SampleChannel[4];
+        private SampleChannel capsTextAddedSample;
+        private SampleChannel textRemovedSample;
+        private SampleChannel textCommittedSample;
+        private SampleChannel caretMovedSample;
+
+        /// <summary>
+        /// Whether to allow playing a different samples based on the type of character.
+        /// If set to false, the same sample will be used for all characters.
+        /// </summary>
+        protected virtual bool AllowUniqueCharacterSamples => true;
+
         protected override float LeftRightPadding => 10;
 
         protected override float CaretWidth => 3;
@@ -41,14 +57,53 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, AudioManager audio)
         {
             BackgroundUnfocused = Color4.Black.Opacity(0.5f);
             BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
             BackgroundCommit = BorderColour = colour.Yellow;
+
+            for (int i = 0; i < textAddedSamples.Length; i++)
+                textAddedSamples[i] = audio.Samples.Get($@"Keyboard/key-press-{1 + i}");
+
+            capsTextAddedSample = audio.Samples.Get(@"Keyboard/key-caps");
+            textRemovedSample = audio.Samples.Get(@"Keyboard/key-delete");
+            textCommittedSample = audio.Samples.Get(@"Keyboard/key-confirm");
+            caretMovedSample = audio.Samples.Get(@"Keyboard/key-movement");
         }
 
         protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
+
+        protected override void OnTextAdded(string added)
+        {
+            base.OnTextAdded(added);
+
+            if (added.Any(char.IsUpper) && AllowUniqueCharacterSamples)
+                capsTextAddedSample?.Play();
+            else
+                textAddedSamples[RNG.Next(0, 3)]?.Play();
+        }
+
+        protected override void OnTextRemoved(string removed)
+        {
+            base.OnTextRemoved(removed);
+
+            textRemovedSample?.Play();
+        }
+
+        protected override void OnTextCommitted(bool textChanged)
+        {
+            base.OnTextCommitted(textChanged);
+
+            textCommittedSample?.Play();
+        }
+
+        protected override void OnCaretMoved(bool selecting)
+        {
+            base.OnCaretMoved(selecting);
+
+            caretMovedSample?.Play();
+        }
 
         protected override void OnFocus(FocusEvent e)
         {
