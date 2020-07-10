@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
@@ -30,6 +31,9 @@ namespace osu.Game.Screens.Multi.Lounge
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
 
         private bool joiningRoom;
 
@@ -121,6 +125,9 @@ namespace osu.Game.Screens.Multi.Lounge
 
             if (selectedRoom.Value?.RoomID.Value == null)
                 selectedRoom.Value = new Room();
+
+            if (music?.IsUserPaused == false)
+                music.Play();
 
             onReturning();
         }
