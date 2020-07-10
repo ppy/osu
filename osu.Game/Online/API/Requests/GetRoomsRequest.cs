@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Humanizer;
 using osu.Framework.IO.Network;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Lounge.Components;
@@ -23,27 +24,11 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            switch (statusFilter)
-            {
-                case RoomStatusFilter.Owned:
-                    req.AddParameter("mode", "owned");
-                    break;
+            if (statusFilter != RoomStatusFilter.Open)
+                req.AddParameter("mode", statusFilter.ToString().Underscore().ToLowerInvariant());
 
-                case RoomStatusFilter.Participated:
-                    req.AddParameter("mode", "participated");
-                    break;
-
-                case RoomStatusFilter.RecentlyEnded:
-                    req.AddParameter("mode", "ended");
-                    break;
-            }
-
-            switch (categoryFilter)
-            {
-                case RoomCategoryFilter.Spotlight:
-                    req.AddParameter("category", "spotlight");
-                    break;
-            }
+            if (categoryFilter != RoomCategoryFilter.Any)
+                req.AddParameter("category", categoryFilter.ToString().Underscore().ToLowerInvariant());
 
             return req;
         }

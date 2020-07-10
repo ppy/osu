@@ -35,6 +35,10 @@ namespace osu.Game.Online.Multiplayer
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
         [Cached]
+        [JsonProperty("category")]
+        public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
+
+        [Cached]
         [JsonIgnore]
         public readonly Bindable<TimeSpan> Duration = new Bindable<TimeSpan>(TimeSpan.FromMinutes(30));
 
