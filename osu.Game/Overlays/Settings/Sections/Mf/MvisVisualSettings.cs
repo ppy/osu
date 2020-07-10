@@ -22,6 +22,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     LabelText = "在无故事版可用时显示背景动画",
                     Bindable = config.GetBindable<bool>(MfSetting.MvisEnableBgTriangles),
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "允许故事版的Overlay层显示在Mvis内容上方",
+                    Bindable = config.GetBindable<bool>(MfSetting.MvisEnableSBOverlayProxy),
+                },
                 new SettingsSlider<int>
                 {
                     LabelText = "屏幕粒子数",

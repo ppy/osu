@@ -84,10 +84,13 @@ namespace osu.Game.Screens
         private LoadingSpinner loadingSpinner;
         private BottomBarSongProgressInfo progressInfo;
         private BindableBool TrackRunning = new BindableBool();
+        private BindableBool SBEnableProxy = new BindableBool();
         private BindableFloat BgBlur = new BindableFloat();
         private BindableFloat IdleBgDim = new BindableFloat();
         private BindableFloat ContentAlpha = new BindableFloat();
         private bool OverlaysHidden = false;
+        private Drawable SBOverlayProxy;
+
         public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
 
         public MvisScreen()
@@ -360,6 +363,7 @@ namespace osu.Game.Screens
             config.BindWith(MfSetting.MvisBgBlur, BgBlur);
             config.BindWith(MfSetting.MvisIdleBgDim, IdleBgDim);
             config.BindWith(MfSetting.MvisContentAlpha, ContentAlpha);
+            config.BindWith(MfSetting.MvisEnableSBOverlayProxy, SBEnableProxy);
         }
 
         protected override void LoadComplete()
@@ -373,12 +377,15 @@ namespace osu.Game.Screens
             idleTracker.IsIdle.BindValueChanged(_ => UpdateVisuals());
             idleTracker.ScreenHovered.BindValueChanged(_ => UpdateVisuals());
 
+            SBEnableProxy.BindValueChanged(v => UpdateStoryboardProxy(v.NewValue), true);
+
             bgSB.NeedToHideTriangles.BindValueChanged(UpdateBgTriangles, true);
-            bgSB.IsReady.ValueChanged += _ =>
+            bgSB.IsReady.BindValueChanged(v =>
             {
                 switch (bgSB.IsReady.Value)
                 {
                     case true:
+                        UpdateStoryboardProxy(SBEnableProxy.Value);
                         loadingSpinner.Hide();
                         break;
 
@@ -386,7 +393,7 @@ namespace osu.Game.Screens
                         loadingSpinner.Show();
                         break;
                 }
-            };
+            });
             bgSB.storyboardReplacesBackground.BindValueChanged(v => Background.StoryboardReplacesBackground.Value = v.NewValue);
 
             inputManager = GetContainingInputManager();
@@ -417,6 +424,31 @@ namespace osu.Game.Screens
 
                 case false:
                     bgTriangles.Show();
+                    break;
+            }
+        }
+
+        private void UpdateStoryboardProxy(bool v)
+        {
+            if ( !bgSB.IsReady.Value ) return;
+            switch(v)
+            {
+                case true:
+                    if (SBOverlayProxy == null)
+                        SBOverlayProxy = bgSB?.SBLayer?.dimmableSB?.OverlayLayerContainer?.CreateProxy();
+
+                    bgSB.Remove(SBOverlayProxy);
+                    gameplayContent.Add(SBOverlayProxy);
+
+                    SBOverlayProxy?.FadeIn(500);
+                    break;
+
+                case false:
+                    if (SBOverlayProxy != null)
+                    {
+                        gameplayContent.Remove(SBOverlayProxy);
+                        bgSB.Add(SBOverlayProxy);
+                    }
                     break;
             }
         }
@@ -632,6 +664,8 @@ namespace osu.Game.Screens
 
             Background.Beatmap = beatmap;
             Background.BlurAmount.Value = BgBlur.Value * 100;
+
+            SBOverlayProxy = null;
 
             this.Schedule(() =>
             {
