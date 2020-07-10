@@ -318,7 +318,7 @@ namespace osu.Game.Screens.Multi
                 var tcs = new TaskCompletionSource<bool>();
 
                 pollReq?.Cancel();
-                pollReq = new GetRoomsRequest(currentFilter.Value.PrimaryFilter);
+                pollReq = new GetRoomsRequest(currentFilter.Value.StatusFilter, currentFilter.Value.RoomCategoryFilter);
 
                 pollReq.Success += result =>
                 {
