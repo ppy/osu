@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -13,28 +15,86 @@ namespace osu.Game.IO
 {
     public class OsuStorage : WrappedStorage
     {
+        /// <summary>
+        /// Indicates the error (if any) that occurred when initialising the custom storage during initial startup.
+        /// </summary>
+        public readonly OsuStorageError Error;
+
+        /// <summary>
+        /// The custom storage path as selected by the user.
+        /// </summary>
+        [CanBeNull]
+        public string CustomStoragePath => storageConfig.Get<string>(StorageConfig.FullPath);
+
+        /// <summary>
+        /// The default storage path to be used if a custom storage path hasn't been selected or is not accessible.
+        /// </summary>
+        [NotNull]
+        public string DefaultStoragePath => defaultStorage.GetFullPath(".");
+
         private readonly GameHost host;
         private readonly StorageConfigManager storageConfig;
+        private readonly Storage defaultStorage;
 
-        internal static readonly string[] IGNORE_DIRECTORIES = { "cache" };
+        public static readonly string[] IGNORE_DIRECTORIES = { "cache" };
 
-        internal static readonly string[] IGNORE_FILES =
+        public static readonly string[] IGNORE_FILES =
         {
             "framework.ini",
             "storage.ini"
         };
 
-        public OsuStorage(GameHost host)
-            : base(host.Storage, string.Empty)
+        public OsuStorage(GameHost host, Storage defaultStorage)
+            : base(defaultStorage, string.Empty)
         {
             this.host = host;
+            this.defaultStorage = defaultStorage;
 
-            storageConfig = new StorageConfigManager(host.Storage);
+            storageConfig = new StorageConfigManager(defaultStorage);
 
-            var customStoragePath = storageConfig.Get<string>(StorageConfig.FullPath);
+            if (!string.IsNullOrEmpty(CustomStoragePath))
+                TryChangeToCustomStorage(out Error);
+        }
 
-            if (!string.IsNullOrEmpty(customStoragePath))
-                ChangeTargetStorage(host.GetStorage(customStoragePath));
+        /// <summary>
+        /// Resets the custom storage path, changing the target storage to the default location.
+        /// </summary>
+        public void ResetCustomStoragePath()
+        {
+            storageConfig.Set(StorageConfig.FullPath, string.Empty);
+            storageConfig.Save();
+
+            ChangeTargetStorage(defaultStorage);
+        }
+
+        /// <summary>
+        /// Attempts to change to the user's custom storage path.
+        /// </summary>
+        /// <param name="error">The error that occurred.</param>
+        /// <returns>Whether the custom storage path was used successfully. If not, <paramref name="error"/> will be populated with the reason.</returns>
+        public bool TryChangeToCustomStorage(out OsuStorageError error)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(CustomStoragePath));
+
+            error = OsuStorageError.None;
+            Storage lastStorage = UnderlyingStorage;
+
+            try
+            {
+                Storage userStorage = host.GetStorage(CustomStoragePath);
+
+                if (!userStorage.ExistsDirectory(".") || !userStorage.GetFiles(".").Any())
+                    error = OsuStorageError.AccessibleButEmpty;
+
+                ChangeTargetStorage(userStorage);
+            }
+            catch
+            {
+                error = OsuStorageError.NotAccessible;
+                ChangeTargetStorage(lastStorage);
+            }
+
+            return error == OsuStorageError.None;
         }
 
         protected override void ChangeTargetStorage(Storage newStorage)
@@ -144,5 +204,24 @@ namespace osu.Game.IO
                 Thread.Sleep(250);
             }
         }
+    }
+
+    public enum OsuStorageError
+    {
+        /// <summary>
+        /// No error.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Occurs when the target storage directory is accessible but does not already contain game files.
+        /// Only happens when the user changes the storage directory and then moves the files manually or mounts a different device to the same path.
+        /// </summary>
+        AccessibleButEmpty,
+
+        /// <summary>
+        /// Occurs when the target storage directory cannot be accessed at all.
+        /// </summary>
+        NotAccessible,
     }
 }

@@ -38,13 +38,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     public class TestScenePlaySongSelect : ScreenTestScene
     {
         private BeatmapManager manager;
-
         private RulesetStore rulesets;
-
         private MusicController music;
-
         private WorkingBeatmap defaultBeatmap;
-
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]
@@ -308,15 +304,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            var sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
-
-            AddStep(@"Sort by Artist", delegate { sortMode.Value = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { sortMode.Value = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { sortMode.Value = SortMode.Author; });
-            AddStep(@"Sort by DateAdded", delegate { sortMode.Value = SortMode.DateAdded; });
-            AddStep(@"Sort by BPM", delegate { sortMode.Value = SortMode.BPM; });
-            AddStep(@"Sort by Length", delegate { sortMode.Value = SortMode.Length; });
-            AddStep(@"Sort by Difficulty", delegate { sortMode.Value = SortMode.Difficulty; });
+            AddStep(@"Sort by Artist", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Artist));
+            AddStep(@"Sort by Title", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Title));
+            AddStep(@"Sort by Author", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Author));
+            AddStep(@"Sort by DateAdded", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.DateAdded));
+            AddStep(@"Sort by BPM", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.BPM));
+            AddStep(@"Sort by Length", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Length));
+            AddStep(@"Sort by Difficulty", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
         }
 
         [Test]

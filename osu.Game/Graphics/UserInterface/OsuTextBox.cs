@@ -202,7 +202,7 @@ namespace osu.Game.Graphics.UserInterface
                     };
                 }
 
-                protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+                protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
                 {
                     if (!hasSelection)
                         this.FadeTo(0.7f).FadeTo(0.4f, timingPoint.BeatLength, Easing.InOutSine);

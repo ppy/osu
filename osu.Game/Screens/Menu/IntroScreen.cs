@@ -41,9 +41,9 @@ namespace osu.Game.Screens.Menu
 
         protected IBindable<bool> MenuMusic { get; private set; }
 
-        private WorkingBeatmap introBeatmap;
+        private WorkingBeatmap initialBeatmap;
 
-        protected Track Track { get; private set; }
+        protected Track Track => initialBeatmap?.Track;
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
@@ -51,12 +51,19 @@ namespace osu.Game.Screens.Menu
 
         private SampleChannel seeya;
 
+        protected virtual string SeeyaSampleName => "Intro/seeya";
+
         private LeasedBindable<WorkingBeatmap> beatmap;
 
         private MainMenu mainMenu;
 
         [Resolved]
         private AudioManager audio { get; set; }
+
+        /// <summary>
+        /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
+        /// </summary>
+        protected bool UsingThemedIntro { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
@@ -66,34 +73,49 @@ namespace osu.Game.Screens.Menu
 
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
-
-            seeya = audio.Samples.Get(@"seeya");
+            seeya = audio.Samples.Get(SeeyaSampleName);
 
             BeatmapSetInfo setInfo = null;
 
+            // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+
                 if (sets.Count > 0)
-                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-            }
-
-            if (setInfo == null)
-            {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
-
-                if (setInfo == null)
                 {
-                    // we need to import the default menu background beatmap
-                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
-
-                    setInfo.Protected = true;
-                    beatmaps.Update(setInfo);
+                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
                 }
             }
 
-            introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-            Track = introBeatmap.Track;
+            // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
+            if (setInfo == null)
+            {
+                if (!loadThemedIntro())
+                {
+                    // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
+                    // this could happen if a user has nuked their files store. for now, reimport to repair this.
+                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
+                    import.Protected = true;
+                    beatmaps.Update(import);
+
+                    loadThemedIntro();
+                }
+            }
+
+            bool loadThemedIntro()
+            {
+                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+
+                if (setInfo != null)
+                {
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+                    UsingThemedIntro = !(Track is TrackVirtual);
+                }
+
+                return UsingThemedIntro;
+            }
         }
 
         public override void OnResuming(IScreen last)
@@ -119,7 +141,7 @@ namespace osu.Game.Screens.Menu
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-            Track = null;
+            initialBeatmap = null;
         }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
@@ -127,7 +149,7 @@ namespace osu.Game.Screens.Menu
         protected void StartTrack()
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (MenuMusic.Value)
+            if (UsingThemedIntro)
                 Track.Restart();
         }
 
@@ -141,8 +163,7 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmap.Value = introBeatmap;
-                introBeatmap = null;
+                beatmap.Value = initialBeatmap;
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);

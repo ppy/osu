@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,17 +21,23 @@ namespace osu.Game.Screens.Multi.Lounge
     {
         public override string Title => "Lounge";
 
-        protected readonly FilterControl Filter;
+        protected FilterControl Filter;
 
-        private readonly Container content;
-        private readonly LoadingLayer loadingLayer;
+        private readonly Bindable<bool> initialRoomsReceived = new Bindable<bool>();
+
+        private Container content;
+        private LoadingLayer loadingLayer;
 
         [Resolved]
         private Bindable<Room> selectedRoom { get; set; }
 
-        public LoungeSubScreen()
+        private bool joiningRoom;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            SearchContainer searchContainer;
+            RoomsContainer roomsContainer;
+            OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
             {
@@ -46,19 +53,14 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.55f,
                             Children = new Drawable[]
                             {
-                                new OsuScrollContainer
+                                scrollContainer = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = searchContainer = new SearchContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Child = new RoomsContainer { JoinRequested = joinRequested }
-                                    },
+                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
                                 },
-                                loadingLayer = new LoadingLayer(searchContainer),
+                                loadingLayer = new LoadingLayer(roomsContainer),
                             }
                         },
                         new RoomInspector
@@ -71,6 +73,22 @@ namespace osu.Game.Screens.Multi.Lounge
                     },
                 },
             };
+
+            // scroll selected room into view on selection.
+            selectedRoom.BindValueChanged(val =>
+            {
+                var drawable = roomsContainer.Rooms.FirstOrDefault(r => r.Room == val.NewValue);
+                if (drawable != null)
+                    scrollContainer.ScrollIntoView(drawable);
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
+            initialRoomsReceived.BindValueChanged(onInitialRoomsReceivedChanged, true);
         }
 
         protected override void UpdateAfterChildren()
@@ -126,12 +144,29 @@ namespace osu.Game.Screens.Multi.Lounge
 
         private void joinRequested(Room room)
         {
-            loadingLayer.Show();
+            joiningRoom = true;
+            updateLoadingLayer();
+
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
+                joiningRoom = false;
+                updateLoadingLayer();
+            }, _ =>
+            {
+                joiningRoom = false;
+                updateLoadingLayer();
+            });
+        }
+
+        private void onInitialRoomsReceivedChanged(ValueChangedEvent<bool> received) => updateLoadingLayer();
+
+        private void updateLoadingLayer()
+        {
+            if (joiningRoom || !initialRoomsReceived.Value)
+                loadingLayer.Show();
+            else
                 loadingLayer.Hide();
-            }, _ => loadingLayer.Hide());
         }
 
         /// <summary>

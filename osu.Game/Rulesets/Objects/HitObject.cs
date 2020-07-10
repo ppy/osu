@@ -133,8 +133,7 @@ namespace osu.Game.Rulesets.Objects
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
-            if (HitWindows == null)
-                HitWindows = CreateHitWindows();
+            HitWindows ??= CreateHitWindows();
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 

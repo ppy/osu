@@ -2,21 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Select.Filter;
-using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Configuration;
-using osu.Game.Rulesets;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Select.Filter;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -26,9 +25,7 @@ namespace osu.Game.Screens.Select
 
         public Action<FilterCriteria> FilterChanged;
 
-        private readonly OsuTabControl<SortMode> sortTabs;
-
-        private readonly TabControl<GroupMode> groupTabs;
+        private OsuTabControl<SortMode> sortTabs;
 
         private Bindable<SortMode> sortMode;
 
@@ -56,19 +53,39 @@ namespace osu.Game.Screens.Select
             return criteria;
         }
 
-        private readonly SeekLimitedSearchTextBox searchTextBox;
+        private SeekLimitedSearchTextBox searchTextBox;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
+            base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
 
-        public FilterControl()
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
+            showConverted.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += _ => updateCriteria();
+
+            ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(_ => updateCriteria());
+
+            sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
+            groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
+
+            groupMode.BindValueChanged(_ => updateCriteria());
+            sortMode.BindValueChanged(_ => updateCriteria());
+
             Children = new Drawable[]
             {
-                Background = new Box
+                new Box
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
+                    Width = 2,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new Container
@@ -96,33 +113,35 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(OsuTabControl<SortMode>.HORIZONTAL_SPACING, 0),
                             Children = new Drawable[]
                             {
-                                groupTabs = new OsuTabControl<GroupMode>
+                                new OsuTabControlCheckbox
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 24,
-                                    Width = 0.5f,
-                                    AutoSort = true,
+                                    Text = "Show converted",
+                                    Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
                                 },
-                                //spriteText = new OsuSpriteText
-                                //{
-                                //    Font = @"Exo2.0-Bold",
-                                //    Text = "Sort results by",
-                                //    Size = 14,
-                                //    Margin = new MarginPadding
-                                //    {
-                                //        Top = 5,
-                                //        Bottom = 5
-                                //    },
-                                //},
                                 sortTabs = new OsuTabControl<SortMode>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,
                                     Height = 24,
                                     AutoSort = true,
-                                }
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                    AccentColour = colours.GreenLight,
+                                    Current = { BindTarget = sortMode }
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = "Sort by",
+                                    Font = OsuFont.GetFont(size: 14),
+                                    Margin = new MarginPadding(5),
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomRight,
+                                },
                             }
                         },
                     }
@@ -131,8 +150,7 @@ namespace osu.Game.Screens.Select
 
             searchTextBox.Current.ValueChanged += _ => FilterChanged?.Invoke(CreateCriteria());
 
-            groupTabs.PinItem(GroupMode.All);
-            groupTabs.PinItem(GroupMode.RecentlyPlayed);
+            updateCriteria();
         }
 
         public void Deactivate()
@@ -155,37 +173,6 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<bool> showConverted = new Bindable<bool>();
         private readonly Bindable<double> minimumStars = new BindableDouble();
         private readonly Bindable<double> maximumStars = new BindableDouble();
-
-        public readonly Box Background;
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
-        {
-            sortTabs.AccentColour = colours.GreenLight;
-
-            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
-            showConverted.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
-            minimumStars.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
-            maximumStars.ValueChanged += _ => updateCriteria();
-
-            ruleset.BindTo(parentRuleset);
-            ruleset.BindValueChanged(_ => updateCriteria());
-
-            sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
-            groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupingMode);
-
-            sortTabs.Current.BindTo(sortMode);
-            groupTabs.Current.BindTo(groupMode);
-
-            groupMode.BindValueChanged(_ => updateCriteria());
-            sortMode.BindValueChanged(_ => updateCriteria());
-
-            updateCriteria();
-        }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
 
