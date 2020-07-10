@@ -115,24 +115,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                                     },
                                 },
                             },
-                            new CircularContainer
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                                Scale = new Vector2(0.1f),
-                                Masking = true,
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White,
-                                    },
-                                },
-                            },
-                        }
-                    }
+                        },
+                    },
+                    new Circle
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.14f),
+                        Colour = new Color4(34, 93, 204, 255),
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Glow,
+                            Radius = 8,
+                            Colour = Color4.White,
+                        },
+                    },
                 };
             }
         }
