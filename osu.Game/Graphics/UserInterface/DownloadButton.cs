@@ -82,7 +82,6 @@ namespace osu.Game.Graphics.UserInterface
                     background.FadeColour(colours.Green, 500, Easing.InOutExpo);
                     icon.MoveToX(-8, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(new Vector2(13), 500, Easing.InOutExpo);
-                    TooltipText = "Go to beatmap";
                     break;
             }
         }
