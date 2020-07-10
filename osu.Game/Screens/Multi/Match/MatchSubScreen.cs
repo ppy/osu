@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -137,30 +136,23 @@ namespace osu.Game.Screens.Multi.Match
                                                                     new Drawable[] { new OverlinedHeader("Playlist"), },
                                                                     new Drawable[]
                                                                     {
-                                                                        new DrawableRoomPlaylist(false, true) // Temporarily always allow selection
+                                                                        new DrawableRoomPlaylistWithResults
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
                                                                             Items = { BindTarget = playlist },
-                                                                            SelectedItem = { BindTarget = SelectedItem }
+                                                                            SelectedItem = { BindTarget = SelectedItem },
+                                                                            RequestShowResults = item =>
+                                                                            {
+                                                                                Debug.Assert(roomId.Value != null);
+                                                                                multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, item, false));
+                                                                            }
                                                                         }
                                                                     },
-                                                                    null,
-                                                                    new Drawable[]
-                                                                    {
-                                                                        new TriangleButton
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X,
-                                                                            Text = "Show beatmap results",
-                                                                            Action = showBeatmapResults
-                                                                        }
-                                                                    }
                                                                 },
                                                                 RowDimensions = new[]
                                                                 {
                                                                     new Dimension(GridSizeMode.AutoSize),
                                                                     new Dimension(),
-                                                                    new Dimension(GridSizeMode.Absolute, 5),
-                                                                    new Dimension(GridSizeMode.AutoSize)
                                                                 }
                                                             }
                                                         },
@@ -295,12 +287,6 @@ namespace osu.Game.Screens.Multi.Match
                     }));
                     break;
             }
-        }
-
-        private void showBeatmapResults()
-        {
-            Debug.Assert(roomId.Value != null);
-            multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, SelectedItem.Value, false));
         }
     }
 }
