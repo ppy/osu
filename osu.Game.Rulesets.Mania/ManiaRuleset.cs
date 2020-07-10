@@ -12,6 +12,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -34,6 +35,7 @@ using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Mania
 {
+    [ExcludeFromDynamicCompile]
     public class ManiaRuleset : Ruleset, ILegacyRuleset
     {
         /// <summary>
