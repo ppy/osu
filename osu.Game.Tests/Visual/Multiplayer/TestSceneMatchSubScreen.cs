@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Room.CopyFrom(new Room());
+            Room = new Room();
         });
 
         [SetUpSteps]
