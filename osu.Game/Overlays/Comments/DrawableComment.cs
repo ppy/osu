@@ -163,20 +163,28 @@ namespace osu.Game.Overlays.Comments
                                                     AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Right = 40 }
                                                 },
-                                                info = new FillFlowContainer
+                                                new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
+                                                    Direction = FillDirection.Vertical,
                                                     Children = new Drawable[]
                                                     {
-                                                        new OsuSpriteText
+                                                        info = new FillFlowContainer
                                                         {
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            Font = OsuFont.GetFont(size: 12),
-                                                            Colour = OsuColour.Gray(0.7f),
-                                                            Text = HumanizerUtils.Humanize(Comment.CreatedAt)
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(10, 0),
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new OsuSpriteText
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Font = OsuFont.GetFont(size: 12),
+                                                                    Colour = OsuColour.Gray(0.7f),
+                                                                    Text = HumanizerUtils.Humanize(Comment.CreatedAt)
+                                                                },
+                                                            }
                                                         },
                                                         repliesButton = new RepliesButton(Comment.RepliesCount)
                                                         {
