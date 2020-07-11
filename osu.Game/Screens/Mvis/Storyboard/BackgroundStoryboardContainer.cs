@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
 
-        private DimmableStoryboard dimmableSB;
+        public DimmableStoryboard dimmableSB;
 
         [BackgroundDependencyLoader]
         private void load()

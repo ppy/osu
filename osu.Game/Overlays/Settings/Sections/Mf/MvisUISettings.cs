@@ -37,11 +37,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Bindable = config.GetBindable<float>(MfSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "启用故事版/背景视频",
-                    Bindable = config.GetBindable<bool>(MfSetting.MvisEnableStoryboard),
                 }
             };
         }

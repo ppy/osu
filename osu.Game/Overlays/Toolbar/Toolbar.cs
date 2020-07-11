@@ -33,8 +33,6 @@ namespace osu.Game.Overlays.Toolbar
         private ToolbarBackground toolbarBg;
 
         private const double transition_time = 500;
-        private float anim_time = 0;
-        private bool OnLaunch = true;
 
         private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
@@ -60,7 +58,7 @@ namespace osu.Game.Overlays.Toolbar
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    LayoutDuration = anim_time,
+                    LayoutDuration = 600,
                     LayoutEasing = Easing.OutBounce,
                     Children = new Drawable[]
                     {
@@ -111,20 +109,12 @@ namespace osu.Game.Overlays.Toolbar
             if (osuGame != null)
                 overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
-            UpdateIcons();
+            optUI.BindValueChanged(UpdateIcons, true);
         }
 
-        protected override void LoadComplete()
+        private void UpdateIcons(ValueChangedEvent<bool> v)
         {
-            base.LoadComplete();
-
-            optUI.ValueChanged += _ => UpdateIcons();
-        }
-
-        private void UpdateIcons()
-        {
-            if (!OnLaunch) LeftSideToolbar.LayoutDuration = 600f;
-            switch (optUI.Value)
+            switch (v.NewValue)
             {
                 case true:
                     ToolbarMfButton.FadeTo(1f, 250);

@@ -48,6 +48,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private readonly Func<BackgroundStoryboardContainer> createSB;
 
         private BackgroundStoryboardContainer SBContainer;
+        public BackgroundStoryboardContainer SBLayer;
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
@@ -117,7 +118,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 {
                     Name = "ClockContainer",
                     Alpha = 0,
-                    Child = new BackgroundStoryboardContainer(),
+                    Child = SBLayer = new BackgroundStoryboardContainer(),
                 }, newsbClock =>
                 {
                     sbClock = newsbClock;

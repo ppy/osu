@@ -41,6 +41,7 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisBarRGBLighting, false);
             Set(MfSetting.MvisEnableBrick, false);
             Set(MfSetting.MvisEnableBgTriangles, true);
+            Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.UseSayobot, true);
         }
     }
@@ -60,6 +61,7 @@ namespace osu.Game.Configuration
         MvisBarRGBLighting,
         MvisEnableBrick,
         MvisEnableBgTriangles,
+        MvisEnableSBOverlayProxy,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect

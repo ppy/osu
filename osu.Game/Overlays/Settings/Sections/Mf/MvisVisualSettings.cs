@@ -17,11 +17,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
-                {
-                    LabelText = "在无故事版可用时显示背景动画",
-                    Bindable = config.GetBindable<bool>(MfSetting.MvisEnableBgTriangles),
-                },
                 new SettingsSlider<int>
                 {
                     LabelText = "屏幕粒子数",
