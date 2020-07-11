@@ -38,10 +38,10 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
-                int intKey = (int)defaultGroup.Key;
+                string stringKey = defaultGroup.Key.ToString();
 
                 // one row per valid action.
-                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => ((int)b.Action).Equals(intKey)))
+                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.StringAction.Equals(stringKey, System.StringComparison.Ordinal)))
                 {
                     AllowMainMouseButtons = Ruleset != null,
                     Defaults = defaultGroup.Select(d => d.KeyCombination)

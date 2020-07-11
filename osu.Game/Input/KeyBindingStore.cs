@@ -39,7 +39,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                    int count = Query(rulesetId, variant).Count(k => k.Action == group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)

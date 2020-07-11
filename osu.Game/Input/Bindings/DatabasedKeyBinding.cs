@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
@@ -24,10 +25,12 @@ namespace osu.Game.Input.Bindings
         }
 
         [Column("Action")]
-        public int IntAction
+        public string StringAction
         {
-            get => (int)Action;
+            get => Action.ToString();
             set => Action = value;
         }
+
+        public override T GetAction<T>() => (T)Enum.Parse(typeof(T), StringAction);
     }
 }
