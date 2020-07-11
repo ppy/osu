@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,7 +12,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -25,7 +23,6 @@ using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
-using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Screens.Multi
@@ -48,7 +45,7 @@ namespace osu.Game.Screens.Multi
         private readonly IBindable<bool> isIdle = new BindableBool();
 
         [Cached]
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
@@ -75,7 +72,7 @@ namespace osu.Game.Screens.Multi
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
-            var backgroundColour = OsuColour.FromHex(@"3e3a44");
+            var backgroundColour = Color4Extensions.FromHex(@"3e3a44");
 
             InternalChild = waves = new MultiplayerWaveContainer
             {
@@ -120,7 +117,7 @@ namespace osu.Game.Screens.Multi
                                         Child = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.5f), backgroundColour)
                                         },
                                     }
                                 }
@@ -163,26 +160,39 @@ namespace osu.Game.Screens.Multi
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.BindTo(currentRoom);
+            dependencies.Model.BindTo(selectedRoom);
             return dependencies;
         }
 
         private void updatePollingRate(bool idle)
         {
-            roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
-            Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
-        }
-
-        /// <summary>
-        /// Push a <see cref="Player"/> to the main screen stack to begin gameplay.
-        /// Generally called from a <see cref="MatchSubScreen"/> via DI resolution.
-        /// </summary>
-        public void Start(Func<Player> player)
-        {
             if (!this.IsCurrentScreen())
-                return;
+            {
+                roomManager.TimeBetweenListingPolls = 0;
+                roomManager.TimeBetweenSelectionPolls = 0;
+            }
+            else
+            {
+                switch (screenStack.CurrentScreen)
+                {
+                    case LoungeSubScreen _:
+                        roomManager.TimeBetweenListingPolls = idle ? 120000 : 15000;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 120000 : 15000;
+                        break;
 
-            this.Push(new PlayerLoader(player));
+                    case MatchSubScreen _:
+                        roomManager.TimeBetweenListingPolls = 0;
+                        roomManager.TimeBetweenSelectionPolls = idle ? 30000 : 5000;
+                        break;
+
+                    default:
+                        roomManager.TimeBetweenListingPolls = 0;
+                        roomManager.TimeBetweenSelectionPolls = 0;
+                        break;
+                }
+            }
+
+            Logger.Log($"Polling adjusted (listing: {roomManager.TimeBetweenListingPolls}, selection: {roomManager.TimeBetweenSelectionPolls})");
         }
 
         public void APIStateChanged(IAPIProvider api, APIState state)
@@ -222,6 +232,8 @@ namespace osu.Game.Screens.Multi
             base.OnResuming(last);
 
             beginHandlingTrack();
+
+            updatePollingRate(isIdle.Value);
         }
 
         public override void OnSuspending(IScreen next)
@@ -231,7 +243,7 @@ namespace osu.Game.Screens.Multi
 
             endHandlingTrack();
 
-            roomManager.TimeBetweenPolls = 0;
+            updatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)
@@ -359,10 +371,10 @@ namespace osu.Game.Screens.Multi
 
             public MultiplayerWaveContainer()
             {
-                FirstWaveColour = OsuColour.FromHex(@"654d8c");
-                SecondWaveColour = OsuColour.FromHex(@"554075");
-                ThirdWaveColour = OsuColour.FromHex(@"44325e");
-                FourthWaveColour = OsuColour.FromHex(@"392850");
+                FirstWaveColour = Color4Extensions.FromHex(@"654d8c");
+                SecondWaveColour = Color4Extensions.FromHex(@"554075");
+                ThirdWaveColour = Color4Extensions.FromHex(@"44325e");
+                FourthWaveColour = Color4Extensions.FromHex(@"392850");
             }
         }
 

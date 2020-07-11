@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -100,10 +99,7 @@ namespace osu.Game.Tests.Beatmaps
 
         private ConvertResult convert(string name, Mod[] mods)
         {
-            var beatmap = getBeatmap(name);
-
-            var rulesetInstance = CreateRuleset();
-            beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+            var beatmap = GetBeatmap(name);
 
             var converterResult = new Dictionary<HitObject, IEnumerable<HitObject>>();
 
@@ -116,7 +112,7 @@ namespace osu.Game.Tests.Beatmaps
                 }
             };
 
-            working.GetPlayableBeatmap(rulesetInstance.RulesetInfo, mods);
+            working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
 
             return new ConvertResult
             {
@@ -144,14 +140,19 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private IBeatmap getBeatmap(string name)
+        public IBeatmap GetBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
-                return decoder.Decode(stream);
+                var beatmap = decoder.Decode(stream);
+
+                var rulesetInstance = CreateRuleset();
+                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+
+                return beatmap;
             }
         }
 
@@ -206,8 +207,6 @@ namespace osu.Game.Tests.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
 
             protected override Texture GetBackground() => throw new NotImplementedException();
-
-            protected override VideoSprite GetVideo() => throw new NotImplementedException();
 
             protected override Track GetTrack() => throw new NotImplementedException();
 

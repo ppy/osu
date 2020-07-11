@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)
         {
-            HasTypeChange = lastObject is RimHit != hitObject is RimHit;
+            HasTypeChange = (lastObject as Hit)?.Type != (hitObject as Hit)?.Type;
         }
     }
 }

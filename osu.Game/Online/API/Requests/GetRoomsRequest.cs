@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Humanizer;
+using osu.Framework.IO.Network;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Lounge.Components;
 
@@ -9,39 +11,28 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetRoomsRequest : APIRequest<List<Room>>
     {
-        private readonly PrimaryFilter primaryFilter;
+        private readonly RoomStatusFilter statusFilter;
+        private readonly RoomCategoryFilter categoryFilter;
 
-        public GetRoomsRequest(PrimaryFilter primaryFilter)
+        public GetRoomsRequest(RoomStatusFilter statusFilter, RoomCategoryFilter categoryFilter)
         {
-            this.primaryFilter = primaryFilter;
+            this.statusFilter = statusFilter;
+            this.categoryFilter = categoryFilter;
         }
 
-        protected override string Target
+        protected override WebRequest CreateWebRequest()
         {
-            get
-            {
-                string target = "rooms";
+            var req = base.CreateWebRequest();
 
-                switch (primaryFilter)
-                {
-                    case PrimaryFilter.Open:
-                        break;
+            if (statusFilter != RoomStatusFilter.Open)
+                req.AddParameter("mode", statusFilter.ToString().Underscore().ToLowerInvariant());
 
-                    case PrimaryFilter.Owned:
-                        target += "/owned";
-                        break;
+            if (categoryFilter != RoomCategoryFilter.Any)
+                req.AddParameter("category", categoryFilter.ToString().Underscore().ToLowerInvariant());
 
-                    case PrimaryFilter.Participated:
-                        target += "/participated";
-                        break;
-
-                    case PrimaryFilter.RecentlyEnded:
-                        target += "/ended";
-                        break;
-                }
-
-                return target;
-            }
+            return req;
         }
+
+        protected override string Target => "rooms";
     }
 }

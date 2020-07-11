@@ -15,6 +15,11 @@ namespace osu.Game.Screens.Multi
         event Action RoomsUpdated;
 
         /// <summary>
+        /// Whether an initial listing of rooms has been received.
+        /// </summary>
+        Bindable<bool> InitialRoomsReceived { get; }
+
+        /// <summary>
         /// All the active <see cref="Room"/>s.
         /// </summary>
         IBindableList<Room> Rooms { get; }

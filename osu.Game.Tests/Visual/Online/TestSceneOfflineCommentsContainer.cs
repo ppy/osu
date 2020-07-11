@@ -17,18 +17,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneOfflineCommentsContainer : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CommentsContainer),
-            typeof(CommentsHeader),
-            typeof(DrawableComment),
-            typeof(HeaderButton),
-            typeof(OverlaySortTabControl<>),
-            typeof(ShowChildrenButton),
-            typeof(DeletedCommentsCounter),
-            typeof(VotePill)
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 

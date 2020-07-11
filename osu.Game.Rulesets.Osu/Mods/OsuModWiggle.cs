@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Wiggle the repeat points with the slider instead of independently.
             // Also fixes an issue with repeat points being positioned incorrectly.
-            if (osuObject is RepeatPoint)
+            if (osuObject is SliderRepeat)
                 return;
 
             Random objRand = new Random((int)osuObject.StartTime);
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Keep wiggling sliders and spinners for their duration
-            if (!(osuObject is IHasEndTime endTime))
+            if (!(osuObject is IHasDuration endTime))
                 return;
 
             amountWiggles = (int)(endTime.Duration / wiggle_duration);

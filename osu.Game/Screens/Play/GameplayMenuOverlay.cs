@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Input;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Bindings;
@@ -204,35 +203,24 @@ namespace osu.Game.Screens.Play
                 InternalButtons[selectionIndex].Selected.Value = true;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat)
-            {
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        if (selectionIndex == -1 || selectionIndex == 0)
-                            setSelected(InternalButtons.Count - 1);
-                        else
-                            setSelected(selectionIndex - 1);
-                        return true;
-
-                    case Key.Down:
-                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                            setSelected(0);
-                        else
-                            setSelected(selectionIndex + 1);
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
+                case GlobalAction.SelectPrevious:
+                    if (selectionIndex == -1 || selectionIndex == 0)
+                        setSelected(InternalButtons.Count - 1);
+                    else
+                        setSelected(selectionIndex - 1);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
+                        setSelected(0);
+                    else
+                        setSelected(selectionIndex + 1);
+                    return true;
+
                 case GlobalAction.Back:
                     BackAction.Invoke();
                     return true;

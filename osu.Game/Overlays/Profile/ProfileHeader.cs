@@ -7,8 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
@@ -48,7 +46,7 @@ namespace osu.Game.Overlays.Profile
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(OsuColour.FromHex("222").Opacity(0.8f), OsuColour.FromHex("222").Opacity(0.2f))
+                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("222").Opacity(0.8f), Color4Extensions.FromHex("222").Opacity(0.2f))
                     },
                 }
             };
@@ -88,19 +86,17 @@ namespace osu.Game.Overlays.Profile
             }
         };
 
-        protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
         private void updateDisplay(User user) => coverContainer.User = user;
 
-        private class ProfileHeaderTitle : ScreenTitle
+        private class ProfileHeaderTitle : OverlayTitle
         {
             public ProfileHeaderTitle()
             {
-                Title = "player";
-                Section = "info";
+                Title = "player info";
+                IconTexture = "Icons/profile";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }

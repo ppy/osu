@@ -1,36 +1,52 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
-    /// <summary>
-    /// The symbol used for swell pieces.
-    /// </summary>
-    public class SwellSymbolPiece : Container
+    public class SwellCirclePiece : CirclePiece
     {
-        public SwellSymbolPiece()
+        public SwellCirclePiece()
         {
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            Add(new SwellSymbolPiece());
+        }
 
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(CirclePiece.SYMBOL_SIZE);
-            Padding = new MarginPadding(CirclePiece.SYMBOL_BORDER);
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.YellowDark;
+        }
 
-            Children = new[]
+        /// <summary>
+        /// The symbol used for swell pieces.
+        /// </summary>
+        public class SwellSymbolPiece : Container
+        {
+            public SwellSymbolPiece()
             {
-                new SpriteIcon
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                RelativeSizeAxes = Axes.Both;
+                Size = new Vector2(SYMBOL_SIZE);
+                Padding = new MarginPadding(SYMBOL_BORDER);
+
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Solid.Asterisk,
-                    Shadow = false
-                }
-            };
+                    new SpriteIcon
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Icon = FontAwesome.Solid.Asterisk,
+                        Shadow = false
+                    }
+                };
+            }
         }
     }
 }

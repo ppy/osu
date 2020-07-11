@@ -160,5 +160,13 @@ namespace osu.Game.Database
                 }
             }
         }
+
+        public void FlushConnections()
+        {
+            foreach (var context in threadContexts.Values)
+                context.Dispose();
+
+            recycleThreadContexts();
+        }
     }
 }

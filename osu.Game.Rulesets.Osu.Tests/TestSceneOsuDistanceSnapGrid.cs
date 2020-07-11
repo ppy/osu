@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,22 +15,16 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneOsuDistanceSnapGrid : ManualInputManagerTestScene
+    public class TestSceneOsuDistanceSnapGrid : OsuManualInputManagerTestScene
     {
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CircularDistanceSnapGrid)
-        };
 
         [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;
@@ -39,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        [Cached(typeof(IDistanceSnapProvider))]
+        [Cached(typeof(IPositionSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         private TestOsuDistanceSnapGrid grid;
@@ -179,9 +172,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class SnapProvider : IDistanceSnapProvider
+        private class SnapProvider : IPositionSnapProvider
         {
-            public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, time);
+            public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
             public float GetBeatSnapDistanceAt(double referenceTime) => (float)beat_length;
 

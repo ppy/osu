@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -14,22 +13,20 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapRulesetSelector RulesetSelector { get; private set; }
 
-        protected override ScreenTitle CreateTitle() => new BeatmapHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new BeatmapHeaderTitle();
 
         protected override Drawable CreateTitleContent() => RulesetSelector = new BeatmapRulesetSelector
         {
             Current = Ruleset
         };
 
-        private class BeatmapHeaderTitle : ScreenTitle
+        private class BeatmapHeaderTitle : OverlayTitle
         {
             public BeatmapHeaderTitle()
             {
-                Title = @"beatmap";
-                Section = @"info";
+                Title = "beatmap info";
+                IconTexture = "Icons/changelog";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 }

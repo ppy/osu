@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -22,6 +21,7 @@ namespace osu.Game.Overlays
     {
         protected OsuTabControl<T> TabControl;
 
+        private readonly Box controlBackground;
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
@@ -29,8 +29,6 @@ namespace osu.Game.Overlays
             get => current.Current;
             set => current.Current = value;
         }
-
-        private readonly Box controlBackground;
 
         protected TabControlOverlayHeader()
         {
@@ -46,7 +44,7 @@ namespace osu.Game.Overlays
                     },
                     TabControl = CreateTabControl().With(control =>
                     {
-                        control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN };
+                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
                         control.Current = Current;
                     })
                 }
@@ -56,7 +54,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            TabControl.AccentColour = colourProvider.Highlight1;
             controlBackground.Colour = colourProvider.Dark4;
         }
 
@@ -65,14 +62,16 @@ namespace osu.Game.Overlays
 
         public class OverlayHeaderTabControl : OverlayTabControl<T>
         {
+            private const float bar_height = 1;
+
             public OverlayHeaderTabControl()
             {
-                BarHeight = 1;
                 RelativeSizeAxes = Axes.None;
                 AutoSizeAxes = Axes.X;
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;
-                Height = 35;
+                Height = 47;
+                BarHeight = bar_height;
             }
 
             protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value);
@@ -82,7 +81,6 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
             };
 
             private class OverlayHeaderTabItem : OverlayTabItem
@@ -92,7 +90,8 @@ namespace osu.Game.Overlays
                 {
                     Text.Text = value.ToString().ToLower();
                     Text.Font = OsuFont.GetFont(size: 14);
-                    Bar.ExpandedSize = 5;
+                    Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
+                    Bar.Margin = new MarginPadding { Bottom = bar_height };
                 }
             }
         }

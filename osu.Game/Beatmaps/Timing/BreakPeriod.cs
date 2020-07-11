@@ -33,6 +33,17 @@ namespace osu.Game.Beatmaps.Timing
         public bool HasEffect => Duration >= MIN_BREAK_DURATION;
 
         /// <summary>
+        /// Constructs a new break period.
+        /// </summary>
+        /// <param name="startTime">The start time of the break period.</param>
+        /// <param name="endTime">The end time of the break period.</param>
+        public BreakPeriod(double startTime, double endTime)
+        {
+            StartTime = startTime;
+            EndTime = endTime;
+        }
+
+        /// <summary>
         /// Whether this break contains a specified time.
         /// </summary>
         /// <param name="time">The time to check in milliseconds.</param>

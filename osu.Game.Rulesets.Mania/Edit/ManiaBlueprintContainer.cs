@@ -30,5 +30,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             return base.CreateBlueprintFor(hitObject);
         }
+
+        protected override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
     }
 }

@@ -84,13 +84,13 @@ namespace osu.Game.Overlays.Notifications
                                 new OsuSpriteText
                                 {
                                     Text = titleText.ToUpperInvariant(),
-                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                                 },
                                 countDrawable = new OsuSpriteText
                                 {
                                     Text = "3",
                                     Colour = colours.Yellow,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                                 },
                             }
                         },

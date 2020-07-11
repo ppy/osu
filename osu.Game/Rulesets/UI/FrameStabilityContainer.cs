@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.UI
 {
     /// <summary>
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
-    /// Will ensure a minimum of 40 frames per clock second is maintained, regardless of any system lag or seeks.
+    /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
     public class FrameStabilityContainer : Container, IHasReplayHandler
     {
@@ -29,14 +29,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback = true;
 
-        [Cached]
-        public GameplayClock GameplayClock { get; }
+        public GameplayClock GameplayClock => stabilityGameplayClock;
+
+        [Cached(typeof(GameplayClock))]
+        private readonly StabilityGameplayClock stabilityGameplayClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
 
-            GameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+            stabilityGameplayClock = new StabilityGameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
 
             this.gameplayStartTime = gameplayStartTime;
         }
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.UI
         {
             if (clock != null)
             {
-                parentGameplayClock = clock;
+                stabilityGameplayClock.ParentGameplayClock = parentGameplayClock = clock;
                 GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
@@ -179,13 +181,24 @@ namespace osu.Game.Rulesets.UI
         private void setClock()
         {
             // in case a parent gameplay clock isn't available, just use the parent clock.
-            if (parentGameplayClock == null)
-                parentGameplayClock = Clock;
+            parentGameplayClock ??= Clock;
 
             Clock = GameplayClock;
             ProcessCustomClock = false;
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
+
+        private class StabilityGameplayClock : GameplayClock
+        {
+            public IFrameBasedClock ParentGameplayClock;
+
+            public StabilityGameplayClock(FramedClock underlyingClock)
+                : base(underlyingClock)
+            {
+            }
+
+            public override bool IsSeeking => ParentGameplayClock != null && Math.Abs(CurrentTime - ParentGameplayClock.CurrentTime) > 200;
+        }
     }
 }

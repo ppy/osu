@@ -7,19 +7,13 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneAutoJuiceStream : PlayerTestScene
+    public class TestSceneAutoJuiceStream : TestSceneCatchPlayer
     {
-        public TestSceneAutoJuiceStream()
-            : base(new CatchRuleset())
-        {
-        }
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
@@ -33,15 +27,15 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             for (int i = 0; i < 100; i++)
             {
-                float width = (i % 10 + 1) / 20f;
+                float width = (i % 10 + 1) / 20f * CatchPlayfield.WIDTH;
 
                 beatmap.HitObjects.Add(new JuiceStream
                 {
-                    X = 0.5f - width / 2,
+                    X = CatchPlayfield.CENTER_X - width / 2,
                     Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,
-                        new Vector2(width * CatchPlayfield.BASE_WIDTH, 0)
+                        new Vector2(width, 0)
                     }),
                     StartTime = i * 2000,
                     NewCombo = i % 8 == 0
@@ -51,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             return beatmap;
         }
 
-        protected override Player CreatePlayer(Ruleset ruleset)
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
             return base.CreatePlayer(ruleset);

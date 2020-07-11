@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
@@ -43,7 +42,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             private TextureStore textureStore;
 
@@ -63,24 +62,6 @@ namespace osu.Game.Beatmaps
                 catch (Exception e)
                 {
                     Logger.Error(e, "Background failed to load");
-                    return null;
-                }
-            }
-
-            protected override VideoSprite GetVideo()
-            {
-                if (Metadata?.VideoFile == null)
-                    return null;
-
-                try
-                {
-                    var stream = textureStore.GetStream(getPathForFile(Metadata.VideoFile));
-
-                    return stream == null ? null : new VideoSprite(stream);
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, "Video failed to load");
                     return null;
                 }
             }

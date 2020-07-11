@@ -52,22 +52,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             highAccuracyColour = colours.GreenLight;
         }
 
-        public IReadOnlyList<ScoreInfo> Scores
+        private bool showPerformancePoints;
+
+        public void DisplayScores(IReadOnlyList<ScoreInfo> scores, bool showPerformanceColumn)
         {
-            set
-            {
-                Content = null;
-                backgroundFlow.Clear();
+            ClearScores();
 
-                if (value?.Any() != true)
-                    return;
+            if (!scores.Any())
+                return;
 
-                for (int i = 0; i < value.Count; i++)
-                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i], row_height));
+            showPerformancePoints = showPerformanceColumn;
 
-                Columns = createHeaders(value[0]);
-                Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
-            }
+            for (int i = 0; i < scores.Count; i++)
+                backgroundFlow.Add(new ScoreTableRowBackground(i, scores[i], row_height));
+
+            Columns = createHeaders(scores.FirstOrDefault());
+            Content = scores.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
+        }
+
+        public void ClearScores()
+        {
+            Content = null;
+            backgroundFlow.Clear();
         }
 
         private TableColumn[] createHeaders(ScoreInfo score)
@@ -88,11 +94,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
 
-            columns.AddRange(new[]
-            {
-                new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)),
-                new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-            });
+            if (showPerformancePoints)
+                columns.Add(new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)));
+
+            columns.Add(new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)));
 
             return columns.ToArray();
         }
@@ -150,24 +155,25 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 });
             }
 
-            content.AddRange(new Drawable[]
+            if (showPerformancePoints)
             {
-                new OsuSpriteText
+                content.Add(new OsuSpriteText
                 {
                     Text = $@"{score.PP:N0}",
                     Font = OsuFont.GetFont(size: text_size)
-                },
-                new FillFlowContainer
+                });
+            }
+
+            content.Add(new FillFlowContainer
+            {
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(1),
+                ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
                 {
-                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(1),
-                    ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.3f)
-                    })
-                },
+                    Scale = new Vector2(0.3f)
+                })
             });
 
             return content.ToArray();

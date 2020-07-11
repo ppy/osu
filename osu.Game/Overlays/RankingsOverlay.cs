@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
 
         protected Bindable<RankingsScope> Scope => header.Current;
 
-        private readonly BasicScrollContainer scrollFlow;
+        private readonly OverlayScrollContainer scrollFlow;
         private readonly Container contentContainer;
         private readonly LoadingLayer loading;
         private readonly Box background;
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                scrollFlow = new BasicScrollContainer
+                scrollFlow = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
