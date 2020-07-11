@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Cinema";
         public override string Acronym => "CN";
-        public override IconUsage Icon => OsuIcon.ModCinema;
+        public override IconUsage? Icon => OsuIcon.ModCinema;
         public override string Description => "Watch the video without visual distractions.";
 
         public void ApplyToHUD(HUDOverlay overlay)
@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Mods
         {
             player.Background.EnableUserDim.Value = false;
 
-            player.DimmableVideo.IgnoreUserSettings.Value = true;
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
 
             player.BreakOverlay.Hide();

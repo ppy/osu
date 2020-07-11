@@ -2,81 +2,98 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
-using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
-using osu.Game.Tests.Visual;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneFruitObjects : OsuTestScene
+    public class TestSceneFruitObjects : CatchSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        protected override void LoadComplete()
         {
-            typeof(CatchHitObject),
-            typeof(Fruit),
-            typeof(Droplet),
-            typeof(DrawableCatchHitObject),
-            typeof(DrawableFruit),
-            typeof(DrawableDroplet),
-            typeof(BananaShower),
-            typeof(Pulp),
-        };
+            base.LoadComplete();
 
-        public TestSceneFruitObjects()
-        {
-            Add(new GridContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        createDrawable(0),
-                        createDrawable(1),
-                        createDrawable(2),
-                    },
-                    new Drawable[]
-                    {
-                        createDrawable(3),
-                        createDrawable(4),
-                        createDrawable(5),
-                    },
-                }
-            });
+            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
+                AddStep($"show {rep}", () => SetContents(() => createDrawable(rep)));
+
+            AddStep("show droplet", () => SetContents(createDrawableDroplet));
+
+            AddStep("show tiny droplet", () => SetContents(createDrawableTinyDroplet));
+
+            foreach (FruitVisualRepresentation rep in Enum.GetValues(typeof(FruitVisualRepresentation)))
+                AddStep($"show hyperdash {rep}", () => SetContents(() => createDrawable(rep, true)));
         }
 
-        private DrawableFruit createDrawable(int index)
+        private Drawable createDrawableTinyDroplet()
         {
-            Fruit fruit = index == 5
-                ? new Banana
-                {
-                    StartTime = 1000000000000,
-                    IndexInBeatmap = index,
-                    Scale = 1.5f,
-                }
-                : new Fruit
-                {
-                    StartTime = 1000000000000,
-                    IndexInBeatmap = index,
-                    Scale = 1.5f,
-                };
+            var droplet = new TinyDroplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
 
-            return new DrawableFruit(fruit)
+            return new DrawableTinyDroplet(droplet)
             {
                 Anchor = Anchor.Centre,
-                RelativePositionAxes = Axes.Both,
+                RelativePositionAxes = Axes.None,
                 Position = Vector2.Zero,
                 Alpha = 1,
                 LifetimeStart = double.NegativeInfinity,
                 LifetimeEnd = double.PositiveInfinity,
             };
+        }
+
+        private Drawable createDrawableDroplet()
+        {
+            var droplet = new Droplet
+            {
+                StartTime = Clock.CurrentTime,
+                Scale = 1.5f,
+            };
+
+            return new DrawableDroplet(droplet)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        private Drawable createDrawable(FruitVisualRepresentation rep, bool hyperdash = false)
+        {
+            Fruit fruit = new TestCatchFruit(rep)
+            {
+                Scale = 1.5f,
+                HyperDashTarget = hyperdash ? new Banana() : null
+            };
+
+            return new DrawableFruit(fruit)
+            {
+                Anchor = Anchor.Centre,
+                RelativePositionAxes = Axes.None,
+                Position = Vector2.Zero,
+                Alpha = 1,
+                LifetimeStart = double.NegativeInfinity,
+                LifetimeEnd = double.PositiveInfinity,
+            };
+        }
+
+        public class TestCatchFruit : Fruit
+        {
+            public TestCatchFruit(FruitVisualRepresentation rep)
+            {
+                VisualRepresentation = rep;
+                StartTime = 1000000000000;
+            }
+
+            public override FruitVisualRepresentation VisualRepresentation { get; }
         }
     }
 }

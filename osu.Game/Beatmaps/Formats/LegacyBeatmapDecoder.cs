@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Formats
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
-        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal);
+        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
@@ -239,11 +239,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Source":
-                    beatmap.BeatmapInfo.Metadata.Source = pair.Value;
+                    metadata.Source = pair.Value;
                     break;
 
                 case @"Tags":
-                    beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
+                    metadata.Tags = pair.Value;
                     break;
 
                 case @"BeatmapID":
@@ -300,23 +300,14 @@ namespace osu.Game.Beatmaps.Formats
             switch (type)
             {
                 case LegacyEventType.Background:
-                    string bgFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = bgFilename.ToStandardisedPath();
-                    break;
-
-                case LegacyEventType.Video:
-                    string videoFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.VideoFile = videoFilename.ToStandardisedPath();
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
 
                 case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
+                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                    var breakEvent = new BreakPeriod
-                    {
-                        StartTime = start,
-                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])))
-                    };
+                    var breakEvent = new BreakPeriod(start, end);
 
                     if (!breakEvent.HasEffect)
                         return;
@@ -395,17 +386,10 @@ namespace osu.Game.Beatmaps.Formats
                 SampleVolume = sampleVolume,
                 CustomSampleBank = customSampleBank,
             }, timingChange);
-
-            // To handle the scenario where a non-timing line shares the same time value as a subsequent timing line but
-            // appears earlier in the file, we buffer non-timing control points and rewrite them *after* control points from the timing line
-            // with the same time value (allowing them to overwrite as necessary).
-            //
-            // The expected outcome is that we prefer the non-timing line's adjustments over the timing line's adjustments when time is equal.
-            if (timingChange)
-                flushPendingPoints();
         }
 
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
+        private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
 
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
@@ -414,28 +398,34 @@ namespace osu.Game.Beatmaps.Formats
                 flushPendingPoints();
 
             if (timingChange)
-            {
-                beatmap.ControlPointInfo.Add(time, point);
-                return;
-            }
+                pendingControlPoints.Insert(0, point);
+            else
+                pendingControlPoints.Add(point);
 
-            pendingControlPoints.Add(point);
             pendingControlPointsTime = time;
         }
 
         private void flushPendingPoints()
         {
-            foreach (var p in pendingControlPoints)
-                beatmap.ControlPointInfo.Add(pendingControlPointsTime, p);
+            // Changes from non-timing-points are added to the end of the list (see addControlPoint()) and should override any changes from timing-points (added to the start of the list).
+            for (int i = pendingControlPoints.Count - 1; i >= 0; i--)
+            {
+                var type = pendingControlPoints[i].GetType();
+                if (pendingControlPointTypes.Contains(type))
+                    continue;
+
+                pendingControlPointTypes.Add(type);
+                beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
+            }
 
             pendingControlPoints.Clear();
+            pendingControlPointTypes.Clear();
         }
 
         private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
-            if (parser == null)
-                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
             if (obj != null)

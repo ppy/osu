@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,29 +20,12 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSlider : SkinnableTestScene
+    public class TestSceneSlider : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Slider),
-            typeof(SliderTick),
-            typeof(SliderTailCircle),
-            typeof(SliderBall),
-            typeof(SliderBody),
-            typeof(SnakingSliderBody),
-            typeof(DrawableSlider),
-            typeof(DrawableSliderTick),
-            typeof(DrawableSliderTail),
-            typeof(DrawableSliderHead),
-            typeof(DrawableRepeatPoint),
-            typeof(DrawableOsuHitObject)
-        };
-
         private Container content;
 
         protected override Container<Drawable> Content
@@ -145,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddAssert("head samples updated", () => assertSamples(((Slider)slider.HitObject).HeadCircle));
             AddAssert("tick samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
-            AddAssert("repeat samples updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<RepeatPoint>().All(assertSamples));
+            AddAssert("repeat samples updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
             AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
 
             static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
@@ -180,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddAssert("head samples not updated", () => assertSamples(((Slider)slider.HitObject).HeadCircle));
             AddAssert("tick samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
-            AddAssert("repeat samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<RepeatPoint>().All(assertSamples));
+            AddAssert("repeat samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
             AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
 
             static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";

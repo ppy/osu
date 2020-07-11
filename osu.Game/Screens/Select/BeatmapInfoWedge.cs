@@ -23,6 +23,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Select
     {
         private const float shear_width = 36.75f;
 
-        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGED_CONTAINER_SIZE.Y, 0);
+        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
@@ -154,7 +155,6 @@ namespace osu.Game.Screens.Select
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 CacheDrawnFrameBuffer = true;
-                RedrawOnScale = false;
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -311,20 +311,27 @@ namespace osu.Game.Screens.Select
                         Content = getBPMRange(b),
                     }));
 
-                    IBeatmap playableBeatmap;
-
                     try
                     {
-                        // Try to get the beatmap with the user's ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
-                    }
-                    catch (BeatmapInvalidForRulesetException)
-                    {
-                        // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
-                    }
+                        IBeatmap playableBeatmap;
 
-                    labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));
+                        try
+                        {
+                            // Try to get the beatmap with the user's ruleset
+                            playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
+                        }
+                        catch (BeatmapInvalidForRulesetException)
+                        {
+                            // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
+                            playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
+                        }
+
+                        labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Could not load beatmap successfully!");
+                    }
                 }
 
                 return labels.ToArray();
@@ -363,7 +370,7 @@ namespace osu.Game.Screens.Select
 
             public class InfoLabel : Container, IHasTooltip
             {
-                public string TooltipText { get; private set; }
+                public string TooltipText { get; }
 
                 public InfoLabel(BeatmapStatistic statistic)
                 {
@@ -384,7 +391,7 @@ namespace osu.Game.Screens.Select
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"441288"),
+                                    Colour = Color4Extensions.FromHex(@"441288"),
                                     Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
@@ -394,7 +401,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Scale = new Vector2(0.8f),
-                                    Colour = OsuColour.FromHex(@"f7dd55"),
+                                    Colour = Color4Extensions.FromHex(@"f7dd55"),
                                     Icon = statistic.Icon,
                                 },
                             }

@@ -41,10 +41,10 @@ namespace osu.Game.Overlays.Chat.Selection
         {
             RelativeSizeAxes = Axes.X;
 
-            Waves.FirstWaveColour = OsuColour.FromHex("353535");
-            Waves.SecondWaveColour = OsuColour.FromHex("434343");
-            Waves.ThirdWaveColour = OsuColour.FromHex("515151");
-            Waves.FourthWaveColour = OsuColour.FromHex("595959");
+            Waves.FirstWaveColour = Color4Extensions.FromHex("353535");
+            Waves.SecondWaveColour = Color4Extensions.FromHex("434343");
+            Waves.ThirdWaveColour = Color4Extensions.FromHex("515151");
+            Waves.FourthWaveColour = Color4Extensions.FromHex("595959");
 
             Children = new Drawable[]
             {
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Chat.Selection
         {
             bg.Colour = colours.Gray3;
             triangles.ColourDark = colours.Gray3;
-            triangles.ColourLight = OsuColour.FromHex(@"353535");
+            triangles.ColourLight = Color4Extensions.FromHex(@"353535");
 
             headerBg.Colour = colours.Gray2.Opacity(0.75f);
         }

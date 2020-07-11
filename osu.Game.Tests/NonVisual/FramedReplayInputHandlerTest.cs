@@ -46,12 +46,12 @@ namespace osu.Game.Tests.NonVisual
             confirmCurrentFrame(0);
             confirmNextFrame(1);
 
-            //if we hit the first frame perfectly, time should progress to it.
+            // if we hit the first frame perfectly, time should progress to it.
             setTime(1000, 1000);
             confirmCurrentFrame(1);
             confirmNextFrame(2);
 
-            //in between non-important frames should progress based on input.
+            // in between non-important frames should progress based on input.
             setTime(1200, 1200);
             confirmCurrentFrame(1);
 
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.NonVisual
             confirmCurrentFrame(2);
             confirmNextFrame(1);
 
-            //ensure each frame plays out until start
+            // ensure each frame plays out until start
             setTime(-500, 1000);
             confirmCurrentFrame(1);
             confirmNextFrame(0);

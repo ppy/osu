@@ -4,13 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -42,11 +42,19 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             {
                 new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.Start),
                 new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.End),
-                new BodyPiece
+                new Container
                 {
-                    AccentColour = Color4.Transparent,
-                    BorderColour = colours.Yellow
-                },
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 1,
+                    BorderColour = colours.Yellow,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    }
+                }
             };
         }
 
@@ -68,5 +76,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
+
+        public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.Head.ScreenSpaceDrawQuad.Centre;
     }
 }

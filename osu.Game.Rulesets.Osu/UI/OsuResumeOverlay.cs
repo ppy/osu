@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
-        private Bindable<float> localCursorScale;
+        private IBindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Add(localCursorContainer = new OsuCursorContainer());
 
-                localCursorScale = new Bindable<float>();
+                localCursorScale = new BindableFloat();
                 localCursorScale.BindTo(localCursorContainer.CursorScale);
                 localCursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
             }
@@ -107,7 +107,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
 
             public void Appear() => Schedule(() =>
             {

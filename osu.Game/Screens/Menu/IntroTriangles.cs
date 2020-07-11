@@ -44,17 +44,15 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            if (MenuVoice.Value && !MenuMusic.Value)
-                welcome = audio.Samples.Get(@"welcome");
+            if (MenuVoice.Value && !UsingThemedIntro)
+                welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
-
-            logo.Triangles = true;
 
             if (!resuming)
             {
@@ -63,7 +61,7 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(MenuMusic.Value ? Track : null),
+                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
@@ -102,13 +100,12 @@ namespace osu.Game.Screens.Menu
                 this.background = background;
             }
 
-            private OsuGameBase game;
+            [Resolved]
+            private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuGameBase game)
+            private void load(TextureStore textures)
             {
-                this.game = game;
-
                 InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
@@ -262,14 +259,20 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
+                private readonly Stream videoStream;
+
                 public LazerLogo(Stream videoStream)
                 {
+                    this.videoStream = videoStream;
                     Size = new Vector2(960);
+                }
 
-                    InternalChild = new VideoSprite(videoStream)
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    InternalChild = new Video(videoStream)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Clock = new FramedOffsetClock(Clock) { Offset = -logo_1 }
                     };
                 }
             }

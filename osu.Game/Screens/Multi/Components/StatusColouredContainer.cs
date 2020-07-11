@@ -17,6 +17,9 @@ namespace osu.Game.Screens.Multi.Components
         [Resolved(typeof(Room), nameof(Room.Status))]
         private Bindable<RoomStatus> status { get; set; }
 
+        [Resolved(typeof(Room), nameof(Room.Category))]
+        private Bindable<RoomCategory> category { get; set; }
+
         public StatusColouredContainer(double transitionDuration = 100)
         {
             this.transitionDuration = transitionDuration;
@@ -25,7 +28,11 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            status.BindValueChanged(s => this.FadeColour(s.NewValue.GetAppropriateColour(colours), transitionDuration), true);
+            status.BindValueChanged(s =>
+            {
+                this.FadeColour(category.Value == RoomCategory.Spotlight ? colours.Pink : s.NewValue.GetAppropriateColour(colours)
+                    , transitionDuration);
+            }, true);
         }
     }
 }

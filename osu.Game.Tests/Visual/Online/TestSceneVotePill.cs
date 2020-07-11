@@ -1,22 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Allocation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
     public class TestSceneVotePill : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(VotePill)
-        };
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private VotePill votePill;
 

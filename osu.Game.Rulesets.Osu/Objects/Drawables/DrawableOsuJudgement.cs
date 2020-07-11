@@ -24,10 +24,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
+        public DrawableOsuJudgement()
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            if (config.Get<bool>(OsuSetting.HitLighting) && Result.Type != HitResult.Miss)
+            if (config.Get<bool>(OsuSetting.HitLighting))
             {
                 AddInternal(lighting = new SkinnableSprite("lighting")
                 {
@@ -36,11 +40,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Blending = BlendingParameters.Additive,
                     Depth = float.MaxValue
                 });
+            }
+        }
 
+        public override void Apply(JudgementResult result, DrawableHitObject judgedObject)
+        {
+            base.Apply(result, judgedObject);
+
+            if (judgedObject?.HitObject is OsuHitObject osuObject)
+            {
+                Position = osuObject.StackedPosition;
+                Scale = new Vector2(osuObject.Scale);
+            }
+        }
+
+        protected override void PrepareForUse()
+        {
+            base.PrepareForUse();
+
+            lightingColour?.UnbindAll();
+
+            if (lighting != null)
+            {
                 if (JudgedObject != null)
                 {
                     lightingColour = JudgedObject.AccentColour.GetBoundCopy();
-                    lightingColour.BindValueChanged(colour => lighting.Colour = colour.NewValue, true);
+                    lightingColour.BindValueChanged(colour => lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
                 }
                 else
                 {
@@ -55,13 +80,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (lighting != null)
             {
-                JudgementBody.Delay(FadeInDuration).FadeOut(400);
+                JudgementBody.FadeIn().Delay(FadeInDuration).FadeOut(400);
 
                 lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
                 lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
             }
 
-            JudgementText?.TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
+            JudgementText?.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
             base.ApplyHitAnimations();
         }
     }

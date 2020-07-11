@@ -4,9 +4,14 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osuTK.Input;
 
@@ -16,6 +21,9 @@ namespace osu.Game.Screens.Select
     {
         private bool removeAutoModOnResume;
         private OsuScreen player;
+
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notifications { get; set; }
 
         public override bool AllowExternalScreenChange => true;
 
@@ -29,20 +37,45 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Edit();
             }, Key.Number4);
+
+            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
+
+        protected void PresentScore(ScoreInfo score) =>
+            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
+
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
+
             player = null;
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
-                ModSelect.DeselectTypes(new[] { autoType }, true);
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
+
+                if (autoType != null)
+                    ModSelect.DeselectTypes(new[] { autoType }, true);
+
                 removeAutoModOnResume = false;
             }
+        }
 
-            base.OnResuming(last);
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                case Key.KeypadEnter:
+                    // this is a special hard-coded case; we can't rely on OnPressed (of SongSelect) as GlobalActionContainer is
+                    // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
+                    FinaliseSelection();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override bool OnStart()
@@ -53,9 +86,18 @@ namespace osu.Game.Screens.Select
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto.GetType();
+                var autoType = auto?.GetType();
 
                 var mods = Mods.Value;
+
+                if (autoType == null)
+                {
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                    });
+                    return false;
+                }
 
                 if (mods.All(m => m.GetType() != autoType))
                 {
@@ -64,14 +106,9 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            Beatmap.Value.Track.Looping = false;
-
             SampleConfirm?.Play();
 
-            LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
-            {
-                if (this.IsCurrentScreen()) this.Push(player);
-            });
+            this.Push(player = new PlayerLoader(() => new Player()));
 
             return true;
         }

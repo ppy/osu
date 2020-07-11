@@ -33,12 +33,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
-        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.DrawableObject.HitObject);
+        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
         private Drawable outline;
 
-        [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
+        [Resolved(CanBeNull = true)]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
+
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
 
         public SelectionHandler()
         {
@@ -71,9 +74,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
+        /// <remarks>
+        /// Just returning true is enough to allow <see cref="HitObject.StartTime"/> updates to take place.
+        /// Custom implementation is only required if other attributes are to be considered, like changing columns.
+        /// </remarks>
         /// <param name="moveEvent">The move event.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s were moved.</returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
+        /// <returns>
+        /// Whether any <see cref="DrawableHitObject"/>s could be moved.
+        /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
+        /// </returns>
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => true;
 
         public bool OnPressed(PlatformAction action)
         {
@@ -87,7 +97,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         #endregion
 
@@ -102,7 +114,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint becoming selected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        internal void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
+        internal void HandleSelected(SelectionBlueprint blueprint)
+        {
+            selectedBlueprints.Add(blueprint);
+            EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+
+            UpdateVisibility();
+        }
 
         /// <summary>
         /// Handle a blueprint becoming deselected.
@@ -111,6 +129,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
+            EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
             if (selectedBlueprints.Count == 0)
@@ -139,14 +158,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DeselectAll?.Invoke();
                 blueprint.Select();
             }
-
-            UpdateVisibility();
         }
 
         private void deleteSelected()
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in selectedBlueprints.ToList())
-                placementHandler.Delete(h.DrawableObject.HitObject);
+                EditorBeatmap?.Remove(h.HitObject);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
@@ -198,6 +219,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
             {
                 // Make sure there isn't already an existing sample
@@ -206,6 +229,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 h.Samples.Add(new HitSampleInfo { Name = sampleName });
             }
+
+            changeHandler?.EndChange();
         }
 
         /// <summary>
@@ -214,22 +239,33 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
+            changeHandler?.BeginChange();
+
             foreach (var h in SelectedHitObjects)
                 h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
+            changeHandler?.EndChange();
         }
 
         #endregion
 
         #region Context Menu
 
-        public virtual MenuItem[] ContextMenuItems
+        public MenuItem[] ContextMenuItems
         {
             get
             {
                 if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
-                var items = new List<MenuItem>
+                var items = new List<MenuItem>();
+
+                items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
+
+                if (selectedBlueprints.Count == 1)
+                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+
+                items.AddRange(new[]
                 {
                     new OsuMenuItem("Sound")
                     {
@@ -241,14 +277,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         }
                     },
                     new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
-                };
-
-                if (selectedBlueprints.Count == 1)
-                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+                });
 
                 return items.ToArray();
             }
         }
+
+        /// <summary>
+        /// Provide context menu items relevant to current selection. Calling base is not required.
+        /// </summary>
+        /// <param name="selection">The current selection.</param>
+        /// <returns>The relevant menu items.</returns>
+        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
+            => Enumerable.Empty<MenuItem>();
 
         private MenuItem createHitSampleMenuItem(string name, string sampleName)
         {

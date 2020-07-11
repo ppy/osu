@@ -16,11 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// How many leading zeroes the counter has.
         /// </summary>
-        public uint LeadingZeroes
-        {
-            get;
-            protected set;
-        }
+        public uint LeadingZeroes { get; }
 
         /// <summary>
         /// Displays score.

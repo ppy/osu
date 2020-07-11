@@ -15,7 +15,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
-        public StoryboardAnimation Animation { get; private set; }
+        public StoryboardAnimation Animation { get; }
 
         private bool flipH;
 
@@ -108,7 +108,7 @@ namespace osu.Game.Storyboards.Drawables
             Animation = animation;
             Origin = animation.Origin;
             Position = animation.InitialPosition;
-            Repeat = animation.LoopType == AnimationLoopType.LoopForever;
+            Loop = animation.LoopType == AnimationLoopType.LoopForever;
 
             LifetimeStart = animation.StartTime;
             LifetimeEnd = animation.EndTime;

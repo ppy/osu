@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,12 +20,7 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneChannelTabControl : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ChannelTabControl),
-        };
-
-        private readonly ChannelTabControl channelTabControl;
+        private readonly TestTabControl channelTabControl;
 
         public TestSceneChannelTabControl()
         {
@@ -37,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    channelTabControl = new ChannelTabControl
+                    channelTabControl = new TestTabControl
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.Centre,
@@ -73,32 +68,40 @@ namespace osu.Game.Tests.Visual.Online
             channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.NewValue;
 
             AddStep("Add random private channel", addRandomPrivateChannel);
-            AddAssert("There is only one channels", () => channelTabControl.Items.Count() == 2);
+            AddAssert("There is only one channels", () => channelTabControl.Items.Count == 2);
             AddRepeatStep("Add 3 random private channels", addRandomPrivateChannel, 3);
-            AddAssert("There are four channels", () => channelTabControl.Items.Count() == 5);
+            AddAssert("There are four channels", () => channelTabControl.Items.Count == 5);
             AddStep("Add random public channel", () => addChannel(RNG.Next().ToString()));
 
-            AddRepeatStep("Select a random channel", () => channelTabControl.Current.Value = channelTabControl.Items.ElementAt(RNG.Next(channelTabControl.Items.Count() - 1)), 20);
+            AddRepeatStep("Select a random channel", () =>
+            {
+                List<Channel> validChannels = channelTabControl.Items.Where(c => !(c is ChannelSelectorTabItem.ChannelSelectorTabChannel)).ToList();
+                channelTabControl.SelectChannel(validChannels[RNG.Next(0, validChannels.Count)]);
+            }, 20);
 
-            Channel channelBefore = channelTabControl.Items.First();
-            AddStep("set first channel", () => channelTabControl.Current.Value = channelBefore);
+            Channel channelBefore = null;
+            AddStep("set first channel", () => channelTabControl.SelectChannel(channelBefore = channelTabControl.Items.First(c => !(c is ChannelSelectorTabItem.ChannelSelectorTabChannel))));
 
-            AddStep("select selector tab", () => channelTabControl.Current.Value = channelTabControl.Items.Last());
+            AddStep("select selector tab", () => channelTabControl.SelectChannel(channelTabControl.Items.Single(c => c is ChannelSelectorTabItem.ChannelSelectorTabChannel)));
             AddAssert("selector tab is active", () => channelTabControl.ChannelSelectorActive.Value);
 
             AddAssert("check channel unchanged", () => channelBefore == channelTabControl.Current.Value);
 
-            AddStep("set second channel", () => channelTabControl.Current.Value = channelTabControl.Items.Skip(1).First());
+            AddStep("set second channel", () => channelTabControl.SelectChannel(channelTabControl.Items.GetNext(channelBefore)));
             AddAssert("selector tab is inactive", () => !channelTabControl.ChannelSelectorActive.Value);
 
             AddUntilStep("remove all channels", () =>
             {
-                var first = channelTabControl.Items.First();
-                if (first is ChannelSelectorTabItem.ChannelSelectorTabChannel)
-                    return true;
+                foreach (var item in channelTabControl.Items.ToList())
+                {
+                    if (item is ChannelSelectorTabItem.ChannelSelectorTabChannel)
+                        continue;
 
-                channelTabControl.RemoveChannel(first);
-                return false;
+                    channelTabControl.RemoveChannel(item);
+                    return false;
+                }
+
+                return true;
             });
 
             AddAssert("selector tab is active", () => channelTabControl.ChannelSelectorActive.Value);
@@ -117,5 +120,10 @@ namespace osu.Game.Tests.Visual.Online
                 Type = ChannelType.Public,
                 Name = name
             });
+
+        private class TestTabControl : ChannelTabControl
+        {
+            public void SelectChannel(Channel channel) => base.SelectTab(TabMap[channel]);
+        }
     }
 }

@@ -21,9 +21,13 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using System;
+using osu.Framework.Testing;
+using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
 {
+    [ExcludeFromDynamicCompile]
     public class CatchRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
@@ -46,7 +50,7 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new CatchModNightcore();
@@ -140,6 +144,8 @@ namespace osu.Game.Rulesets.Catch
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new CatchLegacySkinTransformer(source);
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new CatchPerformanceCalculator(this, beatmap, score);
 

@@ -9,6 +9,7 @@ using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 // performTabSort might've made selectorTab's position wonky, fix it
                 TabContainer.SetLayoutPosition(selectorTab, float.MaxValue);
 
-            ((ChannelTabItem)item).OnRequestClose += tabCloseRequested;
+            ((ChannelTabItem)item).OnRequestClose += channelItem => OnRequestLeave?.Invoke(channelItem.Value);
 
             base.AddTabItem(item, addToDropdown);
         }
@@ -67,21 +68,20 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (!Items.Contains(channel))
                 AddItem(channel);
 
-            if (Current.Value == null)
-                Current.Value = channel;
+            Current.Value ??= channel;
         }
 
         /// <summary>
         /// Removes a channel from the ChannelTabControl.
-        /// If the selected channel is the one that is beeing removed, the next available channel will be selected.
+        /// If the selected channel is the one that is being removed, the next available channel will be selected.
         /// </summary>
         /// <param name="channel">The channel that is going to be removed.</param>
         public void RemoveChannel(Channel channel)
         {
             RemoveItem(channel);
 
-            if (Current.Value == channel)
-                Current.Value = Items.FirstOrDefault();
+            if (SelectedTab == null)
+                SelectTab(selectorTab);
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
@@ -96,19 +96,17 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
-        private void tabCloseRequested(TabItem<Channel> tab)
+        protected override TabFillFlowContainer CreateTabFlow() => new ChannelTabFillFlowContainer
         {
-            int totalTabs = TabContainer.Count - 1; // account for selectorTab
-            int currentIndex = Math.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
+            Direction = FillDirection.Full,
+            RelativeSizeAxes = Axes.Both,
+            Depth = -1,
+            Masking = true
+        };
 
-            if (tab == SelectedTab && totalTabs > 1)
-                // Select the tab after tab-to-be-removed's index, or the tab before if current == last
-                SelectTab(TabContainer[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
-            else if (totalTabs == 1 && !selectorTab.Active.Value)
-                // Open channel selection overlay if all channel tabs will be closed after removing this tab
-                SelectTab(selectorTab);
-
-            OnRequestLeave?.Invoke(tab.Value);
+        private class ChannelTabFillFlowContainer : TabFillFlowContainer
+        {
+            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }

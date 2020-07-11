@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             InternalChildren = new Drawable[]
             {
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         RelativeSizeAxes = Axes.Both,
                         BackgroundColour = Color4.Black,
                         Direction = BarDirection.LeftToRight,
-                        AccentColour = colours.Yellow
+                        AccentColour = colourProvider.Highlight1
                     }
                 },
                 levelProgressText = new OsuSpriteText

@@ -2,34 +2,25 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
 {
     [Cached(typeof(TournamentGameBase))]
-    public abstract class TournamentGameBase : OsuGameBase
+    public class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
 
@@ -37,12 +28,10 @@ namespace osu.Game.Tournament
 
         private Storage storage;
 
+        private TournamentStorage tournamentStorage;
+
         private DependencyContainer dependencies;
-
-        private Bindable<Size> windowSize;
         private FileBasedIPC ipc;
-
-        private Drawable heightWarning;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -50,70 +39,24 @@ namespace osu.Game.Tournament
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage, FrameworkConfigManager frameworkConfig)
+        private void load(Storage storage)
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
-            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
+            dependencies.CacheAs(tournamentStorage = new TournamentStorage(storage));
 
-            Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
+            Textures.AddStore(new TextureLoaderStore(tournamentStorage));
 
             this.storage = storage;
-
-            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
-            windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
-            {
-                var minWidth = (int)(size.NewValue.Height / 9f * 16 + 400);
-
-                heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
-            }), true);
 
             readBracket();
 
             ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
+            dependencies.CacheAs(new StableInfo(storage));
+
             dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
-
-            AddRange(new[]
-            {
-                new TourneyButton
-                {
-                    Text = "Save Changes",
-                    Width = 140,
-                    Height = 50,
-                    Depth = float.MinValue,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Padding = new MarginPadding(10),
-                    Action = SaveChanges,
-                },
-                heightWarning = new Container
-                {
-                    Masking = true,
-                    CornerRadius = 5,
-                    Depth = float.MinValue,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Color4.Red,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "Please make the window wider",
-                            Font = OsuFont.Default.With(weight: "bold"),
-                            Colour = Color4.White,
-                            Padding = new MarginPadding(20)
-                        }
-                    }
-                },
-            });
         }
 
         private void readBracket()
@@ -124,13 +67,9 @@ namespace osu.Game.Tournament
                 using (var sr = new StreamReader(stream))
                     ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
             }
-            else
-            {
-                ladder = new LadderInfo();
-            }
 
-            if (ladder.Ruleset.Value == null)
-                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
+            ladder ??= new LadderInfo();
+            ladder.Ruleset.Value ??= RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
 
@@ -205,9 +144,11 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    if (p.Username == null || p.Statistics == null)
+                    if (string.IsNullOrEmpty(p.Username) || p.Statistics == null)
+                    {
                         PopulateUser(p);
-                    addedInfo = true;
+                        addedInfo = true;
+                    }
                 }
             }
 
@@ -223,15 +164,40 @@ namespace osu.Game.Tournament
 
             foreach (var r in ladder.Rounds)
             {
-                foreach (var b in r.Beatmaps)
+                foreach (var b in r.Beatmaps.ToList())
                 {
-                    if (b.BeatmapInfo == null && b.ID > 0)
+                    if (b.BeatmapInfo != null)
+                        continue;
+
+                    if (b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                         API.Perform(req);
                         b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                         addedInfo = true;
+                    }
+
+                    if (b.BeatmapInfo == null)
+                        // if online population couldn't be performed, ensure we don't leave a null value behind
+                        r.Beatmaps.Remove(b);
+                }
+            }
+
+            foreach (var t in ladder.Teams)
+            {
+                foreach (var s in t.SeedingResults)
+                {
+                    foreach (var b in s.Beatmaps)
+                    {
+                        if (b.BeatmapInfo == null && b.ID > 0)
+                        {
+                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                            req.Perform(API);
+                            b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+
+                            addedInfo = true;
+                        }
                     }
                 }
             }
@@ -265,6 +231,8 @@ namespace osu.Game.Tournament
         protected override void LoadComplete()
         {
             MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
+
+            // we don't want to show the menu cursor as it would appear on stream output.
             MenuCursorContainer.Cursor.Alpha = 0;
 
             base.LoadComplete();
@@ -296,7 +264,7 @@ namespace osu.Game.Tournament
 
         private class TournamentInputManager : UserInputManager
         {
-            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {
                 switch (button)
                 {
@@ -304,7 +272,7 @@ namespace osu.Game.Tournament
                         return new RightMouseManager(button);
                 }
 
-                return base.CreateButtonManagerFor(button);
+                return base.CreateButtonEventManagerFor(button);
             }
 
             private class RightMouseManager : MouseButtonEventManager

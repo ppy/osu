@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Mania.Tests
         private const double time_after_tail = 5250;
 
         private List<JudgementResult> judgementResults;
-        private bool allJudgedFired;
 
         /// <summary>
         ///     -----[           ]-----
@@ -283,20 +282,15 @@ namespace osu.Game.Rulesets.Mania.Tests
                     {
                         if (currentPlayer == p) judgementResults.Add(result);
                     };
-                    p.ScoreProcessor.AllJudged += () =>
-                    {
-                        if (currentPlayer == p) allJudgedFired = true;
-                    };
                 };
 
                 LoadScreen(currentPlayer = p);
-                allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddUntilStep("Wait for all judged", () => allJudgedFired);
+            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer

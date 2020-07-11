@@ -3,7 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
 namespace osu.Game.Online
@@ -11,7 +11,7 @@ namespace osu.Game.Online
     /// <summary>
     /// A component which requires a constant polling process.
     /// </summary>
-    public abstract class PollingComponent : Component
+    public abstract class PollingComponent : CompositeDrawable // switch away from Component because InternalChildren are used in usages.
     {
         private double? lastTimePolled;
 

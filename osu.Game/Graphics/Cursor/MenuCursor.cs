@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osuTK.Input;
 using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Cursor
@@ -74,17 +73,15 @@ namespace osu.Game.Graphics.Cursor
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             // only trigger animation for main mouse buttons
-            if (e.Button <= MouseButton.Right)
-            {
-                activeCursor.Scale = new Vector2(1);
-                activeCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
+            activeCursor.Scale = new Vector2(1);
+            activeCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
 
-                activeCursor.AdditiveLayer.Alpha = 0;
-                activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
-            }
+            activeCursor.AdditiveLayer.Alpha = 0;
+            activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
 
-            if (e.Button == MouseButton.Left && cursorRotate.Value)
+            if (cursorRotate.Value && dragRotationState != DragRotationState.Rotating)
             {
+                // if cursor is already rotating don't reset its rotate origin
                 dragRotationState = DragRotationState.DragStarted;
                 positionMouseDown = e.MousePosition;
             }
@@ -92,22 +89,21 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
+            if (!e.HasAnyButtonPressed)
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 activeCursor.ScaleTo(1, 500, Easing.OutElastic);
-            }
 
-            if (e.Button == MouseButton.Left)
-            {
-                if (dragRotationState == DragRotationState.Rotating)
+                if (dragRotationState != DragRotationState.NotDragging)
+                {
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
-                dragRotationState = DragRotationState.NotDragging;
+                    dragRotationState = DragRotationState.NotDragging;
+                }
             }
 
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void PopIn()

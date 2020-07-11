@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class StarCounter : Container
     {
-        private readonly Container<Star> stars;
+        private readonly FillFlowContainer<Star> stars;
 
         /// <summary>
         /// Maximum amount of stars displayed.
@@ -23,34 +23,29 @@ namespace osu.Game.Graphics.UserInterface
         /// </remarks>
         public int StarCount { get; }
 
-        private double animationDelay => 80;
+        /// <summary>
+        /// The added delay for each subsequent star to be animated.
+        /// </summary>
+        protected virtual double AnimationDelay => 80;
 
-        private double scalingDuration => 1000;
-        private Easing scalingEasing => Easing.OutElasticHalf;
-        private float minStarScale => 0.4f;
-
-        private double fadingDuration => 100;
-        private float minStarAlpha => 0.5f;
-
-        private const float star_size = 20;
         private const float star_spacing = 4;
 
-        private float countStars;
+        private float current;
 
         /// <summary>
         /// Amount of stars represented.
         /// </summary>
-        public float CountStars
+        public float Current
         {
-            get => countStars;
+            get => current;
 
             set
             {
-                if (countStars == value) return;
+                if (current == value) return;
 
                 if (IsLoaded)
-                    transformCount(value);
-                countStars = value;
+                    animate(value);
+                current = value;
             }
         }
 
@@ -71,10 +66,12 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
-                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => new Star { Alpha = minStarAlpha })
+                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => CreateStar())
                 }
             };
         }
+
+        public virtual Star CreateStar() => new DefaultStar();
 
         protected override void LoadComplete()
         {
@@ -86,63 +83,60 @@ namespace osu.Game.Graphics.UserInterface
 
         public void ResetCount()
         {
-            countStars = 0;
+            current = 0;
             StopAnimation();
         }
 
         public void ReplayAnimation()
         {
-            var t = countStars;
+            var t = current;
             ResetCount();
-            CountStars = t;
+            Current = t;
         }
 
         public void StopAnimation()
         {
-            int i = 0;
-
+            animate(current);
             foreach (var star in stars.Children)
+                star.FinishTransforms(true);
+        }
+
+        private float getStarScale(int i, float value) => i + 1 <= value ? 1.0f : Interpolation.ValueAt(value, 0, 1.0f, i, i + 1);
+
+        private void animate(float newValue)
+        {
+            for (var i = 0; i < stars.Children.Count; i++)
             {
+                var star = stars.Children[i];
+
                 star.ClearTransforms(true);
-                star.FadeTo(i < countStars ? 1.0f : minStarAlpha);
-                star.Icon.ScaleTo(getStarScale(i, countStars));
-                i++;
+
+                double delay = (current <= newValue ? Math.Max(i - current, 0) : Math.Max(current - 1 - i, 0)) * AnimationDelay;
+
+                using (star.BeginDelayedSequence(delay, true))
+                    star.DisplayAt(getStarScale(i, newValue));
             }
         }
 
-        private float getStarScale(int i, float value)
+        public class DefaultStar : Star
         {
-            if (value <= i)
-                return minStarScale;
+            private const double scaling_duration = 1000;
 
-            return i + 1 <= value ? 1.0f : Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
-        }
+            private const double fading_duration = 100;
 
-        private void transformCount(float newValue)
-        {
-            int i = 0;
+            private const Easing scaling_easing = Easing.OutElasticHalf;
 
-            foreach (var star in stars.Children)
-            {
-                star.ClearTransforms(true);
+            private const float min_star_scale = 0.4f;
 
-                var delay = (countStars <= newValue ? Math.Max(i - countStars, 0) : Math.Max(countStars - 1 - i, 0)) * animationDelay;
-                star.Delay(delay).FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
-                star.Icon.Delay(delay).ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
+            private const float star_size = 20;
 
-                i++;
-            }
-        }
-
-        private class Star : Container
-        {
             public readonly SpriteIcon Icon;
 
-            public Star()
+            public DefaultStar()
             {
                 Size = new Vector2(star_size);
 
-                Child = Icon = new SpriteIcon
+                InternalChild = Icon = new SpriteIcon
                 {
                     Size = new Vector2(star_size),
                     Icon = FontAwesome.Solid.Star,
@@ -150,6 +144,19 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.Centre,
                 };
             }
+
+            public override void DisplayAt(float scale)
+            {
+                scale = Math.Clamp(scale, min_star_scale, 1);
+
+                this.FadeTo(scale, fading_duration);
+                Icon.ScaleTo(scale, scaling_duration, scaling_easing);
+            }
+        }
+
+        public abstract class Star : CompositeDrawable
+        {
+            public abstract void DisplayAt(float scale);
         }
     }
 }

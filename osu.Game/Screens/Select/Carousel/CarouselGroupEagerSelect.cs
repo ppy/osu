@@ -90,11 +90,15 @@ namespace osu.Game.Screens.Select.Carousel
             PerformSelection();
         }
 
+        protected virtual CarouselItem GetNextToSelect()
+        {
+            return Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
+                   Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+        }
+
         protected virtual void PerformSelection()
         {
-            CarouselItem nextToSelect =
-                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            CarouselItem nextToSelect = GetNextToSelect();
 
             if (nextToSelect != null)
                 nextToSelect.State.Value = CarouselItemState.Selected;
@@ -104,7 +108,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateSelected(CarouselItem newSelection)
         {
-            LastSelected = newSelection;
+            if (newSelection != null)
+                LastSelected = newSelection;
             updateSelectedIndex();
         }
 

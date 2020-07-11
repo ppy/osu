@@ -1,21 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : TabControlOverlayHeader
+    public class ProfileHeader : TabControlOverlayHeader<string>
     {
         private UserCoverBackground coverContainer;
 
@@ -26,8 +23,6 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            BackgroundHeight = 150;
-
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("info");
@@ -36,18 +31,12 @@ namespace osu.Game.Overlays.Profile
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            TabControl.AccentColour = colours.Seafoam;
-            TitleBackgroundColour = colours.GreySeafoamDarker;
-            ControlBackgroundColour = colours.GreySeafoam;
-        }
-
         protected override Drawable CreateBackground() =>
             new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                Height = 150,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     coverContainer = new UserCoverBackground
@@ -57,7 +46,7 @@ namespace osu.Game.Overlays.Profile
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(OsuColour.FromHex("222").Opacity(0.8f), OsuColour.FromHex("222").Opacity(0.2f))
+                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("222").Opacity(0.8f), Color4Extensions.FromHex("222").Opacity(0.2f))
                     },
                 }
             };
@@ -97,25 +86,17 @@ namespace osu.Game.Overlays.Profile
             }
         };
 
-        protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
         private void updateDisplay(User user) => coverContainer.User = user;
 
-        private class ProfileHeaderTitle : ScreenTitle
+        private class ProfileHeaderTitle : OverlayTitle
         {
             public ProfileHeaderTitle()
             {
-                Title = "player";
-                Section = "info";
+                Title = "player info";
+                IconTexture = "Icons/profile";
             }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Seafoam;
-            }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }
