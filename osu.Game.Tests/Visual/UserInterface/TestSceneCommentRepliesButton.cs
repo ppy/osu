@@ -26,22 +26,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    new TestButton
-                    {
-                        Action = () => { }
-                    },
-                    new LoadRepliesButton
-                    {
-                        Action = () => { }
-                    },
-                    new ShowRepliesButton(1)
-                    {
-                        Action = () => { }
-                    },
+                    new TestButton(),
+                    new LoadRepliesButton(),
+                    new ShowRepliesButton(1),
                     new ShowRepliesButton(2)
-                    {
-                        Action = () => { }
-                    }
                 }
             };
         }

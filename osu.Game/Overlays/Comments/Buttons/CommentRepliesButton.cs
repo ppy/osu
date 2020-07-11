@@ -1,100 +1,109 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
-    public abstract class CommentRepliesButton : OsuHoverContainer
+    public abstract class CommentRepliesButton : CompositeDrawable
     {
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+        public Action Action { get; set; }
 
-        protected ChevronIcon Icon;
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
+        protected SpriteIcon Icon;
         private Box background;
 
-        public CommentRepliesButton()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            Add(new CircularContainer
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Masking = true,
-                Children = new Drawable[]
+                new CircularContainer
                 {
-                    background = new Box
+                    AutoSizeAxes = Axes.Both,
+                    Masking = true,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Margin = new MarginPadding
+                        background = new Box
                         {
-                            Vertical = 5,
-                            Horizontal = 10,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background2
                         },
-                        Child = new FillFlowContainer
+                        new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(15, 0),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Children = new Drawable[]
+                            Margin = new MarginPadding
                             {
-                                new OsuSpriteText
+                                Vertical = 5,
+                                Horizontal = 10,
+                            },
+                            Child = new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(15, 0),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                                    Text = GetText()
-                                },
-                                Icon = new ChevronIcon
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                        Text = GetText()
+                                    },
+                                    Icon = new SpriteIcon
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Size = new Vector2(7.5f),
+                                        Icon = FontAwesome.Solid.ChevronDown,
+                                        Colour = colourProvider.Foreground1
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-
-            IdleColour = colourProvider.Background2;
-            HoverColour = colourProvider.Background1;
+                },
+                new HoverClickSounds(),
+            };
         }
 
         protected abstract string GetText();
 
-        protected class ChevronIcon : SpriteIcon
+        protected override bool OnHover(HoverEvent e)
         {
-            public ChevronIcon()
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                Size = new Vector2(7.5f);
-                Icon = FontAwesome.Solid.ChevronDown;
-            }
+            base.OnHover(e);
+            background.FadeColour(colourProvider.Background1, 200, Easing.OutQuint);
+            Icon.FadeColour(colourProvider.Light1, 200, Easing.OutQuint);
+            return true;
+        }
 
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                Colour = colourProvider.Foreground1;
-            }
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
+            Icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            Action?.Invoke();
+            return base.OnClick(e);
         }
     }
 }
