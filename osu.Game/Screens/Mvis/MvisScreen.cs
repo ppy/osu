@@ -660,12 +660,17 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap, float displayDelay = 0)
         {
+            if ( SBOverlayProxy != null )
+            {
+                bgSB.Remove(SBOverlayProxy);
+                gameplayContent.Remove(SBOverlayProxy);
+                SBOverlayProxy = null;
+            }
+
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             Background.Beatmap = beatmap;
             Background.BlurAmount.Value = BgBlur.Value * 100;
-
-            SBOverlayProxy = null;
 
             this.Schedule(() =>
             {
