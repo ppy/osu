@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Catch.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -70,10 +71,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public float DisplayRadius => DrawSize.X / 2 * Scale.X * HitObject.Scale;
 
+        protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
+
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
-            RelativePositionAxes = Axes.X;
             X = hitObject.X;
         }
 
@@ -90,10 +92,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (timeOffset >= 0 && Result != null)
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
-
-        protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
-
-        protected override void UpdateInitialTransforms() => this.FadeInFromZero(200);
 
         protected override void UpdateStateTransforms(ArmedState state)
         {

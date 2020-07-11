@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -71,6 +72,23 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestMenuMakesMusic()
+        {
+            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+            Track track() => beatmap().Track;
+
+            TestSongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestSongSelect());
+
+            AddUntilStep("wait for no track", () => track() is TrackVirtual);
+
+            AddStep("return to menu", () => songSelect.Exit());
+
+            AddUntilStep("wait for track", () => !(track() is TrackVirtual) && track().IsRunning);
+        }
+
+        [Test]
         public void TestExitSongSelectWithClick()
         {
             TestSongSelect songSelect = null;
@@ -112,6 +130,22 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Options overlay was opened", () => Game.Settings.State.Value == Visibility.Visible);
             AddStep("Hide options overlay using escape", () => pressAndRelease(Key.Escape));
             AddAssert("Options overlay was closed", () => Game.Settings.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestWaitForNextTrackInMenu()
+        {
+            bool trackCompleted = false;
+
+            AddUntilStep("Wait for music controller", () => Game.MusicController.IsLoaded);
+            AddStep("Seek close to end", () =>
+            {
+                Game.MusicController.SeekTo(Game.Beatmap.Value.Track.Length - 1000);
+                Game.Beatmap.Value.Track.Completed += () => trackCompleted = true;
+            });
+
+            AddUntilStep("Track was completed", () => trackCompleted);
+            AddUntilStep("Track was restarted", () => Game.Beatmap.Value.Track.IsRunning);
         }
 
         private void pushEscape() =>

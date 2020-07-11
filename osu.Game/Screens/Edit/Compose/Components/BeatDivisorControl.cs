@@ -279,6 +279,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 handleMouseInput(e.ScreenSpaceMousePosition);
             }
 
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                handleMouseInput(e.ScreenSpaceMousePosition);
+            }
+
             private void handleMouseInput(Vector2 screenSpaceMousePosition)
             {
                 // copied from SliderBar so we can do custom spacing logic.

@@ -7,20 +7,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Mania.Edit;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    [Cached(Type = typeof(IManiaHitObjectComposer))]
-    public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene, IManiaHitObjectComposer
+    public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene
     {
         private readonly Column column;
 
@@ -41,16 +39,20 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AccentColour = Color4.OrangeRed,
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
+        }
 
-            AddStep("change direction", () => ((ScrollingTestContainer)HitObjectContainer).Flip());
+        protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)
+        {
+            var time = column.TimeAtScreenSpacePosition(InputManager.CurrentState.Mouse.Position);
+            var pos = column.ScreenSpacePositionAtTime(time);
+
+            return new SnapResult(pos, time, column);
         }
 
         protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };
 
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
 
-        public Column ColumnAt(Vector2 screenSpacePosition) => column;
-
-        public int TotalColumns => 1;
+        public ManiaPlayfield Playfield => null;
     }
 }

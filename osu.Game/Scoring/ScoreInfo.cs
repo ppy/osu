@@ -115,9 +115,7 @@ namespace osu.Game.Scoring
             get => User?.Username;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Username = value;
             }
         }
@@ -129,9 +127,7 @@ namespace osu.Game.Scoring
             get => User?.Id ?? 1;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Id = value ?? 1;
             }
         }
@@ -169,6 +165,10 @@ namespace osu.Game.Scoring
                 Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(value);
             }
         }
+
+        [NotMapped]
+        [JsonIgnore]
+        public List<HitEvent> HitEvents { get; set; }
 
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }

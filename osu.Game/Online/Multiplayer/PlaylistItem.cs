@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -37,7 +36,7 @@ namespace osu.Game.Online.Multiplayer
         public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
-        private APIBeatmap apiBeatmap { get; set; }
+        private APIPlaylistBeatmap apiBeatmap { get; set; }
 
         private APIMod[] allowedModsBacking;
 
@@ -65,9 +64,7 @@ namespace osu.Game.Online.Multiplayer
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            // If we don't have an api beatmap, the request occurred as a result of room creation, so we can query the local beatmap instead
-            // Todo: Is this a bug? Room creation only returns the beatmap ID
-            Beatmap.Value = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
+            Beatmap.Value = apiBeatmap.ToBeatmap(rulesets);
             Ruleset.Value = rulesets.GetRuleset(RulesetID);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();

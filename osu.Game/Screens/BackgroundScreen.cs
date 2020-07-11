@@ -30,7 +30,7 @@ namespace osu.Game.Screens
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            //we don't want to handle escape key.
+            // we don't want to handle escape key.
             return false;
         }
 

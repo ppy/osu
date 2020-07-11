@@ -16,6 +16,8 @@ namespace osu.Game.Beatmaps.Drawables
     {
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
+        protected override double LoadDelay => 500;
+
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 

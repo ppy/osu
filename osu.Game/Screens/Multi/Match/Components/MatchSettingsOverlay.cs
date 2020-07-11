@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"28242d"),
+                                Colour = Color4Extensions.FromHex(@"28242d"),
                             },
                             new GridContainer
                             {
@@ -133,7 +133,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        OnCommit = (sender, text) => apply(),
                                                                     },
                                                                 },
                                                                 new Section("Duration")
@@ -196,7 +195,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                                 new Section("Password (optional)")
@@ -207,7 +205,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         ReadOnly = true,
-                                                                        OnCommit = (sender, text) => apply()
                                                                     },
                                                                 },
                                                             },
@@ -270,7 +267,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = OsuColour.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                                    Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -331,6 +328,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private void apply()
             {
+                if (!ApplyButton.Enabled.Value)
+                    return;
+
                 hideError();
 
                 RoomName.Value = NameField.Text;
@@ -433,7 +433,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             }
         }
 
-        private class CreateRoomButton : TriangleButton
+        public class CreateRoomButton : TriangleButton
         {
             public CreateRoomButton()
             {

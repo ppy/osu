@@ -9,7 +9,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -18,6 +17,7 @@ using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
@@ -25,11 +25,11 @@ namespace osu.Game.Overlays
     public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
     {
         private readonly LoadingSpinner loading;
-        private FillFlowContainer<SocialPanel> panels;
+        private FillFlowContainer<UserPanel> panels;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"60284b");
-        protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"672b51");
-        protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
+        protected override Color4 BackgroundColour => Color4Extensions.FromHex(@"60284b");
+        protected override Color4 TrianglesColourLight => Color4Extensions.FromHex(@"672b51");
+        protected override Color4 TrianglesColourDark => Color4Extensions.FromHex(@"5c2648");
 
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
             Filter.Tabs.Current.ValueChanged += _ => onFilterUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += _ => recreatePanels();
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => recreatePanels();
+            Filter.Dropdown.Current.ValueChanged += _ => recreatePanels();
 
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
@@ -155,10 +155,10 @@ namespace osu.Game.Overlays
                     break;
             }
 
-            if (Filter.DisplayStyleControl.Dropdown.Current.Value == SortDirection.Descending)
+            if (Filter.Dropdown.Current.Value == SortDirection.Descending)
                 sortedUsers = sortedUsers.Reverse();
 
-            var newPanels = new FillFlowContainer<SocialPanel>
+            var newPanels = new FillFlowContainer<UserPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -166,20 +166,21 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding { Top = 10 },
                 ChildrenEnumerable = sortedUsers.Select(u =>
                 {
-                    SocialPanel panel;
+                    UserPanel panel;
 
                     switch (Filter.DisplayStyleControl.DisplayStyle.Value)
                     {
                         case PanelDisplayStyle.Grid:
-                            panel = new SocialGridPanel(u)
+                            panel = new UserGridPanel(u)
                             {
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
+                                Origin = Anchor.TopCentre,
+                                Width = 290,
                             };
                             break;
 
                         default:
-                            panel = new SocialListPanel(u);
+                            panel = new UserListPanel(u);
                             break;
                     }
 
@@ -237,11 +238,5 @@ namespace osu.Game.Overlays
                     break;
             }
         }
-    }
-
-    public enum SortDirection
-    {
-        Ascending,
-        Descending
     }
 }

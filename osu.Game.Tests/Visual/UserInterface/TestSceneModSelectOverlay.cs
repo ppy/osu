@@ -12,14 +12,10 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mania;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
@@ -29,20 +25,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     [Description("mod select and icon display")]
     public class TestSceneModSelectOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ModDisplay),
-            typeof(ModSection),
-            typeof(ModIcon),
-            typeof(ModButton),
-            typeof(ModButtonEmpty),
-            typeof(DifficultyReductionSection),
-            typeof(DifficultyIncreaseSection),
-            typeof(AutomationSection),
-            typeof(ConversionSection),
-            typeof(FunSection),
-        };
-
         private RulesetStore rulesets;
         private ModDisplay modDisplay;
         private TestModSelectOverlay modSelect;
@@ -70,7 +52,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     AutoSizeAxes = Axes.Both,
-                    Position = new Vector2(0, 25),
+                    Position = new Vector2(-5, 25),
                     Current = { BindTarget = modSelect.SelectedMods }
                 }
             };
@@ -91,13 +73,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var easierMods = osu.GetModsFor(ModType.DifficultyReduction);
             var harderMods = osu.GetModsFor(ModType.DifficultyIncrease);
+            var conversionMods = osu.GetModsFor(ModType.Conversion);
 
             var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
-            var spunOutMod = easierMods.FirstOrDefault(m => m is OsuModSpunOut);
+            var targetMod = conversionMods.FirstOrDefault(m => m is OsuModTarget);
 
             var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
             var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
@@ -109,15 +92,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiplierTextColour(noFailMod, () => modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, () => modSelect.HighMultiplierColour);
 
-            testUnimplementedMod(spunOutMod);
+            testUnimplementedMod(targetMod);
         }
 
         [Test]
         public void TestManiaMods()
         {
             changeRuleset(3);
-
-            testRankedText(new ManiaRuleset().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
         }
 
         [Test]
@@ -216,15 +197,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkLabelColor(() => Color4.White);
         }
 
-        private void testRankedText(Mod mod)
-        {
-            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
-            selectNext(mod);
-            AddUntilStep("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
-            selectPrevious(mod);
-            AddUntilStep("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
-        }
-
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
 
         private void selectPrevious(Mod mod) => AddStep($"right click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(-1));
@@ -271,7 +243,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
-            public new OsuSpriteText UnrankedLabel => base.UnrankedLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
