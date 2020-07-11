@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
                     return 0;
 
                 case HitResult.Perfect:
-                    return 0.01;
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.75;
             }
         }
 
