@@ -438,7 +438,9 @@ namespace osu.Game.Screens
                         SBOverlayProxy = bgSB?.SBLayer?.dimmableSB?.OverlayLayerContainer?.CreateProxy();
 
                     bgSB.Remove(SBOverlayProxy);
-                    gameplayContent.Add(SBOverlayProxy);
+
+                    if (SBOverlayProxy != null) //如果SBOverlayProxy仍然为空，可能用户禁用了故事版，跳过添加的过程
+                        gameplayContent.Add(SBOverlayProxy);
 
                     SBOverlayProxy?.FadeIn(500);
                     break;
