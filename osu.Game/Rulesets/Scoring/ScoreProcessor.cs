@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Scoring
     {
         private const double base_portion = 0.3;
         private const double combo_portion = 0.7;
+        private const double accuracy_exponent = 10;
         private const double max_score = 1000000;
 
         /// <summary>
@@ -189,7 +190,10 @@ namespace osu.Game.Rulesets.Scoring
             {
                 default:
                 case ScoringMode.Standardised:
-                    return (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier;
+                    double accuracyPortion = base_portion * Math.Pow(baseScore / maxBaseScore, accuracy_exponent);
+                    double comboPortion = combo_portion * HighestCombo.Value / maxHighestCombo;
+
+                    return (max_score * (accuracyPortion + comboPortion) + bonusScore) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
