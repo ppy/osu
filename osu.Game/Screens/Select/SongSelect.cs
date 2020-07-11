@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        protected ModSelectOverlay ModSelect { get; private set; }
+        public ModSelectOverlay ModSelect { get; private set; }
 
         protected SampleChannel SampleConfirm { get; private set; }
 

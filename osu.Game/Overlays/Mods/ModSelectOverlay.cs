@@ -231,7 +231,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 Width = 180,
                                                 Text = "Deselect All",
-                                                Action = DeselectAll,
+                                                Action = () => DeselectAll(),
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
                                             },
@@ -328,10 +328,10 @@ namespace osu.Game.Overlays.Mods
             sampleOff = audio.Samples.Get(@"UI/check-off");
         }
 
-        public void DeselectAll()
+        public void DeselectAll(bool immediate = false)
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.DeselectAll();
+                section.DeselectAll(immediate);
 
             refreshSelectedMods();
         }
