@@ -29,6 +29,10 @@ namespace osu.Game.Overlays.Comments.Buttons
         private void load()
         {
             AutoSizeAxes = Axes.Both;
+            Margin = new MarginPadding
+            {
+                Vertical = 2
+            };
             InternalChildren = new Drawable[]
             {
                 new CircularContainer

@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding(margin) { Left = margin + 5 },
+                            Padding = new MarginPadding(margin) { Left = margin + 5, Top = Comment.IsTopLevel ? 10 : 0 },
                             Child = content = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.X,
