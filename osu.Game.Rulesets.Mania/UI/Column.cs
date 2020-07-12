@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnHitObjectArea hitObjectArea;
+        public readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
 
