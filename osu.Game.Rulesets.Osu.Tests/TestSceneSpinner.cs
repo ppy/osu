@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (auto && !userTriggered && Time.Current > Spinner.StartTime + Spinner.Duration / 2 && Progress < 1)
                 {
                     // force completion only once to not break human interaction
-                    Disc.RotationAbsolute = Spinner.SpinsRequired * 360;
+                    Disc.CumulativeRotation = Spinner.SpinsRequired * 360;
                     auto = false;
                 }
 

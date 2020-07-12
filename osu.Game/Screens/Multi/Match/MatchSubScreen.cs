@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -53,9 +52,10 @@ namespace osu.Game.Screens.Multi.Match
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         private MatchSettingsOverlay settingsOverlay;
-        private OverlinedLeaderboard leaderboard;
+        private MatchLeaderboard leaderboard;
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
+        private OverlinedHeader participantsHeader;
 
         public MatchSubScreen(Room room)
         {
@@ -85,11 +85,22 @@ namespace osu.Game.Screens.Multi.Match
                                 Child = new GridContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(),
+                                    },
                                     Content = new[]
                                     {
+                                        new Drawable[] { new Components.Header() },
                                         new Drawable[]
                                         {
-                                            new Components.Header()
+                                            participantsHeader = new OverlinedHeader("Participants")
+                                            {
+                                                ShowLine = false
+                                            }
                                         },
                                         new Drawable[]
                                         {
@@ -97,12 +108,10 @@ namespace osu.Game.Screens.Multi.Match
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Margin = new MarginPadding { Top = 10 },
-                                                Child = new OverlinedParticipants(Direction.Horizontal)
+                                                Margin = new MarginPadding { Top = 5 },
+                                                Child = new ParticipantsDisplay(Direction.Horizontal)
                                                 {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    ShowLine = false
+                                                    Details = { BindTarget = participantsHeader.Details }
                                                 }
                                             }
                                         },
@@ -124,30 +133,26 @@ namespace osu.Game.Screens.Multi.Match
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Content = new[]
                                                                 {
+                                                                    new Drawable[] { new OverlinedHeader("Playlist"), },
                                                                     new Drawable[]
                                                                     {
-                                                                        new OverlinedPlaylist(true) // Temporarily always allow selection
+                                                                        new DrawableRoomPlaylistWithResults
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                            SelectedItem = { BindTarget = SelectedItem }
+                                                                            Items = { BindTarget = playlist },
+                                                                            SelectedItem = { BindTarget = SelectedItem },
+                                                                            RequestShowResults = item =>
+                                                                            {
+                                                                                Debug.Assert(roomId.Value != null);
+                                                                                multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, item, false));
+                                                                            }
                                                                         }
                                                                     },
-                                                                    null,
-                                                                    new Drawable[]
-                                                                    {
-                                                                        new TriangleButton
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X,
-                                                                            Text = "Show beatmap results",
-                                                                            Action = showBeatmapResults
-                                                                        }
-                                                                    }
                                                                 },
                                                                 RowDimensions = new[]
                                                                 {
+                                                                    new Dimension(GridSizeMode.AutoSize),
                                                                     new Dimension(),
-                                                                    new Dimension(GridSizeMode.Absolute, 5),
-                                                                    new Dimension(GridSizeMode.AutoSize)
                                                                 }
                                                             }
                                                         },
@@ -157,18 +162,16 @@ namespace osu.Game.Screens.Multi.Match
                                                             RelativeSizeAxes = Axes.Both,
                                                             Content = new[]
                                                             {
-                                                                new Drawable[]
-                                                                {
-                                                                    leaderboard = new OverlinedLeaderboard { RelativeSizeAxes = Axes.Both },
-                                                                },
-                                                                new Drawable[]
-                                                                {
-                                                                    new OverlinedChatDisplay { RelativeSizeAxes = Axes.Both }
-                                                                }
+                                                                new Drawable[] { new OverlinedHeader("Leaderboard"), },
+                                                                new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
+                                                                new Drawable[] { new OverlinedHeader("Chat"), },
+                                                                new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
                                                             },
                                                             RowDimensions = new[]
                                                             {
+                                                                new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(),
+                                                                new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 240),
                                                             }
                                                         },
@@ -185,12 +188,6 @@ namespace osu.Game.Screens.Multi.Match
                                             }
                                         }
                                     },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(),
-                                    }
                                 }
                             }
                         },
@@ -290,12 +287,6 @@ namespace osu.Game.Screens.Multi.Match
                     }));
                     break;
             }
-        }
-
-        private void showBeatmapResults()
-        {
-            Debug.Assert(roomId.Value != null);
-            multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, SelectedItem.Value, false));
         }
     }
 }

@@ -19,12 +19,14 @@ namespace osu.Game.Overlays.SearchableList
     {
         private const float padding = 10;
 
-        private readonly Container filterContainer;
+        private readonly Drawable filterContainer;
+        private readonly Drawable rightFilterContainer;
         private readonly Box tabStrip;
 
         public readonly SearchTextBox Search;
         public readonly PageTabControl<TTab> Tabs;
-        public readonly DisplayStyleControl<TCategory> DisplayStyleControl;
+        public readonly SlimEnumDropdown<TCategory> Dropdown;
+        public readonly DisplayStyleControl DisplayStyleControl;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract TTab DefaultTab { get; }
@@ -42,7 +44,7 @@ namespace osu.Game.Overlays.SearchableList
 
             var controls = CreateSupplementaryControls();
             Container controlsContainer;
-            Children = new Drawable[]
+            Children = new[]
             {
                 filterContainer = new Container
                 {
@@ -104,11 +106,27 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
-                DisplayStyleControl = new DisplayStyleControl<TCategory>
+                rightFilterContainer = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                },
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        Dropdown = new SlimEnumDropdown<TCategory>
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            RelativeSizeAxes = Axes.None,
+                            Width = 160f,
+                        },
+                        DisplayStyleControl = new DisplayStyleControl
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        },
+                    }
+                }
             };
 
             if (controls != null) controlsContainer.Children = new[] { controls };
@@ -116,8 +134,8 @@ namespace osu.Game.Overlays.SearchableList
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
 
-            DisplayStyleControl.Dropdown.Current.Value = DefaultCategory;
-            DisplayStyleControl.Dropdown.Current.TriggerChange();
+            Dropdown.Current.Value = DefaultCategory;
+            Dropdown.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
@@ -131,13 +149,11 @@ namespace osu.Game.Overlays.SearchableList
             base.Update();
 
             Height = filterContainer.Height;
-            DisplayStyleControl.Margin = new MarginPadding { Top = filterContainer.Height - 35, Right = SearchableListOverlay.WIDTH_PADDING };
+            rightFilterContainer.Margin = new MarginPadding { Top = filterContainer.Height - 30, Right = ContentHorizontalPadding };
         }
 
         private class FilterSearchTextBox : SearchTextBox
         {
-            protected override bool AllowCommit => true;
-
             [BackgroundDependencyLoader]
             private void load()
             {
