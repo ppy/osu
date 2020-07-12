@@ -251,6 +251,7 @@ namespace osu.Game.Screens.Play.HUD
                 switch (action)
                 {
                     case GlobalAction.Back:
+                    case GlobalAction.PauseGameplay:
                         if (!pendingAnimation)
                             BeginConfirm();
                         return true;
