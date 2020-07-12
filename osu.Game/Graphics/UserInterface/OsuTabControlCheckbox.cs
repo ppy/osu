@@ -32,12 +32,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
 
-                if (Current.Value)
-                {
-                    text.Colour = AccentColour;
-                    icon.Colour = AccentColour;
-                }
-
                 updateFade();
             }
         }
@@ -89,6 +83,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
                 text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
+
+                updateFade();
             };
         }
 
@@ -115,8 +111,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateFade()
         {
-            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
-            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
+            box.FadeTo(Current.Value || IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+            text.FadeColour(Current.Value || IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
         }
     }
 }
