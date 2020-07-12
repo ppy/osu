@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
-        public void DeselectAll(bool immediate = false) => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null), immediate);
+        public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
 
         /// <summary>
         /// Deselect one or more mods in this section.
