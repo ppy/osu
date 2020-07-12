@@ -388,9 +388,8 @@ namespace osu.Game.Online.Leaderboards
 
         private void getMods()
         {
-            songSelect.ModSelect.DeselectAll(true);
-
-            songSelect.Mods.Value = score.Mods;
+            if (songSelect != null)
+                songSelect.Mods.Value = score.Mods;
         }
     }
 }
