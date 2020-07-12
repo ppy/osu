@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        protected readonly SpriteIcon Icon;
+        private readonly SpriteIcon icon;
         private readonly Box background;
         private readonly OsuSpriteText text;
 
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Comments.Buttons
                                         Origin = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
                                     },
-                                    Icon = new SpriteIcon
+                                    icon = new SpriteIcon
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
@@ -94,14 +94,16 @@ namespace osu.Game.Overlays.Comments.Buttons
         private void load()
         {
             background.Colour = colourProvider.Background2;
-            Icon.Colour = colourProvider.Foreground1;
+            icon.Colour = colourProvider.Foreground1;
         }
+
+        protected void ToggleIcon(bool upwards) => icon.ScaleTo(new Vector2(1, upwards ? -1 : 1));
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
             background.FadeColour(colourProvider.Background1, 200, Easing.OutQuint);
-            Icon.FadeColour(colourProvider.Light1, 200, Easing.OutQuint);
+            icon.FadeColour(colourProvider.Light1, 200, Easing.OutQuint);
             return true;
         }
 
@@ -109,7 +111,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         {
             base.OnHoverLost(e);
             background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
-            Icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
+            icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)
