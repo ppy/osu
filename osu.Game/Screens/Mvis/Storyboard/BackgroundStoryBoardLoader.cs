@@ -169,6 +169,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
 
+            SBLayer = null;
+
             if ( !EnableSB.Value )
             {
                 IsReady.Value = true;
