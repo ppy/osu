@@ -15,6 +15,8 @@ namespace osu.Game.Overlays
 {
     public class NewsOverlay : FullscreenOverlay
     {
+        private readonly Bindable<string> article = new Bindable<string>(null);
+
         private Container content;
         private LoadingLayer loading;
         private NewsHeader header;
@@ -46,7 +48,10 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new NewsHeader(),
+                            header = new NewsHeader
+                            {
+                                ShowFrontPage = ShowFrontPage
+                            },
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -62,34 +67,36 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            header.Post.BindValueChanged(onPostChanged, true);
+            article.BindValueChanged(onArticleChanged, true);
         }
 
         public void ShowFrontPage()
         {
-            header.SetFrontPage();
+            article.Value = null;
             Show();
         }
 
         public void ShowArticle(string slug)
         {
-            header.SetArticle(slug);
+            article.Value = slug;
             Show();
         }
 
         private CancellationTokenSource cancellationToken;
 
-        private void onPostChanged(ValueChangedEvent<string> post)
+        private void onArticleChanged(ValueChangedEvent<string> e)
         {
             cancellationToken?.Cancel();
             loading.Show();
 
-            if (post.NewValue == NewsHeader.FRONT_PAGE_STRING)
+            if (e.NewValue == null)
             {
+                header.SetFrontPage();
                 LoadDisplay(new FrontPageDisplay());
                 return;
             }
 
+            header.SetArticle(e.NewValue);
             LoadDisplay(Empty());
         }
 
