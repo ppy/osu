@@ -95,7 +95,6 @@ namespace osu.Game.Screens.Select
             CarouselRoot newRoot = new CarouselRoot(this);
 
             beatmapSets.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
-            newRoot.Filter(activeCriteria);
 
             // preload drawables as the ctor overhead is quite high currently.
             _ = newRoot.Drawables;
@@ -107,6 +106,9 @@ namespace osu.Game.Screens.Select
             scrollableContent.Clear(false);
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
+
+            // the filter criteria may have changed since the above filter operation.
+            FlushPendingFilterOperations();
 
             // Run on late scheduler want to ensure this runs after all pending UpdateBeatmapSet / RemoveBeatmapSet operations are run.
             SchedulerAfterChildren.Add(() =>
@@ -321,6 +323,9 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection could be made, else False.</returns>
         public bool SelectNextRandom()
         {
+            if (!AllowSelection)
+                return false;
+
             var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
             if (!visibleSets.Any())
                 return false;
@@ -427,7 +432,19 @@ namespace osu.Game.Screens.Select
 
         private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
-            if (root.Children.Any() != true) return;
+            PendingFilter?.Cancel();
+            PendingFilter = null;
+
+            if (debounce)
+                PendingFilter = Scheduler.AddDelayed(perform, 250);
+            else
+            {
+                // if initial load is not yet finished, this will be run inline in loadBeatmapSets to ensure correct order of operation.
+                if (!BeatmapSetsLoaded)
+                    PendingFilter = Schedule(perform);
+                else
+                    perform();
+            }
 
             void perform()
             {
@@ -439,14 +456,6 @@ namespace osu.Game.Screens.Select
                 if (alwaysResetScrollPosition || !scroll.UserScrolling)
                     ScrollToSelected();
             }
-
-            PendingFilter?.Cancel();
-            PendingFilter = null;
-
-            if (debounce)
-                PendingFilter = Scheduler.AddDelayed(perform, 250);
-            else
-                perform();
         }
 
         private float? scrollTarget;
