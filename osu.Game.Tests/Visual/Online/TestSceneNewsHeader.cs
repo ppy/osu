@@ -17,14 +17,14 @@ namespace osu.Game.Tests.Visual.Online
         private TestHeader header;
 
         [SetUp]
-        public void Setup()
+        public void Setup() => Schedule(() =>
         {
             Child = header = new TestHeader
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
-        }
+        });
 
         [Test]
         public void TestControl()
