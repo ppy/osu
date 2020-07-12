@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        public readonly ColumnHitObjectArea hitObjectArea;
+        public readonly ColumnHitObjectArea HitObjectArea;
 
         internal readonly Container TopLevelContainer;
 
-        public Container UnderlayElements => hitObjectArea.UnderlayElements;
+        public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
         public Column(int index)
         {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
+            TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 RelativeSizeAxes = Axes.Both
             };
 
-            hitObjectArea.Explosions.Add(explosion);
+            HitObjectArea.Explosions.Add(explosion);
 
             explosion.Delay(200).Expire(true);
         }
