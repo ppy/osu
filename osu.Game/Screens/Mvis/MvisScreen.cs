@@ -385,7 +385,7 @@ namespace osu.Game.Screens
                 switch (bgSB.IsReady.Value)
                 {
                     case true:
-                        UpdateStoryboardProxy(SBEnableProxy.Value);
+                        UpdateStoryboardProxy(SBEnableProxy.Value, true);
                         loadingSpinner.Hide();
                         break;
 
@@ -428,16 +428,27 @@ namespace osu.Game.Screens
             }
         }
 
-        private void UpdateStoryboardProxy(bool v)
+        private void UpdateStoryboardProxy(bool v, bool isBeatmapChanged = false)
         {
+            //重置proxy
+            if (SBOverlayProxy != null) //如果SBOverlayProxy不是空，则从背景和面板容器中移除
+            {
+                bgSB.Remove(SBOverlayProxy);
+                gameplayContent.Remove(SBOverlayProxy);
+                if ( isBeatmapChanged ) SBOverlayProxy = null;
+            }
+
+            if (SBOverlayProxy == null || SBOverlayProxy is Box) //如果SBOverlayProxy为空或为Box(没有故事版时的占位),则赋值
+            {
+                SBOverlayProxy = bgSB?.SBLayer?.dimmableSB?.OverlayLayerContainer?.CreateProxy() ?? new Box();
+            }
+
             if ( !bgSB.IsReady.Value ) return;
             switch(v)
             {
                 case true:
-                    if (SBOverlayProxy == null)
-                        SBOverlayProxy = bgSB?.SBLayer?.dimmableSB?.OverlayLayerContainer?.CreateProxy();
-
                     bgSB.Remove(SBOverlayProxy);
+
                     gameplayContent.Add(SBOverlayProxy);
 
                     SBOverlayProxy?.FadeIn(500);
@@ -660,13 +671,6 @@ namespace osu.Game.Screens
 
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap, float displayDelay = 0)
         {
-            if ( SBOverlayProxy != null )
-            {
-                bgSB.Remove(SBOverlayProxy);
-                gameplayContent.Remove(SBOverlayProxy);
-                SBOverlayProxy = null;
-            }
-
             Beatmap.Value.Track.Looping = loopToggleButton.ToggleableValue.Value;
 
             Background.Beatmap = beatmap;
