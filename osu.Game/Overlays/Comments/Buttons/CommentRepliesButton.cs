@@ -19,14 +19,20 @@ namespace osu.Game.Overlays.Comments.Buttons
     {
         public Action Action { get; set; }
 
+        protected string Text
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        protected SpriteIcon Icon;
-        private Box background;
+        protected readonly SpriteIcon Icon;
+        private readonly Box background;
+        private readonly OsuSpriteText text;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public CommentRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
             Margin = new MarginPadding
@@ -43,8 +49,7 @@ namespace osu.Game.Overlays.Comments.Buttons
                     {
                         background = new Box
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background2
+                            RelativeSizeAxes = Axes.Both
                         },
                         new Container
                         {
@@ -63,20 +68,18 @@ namespace osu.Game.Overlays.Comments.Buttons
                                 Origin = Anchor.Centre,
                                 Children = new Drawable[]
                                 {
-                                    new OsuSpriteText
+                                    text = new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                                        Text = GetText()
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
                                     },
                                     Icon = new SpriteIcon
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Size = new Vector2(7.5f),
-                                        Icon = FontAwesome.Solid.ChevronDown,
-                                        Colour = colourProvider.Foreground1
+                                        Icon = FontAwesome.Solid.ChevronDown
                                     }
                                 }
                             }
@@ -87,7 +90,12 @@ namespace osu.Game.Overlays.Comments.Buttons
             };
         }
 
-        protected abstract string GetText();
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            background.Colour = colourProvider.Background2;
+            Icon.Colour = colourProvider.Foreground1;
+        }
 
         protected override bool OnHover(HoverEvent e)
         {

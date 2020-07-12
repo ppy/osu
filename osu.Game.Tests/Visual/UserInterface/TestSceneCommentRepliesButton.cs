@@ -36,7 +36,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestButton : CommentRepliesButton
         {
-            protected override string GetText() => "sample text";
+            public TestButton()
+            {
+                Text = "sample text";
+            }
         }
     }
 }
