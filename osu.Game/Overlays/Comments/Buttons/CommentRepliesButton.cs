@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         private readonly Box background;
         private readonly OsuSpriteText text;
 
-        public CommentRepliesButton()
+        protected CommentRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
             Margin = new MarginPadding
