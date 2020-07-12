@@ -5,6 +5,9 @@ namespace osu.Game.Overlays.Comments.Buttons
 {
     public class LoadRepliesButton : CommentRepliesButton
     {
-        protected override string GetText() => "load replies";
+        public LoadRepliesButton()
+        {
+            Text = "load replies";
+        }
     }
 }

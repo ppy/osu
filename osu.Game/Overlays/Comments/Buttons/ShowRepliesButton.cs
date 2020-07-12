@@ -13,11 +13,9 @@ namespace osu.Game.Overlays.Comments.Buttons
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 
-        private readonly int count;
-
         public ShowRepliesButton(int count)
         {
-            this.count = count;
+            Text = "reply".ToQuantity(count);
         }
 
         protected override void LoadComplete()
@@ -36,7 +34,5 @@ namespace osu.Game.Overlays.Comments.Buttons
             Expanded.Toggle();
             return base.OnClick(e);
         }
-
-        protected override string GetText() => "reply".ToQuantity(count);
     }
 }
