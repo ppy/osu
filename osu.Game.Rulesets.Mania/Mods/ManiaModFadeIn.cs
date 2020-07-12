@@ -30,9 +30,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
 
-        private const float lanecover_size_filled = 0.5f;
-        private const float lanecover_size_gradient = 0.25f;
-
         public void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             ManiaPlayfield maniaPlayfield = (ManiaPlayfield)drawableRuleset.Playfield;
@@ -42,8 +39,8 @@ namespace osu.Game.Rulesets.Mania.Mods
                 column.HitObjectArea.ChildrenOfType<BufferedContainer>().First().Add(new LaneCover(false)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SizeFilled = lanecover_size_filled,
-                    SizeGradient = lanecover_size_gradient
+                    SizeFilled = 0.5f,
+                    SizeGradient = 0.25f
                 });
             }
         }
