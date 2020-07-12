@@ -252,6 +252,12 @@ namespace osu.Game.Rulesets.Scoring
             HighestCombo.Value = 0;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            hitEvents.Clear();
+        }
+
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
@@ -269,7 +275,7 @@ namespace osu.Game.Rulesets.Scoring
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 score.Statistics[result] = GetStatistic(result);
 
-            score.HitEvents = new List<HitEvent>(hitEvents);
+            score.HitEvents = hitEvents;
         }
 
         /// <summary>
