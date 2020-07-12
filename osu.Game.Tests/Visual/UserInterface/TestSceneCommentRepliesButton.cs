@@ -7,6 +7,9 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 using osuTK;
+using NUnit.Framework;
+using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -14,6 +17,8 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+        private readonly TestButton button;
 
         public TestSceneCommentRepliesButton()
         {
@@ -26,7 +31,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    new TestButton(),
+                    button = new TestButton(),
                     new LoadRepliesButton(),
                     new ShowRepliesButton(1),
                     new ShowRepliesButton(2)
@@ -34,12 +39,25 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
+        [Test]
+        public void TestArrowRotation()
+        {
+            AddStep("Toggle icon up", () => button.ToggleIcon(true));
+            AddAssert("Icon facing upwards", () => button.Icon.Scale.Y == -1);
+            AddStep("Toggle icon down", () => button.ToggleIcon(false));
+            AddAssert("Icon facing downwards", () => button.Icon.Scale.Y == 1);
+        }
+
         private class TestButton : CommentRepliesButton
         {
+            public SpriteIcon Icon => InternalChildren.OfType<CircularContainer>().First().Children.OfType<Container>().First().Children.OfType<FillFlowContainer>().First().Children.OfType<SpriteIcon>().First();
+
             public TestButton()
             {
                 Text = "sample text";
             }
+
+            public new void ToggleIcon(bool upwards) => base.ToggleIcon(upwards);
         }
     }
 }
