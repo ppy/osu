@@ -3,9 +3,7 @@
 
 using Humanizer;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osuTK;
 
 namespace osu.Game.Overlays.Comments.Buttons
 {
@@ -21,12 +19,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Expanded.BindValueChanged(onExpandedChanged, true);
-        }
-
-        private void onExpandedChanged(ValueChangedEvent<bool> expanded)
-        {
-            Icon.ScaleTo(new Vector2(1, expanded.NewValue ? -1 : 1));
+            Expanded.BindValueChanged(expanded => ToggleIcon(expanded.NewValue), true);
         }
 
         protected override bool OnClick(ClickEvent e)
