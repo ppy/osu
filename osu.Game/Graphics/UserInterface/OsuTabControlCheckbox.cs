@@ -21,7 +21,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly Box box;
         private readonly SpriteText text;
-        private readonly SpriteIcon icon;
 
         private Color4? accentColour;
 
@@ -46,6 +45,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControlCheckbox()
         {
+            SpriteIcon icon;
+
             AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
