@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -8,41 +9,42 @@ namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        public const string FRONT_PAGE_STRING = "frontpage";
+        private const string front_page_string = "frontpage";
 
-        public readonly Bindable<string> Post = new Bindable<string>(FRONT_PAGE_STRING);
+        public Action ShowFrontPage;
+
+        private readonly Bindable<string> article = new Bindable<string>(null);
 
         public NewsHeader()
         {
-            TabControl.AddItem(FRONT_PAGE_STRING);
-            Current.Value = FRONT_PAGE_STRING;
-            Current.BindValueChanged(onCurrentChanged);
-            Post.BindValueChanged(onPostChanged, true);
-        }
+            TabControl.AddItem(front_page_string);
 
-        public void SetFrontPage() => Post.Value = FRONT_PAGE_STRING;
-
-        public void SetArticle(string slug) => Post.Value = slug;
-
-        private void onCurrentChanged(ValueChangedEvent<string> current)
-        {
-            if (current.NewValue == FRONT_PAGE_STRING)
-                Post.Value = FRONT_PAGE_STRING;
-        }
-
-        private void onPostChanged(ValueChangedEvent<string> post)
-        {
-            if (post.OldValue != FRONT_PAGE_STRING)
-                TabControl.RemoveItem(post.OldValue);
-
-            if (post.NewValue != FRONT_PAGE_STRING)
+            Current.BindValueChanged(e =>
             {
-                TabControl.AddItem(post.NewValue);
-                Current.Value = post.NewValue;
+                if (e.NewValue == front_page_string)
+                    ShowFrontPage?.Invoke();
+            });
+
+            article.BindValueChanged(onArticleChanged, true);
+        }
+
+        public void SetFrontPage() => article.Value = null;
+
+        public void SetArticle(string slug) => article.Value = slug;
+
+        private void onArticleChanged(ValueChangedEvent<string> e)
+        {
+            if (e.OldValue != null)
+                TabControl.RemoveItem(e.OldValue);
+
+            if (e.NewValue != null)
+            {
+                TabControl.AddItem(e.NewValue);
+                Current.Value = e.NewValue;
             }
             else
             {
-                Current.Value = FRONT_PAGE_STRING;
+                Current.Value = front_page_string;
             }
         }
 
