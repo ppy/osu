@@ -10,6 +10,7 @@ using osuTK;
 using NUnit.Framework;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestButton : CommentRepliesButton
         {
-            public SpriteIcon Icon => InternalChildren.OfType<CircularContainer>().First().Children.OfType<Container>().First().Children.OfType<FillFlowContainer>().First().Children.OfType<SpriteIcon>().First();
+            public SpriteIcon Icon => this.ChildrenOfType<SpriteIcon>().First();
 
             public TestButton()
             {
