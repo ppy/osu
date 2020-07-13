@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Select
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
 
-            // the filter criteria may have changed since the above filter operation.
+            // apply any pending filter operation that may have been delayed (see applyActiveCriteria's scheduling behaviour when BeatmapSetsLoaded is false).
             FlushPendingFilterOperations();
 
             // Run on late scheduler want to ensure this runs after all pending UpdateBeatmapSet / RemoveBeatmapSet operations are run.
