@@ -1,6 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
+using osu.Framework.Platform;
+using osu.Game.Database;
+using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace osu.Game.Migrations
