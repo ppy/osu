@@ -376,20 +376,14 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered))
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, getMods));
+                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
 
                 return items.ToArray();
             }
-        }
-
-        private void getMods()
-        {
-            if (songSelect != null)
-                songSelect.Mods.Value = score.Mods;
         }
     }
 }
