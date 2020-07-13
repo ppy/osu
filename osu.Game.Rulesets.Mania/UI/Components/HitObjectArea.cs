@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public HitObjectArea(HitObjectContainer hitObjectContainer)
         {
-            InternalChild = new BufferedContainer
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = HitObjectContainer = hitObjectContainer
