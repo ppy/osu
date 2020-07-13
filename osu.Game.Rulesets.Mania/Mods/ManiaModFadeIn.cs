@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
