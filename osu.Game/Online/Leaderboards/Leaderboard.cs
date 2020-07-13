@@ -170,36 +170,37 @@ namespace osu.Game.Online.Leaderboards
         {
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    Masking = true,
+                    Child = new GridContainer
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            new OsuContextMenuContainer
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Child = scrollContainer = new OsuScrollContainer
+                                scrollContainer = new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarVisible = false,
                                 }
+                            },
+                            new Drawable[]
+                            {
+                                content = new Container
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                },
                             }
                         },
-                        new Drawable[]
-                        {
-                            content = new Container
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                            },
-                        }
                     },
                 },
                 loading = new LoadingSpinner(),
