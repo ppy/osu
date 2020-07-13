@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens;
+using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -23,9 +24,14 @@ namespace osu.Game.Screens
         private Container avatarScroll;
         private FillFlowContainer baseContainer;
 
+        private Bindable<int> Coins = new Bindable<int>();
+        private OsuSpriteText ppCountText;
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, MfConfigManager config)
         {
+            config.BindWith(MfSetting.EasterEggCoinCount, Coins);
+
             Content = new Drawable[]
             {
                 baseContainer = new FillFlowContainer
@@ -111,7 +117,7 @@ namespace osu.Game.Screens
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "最高可拿200pp！",
+                                            Text = "最高可拿1000pp！",
                                             Font = OsuFont.GetFont(size: 30),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
@@ -197,6 +203,7 @@ namespace osu.Game.Screens
                                                     {
                                                         config.Set(MfSetting.EasterEggBGTriangle, false);
                                                         config.Set(MfSetting.EasterEggBGBeatmap, false);
+                                                        config.Set(MfSetting.EasterEggCoinCount, 1000);
                                                     }
                                                 },
                                                 new TriangleButton
@@ -211,6 +218,12 @@ namespace osu.Game.Screens
                                         new OsuSpriteText
                                         {
                                             Text = "不会有任何真实货币将被消耗, 也不会产生任何流量, 请放心游玩",
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                        },
+                                        ppCountText = new OsuSpriteText
+                                        {
+                                            Text = "剩余pp",
                                             Anchor = Anchor.BottomCentre,
                                             Origin = Anchor.BottomCentre,
                                         },
@@ -243,6 +256,8 @@ namespace osu.Game.Screens
                 i.Delay(time + time*count).FadeIn(anim_duration, Easing.OutQuint);
                 count++;
             }
+
+            Coins.BindValueChanged(v => ppCountText.Text = $"剩余pp: {v.NewValue}", true);
         }
     }
 }

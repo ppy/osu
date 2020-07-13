@@ -13,6 +13,7 @@ namespace osu.Game.Screens.Purcashe
 {
     public class PurcasheBasicScreen : ScreenWithBeatmapBackground
     {
+        public override bool HideOverlaysOnEnter => true;
         protected const float anim_duration = 500;
         private MfBgTriangles triangles;
         private BindableBool EnableTriangles = new BindableBool();
@@ -102,7 +103,6 @@ namespace osu.Game.Screens.Purcashe
             this.ScaleTo(0.6f, anim_duration, Easing.OutQuint)
                 .FadeOut(anim_duration, Easing.OutQuint);
         }
-
 
         protected void updateComponentFromBeatmap(WorkingBeatmap beatmap, bool BlurOnly = false)
         {

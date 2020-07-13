@@ -47,6 +47,7 @@ namespace osu.Game.Configuration
             //Easter Eggs
             Set(MfSetting.EasterEggBGBeatmap, false);
             Set(MfSetting.EasterEggBGTriangle, false);
+            Set(MfSetting.EasterEggCoinCount, 1000, 0, int.MaxValue/2);
         }
     }
 
@@ -71,5 +72,6 @@ namespace osu.Game.Configuration
         IntroLoadDirectToSongSelect,
         EasterEggBGTriangle,
         EasterEggBGBeatmap,
+        EasterEggCoinCount
     }
 }

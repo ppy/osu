@@ -149,9 +149,13 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.SetRecordTarget(recordingReplay = new Replay());
         }
 
+        private MfConfigManager mfConfig;
+
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config)
+        private void load(AudioManager audio, OsuConfigManager config, MfConfigManager mfConfig)
         {
+            this.mfConfig = mfConfig;
+
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)
@@ -674,6 +678,8 @@ namespace osu.Game.Screens.Play
                 this.Push(CreateResults(CreateScore()));
                 return;
             }
+
+            mfConfig.Set(MfSetting.EasterEggCoinCount, (mfConfig.Get<int>(MfSetting.EasterEggCoinCount) + 100) );
 
             LegacyByteArrayReader replayReader = null;
 

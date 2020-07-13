@@ -1,4 +1,5 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -6,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -24,12 +26,16 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         private OsuScrollContainer panelScroll;
         private TriangleButton unMaskAllButton;
 
+        private Bindable<int> Coins = new Bindable<int>();
+        private OsuSpriteText ppCountText;
         protected virtual string ScreenTitle => null;
         protected virtual int ItemCount => 0;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(MfConfigManager config)
         {
+            config.BindWith(MfSetting.EasterEggCoinCount, Coins);
+
             Content = new Drawable[]
             {
                 new Container
@@ -45,12 +51,29 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.8f), Color4.Black.Opacity(0))
                         },
-                        new OsuSpriteText
+                        new FillFlowContainer
                         {
+                            AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = ScreenTitle ?? Title,
-                            Font = OsuFont.GetFont(size: 60)
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = ScreenTitle ?? Title,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Font = OsuFont.GetFont(size: 60)
+                                },
+                                ppCountText = new OsuSpriteText
+                                {
+                                    Text = "剩余pp",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Font = OsuFont.GetFont(size: 30)
+                                },
+                            }
                         }
                     }
                 },
@@ -111,6 +134,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         {
             base.LoadComplete();
 
+            Coins.BindValueChanged(v => ppCountText.Text = $"剩余pp: {v.NewValue}", true);
             loadingSpinner.Show();
             this.Delay(500).Schedule(() => CreatePanels());
         }
@@ -144,7 +168,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                     Rank = RandomRank(),
                     TexturePath = RandomTexture(),
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Origin = Anchor.Centre,
                 });
             }
 
@@ -172,7 +196,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
         private int RandomPP()
         {
-            return RNG.Next(-200, 200);
+            return RNG.Next(-400, 400);
         }
 
         private RankStats RandomRank()
@@ -200,7 +224,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 "Backgrounds/bg1",
                 "Backgrounds/bg2",
                 "Backgrounds/bg3",
-                "Backgrounds/registration",
+                //"Backgrounds/registration",
                 "Menu/menu-background-1",
                 "Menu/menu-background-2",
                 "Menu/menu-background-3",
