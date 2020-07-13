@@ -9,13 +9,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Threading;
+using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class RoomsContainer : CompositeDrawable
+    public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public Action<Room> JoinRequested;
 
@@ -73,14 +77,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     if (!string.IsNullOrEmpty(criteria.SearchString))
                         matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
-                    switch (criteria.SecondaryFilter)
-                    {
-                        default:
-                        case SecondaryFilter.Public:
-                            matchingFilter &= r.Room.Availability.Value == RoomAvailability.Public;
-                            break;
-                    }
-
                     r.MatchingFilter = matchingFilter;
                 }
             });
@@ -88,8 +84,22 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void addRooms(IEnumerable<Room> rooms)
         {
-            foreach (var r in rooms)
-                roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
+            foreach (var room in rooms)
+            {
+                roomFlow.Add(new DrawableRoom(room)
+                {
+                    Action = () =>
+                    {
+                        if (room == selectedRoom.Value)
+                        {
+                            joinSelected();
+                            return;
+                        }
+
+                        selectRoom(room);
+                    }
+                });
+            }
 
             Filter(filter?.Value);
         }
@@ -115,15 +125,99 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void selectRoom(Room room)
         {
-            var drawable = roomFlow.FirstOrDefault(r => r.Room == room);
-
-            if (drawable != null && drawable.State == SelectionState.Selected)
-                JoinRequested?.Invoke(room);
-            else
-                roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
-
+            roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
             selectedRoom.Value = room;
         }
+
+        private void joinSelected()
+        {
+            if (selectedRoom.Value == null) return;
+
+            JoinRequested?.Invoke(selectedRoom.Value);
+        }
+
+        #region Key selection logic (shared with BeatmapCarousel)
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    joinSelected();
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    beginRepeatSelection(() => selectNext(1), action);
+                    return true;
+
+                case GlobalAction.SelectPrevious:
+                    beginRepeatSelection(() => selectNext(-1), action);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.SelectNext:
+                case GlobalAction.SelectPrevious:
+                    endRepeatSelection(action);
+                    break;
+            }
+        }
+
+        private ScheduledDelegate repeatDelegate;
+        private object lastRepeatSource;
+
+        /// <summary>
+        /// Begin repeating the specified selection action.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        /// <param name="source">The source of the action. Used in conjunction with <see cref="endRepeatSelection"/> to only cancel the correct action (most recently pressed key).</param>
+        private void beginRepeatSelection(Action action, object source)
+        {
+            endRepeatSelection();
+
+            lastRepeatSource = source;
+            repeatDelegate = this.BeginKeyRepeat(Scheduler, action);
+        }
+
+        private void endRepeatSelection(object source = null)
+        {
+            // only the most recent source should be able to cancel the current action.
+            if (source != null && !EqualityComparer<object>.Default.Equals(lastRepeatSource, source))
+                return;
+
+            repeatDelegate?.Cancel();
+            repeatDelegate = null;
+            lastRepeatSource = null;
+        }
+
+        private void selectNext(int direction)
+        {
+            var visibleRooms = Rooms.AsEnumerable().Where(r => r.IsPresent);
+
+            Room room;
+
+            if (selectedRoom.Value == null)
+                room = visibleRooms.FirstOrDefault()?.Room;
+            else
+            {
+                if (direction < 0)
+                    visibleRooms = visibleRooms.Reverse();
+
+                room = visibleRooms.SkipWhile(r => r.Room != selectedRoom.Value).Skip(1).FirstOrDefault()?.Room;
+            }
+
+            // we already have a valid selection only change selection if we still have a room to switch to.
+            if (room != null)
+                selectRoom(room);
+        }
+
+        #endregion
 
         protected override void Dispose(bool isDisposing)
         {

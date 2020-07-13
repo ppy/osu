@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -142,6 +143,8 @@ namespace osu.Game.Screens.Multi
             joinedRoom = null;
         }
 
+        private readonly HashSet<int> ignoredRooms = new HashSet<int>();
+
         /// <summary>
         /// Invoked when the listing of all <see cref="Room"/>s is received from the server.
         /// </summary>
@@ -163,11 +166,27 @@ namespace osu.Game.Screens.Multi
                     continue;
                 }
 
-                var r = listing[i];
-                r.Position.Value = i;
+                var room = listing[i];
 
-                update(r, r);
-                addRoom(r);
+                Debug.Assert(room.RoomID.Value != null);
+
+                if (ignoredRooms.Contains(room.RoomID.Value.Value))
+                    continue;
+
+                room.Position.Value = i;
+
+                try
+                {
+                    update(room, room);
+                    addRoom(room);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Failed to update room: {room.Name.Value}.");
+
+                    ignoredRooms.Add(room.RoomID.Value.Value);
+                    rooms.Remove(room);
+                }
             }
 
             RoomsUpdated?.Invoke();
@@ -299,7 +318,7 @@ namespace osu.Game.Screens.Multi
                 var tcs = new TaskCompletionSource<bool>();
 
                 pollReq?.Cancel();
-                pollReq = new GetRoomsRequest(currentFilter.Value.PrimaryFilter);
+                pollReq = new GetRoomsRequest(currentFilter.Value.StatusFilter, currentFilter.Value.RoomCategoryFilter);
 
                 pollReq.Success += result =>
                 {

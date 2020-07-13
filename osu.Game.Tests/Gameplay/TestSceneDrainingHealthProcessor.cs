@@ -157,6 +157,24 @@ namespace osu.Game.Tests.Gameplay
             assertHealthNotEqualTo(1);
         }
 
+        [Test]
+        public void TestBonusObjectsExcludedFromDrain()
+        {
+            var beatmap = new Beatmap
+            {
+                BeatmapInfo = { BaseDifficulty = { DrainRate = 10 } },
+            };
+
+            beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 0 });
+            for (double time = 0; time < 5000; time += 100)
+                beatmap.HitObjects.Add(new JudgeableHitObject(false) { StartTime = time });
+            beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 5000 });
+
+            createProcessor(beatmap);
+            setTime(4900); // Get close to the second combo-affecting object
+            assertHealthNotEqualTo(0);
+        }
+
         private Beatmap createBeatmap(double startTime, double endTime, params BreakPeriod[] breaks)
         {
             var beatmap = new Beatmap
@@ -197,8 +215,25 @@ namespace osu.Game.Tests.Gameplay
 
         private class JudgeableHitObject : HitObject
         {
-            public override Judgement CreateJudgement() => new Judgement();
+            private readonly bool affectsCombo;
+
+            public JudgeableHitObject(bool affectsCombo = true)
+            {
+                this.affectsCombo = affectsCombo;
+            }
+
+            public override Judgement CreateJudgement() => new TestJudgement(affectsCombo);
             protected override HitWindows CreateHitWindows() => new HitWindows();
+
+            private class TestJudgement : Judgement
+            {
+                public override bool AffectsCombo { get; }
+
+                public TestJudgement(bool affectsCombo)
+                {
+                    AffectsCombo = affectsCombo;
+                }
+            }
         }
     }
 }

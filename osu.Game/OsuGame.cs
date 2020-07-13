@@ -767,7 +767,7 @@ namespace osu.Game
                         Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
-                            Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
                             return true;
                         }
                     }));
@@ -888,6 +888,10 @@ namespace osu.Game
 
                 case GlobalAction.ToggleDirect:
                     beatmapListing.ToggleVisibility();
+                    return true;
+
+                case GlobalAction.ToggleNotifications:
+                    notifications.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:

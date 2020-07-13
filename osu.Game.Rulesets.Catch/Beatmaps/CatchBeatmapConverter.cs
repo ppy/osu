@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         Path = curveData.Path,
                         NodeSamples = curveData.NodeSamples,
                         RepeatCount = curveData.RepeatCount,
-                        X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
+                        X = positionData?.X ?? 0,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
                         LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         Samples = obj.Samples,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
-                        X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH
+                        X = positionData?.X ?? 0
                     }.Yield();
             }
         }

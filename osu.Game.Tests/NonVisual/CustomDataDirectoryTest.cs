@@ -19,24 +19,18 @@ namespace osu.Game.Tests.NonVisual
     [TestFixture]
     public class CustomDataDirectoryTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            if (Directory.Exists(customPath))
-                Directory.Delete(customPath, true);
-        }
-
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestDefaultDirectory)))
+            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestDefaultDirectory)))
             {
                 try
                 {
+                    string defaultStorageLocation = getDefaultLocationFor(nameof(TestDefaultDirectory));
+
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
 
-                    string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestDefaultDirectory));
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
                 }
                 finally
@@ -46,21 +40,14 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
-        private string customPath => Path.Combine(RuntimeInfo.StartupDirectory, "custom-path");
-
         [Test]
         public void TestCustomDirectory()
         {
-            using (var host = new HeadlessGameHost(nameof(TestCustomDirectory)))
+            string customPath = prepareCustomPath();
+
+            using (var host = new CustomTestHeadlessGameHost(nameof(TestCustomDirectory)))
             {
-                string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestCustomDirectory));
-
-                // need access before the game has constructed its own storage yet.
-                Storage storage = new DesktopStorage(defaultStorageLocation, host);
-                // manual cleaning so we can prepare a config file.
-                storage.DeleteDirectory(string.Empty);
-
-                using (var storageConfig = new StorageConfigManager(storage))
+                using (var storageConfig = new StorageConfigManager(host.InitialStorage))
                     storageConfig.Set(StorageConfig.FullPath, customPath);
 
                 try
@@ -68,7 +55,7 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
 
                     // switch to DI'd storage
-                    storage = osu.Dependencies.Get<Storage>();
+                    var storage = osu.Dependencies.Get<Storage>();
 
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
                 }
@@ -82,16 +69,11 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestSubDirectoryLookup()
         {
-            using (var host = new HeadlessGameHost(nameof(TestSubDirectoryLookup)))
+            string customPath = prepareCustomPath();
+
+            using (var host = new CustomTestHeadlessGameHost(nameof(TestSubDirectoryLookup)))
             {
-                string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestSubDirectoryLookup));
-
-                // need access before the game has constructed its own storage yet.
-                Storage storage = new DesktopStorage(defaultStorageLocation, host);
-                // manual cleaning so we can prepare a config file.
-                storage.DeleteDirectory(string.Empty);
-
-                using (var storageConfig = new StorageConfigManager(storage))
+                using (var storageConfig = new StorageConfigManager(host.InitialStorage))
                     storageConfig.Set(StorageConfig.FullPath, customPath);
 
                 try
@@ -99,7 +81,7 @@ namespace osu.Game.Tests.NonVisual
                     var osu = loadOsu(host);
 
                     // switch to DI'd storage
-                    storage = osu.Dependencies.Get<Storage>();
+                    var storage = osu.Dependencies.Get<Storage>();
 
                     string actualTestFile = Path.Combine(customPath, "rulesets", "test");
 
@@ -120,12 +102,19 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigration()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigration)))
+            string customPath = prepareCustomPath();
+
+            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigration)))
             {
                 try
                 {
+                    string defaultStorageLocation = getDefaultLocationFor(nameof(TestMigration));
+
                     var osu = loadOsu(host);
                     var storage = osu.Dependencies.Get<Storage>();
+
+                    // Store the current storage's path. We'll need to refer to this for assertions in the original directory after the migration completes.
+                    string originalDirectory = storage.GetFullPath(".");
 
                     // ensure we perform a save
                     host.Dependencies.Get<FrameworkConfigManager>().Save();
@@ -136,8 +125,6 @@ namespace osu.Game.Tests.NonVisual
                     // for testing nested files are not ignored (only top level)
                     host.Storage.GetStorageForDirectory("test-nested").GetStorageForDirectory("cache");
 
-                    string defaultStorageLocation = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(TestMigration));
-
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(defaultStorageLocation));
 
                     osu.Migrate(customPath);
@@ -145,25 +132,25 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(storage.GetFullPath("."), Is.EqualTo(customPath));
 
                     // ensure cache was not moved
-                    Assert.That(host.Storage.ExistsDirectory("cache"));
+                    Assert.That(Directory.Exists(Path.Combine(originalDirectory, "cache")));
 
                     // ensure nested cache was moved
-                    Assert.That(!host.Storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
+                    Assert.That(!Directory.Exists(Path.Combine(originalDirectory, "test-nested", "cache")));
                     Assert.That(storage.ExistsDirectory(Path.Combine("test-nested", "cache")));
 
                     foreach (var file in OsuStorage.IGNORE_FILES)
                     {
-                        Assert.That(host.Storage.Exists(file), Is.True);
+                        Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
                     foreach (var dir in OsuStorage.IGNORE_DIRECTORIES)
                     {
-                        Assert.That(host.Storage.ExistsDirectory(dir), Is.True);
+                        Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
                         Assert.That(storage.ExistsDirectory(dir), Is.False);
                     }
 
-                    Assert.That(new StreamReader(host.Storage.GetStream("storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
+                    Assert.That(new StreamReader(Path.Combine(originalDirectory, "storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));
                 }
                 finally
                 {
@@ -175,13 +162,14 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationBetweenTwoTargets()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationBetweenTwoTargets)))
+            string customPath = prepareCustomPath();
+            string customPath2 = prepareCustomPath("-2");
+
+            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationBetweenTwoTargets)))
             {
                 try
                 {
                     var osu = loadOsu(host);
-
-                    string customPath2 = $"{customPath}-2";
 
                     const string database_filename = "client.db";
 
@@ -204,7 +192,9 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToSameTargetFails()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSameTargetFails)))
+            string customPath = prepareCustomPath();
+
+            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationToSameTargetFails)))
             {
                 try
                 {
@@ -223,7 +213,9 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToNestedTargetFails()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToNestedTargetFails)))
+            string customPath = prepareCustomPath();
+
+            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationToNestedTargetFails)))
             {
                 try
                 {
@@ -250,7 +242,9 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMigrationToSeeminglyNestedTarget()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestMigrationToSeeminglyNestedTarget)))
+            string customPath = prepareCustomPath();
+
+            using (HeadlessGameHost host = new CustomTestHeadlessGameHost(nameof(TestMigrationToSeeminglyNestedTarget)))
             {
                 try
                 {
@@ -279,6 +273,7 @@ namespace osu.Game.Tests.NonVisual
             var osu = new OsuGameBase();
             Task.Run(() => host.Run(osu));
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
+
             return osu;
         }
 
@@ -290,6 +285,40 @@ namespace osu.Game.Tests.NonVisual
             });
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
+        }
+
+        private static string getDefaultLocationFor(string testTypeName)
+        {
+            string path = Path.Combine(RuntimeInfo.StartupDirectory, "headless", testTypeName);
+
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+
+            return path;
+        }
+
+        private string prepareCustomPath(string suffix = "")
+        {
+            string path = Path.Combine(RuntimeInfo.StartupDirectory, $"custom-path{suffix}");
+
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+
+            return path;
+        }
+
+        public class CustomTestHeadlessGameHost : HeadlessGameHost
+        {
+            public Storage InitialStorage { get; }
+
+            public CustomTestHeadlessGameHost(string name)
+                : base(name)
+            {
+                string defaultStorageLocation = getDefaultLocationFor(name);
+
+                InitialStorage = new DesktopStorage(defaultStorageLocation, this);
+                InitialStorage.DeleteDirectory(string.Empty);
+            }
         }
     }
 }
