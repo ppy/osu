@@ -173,6 +173,7 @@ namespace osu.Game.Online.Leaderboards
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Masking = true,
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
