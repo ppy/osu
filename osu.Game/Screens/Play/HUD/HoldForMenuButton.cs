@@ -265,6 +265,7 @@ namespace osu.Game.Screens.Play.HUD
                 switch (action)
                 {
                     case GlobalAction.Back:
+                    case GlobalAction.PauseGameplay:
                         AbortConfirm();
                         break;
                 }
