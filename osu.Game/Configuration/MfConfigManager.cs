@@ -43,6 +43,10 @@ namespace osu.Game.Configuration
             Set(MfSetting.MvisEnableBgTriangles, true);
             Set(MfSetting.MvisEnableSBOverlayProxy, true);
             Set(MfSetting.UseSayobot, true);
+
+            //Easter Eggs
+            Set(MfSetting.EasterEggBGBeatmap, false);
+            Set(MfSetting.EasterEggBGTriangle, false);
         }
     }
 
@@ -64,6 +68,8 @@ namespace osu.Game.Configuration
         MvisEnableSBOverlayProxy,
         SamplePlaybackGain,
         SongSelectBgBlur,
-        IntroLoadDirectToSongSelect
+        IntroLoadDirectToSongSelect,
+        EasterEggBGTriangle,
+        EasterEggBGBeatmap,
     }
 }

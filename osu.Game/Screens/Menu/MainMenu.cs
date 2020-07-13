@@ -107,6 +107,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMvisButton = onMvis,
+                            OnPurcashe = onPurcashe,
                             OnPurePlayerButton = onPurePlayer,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = confirmAndExit,
@@ -145,6 +146,7 @@ namespace osu.Game.Screens.Menu
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             LoadComponentAsync(mvisScreen = new MvisScreen());
+            LoadComponentAsync(purcasheScreen = new PurcasheScreen());
             LoadComponentAsync(purePlayerScreen = new PurePlayerScreen());
             preloadScreens();
         }
@@ -165,6 +167,9 @@ namespace osu.Game.Screens.Menu
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
 
+            if (purcasheScreen == null)
+                LoadComponentAsync(purcasheScreen = new PurcasheScreen());
+
             if (mvisScreen == null)
                 LoadComponentAsync(mvisScreen = new MvisScreen());
 
@@ -179,6 +184,8 @@ namespace osu.Game.Screens.Menu
         private void onMvis() => this.Push(consumeMvis());
 
         private void onPurePlayer() => this.Push(consumePurePlayer());
+
+        private void onPurcashe() => this.Push(consumePurcashe());
 
         private Screen consumeSongSelect()
         {
@@ -200,6 +207,14 @@ namespace osu.Game.Screens.Menu
             purePlayerScreen = null;
             return s;
         }
+
+        private Screen consumePurcashe()
+        {
+            var s = purcasheScreen;
+            purcasheScreen = null;
+            return s;
+        }
+
         [Resolved]
         private Storage storage { get; set; }
 
@@ -225,6 +240,7 @@ namespace osu.Game.Screens.Menu
         }
 
         private bool exitConfirmed;
+        private PurcasheScreen purcasheScreen;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
