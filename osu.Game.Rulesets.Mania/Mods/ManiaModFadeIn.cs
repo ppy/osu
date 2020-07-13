@@ -35,11 +35,23 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
             {
-                ((BufferedContainer)column.HitObjectArea.HitObjectContainer.Parent).Add(new LaneCover(false)
+                HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
+                Container hocParent = (Container)hoc.Parent;
+
+                hocParent.Remove(hoc);
+                hocParent.Add(new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SizeFilled = 0.5f,
-                    SizeGradient = 0.25f
+                    Children = new Drawable[]
+                    {
+                        hoc,
+                        new LaneCover(false)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            SizeFilled = 0.5f,
+                            SizeGradient = 0.25f
+                        }
+                    }
                 });
             }
         }
