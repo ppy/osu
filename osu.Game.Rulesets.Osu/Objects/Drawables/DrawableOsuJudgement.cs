@@ -62,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (lighting != null)
             {
+                lighting.ResetAnimation();
+
                 if (JudgedObject != null)
                 {
                     lightingColour = JudgedObject.AccentColour.GetBoundCopy();
