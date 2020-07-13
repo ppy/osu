@@ -80,9 +80,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestRecommendedSelection()
         {
-            loadBeatmaps();
+            loadBeatmaps(carouselAdjust: carousel => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.LastOrDefault());
 
-            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.LastOrDefault());
+            AddStep("select last", () => carousel.SelectBeatmap(carousel.BeatmapSets.Last().Beatmaps.Last()));
 
             // check recommended was selected
             advanceSelection(direction: 1, diff: false);
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             loadBeatmaps();
 
-            advanceSelection(direction: 1, diff: false);
+            AddStep("select last", () => carousel.SelectBeatmap(carousel.BeatmapSets.First().Beatmaps.First()));
             waitForSelection(1, 1);
 
             advanceSelection(direction: 1, diff: true);
@@ -707,9 +707,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null)
         {
-            createCarousel();
+            createCarousel(carouselAdjust);
 
             if (beatmapSets == null)
             {
@@ -730,17 +730,21 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Wait for load", () => changed);
         }
 
-        private void createCarousel(Container target = null)
+        private void createCarousel(Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
         {
             AddStep("Create carousel", () =>
             {
                 selectedSets.Clear();
                 eagerSelectedIDs.Clear();
 
-                (target ?? this).Child = carousel = new TestBeatmapCarousel
+                carousel = new TestBeatmapCarousel
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
+
+                carouselAdjust?.Invoke(carousel);
+
+                (target ?? this).Child = carousel;
             });
         }
 
