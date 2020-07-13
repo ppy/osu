@@ -56,7 +56,6 @@ namespace osu.Game.Graphics
             public BackgroundTriangles(bool highLight = false, float triangleScaleValue = 2f)
             {
                 RelativeSizeAxes = Axes.Both;
-                Masking = true;
                 this.highLight = highLight;
                 this.scale = triangleScaleValue;
                 Child = triangles = new Triangles

@@ -18,8 +18,6 @@ namespace osu.Game.Screens
 {
     public class PurcasheScreen : PurcasheBasicScreen
     {
-        private const float anim_duration = 500;
-
         private Container contentContainer;
         private FillFlowContainer buttonsFillFlow;
         private Container avatarScroll;
@@ -110,6 +108,13 @@ namespace osu.Game.Screens
                                             Font = OsuFont.GetFont(size: 30),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "最高可拿200pp！",
+                                            Font = OsuFont.GetFont(size: 30),
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
                                         }
                                     }
                                 },
@@ -160,12 +165,13 @@ namespace osu.Game.Screens
                                             LayoutDuration = anim_duration,
                                             LayoutEasing = Easing.OutQuint,
                                             Name = "Button FillFlow",
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Margin = new MarginPadding{Vertical = 15},
-                                            Spacing = new Vector2(10),
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 0.9f,
                                             Anchor = Anchor.BottomCentre,
                                             Origin = Anchor.BottomCentre,
+                                            Margin = new MarginPadding{Vertical = 15},
+                                            Spacing = new Vector2(10),
                                             Children = new Drawable[]
                                             {
                                                 new TriangleButton
@@ -193,11 +199,18 @@ namespace osu.Game.Screens
                                                         config.Set(MfSetting.EasterEggBGBeatmap, false);
                                                     }
                                                 },
+                                                new TriangleButton
+                                                {
+                                                    Alpha = 0,
+                                                    Width = 120,
+                                                    Text = "退出",
+                                                    Action = () => this.Exit()
+                                                },
                                             }
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "",
+                                            Text = "不会有任何真实货币将被消耗, 也不会产生任何流量, 请放心游玩",
                                             Anchor = Anchor.BottomCentre,
                                             Origin = Anchor.BottomCentre,
                                         },
@@ -224,27 +237,12 @@ namespace osu.Game.Screens
             var count = 0;
             foreach(var i in buttonsFillFlow)
             {
+                i.Anchor = Anchor.Centre;
+                i.Origin = Anchor.Centre;
+
                 i.Delay(time + time*count).FadeIn(anim_duration, Easing.OutQuint);
                 count++;
             }
-        }
-
-        //切换至后台
-        public override void OnSuspending(IScreen next)
-        {
-            base.OnSuspending(next);
-
-            this.ScaleTo(0.6f, anim_duration, Easing.OutQuint)
-                .FadeOut(anim_duration, Easing.OutQuint);
-        }
-
-        //切换至前台
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-            
-            this.ScaleTo(1f, anim_duration, Easing.OutQuint)
-                .FadeIn(anim_duration, Easing.OutQuint);
         }
     }
 }

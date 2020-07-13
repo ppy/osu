@@ -61,12 +61,12 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                     Child = panelFillFlow = new FillFlowContainer
                     {
                         Name = "Panel Container",
-                        AutoSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         LayoutDuration = 300,
                         LayoutEasing = Easing.OutQuint,
-                        Margin = new MarginPadding{Horizontal = 150},
                         Padding = new MarginPadding{Top = (this.DrawHeight * 0.2f)},
                         Spacing = new Vector2(10)
                     },
@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 panelFillFlow.Add(new ItemPanel()
                 {
                     Alpha = 0,
-                    ItemName = RandomName(),
+                    PPCount = RandomPP(),
                     Rank = RandomRank(),
                     TexturePath = RandomTexture(),
                     Anchor = Anchor.Centre,
@@ -170,22 +170,9 @@ namespace osu.Game.Screens.Purcashe.SubScreens
             }
         }
 
-        private string RandomName()
+        private int RandomPP()
         {
-            string[] texts =
-            {
-                "ppy",
-                "idke",
-                "Pippi",
-                "Yuzu",
-                "Maria",
-                "Mocha",
-                "WhiteCat",
-                "chocomint",
-                "FlyingTuna",
-            };
-
-            return texts[RNG.Next(0, texts.Length)];
+            return RNG.Next(-200, 200);
         }
 
         private RankStats RandomRank()
