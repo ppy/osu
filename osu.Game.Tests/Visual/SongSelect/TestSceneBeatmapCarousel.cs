@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             loadBeatmaps();
 
-            AddStep("select last", () => carousel.SelectBeatmap(carousel.BeatmapSets.First().Beatmaps.First()));
+            AddStep("select first", () => carousel.SelectBeatmap(carousel.BeatmapSets.First().Beatmaps.First()));
             waitForSelection(1, 1);
 
             advanceSelection(direction: 1, diff: true);
