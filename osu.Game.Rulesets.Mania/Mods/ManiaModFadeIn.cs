@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
             {
-                column.HitObjectArea.ChildrenOfType<BufferedContainer>().First().Add(new LaneCover(false)
+                ((BufferedContainer)column.HitObjectArea.HitObjectContainer.Parent).Add(new LaneCover(false)
                 {
                     RelativeSizeAxes = Axes.Both,
                     SizeFilled = 0.5f,

@@ -15,13 +15,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
     public class HitObjectArea : SkinReloadableDrawable
     {
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+        public readonly HitObjectContainer HitObjectContainer;
 
         public HitObjectArea(HitObjectContainer hitObjectContainer)
         {
             InternalChild = new BufferedContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = hitObjectContainer
+                Child = HitObjectContainer = hitObjectContainer
             };
         }
 
