@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             double addition = 1;
 
             // We get an extra addition if we are not a slider or spinner
-            if (current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000)
+            if (current.LastObject is Hit && current.BaseObject is Hit && (current.BaseObject.StartTime - current.LastObject.StartTime) < 1000)
             {
                 if (hasColourChange(current))
                     addition += 0.75;
