@@ -162,7 +162,7 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle notifications")]
         ToggleNotifications,
-        
+
         [Description("Pause")]
         PauseGameplay,
     }
