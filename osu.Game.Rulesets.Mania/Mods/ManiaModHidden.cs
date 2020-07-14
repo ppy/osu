@@ -10,11 +10,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             private readonly Box gradient;
             private readonly Box filled;
             private bool reversed;
-            private readonly Bindable<ManiaScrollingDirection> scrollDirection = new Bindable<ManiaScrollingDirection>();
+            private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
 
             public LaneCover()
             {
@@ -86,9 +86,9 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
 
             [BackgroundDependencyLoader]
-            private void load(ManiaRulesetConfigManager configManager)
+            private void load(IScrollingInfo configManager)
             {
-                scrollDirection.BindTo(configManager.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection));
+                scrollDirection.BindTo(configManager.Direction);
                 scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
             }
 
@@ -105,9 +105,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                 );
             }
 
-            private void onScrollDirectionChanged(ValueChangedEvent<ManiaScrollingDirection> valueChangedEvent)
+            private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> valueChangedEvent)
             {
-                reversed = valueChangedEvent.NewValue == ManiaScrollingDirection.Up;
+                reversed = valueChangedEvent.NewValue == ScrollingDirection.Up;
                 updateCoverage();
             }
 
