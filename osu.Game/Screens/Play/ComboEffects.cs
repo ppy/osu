@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config)
         {
             InternalChild = comboBreakSample = new SkinnableSound(new SampleInfo("combobreak"));
-            alwaysPlay = config.GetBindable<bool>(OsuSetting.AlwaysPlayComboBreak);
+            alwaysPlay = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak);
         }
 
         protected override void LoadComplete()

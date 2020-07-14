@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Always play first combo break sound",
                     Keywords = new[] { "regardless", "combobreak.wav" },
-                    Bindable = config.GetBindable<bool>(OsuSetting.AlwaysPlayComboBreak)
+                    Bindable = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {

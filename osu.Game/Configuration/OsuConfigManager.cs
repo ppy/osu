@@ -91,7 +91,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
             Set(OsuSetting.KeyOverlay, false);
             Set(OsuSetting.PositionalHitSounds, true);
-            Set(OsuSetting.AlwaysPlayComboBreak, false);
+            Set(OsuSetting.AlwaysPlayFirstComboBreak, true);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             Set(OsuSetting.FloatingComments, false);
@@ -181,7 +181,7 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         KeyOverlay,
         PositionalHitSounds,
-        AlwaysPlayComboBreak,
+        AlwaysPlayFirstComboBreak,
         ScoreMeter,
         FloatingComments,
         ShowInterface,
