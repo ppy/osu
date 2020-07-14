@@ -33,7 +33,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Children = new Drawable[]
                 {
                     button = new TestButton(),
-                    new LoadRepliesButton(),
+                    new LoadRepliesButton
+                    {
+                        Action = () => { }
+                    },
                     new ShowRepliesButton(1),
                     new ShowRepliesButton(2)
                 }
