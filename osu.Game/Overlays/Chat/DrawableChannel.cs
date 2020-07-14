@@ -105,6 +105,14 @@ namespace osu.Game.Overlays.Chat
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
+            if (newMessages.Min(m => m.Id) < chatLines.Max(c => c.Message.Id))
+            {
+                // there is a case (on initial population) that we may receive past messages and need to reorder.
+                // easiest way is to just combine messages and recreate drawables (less worrying about day separators etc.)
+                newMessages = newMessages.Concat(chatLines.Select(c => c.Message)).OrderBy(m => m.Id).ToList();
+                ChatLineFlow.Clear();
+            }
+
             bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
 
             // Add up to last Channel.MAX_HISTORY messages

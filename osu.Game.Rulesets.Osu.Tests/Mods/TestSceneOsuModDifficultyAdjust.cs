@@ -9,17 +9,11 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModDifficultyAdjust : ModTestScene
+    public class TestSceneOsuModDifficultyAdjust : OsuModTestScene
     {
-        public TestSceneOsuModDifficultyAdjust()
-            : base(new OsuRuleset())
-        {
-        }
-
         [Test]
         public void TestNoAdjustment() => CreateModTest(new ModTestData
         {

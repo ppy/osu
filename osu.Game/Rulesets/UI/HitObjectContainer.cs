@@ -43,6 +43,15 @@ namespace osu.Game.Rulesets.UI
             return true;
         }
 
+        public virtual void Clear(bool disposeChildren = true)
+        {
+            ClearInternal(disposeChildren);
+
+            foreach (var kvp in startTimeMap)
+                kvp.Value.bindable.UnbindAll();
+            startTimeMap.Clear();
+        }
+
         public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);
 
         private void onStartTimeChanged(DrawableHitObject hitObject)

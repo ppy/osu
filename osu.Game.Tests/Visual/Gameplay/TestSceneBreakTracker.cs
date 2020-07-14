@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -15,11 +14,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneBreakTracker : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(BreakOverlay),
-        };
-
         private readonly BreakOverlay breakOverlay;
 
         private readonly TestBreakTracker breakTracker;
@@ -97,8 +91,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadBreaksStep("multiple breaks", testBreaks);
 
             seekAndAssertBreak("seek to break start", testBreaks[1].StartTime, true);
-            AddAssert("is skipped to break #2", () => breakTracker.CurrentBreakIndex == 1);
-
             seekAndAssertBreak("seek to break middle", testBreaks[1].StartTime + testBreaks[1].Duration / 2, true);
             seekAndAssertBreak("seek to break end", testBreaks[1].EndTime, false);
             seekAndAssertBreak("seek to break after end", testBreaks[1].EndTime + 500, false);
@@ -173,8 +165,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             private readonly ManualClock manualClock;
             private IFrameBasedClock originalClock;
-
-            public new int CurrentBreakIndex => base.CurrentBreakIndex;
 
             public double ManualClockTime
             {

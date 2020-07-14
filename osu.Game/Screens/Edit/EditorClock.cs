@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -13,7 +15,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
     /// </summary>
-    public class EditorClock : DecoupleableInterpolatingFramedClock
+    public class EditorClock : Component, IFrameBasedClock, IAdjustableClock, ISourceChangeableClock
     {
         public readonly double TrackLength;
 
@@ -21,12 +23,11 @@ namespace osu.Game.Screens.Edit
 
         private readonly BindableBeatDivisor beatDivisor;
 
-        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-        {
-            this.beatDivisor = beatDivisor;
+        private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
-            ControlPointInfo = beatmap.Beatmap.ControlPointInfo;
-            TrackLength = beatmap.Track.Length;
+        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
+            : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
+        {
         }
 
         public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
@@ -35,6 +36,13 @@ namespace osu.Game.Screens.Edit
 
             ControlPointInfo = controlPointInfo;
             TrackLength = trackLength;
+
+            underlyingClock = new DecoupleableInterpolatingFramedClock();
+        }
+
+        public EditorClock()
+            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
+        {
         }
 
         /// <summary>
@@ -79,20 +87,22 @@ namespace osu.Game.Screens.Edit
 
         private void seek(int direction, bool snapped, double amount = 1)
         {
+            double current = CurrentTimeAccurate;
+
             if (amount <= 0) throw new ArgumentException("Value should be greater than zero", nameof(amount));
 
-            var timingPoint = ControlPointInfo.TimingPointAt(CurrentTime);
+            var timingPoint = ControlPointInfo.TimingPointAt(current);
 
-            if (direction < 0 && timingPoint.Time == CurrentTime)
+            if (direction < 0 && timingPoint.Time == current)
                 // When going backwards and we're at the boundary of two timing points, we compute the seek distance with the timing point which we are seeking into
-                timingPoint = ControlPointInfo.TimingPointAt(CurrentTime - 1);
+                timingPoint = ControlPointInfo.TimingPointAt(current - 1);
 
             double seekAmount = timingPoint.BeatLength / beatDivisor.Value * amount;
-            double seekTime = CurrentTime + seekAmount * direction;
+            double seekTime = current + seekAmount * direction;
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)
             {
-                Seek(seekTime);
+                SeekTo(seekTime);
                 return;
             }
 
@@ -110,7 +120,7 @@ namespace osu.Game.Screens.Edit
 
             // Due to the rounding above, we may end up on the current beat. This will effectively cause 0 seeking to happen, but we don't want this.
             // Instead, we'll go to the next beat in the direction when this is the case
-            if (Precision.AlmostEquals(CurrentTime, seekTime))
+            if (Precision.AlmostEquals(current, seekTime))
             {
                 closestBeat += direction > 0 ? 1 : -1;
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
@@ -125,7 +135,97 @@ namespace osu.Game.Screens.Edit
 
             // Ensure the sought point is within the boundaries
             seekTime = Math.Clamp(seekTime, 0, TrackLength);
-            Seek(seekTime);
+            SeekTo(seekTime);
+        }
+
+        /// <summary>
+        /// The current time of this clock, include any active transform seeks performed via <see cref="SeekTo"/>.
+        /// </summary>
+        public double CurrentTimeAccurate =>
+            Transforms.OfType<TransformSeek>().FirstOrDefault()?.EndValue ?? CurrentTime;
+
+        public double CurrentTime => underlyingClock.CurrentTime;
+
+        public void Reset()
+        {
+            ClearTransforms();
+            underlyingClock.Reset();
+        }
+
+        public void Start()
+        {
+            ClearTransforms();
+            underlyingClock.Start();
+        }
+
+        public void Stop()
+        {
+            underlyingClock.Stop();
+        }
+
+        public bool Seek(double position)
+        {
+            ClearTransforms();
+            return underlyingClock.Seek(position);
+        }
+
+        public void ResetSpeedAdjustments() => underlyingClock.ResetSpeedAdjustments();
+
+        double IAdjustableClock.Rate
+        {
+            get => underlyingClock.Rate;
+            set => underlyingClock.Rate = value;
+        }
+
+        double IClock.Rate => underlyingClock.Rate;
+
+        public bool IsRunning => underlyingClock.IsRunning;
+
+        public void ProcessFrame() => underlyingClock.ProcessFrame();
+
+        public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
+
+        public double FramesPerSecond => underlyingClock.FramesPerSecond;
+
+        public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
+
+        public void ChangeSource(IClock source) => underlyingClock.ChangeSource(source);
+
+        public IClock Source => underlyingClock.Source;
+
+        public bool IsCoupled
+        {
+            get => underlyingClock.IsCoupled;
+            set => underlyingClock.IsCoupled = value;
+        }
+
+        private const double transform_time = 300;
+
+        public void SeekTo(double seekDestination)
+        {
+            if (IsRunning)
+                Seek(seekDestination);
+            else
+                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
+        }
+
+        private void transformSeekTo(double seek, double duration = 0, Easing easing = Easing.None)
+            => this.TransformTo(this.PopulateTransform(new TransformSeek(), seek, duration, easing));
+
+        private double currentTime
+        {
+            get => underlyingClock.CurrentTime;
+            set => underlyingClock.Seek(value);
+        }
+
+        private class TransformSeek : Transform<double, EditorClock>
+        {
+            public override string TargetMember => nameof(currentTime);
+
+            protected override void Apply(EditorClock clock, double time) =>
+                clock.currentTime = Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+
+            protected override void ReadIntoStartValue(EditorClock clock) => StartValue = clock.currentTime;
         }
     }
 }

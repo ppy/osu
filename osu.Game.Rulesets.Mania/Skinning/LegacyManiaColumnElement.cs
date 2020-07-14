@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
     /// <summary>
     /// A <see cref="CompositeDrawable"/> which is placed somewhere within a <see cref="Column"/>.
     /// </summary>
-    public class LegacyManiaColumnElement : LegacyManiaElement
+    public class LegacyManiaColumnElement : CompositeDrawable
     {
         [Resolved]
         protected Column Column { get; private set; }
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             }
         }
 
-        protected override IBindable<T> GetManiaSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup, int? index = null)
-            => base.GetManiaSkinConfig<T>(skin, lookup, index ?? Column.Index);
+        protected IBindable<T> GetColumnSkinConfig<T>(ISkin skin, LegacyManiaSkinConfigurationLookups lookup)
+            => skin.GetManiaSkinConfig<T>(lookup, Column.Index);
     }
 }

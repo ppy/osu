@@ -1,22 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
@@ -63,6 +62,8 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
+        internal Track Track { get; private set; }
+
         private Bindable<float> holdDelay;
         private Bindable<bool> loginDisplayed;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
+        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -133,7 +134,7 @@ namespace osu.Game.Screens.Menu
             };
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
-            buttons.OnDirect = () => direct?.ToggleVisibility();
+            buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
             buttons.OnChart = () => rankings?.ShowSpotlights();
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
@@ -168,22 +169,28 @@ namespace osu.Game.Screens.Menu
             return s;
         }
 
+        [Resolved]
+        private Storage storage { get; set; }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
 
-            var track = Beatmap.Value.Track;
+            Track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is IntroScreen && track != null)
+            if (last is IntroScreen && Track != null)
             {
-                if (!track.IsRunning)
+                if (!Track.IsRunning)
                 {
-                    track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
-                    track.Start();
+                    Track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * Track.Length);
+                    Track.Start();
                 }
             }
+
+            if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
+                dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
         }
 
         private bool exitConfirmed;
@@ -250,11 +257,10 @@ namespace osu.Game.Screens.Menu
 
             (Background as BackgroundScreenDefault)?.Next();
 
-            //we may have consumed our preloaded instance, so let's make another.
+            // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
 
-            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
-                Beatmap.Value.Track.Start();
+            music.EnsurePlayingSomething();
         }
 
         public override bool OnExiting(IScreen next)
@@ -279,31 +285,6 @@ namespace osu.Game.Screens.Menu
 
             this.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        private class ConfirmExitDialog : PopupDialog
-        {
-            public ConfirmExitDialog(Action confirm, Action cancel)
-            {
-                HeaderText = "Are you sure you want to exit?";
-                BodyText = "Last chance to back out.";
-
-                Icon = FontAwesome.Solid.ExclamationTriangle;
-
-                Buttons = new PopupDialogButton[]
-                {
-                    new PopupDialogOkButton
-                    {
-                        Text = @"Goodbye",
-                        Action = confirm
-                    },
-                    new PopupDialogCancelButton
-                    {
-                        Text = @"Just a little more",
-                        Action = cancel
-                    },
-                };
-            }
         }
     }
 }

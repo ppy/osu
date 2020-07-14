@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.Internal;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Objects;
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Beatmaps
             var hitCircle = new HitCircle { StartTime = 1000 };
             editorBeatmap.Add(hitCircle);
             Assert.That(editorBeatmap.HitObjects.Count(h => h == hitCircle), Is.EqualTo(1));
-            Assert.That(editorBeatmap.HitObjects.IndexOf(hitCircle), Is.EqualTo(3));
+            Assert.That(Array.IndexOf(editorBeatmap.HitObjects.ToArray(), hitCircle), Is.EqualTo(3));
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Beatmaps
 
             hitCircle.StartTime = 0;
             Assert.That(editorBeatmap.HitObjects.Count(h => h == hitCircle), Is.EqualTo(1));
-            Assert.That(editorBeatmap.HitObjects.IndexOf(hitCircle), Is.EqualTo(1));
+            Assert.That(Array.IndexOf(editorBeatmap.HitObjects.ToArray(), hitCircle), Is.EqualTo(1));
         }
 
         /// <summary>

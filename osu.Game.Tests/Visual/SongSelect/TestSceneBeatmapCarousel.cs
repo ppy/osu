@@ -17,29 +17,15 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
     [TestFixture]
-    public class TestSceneBeatmapCarousel : OsuTestScene
+    public class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
     {
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CarouselItem),
-            typeof(CarouselGroup),
-            typeof(CarouselGroupEagerSelect),
-            typeof(CarouselBeatmap),
-            typeof(CarouselBeatmapSet),
-
-            typeof(DrawableCarouselItem),
-            typeof(CarouselItemState),
-
-            typeof(DrawableCarouselBeatmap),
-            typeof(DrawableCarouselBeatmapSet),
-        };
 
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
         private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
@@ -55,11 +41,48 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestRecommendedSelection()
+        public void TestKeyRepeat()
         {
             loadBeatmaps();
+            advanceSelection(false);
 
-            AddStep("set recommendation function", () => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.LastOrDefault());
+            AddStep("press down arrow", () => InputManager.PressKey(Key.Down));
+
+            BeatmapInfo selection = null;
+
+            checkSelectionIterating(true);
+
+            AddStep("press up arrow", () => InputManager.PressKey(Key.Up));
+
+            checkSelectionIterating(true);
+
+            AddStep("release down arrow", () => InputManager.ReleaseKey(Key.Down));
+
+            checkSelectionIterating(true);
+
+            AddStep("release up arrow", () => InputManager.ReleaseKey(Key.Up));
+
+            checkSelectionIterating(false);
+
+            void checkSelectionIterating(bool isIterating)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    AddStep("store selection", () => selection = carousel.SelectedBeatmap);
+                    if (isIterating)
+                        AddUntilStep("selection changed", () => carousel.SelectedBeatmap != selection);
+                    else
+                        AddUntilStep("selection not changed", () => carousel.SelectedBeatmap == selection);
+                }
+            }
+        }
+
+        [Test]
+        public void TestRecommendedSelection()
+        {
+            loadBeatmaps(carouselAdjust: carousel => carousel.GetRecommendedBeatmap = beatmaps => beatmaps.LastOrDefault());
+
+            AddStep("select last", () => carousel.SelectBeatmap(carousel.BeatmapSets.Last().Beatmaps.Last()));
 
             // check recommended was selected
             advanceSelection(direction: 1, diff: false);
@@ -91,7 +114,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             loadBeatmaps();
 
-            advanceSelection(direction: 1, diff: false);
+            AddStep("select first", () => carousel.SelectBeatmap(carousel.BeatmapSets.First().Beatmaps.First()));
             waitForSelection(1, 1);
 
             advanceSelection(direction: 1, diff: true);
@@ -684,9 +707,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(true, 15);
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null)
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null, Func<FilterCriteria> initialCriteria = null, Action<BeatmapCarousel> carouselAdjust = null)
         {
-            createCarousel();
+            createCarousel(carouselAdjust);
 
             if (beatmapSets == null)
             {
@@ -707,17 +730,21 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Wait for load", () => changed);
         }
 
-        private void createCarousel(Container target = null)
+        private void createCarousel(Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
         {
             AddStep("Create carousel", () =>
             {
                 selectedSets.Clear();
                 eagerSelectedIDs.Clear();
 
-                (target ?? this).Child = carousel = new TestBeatmapCarousel
+                carousel = new TestBeatmapCarousel
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
+
+                carouselAdjust?.Invoke(carousel);
+
+                (target ?? this).Child = carousel;
             });
         }
 

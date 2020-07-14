@@ -35,7 +35,7 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(cpi.TimingPoints.Count, Is.EqualTo(2));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(2));
 
-            cpi.Add(1000, new TimingControlPoint()); //is redundant
+            cpi.Add(1000, new TimingControlPoint()); // is redundant
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(2));
             Assert.That(cpi.TimingPoints.Count, Is.EqualTo(2));

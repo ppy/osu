@@ -9,9 +9,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class TestSceneOsuPlayer : PlayerTestScene
     {
-        public TestSceneOsuPlayer()
-            : base(new OsuRuleset())
-        {
-        }
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
     }
 }

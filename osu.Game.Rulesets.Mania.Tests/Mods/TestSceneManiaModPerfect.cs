@@ -10,8 +10,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
     public class TestSceneManiaModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
+
         public TestSceneManiaModPerfect()
-            : base(new ManiaRuleset(), new ManiaModPerfect())
+            : base(new ManiaModPerfect())
         {
         }
 

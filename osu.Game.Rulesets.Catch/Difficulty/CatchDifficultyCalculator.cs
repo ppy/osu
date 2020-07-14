@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.145;
+        private const double star_scaling_factor = 0.153;
 
         protected override int SectionLength => 750;
 
@@ -71,8 +71,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
-            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
-                halfCatcherWidth = catcher.CatchWidth * 0.5f;
+            halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
+
+            // For circle sizes above 5.5, reduce the catcher width further to simulate imperfect gameplay.
+            halfCatcherWidth *= 1 - (Math.Max(0, beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5.5f) * 0.0625f);
 
             return new Skill[]
             {
