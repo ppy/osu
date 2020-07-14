@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Comments
         private ShowRepliesButton showRepliesButton;
         private ChevronButton chevronButton;
         private DeletedCommentsCounter deletedCommentsCounter;
-        private Loading loading;
+        private LoadingSpinner loading;
 
         public DrawableComment(Comment comment)
         {
@@ -209,10 +209,16 @@ namespace osu.Game.Overlays.Comments
                                 }
                             }
                         },
-                        loading = new Loading
+                        loading = new LoadingSpinner
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Size = new Vector2(15),
+                            Margin = new MarginPadding
+                            {
+                                Vertical = 5,
+                                Left = 80
+                            }
                         },
                         childCommentsVisibilityContainer = new FillFlowContainer
                         {
@@ -368,6 +374,7 @@ namespace osu.Game.Overlays.Comments
 
             showMoreButton.IsLoading = false;
             loading.Hide();
+            loading.FinishTransforms();
         }
 
         private class ChevronButton : ShowChildrenButton
@@ -436,32 +443,6 @@ namespace osu.Game.Overlays.Comments
                     return string.Empty;
 
                 return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
-            }
-        }
-
-        private class Loading : Container
-        {
-            private readonly LoadingSpinner loading;
-
-            public Loading()
-            {
-                Child = loading = new LoadingSpinner
-                {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    Size = new Vector2(15),
-                    Margin = new MarginPadding
-                    {
-                        Vertical = 5,
-                        Left = 80
-                    }
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                loading.Show();
             }
         }
     }
