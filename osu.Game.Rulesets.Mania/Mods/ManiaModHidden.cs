@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Children = new Drawable[]
                     {
                         hoc,
-                        new LaneCover(false)
+                        new LaneCover
                         {
                             Coverage = 0.5f,
                             RelativeSizeAxes = Axes.Both
@@ -54,8 +55,10 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             private readonly Box gradient;
             private readonly Box filled;
+            private bool reversed;
+            private readonly Bindable<ManiaScrollingDirection> scrollDirection = new Bindable<ManiaScrollingDirection>();
 
-            public LaneCover(bool reversed)
+            public LaneCover()
             {
                 Blending = new BlendingParameters
                 {
@@ -80,8 +83,6 @@ namespace osu.Game.Rulesets.Mania.Mods
                         RelativeSizeAxes = Axes.Both
                     }
                 };
-
-                Reversed = reversed;
             }
 
             private void updateCoverage()
@@ -95,6 +96,12 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Color4.White.Opacity(reversed ? 0f : 1f),
                     Color4.White.Opacity(reversed ? 1f : 0f)
                 );
+            }
+
+            private void onScrollDirectionChanged(ValueChangedEvent<ManiaScrollingDirection> valueChangedEvent)
+            {
+                reversed = valueChangedEvent.NewValue == ManiaScrollingDirection.Up;
+                updateCoverage();
             }
 
             private float coverage;
@@ -112,28 +119,11 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
 
-            private bool reversed;
-
-            public bool Reversed
-            {
-                set
-                {
-                    if (reversed == value)
-                        return;
-
-                    reversed = value;
-
-                    updateCoverage();
-                }
-            }
-
             [BackgroundDependencyLoader]
             private void load(ManiaRulesetConfigManager configManager)
             {
-                var scrollDirection = configManager.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection);
-
-                if (scrollDirection.Value == ManiaScrollingDirection.Up)
-                    Reversed = !reversed;
+                scrollDirection.BindTo(configManager.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection));
+                scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
             }
         }
     }
