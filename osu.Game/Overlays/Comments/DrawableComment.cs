@@ -22,7 +22,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Game.Overlays.Comments.Buttons;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -52,7 +51,6 @@ namespace osu.Game.Overlays.Comments
         private ShowRepliesButton showRepliesButton;
         private ChevronButton chevronButton;
         private DeletedCommentsCounter deletedCommentsCounter;
-        private LoadingSpinner loading;
 
         public DrawableComment(Comment comment)
         {
@@ -194,12 +192,7 @@ namespace osu.Game.Overlays.Comments
                                                         },
                                                         loadRepliesButton = new LoadRepliesButton
                                                         {
-                                                            Action = () =>
-                                                            {
-                                                                RepliesRequested(this, ++currentPage);
-                                                                loadRepliesButton.Hide();
-                                                                loading.Show();
-                                                            }
+                                                            Action = () => RepliesRequested(this, ++currentPage)
                                                         }
                                                     }
                                                 }
@@ -207,17 +200,6 @@ namespace osu.Game.Overlays.Comments
                                         }
                                     }
                                 }
-                            }
-                        },
-                        loading = new LoadingSpinner
-                        {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Size = new Vector2(15),
-                            Margin = new MarginPadding
-                            {
-                                Vertical = 5,
-                                Left = 80
                             }
                         },
                         childCommentsVisibilityContainer = new FillFlowContainer
@@ -372,9 +354,7 @@ namespace osu.Game.Overlays.Comments
             if (Comment.IsTopLevel)
                 chevronButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
 
-            showMoreButton.IsLoading = false;
-            loading.Hide();
-            loading.FinishTransforms();
+            showMoreButton.IsLoading = loadRepliesButton.IsLoading = false;
         }
 
         private class ChevronButton : ShowChildrenButton

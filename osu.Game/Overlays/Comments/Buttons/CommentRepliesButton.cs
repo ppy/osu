@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,8 +16,6 @@ namespace osu.Game.Overlays.Comments.Buttons
 {
     public abstract class CommentRepliesButton : CompositeDrawable
     {
-        public Action Action { get; set; }
-
         protected string Text
         {
             get => text.Text;
@@ -72,6 +69,7 @@ namespace osu.Game.Overlays.Comments.Buttons
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
+                                        AlwaysPresent = true,
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
                                     },
                                     icon = new SpriteIcon
@@ -99,6 +97,8 @@ namespace osu.Game.Overlays.Comments.Buttons
 
         protected void SetIconDirection(bool upwards) => icon.ScaleTo(new Vector2(1, upwards ? -1 : 1));
 
+        public void ToggleTextVisibility(bool visible) => text.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
+
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
@@ -112,12 +112,6 @@ namespace osu.Game.Overlays.Comments.Buttons
             base.OnHoverLost(e);
             background.FadeColour(colourProvider.Background2, 200, Easing.OutQuint);
             icon.FadeColour(colourProvider.Foreground1, 200, Easing.OutQuint);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Action?.Invoke();
-            return base.OnClick(e);
         }
     }
 }
