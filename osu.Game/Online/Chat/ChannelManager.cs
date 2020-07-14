@@ -381,7 +381,7 @@ namespace osu.Game.Online.Chat
                         break;
 
                     default:
-                        var req = new JoinChannelRequest(channel, api.LocalUser.Value);
+                        var req = new JoinChannelRequest(channel);
                         req.Success += () => joinChannel(channel, fetchInitialMessages);
                         req.Failure += ex => LeaveChannel(channel);
                         api.Queue(req);
@@ -410,7 +410,7 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel, api.LocalUser.Value));
+                api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
         }
