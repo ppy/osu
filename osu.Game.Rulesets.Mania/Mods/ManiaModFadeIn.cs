@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -45,11 +47,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Children = new Drawable[]
                     {
                         hoc,
-                        new LaneCover(false)
+                        new LaneCover(0.5f, false)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            SizeFilled = 0.5f,
-                            SizeGradient = 0.25f
+                            RelativeSizeAxes = Axes.Both
                         }
                     }
                 });
@@ -60,9 +60,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             private readonly Box gradient;
             private readonly Box filled;
-            private readonly bool reversed;
 
-            public LaneCover(bool reversed)
+            public LaneCover(float initialCoverage, bool reversed)
             {
                 Blending = new BlendingParameters
                 {
@@ -73,49 +72,60 @@ namespace osu.Game.Rulesets.Mania.Mods
                     SourceAlpha = BlendingType.Zero,
                     DestinationAlpha = BlendingType.OneMinusSrcAlpha
                 };
-
                 InternalChildren = new Drawable[]
                 {
                     gradient = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(1f), Color4.White.Opacity(0f))
+                        Height = 0.25f
                     },
                     filled = new Box
                     {
                         RelativeSizeAxes = Axes.Both
                     }
                 };
-
-                if (reversed)
-                {
-                    gradient.Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0f), Color4.White.Opacity(1f));
-                    filled.Anchor = Anchor.BottomLeft;
-                    filled.Origin = Anchor.BottomLeft;
-                }
-
-                this.reversed = reversed;
+                Coverage = initialCoverage;
+                Reversed = reversed;
             }
 
-            public float SizeFilled
+            private float coverage;
+
+            public float Coverage
             {
                 set
                 {
                     filled.Height = value;
-                    if (!reversed)
-                        gradient.Y = value;
+                    gradient.Y = reversed ? 1 - value - gradient.Height : value;
+                    coverage = value;
                 }
             }
 
-            public float SizeGradient
+            private bool reversed;
+
+            public bool Reversed
             {
                 set
                 {
-                    gradient.Height = value;
-                    if (reversed)
-                        gradient.Y = 1 - value - filled.Height;
+                    filled.Anchor = value ? Anchor.BottomLeft : Anchor.TopLeft;
+                    filled.Origin = value ? Anchor.BottomLeft : Anchor.TopLeft;
+                    gradient.Colour = ColourInfo.GradientVertical(
+                        Color4.White.Opacity(value ? 0f : 1f),
+                        Color4.White.Opacity(value ? 1f : 0f)
+                    );
+
+                    reversed = value;
+                    Coverage = coverage; //re-apply coverage to update visuals
                 }
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ManiaRulesetConfigManager configManager)
+            {
+                var scrollDirection = configManager.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection);
+
+                if (scrollDirection.Value == ManiaScrollingDirection.Up)
+                    Reversed = !reversed;
             }
         }
     }
