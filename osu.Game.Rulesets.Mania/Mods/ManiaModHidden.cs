@@ -85,6 +85,13 @@ namespace osu.Game.Rulesets.Mania.Mods
                 };
             }
 
+            [BackgroundDependencyLoader]
+            private void load(ManiaRulesetConfigManager configManager)
+            {
+                scrollDirection.BindTo(configManager.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection));
+                scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
+            }
+
             private void updateCoverage()
             {
                 filled.Anchor = reversed ? Anchor.BottomLeft : Anchor.TopLeft;
@@ -117,13 +124,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                     updateCoverage();
                 }
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(ManiaRulesetConfigManager configManager)
-            {
-                scrollDirection.BindTo(configManager.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection));
-                scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
             }
         }
     }
