@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            OverlinedHeader participantsHeader;
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -55,22 +57,31 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                             RelativeSizeAxes = Axes.X,
                                             Margin = new MarginPadding { Vertical = 60 },
                                         },
-                                        new OverlinedParticipants(Direction.Horizontal)
+                                        participantsHeader = new OverlinedHeader("Recent Participants"),
+                                        new ParticipantsDisplay(Direction.Vertical)
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y
-                                        },
+                                            Height = ParticipantsList.TILE_SIZE * 3,
+                                            Details = { BindTarget = participantsHeader.Details }
+                                        }
                                     }
                                 }
                             },
+                            new Drawable[] { new OverlinedHeader("Playlist"), },
                             new Drawable[]
                             {
-                                new OverlinedPlaylist(false) { RelativeSizeAxes = Axes.Both },
+                                new DrawableRoomPlaylist(false, false)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Items = { BindTarget = Playlist }
+                                },
                             },
                         },
                         RowDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(),
                         }
                     }
                 }

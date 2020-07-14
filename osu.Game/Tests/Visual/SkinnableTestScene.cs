@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -31,9 +32,6 @@ namespace osu.Game.Tests.Visual
             : base(2, 3)
         {
         }
-
-        // Required to be part of the per-ruleset implementation to construct the newer version of the Ruleset.
-        protected abstract Ruleset CreateRulesetForSkinProvider();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SkinManager skinManager)
@@ -107,7 +105,7 @@ namespace osu.Game.Tests.Visual
                         {
                             new OutlineBox { Alpha = autoSize ? 1 : 0 },
                             mainProvider.WithChild(
-                                new SkinProvidingContainer(CreateRulesetForSkinProvider().CreateLegacySkinProvider(mainProvider, beatmap))
+                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
                                 {
                                     Child = created,
                                     RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
@@ -119,6 +117,14 @@ namespace osu.Game.Tests.Visual
                 }
             };
         }
+
+        /// <summary>
+        /// Creates the ruleset for adding the corresponding skin transforming component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreateRulesetForSkinProvider();
+
+        protected sealed override Ruleset CreateRuleset() => CreateRulesetForSkinProvider();
 
         protected virtual IBeatmap CreateBeatmapForSkinProvider() => CreateWorkingBeatmap(Ruleset.Value).GetPlayableBeatmap(Ruleset.Value);
 

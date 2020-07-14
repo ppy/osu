@@ -132,6 +132,8 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.CacheAs(Storage);
+
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
@@ -162,13 +164,13 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            if (API == null) API = new APIAccess(LocalConfig);
+            API ??= new APIAccess(LocalConfig);
 
             dependencies.CacheAs(API);
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
@@ -184,8 +186,17 @@ namespace osu.Game
                 return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
             }
 
-            BeatmapManager.ItemRemoved += i => ScoreManager.Delete(getBeatmapScores(i), true);
-            BeatmapManager.ItemAdded += i => ScoreManager.Undelete(getBeatmapScores(i), true);
+            BeatmapManager.ItemRemoved.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Delete(getBeatmapScores(item), true);
+            });
+
+            BeatmapManager.ItemUpdated.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Undelete(getBeatmapScores(item), true);
+            });
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -218,8 +229,8 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            if (API is APIAccess apiAcces)
-                AddInternal(apiAcces);
+            if (API is APIAccess apiAccess)
+                AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;
@@ -300,12 +311,13 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null)
-                Storage = host.Storage;
+            // may be non-null for certain tests
+            Storage ??= host.Storage;
 
-            if (LocalConfig == null)
-                LocalConfig = new OsuConfigManager(Storage);
+            LocalConfig ??= new OsuConfigManager(Storage);
         }
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
@@ -326,6 +338,9 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+            BeatmapManager?.Dispose();
+
+            contextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
@@ -352,6 +367,12 @@ namespace osu.Game
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
+        }
+
+        public void Migrate(string path)
+        {
+            contextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(path);
         }
     }
 }

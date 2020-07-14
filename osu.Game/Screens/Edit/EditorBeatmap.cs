@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -136,14 +137,26 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Add(HitObject hitObject)
         {
-            trackStartTime(hitObject);
-
             // Preserve existing sorting order in the beatmap
             var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
-            mutableHitObjects.Insert(insertionIndex + 1, hitObject);
+            Insert(insertionIndex + 1, hitObject);
+        }
+
+        /// <summary>
+        /// Inserts a <see cref="HitObject"/> into this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        /// <remarks>
+        /// It is the invoker's responsibility to make sure that <see cref="HitObject"/> sorting order is maintained.
+        /// </remarks>
+        /// <param name="index">The index to insert the <see cref="HitObject"/> at.</param>
+        /// <param name="hitObject">The <see cref="HitObject"/> to insert.</param>
+        public void Insert(int index, HitObject hitObject)
+        {
+            trackStartTime(hitObject);
+
+            mutableHitObjects.Insert(index, hitObject);
 
             HitObjectAdded?.Invoke(hitObject);
-
             updateHitObject(hitObject, true);
         }
 
@@ -185,6 +198,25 @@ namespace osu.Game.Screens.Edit
 
             startTimeBindables.Remove(hitObject);
             HitObjectRemoved?.Invoke(hitObject);
+
+            updateHitObject(null, true);
+        }
+
+        /// <summary>
+        /// Clears all <see cref="HitObjects"/> from this <see cref="EditorBeatmap"/>.
+        /// </summary>
+        public void Clear()
+        {
+            var removed = HitObjects.ToList();
+
+            mutableHitObjects.Clear();
+
+            foreach (var b in startTimeBindables)
+                b.Value.UnbindAll();
+            startTimeBindables.Clear();
+
+            foreach (var h in removed)
+                HitObjectRemoved?.Invoke(h);
 
             updateHitObject(null, true);
         }

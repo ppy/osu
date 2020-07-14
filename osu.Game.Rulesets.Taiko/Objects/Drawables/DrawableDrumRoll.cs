@@ -14,6 +14,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -29,25 +31,28 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private int rollingHits;
 
-        private readonly Container<DrawableDrumRollTick> tickContainer;
+        private Container tickContainer;
 
         private Color4 colourIdle;
         private Color4 colourEngaged;
-
-        private ElongatedCirclePiece elongatedPiece;
 
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
             RelativeSizeAxes = Axes.Y;
-            elongatedPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            elongatedPiece.AccentColour = colourIdle = colours.YellowDark;
+            colourIdle = colours.YellowDark;
             colourEngaged = colours.YellowDarker;
+
+            Content.Add(tickContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MinValue
+            });
         }
 
         protected override void LoadComplete()
@@ -55,6 +60,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.LoadComplete();
 
             OnNewResult += onNewResult;
+        }
+
+        protected override void RecreatePieces()
+        {
+            base.RecreatePieces();
+            updateColour();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -86,7 +97,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return base.CreateNestedHitObject(hitObject);
         }
 
-        protected override CompositeDrawable CreateMainPiece() => elongatedPiece = new ElongatedCirclePiece();
+        protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.DrumRollBody),
+            _ => new ElongatedCirclePiece());
 
         public override bool OnPressed(TaikoAction action) => false;
 
@@ -102,8 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             rollingHits = Math.Clamp(rollingHits, 0, rolling_hits_for_engaged_colour);
 
-            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
-            (MainPiece as IHasAccentColour)?.FadeAccent(newColour, 100);
+            updateColour();
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -115,8 +126,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
+
             if (countHit >= HitObject.RequiredGoodHits)
+            {
                 ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+            }
             else
                 ApplyResult(r => r.Type = HitResult.Miss);
         }
@@ -132,7 +146,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            OriginPosition = new Vector2(DrawHeight);
+            Content.X = DrawHeight / 2;
+        }
+
         protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+
+        private void updateColour()
+        {
+            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
+            (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, 100);
+        }
 
         private class StrongNestedHit : DrawableStrongNestedHit
         {

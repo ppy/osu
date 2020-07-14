@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Containers
         private TimingControlPoint lastTimingPoint;
 
         /// <summary>
-        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, TrackAmplitudes)"/>.
+        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
         /// This allows for adding easing to animations that may be synchronised to the beat.
         /// </summary>
         protected double EarlyActivationMilliseconds;
@@ -50,7 +50,6 @@ namespace osu.Game.Graphics.Containers
 
         private TimingControlPoint defaultTiming;
         private EffectControlPoint defaultEffect;
-        private TrackAmplitudes defaultAmplitudes;
 
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
@@ -107,7 +106,7 @@ namespace osu.Game.Graphics.Containers
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? defaultAmplitudes);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
@@ -128,16 +127,9 @@ namespace osu.Game.Graphics.Containers
                 KiaiMode = false,
                 OmitFirstBarLine = false
             };
-
-            defaultAmplitudes = new TrackAmplitudes
-            {
-                FrequencyAmplitudes = new float[256],
-                LeftChannel = 0,
-                RightChannel = 0
-            };
         }
 
-        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
         }
     }

@@ -1,12 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -19,41 +20,41 @@ namespace osu.Game.Screens.Multi
 {
     public class Header : Container
     {
-        public const float HEIGHT = 121;
-
-        private readonly HeaderBreadcrumbControl breadcrumbs;
+        public const float HEIGHT = 80;
 
         public Header(ScreenStack stack)
         {
-            MultiHeaderTitle title;
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+
+            HeaderBreadcrumbControl breadcrumbs;
+            MultiHeaderTitle title;
 
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex(@"2f2043"),
+                    Colour = Color4Extensions.FromHex(@"#1f1921"),
                 },
                 new Container
                 {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
+                    Padding = new MarginPadding { Left = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         title = new MultiHeaderTitle
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            X = -MultiHeaderTitle.ICON_WIDTH,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
                             Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                        },
+                            Origin = Anchor.BottomLeft
+                        }
                     },
                 },
             };
@@ -67,32 +68,16 @@ namespace osu.Game.Screens.Multi
             breadcrumbs.Current.TriggerChange();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private class MultiHeaderTitle : CompositeDrawable
         {
-            breadcrumbs.StripColour = colours.Green;
-        }
-
-        private class MultiHeaderTitle : CompositeDrawable, IHasAccentColour
-        {
-            public const float ICON_WIDTH = icon_size + spacing;
-
-            private const float icon_size = 25;
             private const float spacing = 6;
-            private const int text_offset = 2;
 
-            private readonly SpriteIcon iconSprite;
-            private readonly OsuSpriteText title, pageText;
+            private readonly OsuSpriteText dot;
+            private readonly OsuSpriteText pageTitle;
 
             public IMultiplayerSubScreen Screen
             {
-                set => pageText.Text = value.ShortTitle.ToLowerInvariant();
-            }
-
-            public Color4 AccentColour
-            {
-                get => pageText.Colour;
-                set => pageText.Colour = value;
+                set => pageTitle.Text = value.ShortTitle.Titleize();
             }
 
             public MultiHeaderTitle()
@@ -108,32 +93,26 @@ namespace osu.Game.Screens.Multi
                         Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            iconSprite = new SpriteIcon
+                            new OsuSpriteText
                             {
-                                Size = new Vector2(icon_size),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: 24),
+                                Text = "Multiplayer"
                             },
-                            title = new OsuSpriteText
+                            dot = new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                                Margin = new MarginPadding { Bottom = text_offset }
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: 24),
+                                Text = "·"
                             },
-                            new Circle
+                            pageTitle = new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(4),
-                                Colour = Color4.Gray,
-                            },
-                            pageText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 20),
-                                Margin = new MarginPadding { Bottom = text_offset }
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(size: 24),
+                                Text = "Lounge"
                             }
                         }
                     },
@@ -143,9 +122,7 @@ namespace osu.Game.Screens.Multi
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                title.Text = "multi";
-                iconSprite.Icon = OsuIcon.Multi;
-                AccentColour = colours.Yellow;
+                pageTitle.Colour = dot.Colour = colours.Yellow;
             }
         }
 
@@ -154,12 +131,28 @@ namespace osu.Game.Screens.Multi
             public HeaderBreadcrumbControl(ScreenStack stack)
                 : base(stack)
             {
+                RelativeSizeAxes = Axes.X;
+                StripColour = Color4.Transparent;
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                AccentColour = Color4.White;
+                AccentColour = Color4Extensions.FromHex("#e35c99");
+            }
+
+            protected override TabItem<IScreen> CreateTabItem(IScreen value) => new HeaderBreadcrumbTabItem(value)
+            {
+                AccentColour = AccentColour
+            };
+
+            private class HeaderBreadcrumbTabItem : BreadcrumbTabItem
+            {
+                public HeaderBreadcrumbTabItem(IScreen value)
+                    : base(value)
+                {
+                    Bar.Colour = Color4.Transparent;
+                }
             }
         }
     }

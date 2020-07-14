@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Spinner : OsuHitObject, IHasEndTime
+    public class Spinner : OsuHitObject, IHasDuration
     {
         public double EndTime
         {

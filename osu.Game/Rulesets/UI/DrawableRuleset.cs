@@ -11,20 +11,13 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
@@ -59,13 +52,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public PassThroughInputManager KeyBindingInputManager;
 
-        public override double GameplayStartTime => Objects.First().StartTime - 2000;
+        public override double GameplayStartTime => Objects.FirstOrDefault()?.StartTime - 2000 ?? 0;
 
         private readonly Lazy<Playfield> playfield;
-
-        private TextureStore textureStore;
-
-        private ISampleStore localSampleStore;
 
         /// <summary>
         /// The playfield.
@@ -107,11 +96,13 @@ namespace osu.Game.Rulesets.UI
         /// The mods which are to be applied.
         /// </summary>
         [Cached(typeof(IReadOnlyList<Mod>))]
-        private readonly IReadOnlyList<Mod> mods;
+        protected readonly IReadOnlyList<Mod> Mods;
 
         private FrameStabilityContainer frameStabilityContainer;
 
         private OnScreenDisplay onScreenDisplay;
+
+        private DrawableRulesetDependencies dependencies;
 
         /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
@@ -129,7 +120,7 @@ namespace osu.Game.Rulesets.UI
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
 
             Beatmap = tBeatmap;
-            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
+            Mods = mods?.ToArray() ?? Array.Empty<Mod>();
 
             RelativeSizeAxes = Axes.Both;
 
@@ -147,30 +138,13 @@ namespace osu.Game.Rulesets.UI
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies = new DrawableRulesetDependencies(Ruleset, base.CreateChildDependencies(parent));
 
-            var resources = Ruleset.CreateResourceStore();
-
-            if (resources != null)
-            {
-                textureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, "Textures")));
-                textureStore.AddStore(dependencies.Get<TextureStore>());
-                dependencies.Cache(textureStore);
-
-                localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
-                localSampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-                dependencies.CacheAs<ISampleStore>(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
-            }
+            Config = dependencies.RulesetConfigManager;
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
-
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
-
             if (Config != null)
-            {
-                dependencies.Cache(Config);
                 onScreenDisplay?.BeginTracking(this, Config);
-            }
 
             return dependencies;
         }
@@ -204,7 +178,7 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(mods, config);
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken);
         }
@@ -224,7 +198,7 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
         }
 
@@ -362,13 +336,14 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            localSampleStore?.Dispose();
-
             if (Config != null)
             {
                 onScreenDisplay?.StopTracking(this, Config);
                 Config = null;
             }
+
+            // Dispose the components created by this dependency container.
+            dependencies?.Dispose();
         }
     }
 
@@ -488,6 +463,11 @@ namespace osu.Game.Rulesets.UI
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
         /// <summary>
+        /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
+        /// </summary>
+        public virtual bool AllowGameplayOverlays => true;
+
+        /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
@@ -516,64 +496,6 @@ namespace osu.Game.Rulesets.UI
     {
         public BeatmapInvalidForRulesetException(string text)
             : base(text)
-        {
-        }
-    }
-
-    /// <summary>
-    /// A sample store which adds a fallback source.
-    /// </summary>
-    /// <remarks>
-    /// This is a temporary implementation to workaround ISampleStore limitations.
-    /// </remarks>
-    public class FallbackSampleStore : ISampleStore
-    {
-        private readonly ISampleStore primary;
-        private readonly ISampleStore secondary;
-
-        public FallbackSampleStore(ISampleStore primary, ISampleStore secondary)
-        {
-            this.primary = primary;
-            this.secondary = secondary;
-        }
-
-        public SampleChannel Get(string name) => primary.Get(name) ?? secondary.Get(name);
-
-        public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? secondary.GetAsync(name);
-
-        public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
-
-        public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
-
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
-
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
-
-        public BindableNumber<double> Volume => throw new NotSupportedException();
-
-        public BindableNumber<double> Balance => throw new NotSupportedException();
-
-        public BindableNumber<double> Frequency => throw new NotSupportedException();
-
-        public BindableNumber<double> Tempo => throw new NotSupportedException();
-
-        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
-
-        public IBindable<double> AggregateVolume => throw new NotSupportedException();
-
-        public IBindable<double> AggregateBalance => throw new NotSupportedException();
-
-        public IBindable<double> AggregateFrequency => throw new NotSupportedException();
-
-        public IBindable<double> AggregateTempo => throw new NotSupportedException();
-
-        public int PlaybackConcurrency
-        {
-            get => throw new NotSupportedException();
-            set => throw new NotSupportedException();
-        }
-
-        public void Dispose()
         {
         }
     }

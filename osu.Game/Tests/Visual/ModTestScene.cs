@@ -14,16 +14,6 @@ namespace osu.Game.Tests.Visual
     {
         protected sealed override bool HasCustomSteps => true;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ModTestScene)
-        };
-
-        protected ModTestScene(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
-
         private ModTestData currentTestData;
 
         protected void CreateModTest(ModTestData testData) => CreateTest(() =>
@@ -64,12 +54,14 @@ namespace osu.Game.Tests.Visual
 
         protected class ModTestPlayer : TestPlayer
         {
-            protected override bool AllowFail { get; }
+            private readonly bool allowFail;
+
+            protected override bool CheckModsAllowFailure() => allowFail;
 
             public ModTestPlayer(bool allowFail)
                 : base(false, false)
             {
-                AllowFail = allowFail;
+                this.allowFail = allowFail;
             }
         }
 

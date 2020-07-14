@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,8 +9,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Backgrounds;
 using osuTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Effects;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// for a usage example.
     /// </para>
     /// </summary>
-    public abstract class CirclePiece : BeatSyncedContainer
+    public abstract class CirclePiece : BeatSyncedContainer, IHasAccentColour
     {
         public const float SYMBOL_SIZE = 0.45f;
         public const float SYMBOL_BORDER = 8;
@@ -147,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             };
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
                 return;
