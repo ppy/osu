@@ -220,6 +220,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 Alpha = 0;
         }
 
+        protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
+
         private class RoomName : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Name))]
