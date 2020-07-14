@@ -20,9 +20,9 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
-using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.Multi
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Multi
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
 
         [Cached]
-        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
+        private readonly Bindable<Lounge.Components.FilterCriteria> currentFilter = new Bindable<Lounge.Components.FilterCriteria>(new Lounge.Components.FilterCriteria());
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -265,6 +265,14 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnBackButton()
         {
+            var songSelect = screenStack.CurrentScreen as MatchSongSelect;
+
+            if (songSelect?.ModSelect.State.Value == Visibility.Visible)
+            {
+                songSelect.ModSelect.Hide();
+                return true;
+            }
+
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
             {
                 screenStack.Exit();
