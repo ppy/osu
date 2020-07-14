@@ -56,5 +56,7 @@ namespace osu.Game.Screens
         /// Whether mod rate adjustments are allowed to be applied.
         /// </summary>
         bool AllowRateAdjustments { get; }
+
+        bool OnBackButton();
     }
 }
