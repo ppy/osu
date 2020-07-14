@@ -32,6 +32,7 @@ namespace osu.Game.Graphics
         public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f, bool sync = false)
         {
             this.Alpha = alpha;
+            Masking = true;
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -56,9 +57,9 @@ namespace osu.Game.Graphics
             public BackgroundTriangles(bool highLight = false, float triangleScaleValue = 2f)
             {
                 RelativeSizeAxes = Axes.Both;
-                Masking = true;
                 this.highLight = highLight;
                 this.scale = triangleScaleValue;
+                Masking = false;
                 Child = triangles = new Triangles
                 {
                     Anchor = Anchor.BottomCentre,
