@@ -40,8 +40,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Children = new Drawable[]
                     {
                         hoc,
-                        new LaneCover(0.5f, false)
+                        new LaneCover(false)
                         {
+                            Coverage = 0.5f,
                             RelativeSizeAxes = Axes.Both
                         }
                     }
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             private readonly Box gradient;
             private readonly Box filled;
 
-            public LaneCover(float initialCoverage, bool reversed)
+            public LaneCover(bool reversed)
             {
                 Blending = new BlendingParameters
                 {
@@ -65,6 +66,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     SourceAlpha = BlendingType.Zero,
                     DestinationAlpha = BlendingType.OneMinusSrcAlpha
                 };
+
                 InternalChildren = new Drawable[]
                 {
                     gradient = new Box
@@ -78,8 +80,21 @@ namespace osu.Game.Rulesets.Mania.Mods
                         RelativeSizeAxes = Axes.Both
                     }
                 };
-                Coverage = initialCoverage;
+
                 Reversed = reversed;
+            }
+
+            private void updateCoverage()
+            {
+                filled.Anchor = reversed ? Anchor.BottomLeft : Anchor.TopLeft;
+                filled.Origin = reversed ? Anchor.BottomLeft : Anchor.TopLeft;
+                filled.Height = coverage;
+
+                gradient.Y = reversed ? 1 - filled.Height - gradient.Height : coverage;
+                gradient.Colour = ColourInfo.GradientVertical(
+                    Color4.White.Opacity(reversed ? 0f : 1f),
+                    Color4.White.Opacity(reversed ? 1f : 0f)
+                );
             }
 
             private float coverage;
@@ -88,9 +103,12 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 set
                 {
-                    filled.Height = value;
-                    gradient.Y = reversed ? 1 - value - gradient.Height : value;
+                    if (coverage == value)
+                        return;
+
                     coverage = value;
+
+                    updateCoverage();
                 }
             }
 
@@ -100,15 +118,12 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 set
                 {
-                    filled.Anchor = value ? Anchor.BottomLeft : Anchor.TopLeft;
-                    filled.Origin = value ? Anchor.BottomLeft : Anchor.TopLeft;
-                    gradient.Colour = ColourInfo.GradientVertical(
-                        Color4.White.Opacity(value ? 0f : 1f),
-                        Color4.White.Opacity(value ? 1f : 0f)
-                    );
+                    if (reversed == value)
+                        return;
 
                     reversed = value;
-                    Coverage = coverage; //re-apply coverage to update visuals
+
+                    updateCoverage();
                 }
             }
 
