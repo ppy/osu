@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         protected override bool OnClick(ClickEvent e)
         {
             Expanded.Toggle();
-            return base.OnClick(e);
+            return true;
         }
     }
 }
