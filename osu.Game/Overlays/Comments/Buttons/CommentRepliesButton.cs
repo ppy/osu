@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Comments.Buttons
             icon.Colour = colourProvider.Foreground1;
         }
 
-        protected void ToggleIcon(bool upwards) => icon.ScaleTo(new Vector2(1, upwards ? -1 : 1));
+        protected void SetIconDirection(bool upwards) => icon.ScaleTo(new Vector2(1, upwards ? -1 : 1));
 
         protected override bool OnHover(HoverEvent e)
         {
