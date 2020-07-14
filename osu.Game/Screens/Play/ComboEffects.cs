@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
 
         private void onComboChange(ValueChangedEvent<int> combo)
         {
-            if (combo.NewValue == 0 && (combo.OldValue > 20 || alwaysPlay.Value && firstTime))
+            if (combo.NewValue == 0 && (combo.OldValue > 20 || (alwaysPlay.Value && firstTime)))
             {
                 comboBreakSample?.Play();
                 firstTime = false;
