@@ -2,26 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class OverlinedParticipants : OverlinedDisplay
+    public class ParticipantsDisplay : MultiplayerComposite
     {
-        public new Axes AutoSizeAxes
-        {
-            get => base.AutoSizeAxes;
-            set => base.AutoSizeAxes = value;
-        }
+        public Bindable<string> Details = new Bindable<string>();
 
-        public OverlinedParticipants(Direction direction)
-            : base("Recent participants")
+        public ParticipantsDisplay(Direction direction)
         {
             OsuScrollContainer scroll;
             ParticipantsList list;
 
-            Content.Add(scroll = new OsuScrollContainer(direction)
+            AddInternal(scroll = new OsuScrollContainer(direction)
             {
                 Child = list = new ParticipantsList()
             });
@@ -29,13 +25,21 @@ namespace osu.Game.Screens.Multi.Components
             switch (direction)
             {
                 case Direction.Horizontal:
+                    AutoSizeAxes = Axes.Y;
+                    RelativeSizeAxes = Axes.X;
+
                     scroll.RelativeSizeAxes = Axes.X;
                     scroll.Height = ParticipantsList.TILE_SIZE + OsuScrollContainer.SCROLL_BAR_HEIGHT + OsuScrollContainer.SCROLL_BAR_PADDING * 2;
-                    list.AutoSizeAxes = Axes.Both;
+
+                    list.RelativeSizeAxes = Axes.Y;
+                    list.AutoSizeAxes = Axes.X;
                     break;
 
                 case Direction.Vertical:
+                    RelativeSizeAxes = Axes.Both;
+
                     scroll.RelativeSizeAxes = Axes.Both;
+
                     list.RelativeSizeAxes = Axes.X;
                     list.AutoSizeAxes = Axes.Y;
                     break;
@@ -46,11 +50,10 @@ namespace osu.Game.Screens.Multi.Components
         private void load()
         {
             ParticipantCount.BindValueChanged(_ => setParticipantCount());
-            MaxParticipants.BindValueChanged(_ => setParticipantCount());
-
-            setParticipantCount();
+            MaxParticipants.BindValueChanged(_ => setParticipantCount(), true);
         }
 
-        private void setParticipantCount() => Details = MaxParticipants.Value != null ? $"{ParticipantCount.Value}/{MaxParticipants.Value}" : ParticipantCount.Value.ToString();
+        private void setParticipantCount() =>
+            Details.Value = MaxParticipants.Value != null ? $"{ParticipantCount.Value}/{MaxParticipants.Value}" : ParticipantCount.Value.ToString();
     }
 }
