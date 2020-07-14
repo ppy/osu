@@ -22,10 +22,8 @@ namespace osu.Game.Overlays.Rankings
     {
         private const int duration = 300;
 
-        private readonly Box background;
-        private readonly SpotlightsDropdown dropdown;
-
         private readonly BindableWithCurrent<APISpotlight> current = new BindableWithCurrent<APISpotlight>();
+        public readonly Bindable<RankingsSortCriteria> Sort = new Bindable<RankingsSortCriteria>();
 
         public Bindable<APISpotlight> Current
         {
@@ -41,11 +39,13 @@ namespace osu.Game.Overlays.Rankings
 
         protected override bool StartHidden => true;
 
+        private readonly Box background;
+        private readonly Container content;
+        private readonly SpotlightsDropdown dropdown;
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
         private readonly InfoColumn mapCountColumn;
         private readonly InfoColumn participantsColumn;
-        private readonly Container content;
 
         public SpotlightSelector()
         {
@@ -107,7 +107,8 @@ namespace osu.Game.Overlays.Rankings
                                     Child = new RankingsSortTabControl
                                     {
                                         Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight
+                                        Origin = Anchor.CentreRight,
+                                        Current = Sort
                                     }
                                 }
                             }
