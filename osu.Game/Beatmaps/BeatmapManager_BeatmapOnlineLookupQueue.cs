@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
 
             // todo: expose this when we need to do individual difficulty lookups.
             protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
 
             private void lookup(BeatmapSetInfo set, BeatmapInfo beatmap)
             {
