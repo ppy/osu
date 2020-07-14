@@ -30,6 +30,14 @@ namespace osu.Game.Overlays
             set => current.Current = value;
         }
 
+        public string Title
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
+
+        private readonly OsuSpriteText text;
+
         public OverlaySortTabControl()
         {
             AutoSizeAxes = Axes.Both;
@@ -40,7 +48,7 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(10, 0),
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -163,7 +171,7 @@ namespace osu.Game.Overlays
 
                 ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
 
-                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
+                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.SemiBold);
             }
         }
     }
