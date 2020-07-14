@@ -16,7 +16,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuJudgement : DrawableJudgement
     {
-        private SkinnableSprite lighting;
+        protected SkinnableSprite Lighting;
+
         private Bindable<Color4> lightingColour;
 
         public DrawableOsuJudgement(JudgementResult result, DrawableHitObject judgedObject)
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (config.Get<bool>(OsuSetting.HitLighting))
             {
-                AddInternal(lighting = new SkinnableSprite("lighting")
+                AddInternal(Lighting = new SkinnableSprite("lighting")
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -60,32 +61,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             lightingColour?.UnbindAll();
 
-            if (lighting != null)
+            if (Lighting != null)
             {
-                lighting.ResetAnimation();
+                Lighting.ResetAnimation();
 
                 if (JudgedObject != null)
                 {
                     lightingColour = JudgedObject.AccentColour.GetBoundCopy();
-                    lightingColour.BindValueChanged(colour => lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
+                    lightingColour.BindValueChanged(colour => Lighting.Colour = Result.Type == HitResult.Miss ? Color4.Transparent : colour.NewValue, true);
                 }
                 else
                 {
-                    lighting.Colour = Color4.White;
+                    Lighting.Colour = Color4.White;
                 }
             }
         }
 
-        protected override double FadeOutDelay => lighting == null ? base.FadeOutDelay : 1400;
+        protected override double FadeOutDelay => Lighting == null ? base.FadeOutDelay : 1400;
 
         protected override void ApplyHitAnimations()
         {
-            if (lighting != null)
+            if (Lighting != null)
             {
                 JudgementBody.FadeIn().Delay(FadeInDuration).FadeOut(400);
 
-                lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
-                lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
+                Lighting.ScaleTo(0.8f).ScaleTo(1.2f, 600, Easing.Out);
+                Lighting.FadeIn(200).Then().Delay(200).FadeOut(1000);
             }
 
             JudgementText?.TransformSpacingTo(Vector2.Zero).Then().TransformSpacingTo(new Vector2(14, 0), 1800, Easing.OutQuint);
