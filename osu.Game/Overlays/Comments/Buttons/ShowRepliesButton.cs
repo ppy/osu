@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Comments.Buttons
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Expanded.BindValueChanged(expanded => ToggleIcon(expanded.NewValue), true);
+            Expanded.BindValueChanged(expanded => SetIconDirection(expanded.NewValue), true);
         }
 
         protected override bool OnClick(ClickEvent e)

@@ -41,11 +41,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestArrowRotation()
+        public void TestArrowDirection()
         {
-            AddStep("Toggle icon up", () => button.ToggleIcon(true));
+            AddStep("Set upwards", () => button.SetIconDirection(true));
             AddAssert("Icon facing upwards", () => button.Icon.Scale.Y == -1);
-            AddStep("Toggle icon down", () => button.ToggleIcon(false));
+            AddStep("Set downwards", () => button.SetIconDirection(false));
             AddAssert("Icon facing downwards", () => button.Icon.Scale.Y == 1);
         }
 
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Text = "sample text";
             }
 
-            public new void ToggleIcon(bool upwards) => base.ToggleIcon(upwards);
+            public new void SetIconDirection(bool upwards) => base.SetIconDirection(upwards);
         }
     }
 }
