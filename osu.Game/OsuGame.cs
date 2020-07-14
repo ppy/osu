@@ -890,6 +890,10 @@ namespace osu.Game
                     beatmapListing.ToggleVisibility();
                     return true;
 
+                case GlobalAction.ToggleNotifications:
+                    notifications.ToggleVisibility();
+                    return true;
+
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
