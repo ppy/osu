@@ -103,7 +103,7 @@ namespace osu.Game.Screens
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = "限时特惠，立省100%",
+                                            Text = "限时特惠，立省50%",
                                             Font = OsuFont.GetFont(size: 60),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
@@ -217,6 +217,12 @@ namespace osu.Game.Screens
                                         },
                                         new OsuSpriteText
                                         {
+                                            Text = "打发打发时间就行了, 请不要沉迷其中 ;)",
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                        },
+                                        new OsuSpriteText
+                                        {
                                             Text = "不会有任何真实货币将被消耗, 也不会产生任何流量, 请放心游玩",
                                             Anchor = Anchor.BottomCentre,
                                             Origin = Anchor.BottomCentre,
@@ -257,7 +263,7 @@ namespace osu.Game.Screens
                 count++;
             }
 
-            Coins.BindValueChanged(v => ppCountText.Text = $"剩余pp: {v.NewValue}", true);
+            Coins.BindValueChanged(v => ppCountText.Text = $"剩余pp: {v.NewValue}, 抽取一次将花费50pp", true);
         }
     }
 }

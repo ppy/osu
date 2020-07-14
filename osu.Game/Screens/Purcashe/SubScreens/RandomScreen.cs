@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                         Origin = Anchor.Centre,
                         LayoutDuration = 300,
                         LayoutEasing = Easing.OutQuint,
+                        Margin = new MarginPadding{Horizontal = 150},
                         Padding = new MarginPadding{Top = (this.DrawHeight * 0.2f)},
                         Spacing = new Vector2(10)
                     },
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 {
                     Alpha = 0,
                     PPCount = RandomPP(),
-                    Rank = RandomRank(),
+                    Level = RandomLevel(),
                     TexturePath = RandomTexture(),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -194,20 +195,17 @@ namespace osu.Game.Screens.Purcashe.SubScreens
             }
         }
 
-        private int RandomPP()
-        {
-            return RNG.Next(-400, 400);
-        }
+        private int RandomPP() => RNG.Next(-400, 400);
 
-        private RankStats RandomRank()
+        private LevelStats RandomLevel()
         {
-            var rank = (RankStats)RNG.Next(0, (int)RankStats.Last);
+            var rank = (LevelStats)RNG.Next(0, (int)LevelStats.Last);
             switch(rank)
             {
-                case RankStats.Triangle:
-                case RankStats.Beatmap:
+                case LevelStats.Triangle:
+                case LevelStats.Beatmap:
                     if ( (ReturnRare)RNG.Next(0, (int)ReturnRare.last) != ReturnRare.yes)
-                        rank = (RankStats)RNG.Next(0, (int)RankStats.Triangle);
+                        rank = (LevelStats)RNG.Next(0, (int)LevelStats.Triangle);
                     break;
 
                 default:
@@ -224,7 +222,6 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 "Backgrounds/bg1",
                 "Backgrounds/bg2",
                 "Backgrounds/bg3",
-                //"Backgrounds/registration",
                 "Menu/menu-background-1",
                 "Menu/menu-background-2",
                 "Menu/menu-background-3",

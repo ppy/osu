@@ -22,8 +22,9 @@ namespace osu.Game.Screens.Purcashe.Components
     public class ItemPanel : Container
     {
         public int PPCount;
-        public RankStats Rank;
+        public LevelStats Level;
         public string TexturePath;
+        private Rank rank;
 
         private Container mask;
         private Container content;
@@ -36,6 +37,7 @@ namespace osu.Game.Screens.Purcashe.Components
         private Bindable<int> Coins = new Bindable<int>();
         private bool UnMasked = false;
         private Box maskBox;
+        private OsuSpriteText ppChangeText;
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, MfConfigManager config)
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Purcashe.Components
                         },
                         centreContent = new Container
                         {
-                            Name = "Centre Contnt Container",
+                            Name = "Centre Content Container",
                             RelativeSizeAxes = Axes.Both,
                             Height = 0.9f,
                             CornerRadius = 12.5f,
@@ -109,11 +111,6 @@ namespace osu.Game.Screens.Purcashe.Components
                             Origin = Anchor.BottomCentre,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    Colour = Color4Extensions.FromHex("#333"),
-                                    RelativeSizeAxes = Axes.Both
-                                },
                                 new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -123,7 +120,29 @@ namespace osu.Game.Screens.Purcashe.Components
                                     Texture = textures.Get($"{TexturePath ?? "Online/avatar-guest"}"),
                                 }
                             }
-                        }
+                        },
+                        new Container
+                        {
+                            Name = "Bottom Content Container",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 0.1f,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black.Opacity(0.8f))
+                                },
+                                ppChangeText = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Font = OsuFont.Numeric.With(size: 20)
+                                },
+                            }
+                        },
                     }
                 }
             };
@@ -133,37 +152,6 @@ namespace osu.Game.Screens.Purcashe.Components
         {
             UnMask();
             return base.OnClick(e);
-        }
-
-        private ColourInfo UpdateRankColor()
-        {
-            switch (Rank)
-            {
-                case RankStats.F:
-                case RankStats.D:
-                    return Color4.Red;
-
-                case RankStats.C:
-                    return Color4.Khaki;
-
-                case RankStats.B:
-                    return Color4.Indigo;
-
-                case RankStats.A:
-                    return Color4Extensions.FromHex(@"88da20");
-
-                case RankStats.S:
-                    return Color4.Orange;
-
-                case RankStats.SS:
-                case RankStats.Beatmap:
-                case RankStats.Triangle:
-                    return Color4.Gold;
-
-                case RankStats.Bruh:
-                default:
-                    return Color4.Gray;
-            }
         }
 
         public void UnMask()
@@ -177,38 +165,39 @@ namespace osu.Game.Screens.Purcashe.Components
 
             this.Delay(500).Schedule(() =>
             {
-                if (Coins.Value < 0 || (Coins.Value - 100) < 0)
+                if (Coins.Value < 0 || (Coins.Value - 50) < 0)
                 {
                     lockIcon.Icon = FontAwesome.Solid.Lock;
                     lockIcon.ScaleTo(1f, 300, Easing.OutQuint);
                     maskBox.FadeColour(Color4.DarkRed, 300, Easing.OutQuint);
+                    this.Delay(500).ScaleTo(0f, 300).FadeOut(300);
+                    this.Expire();
                     return;
                 }
                 else
                 {
-                    maskBox.FadeColour(Color4Extensions.FromHex("#111"), 300, Easing.OutQuint);
-                    Coins.Value -= 100;
+                    Coins.Value -= 50;
                 }
 
                 //其他设定
-                switch (Rank)
+                switch (Level)
                 {
-                    case RankStats.Triangle:
-                        PPCount = 1000;
+                    case LevelStats.Triangle:
                         itemName.Text = "粒子动画!";
                         centreContent.Add(new MfBgTriangles(){Masking = false});
                         config.Set(MfSetting.EasterEggBGTriangle, true);
+                        PPCount = 1000;
                         break;
 
-                    case RankStats.Beatmap:
+                    case LevelStats.Beatmap:
                         PPCount = 1000;
                         itemName.Text = "实时谱面背景!";
                         centreContent.Add(new BeatmapCover());
                         config.Set(MfSetting.EasterEggBGBeatmap, true);
                         break;
 
-                    case RankStats.Pippi:
-                        PPCount = 300;
+                    case LevelStats.Pippi:
+                        PPCount = 500;
                         itemName.Text = "一只Pippi!";
                         centreContent.Add(new Sprite
                         {
@@ -225,20 +214,26 @@ namespace osu.Game.Screens.Purcashe.Components
                         break;
                 }
 
-                config.Set(MfSetting.EasterEggCoinCount, (Coins.Value + PPCount));
+                if (PPCount >= 400) this.rank = Rank.Legendary;
+                if (PPCount > 300 && PPCount < 1000) this.rank = Rank.Rare;
 
                 //视觉效果
-                switch (Rank)
+                switch(rank)
                 {
-                    case RankStats.Triangle:
-                    case RankStats.Beatmap:
-                    case RankStats.Pippi:
-                        mask.Add(
-                            new Box
-                            {
-                                Colour = Color4.Gold,
-                                RelativeSizeAxes = Axes.Both,
-                            });
+                    case Rank.Rare:
+                        lockIcon.Hide();
+                        maskBox.Colour = Colour4.Silver;
+                        this.TweenEdgeEffectTo(new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Glow,
+                            Radius = 10,
+                            Colour = Color4.Silver
+                        });
+                        break;
+                    
+                    case Rank.Legendary:
+                        lockIcon.Hide();
+                        maskBox.Colour = Colour4.Gold;
                         this.TweenEdgeEffectTo(new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Glow,
@@ -246,7 +241,15 @@ namespace osu.Game.Screens.Purcashe.Components
                             Colour = Color4.Gold
                         });
                         break;
+                    
+                    default:
+                        break;
                 }
+
+                var symbol = "";
+                if (PPCount > 0) symbol = "+";
+                ppChangeText.Text = $"{symbol}" + $"{PPCount.ToString()}";
+                config.Set(MfSetting.EasterEggCoinCount, (Coins.Value + PPCount));
 
                 mask.FadeOut(300);
                 lockIcon.ScaleTo(0.8f, 300);
@@ -254,7 +257,7 @@ namespace osu.Game.Screens.Purcashe.Components
             });
         }
 
-        public enum RankStats
+        public enum LevelStats
         {
             F,
             D,
@@ -281,6 +284,14 @@ namespace osu.Game.Screens.Purcashe.Components
             no7,
             yes,
             last
+        }
+    
+        public enum Rank
+        {
+            Common,
+            Oops,
+            Rare,
+            Legendary
         }
     }
 }
