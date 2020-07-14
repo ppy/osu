@@ -48,9 +48,6 @@ namespace osu.Game.Beatmaps
 
             public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
             {
-                if (api?.State != APIState.Online)
-                    return Task.CompletedTask;
-
                 LogForModel(beatmapSet, "Performing online lookups...");
                 return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
             }
