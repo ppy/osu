@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Multi
         public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             currentJoinRoomRequest?.Cancel();
-            currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
+            currentJoinRoomRequest = new JoinRoomRequest(room);
 
             currentJoinRoomRequest.Success += () =>
             {
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Multi
             if (joinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(joinedRoom, api.LocalUser.Value));
+            api.Queue(new PartRoomRequest(joinedRoom));
             joinedRoom = null;
         }
 
