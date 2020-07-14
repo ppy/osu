@@ -149,7 +149,7 @@ namespace osu.Game.Overlays
                 if (beatmap.Disabled)
                     return;
 
-                next();
+                NextTrack();
             }
             else if (!IsPlaying)
             {
@@ -217,6 +217,9 @@ namespace osu.Game.Overlays
         /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
         private PreviousTrackResult prev()
         {
+            if (beatmap.Disabled)
+                return PreviousTrackResult.None;
+
             var currentTrackPosition = current?.Track.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
@@ -248,6 +251,9 @@ namespace osu.Game.Overlays
 
         private bool next()
         {
+            if (beatmap.Disabled)
+                return false;
+
             queuedDirection = TrackChangeDirection.Next;
 
             var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
