@@ -19,6 +19,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
@@ -489,5 +490,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         #endregion
+
+        public override bool OnPressed(GlobalAction action) => false; // handled by back button
     }
 }
