@@ -85,30 +85,32 @@ namespace osu.Game.Overlays.Rankings
                                         Current = Current
                                     }
                                 },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
-                                    Margin = new MarginPadding { Vertical = 5 },
-                                    Children = new Drawable[]
-                                    {
-                                        startDateColumn = new InfoColumn(@"Start Date"),
-                                        endDateColumn = new InfoColumn(@"End Date"),
-                                        mapCountColumn = new InfoColumn(@"Map Count"),
-                                        participantsColumn = new InfoColumn(@"Participants")
-                                    }
-                                },
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Vertical = 20 },
-                                    Child = new RankingsSortTabControl
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Current = Sort
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10, 0),
+                                            Margin = new MarginPadding { Bottom = 5 },
+                                            Children = new Drawable[]
+                                            {
+                                                startDateColumn = new InfoColumn(@"Start Date"),
+                                                endDateColumn = new InfoColumn(@"End Date"),
+                                                mapCountColumn = new InfoColumn(@"Map Count"),
+                                                participantsColumn = new InfoColumn(@"Participants")
+                                            }
+                                        },
+                                        new RankingsSortTabControl
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Current = Sort
+                                        }
                                     }
                                 }
                             }
