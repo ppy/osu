@@ -19,13 +19,14 @@ namespace osu.Game.Input
         public KeyBindingStore(DatabaseContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
             : base(contextFactory, storage)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
                 foreach (var info in rulesets.AvailableRulesets)
                 {
                     var ruleset = info.CreateInstance();
 
-                    foreach (var variant in ruleset.AvailableVariants) {
+                    foreach (var variant in ruleset.AvailableVariants)
+                    {
                         insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
                     }
                 }
@@ -70,7 +71,7 @@ namespace osu.Game.Input
                     {
                         if (databasedKeyBinding.StringAction != null) continue;
 
-                        databasedKeyBinding.StringAction = @group.Key.ToString();
+                        databasedKeyBinding.StringAction = group.Key.ToString();
                         usage.Context.DatabasedKeyBinding.Update(databasedKeyBinding);
                     }
                 }
