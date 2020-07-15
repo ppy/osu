@@ -404,6 +404,8 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
+        public override bool OnPressed(GlobalAction action) => false; // handled by back button
+
         private void availableModsChanged(ValueChangedEvent<Dictionary<ModType, IReadOnlyList<Mod>>> mods)
         {
             if (mods.NewValue == null) return;
@@ -490,7 +492,5 @@ namespace osu.Game.Overlays.Mods
         }
 
         #endregion
-
-        public override bool OnPressed(GlobalAction action) => false; // handled by back button
     }
 }
