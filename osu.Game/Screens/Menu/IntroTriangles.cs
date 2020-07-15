@@ -217,8 +217,7 @@ namespace osu.Game.Screens.Menu
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
 
-                        lazerLogo.TransformTo(nameof(LazerLogo.Background), 1f, logo_scale_duration);
-                        lazerLogo.TransformTo(nameof(LazerLogo.Highlight), 1f, logo_scale_duration);
+                        lazerLogo.TransformTo(nameof(LazerLogo.Progress), 1f, logo_scale_duration);
 
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
@@ -263,16 +262,14 @@ namespace osu.Game.Screens.Menu
             {
                 private HueAnimation highlight, background;
 
-                public float Highlight
-                {
-                    get => highlight.AnimationProgress;
-                    set => highlight.AnimationProgress = value;
-                }
-
-                public float Background
+                public float Progress
                 {
                     get => background.AnimationProgress;
-                    set => background.AnimationProgress = value;
+                    set
+                    {
+                        background.AnimationProgress = value;
+                        highlight.AnimationProgress = value;
+                    }
                 }
 
                 public LazerLogo()
