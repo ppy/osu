@@ -4,19 +4,16 @@
 using System.Net.Http;
 using osu.Framework.IO.Network;
 using osu.Game.Online.Chat;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
     public class LeaveChannelRequest : APIRequest
     {
         private readonly Channel channel;
-        private readonly User user;
 
-        public LeaveChannelRequest(Channel channel, User user)
+        public LeaveChannelRequest(Channel channel)
         {
             this.channel = channel;
-            this.user = user;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -26,6 +23,6 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $@"chat/channels/{channel.Id}/users/{user.Id}";
+        protected override string Target => $@"chat/channels/{channel.Id}/users/{User.Id}";
     }
 }

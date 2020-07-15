@@ -173,7 +173,6 @@ namespace osu.Game.Screens.Select
                             RelativeSizeAxes = Axes.X,
                             Height = FilterControl.HEIGHT,
                             FilterChanged = ApplyFilterToCarousel,
-                            Background = { Width = 2 },
                         },
                         new GridContainer // used for max width implementation
                         {
@@ -600,12 +599,6 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
-            if (ModSelect.State.Value == Visibility.Visible)
-            {
-                ModSelect.Hide();
-                return true;
-            }
-
             if (base.OnExiting(next))
                 return true;
 
@@ -617,6 +610,17 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
+
+            return false;
+        }
+
+        public override bool OnBackButton()
+        {
+            if (ModSelect.State.Value == Visibility.Visible)
+            {
+                ModSelect.Hide();
+                return true;
+            }
 
             return false;
         }
