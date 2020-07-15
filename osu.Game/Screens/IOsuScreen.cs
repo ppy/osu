@@ -58,8 +58,12 @@ namespace osu.Game.Screens
         bool AllowRateAdjustments { get; }
 
         /// <summary>
-        /// Whether there are sub overlays/screens that need closing with the back button before this <see cref="IOsuScreen"/> can be exited.
+        /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.
         /// </summary>
+        /// <remarks>
+        /// Return <c>true</c> to block this <see cref="IOsuScreen"/> from being exited after closing an overlay.
+        /// Return <c>false</c> if this <see cref="IOsuScreen"/> should continue exiting.
+        /// </remarks>
         bool OnBackButton();
     }
 }
