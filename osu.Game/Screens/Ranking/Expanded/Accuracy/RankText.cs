@@ -77,11 +77,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(35),
                     BypassAutoSizeAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(200),
                     CacheDrawnFrameBuffer = true,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
-                    Size = new Vector2(2f), // increase buffer size to allow for scale
                     Scale = new Vector2(1.8f),
                     Children = new[]
                     {
@@ -122,15 +121,18 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
 
             flash.Colour = OsuColour.ForRank(rank);
-            flash.FadeIn().Then().FadeOut(1200, Easing.OutQuint);
 
             if (rank >= ScoreRank.S)
                 rankText.ScaleTo(1.05f).ScaleTo(1, 3000, Easing.OutQuint);
 
             if (rank >= ScoreRank.X)
             {
-                flash.FadeIn().Then().FadeOut(3000);
-                superFlash.FadeIn().Then().FadeOut(800, Easing.OutQuint);
+                flash.FadeOutFromOne(3000);
+                superFlash.FadeOutFromOne(800, Easing.OutQuint);
+            }
+            else
+            {
+                flash.FadeOutFromOne(1200, Easing.OutQuint);
             }
         }
     }
