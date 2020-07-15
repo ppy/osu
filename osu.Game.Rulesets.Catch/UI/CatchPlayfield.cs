@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Origin = Anchor.TopLeft,
             };
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new []
             {
                 explodingFruitContainer,
                 CatcherArea.MovableCatcher.CaughtFruitContainer.CreateProxy(),
