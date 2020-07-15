@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,8 +25,9 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
+        protected List<LaneCover> laneCovers = new List<LaneCover>();
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             ManiaPlayfield maniaPlayfield = (ManiaPlayfield)drawableRuleset.Playfield;
 
@@ -34,6 +36,8 @@ namespace osu.Game.Rulesets.Mania.Mods
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
 
+                LaneCover laneCover;
+
                 hocParent.Remove(hoc);
                 hocParent.Add(new BufferedContainer
                 {
@@ -41,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Children = new Drawable[]
                     {
                         hoc,
-                        new LaneCover
+                        laneCover = new LaneCover
                         {
                             Coverage = 0.5f,
                             RelativeSizeAxes = Axes.Both,
@@ -50,10 +54,12 @@ namespace osu.Game.Rulesets.Mania.Mods
                         }
                     }
                 });
+
+                laneCovers.Add(laneCover);
             }
         }
 
-        private class LaneCover : CompositeDrawable
+        protected class LaneCover : CompositeDrawable
         {
             private readonly Box gradient;
             private readonly Box filled;
