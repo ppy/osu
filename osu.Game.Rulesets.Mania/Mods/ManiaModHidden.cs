@@ -44,7 +44,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                         new LaneCover
                         {
                             Coverage = 0.5f,
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre
                         }
                     }
                 });
@@ -55,7 +57,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             private readonly Box gradient;
             private readonly Box filled;
-            private bool reversed;
             private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
 
             public LaneCover()
@@ -76,11 +77,17 @@ namespace osu.Game.Rulesets.Mania.Mods
                     {
                         RelativeSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.Both,
-                        Height = 0.25f
+                        Height = 0.25f,
+                        Colour = ColourInfo.GradientVertical(
+                            Color4.White.Opacity(0f),
+                            Color4.White.Opacity(1f)
+                        )
                     },
                     filled = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft
                     }
                 };
             }
@@ -92,37 +99,18 @@ namespace osu.Game.Rulesets.Mania.Mods
                 scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
             }
 
-            private void updateCoverage()
-            {
-                filled.Anchor = reversed ? Anchor.BottomLeft : Anchor.TopLeft;
-                filled.Origin = reversed ? Anchor.BottomLeft : Anchor.TopLeft;
-                filled.Height = coverage;
-
-                gradient.Y = reversed ? 1 - filled.Height - gradient.Height : coverage;
-                gradient.Colour = ColourInfo.GradientVertical(
-                    Color4.White.Opacity(reversed ? 0f : 1f),
-                    Color4.White.Opacity(reversed ? 1f : 0f)
-                );
-            }
-
             private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> valueChangedEvent)
             {
-                reversed = valueChangedEvent.NewValue == ScrollingDirection.Up;
-                updateCoverage();
+                bool isUpscroll = valueChangedEvent.NewValue == ScrollingDirection.Up;
+                Rotation = isUpscroll ? 180f : 0f;
             }
-
-            private float coverage;
 
             public float Coverage
             {
                 set
                 {
-                    if (coverage == value)
-                        return;
-
-                    coverage = value;
-
-                    updateCoverage();
+                    filled.Height = value;
+                    gradient.Y = 1 - filled.Height - gradient.Height;
                 }
             }
         }
