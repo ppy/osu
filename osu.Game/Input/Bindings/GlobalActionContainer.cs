@@ -57,6 +57,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -160,6 +161,9 @@ namespace osu.Game.Input.Bindings
         Home,
 
         [Description("Toggle notifications")]
-        ToggleNotifications
+        ToggleNotifications,
+
+        [Description("Pause")]
+        PauseGameplay,
     }
 }
