@@ -30,7 +30,7 @@ namespace osu.Game.Input.Bindings
             set => Action = value;
         }
 
-        [Column("SAction")]
-        public string StringAction { get; set; }
+        [Column("ActionName")]
+        public string ActionName { get; set; }
     }
 }

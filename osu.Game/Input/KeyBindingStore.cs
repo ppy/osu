@@ -69,9 +69,9 @@ namespace osu.Game.Input
                 {
                     foreach (var databasedKeyBinding in usage.Context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant && b.IntAction == (int)group.Key))
                     {
-                        if (databasedKeyBinding.StringAction != null) continue;
+                        if (databasedKeyBinding.ActionName != null) continue;
 
-                        databasedKeyBinding.StringAction = group.Key.ToString();
+                        databasedKeyBinding.ActionName = group.Key.ToString();
                         usage.Context.DatabasedKeyBinding.Update(databasedKeyBinding);
                     }
                 }
