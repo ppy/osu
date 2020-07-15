@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
@@ -24,6 +25,13 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        public override Judgement CreateJudgement() => new SliderRepeat.SliderRepeatJudgement();
+        public override Judgement CreateJudgement() => new SliderTailJudgement();
+
+        public class SliderTailJudgement : OsuJudgement
+        {
+            protected override int NumericResultFor(HitResult result) => 0;
+
+            public override bool AffectsCombo => false;
+        }
     }
 }

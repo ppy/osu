@@ -312,10 +312,12 @@ namespace osu.Game
             base.SetHost(host);
 
             // may be non-null for certain tests
-            Storage ??= new OsuStorage(host);
+            Storage ??= host.Storage;
 
             LocalConfig ??= new OsuConfigManager(Storage);
         }
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 

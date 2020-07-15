@@ -14,6 +14,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -137,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
-        public float Progress => Math.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress => Math.Clamp(Disc.CumulativeRotation / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -190,12 +191,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
-            SpmCounter.SetRotation(Disc.RotationAbsolute);
+            SpmCounter.SetRotation(Disc.CumulativeRotation);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
-            Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
+            float targetScale = relativeCircleScale + (1 - relativeCircleScale) * Progress;
+            Disc.Scale = new Vector2((float)Interpolation.Lerp(Disc.Scale.X, targetScale, Math.Clamp(Math.Abs(Time.Elapsed) / 100, 0, 1)));
 
-            symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
+            symbol.Rotation = (float)Interpolation.Lerp(symbol.Rotation, Disc.Rotation / 2, Math.Clamp(Math.Abs(Time.Elapsed) / 40, 0, 1));
         }
 
         protected override void UpdateInitialTransforms()
@@ -204,9 +206,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
-
-            Disc.RotateTo(-720);
-            symbol.RotateTo(-720);
 
             mainContainer
                 .ScaleTo(0)

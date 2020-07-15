@@ -35,6 +35,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
@@ -56,6 +57,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -157,5 +159,11 @@ namespace osu.Game.Input.Bindings
 
         [Description("Home")]
         Home,
+
+        [Description("Toggle notifications")]
+        ToggleNotifications,
+
+        [Description("Pause")]
+        PauseGameplay,
     }
 }

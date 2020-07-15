@@ -10,10 +10,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToTrack
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToAudio
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
@@ -58,6 +59,11 @@ namespace osu.Game.Rulesets.Mods
             AdjustPitch.TriggerChange();
         }
 
+        public void ApplyToSample(SampleChannel sample)
+        {
+            sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
+        }
+
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
         {
             HitObject lastObject = beatmap.HitObjects.LastOrDefault();
@@ -83,9 +89,9 @@ namespace osu.Game.Rulesets.Mods
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {
             // remove existing old adjustment
-            track.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
 
-            track.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
         }
 
         private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
