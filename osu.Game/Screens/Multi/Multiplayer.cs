@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnBackButton()
         {
-            if ((screenStack.CurrentScreen as IMultiplayerSubScreen).OnBackButton())
+            if ((screenStack.CurrentScreen as IMultiplayerSubScreen)?.OnBackButton() == true)
                 return true;
 
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
