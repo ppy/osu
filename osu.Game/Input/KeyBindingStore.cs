@@ -19,13 +19,15 @@ namespace osu.Game.Input
         public KeyBindingStore(DatabaseContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
             : base(contextFactory, storage)
         {
-            using (ContextFactory.GetForWrite())
+            using (var usage = ContextFactory.GetForWrite())
             {
                 foreach (var info in rulesets.AvailableRulesets)
                 {
                     var ruleset = info.CreateInstance();
-                    foreach (var variant in ruleset.AvailableVariants)
+
+                    foreach (var variant in ruleset.AvailableVariants) {
                         insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
+                    }
                 }
             }
         }
@@ -39,7 +41,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = Query(rulesetId, variant).Count(k => k.Action == group.Key);
+                    int count = Query(rulesetId, variant).Count(k => k.IntAction == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -58,6 +60,18 @@ namespace osu.Game.Input
 
                         // required to ensure stable insert order (https://github.com/dotnet/efcore/issues/11686)
                         usage.Context.SaveChanges();
+                    }
+                }
+
+                // for now this should be fine here
+                foreach (var group in defaults.GroupBy(k => k.Action))
+                {
+                    foreach (var databasedKeyBinding in usage.Context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant && b.IntAction == (int)group.Key))
+                    {
+                        if (databasedKeyBinding.StringAction != null) continue;
+
+                        databasedKeyBinding.StringAction = @group.Key.ToString();
+                        usage.Context.DatabasedKeyBinding.Update(databasedKeyBinding);
                     }
                 }
             }
