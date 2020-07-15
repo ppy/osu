@@ -86,9 +86,9 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
 
             [BackgroundDependencyLoader]
-            private void load(IScrollingInfo configManager)
+            private void load(IScrollingInfo scrollingInfo)
             {
-                scrollDirection.BindTo(configManager.Direction);
+                scrollDirection.BindTo(scrollingInfo.Direction);
                 scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
             }
 
