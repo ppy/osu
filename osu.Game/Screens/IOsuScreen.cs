@@ -56,5 +56,14 @@ namespace osu.Game.Screens
         /// Whether mod rate adjustments are allowed to be applied.
         /// </summary>
         bool AllowRateAdjustments { get; }
+
+        /// <summary>
+        /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.
+        /// </summary>
+        /// <remarks>
+        /// Return <c>true</c> to block this <see cref="IOsuScreen"/> from being exited after closing an overlay.
+        /// Return <c>false</c> if this <see cref="IOsuScreen"/> should continue exiting.
+        /// </remarks>
+        bool OnBackButton();
     }
 }
