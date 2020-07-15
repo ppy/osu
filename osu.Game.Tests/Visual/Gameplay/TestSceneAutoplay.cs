@@ -35,8 +35,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+
+            double? time = null;
+
+            AddStep("store time", () => time = Player.GameplayClockContainer.GameplayClock.CurrentTime);
+
+            // test seek via keyboard
             AddStep("seek with right arrow key", () => press(Key.Right));
-            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
+            AddAssert("time seeked forward", () => Player.GameplayClockContainer.GameplayClock.CurrentTime > time + 2000);
+
+            AddStep("store time", () => time = Player.GameplayClockContainer.GameplayClock.CurrentTime);
+            AddStep("seek with left arrow key", () => press(Key.Left));
+            AddAssert("time seeked backward", () => Player.GameplayClockContainer.GameplayClock.CurrentTime < time);
 
             seekToBreak(0);
             seekToBreak(1);
