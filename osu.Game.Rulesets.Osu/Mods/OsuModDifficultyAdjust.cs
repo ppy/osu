@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableNumber<float> CircleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             Default = 5,
             Value = 5,
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
-            MinValue = 1,
+            MinValue = 0,
             MaxValue = 10,
             Default = 5,
             Value = 5,
