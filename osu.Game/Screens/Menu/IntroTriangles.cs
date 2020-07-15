@@ -283,21 +283,18 @@ namespace osu.Game.Screens.Menu
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
-                    const string lazer_logo_background = @"Intro/Triangles/logo-background";
-                    const string lazer_logo_highlight = @"Intro/Triangles/logo-highlight";
-
                     InternalChildren = new Drawable[]
                     {
                         highlight = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(lazer_logo_highlight),
-                            Colour = OsuColour.Gray(1f),
+                            Texture = textures.Get(@"Intro/Triangles/logo-highlight"),
+                            Colour = Color4.White,
                         },
                         background = new HueAnimation
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(lazer_logo_background),
+                            Texture = textures.Get(@"Intro/Triangles/logo-background"),
                             Colour = OsuColour.Gray(0.6f),
                         },
                     };
