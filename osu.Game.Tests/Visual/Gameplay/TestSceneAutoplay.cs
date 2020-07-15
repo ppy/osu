@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
 using osu.Game.Screens.Ranking;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -34,6 +35,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("overlay displays 100% accuracy", () => Player.BreakOverlay.ChildrenOfType<BreakInfo>().Single().AccuracyDisplay.Current.Value == 1);
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-80000));
             AddUntilStep("key counter reset", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+            AddStep("seek with right arrow key", () => press(Key.Right));
+            AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
 
             seekToBreak(0);
             seekToBreak(1);
@@ -53,6 +56,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for seek to complete", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= destBreak().StartTime);
 
             BreakPeriod destBreak() => Beatmap.Value.Beatmap.Breaks.ElementAt(breakIndex);
+        }
+
+        private void press(Key key)
+        {
+            InputManager.PressKey(key);
+            InputManager.ReleaseKey(key);
         }
     }
 }
