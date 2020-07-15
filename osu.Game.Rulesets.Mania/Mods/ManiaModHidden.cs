@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
-        protected List<LaneCover> laneCovers = new List<LaneCover>();
+        protected List<LaneCover> LaneCovers = new List<LaneCover>();
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     }
                 });
 
-                laneCovers.Add(laneCover);
+                LaneCovers.Add(laneCover);
             }
         }
 

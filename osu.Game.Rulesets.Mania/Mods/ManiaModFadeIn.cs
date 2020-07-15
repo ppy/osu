@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             base.ApplyToDrawableRuleset(drawableRuleset);
-            laneCovers.ForEach(laneCover => laneCover.Scale = new Vector2(1f, -1f));
+            LaneCovers.ForEach(laneCover => laneCover.Scale = new Vector2(1f, -1f));
         }
     }
 }
