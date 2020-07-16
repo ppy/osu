@@ -24,14 +24,13 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(300, 500),
-                Child = cover = new PlayfieldCoveringContainer
+                Child = cover = new PlayfieldCoveringContainer(new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Orange
-                    }
+                    Colour = Color4.Orange
+                })
+                {
+                    RelativeSizeAxes = Axes.Both,
                 }
             };
         }
