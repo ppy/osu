@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
 
+        public readonly Catcher MovableCatcher;
+
         public Container ExplodingFruitTarget
         {
             set => MovableCatcher.ExplodingFruitTarget = value;
@@ -104,7 +106,5 @@ namespace osu.Game.Rulesets.Catch.UI
             if (state?.CatcherX != null)
                 MovableCatcher.X = state.CatcherX.Value;
         }
-
-        protected internal readonly Catcher MovableCatcher;
     }
 }
