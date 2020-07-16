@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -13,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -20,6 +23,8 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -40,6 +45,15 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyManager difficultyManager { get; set; }
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
             : base(panel)
@@ -137,7 +151,6 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         starCounter = new StarCounter
                                         {
-                                            Current = (float)beatmap.StarDifficulty,
                                             Scale = new Vector2(0.8f),
                                         }
                                     }
@@ -147,6 +160,36 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 }
             };
+
+            ruleset.BindValueChanged(_ => refreshStarCounter());
+            mods.BindValueChanged(_ => refreshStarCounter(), true);
+        }
+
+        private ScheduledDelegate scheduledRefresh;
+        private CancellationTokenSource cancellationSource;
+
+        private void refreshStarCounter()
+        {
+            scheduledRefresh?.Cancel();
+            scheduledRefresh = null;
+
+            cancellationSource?.Cancel();
+            cancellationSource = null;
+
+            // Only want to run the calculation when we become visible.
+            scheduledRefresh = Schedule(() =>
+            {
+                var ourSource = cancellationSource = new CancellationTokenSource();
+                difficultyManager.GetDifficultyAsync(beatmap, ruleset.Value, mods.Value, ourSource.Token).ContinueWith(t =>
+                {
+                    // We're currently on a random threadpool thread which we must exit.
+                    Schedule(() =>
+                    {
+                        if (!ourSource.IsCancellationRequested)
+                            starCounter.Current = (float)t.Result;
+                    });
+                }, ourSource.Token);
+            });
         }
 
         protected override void Selected()
