@@ -62,6 +62,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(false)]
         public void TestHitLighting(bool enable)
         {
+            AddStep("create catcher", () => createCatcher(5));
+
             AddStep("Toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
             AddStep("Catch fruit", () => catchFruit(new TestFruit(false)
             {
