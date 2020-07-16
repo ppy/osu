@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -18,6 +17,11 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
+
+        /// <summary>
+        /// The direction in which the cover should expand.
+        /// </summary>
+        protected virtual CoverExpandDirection ExpandDirection => CoverExpandDirection.AgainstScroll;
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
@@ -29,23 +33,12 @@ namespace osu.Game.Rulesets.Mania.Mods
                 Container hocParent = (Container)hoc.Parent;
 
                 hocParent.Remove(hoc);
-                hocParent.Add(CreateCover(hoc).With(c =>
+                hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
+                    c.Direction = ExpandDirection;
                     c.Coverage = 0.5f;
                 }));
-            }
-        }
-
-        protected virtual PlayfieldCoveringWrapper CreateCover(Drawable content) => new ModHiddenCoveringWrapper(content);
-
-        private class ModHiddenCoveringWrapper : PlayfieldCoveringWrapper
-        {
-            public ModHiddenCoveringWrapper(Drawable content)
-                : base(content)
-            {
-                // This cover extends outwards from the hit position.
-                Cover.Scale = new Vector2(1, -1);
             }
         }
     }
