@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mods
         Conversion,
         Automation,
         Fun,
+        Challenge,
         System
     }
 }

@@ -190,6 +190,7 @@ namespace osu.Game.Overlays.Mods
                                         new AutomationSection { Action = modButtonPressed },
                                         new ConversionSection { Action = modButtonPressed },
                                         new FunSection { Action = modButtonPressed },
+                                        new ChallengeSection { Action = modButtonPressed },
                                     }
                                 },
                             },
