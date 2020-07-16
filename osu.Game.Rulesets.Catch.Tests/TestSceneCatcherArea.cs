@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
+        private Catcher catcher => this.ChildrenOfType<CatcherArea>().First().MovableCatcher;
+
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
@@ -38,20 +40,20 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddRepeatStep("catch fruit", () => catchFruit(new TestFruit(false)
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X
+                X = catcher.X
             }), 20);
             AddRepeatStep("catch fruit last in combo", () => catchFruit(new TestFruit(false)
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X,
+                X = catcher.X,
                 LastInCombo = true,
             }), 20);
             AddRepeatStep("catch kiai fruit", () => catchFruit(new TestFruit(true)
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X,
+                X = catcher.X
             }), 20);
             AddRepeatStep("miss fruit", () => catchFruit(new Fruit
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X + 100,
+                X = catcher.X + 100,
                 LastInCombo = true,
             }, true), 20);
         }
@@ -60,8 +62,6 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(false)]
         public void TestHitLighting(bool enable)
         {
-            Catcher catcher = this.ChildrenOfType<CatcherArea>().First().MovableCatcher;
-
             AddStep("Toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
             AddStep("Catch fruit", () => catchFruit(new TestFruit(false)
             {
