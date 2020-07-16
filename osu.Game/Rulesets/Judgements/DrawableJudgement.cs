@@ -31,8 +31,10 @@ namespace osu.Game.Rulesets.Judgements
         public JudgementResult Result { get; private set; }
         public DrawableHitObject JudgedObject { get; private set; }
 
-        protected Container JudgementBody;
-        protected SpriteText JudgementText;
+        protected Container JudgementBody { get; private set; }
+        protected SpriteText JudgementText { get; private set; }
+
+        private SkinnableDrawable bodyDrawable;
 
         /// <summary>
         /// Duration of initial fade in.
@@ -89,6 +91,8 @@ namespace osu.Game.Rulesets.Judgements
 
             prepareDrawables();
 
+            bodyDrawable.ResetAnimation();
+
             this.FadeInFromZero(FadeInDuration, Easing.OutQuint);
             JudgementBody.ScaleTo(1);
             JudgementBody.RotateTo(0);
@@ -131,7 +135,7 @@ namespace osu.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
+                Child = bodyDrawable = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(type), _ => JudgementText = new OsuSpriteText
                 {
                     Text = type.GetDescription().ToUpperInvariant(),
                     Font = OsuFont.Numeric.With(size: 20),
