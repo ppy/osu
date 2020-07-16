@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             public ModHiddenCoveringContainer()
             {
+                // This cover extends outwards from the hit position.
                 Cover.Scale = new Vector2(1, -1);
             }
         }
