@@ -64,13 +64,12 @@ namespace osu.Game.Input
                     }
                 }
 
-                // for now this should be fine here
+                // has nothing to do with inserting defaults. This migrates values and shoud be fine for the time being. See https://github.com/ppy/osu/pull/9549
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    foreach (var databasedKeyBinding in usage.Context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant && b.IntAction == (int)group.Key))
+                    foreach (var databasedKeyBinding in usage.Context.DatabasedKeyBinding.Where(
+                        b => b.RulesetID == rulesetId && b.Variant == variant && b.IntAction == (int)group.Key && b.ActionName == null))
                     {
-                        if (databasedKeyBinding.ActionName != null) continue;
-
                         databasedKeyBinding.ActionName = group.Key.ToString();
                         usage.Context.DatabasedKeyBinding.Update(databasedKeyBinding);
                     }
