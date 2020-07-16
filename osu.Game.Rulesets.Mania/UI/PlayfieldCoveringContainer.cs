@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.UI
     public class PlayfieldCoveringContainer : Container
     {
         protected override Container<Drawable> Content => content;
+
         private readonly Container content;
 
         /// <summary>
