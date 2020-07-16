@@ -34,8 +34,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
         }
 
-        [TestCase(ScoringMode.Standardised, HitResult.Meh, 750_000)]
-        [TestCase(ScoringMode.Standardised, HitResult.Good, 800_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.Meh, 700_000)]
+        [TestCase(ScoringMode.Standardised, HitResult.Good, 700_005)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
         [TestCase(ScoringMode.Classic, HitResult.Meh, 50)]
         [TestCase(ScoringMode.Classic, HitResult.Good, 100)]
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
             scoreProcessor.ApplyResult(judgementResult);
 
-            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value, 1));
         }
     }
 }
