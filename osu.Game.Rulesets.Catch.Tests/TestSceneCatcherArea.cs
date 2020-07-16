@@ -25,7 +25,9 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestSceneCatcherArea : CatchSkinnableTestScene
     {
         private RulesetInfo catchRuleset;
-        private OsuConfigManager config;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         public TestSceneCatcherArea()
         {
@@ -105,10 +107,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, OsuConfigManager configManager)
+        private void load(RulesetStore rulesets)
         {
             catchRuleset = rulesets.GetRuleset(2);
-            config = configManager;
         }
 
         public class TestFruit : Fruit
