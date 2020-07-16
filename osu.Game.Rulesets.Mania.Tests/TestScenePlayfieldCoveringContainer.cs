@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     public class TestScenePlayfieldCoveringContainer : OsuTestScene
     {
         private readonly ScrollingTestContainer scrollingContainer;
-        private readonly PlayfieldCoveringContainer cover;
+        private readonly PlayfieldCoveringWrapper cover;
 
         public TestScenePlayfieldCoveringContainer()
         {
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(300, 500),
-                Child = cover = new PlayfieldCoveringContainer(new Box
+                Child = cover = new PlayfieldCoveringWrapper(new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Orange

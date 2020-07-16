@@ -37,11 +37,11 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
         }
 
-        protected virtual PlayfieldCoveringContainer CreateCover(Drawable content) => new ModHiddenCoveringContainer(content);
+        protected virtual PlayfieldCoveringWrapper CreateCover(Drawable content) => new ModHiddenCoveringWrapper(content);
 
-        private class ModHiddenCoveringContainer : PlayfieldCoveringContainer
+        private class ModHiddenCoveringWrapper : PlayfieldCoveringWrapper
         {
-            public ModHiddenCoveringContainer(Drawable content)
+            public ModHiddenCoveringWrapper(Drawable content)
                 : base(content)
             {
                 // This cover extends outwards from the hit position.
