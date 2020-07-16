@@ -56,7 +56,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         [TestCase(true)]
         [TestCase(false)]
-        public void TestHitLighting(bool enable) {
+        public void TestHitLighting(bool enable)
+        {
             Catcher catcher = this.ChildrenOfType<CatcherArea>().First().MovableCatcher;
 
             AddStep("Toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
