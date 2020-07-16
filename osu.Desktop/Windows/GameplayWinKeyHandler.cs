@@ -11,26 +11,26 @@ namespace osu.Desktop.Windows
 {
     public class GameplayWinKeyHandler : Component
     {
-        private Bindable<bool> allowScreenSuspension;
         private Bindable<bool> disableWinKey;
+        private Bindable<bool> disableWinKeySetting;
 
         private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config)
+        private void load(GameHost host, OsuConfigManager config, SessionStatics statics)
         {
             this.host = host;
 
-            allowScreenSuspension = host.AllowScreenSuspension.GetBoundCopy();
-            allowScreenSuspension.ValueChanged += toggleWinKey;
+            disableWinKey = statics.GetBindable<bool>(Static.DisableWindowsKey);
+            disableWinKey.ValueChanged += toggleWinKey;
 
-            disableWinKey = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey);
-            disableWinKey.BindValueChanged(t => allowScreenSuspension.TriggerChange(), true);
+            disableWinKeySetting = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey);
+            disableWinKeySetting.BindValueChanged(t => disableWinKey.TriggerChange(), true);
         }
 
         private void toggleWinKey(ValueChangedEvent<bool> e)
         {
-            if (!e.NewValue && disableWinKey.Value)
+            if (e.NewValue && disableWinKeySetting.Value)
                 host.InputThread.Scheduler.Add(WindowsKey.Disable);
             else
                 host.InputThread.Scheduler.Add(WindowsKey.Enable);

@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
@@ -21,6 +22,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private GameHost host { get; set; }
+
+        [Resolved]
+        private SessionStatics statics { get; set; }
 
         public ScreenSuspensionHandler([NotNull] GameplayClockContainer gameplayClockContainer)
         {
@@ -36,7 +40,11 @@ namespace osu.Game.Screens.Play
             Debug.Assert(host.AllowScreenSuspension.Value);
 
             isPaused = gameplayClockContainer.IsPaused.GetBoundCopy();
-            isPaused.BindValueChanged(paused => host.AllowScreenSuspension.Value = paused.NewValue, true);
+            isPaused.BindValueChanged(paused =>
+            {
+                host.AllowScreenSuspension.Value = paused.NewValue;
+                statics.Set(Static.DisableWindowsKey, !paused.NewValue);
+            }, true);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -46,7 +54,10 @@ namespace osu.Game.Screens.Play
             isPaused?.UnbindAll();
 
             if (host != null)
+            {
                 host.AllowScreenSuspension.Value = true;
+                statics.Set(Static.DisableWindowsKey, false);
+            }
         }
     }
 }
