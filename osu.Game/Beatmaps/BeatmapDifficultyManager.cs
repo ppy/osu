@@ -29,32 +29,32 @@ namespace osu.Game.Beatmaps
             this.beatmapManager = beatmapManager;
         }
 
-        public Task<double> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IReadOnlyList<Mod> mods = null,
-                                               CancellationToken cancellationToken = default)
-            => Task.Factory.StartNew(() => GetDifficulty(beatmapInfo, rulesetInfo, mods), cancellationToken,
-                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
-                updateScheduler);
+        public async Task<double> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IReadOnlyList<Mod> mods = null,
+                                                     CancellationToken cancellationToken = default)
+        {
+            if (tryGetGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
+                return existing;
+
+            return await Task.Factory.StartNew(() => getDifficulty(key), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+        }
 
         public double GetDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IReadOnlyList<Mod> mods = null)
         {
-            // Difficulty can only be computed if the beatmap is locally available.
-            if (beatmapInfo.ID == 0)
-                return 0;
-
-            // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
-            rulesetInfo ??= beatmapInfo.Ruleset;
-
-            var key = new DifficultyCacheLookup(beatmapInfo, rulesetInfo, mods);
-            if (difficultyCache.TryGetValue(key, out var existing))
+            if (tryGetGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
+            return getDifficulty(key);
+        }
+
+        private double getDifficulty(in DifficultyCacheLookup key)
+        {
             try
             {
-                var ruleset = rulesetInfo.CreateInstance();
+                var ruleset = key.RulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
-                var attributes = calculator.Calculate(mods?.ToArray() ?? Array.Empty<Mod>());
+                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
+                var attributes = calculator.Calculate(key.Mods);
 
                 difficultyCache.Add(key, attributes.StarRating);
                 return attributes.StarRating;
@@ -66,30 +66,57 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// Attempts to retrieve an existing difficulty for the combination.
+        /// </summary>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/>.</param>
+        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/>.</param>
+        /// <param name="mods">The <see cref="Mod"/>s.</param>
+        /// <param name="existingDifficulty">The existing difficulty value, if present.</param>
+        /// <param name="key">The <see cref="DifficultyCacheLookup"/> key that was used to perform this lookup. This can be further used to query <see cref="getDifficulty"/>.</param>
+        /// <returns>Whether an existing difficulty was found.</returns>
+        private bool tryGetGetExisting(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo, IReadOnlyList<Mod> mods, out double existingDifficulty, out DifficultyCacheLookup key)
+        {
+            // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
+            rulesetInfo ??= beatmapInfo.Ruleset;
+
+            // Difficulty can only be computed if the beatmap is locally available.
+            if (beatmapInfo.ID == 0)
+            {
+                existingDifficulty = 0;
+                key = default;
+
+                return true;
+            }
+
+            key = new DifficultyCacheLookup(beatmapInfo, rulesetInfo, mods);
+            return difficultyCache.TryGetValue(key, out existingDifficulty);
+        }
+
         private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
-            private readonly BeatmapInfo beatmapInfo;
-            private readonly RulesetInfo rulesetInfo;
-            private readonly IReadOnlyList<Mod> mods;
+            public readonly BeatmapInfo BeatmapInfo;
+            public readonly RulesetInfo RulesetInfo;
+            public readonly Mod[] Mods;
 
             public DifficultyCacheLookup(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo, IEnumerable<Mod> mods)
             {
-                this.beatmapInfo = beatmapInfo;
-                this.rulesetInfo = rulesetInfo;
-                this.mods = mods?.OrderBy(m => m.Acronym).ToArray() ?? Array.Empty<Mod>();
+                BeatmapInfo = beatmapInfo;
+                RulesetInfo = rulesetInfo;
+                Mods = mods?.OrderBy(m => m.Acronym).ToArray() ?? Array.Empty<Mod>();
             }
 
             public bool Equals(DifficultyCacheLookup other)
-                => beatmapInfo.Equals(other.beatmapInfo)
-                   && mods.SequenceEqual(other.mods);
+                => BeatmapInfo.Equals(other.BeatmapInfo)
+                   && Mods.SequenceEqual(other.Mods);
 
             public override int GetHashCode()
             {
                 var hashCode = new HashCode();
 
-                hashCode.Add(beatmapInfo.Hash);
-                hashCode.Add(rulesetInfo.GetHashCode());
-                foreach (var mod in mods)
+                hashCode.Add(BeatmapInfo.Hash);
+                hashCode.Add(RulesetInfo.GetHashCode());
+                foreach (var mod in Mods)
                     hashCode.Add(mod.Acronym);
 
                 return hashCode.ToHashCode();
