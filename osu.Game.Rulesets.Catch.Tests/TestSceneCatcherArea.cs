@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
@@ -24,6 +25,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestSceneCatcherArea : CatchSkinnableTestScene
     {
         private RulesetInfo catchRuleset;
+        private OsuConfigManager config;
 
         public TestSceneCatcherArea()
         {
@@ -50,6 +52,24 @@ namespace osu.Game.Rulesets.Catch.Tests
                 X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X + 100,
                 LastInCombo = true,
             }, true), 20);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestHitLighting(bool enable) {
+            Catcher catcher = this.ChildrenOfType<CatcherArea>().First().MovableCatcher;
+
+            AddStep("Toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
+            AddStep("Catch fruit", () => catchFruit(new TestFruit(false)
+            {
+                X = catcher.X
+            }));
+            AddStep("Catch fruit last combo", () => catchFruit(new TestFruit(false)
+            {
+                X = catcher.X,
+                LastInCombo = true
+            }));
+            AddAssert("Check hit explotion", () => catcher.ChildrenOfType<HitExplosion>().Any() == enable);
         }
 
         private void catchFruit(Fruit fruit, bool miss = false)
@@ -84,9 +104,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load(RulesetStore rulesets, OsuConfigManager configManager)
         {
             catchRuleset = rulesets.GetRuleset(2);
+            config = configManager;
         }
 
         public class TestFruit : Fruit
