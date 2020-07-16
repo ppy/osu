@@ -250,12 +250,6 @@ namespace osu.Game.Screens.Multi
         {
             roomManager.PartRoom();
 
-            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
-            {
-                screenStack.Exit();
-                return true;
-            }
-
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
@@ -266,6 +260,20 @@ namespace osu.Game.Screens.Multi
             endHandlingTrack();
 
             base.OnExiting(next);
+            return false;
+        }
+
+        public override bool OnBackButton()
+        {
+            if ((screenStack.CurrentScreen as IMultiplayerSubScreen)?.OnBackButton() == true)
+                return true;
+
+            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
+            {
+                screenStack.Exit();
+                return true;
+            }
+
             return false;
         }
 
