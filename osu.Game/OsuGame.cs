@@ -872,10 +872,6 @@ namespace osu.Game
                     dashboard.ToggleVisibility();
                     return true;
 
-                case GlobalAction.ToggleNews:
-                    news.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
