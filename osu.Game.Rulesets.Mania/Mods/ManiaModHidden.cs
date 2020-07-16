@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +9,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
-        protected List<PlayfieldCover> PlayfieldCovers = new List<PlayfieldCover>();
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
@@ -29,26 +28,23 @@ namespace osu.Game.Rulesets.Mania.Mods
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
 
-                PlayfieldCover laneCover;
-
                 hocParent.Remove(hoc);
-                hocParent.Add(new BufferedContainer
+                hocParent.Add(CreateCover().With(c =>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        hoc,
-                        laneCover = new PlayfieldCover
-                        {
-                            Coverage = 0.5f,
-                            RelativeSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre
-                        }
-                    }
-                });
+                    c.RelativeSizeAxes = Axes.Both;
+                    c.Coverage = 0.5f;
+                    c.Child = hoc;
+                }));
+            }
+        }
 
-                PlayfieldCovers.Add(laneCover);
+        protected virtual PlayfieldCoveringContainer CreateCover() => new ModHiddenCoveringContainer();
+
+        private class ModHiddenCoveringContainer : PlayfieldCoveringContainer
+        {
+            public ModHiddenCoveringContainer()
+            {
+                Cover.Scale = new Vector2(1, -1);
             }
         }
     }
