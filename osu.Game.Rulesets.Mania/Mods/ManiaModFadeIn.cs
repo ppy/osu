@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override string Description => @"Keys appear out of nowhere!";
 
-        protected override PlayfieldCoveringContainer CreateCover(Drawable content) => new PlayfieldCoveringContainer(content);
+        protected override PlayfieldCoveringWrapper CreateCover(Drawable content) => new PlayfieldCoveringWrapper(content);
     }
 }
