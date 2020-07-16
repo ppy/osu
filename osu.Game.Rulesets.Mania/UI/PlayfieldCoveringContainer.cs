@@ -83,7 +83,8 @@ namespace osu.Game.Rulesets.Mania.UI
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0
                             }
                         }
                     }
