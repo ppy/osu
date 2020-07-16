@@ -138,6 +138,12 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new ModWindUp(), new ModWindDown())
                     };
 
+                case ModType.Challenge:
+                    return new Mod[]
+                    {
+                        new TaikoModHealthChallenge(),
+                    };
+
                 default:
                     return Array.Empty<Mod>();
             }

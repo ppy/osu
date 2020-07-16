@@ -158,6 +158,12 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModTraceable(),
                     };
 
+                case ModType.Challenge:
+                    return new Mod[]
+                    {
+                        new OsuModHealthChallenge(),
+                    };
+
                 case ModType.System:
                     return new Mod[]
                     {

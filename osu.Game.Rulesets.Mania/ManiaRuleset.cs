@@ -234,6 +234,12 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ModWindUp(), new ModWindDown())
                     };
 
+                case ModType.Challenge:
+                    return new Mod[]
+                    {
+                        new ManiaModHealthChallenge(),
+                    };
+
                 default:
                     return Array.Empty<Mod>();
             }

@@ -130,6 +130,12 @@ namespace osu.Game.Rulesets.Catch
                         new MultiMod(new ModWindUp(), new ModWindDown())
                     };
 
+                case ModType.Challenge:
+                    return new Mod[]
+                    {
+                        new CatchModHealthChallenge(),
+                    };
+
                 default:
                     return Array.Empty<Mod>();
             }
