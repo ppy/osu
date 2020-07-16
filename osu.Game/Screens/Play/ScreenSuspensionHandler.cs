@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly GameplayClockContainer gameplayClockContainer;
         private Bindable<bool> isPaused;
+        private readonly Bindable<bool> hasReplayLoaded;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -26,9 +27,10 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SessionStatics statics { get; set; }
 
-        public ScreenSuspensionHandler([NotNull] GameplayClockContainer gameplayClockContainer)
+        public ScreenSuspensionHandler([NotNull] GameplayClockContainer gameplayClockContainer, Bindable<bool> hasReplayLoaded)
         {
             this.gameplayClockContainer = gameplayClockContainer ?? throw new ArgumentNullException(nameof(gameplayClockContainer));
+            this.hasReplayLoaded = hasReplayLoaded.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -43,8 +45,9 @@ namespace osu.Game.Screens.Play
             isPaused.BindValueChanged(paused =>
             {
                 host.AllowScreenSuspension.Value = paused.NewValue;
-                statics.Set(Static.DisableWindowsKey, !paused.NewValue);
+                statics.Set(Static.DisableWindowsKey, !paused.NewValue && !hasReplayLoaded.Value);
             }, true);
+            hasReplayLoaded.BindValueChanged(_ => isPaused.TriggerChange(), true);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -52,6 +55,7 @@ namespace osu.Game.Screens.Play
             base.Dispose(isDisposing);
 
             isPaused?.UnbindAll();
+            hasReplayLoaded.UnbindAll();
 
             if (host != null)
             {

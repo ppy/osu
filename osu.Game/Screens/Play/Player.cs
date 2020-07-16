@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Play
             InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
-            AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
+            AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer, DrawableRuleset.HasReplayLoaded));
 
             dependencies.CacheAs(gameplayBeatmap);
 
