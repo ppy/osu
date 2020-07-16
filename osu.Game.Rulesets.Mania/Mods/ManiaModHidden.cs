@@ -29,11 +29,10 @@ namespace osu.Game.Rulesets.Mania.Mods
                 Container hocParent = (Container)hoc.Parent;
 
                 hocParent.Remove(hoc);
-                hocParent.Add(CreateCover().With(c =>
+                hocParent.Add(CreateCover().WithChild(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Coverage = 0.5f;
-                    c.Child = hoc;
                 }));
             }
         }
