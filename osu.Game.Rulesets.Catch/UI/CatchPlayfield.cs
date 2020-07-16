@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             InternalChildren = new[]
             {
                 explodingFruitContainer,
-                CatcherArea.MovableCatcher.CaughtFruitContainer.CreateProxy(),
+                CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer,
                 CatcherArea
             };
