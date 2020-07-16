@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -16,15 +17,12 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A <see cref="Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
     /// </summary>
-    /// <remarks>
-    /// The covered area extends in the scrolling direction, with its size depending on <see cref="Coverage"/>.
-    /// </remarks>
     public class PlayfieldCoveringWrapper : CompositeDrawable
     {
         /// <summary>
         /// The complete cover, including gradient and fill.
         /// </summary>
-        protected readonly Drawable Cover;
+        private readonly Drawable cover;
 
         /// <summary>
         /// The gradient portion of the cover.
@@ -46,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 Children = new[]
                 {
                     content,
-                    Cover = new Container
+                    cover = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -97,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
-            => Cover.Rotation = direction.NewValue == ScrollingDirection.Up ? 0 : 180f;
+            => cover.Rotation = direction.NewValue == ScrollingDirection.Up ? 0 : 180f;
 
         /// <summary>
         /// The relative area that should be completely covered. This does not include the fade.
@@ -110,5 +108,26 @@ namespace osu.Game.Rulesets.Mania.UI
                 gradient.Y = -value;
             }
         }
+
+        /// <summary>
+        /// The direction in which the cover expands.
+        /// </summary>
+        public CoverExpandDirection Direction
+        {
+            set => cover.Scale = value == CoverExpandDirection.AlongScroll ? Vector2.One : new Vector2(1, -1);
+        }
+    }
+
+    public enum CoverExpandDirection
+    {
+        /// <summary>
+        /// The cover expands along the scrolling direction.
+        /// </summary>
+        AlongScroll,
+
+        /// <summary>
+        /// The cover expands against the scrolling direction.
+        /// </summary>
+        AgainstScroll
     }
 }
