@@ -199,6 +199,7 @@ namespace osu.Game
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
 
+            dependencies.Cache(new BeatmapDifficultyManager(BeatmapManager));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
