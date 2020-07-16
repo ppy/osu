@@ -148,7 +148,6 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Creates proxied content to be displayed beneath hitobjects.
         /// </summary>
-        /// <returns></returns>
         public Drawable CreateProxiedContent() => caughtFruitContainer.CreateProxy();
 
         /// <summary>
