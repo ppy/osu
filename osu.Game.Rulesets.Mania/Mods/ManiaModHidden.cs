@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 Container hocParent = (Container)hoc.Parent;
 
                 hocParent.Remove(hoc);
-                hocParent.Add(CreateCover().WithChild(hoc).With(c =>
+                hocParent.Add(CreateCover(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Coverage = 0.5f;
@@ -37,11 +37,12 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
         }
 
-        protected virtual PlayfieldCoveringContainer CreateCover() => new ModHiddenCoveringContainer();
+        protected virtual PlayfieldCoveringContainer CreateCover(Drawable content) => new ModHiddenCoveringContainer(content);
 
         private class ModHiddenCoveringContainer : PlayfieldCoveringContainer
         {
-            public ModHiddenCoveringContainer()
+            public ModHiddenCoveringContainer(Drawable content)
+                : base(content)
             {
                 // This cover extends outwards from the hit position.
                 Cover.Scale = new Vector2(1, -1);

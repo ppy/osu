@@ -19,12 +19,8 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <remarks>
     /// The covered area extends in the scrolling direction, with its size depending on <see cref="Coverage"/>.
     /// </remarks>
-    public class PlayfieldCoveringContainer : Container
+    public class PlayfieldCoveringContainer : CompositeDrawable
     {
-        protected override Container<Drawable> Content => content;
-
-        private readonly Container content;
-
         /// <summary>
         /// The complete cover, including gradient and fill.
         /// </summary>
@@ -42,14 +38,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
 
-        public PlayfieldCoveringContainer()
+        public PlayfieldCoveringContainer(Drawable content)
         {
             InternalChild = new BufferedContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    content = new Container { RelativeSizeAxes = Axes.Both },
+                    content,
                     Cover = new Container
                     {
                         Anchor = Anchor.Centre,
