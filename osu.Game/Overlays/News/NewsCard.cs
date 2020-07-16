@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -187,6 +188,8 @@ namespace osu.Game.Overlays.News
                     }
                 };
             }
+
+            protected override bool OnClick(ClickEvent e) => true; // Protects the NewsCard from clicks while hovering DateContainer
         }
     }
 }
