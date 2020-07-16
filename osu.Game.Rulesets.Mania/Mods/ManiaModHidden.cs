@@ -4,19 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.UI.Scrolling;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -25,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
-        protected List<LaneCover> LaneCovers = new List<LaneCover>();
+        protected List<PlayfieldCover> PlayfieldCovers = new List<PlayfieldCover>();
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
@@ -36,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
                 Container hocParent = (Container)hoc.Parent;
 
-                LaneCover laneCover;
+                PlayfieldCover laneCover;
 
                 hocParent.Remove(hoc);
                 hocParent.Add(new BufferedContainer
@@ -45,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Children = new Drawable[]
                     {
                         hoc,
-                        laneCover = new LaneCover
+                        laneCover = new PlayfieldCover
                         {
                             Coverage = 0.5f,
                             RelativeSizeAxes = Axes.Both,
@@ -55,69 +48,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     }
                 });
 
-                LaneCovers.Add(laneCover);
-            }
-        }
-
-        protected class LaneCover : CompositeDrawable
-        {
-            private readonly Box gradient;
-            private readonly Box filled;
-            private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
-
-            public LaneCover()
-            {
-                Blending = new BlendingParameters
-                {
-                    RGBEquation = BlendingEquation.Add,
-                    Source = BlendingType.Zero,
-                    Destination = BlendingType.One,
-                    AlphaEquation = BlendingEquation.Add,
-                    SourceAlpha = BlendingType.Zero,
-                    DestinationAlpha = BlendingType.OneMinusSrcAlpha
-                };
-
-                InternalChildren = new Drawable[]
-                {
-                    gradient = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RelativePositionAxes = Axes.Both,
-                        Height = 0.25f,
-                        Colour = ColourInfo.GradientVertical(
-                            Color4.White.Opacity(0f),
-                            Color4.White.Opacity(1f)
-                        )
-                    },
-                    filled = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(IScrollingInfo scrollingInfo)
-            {
-                scrollDirection.BindTo(scrollingInfo.Direction);
-                scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
-            }
-
-            private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> valueChangedEvent)
-            {
-                bool isUpscroll = valueChangedEvent.NewValue == ScrollingDirection.Up;
-                Rotation = isUpscroll ? 180f : 0f;
-            }
-
-            public float Coverage
-            {
-                set
-                {
-                    filled.Height = value;
-                    gradient.Y = 1 - filled.Height - gradient.Height;
-                }
+                PlayfieldCovers.Add(laneCover);
             }
         }
     }
