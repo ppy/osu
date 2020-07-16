@@ -64,17 +64,17 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("create catcher", () => createCatcher(5));
 
-            AddStep("Toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
-            AddStep("Catch fruit", () => catchFruit(new TestFruit(false)
+            AddStep("toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
+            AddStep("catch fruit", () => catchFruit(new TestFruit(false)
             {
                 X = catcher.X
             }));
-            AddStep("Catch fruit last combo", () => catchFruit(new TestFruit(false)
+            AddStep("catch fruit last in combo", () => catchFruit(new TestFruit(false)
             {
                 X = catcher.X,
                 LastInCombo = true
             }));
-            AddAssert("Check hit explotion", () => catcher.ChildrenOfType<HitExplosion>().Any() == enable);
+            AddAssert("check hit explosion", () => catcher.ChildrenOfType<HitExplosion>().Any() == enable);
         }
 
         private void catchFruit(Fruit fruit, bool miss = false)
