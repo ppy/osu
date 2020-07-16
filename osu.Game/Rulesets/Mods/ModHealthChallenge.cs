@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Hold your health or you fail";
 
         [SettingSource("Health Threshold", "Set your own health threshold")]
-        public Bindable<double> HealthThreshold { get; } = new BindableAccuracy
+        public Bindable<double> HealthThreshold { get; } = new BindableDouble
         {
             Precision = 0.01,
             MinValue = 0.50,
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.96,
         };
 
-        public override string SettingDescription => $"{HealthThreshold}";
+        public override string SettingDescription => $"{HealthThreshold.Value:0%}";
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
@@ -39,11 +39,6 @@ namespace osu.Game.Rulesets.Mods
             if (!allJudged) return false;
 
             return result.HealthAtJudgement < HealthThreshold.Value;
-        }
-
-        private class BindableAccuracy : BindableDouble
-        {
-            public override string ToString() => $"{Value:0%}";
         }
     }
 }
