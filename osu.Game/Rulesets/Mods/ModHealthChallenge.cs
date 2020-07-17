@@ -28,16 +28,11 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            healthProcessor.FailConditions += checkThresholdCondition;
+            healthProcessor.FailConditions += CheckThresholdCondition;
         }
 
-        private bool checkThresholdCondition(HealthProcessor healthProcessor, JudgementResult result)
+        protected virtual bool CheckThresholdCondition(HealthProcessor healthProcessor, JudgementResult result)
         {
-            // Need to manually checked here since HasCompleted is updated after ApplyResultInternal
-            bool allJudged = healthProcessor.JudgedHits == healthProcessor.MaxHits;
-
-            if (!allJudged) return false;
-
             return healthProcessor.Health.Value < MinimumHealth.Value;
         }
     }
