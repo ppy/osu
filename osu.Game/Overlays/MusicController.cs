@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
@@ -60,18 +61,18 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
-        private IBindable<WeakReference<BeatmapSetInfo>> managerAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> managerRemoved;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            managerAdded = beatmaps.ItemAdded.GetBoundCopy();
-            managerAdded.BindValueChanged(beatmapAdded);
+            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+            managerUpdated.BindValueChanged(beatmapUpdated);
             managerRemoved = beatmaps.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(beatmapRemoved);
 
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal).OrderBy(_ => RNG.Next()));
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
         }
 
         protected override void LoadComplete()
@@ -98,14 +99,14 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool IsPlaying => current?.Track.IsRunning ?? false;
 
-        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
         {
             if (weakSet.NewValue.TryGetTarget(out var set))
             {
                 Schedule(() =>
                 {
-                    if (!beatmapSets.Contains(set))
-                        beatmapSets.Add(set);
+                    beatmapSets.Remove(set);
+                    beatmapSets.Add(set);
                 });
             }
         }
@@ -134,6 +135,29 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
+        /// Ensures music is playing, no matter what, unless the user has explicitly paused.
+        /// This means that if the current beatmap has a virtual track (see <see cref="TrackVirtual"/>) a new beatmap will be selected.
+        /// </summary>
+        public void EnsurePlayingSomething()
+        {
+            if (IsUserPaused) return;
+
+            var track = current?.Track;
+
+            if (track == null || track is TrackVirtual)
+            {
+                if (beatmap.Disabled)
+                    return;
+
+                NextTrack();
+            }
+            else if (!IsPlaying)
+            {
+                Play();
+            }
+        }
+
+        /// <summary>
         /// Start playing the current track (if not already playing).
         /// </summary>
         /// <returns>Whether the operation was successful.</returns>
@@ -144,13 +168,7 @@ namespace osu.Game.Overlays
             IsUserPaused = false;
 
             if (track == null)
-            {
-                if (beatmap.Disabled)
-                    return false;
-
-                next(true);
-                return true;
-            }
+                return false;
 
             if (restart)
                 track.Restart();
@@ -199,6 +217,9 @@ namespace osu.Game.Overlays
         /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action.</returns>
         private PreviousTrackResult prev()
         {
+            if (beatmap.Disabled)
+                return PreviousTrackResult.None;
+
             var currentTrackPosition = current?.Track.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
@@ -228,10 +249,12 @@ namespace osu.Game.Overlays
         /// </summary>
         public void NextTrack() => Schedule(() => next());
 
-        private bool next(bool instant = false)
+        private bool next()
         {
-            if (!instant)
-                queuedDirection = TrackChangeDirection.Next;
+            if (beatmap.Disabled)
+                return false;
+
+            queuedDirection = TrackChangeDirection.Next;
 
             var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
 

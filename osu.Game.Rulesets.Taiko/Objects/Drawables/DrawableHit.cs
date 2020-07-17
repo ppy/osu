@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        public TaikoAction[] HitActions { get; }
+        public TaikoAction[] HitActions { get; private set; }
 
         /// <summary>
         /// The action that caused this <see cref="DrawableHit"/> to be hit.
@@ -34,15 +36,35 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool pressHandledThisFrame;
 
+        private Bindable<HitType> type;
+
         public DrawableHit(Hit hit)
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            type = HitObject.TypeBindable.GetBoundCopy();
+            type.BindValueChanged(_ =>
+            {
+                updateType();
+                RecreatePieces();
+            });
+
+            updateType();
+        }
+
+        private void updateType()
+        {
             HitActions =
                 HitObject.Type == HitType.Centre
                     ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
                     : new[] { TaikoAction.LeftRim, TaikoAction.RightRim };
+
+            RecreatePieces();
         }
 
         protected override SkinnableDrawable CreateMainPiece() => HitObject.Type == HitType.Centre

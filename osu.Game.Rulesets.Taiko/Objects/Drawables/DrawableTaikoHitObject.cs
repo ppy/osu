@@ -8,6 +8,8 @@ using osuTK;
 using System.Linq;
 using osu.Game.Audio;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Objects;
@@ -115,8 +117,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public new TObject HitObject;
 
-        protected readonly Vector2 BaseSize;
-        protected readonly SkinnableDrawable MainPiece;
+        protected Vector2 BaseSize;
+        protected SkinnableDrawable MainPiece;
+
+        private Bindable<bool> isStrong;
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
@@ -129,11 +133,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
-            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
-
-            Content.Add(MainPiece = CreateMainPiece());
 
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
+            isStrong.BindValueChanged(_ => RecreatePieces(), true);
+        }
+
+        protected virtual void RecreatePieces()
+        {
+            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
+
+            MainPiece?.Expire();
+            Content.Add(MainPiece = CreateMainPiece());
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)

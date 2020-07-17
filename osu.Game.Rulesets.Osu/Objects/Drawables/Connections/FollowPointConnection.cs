@@ -135,8 +135,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 fp.Alpha = 0;
                 fp.Scale = new Vector2(1.5f * osuEnd.Scale);
 
-                if (firstTransformStartTime == null)
-                    firstTransformStartTime = fadeInTime;
+                firstTransformStartTime ??= fadeInTime;
 
                 fp.AnimationStartTime = fadeInTime;
 

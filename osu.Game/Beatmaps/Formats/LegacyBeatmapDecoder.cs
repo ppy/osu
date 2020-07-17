@@ -369,7 +369,9 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new LegacyDifficultyControlPoint
+#pragma warning disable 618
+            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);
@@ -425,8 +427,7 @@ namespace osu.Game.Beatmaps.Formats
         private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
-            if (parser == null)
-                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
             if (obj != null)

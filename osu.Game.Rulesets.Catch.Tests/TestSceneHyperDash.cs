@@ -9,19 +9,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneHyperDash : PlayerTestScene
+    public class TestSceneHyperDash : TestSceneCatchPlayer
     {
-        public TestSceneHyperDash()
-            : base(new CatchRuleset())
-        {
-        }
-
         protected override bool Autoplay => true;
 
         [Test]
@@ -53,13 +47,13 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             // Should produce a hyper-dash (edge case test)
-            beatmap.HitObjects.Add(new Fruit { StartTime = 1816, X = 56 / 512f, NewCombo = true });
-            beatmap.HitObjects.Add(new Fruit { StartTime = 2008, X = 308 / 512f, NewCombo = true });
+            beatmap.HitObjects.Add(new Fruit { StartTime = 1816, X = 56, NewCombo = true });
+            beatmap.HitObjects.Add(new Fruit { StartTime = 2008, X = 308, NewCombo = true });
 
             double startTime = 3000;
 
-            const float left_x = 0.02f;
-            const float right_x = 0.98f;
+            const float left_x = 0.02f * CatchPlayfield.WIDTH;
+            const float right_x = 0.98f * CatchPlayfield.WIDTH;
 
             createObjects(() => new Fruit { X = left_x });
             createObjects(() => new TestJuiceStream(right_x), 1);

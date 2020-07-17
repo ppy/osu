@@ -152,6 +152,7 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
@@ -164,7 +165,7 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            if (API == null) API = new APIAccess(LocalConfig);
+            API ??= new APIAccess(LocalConfig);
 
             dependencies.CacheAs(API);
 
@@ -192,7 +193,7 @@ namespace osu.Game
                     ScoreManager.Delete(getBeatmapScores(item), true);
             });
 
-            BeatmapManager.ItemAdded.BindValueChanged(i =>
+            BeatmapManager.ItemUpdated.BindValueChanged(i =>
             {
                 if (i.NewValue.TryGetTarget(out var item))
                     ScoreManager.Undelete(getBeatmapScores(item), true);
@@ -229,8 +230,8 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            if (API is APIAccess apiAcces)
-                AddInternal(apiAcces);
+            if (API is APIAccess apiAccess)
+                AddInternal(apiAccess);
             AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;
@@ -311,12 +312,13 @@ namespace osu.Game
         {
             base.SetHost(host);
 
-            if (Storage == null) // may be non-null for certain tests
-                Storage = new OsuStorage(host);
+            // may be non-null for certain tests
+            Storage ??= host.Storage;
 
-            if (LocalConfig == null)
-                LocalConfig = new OsuConfigManager(Storage);
+            LocalConfig ??= new OsuConfigManager(Storage);
         }
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
@@ -337,6 +339,7 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
             RulesetStore?.Dispose();
+            BeatmapManager?.Dispose();
 
             contextFactory.FlushConnections();
         }

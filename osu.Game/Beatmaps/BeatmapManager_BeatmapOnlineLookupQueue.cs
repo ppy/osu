@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
-        private class BeatmapOnlineLookupQueue
+        private class BeatmapOnlineLookupQueue : IDisposable
         {
             private readonly IAPIProvider api;
             private readonly Storage storage;
@@ -48,16 +48,13 @@ namespace osu.Game.Beatmaps
 
             public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
             {
-                if (api?.State != APIState.Online)
-                    return Task.CompletedTask;
-
                 LogForModel(beatmapSet, "Performing online lookups...");
                 return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
             }
 
             // todo: expose this when we need to do individual difficulty lookups.
             protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
+                => Task.Factory.StartNew(() => lookup(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
 
             private void lookup(BeatmapSetInfo set, BeatmapInfo beatmap)
             {
@@ -178,6 +175,12 @@ namespace osu.Game.Beatmaps
                 }
 
                 return false;
+            }
+
+            public void Dispose()
+            {
+                cacheDownloadRequest?.Dispose();
+                updateScheduler?.Dispose();
             }
 
             [Serializable]

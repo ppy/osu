@@ -147,8 +147,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
             samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
-            updateState(ArmedState.Idle, true);
             apply(HitObject);
+
+            updateState(ArmedState.Idle, true);
         }
 
         private void loadSamples()
@@ -257,7 +258,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 }
             }
 
-            if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue || HitObject.HitWindows == null)
+            if (LifetimeEnd == double.MaxValue && (state.Value != ArmedState.Idle || HitObject.HitWindows == null))
                 Expire();
 
             // apply any custom state overrides

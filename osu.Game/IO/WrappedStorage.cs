@@ -69,7 +69,7 @@ namespace osu.Game.IO
 
         public override void DeleteDatabase(string name) => UnderlyingStorage.DeleteDatabase(MutatePath(name));
 
-        public override void OpenInNativeExplorer() => UnderlyingStorage.OpenInNativeExplorer();
+        public override void OpenPathInNativeExplorer(string path) => UnderlyingStorage.OpenPathInNativeExplorer(MutatePath(path));
 
         public override Storage GetStorageForDirectory(string path)
         {

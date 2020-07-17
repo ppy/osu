@@ -32,28 +32,28 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string lightImage = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.LightImage, 0)?.Value
+            string lightImage = skin.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.LightImage)?.Value
                                 ?? "mania-stage-light";
 
-            float leftLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)
+            float leftLineWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LeftLineWidth)
                 ?.Value ?? 1;
-            float rightLineWidth = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.RightLineWidth)
+            float rightLineWidth = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.RightLineWidth)
                 ?.Value ?? 1;
 
             bool hasLeftLine = leftLineWidth > 0;
             bool hasRightLine = rightLineWidth > 0 && skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value >= 2.4m
                                 || isLastColumn;
 
-            float lightPosition = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LightPosition)?.Value
+            float lightPosition = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.LightPosition)?.Value
                                   ?? 0;
 
-            Color4 lineColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
+            Color4 lineColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLineColour)?.Value
                                 ?? Color4.White;
 
-            Color4 backgroundColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour)?.Value
+            Color4 backgroundColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour)?.Value
                                       ?? Color4.Black;
 
-            Color4 lightColour = GetManiaSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
+            Color4 lightColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
                                  ?? Color4.White;
 
             InternalChildren = new Drawable[]

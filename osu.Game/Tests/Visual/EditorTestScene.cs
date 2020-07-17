@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
@@ -15,17 +16,10 @@ namespace osu.Game.Tests.Visual
     {
         protected Editor Editor { get; private set; }
 
-        private readonly Ruleset ruleset;
-
-        protected EditorTestScene(Ruleset ruleset)
-        {
-            this.ruleset = ruleset;
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = CreateWorkingBeatmap(ruleset.RulesetInfo);
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
         }
 
         public override void SetUpSteps()
@@ -36,6 +30,14 @@ namespace osu.Game.Tests.Visual
             AddUntilStep("wait for editor to load", () => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
                                                           && Editor.ChildrenOfType<TimelineArea>().FirstOrDefault()?.IsLoaded == true);
         }
+
+        /// <summary>
+        /// Creates the ruleset for providing a corresponding beatmap to load the editor on.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreateEditorRuleset();
+
+        protected sealed override Ruleset CreateRuleset() => CreateEditorRuleset();
 
         protected virtual Editor CreateEditor() => new Editor();
     }

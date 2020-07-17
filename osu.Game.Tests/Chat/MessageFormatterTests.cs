@@ -428,22 +428,27 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(5, result.Links.Count);
 
             Link f = result.Links.Find(l => l.Url == "https://osu.ppy.sh/wiki/wiki links");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(44, f.Index);
             Assert.AreEqual(10, f.Length);
 
             f = result.Links.Find(l => l.Url == "http://www.simple-test.com");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(10, f.Index);
             Assert.AreEqual(11, f.Length);
 
             f = result.Links.Find(l => l.Url == "http://google.com");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(97, f.Index);
             Assert.AreEqual(4, f.Length);
 
             f = result.Links.Find(l => l.Url == "https://osu.ppy.sh");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(78, f.Index);
             Assert.AreEqual(18, f.Length);
 
             f = result.Links.Find(l => l.Url == "\uD83D\uDE12");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(101, f.Index);
             Assert.AreEqual(3, f.Length);
         }
