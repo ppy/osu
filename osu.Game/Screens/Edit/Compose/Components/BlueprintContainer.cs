@@ -64,6 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox = CreateDragBox(select),
                 selectionHandler,
                 SelectionBlueprints = CreateSelectionBlueprintContainer(),
+                selectionHandler.CreateProxy(),
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
