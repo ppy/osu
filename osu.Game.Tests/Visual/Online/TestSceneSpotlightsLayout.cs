@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings.Displays;
 using osu.Game.Rulesets;
@@ -34,7 +35,15 @@ namespace osu.Game.Tests.Visual.Online
                 Width = 0.8f,
                 Child = new SpotlightsDisplay
                 {
-                    Ruleset = { BindTarget = ruleset }
+                    Current = ruleset,
+                    Spotlights = new[]
+                    {
+                        new APISpotlight
+                        {
+                            Id = 271,
+                            Name = "test"
+                        }
+                    }
                 }
             });
 

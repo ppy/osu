@@ -19,8 +19,6 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
-        protected Bindable<Country> Country => header.Country;
-
         protected Bindable<RankingsScope> Scope => header.Current;
 
         [Resolved]
@@ -84,8 +82,6 @@ namespace osu.Game.Overlays
             header.Ruleset.BindTo(ruleset);
             Scope.BindValueChanged(scope =>
             {
-                spotlightsRequest?.Cancel();
-
                 if (scope.NewValue != RankingsScope.Performance)
                     requestedCountry = null;
 
@@ -96,6 +92,8 @@ namespace osu.Game.Overlays
         private void loadNewDisplay()
         {
             cancellationToken?.Cancel();
+            spotlightsRequest?.Cancel();
+
             loading.Show();
 
             var display = selectDisplay().With(d =>
@@ -111,10 +109,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            LoadComponentAsync(display, loaded =>
-            {
-                contentContainer.Child = loaded;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+            loadDisplayAsync(display);
         }
 
         private void loadSpotlightsDisplay(SpotlightsDisplay display)
@@ -123,12 +118,17 @@ namespace osu.Game.Overlays
             spotlightsRequest.Success += response => Schedule(() =>
             {
                 display.Spotlights = response.Spotlights;
-                LoadComponentAsync(display, loaded =>
-                {
-                    contentContainer.Child = loaded;
-                }, (cancellationToken = new CancellationTokenSource()).Token);
+                loadDisplayAsync(display);
             });
             API.Queue(spotlightsRequest);
+        }
+
+        private void loadDisplayAsync(RankingsDisplay display)
+        {
+            LoadComponentAsync(display, loaded =>
+            {
+                contentContainer.Child = loaded;
+            }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private RankingsDisplay selectDisplay()
@@ -155,12 +155,15 @@ namespace osu.Game.Overlays
 
         public void ShowCountry(Country requested)
         {
+            if (requestedCountry == requested)
+                return;
+
             requestedCountry = requested;
 
-            if (Scope.Value == RankingsScope.Performance)
-                Scope.TriggerChange();
-            else
-                Scope.Value = RankingsScope.Performance;
+            if (contentContainer.Child is PerformanceDisplay)
+                ((PerformanceDisplay)contentContainer.Child).Country.Value = requested;
+
+            Scope.Value = RankingsScope.Performance;
 
             Show();
         }

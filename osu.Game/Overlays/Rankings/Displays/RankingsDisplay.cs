@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Rankings.Displays
         private readonly Container content;
         private readonly Box headerBackground;
 
-        public RankingsDisplay()
+        protected RankingsDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Rankings.Displays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Depth = -float.MaxValue,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             headerBackground = new Box
                             {

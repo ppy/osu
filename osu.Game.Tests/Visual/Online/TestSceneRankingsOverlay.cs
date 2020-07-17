@@ -15,45 +15,31 @@ namespace osu.Game.Tests.Visual.Online
         protected override bool UseOnlineAPI => true;
 
         [Cached(typeof(RankingsOverlay))]
-        private readonly RankingsOverlay rankingsOverlay;
-
-        private readonly Bindable<Country> countryBindable = new Bindable<Country>();
-        private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
+        private readonly TestRankingsOverlay rankings;
 
         public TestSceneRankingsOverlay()
         {
-            Add(rankingsOverlay = new TestRankingsOverlay
-            {
-                Country = { BindTarget = countryBindable },
-                Scope = { BindTarget = scope },
-            });
+            Add(rankings = new TestRankingsOverlay());
         }
 
         [Test]
         public void TestShow()
         {
-            AddStep("Show", rankingsOverlay.Show);
+            AddStep("Show", rankings.Show);
         }
 
         [Test]
         public void TestFlagScopeDependency()
         {
-            AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddAssert("Check country is Null", () => countryBindable.Value == null);
-            AddStep("Set country", () => countryBindable.Value = us_country);
-            AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
-        }
-
-        [Test]
-        public void TestShowCountry()
-        {
-            AddStep("Show US", () => rankingsOverlay.ShowCountry(us_country));
+            AddStep("Set scope to Score", () => rankings.Scope.Value = RankingsScope.Score);
+            AddStep("Show US", () => rankings.ShowCountry(us_country));
+            AddAssert("Check scope is Performance", () => rankings.Scope.Value == RankingsScope.Performance);
         }
 
         [Test]
         public void TestHide()
         {
-            AddStep("Hide", rankingsOverlay.Hide);
+            AddStep("Hide", rankings.Hide);
         }
 
         private static readonly Country us_country = new Country
@@ -64,8 +50,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestRankingsOverlay : RankingsOverlay
         {
-            public new Bindable<Country> Country => base.Country;
-
             public new Bindable<RankingsScope> Scope => base.Scope;
         }
     }
