@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -12,16 +11,11 @@ namespace osu.Game.Overlays.Rankings
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
-        public Bindable<Country> Country => countryFilter.Current;
-
         private OverlayRulesetSelector rulesetSelector;
-        private CountryFilter countryFilter;
 
         protected override OverlayTitle CreateTitle() => new RankingsTitle();
 
         protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector();
-
-        protected override Drawable CreateContent() => countryFilter = new CountryFilter();
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground("Headers/rankings");
 
