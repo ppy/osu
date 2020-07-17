@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Screens;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -25,13 +24,16 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        protected override void GotoRanking()
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
+
+        protected override ScoreInfo CreateScore()
         {
-            this.Push(CreateResults(DrawableRuleset.ReplayScore.ScoreInfo));
+            var baseScore = base.CreateScore();
+
+            // Since the replay score doesn't contain statistics, we'll pass them through here.
+            score.ScoreInfo.HitEvents = baseScore.HitEvents;
+
+            return score.ScoreInfo;
         }
-
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new ResultsScreen(score, false);
-
-        protected override ScoreInfo CreateScore() => score.ScoreInfo;
     }
 }

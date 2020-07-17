@@ -9,7 +9,7 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 
 namespace osu.Game.Tournament.Tests.Components
 {
-    public class TestSceneMatchScoreDisplay : LadderTestScene
+    public class TestSceneMatchScoreDisplay : TournamentTestScene
     {
         [Cached(Type = typeof(MatchIPCInfo))]
         private MatchIPCInfo matchInfo = new MatchIPCInfo();

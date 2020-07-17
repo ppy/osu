@@ -16,7 +16,16 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
-        public const float BASE_WIDTH = 512;
+        /// <summary>
+        /// The width of the playfield.
+        /// The horizontal movement of the catcher is confined in the area of this width.
+        /// </summary>
+        public const float WIDTH = 512;
+
+        /// <summary>
+        /// The center position of the playfield.
+        /// </summary>
+        public const float CENTER_X = WIDTH / 2;
 
         internal readonly CatcherArea CatcherArea;
 
@@ -26,22 +35,25 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {
-            Container explodingFruitContainer;
-
-            InternalChildren = new Drawable[]
+            var explodingFruitContainer = new Container
             {
-                explodingFruitContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                CatcherArea = new CatcherArea(difficulty)
-                {
-                    CreateDrawableRepresentation = createDrawableRepresentation,
-                    ExplodingFruitTarget = explodingFruitContainer,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                },
-                HitObjectContainer
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            CatcherArea = new CatcherArea(difficulty)
+            {
+                CreateDrawableRepresentation = createDrawableRepresentation,
+                ExplodingFruitTarget = explodingFruitContainer,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.TopLeft,
+            };
+
+            InternalChildren = new[]
+            {
+                explodingFruitContainer,
+                CatcherArea.MovableCatcher.CreateProxiedContent(),
+                HitObjectContainer,
+                CatcherArea
             };
         }
 

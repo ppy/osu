@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Mania.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            string imageName = GetManiaSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.ExplosionImage)?.Value
+            string imageName = GetColumnSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.ExplosionImage)?.Value
                                ?? "lightingN";
 
-            float explosionScale = GetManiaSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.ExplosionScale)?.Value
+            float explosionScale = GetColumnSkinConfig<float>(skin, LegacyManiaSkinConfigurationLookups.ExplosionScale)?.Value
                                    ?? 1;
 
             // Create a temporary animation to retrieve the number of frames, in an effort to calculate the intended frame length.

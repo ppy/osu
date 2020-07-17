@@ -19,6 +19,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -94,7 +95,6 @@ namespace osu.Game.Screens.Select
             CarouselRoot newRoot = new CarouselRoot(this);
 
             beatmapSets.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
-            newRoot.Filter(activeCriteria);
 
             // preload drawables as the ctor overhead is quite high currently.
             _ = newRoot.Drawables;
@@ -106,6 +106,9 @@ namespace osu.Game.Screens.Select
             scrollableContent.Clear(false);
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
+
+            // apply any pending filter operation that may have been delayed (see applyActiveCriteria's scheduling behaviour when BeatmapSetsLoaded is false).
+            FlushPendingFilterOperations();
 
             // Run on late scheduler want to ensure this runs after all pending UpdateBeatmapSet / RemoveBeatmapSet operations are run.
             SchedulerAfterChildren.Add(() =>
@@ -131,7 +134,7 @@ namespace osu.Game.Screens.Select
 
         private CarouselRoot root;
 
-        private IBindable<WeakReference<BeatmapSetInfo>> itemAdded;
+        private IBindable<WeakReference<BeatmapSetInfo>> itemUpdated;
         private IBindable<WeakReference<BeatmapSetInfo>> itemRemoved;
         private IBindable<WeakReference<BeatmapInfo>> itemHidden;
         private IBindable<WeakReference<BeatmapInfo>> itemRestored;
@@ -166,8 +169,8 @@ namespace osu.Game.Screens.Select
             RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
-            itemAdded = beatmaps.ItemAdded.GetBoundCopy();
-            itemAdded.BindValueChanged(beatmapAdded);
+            itemUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+            itemUpdated.BindValueChanged(beatmapUpdated);
             itemRemoved = beatmaps.ItemRemoved.GetBoundCopy();
             itemRemoved.BindValueChanged(beatmapRemoved);
             itemHidden = beatmaps.BeatmapHidden.GetBoundCopy();
@@ -301,6 +304,9 @@ namespace osu.Game.Screens.Select
 
         private void selectNextDifficulty(int direction)
         {
+            if (selectedBeatmap == null)
+                return;
+
             var unfilteredDifficulties = selectedBeatmapSet.Children.Where(s => !s.Filtered.Value).ToList();
 
             int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
@@ -317,6 +323,9 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection could be made, else False.</returns>
         public bool SelectNextRandom()
         {
+            if (!AllowSelection)
+                return false;
+
             var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
             if (!visibleSets.Any())
                 return false;
@@ -423,7 +432,19 @@ namespace osu.Game.Screens.Select
 
         private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
-            if (root.Children.Any() != true) return;
+            PendingFilter?.Cancel();
+            PendingFilter = null;
+
+            if (debounce)
+                PendingFilter = Scheduler.AddDelayed(perform, 250);
+            else
+            {
+                // if initial load is not yet finished, this will be run inline in loadBeatmapSets to ensure correct order of operation.
+                if (!BeatmapSetsLoaded)
+                    PendingFilter = Schedule(perform);
+                else
+                    perform();
+            }
 
             void perform()
             {
@@ -435,14 +456,6 @@ namespace osu.Game.Screens.Select
                 if (alwaysResetScrollPosition || !scroll.UserScrolling)
                     ScrollToSelected();
             }
-
-            PendingFilter?.Cancel();
-            PendingFilter = null;
-
-            if (debounce)
-                PendingFilter = Scheduler.AddDelayed(perform, 250);
-            else
-                perform();
         }
 
         private float? scrollTarget;
@@ -452,20 +465,37 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
+        #region Key / button selection logic
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             switch (e.Key)
             {
                 case Key.Left:
-                    SelectNext(-1, true);
+                    if (!e.Repeat)
+                        beginRepeatSelection(() => SelectNext(-1, true), e.Key);
                     return true;
 
                 case Key.Right:
-                    SelectNext(1, true);
+                    if (!e.Repeat)
+                        beginRepeatSelection(() => SelectNext(1, true), e.Key);
                     return true;
             }
 
             return false;
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                case Key.Right:
+                    endRepeatSelection(e.Key);
+                    break;
+            }
+
+            base.OnKeyUp(e);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -473,11 +503,11 @@ namespace osu.Game.Screens.Select
             switch (action)
             {
                 case GlobalAction.SelectNext:
-                    SelectNext(1, false);
+                    beginRepeatSelection(() => SelectNext(1, false), action);
                     return true;
 
                 case GlobalAction.SelectPrevious:
-                    SelectNext(-1, false);
+                    beginRepeatSelection(() => SelectNext(-1, false), action);
                     return true;
             }
 
@@ -486,7 +516,43 @@ namespace osu.Game.Screens.Select
 
         public void OnReleased(GlobalAction action)
         {
+            switch (action)
+            {
+                case GlobalAction.SelectNext:
+                case GlobalAction.SelectPrevious:
+                    endRepeatSelection(action);
+                    break;
+            }
         }
+
+        private ScheduledDelegate repeatDelegate;
+        private object lastRepeatSource;
+
+        /// <summary>
+        /// Begin repeating the specified selection action.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        /// <param name="source">The source of the action. Used in conjunction with <see cref="endRepeatSelection"/> to only cancel the correct action (most recently pressed key).</param>
+        private void beginRepeatSelection(Action action, object source)
+        {
+            endRepeatSelection();
+
+            lastRepeatSource = source;
+            repeatDelegate = this.BeginKeyRepeat(Scheduler, action);
+        }
+
+        private void endRepeatSelection(object source = null)
+        {
+            // only the most recent source should be able to cancel the current action.
+            if (source != null && !EqualityComparer<object>.Default.Equals(lastRepeatSource, source))
+                return;
+
+            repeatDelegate?.Cancel();
+            repeatDelegate = null;
+            lastRepeatSource = null;
+        }
+
+        #endregion
 
         protected override void Update()
         {
@@ -582,7 +648,7 @@ namespace osu.Game.Screens.Select
                 RemoveBeatmapSet(item);
         }
 
-        private void beatmapAdded(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
                 UpdateBeatmapSet(item);
@@ -607,10 +673,7 @@ namespace osu.Game.Screens.Select
 
             // todo: remove the need for this.
             foreach (var b in beatmapSet.Beatmaps)
-            {
-                if (b.Metadata == null)
-                    b.Metadata = beatmapSet.Metadata;
-            }
+                b.Metadata ??= beatmapSet.Metadata;
 
             var set = new CarouselBeatmapSet(beatmapSet)
             {

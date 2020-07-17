@@ -27,14 +27,13 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
-using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IDisposable
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -66,7 +65,6 @@ namespace osu.Game.Beatmaps
         private readonly AudioManager audioManager;
         private readonly GameHost host;
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
-        private readonly Storage exportStorage;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
@@ -81,9 +79,10 @@ namespace osu.Game.Beatmaps
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => beatmapHidden.Value = new WeakReference<BeatmapInfo>(b);
             beatmaps.BeatmapRestored += b => beatmapRestored.Value = new WeakReference<BeatmapInfo>(b);
+            beatmaps.ItemRemoved += removeWorkingCache;
+            beatmaps.ItemUpdated += removeWorkingCache;
 
             onlineLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
-            exportStorage = storage.GetStorageForDirectory("exports");
         }
 
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
@@ -206,32 +205,17 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                using (ContextFactory.GetForWrite())
+                {
+                    var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
+                    beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+
+                    stream.Seek(0, SeekOrigin.Begin);
+                    UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+                }
             }
 
-            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
-            if (working != null)
-                workingCache.Remove(working);
-        }
-
-        /// <summary>
-        /// Exports a <see cref="BeatmapSetInfo"/> to an .osz package.
-        /// </summary>
-        /// <param name="set">The <see cref="BeatmapSetInfo"/> to export.</param>
-        public void Export(BeatmapSetInfo set)
-        {
-            var localSet = QueryBeatmapSet(s => s.ID == set.ID);
-
-            using (var archive = ZipArchive.Create())
-            {
-                foreach (var file in localSet.Files)
-                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
-
-                using (var outputStream = exportStorage.GetStream($"{set}.osz", FileAccess.Write, FileMode.Create))
-                    archive.SaveTo(outputStream);
-
-                exportStorage.OpenInNativeExplorer();
-            }
+            removeWorkingCache(info);
         }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
@@ -256,14 +240,16 @@ namespace osu.Game.Beatmaps
                 beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
             }
 
+            if (beatmapInfo == null)
+                return DefaultBeatmap;
+
             lock (workingCache)
             {
                 var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
 
                 if (working == null)
                 {
-                    if (beatmapInfo.Metadata == null)
-                        beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
+                    beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
                     workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
                         new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
@@ -281,9 +267,9 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
-        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
-            if (!base.CanUndelete(existing, import))
+            if (!base.CanReuseExisting(existing, import))
                 return false;
 
             var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
@@ -297,14 +283,16 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All) => GetAllUsableBeatmapSetsEnumerable(includes).ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All, bool includeProtected = false) =>
+            GetAllUsableBeatmapSetsEnumerable(includes, includeProtected).ToList();
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
         /// </summary>
         /// <param name="includes">The level of detail to include in the returned objects.</param>
+        /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes)
+        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false)
         {
             IQueryable<BeatmapSetInfo> queryable;
 
@@ -326,7 +314,7 @@ namespace osu.Game.Beatmaps
             // AsEnumerable used here to avoid applying the WHERE in sql. When done so, ef core 2.x uses an incorrect ORDER BY
             // clause which causes queries to take 5-10x longer.
             // TODO: remove if upgrading to EF core 3.x.
-            return queryable.AsEnumerable().Where(s => !s.DeletePending && !s.Protected);
+            return queryable.AsEnumerable().Where(s => !s.DeletePending && (includeProtected || !s.Protected));
         }
 
         /// <summary>
@@ -431,6 +419,29 @@ namespace osu.Game.Beatmaps
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
+        }
+
+        private void removeWorkingCache(BeatmapSetInfo info)
+        {
+            if (info.Beatmaps == null) return;
+
+            foreach (var b in info.Beatmaps)
+                removeWorkingCache(b);
+        }
+
+        private void removeWorkingCache(BeatmapInfo info)
+        {
+            lock (workingCache)
+            {
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                if (working != null)
+                    workingCache.Remove(working);
+            }
+        }
+
+        public void Dispose()
+        {
+            onlineLookupQueue?.Dispose();
         }
 
         /// <summary>

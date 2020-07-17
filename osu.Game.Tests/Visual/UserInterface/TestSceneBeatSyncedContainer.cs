@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 timeSinceLastBeat.Value = TimeSinceLastBeat;
             }
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
