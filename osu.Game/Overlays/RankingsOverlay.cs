@@ -19,6 +19,8 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
+        protected readonly Bindable<Country> Country = new Bindable<Country>();
+
         protected Bindable<RankingsScope> Scope => header.Current;
 
         [Resolved]
@@ -79,11 +81,19 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             header.Ruleset.BindTo(ruleset);
+
+            Country.BindValueChanged(country =>
+            {
+                if (country.NewValue != null)
+                    Scope.Value = RankingsScope.Performance;
+            });
+
             Scope.BindValueChanged(scope =>
             {
                 if (scope.NewValue != RankingsScope.Performance)
-                    requestedCountry = null;
+                    Country.Value = null;
 
                 Scheduler.AddOnce(loadNewDisplay);
             }, true);
@@ -139,7 +149,10 @@ namespace osu.Game.Overlays
                     return new CountriesDisplay();
 
                 case RankingsScope.Performance:
-                    return new PerformanceDisplay().With(d => d.Country.Value = requestedCountry);
+                    return new PerformanceDisplay
+                    {
+                        Country = { BindTarget = Country }
+                    };
 
                 case RankingsScope.Score:
                     return new ScoresDisplay();
@@ -151,19 +164,12 @@ namespace osu.Game.Overlays
             throw new NotImplementedException($"Display for {Scope.Value} is not implemented.");
         }
 
-        private Country requestedCountry;
-
         public void ShowCountry(Country requested)
         {
-            if (requestedCountry == requested)
+            if (requested == null)
                 return;
 
-            requestedCountry = requested;
-
-            if (contentContainer.Child is PerformanceDisplay)
-                ((PerformanceDisplay)contentContainer.Child).Country.Value = requested;
-
-            Scope.Value = RankingsScope.Performance;
+            Country.Value = requested;
 
             Show();
         }

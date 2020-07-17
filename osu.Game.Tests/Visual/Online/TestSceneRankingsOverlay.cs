@@ -32,8 +32,15 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFlagScopeDependency()
         {
             AddStep("Set scope to Score", () => rankings.Scope.Value = RankingsScope.Score);
-            AddStep("Show US", () => rankings.ShowCountry(us_country));
+            AddAssert("Check country is Null", () => rankings.Country.Value == null);
+            AddStep("Set country", () => rankings.Country.Value = us_country);
             AddAssert("Check scope is Performance", () => rankings.Scope.Value == RankingsScope.Performance);
+        }
+
+        [Test]
+        public void TestShowCountry()
+        {
+            AddStep("Show US", () => rankings.ShowCountry(us_country));
         }
 
         [Test]
@@ -50,6 +57,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestRankingsOverlay : RankingsOverlay
         {
+            public new Bindable<Country> Country => base.Country;
+
             public new Bindable<RankingsScope> Scope => base.Scope;
         }
     }
