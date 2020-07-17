@@ -17,7 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing.Panels;
 
-namespace osu.Game.Overlays.Rankings
+namespace osu.Game.Overlays.Rankings.Displays
 {
     public class SpotlightsDisplay : CompositeDrawable
     {

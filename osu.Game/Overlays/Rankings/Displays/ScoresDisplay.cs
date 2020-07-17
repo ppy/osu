@@ -15,7 +15,7 @@ using System;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Rankings
+namespace osu.Game.Overlays.Rankings.Displays
 {
     public class ScoresDisplay : CompositeDrawable
     {

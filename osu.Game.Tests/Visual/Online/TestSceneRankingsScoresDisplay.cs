@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Rankings;
+using osu.Game.Overlays.Rankings.Displays;
 
 namespace osu.Game.Tests.Visual.Online
 {

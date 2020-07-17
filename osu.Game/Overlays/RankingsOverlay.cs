@@ -14,6 +14,7 @@ using System.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
+using osu.Game.Overlays.Rankings.Displays;
 
 namespace osu.Game.Overlays
 {
