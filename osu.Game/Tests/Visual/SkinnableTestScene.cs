@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -157,7 +158,7 @@ namespace osu.Game.Tests.Visual
                 this.extrapolateAnimations = extrapolateAnimations;
             }
 
-            public override Texture GetTexture(string componentName)
+            public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 // extrapolate frames to test longer animations
                 if (extrapolateAnimations)
@@ -165,10 +166,10 @@ namespace osu.Game.Tests.Visual
                     var match = Regex.Match(componentName, "-([0-9]*)");
 
                     if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
-                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
+                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"), wrapModeS, wrapModeT);
                 }
 
-                return base.GetTexture(componentName);
+                return base.GetTexture(componentName, wrapModeS, wrapModeT);
             }
         }
     }
