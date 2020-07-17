@@ -153,7 +153,7 @@ namespace osu.Game.Overlays
 
             if (Scope.Value == RankingsScope.Spotlights)
             {
-                loadContent(new SpotlightsLayout
+                loadContent(new SpotlightsDisplay
                 {
                     Ruleset = { BindTarget = ruleset }
                 });

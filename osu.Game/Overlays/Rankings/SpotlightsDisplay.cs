@@ -19,7 +19,7 @@ using osu.Game.Overlays.BeatmapListing.Panels;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightsLayout : CompositeDrawable
+    public class SpotlightsDisplay : CompositeDrawable
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
