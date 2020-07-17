@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.IO.Network;
+using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
@@ -11,12 +12,14 @@ namespace osu.Game.Online.API.Requests
         public readonly UserRankingsType Type;
 
         private readonly string country;
+        private readonly RankingsSortCriteria sort;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, RankingsSortCriteria sort = RankingsSortCriteria.All, int page = 1, string country = null)
             : base(ruleset, page)
         {
             Type = type;
             this.country = country;
+            this.sort = sort;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -25,6 +28,8 @@ namespace osu.Game.Online.API.Requests
 
             if (country != null)
                 req.AddParameter("country", country);
+
+            req.AddParameter("filter", sort.ToString().ToLower());
 
             return req;
         }

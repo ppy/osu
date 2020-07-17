@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             onLoadStarted();
 
-            request = new GetUserRankingsRequest(ruleset, UserRankingsType.Score, page);
+            request = new GetUserRankingsRequest(ruleset, UserRankingsType.Score, RankingsSortCriteria.All, page);
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
                 var table = new ScoresTable(page, rankings.Users);

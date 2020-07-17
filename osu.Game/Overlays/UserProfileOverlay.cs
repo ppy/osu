@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         private ProfileSectionsContainer sectionsContainer;
         private ProfileSectionTabControl tabs;
 
-        public const float CONTENT_X_MARGIN = 70;
+        public const float CONTENT_X_MARGIN = 50;
 
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink)
