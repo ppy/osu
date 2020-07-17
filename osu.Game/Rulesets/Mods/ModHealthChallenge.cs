@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mods
 
             if (!allJudged) return false;
 
-            return result.HealthAtJudgement < HealthThreshold.Value;
+            return healthProcessor.Health.Value < MinimumHealth.Value;
         }
     }
 }
