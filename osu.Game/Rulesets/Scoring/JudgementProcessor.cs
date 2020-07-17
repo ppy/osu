@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The maximum number of hits that can be judged.
         /// </summary>
-        protected internal int MaxHits { get; private set; }
+        public int MaxHits { get; private set; }
 
         /// <summary>
         /// The total number of judged <see cref="HitObject"/>s at the current point in time.
