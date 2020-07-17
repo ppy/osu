@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         BorderThickness = BORDER_RADIUS,
-                        BorderColour = colours.Yellow,
+                        BorderColour = colours.YellowDark,
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -83,13 +83,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         {
                             new Box
                             {
-                                Colour = colours.Yellow,
+                                Colour = colours.YellowDark,
                                 RelativeSizeAxes = Axes.Both,
                             },
                             selectionDetailsText = new OsuSpriteText
                             {
                                 Padding = new MarginPadding(2),
                                 Colour = colours.Gray0,
+                                Font = OsuFont.Default.With(size: 11)
                             }
                         }
                     }
