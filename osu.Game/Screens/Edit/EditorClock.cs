@@ -118,9 +118,14 @@ namespace osu.Game.Screens.Edit
 
             seekTime = timingPoint.Time + closestBeat * seekAmount;
 
+            // limit forward seeking to only up to the next timing point's start time.
+            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            if (seekTime > nextTimingPoint?.Time)
+                seekTime = nextTimingPoint.Time;
+
             // Due to the rounding above, we may end up on the current beat. This will effectively cause 0 seeking to happen, but we don't want this.
             // Instead, we'll go to the next beat in the direction when this is the case
-            if (Precision.AlmostEquals(current, seekTime, 1))
+            if (Precision.AlmostEquals(current, seekTime, 0.5f))
             {
                 closestBeat += direction > 0 ? 1 : -1;
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
@@ -128,10 +133,6 @@ namespace osu.Game.Screens.Edit
 
             if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
                 seekTime = timingPoint.Time;
-
-            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
-            if (seekTime > nextTimingPoint?.Time)
-                seekTime = nextTimingPoint.Time;
 
             // Ensure the sought point is within the boundaries
             seekTime = Math.Clamp(seekTime, 0, TrackLength);
