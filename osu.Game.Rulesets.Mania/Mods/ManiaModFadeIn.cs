@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -12,5 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "FI";
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override string Description => @"Keys appear out of nowhere!";
+
+        protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AlongScroll;
     }
 }
