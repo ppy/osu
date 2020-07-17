@@ -11,6 +11,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
@@ -250,6 +251,15 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.RightStageImage:
                     return SkinUtils.As<TValue>(getManiaImage(existing, "StageRight"));
 
+                case LegacyManiaSkinConfigurationLookups.BottomStageImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageBottom"));
+
+                case LegacyManiaSkinConfigurationLookups.LightImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageLight"));
+
+                case LegacyManiaSkinConfigurationLookups.HitTargetImage:
+                    return SkinUtils.As<TValue>(getManiaImage(existing, "StageHint"));
+
                 case LegacyManiaSkinConfigurationLookups.LeftLineWidth:
                     Debug.Assert(maniaLookup.TargetColumn != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnLineWidth[maniaLookup.TargetColumn.Value]));
@@ -302,17 +312,17 @@ namespace osu.Game.Skinning
             return this.GetAnimation(component.LookupName, false, false);
         }
 
-        public override Texture GetTexture(string componentName)
+        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
             foreach (var name in getFallbackNames(componentName))
             {
                 float ratio = 2;
-                var texture = Textures?.Get($"{name}@2x");
+                var texture = Textures?.Get($"{name}@2x", wrapModeS, wrapModeT);
 
                 if (texture == null)
                 {
                     ratio = 1;
-                    texture = Textures?.Get(name);
+                    texture = Textures?.Get(name, wrapModeS, wrapModeT);
                 }
 
                 if (texture == null)

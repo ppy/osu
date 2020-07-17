@@ -5,12 +5,14 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
@@ -45,6 +47,12 @@ namespace osu.Game.Rulesets.Catch.UI
         public const double BASE_SPEED = 1.0;
 
         public Container ExplodingFruitTarget;
+
+        private Container<DrawableHitObject> caughtFruitContainer { get; } = new Container<DrawableHitObject>
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.BottomCentre,
+        };
 
         [NotNull]
         private readonly Container trailsTarget;
@@ -83,8 +91,6 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly float catchWidth;
 
-        private Container<DrawableHitObject> caughtFruit;
-
         private CatcherSprite catcherIdle;
         private CatcherSprite catcherKiai;
         private CatcherSprite catcherFail;
@@ -99,6 +105,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
+        private Bindable<bool> hitLighting;
 
         public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
@@ -114,15 +121,13 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
+
             InternalChildren = new Drawable[]
             {
-                caughtFruit = new Container<DrawableHitObject>
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.BottomCentre,
-                },
+                caughtFruitContainer,
                 catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
                 {
                     Anchor = Anchor.TopCentre,
@@ -144,6 +149,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
             updateCatcher();
         }
+
+        /// <summary>
+        /// Creates proxied content to be displayed beneath hitobjects.
+        /// </summary>
+        public Drawable CreateProxiedContent() => caughtFruitContainer.CreateProxy();
 
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
@@ -176,7 +186,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             const float allowance = 10;
 
-            while (caughtFruit.Any(f =>
+            while (caughtFruitContainer.Any(f =>
                 f.LifetimeEnd == double.MaxValue &&
                 Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = f.DrawSize.X / 2 * f.Scale.X)) / (allowance / 2)))
             {
@@ -187,13 +197,16 @@ namespace osu.Game.Rulesets.Catch.UI
 
             fruit.X = Math.Clamp(fruit.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
 
-            caughtFruit.Add(fruit);
+            caughtFruitContainer.Add(fruit);
 
-            AddInternal(new HitExplosion(fruit)
+            if (hitLighting.Value)
             {
-                X = fruit.X,
-                Scale = new Vector2(fruit.HitObject.Scale)
-            });
+                AddInternal(new HitExplosion(fruit)
+                {
+                    X = fruit.X,
+                    Scale = new Vector2(fruit.HitObject.Scale)
+                });
+            }
         }
 
         /// <summary>
@@ -342,7 +355,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public void Drop()
         {
-            foreach (var f in caughtFruit.ToArray())
+            foreach (var f in caughtFruitContainer.ToArray())
                 Drop(f);
         }
 
@@ -351,7 +364,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public void Explode()
         {
-            foreach (var f in caughtFruit.ToArray())
+            foreach (var f in caughtFruitContainer.ToArray())
                 Explode(f);
         }
 
@@ -450,9 +463,9 @@ namespace osu.Game.Rulesets.Catch.UI
             if (ExplodingFruitTarget != null)
             {
                 fruit.Anchor = Anchor.TopLeft;
-                fruit.Position = caughtFruit.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
+                fruit.Position = caughtFruitContainer.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
 
-                if (!caughtFruit.Remove(fruit))
+                if (!caughtFruitContainer.Remove(fruit))
                     // we may have already been removed by a previous operation (due to the weird OnLoadComplete scheduling).
                     // this avoids a crash on potentially attempting to Add a fruit to ExplodingFruitTarget twice.
                     return;

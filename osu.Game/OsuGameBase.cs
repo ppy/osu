@@ -152,6 +152,7 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");

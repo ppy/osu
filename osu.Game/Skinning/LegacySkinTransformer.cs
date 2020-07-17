@@ -4,6 +4,7 @@
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -27,7 +28,10 @@ namespace osu.Game.Skinning
 
         public abstract Drawable GetDrawableComponent(ISkinComponent component);
 
-        public Texture GetTexture(string componentName) => Source.GetTexture(componentName);
+        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
+
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+            => Source.GetTexture(componentName, wrapModeS, wrapModeT);
 
         public virtual SampleChannel GetSample(ISampleInfo sampleInfo)
         {

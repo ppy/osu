@@ -369,7 +369,9 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new LegacyDifficultyControlPoint
+#pragma warning disable 618
+            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);
