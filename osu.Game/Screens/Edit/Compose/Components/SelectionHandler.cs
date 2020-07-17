@@ -15,6 +15,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.States;
 using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -35,7 +36,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
-        private Drawable outline;
+        private Drawable content;
+
+        private OsuSpriteText selectionDetailsText;
 
         [Resolved(CanBeNull = true)]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -55,16 +58,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChild = outline = new Container
+            InternalChild = content = new Container
             {
-                Masking = true,
-                BorderThickness = BORDER_RADIUS,
-                BorderColour = colours.Yellow,
-                Child = new Box
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Alpha = 0
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = BORDER_RADIUS,
+                        BorderColour = colours.Yellow,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            AlwaysPresent = true,
+                            Alpha = 0
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "info text",
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = colours.Yellow,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            selectionDetailsText = new OsuSpriteText
+                            {
+                                Padding = new MarginPadding(2),
+                                Colour = colours.Gray0,
+                            }
+                        }
+                    }
                 }
             };
         }
@@ -131,9 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectedBlueprints.Remove(blueprint);
             EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
-            // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
-            if (selectedBlueprints.Count == 0)
-                UpdateVisibility();
+            UpdateVisibility();
         }
 
         /// <summary>
@@ -179,7 +205,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         internal void UpdateVisibility()
         {
-            if (selectedBlueprints.Count > 0)
+            int count = selectedBlueprints.Count;
+
+            selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
+
+            if (count > 0)
                 Show();
             else
                 Hide();
@@ -205,8 +235,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             topLeft -= new Vector2(5);
             bottomRight += new Vector2(5);
 
-            outline.Size = bottomRight - topLeft;
-            outline.Position = topLeft;
+            content.Size = bottomRight - topLeft;
+            content.Position = topLeft;
         }
 
         #endregion
