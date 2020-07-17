@@ -16,12 +16,16 @@ namespace osu.Game.Screens.Play
     {
         public Action OnResume;
 
+        public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
+
         public override string Header => "paused";
         public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
         private SkinnableSound pauseLoop;
 
         protected override Action BackAction => () => InternalButtons.Children.First().Click();
+
+        private const float minimum_volume = 0.0001f;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -34,18 +38,20 @@ namespace osu.Game.Screens.Play
             {
                 Looping = true,
             });
+
             // PopIn is called before updating the skin, and when a sample is updated, its "playing" value is reset
             // the sample must be played again
             pauseLoop.OnSkinChanged += () => pauseLoop.Play();
+
+            // SkinnableSound only plays a sound if its aggregate volume is > 0, so the volume must be turned up before playing it
+            pauseLoop.VolumeTo(minimum_volume);
         }
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            //SkinnableSound only plays a sound if its aggregate volume is > 0, so the volume must be turned up before playing it
-            pauseLoop.VolumeTo(0.00001f);
-            pauseLoop.VolumeTo(1.0f, 400, Easing.InQuint);
+            pauseLoop.VolumeTo(1.0f, TRANSITION_DURATION, Easing.InQuint);
             pauseLoop.Play();
         }
 
@@ -53,8 +59,7 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
 
-            var transformSeq = pauseLoop.VolumeTo(0.0f, 190, Easing.OutQuad);
-            transformSeq.Finally(_ => pauseLoop.Stop());
+            pauseLoop.VolumeTo(minimum_volume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
         }
     }
 }
