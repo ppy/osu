@@ -573,7 +573,9 @@ namespace osu.Game
                             Origin = Anchor.BottomLeft,
                             Action = () =>
                             {
-                                if ((ScreenStack.CurrentScreen as IOsuScreen)?.AllowBackButton == true)
+                                var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
+
+                                if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
                                     ScreenStack.Exit();
                             }
                         },
@@ -888,6 +890,10 @@ namespace osu.Game
 
                 case GlobalAction.ToggleDirect:
                     beatmapListing.ToggleVisibility();
+                    return true;
+
+                case GlobalAction.ToggleNotifications:
+                    notifications.ToggleVisibility();
                     return true;
 
                 case GlobalAction.ToggleGameplayMouseButtons:

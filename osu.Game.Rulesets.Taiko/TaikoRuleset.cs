@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
 using System.Linq;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -31,6 +32,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
+    [ExcludeFromDynamicCompile]
     public class TaikoRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);

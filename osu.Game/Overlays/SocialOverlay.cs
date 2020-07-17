@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
             Filter.Tabs.Current.ValueChanged += _ => onFilterUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += _ => recreatePanels();
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => recreatePanels();
+            Filter.Dropdown.Current.ValueChanged += _ => recreatePanels();
 
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays
                     break;
             }
 
-            if (Filter.DisplayStyleControl.Dropdown.Current.Value == SortDirection.Descending)
+            if (Filter.Dropdown.Current.Value == SortDirection.Descending)
                 sortedUsers = sortedUsers.Reverse();
 
             var newPanels = new FillFlowContainer<UserPanel>

@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Multi
                                         Child = new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.7f), backgroundColour)
+                                            Colour = ColourInfo.GradientVertical(backgroundColour.Opacity(0.5f), backgroundColour)
                                         },
                                     }
                                 }
@@ -250,12 +250,6 @@ namespace osu.Game.Screens.Multi
         {
             roomManager.PartRoom();
 
-            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
-            {
-                screenStack.Exit();
-                return true;
-            }
-
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
@@ -266,6 +260,20 @@ namespace osu.Game.Screens.Multi
             endHandlingTrack();
 
             base.OnExiting(next);
+            return false;
+        }
+
+        public override bool OnBackButton()
+        {
+            if ((screenStack.CurrentScreen as IMultiplayerSubScreen)?.OnBackButton() == true)
+                return true;
+
+            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
+            {
+                screenStack.Exit();
+                return true;
+            }
+
             return false;
         }
 

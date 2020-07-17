@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Room.CopyFrom(new Room());
+            Room = new Room();
         });
 
         [SetUpSteps]
@@ -56,6 +56,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("load match", () => LoadScreen(match = new TestMatchSubScreen(Room)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestLoadSimpleMatch()
+        {
+            AddStep("set room properties", () =>
+            {
+                Room.RoomID.Value = 1;
+                Room.Name.Value = "my awesome room";
+                Room.Host.Value = new User { Id = 2, Username = "peppy" };
+                Room.RecentParticipants.Add(Room.Host.Value);
+                Room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                });
+            });
         }
 
         [Test]

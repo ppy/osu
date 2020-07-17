@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -68,6 +69,23 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for track playing", () => track().IsRunning);
             AddAssert("Ensure time wasn't reset to preview point", () => track().CurrentTime < beatmap().Metadata.PreviewTime);
+        }
+
+        [Test]
+        public void TestMenuMakesMusic()
+        {
+            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+            Track track() => beatmap().Track;
+
+            TestSongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestSongSelect());
+
+            AddUntilStep("wait for no track", () => track() is TrackVirtual);
+
+            AddStep("return to menu", () => songSelect.Exit());
+
+            AddUntilStep("wait for track", () => !(track() is TrackVirtual) && track().IsRunning);
         }
 
         [Test]

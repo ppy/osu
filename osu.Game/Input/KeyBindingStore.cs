@@ -55,6 +55,9 @@ namespace osu.Game.Input
                             RulesetID = rulesetId,
                             Variant = variant
                         });
+
+                        // required to ensure stable insert order (https://github.com/dotnet/efcore/issues/11686)
+                        usage.Context.SaveChanges();
                     }
                 }
             }
