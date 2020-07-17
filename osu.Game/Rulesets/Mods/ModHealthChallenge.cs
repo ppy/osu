@@ -12,9 +12,9 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Health Challenge";
         public override string Acronym => "HC";
-        public override string Description => "Hold your health or you fail";
+        public override string Description => "Keep your health above the target!";
 
-        [SettingSource("Health Threshold", "Set your own health threshold")]
+        [SettingSource("Health Target", "Minimal percentage of health needed to pass.")]
         public Bindable<double> HealthThreshold { get; } = new BindableDouble
         {
             Precision = 0.01,

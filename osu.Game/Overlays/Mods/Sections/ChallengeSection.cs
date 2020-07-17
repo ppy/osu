@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Mods.Sections
 
         public ChallengeSection()
         {
-            Header = @"Challenge";
+            Header = "Challenge";
         }
     }
 }
