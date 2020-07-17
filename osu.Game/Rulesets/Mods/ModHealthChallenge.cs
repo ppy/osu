@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Keep your health above the target!";
 
         [SettingSource("Health Target", "Minimal percentage of health needed to pass.")]
-        public Bindable<double> HealthThreshold { get; } = new BindableDouble
+        public Bindable<double> MinimumHealth { get; } = new BindableDouble
         {
             Precision = 0.01,
             MinValue = 0.50,
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.96,
         };
 
-        public override string SettingDescription => $"{HealthThreshold.Value:0%}";
+        public override string SettingDescription => $"{MinimumHealth.Value:0%}";
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
