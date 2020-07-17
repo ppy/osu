@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Edit
 
             // Due to the rounding above, we may end up on the current beat. This will effectively cause 0 seeking to happen, but we don't want this.
             // Instead, we'll go to the next beat in the direction when this is the case
-            if (Precision.AlmostEquals(current, seekTime))
+            if (Precision.AlmostEquals(current, seekTime, 1))
             {
                 closestBeat += direction > 0 ? 1 : -1;
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
