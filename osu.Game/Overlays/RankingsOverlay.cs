@@ -9,12 +9,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
-using osu.Game.Online.API;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Rankings.Tables;
 using osu.Game.Overlays.Rankings.Displays;
+using System;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays
 {
@@ -24,17 +23,16 @@ namespace osu.Game.Overlays
 
         protected Bindable<RankingsScope> Scope => header.Current;
 
-        private readonly OverlayScrollContainer scrollFlow;
-        private readonly Container contentContainer;
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
+
+        private readonly Container<RankingsDisplay> contentContainer;
         private readonly LoadingLayer loading;
         private readonly Box background;
         private readonly RankingsOverlayHeader header;
 
-        private APIRequest lastRequest;
+        private GetSpotlightsRequest spotlightsRequest;
         private CancellationTokenSource cancellationToken;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -45,7 +43,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                scrollFlow = new OverlayScrollContainer
+                new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -62,26 +60,15 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre,
                                 Depth = -float.MaxValue
                             },
-                            new Container
+                            contentContainer = new Container<RankingsDisplay>
                             {
-                                RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
-                                {
-                                    contentContainer = new Container
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10 }
-                                    },
-                                    loading = new LoadingLayer(contentContainer),
-                                }
+                                RelativeSizeAxes = Axes.X,
                             }
                         }
                     }
-                }
+                },
+                loading = new LoadingLayer()
             };
         }
 
@@ -91,52 +78,91 @@ namespace osu.Game.Overlays
             background.Colour = ColourProvider.Background5;
         }
 
-        [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             header.Ruleset.BindTo(ruleset);
-
-            Country.BindValueChanged(_ =>
+            Scope.BindValueChanged(scope =>
             {
-                // if a country is requested, force performance scope.
-                if (Country.Value != null)
-                    Scope.Value = RankingsScope.Performance;
+                spotlightsRequest?.Cancel();
 
-                Scheduler.AddOnce(loadNewContent);
-            });
+                if (scope.NewValue != RankingsScope.Performance)
+                    requestedCountry = null;
 
-            Scope.BindValueChanged(_ =>
-            {
-                // country filtering is only valid for performance scope.
-                if (Scope.Value != RankingsScope.Performance)
-                    Country.Value = null;
-
-                Scheduler.AddOnce(loadNewContent);
-            });
-
-            ruleset.BindValueChanged(_ =>
-            {
-                if (Scope.Value == RankingsScope.Spotlights)
-                    return;
-
-                Scheduler.AddOnce(loadNewContent);
-            });
-
-            Scheduler.AddOnce(loadNewContent);
+                Scheduler.AddOnce(loadNewDisplay);
+            }, true);
         }
+
+        private void loadNewDisplay()
+        {
+            cancellationToken?.Cancel();
+            loading.Show();
+
+            var display = selectDisplay().With(d =>
+            {
+                d.Current = ruleset;
+                d.StartLoading = loading.Show;
+                d.FinishLoading = loading.Hide;
+            });
+
+            if (display is SpotlightsDisplay)
+            {
+                loadSpotlightsDisplay((SpotlightsDisplay)display);
+                return;
+            }
+
+            LoadComponentAsync(display, loaded =>
+            {
+                contentContainer.Child = loaded;
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private void loadSpotlightsDisplay(SpotlightsDisplay display)
+        {
+            spotlightsRequest = new GetSpotlightsRequest();
+            spotlightsRequest.Success += response => Schedule(() =>
+            {
+                display.Spotlights = response.Spotlights;
+                LoadComponentAsync(display, loaded =>
+                {
+                    contentContainer.Child = loaded;
+                }, (cancellationToken = new CancellationTokenSource()).Token);
+            });
+            API.Queue(spotlightsRequest);
+        }
+
+        private RankingsDisplay selectDisplay()
+        {
+            switch (Scope.Value)
+            {
+                case RankingsScope.Country:
+                    return new CountriesDisplay();
+
+                case RankingsScope.Performance:
+                    return new PerformanceDisplay().With(d => d.Country.Value = requestedCountry);
+
+                case RankingsScope.Score:
+                    return new ScoresDisplay();
+
+                case RankingsScope.Spotlights:
+                    return new SpotlightsDisplay();
+            }
+
+            throw new NotImplementedException($"Display for {Scope.Value} is not implemented.");
+        }
+
+        private Country requestedCountry;
 
         public void ShowCountry(Country requested)
         {
-            if (requested == null)
-                return;
+            requestedCountry = requested;
+
+            if (Scope.Value == RankingsScope.Performance)
+                Scope.TriggerChange();
+            else
+                Scope.Value = RankingsScope.Performance;
 
             Show();
-
-            Country.Value = requested;
         }
 
         public void ShowSpotlights()
@@ -145,100 +171,10 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private void loadNewContent()
-        {
-            loading.Show();
-
-            cancellationToken?.Cancel();
-            lastRequest?.Cancel();
-
-            if (Scope.Value == RankingsScope.Spotlights)
-            {
-                loadContent(new SpotlightsDisplay
-                {
-                    Ruleset = { BindTarget = ruleset }
-                });
-                return;
-            }
-
-            var request = createScopedRequest();
-            lastRequest = request;
-
-            if (request == null)
-            {
-                loadContent(null);
-                return;
-            }
-
-            request.Success += () => Schedule(() => loadContent(createTableFromResponse(request)));
-            request.Failure += _ => Schedule(() => loadContent(null));
-
-            api.Queue(request);
-        }
-
-        private APIRequest createScopedRequest()
-        {
-            switch (Scope.Value)
-            {
-                case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
-
-                case RankingsScope.Country:
-                    return new GetCountryRankingsRequest(ruleset.Value);
-
-                case RankingsScope.Score:
-                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
-            }
-
-            return null;
-        }
-
-        private Drawable createTableFromResponse(APIRequest request)
-        {
-            switch (request)
-            {
-                case GetUserRankingsRequest userRequest:
-                    switch (userRequest.Type)
-                    {
-                        case UserRankingsType.Performance:
-                            return new PerformanceTable(1, userRequest.Result.Users);
-
-                        case UserRankingsType.Score:
-                            return new ScoresTable(1, userRequest.Result.Users);
-                    }
-
-                    return null;
-
-                case GetCountryRankingsRequest countryRequest:
-                    return new CountriesTable(1, countryRequest.Result.Countries);
-            }
-
-            return null;
-        }
-
-        private void loadContent(Drawable content)
-        {
-            scrollFlow.ScrollToStart();
-
-            if (content == null)
-            {
-                contentContainer.Clear();
-                loading.Hide();
-                return;
-            }
-
-            LoadComponentAsync(content, loaded =>
-            {
-                loading.Hide();
-                contentContainer.Child = loaded;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
-
         protected override void Dispose(bool isDisposing)
         {
-            lastRequest?.Cancel();
+            spotlightsRequest?.Cancel();
             cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }

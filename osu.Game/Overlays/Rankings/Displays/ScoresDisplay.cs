@@ -3,127 +3,32 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Allocation;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using System.Threading;
 using osu.Game.Overlays.Rankings.Tables;
-using osu.Framework.Graphics.Shapes;
-using System;
-using osu.Game.Graphics;
-using osuTK.Graphics;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class ScoresDisplay : CompositeDrawable
+    public class ScoresDisplay : RankingsDisplay
     {
-        public Action StartLoading;
-        public Action FinishLoading;
-
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private CancellationTokenSource cancellationToken;
-        private GetUserRankingsRequest request;
-
-        private Container content;
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            InternalChildren = new Drawable[]
-            {
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Dark3
-                                },
-                                new RankingsSortTabControl
-                                {
-                                    Margin = new MarginPadding { Vertical = 20, Right = UserProfileOverlay.CONTENT_X_MARGIN },
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Current = sort
-                                }
-                            }
-                        },
-                        content = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Vertical = 20 },
-                            Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN }
-                        }
-                    }
-                }
-            };
-        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            sort.BindValueChanged(_ => fetchRankings());
-            Ruleset.BindValueChanged(_ => fetchRankings(), true);
+            sort.BindValueChanged(_ => FetchRankings(), true);
         }
 
-        private void startLoading()
+        protected override APIRequest CreateRequest() => new GetUserRankingsRequest(Current.Value, UserRankingsType.Score, sort.Value);
+
+        protected override Drawable CreateHeader() => new RankingsSortTabControl
         {
-            content.FadeColour(OsuColour.Gray(0.5f), 500, Easing.OutQuint);
-            StartLoading?.Invoke();
-        }
+            Margin = new MarginPadding { Vertical = 20, Right = UserProfileOverlay.CONTENT_X_MARGIN },
+            Anchor = Anchor.CentreRight,
+            Origin = Anchor.CentreRight,
+            Current = sort
+        };
 
-        private void finishLoading()
-        {
-            content.FadeColour(Color4.White, 500, Easing.OutQuint);
-            FinishLoading?.Invoke();
-        }
-
-        private void fetchRankings()
-        {
-            startLoading();
-            request?.Cancel();
-            request = new GetUserRankingsRequest(Ruleset.Value, UserRankingsType.Score, sort.Value);
-            request.Success += response => Schedule(() => createTable(response));
-            api?.Queue(request);
-        }
-
-        private void createTable(GetUsersResponse response)
-        {
-            cancellationToken?.Cancel();
-            var table = new ScoresTable(1, response.Users);
-            LoadComponentAsync(table, loaded =>
-            {
-                content.Child = loaded;
-                finishLoading();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            request?.Cancel();
-            cancellationToken?.Cancel();
-            base.Dispose(isDisposing);
-        }
+        protected override Drawable CreateContent(APIRequest request) => new ScoresTable(1, ((GetUserRankingsRequest)request).Result.Users);
     }
 }

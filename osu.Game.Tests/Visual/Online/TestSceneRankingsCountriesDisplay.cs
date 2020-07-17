@@ -24,10 +24,8 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = display = new CountriesDisplay()
+                Child = display = new CountriesDisplay().With(d => d.Current.Value = new OsuRuleset().RulesetInfo)
             };
-
-            display.Ruleset.Value = new OsuRuleset().RulesetInfo;
         }
     }
 }

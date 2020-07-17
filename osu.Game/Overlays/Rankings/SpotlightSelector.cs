@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -35,7 +34,6 @@ namespace osu.Game.Overlays.Rankings
             set => dropdown.Items = value;
         }
 
-        private readonly Box background;
         private readonly SpotlightsDropdown dropdown;
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
@@ -48,10 +46,6 @@ namespace osu.Game.Overlays.Rankings
             AutoSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -108,12 +102,6 @@ namespace osu.Game.Overlays.Rankings
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            background.Colour = colourProvider.Dark3;
         }
 
         public void ShowInfo(GetSpotlightRankingsResponse response)

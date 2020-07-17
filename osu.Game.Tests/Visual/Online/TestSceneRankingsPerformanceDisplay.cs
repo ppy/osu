@@ -27,10 +27,8 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = display = new PerformanceDisplay()
+                Child = display = new PerformanceDisplay().With(d => d.Current.Value = new OsuRuleset().RulesetInfo)
             };
-
-            display.Ruleset.Value = new OsuRuleset().RulesetInfo;
         });
 
         [Test]

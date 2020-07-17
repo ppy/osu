@@ -12,157 +12,68 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
-using System.Threading;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing.Panels;
-using System;
-using osu.Game.Graphics;
-using osuTK.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class SpotlightsDisplay : CompositeDrawable
+    public class SpotlightsDisplay : RankingsDisplay
     {
-        public Action StartLoading;
-        public Action FinishLoading;
-
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-
         private readonly Bindable<APISpotlight> selectedSpotlight = new Bindable<APISpotlight>();
-        private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private Bindable<RankingsSortCriteria> sort => selector.Sort;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private CancellationTokenSource cancellationToken;
-        private GetSpotlightRankingsRequest getRankingsRequest;
-        private GetSpotlightsRequest spotlightsRequest;
+        public IEnumerable<APISpotlight> Spotlights
+        {
+            get => selector.Spotlights;
+            set => selector.Spotlights = value;
+        }
 
         private SpotlightSelector selector;
-        private Container content;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            InternalChild = new ReverseChildIDFillFlowContainer<Drawable>
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
-                {
-                    selector = new SpotlightSelector
-                    {
-                        Current = selectedSpotlight,
-                    },
-                    content = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Vertical = 20 },
-                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN }
-                    }
-                }
-            };
-
-            sort.BindTo(selector.Sort);
-        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            selectedSpotlight.BindValueChanged(_ => onSpotlightChanged());
-            sort.BindValueChanged(_ => onSpotlightChanged());
-            Ruleset.BindValueChanged(onRulesetChanged);
-
-            getSpotlights();
+            selectedSpotlight.BindValueChanged(_ => FetchRankings());
+            sort.BindValueChanged(_ => FetchRankings(), true);
         }
 
-        private void startLoading()
+        protected override APIRequest CreateRequest() => new GetSpotlightRankingsRequest(Current.Value, selectedSpotlight.Value.Id, sort.Value);
+
+        protected override Drawable CreateHeader() => selector = new SpotlightSelector
         {
-            content.FadeColour(OsuColour.Gray(0.5f), 500, Easing.OutQuint);
-            StartLoading?.Invoke();
-        }
-
-        private void finishLoading()
-        {
-            content.FadeColour(Color4.White, 500, Easing.OutQuint);
-            FinishLoading?.Invoke();
-        }
-
-        private void getSpotlights()
-        {
-            spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => Schedule(() => selector.Spotlights = response.Spotlights);
-            api.Queue(spotlightsRequest);
-        }
-
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
-        {
-            if (!selector.Spotlights.Any())
-                return;
-
-            selectedSpotlight.TriggerChange();
-        }
-
-        private void onSpotlightChanged()
-        {
-            startLoading();
-            getRankingsRequest?.Cancel();
-            getRankingsRequest = new GetSpotlightRankingsRequest(Ruleset.Value, selectedSpotlight.Value.Id, sort.Value);
-            getRankingsRequest.Success += onSuccess;
-            api.Queue(getRankingsRequest);
-        }
-
-        private void onSuccess(GetSpotlightRankingsResponse response)
-        {
-            LoadComponentAsync(createContent(response), loaded =>
-            {
-                selector.ShowInfo(response);
-
-                content.Clear();
-                content.Add(loaded);
-
-                finishLoading();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
-
-        private Drawable createContent(GetSpotlightRankingsResponse response) => new FillFlowContainer
-        {
-            AutoSizeAxes = Axes.Y,
-            RelativeSizeAxes = Axes.X,
-            Direction = FillDirection.Vertical,
-            Spacing = new Vector2(0, 20),
-            Children = new Drawable[]
-            {
-                new ScoresTable(1, response.Users),
-                new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Spacing = new Vector2(10),
-                    Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b.ToBeatmapSet(rulesets))
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                    }).ToList()
-                }
-            }
+            Current = selectedSpotlight
         };
 
-        protected override void Dispose(bool isDisposing)
+        protected override Drawable CreateContent(APIRequest request)
         {
-            spotlightsRequest?.Cancel();
-            getRankingsRequest?.Cancel();
-            cancellationToken?.Cancel();
+            var response = ((GetSpotlightRankingsRequest)request).Result;
+            selector.ShowInfo(response);
 
-            base.Dispose(isDisposing);
+            return new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
+                {
+                    new ScoresTable(1, response.Users),
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Spacing = new Vector2(10),
+                        Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b.ToBeatmapSet(rulesets))
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }).ToList()
+                    }
+                }
+            };
         }
     }
 }
