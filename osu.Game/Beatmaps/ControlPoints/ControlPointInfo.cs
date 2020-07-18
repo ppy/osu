@@ -173,7 +173,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="fallback">The control point to use when <paramref name="time"/> is before any control points.</param>
         /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
         private T binarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
-            where T : ControlPoint, new()
+            where T : ControlPoint
         {
             return binarySearch(list, time) ?? fallback;
         }
