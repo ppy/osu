@@ -34,6 +34,10 @@ namespace osu.Game.Overlays
             {
                 Icon = FontAwesome.Solid.Bars
             });
+            AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Brick)
+            {
+                Icon = FontAwesome.Solid.Th
+            });
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
@@ -96,6 +100,7 @@ namespace osu.Game.Overlays
     public enum OverlayPanelDisplayStyle
     {
         Card,
-        List
+        List,
+        Brick
     }
 }
