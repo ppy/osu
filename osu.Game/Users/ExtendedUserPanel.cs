@@ -25,7 +25,7 @@ namespace osu.Game.Users
         private SpriteIcon statusIcon;
         private OsuSpriteText statusMessage;
 
-        public ExtendedUserPanel(User user)
+        protected ExtendedUserPanel(User user)
             : base(user)
         {
         }
