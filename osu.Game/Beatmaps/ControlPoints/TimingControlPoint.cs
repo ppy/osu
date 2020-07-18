@@ -20,8 +20,11 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public static readonly TimingControlPoint DEFAULT = new TimingControlPoint
         {
-            BeatLength = default_beat_length,
-            BeatLengthBindable = { Disabled = true },
+            BeatLengthBindable =
+            {
+                Value = default_beat_length,
+                Disabled = true
+            },
             TimeSignatureBindable = { Disabled = true }
         };
 
