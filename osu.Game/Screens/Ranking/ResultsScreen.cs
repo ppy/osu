@@ -267,7 +267,6 @@ namespace osu.Game.Screens.Ranking
                     break;
             };
 
-
             return base.OnExiting(next);
         }
 
