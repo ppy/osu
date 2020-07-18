@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override BindableNumber<float> StartScale { get; } = new BindableFloat
         {
             MinValue = 1f,
-            MaxValue = 15f,
+            MaxValue = 25f,
             Default = 2f,
             Value = 2f,
             Precision = 0.1f,
