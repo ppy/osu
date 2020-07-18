@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Description => "Hit them at the right size!";
 
-        [SettingSource("Starting size modifier", "The object starting size modifier")]
+        [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
         public override BindableNumber<float> StartScale { get; } = new BindableFloat
         {
             MinValue = 0f,
