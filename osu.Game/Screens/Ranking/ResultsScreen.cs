@@ -257,12 +257,6 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            if (statisticsPanel.State.Value == Visibility.Visible)
-            {
-                statisticsPanel.Hide();
-                return true;
-            }
-
             Background.FadeTo(1, 250);
 
             switch (OptUIEnabled.Value)
@@ -274,6 +268,17 @@ namespace osu.Game.Screens.Ranking
             };
 
             return base.OnExiting(next);
+        }
+
+        public override bool OnBackButton()
+        {
+            if (statisticsPanel.State.Value == Visibility.Visible)
+            {
+                statisticsPanel.Hide();
+                return true;
+            }
+
+            return false;
         }
 
         private void OnSelectedScoreChanged(ValueChangedEvent<ScoreInfo> s)

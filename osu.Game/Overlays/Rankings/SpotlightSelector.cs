@@ -22,10 +22,8 @@ namespace osu.Game.Overlays.Rankings
     {
         private const int duration = 300;
 
-        private readonly Box background;
-        private readonly SpotlightsDropdown dropdown;
-
         private readonly BindableWithCurrent<APISpotlight> current = new BindableWithCurrent<APISpotlight>();
+        public readonly Bindable<RankingsSortCriteria> Sort = new Bindable<RankingsSortCriteria>();
 
         public Bindable<APISpotlight> Current
         {
@@ -41,19 +39,22 @@ namespace osu.Game.Overlays.Rankings
 
         protected override bool StartHidden => true;
 
+        private readonly Box background;
+        private readonly Container content;
+        private readonly SpotlightsDropdown dropdown;
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
         private readonly InfoColumn mapCountColumn;
         private readonly InfoColumn participantsColumn;
-        private readonly Container content;
 
         public SpotlightSelector()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            AutoSizeAxes = Axes.Y;
             Add(content = new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
                     background = new Box
@@ -62,31 +63,55 @@ namespace osu.Game.Overlays.Rankings
                     },
                     new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
-                        Children = new Drawable[]
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                        Child = new FillFlowContainer
                         {
-                            dropdown = new SpotlightsDropdown
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                RelativeSizeAxes = Axes.X,
-                                Current = Current,
-                                Depth = -float.MaxValue
-                            },
-                            new FillFlowContainer
-                            {
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomRight,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(15, 0),
-                                Children = new Drawable[]
+                                new Container
                                 {
-                                    startDateColumn = new InfoColumn(@"开始日期"),
-                                    endDateColumn = new InfoColumn(@"结束日期"),
-                                    mapCountColumn = new InfoColumn(@"谱面数量"),
-                                    participantsColumn = new InfoColumn(@"参与人数")
+                                    Margin = new MarginPadding { Vertical = 20 },
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 40,
+                                    Depth = -float.MaxValue,
+                                    Child = dropdown = new SpotlightsDropdown
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Current = Current
+                                    }
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10, 0),
+                                            Margin = new MarginPadding { Bottom = 5 },
+                                            Children = new Drawable[]
+                                            {
+                                                startDateColumn = new InfoColumn(@"开始日期"),
+                                                endDateColumn = new InfoColumn(@"结束日期"),
+                                                mapCountColumn = new InfoColumn(@"谱面数量"),
+                                                participantsColumn = new InfoColumn(@"参与人数")
+                                            }
+                                        },
+                                        new RankingsSortTabControl
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Current = Sort
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -128,6 +153,7 @@ namespace osu.Game.Overlays.Rankings
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;
+                Margin = new MarginPadding { Vertical = 10 };
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -143,7 +169,7 @@ namespace osu.Game.Overlays.Rankings
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Light),
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
                         }
                     }
                 };

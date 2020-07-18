@@ -159,11 +159,20 @@ namespace osu.Game.Beatmaps.Formats
             Mania,
         }
 
-        internal class LegacyDifficultyControlPoint : DifficultyControlPoint
+        [Obsolete("Do not use unless you're a legacy ruleset and 100% sure.")]
+        public class LegacyDifficultyControlPoint : DifficultyControlPoint
         {
-            public LegacyDifficultyControlPoint()
+            /// <summary>
+            /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
+            /// DO NOT USE THIS UNLESS 100% SURE.
+            /// </summary>
+            public readonly float BpmMultiplier;
+
+            public LegacyDifficultyControlPoint(double beatLength)
             {
                 SpeedMultiplierBindable.Precision = double.Epsilon;
+
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100f : 1;
             }
         }
 
