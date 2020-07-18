@@ -64,14 +64,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearchWithFallback(DifficultyPoints, time);
+        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearchWithFallback(DifficultyPoints, time, DifficultyControlPoint.DEFAULT);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearchWithFallback(EffectPoints, time);
+        public EffectControlPoint EffectPointAt(double time) => binarySearchWithFallback(EffectPoints, time, EffectControlPoint.DEFAULT);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
@@ -92,21 +92,21 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         [JsonIgnore]
         public double BPMMaximum =>
-            60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
+            60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Finds the minimum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
         public double BPMMinimum =>
-            60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
+            60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Finds the mode BPM (most common BPM) represented by the control points.
         /// </summary>
         [JsonIgnore]
         public double BPMMode =>
-            60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
+            60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
         /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
@@ -170,12 +170,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
+        /// <param name="fallback">The control point to use when <paramref name="time"/> is before any control points.</param>
         /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
-        private T binarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T prePoint = null)
+        private T binarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T fallback)
             where T : ControlPoint, new()
         {
-            return binarySearch(list, time) ?? prePoint ?? new T();
+            return binarySearch(list, time) ?? fallback;
         }
 
         /// <summary>
