@@ -12,9 +12,26 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        protected virtual int ContentSideMargin() => 70;
+        private float contentSidePadding;
+
+        /// <summary>
+        /// Horizontal padding of the header content.
+        /// </summary>
+        protected float ContentSidePadding
+        {
+            get => contentSidePadding;
+            set
+            {
+                contentSidePadding = value;
+                content.Padding = new MarginPadding
+                {
+                    Horizontal = value
+                };
+            }
+        }
 
         private readonly Box titleBackground;
+        private readonly Container content;
 
         protected readonly FillFlowContainer HeaderInfo;
 
@@ -50,14 +67,10 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Gray,
                                     },
-                                    new Container
+                                    content = new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding
-                                        {
-                                            Horizontal = ContentSideMargin(),
-                                        },
                                         Children = new[]
                                         {
                                             CreateTitle().With(title =>
@@ -79,6 +92,8 @@ namespace osu.Game.Overlays
                     CreateContent()
                 }
             });
+
+            ContentSidePadding = 70;
         }
 
         [BackgroundDependencyLoader]
