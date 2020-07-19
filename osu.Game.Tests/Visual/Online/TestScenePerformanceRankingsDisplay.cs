@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneRankingsPerformanceDisplay : OsuTestScene
+    public class TestScenePerformanceRankingsDisplay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
