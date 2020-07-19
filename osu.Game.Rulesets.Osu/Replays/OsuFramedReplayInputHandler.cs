@@ -36,19 +36,19 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void GetPendingInputs(List<IInput> input)
         {
-            return new List<IInput>
-            {
+            input.Add(
                 new MousePositionAbsoluteInput
                 {
                     Position = GamefieldToScreenSpace(Position ?? Vector2.Zero)
-                },
+                });
+            input.Add(
                 new ReplayState<OsuAction>
                 {
                     PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>()
-                }
-            };
+                });
+            ;
         }
     }
 }

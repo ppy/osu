@@ -173,19 +173,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public override List<IInput> GetPendingInputs()
+            public override void GetPendingInputs(List<IInput> inputs)
             {
-                return new List<IInput>
-                {
-                    new MousePositionAbsoluteInput
-                    {
-                        Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero)
-                    },
-                    new ReplayState<TestAction>
-                    {
-                        PressedActions = CurrentFrame?.Actions ?? new List<TestAction>()
-                    }
-                };
+                inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero) });
+                inputs.Add(new ReplayState<TestAction> { PressedActions = CurrentFrame?.Actions ?? new List<TestAction>() });
             }
         }
 
