@@ -153,23 +153,27 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var display = selectDisplay();
-
-            if (display is SpotlightsRankingsDisplay)
+            if (Scope.Value == RankingsScope.Spotlights)
             {
-                loadSpotlightsDisplay(display);
+                loadSpotlightsDisplay();
                 return;
             }
 
-            loadDisplayAsync(display);
+            loadDisplayAsync(selectDisplay());
         }
 
-        private void loadSpotlightsDisplay(Drawable display)
+        private void loadSpotlightsDisplay()
         {
             spotlightsRequest = new GetSpotlightsRequest();
             spotlightsRequest.Success += response => Schedule(() =>
             {
-                ((SpotlightsRankingsDisplay)display).Spotlights = response.Spotlights;
+                var display = new SpotlightsRankingsDisplay
+                {
+                    Current = ruleset,
+                    StartLoading = loading.Show,
+                    FinishLoading = loading.Hide,
+                    Spotlights = response.Spotlights
+                };
                 loadDisplayAsync(display);
             });
             API.Queue(spotlightsRequest);
@@ -208,14 +212,6 @@ namespace osu.Game.Overlays
 
                 case RankingsScope.Score:
                     return new ScoreRankingsDisplay
-                    {
-                        Current = ruleset,
-                        StartLoading = loading.Show,
-                        FinishLoading = loading.Hide
-                    };
-
-                case RankingsScope.Spotlights:
-                    return new SpotlightsRankingsDisplay
                     {
                         Current = ruleset,
                         StartLoading = loading.Show,
