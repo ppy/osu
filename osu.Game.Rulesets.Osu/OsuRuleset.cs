@@ -151,6 +151,7 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[]
                     {
                         new OsuModTransform(),
+                        new OsuModNinja(),
                         new OsuModWiggle(),
                         new OsuModSpinIn(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),

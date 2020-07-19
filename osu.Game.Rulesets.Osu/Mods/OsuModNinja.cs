@@ -9,21 +9,20 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModNinja : Mod, IApplicableToDrawableHitObjects
     {
-        public override string Name => "Transform";
-        public override string Acronym => "TR";
-        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
+        public override string Name => "Ninja";
+        public override string Acronym => "NJ";
+        public override IconUsage? Icon => FontAwesome.Solid.UserNinja;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Everything rotates. EVERYTHING.";
+        public override string Description => "Slice the circles!";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModNinja) };
-
-        private float theta;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModTransform), typeof(OsuModSpinIn) };
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
@@ -44,10 +43,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 default:
                     var hitObject = (OsuHitObject)drawable.HitObject;
 
-                    float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
-
-                    Vector2 originalPosition = drawable.Position;
-                    Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
+                    var originalPosition = drawable.Position;
+                    var appearPosition = new Vector2(originalPosition.X, OsuPlayfield.BASE_SIZE.Y);
 
                     // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
                     double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
@@ -56,11 +53,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     using (drawable.BeginAbsoluteSequence(appearTime, true))
                     {
                         drawable
-                            .MoveToOffset(appearOffset)
-                            .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
+                            .MoveTo(appearPosition)
+                            .MoveTo(originalPosition, moveDuration, Easing.Out);
                     }
-
-                    theta += (float)hitObject.TimeFadeIn / 1000;
                     break;
             }
         }
