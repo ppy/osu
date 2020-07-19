@@ -251,16 +251,13 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("IntAction")
-                        .HasColumnName("Action");
+                    b.Property<string>("StringAction")
+                     .HasColumnName("Action");
 
                     b.Property<string>("KeysString")
                         .HasColumnName("Keys");
 
                     b.Property<int?>("RulesetID");
-
-                    b.Property<string>("StringAction")
-                        .HasColumnName("SAction");
 
                     b.Property<int?>("Variant");
 

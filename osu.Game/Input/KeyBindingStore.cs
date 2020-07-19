@@ -27,13 +27,38 @@ namespace osu.Game.Input
 
                     foreach (var variant in ruleset.AvailableVariants)
                     {
+                        migrate(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
                         insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
                     }
                 }
             }
         }
 
-        public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
+        public void Register(KeyBindingContainer manager)
+        {
+            migrate(manager.DefaultKeyBindings);
+            insertDefaults(manager.DefaultKeyBindings);
+        }
+
+        // See https://github.com/ppy/osu/pull/9549
+        private void migrate(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                foreach (var group in defaults.GroupBy(k => k.Action))
+                {
+                    foreach (var databasedKeyBinding in usage.Context.DatabasedKeyBinding.Where(
+                        b => b.RulesetID == rulesetId && b.Variant == variant && b.IntAction == (int)group.Key && b.ActionName == null))
+                    {
+                        databasedKeyBinding.ActionName = group.Key.ToString();
+                        databasedKeyBinding.IntAction = -1;
+                        usage.Context.DatabasedKeyBinding.Update(databasedKeyBinding);
+                    }
+
+                    usage.Context.SaveChanges();
+                }
+            }
+        }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
@@ -42,7 +67,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = Query(rulesetId, variant).Count(k => k.IntAction == (int)group.Key);
+                    int count = Query(rulesetId, variant).Count(k => k.ActionName == group.Key.ToString());
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -55,23 +80,13 @@ namespace osu.Game.Input
                         {
                             KeyCombination = insertable.KeyCombination,
                             Action = insertable.Action,
+                            IntAction = -1,
                             RulesetID = rulesetId,
                             Variant = variant
                         });
 
                         // required to ensure stable insert order (https://github.com/dotnet/efcore/issues/11686)
                         usage.Context.SaveChanges();
-                    }
-                }
-
-                // has nothing to do with inserting defaults. This migrates values and shoud be fine for the time being. See https://github.com/ppy/osu/pull/9549
-                foreach (var group in defaults.GroupBy(k => k.Action))
-                {
-                    foreach (var databasedKeyBinding in usage.Context.DatabasedKeyBinding.Where(
-                        b => b.RulesetID == rulesetId && b.Variant == variant && b.IntAction == (int)group.Key && b.ActionName == null))
-                    {
-                        databasedKeyBinding.ActionName = group.Key.ToString();
-                        usage.Context.DatabasedKeyBinding.Update(databasedKeyBinding);
                     }
                 }
             }
