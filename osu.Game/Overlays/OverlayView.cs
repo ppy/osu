@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Force a re-request for data from the API.
         /// </summary>
-        protected void PerformFetch()
+        protected virtual void PerformFetch()
         {
             request?.Cancel();
 

@@ -9,17 +9,17 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class ScoreRankingsDisplay : RankingsDisplay
+    public class ScoreRankingsDisplay : RankingsDisplay<GetUsersResponse>
     {
         private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            sort.BindValueChanged(_ => FetchRankings(), true);
+            sort.BindValueChanged(_ => PerformFetch());
         }
 
-        protected override APIRequest CreateRequest() => new GetUserRankingsRequest(Current.Value, UserRankingsType.Score, sort.Value);
+        protected override APIRequest<GetUsersResponse> CreateRequest() => new GetUserRankingsRequest(Current.Value, UserRankingsType.Score, sort.Value);
 
         protected override Drawable CreateHeader() => new RankingsSortTabControl
         {
@@ -29,6 +29,6 @@ namespace osu.Game.Overlays.Rankings.Displays
             Current = sort
         };
 
-        protected override Drawable CreateContent(APIRequest request) => new ScoresTable(1, ((GetUserRankingsRequest)request).Result.Users);
+        protected override Drawable CreateContent(GetUsersResponse response) => new ScoresTable(1, response.Users);
     }
 }

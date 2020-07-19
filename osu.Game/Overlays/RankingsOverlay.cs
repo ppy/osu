@@ -14,6 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Rankings.Displays;
 using System;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays
 {
@@ -28,10 +29,11 @@ namespace osu.Game.Overlays
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; }
 
-        private readonly Container<RankingsDisplay> contentContainer;
+        private readonly Container contentContainer;
         private readonly LoadingLayer loading;
         private readonly Box background;
         private readonly RankingsOverlayHeader header;
+        private readonly OverlayScrollContainer scrollFlow;
 
         private GetSpotlightsRequest spotlightsRequest;
         private CancellationTokenSource cancellationToken;
@@ -45,7 +47,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                new OverlayScrollContainer
+                scrollFlow = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.TopCentre,
                                 Depth = -float.MaxValue
                             },
-                            contentContainer = new Container<RankingsDisplay>
+                            contentContainer = new Container
                             {
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
@@ -97,73 +99,29 @@ namespace osu.Game.Overlays
                 if (scope.NewValue != RankingsScope.Performance)
                     Country.Value = null;
 
-                Scheduler.AddOnce(loadNewDisplay);
-            }, true);
-        }
-
-        private void loadNewDisplay()
-        {
-            cancellationToken?.Cancel();
-            spotlightsRequest?.Cancel();
-
-            loading.Show();
-
-            var display = selectDisplay().With(d =>
-            {
-                d.Current = ruleset;
-                d.StartLoading = loading.Show;
-                d.FinishLoading = loading.Hide;
+                Scheduler.AddOnce(selectDisplayToLoad);
             });
+        }
 
-            if (display is SpotlightsRankingsDisplay)
+        private bool displayUpdateRequired = true;
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            // We don't want to create a new display on every call, only when exiting from fully closed state.
+            if (displayUpdateRequired)
             {
-                loadSpotlightsDisplay((SpotlightsRankingsDisplay)display);
-                return;
+                header.Current.TriggerChange();
+                displayUpdateRequired = false;
             }
-
-            loadDisplayAsync(display);
         }
 
-        private void loadSpotlightsDisplay(SpotlightsRankingsDisplay display)
+        protected override void PopOutComplete()
         {
-            spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => Schedule(() =>
-            {
-                display.Spotlights = response.Spotlights;
-                loadDisplayAsync(display);
-            });
-            API.Queue(spotlightsRequest);
-        }
-
-        private void loadDisplayAsync(RankingsDisplay display)
-        {
-            LoadComponentAsync(display, loaded =>
-            {
-                contentContainer.Child = loaded;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
-
-        private RankingsDisplay selectDisplay()
-        {
-            switch (Scope.Value)
-            {
-                case RankingsScope.Country:
-                    return new CountryRankingsDisplay();
-
-                case RankingsScope.Performance:
-                    return new PerformanceRankingsDisplay
-                    {
-                        Country = { BindTarget = Country }
-                    };
-
-                case RankingsScope.Score:
-                    return new ScoreRankingsDisplay();
-
-                case RankingsScope.Spotlights:
-                    return new SpotlightsRankingsDisplay();
-            }
-
-            throw new NotImplementedException($"Display for {Scope.Value} is not implemented.");
+            base.PopOutComplete();
+            loadDisplayAsync(Empty());
+            displayUpdateRequired = true;
         }
 
         public void ShowCountry(Country requested)
@@ -180,6 +138,100 @@ namespace osu.Game.Overlays
         {
             Scope.Value = RankingsScope.Spotlights;
             Show();
+        }
+
+        private void selectDisplayToLoad()
+        {
+            cancellationToken?.Cancel();
+            spotlightsRequest?.Cancel();
+
+            loading.Show();
+
+            if (!API.IsLoggedIn)
+            {
+                loadDisplayAsync(Empty());
+                return;
+            }
+
+            var display = selectDisplay();
+
+            if (display is SpotlightsRankingsDisplay)
+            {
+                loadSpotlightsDisplay(display);
+                return;
+            }
+
+            loadDisplayAsync(display);
+        }
+
+        private void loadSpotlightsDisplay(Drawable display)
+        {
+            spotlightsRequest = new GetSpotlightsRequest();
+            spotlightsRequest.Success += response => Schedule(() =>
+            {
+                ((SpotlightsRankingsDisplay)display).Spotlights = response.Spotlights;
+                loadDisplayAsync(display);
+            });
+            API.Queue(spotlightsRequest);
+        }
+
+        private void loadDisplayAsync(Drawable display)
+        {
+            scrollFlow.ScrollToStart();
+
+            LoadComponentAsync(display, loaded =>
+            {
+                contentContainer.Child = loaded;
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private Drawable selectDisplay()
+        {
+            switch (Scope.Value)
+            {
+                case RankingsScope.Country:
+                    return new CountryRankingsDisplay
+                    {
+                        Current = ruleset,
+                        StartLoading = loading.Show,
+                        FinishLoading = loading.Hide
+                    };
+
+                case RankingsScope.Performance:
+                    return new PerformanceRankingsDisplay
+                    {
+                        Country = { BindTarget = Country },
+                        Current = ruleset,
+                        StartLoading = loading.Show,
+                        FinishLoading = loading.Hide
+                    };
+
+                case RankingsScope.Score:
+                    return new ScoreRankingsDisplay
+                    {
+                        Current = ruleset,
+                        StartLoading = loading.Show,
+                        FinishLoading = loading.Hide
+                    };
+
+                case RankingsScope.Spotlights:
+                    return new SpotlightsRankingsDisplay
+                    {
+                        Current = ruleset,
+                        StartLoading = loading.Show,
+                        FinishLoading = loading.Hide
+                    };
+            }
+
+            throw new NotImplementedException($"Display for {Scope.Value} is not implemented.");
+        }
+
+        public override void APIStateChanged(IAPIProvider api, APIState state)
+        {
+            if (State.Value == Visibility.Hidden)
+                return;
+
+            Scope.TriggerChange();
         }
 
         protected override void Dispose(bool isDisposing)

@@ -8,16 +8,10 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class CountryRankingsDisplay : RankingsDisplay
+    public class CountryRankingsDisplay : RankingsDisplay<GetCountriesResponse>
     {
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            FetchRankings();
-        }
+        protected override APIRequest<GetCountriesResponse> CreateRequest() => new GetCountryRankingsRequest(Current.Value);
 
-        protected override APIRequest CreateRequest() => new GetCountryRankingsRequest(Current.Value);
-
-        protected override Drawable CreateContent(APIRequest request) => new CountriesTable(1, ((GetCountryRankingsRequest)request).Result.Countries);
+        protected override Drawable CreateContent(GetCountriesResponse response) => new CountriesTable(1, response.Countries);
     }
 }

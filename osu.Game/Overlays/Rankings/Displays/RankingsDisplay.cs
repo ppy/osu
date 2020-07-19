@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Game.Rulesets;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Allocation;
-using osu.Game.Online.API;
 using System.Threading;
 using System;
 using osu.Game.Graphics;
@@ -16,7 +15,8 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public abstract class RankingsDisplay : CompositeDrawable, IHasCurrentValue<RulesetInfo>
+    public abstract class RankingsDisplay<T> : OverlayView<T>, IHasCurrentValue<RulesetInfo>
+        where T : class
     {
         public Action StartLoading;
         public Action FinishLoading;
@@ -29,19 +29,13 @@ namespace osu.Game.Overlays.Rankings.Displays
             set => current.Current = value;
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         private CancellationTokenSource cancellationToken;
-        private APIRequest request;
 
         private readonly Container content;
         private readonly Box headerBackground;
 
         protected RankingsDisplay()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -83,24 +77,18 @@ namespace osu.Game.Overlays.Rankings.Displays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            current.BindValueChanged(_ => FetchRankings());
+            current.BindValueChanged(_ => PerformFetch());
         }
 
-        protected void FetchRankings()
+        protected override void PerformFetch()
         {
             startLoading();
-
-            cancellationToken?.Cancel();
-            request?.Cancel();
-
-            request = CreateRequest();
-            request.Success += () => Schedule(() => createContent(request));
-            api?.Queue(request);
+            base.PerformFetch();
         }
 
-        private void createContent(APIRequest request)
+        protected override void OnSuccess(T response)
         {
-            LoadComponentAsync(CreateContent(request), loaded =>
+            LoadComponentAsync(CreateContent(response), loaded =>
             {
                 content.Child = loaded;
                 finishLoading();
@@ -109,9 +97,7 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected virtual Drawable CreateHeader() => Empty();
 
-        protected abstract APIRequest CreateRequest();
-
-        protected abstract Drawable CreateContent(APIRequest request);
+        protected abstract Drawable CreateContent(T response);
 
         private void startLoading()
         {
@@ -127,7 +113,6 @@ namespace osu.Game.Overlays.Rankings.Displays
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class SpotlightsRankingsDisplay : RankingsDisplay
+    public class SpotlightsRankingsDisplay : RankingsDisplay<GetSpotlightRankingsResponse>
     {
         private readonly Bindable<APISpotlight> selectedSpotlight = new Bindable<APISpotlight>();
         private Bindable<RankingsSortCriteria> sort => selector.Sort;
@@ -36,20 +36,19 @@ namespace osu.Game.Overlays.Rankings.Displays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            selectedSpotlight.BindValueChanged(_ => FetchRankings());
-            sort.BindValueChanged(_ => FetchRankings(), true);
+            selectedSpotlight.BindValueChanged(_ => PerformFetch());
+            sort.BindValueChanged(_ => PerformFetch());
         }
 
-        protected override APIRequest CreateRequest() => new GetSpotlightRankingsRequest(Current.Value, selectedSpotlight.Value.Id, sort.Value);
+        protected override APIRequest<GetSpotlightRankingsResponse> CreateRequest() => new GetSpotlightRankingsRequest(Current.Value, selectedSpotlight.Value.Id, sort.Value);
 
         protected override Drawable CreateHeader() => selector = new SpotlightSelector
         {
             Current = selectedSpotlight
         };
 
-        protected override Drawable CreateContent(APIRequest request)
+        protected override Drawable CreateContent(GetSpotlightRankingsResponse response)
         {
-            var response = ((GetSpotlightRankingsRequest)request).Result;
             selector.ShowInfo(response);
 
             return new FillFlowContainer

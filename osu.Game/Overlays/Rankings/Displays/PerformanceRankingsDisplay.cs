@@ -11,7 +11,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class PerformanceRankingsDisplay : RankingsDisplay
+    public class PerformanceRankingsDisplay : RankingsDisplay<GetUsersResponse>
     {
         public readonly BindableWithCurrent<Country> Country = new BindableWithCurrent<Country>();
         private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
@@ -20,11 +20,11 @@ namespace osu.Game.Overlays.Rankings.Displays
         {
             base.LoadComplete();
 
-            Country.BindValueChanged(_ => FetchRankings());
-            sort.BindValueChanged(_ => FetchRankings(), true);
+            Country.BindValueChanged(_ => PerformFetch());
+            sort.BindValueChanged(_ => PerformFetch());
         }
 
-        protected override APIRequest CreateRequest() => new GetUserRankingsRequest(Current.Value, UserRankingsType.Performance, sort.Value, 1, Country.Value?.FlagName);
+        protected override APIRequest<GetUsersResponse> CreateRequest() => new GetUserRankingsRequest(Current.Value, UserRankingsType.Performance, sort.Value, 1, Country.Value?.FlagName);
 
         protected override Drawable CreateHeader() => new Container
         {
@@ -60,6 +60,6 @@ namespace osu.Game.Overlays.Rankings.Displays
             }
         };
 
-        protected override Drawable CreateContent(APIRequest request) => new PerformanceTable(1, ((GetUserRankingsRequest)request).Result.Users);
+        protected override Drawable CreateContent(GetUsersResponse response) => new PerformanceTable(1, response.Users);
     }
 }
