@@ -19,6 +19,8 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
+        public const float CONTENT_X_MARGIN = 50;
+
         protected readonly Bindable<Country> Country = new Bindable<Country>();
 
         protected Bindable<RankingsScope> Scope => header.Current;

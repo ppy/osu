@@ -19,6 +19,8 @@ namespace osu.Game.Overlays.Rankings
 
         protected override Drawable CreateBackground() => new OverlayHeaderBackground("Headers/rankings");
 
+        protected override int ContentSideMargin() => 50;
+
         private class RankingsTitle : OverlayTitle
         {
             public RankingsTitle()

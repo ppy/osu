@@ -12,7 +12,7 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        public const int CONTENT_X_MARGIN = 50;
+        protected virtual int ContentSideMargin() => 70;
 
         private readonly Box titleBackground;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
                                         AutoSizeAxes = Axes.Y,
                                         Padding = new MarginPadding
                                         {
-                                            Horizontal = CONTENT_X_MARGIN,
+                                            Horizontal = ContentSideMargin(),
                                         },
                                         Children = new[]
                                         {

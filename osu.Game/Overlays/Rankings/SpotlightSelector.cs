@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Padding = new MarginPadding { Horizontal = RankingsOverlay.CONTENT_X_MARGIN },
                     Child = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,

@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                     },
                     TabControl = CreateTabControl().With(control =>
                     {
-                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
+                        control.Margin = new MarginPadding { Left = ContentSideMargin() };
                         control.Current = Current;
                     })
                 }

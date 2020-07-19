@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Rankings.Displays
                             AutoSizeAxes = Axes.Y,
                             Child = new RankingsSortTabControl
                             {
-                                Margin = new MarginPadding { Vertical = 20, Right = UserProfileOverlay.CONTENT_X_MARGIN },
+                                Margin = new MarginPadding { Vertical = 20, Right = RankingsOverlay.CONTENT_X_MARGIN },
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Current = sort

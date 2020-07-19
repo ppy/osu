@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Rankings.Displays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Margin = new MarginPadding { Vertical = 20 },
-                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN }
+                        Padding = new MarginPadding { Horizontal = RankingsOverlay.CONTENT_X_MARGIN }
                     }
                 }
             };
