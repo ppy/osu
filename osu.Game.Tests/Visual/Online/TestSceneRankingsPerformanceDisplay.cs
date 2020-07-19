@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
-        private PerformanceDisplay display;
+        private PerformanceRankingsDisplay display;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = display = new PerformanceDisplay().With(d => d.Current.Value = new OsuRuleset().RulesetInfo)
+                Child = display = new PerformanceRankingsDisplay().With(d => d.Current.Value = new OsuRuleset().RulesetInfo)
             };
         });
 

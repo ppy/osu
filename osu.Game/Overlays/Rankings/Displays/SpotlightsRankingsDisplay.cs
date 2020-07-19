@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class SpotlightsDisplay : RankingsDisplay
+    public class SpotlightsRankingsDisplay : RankingsDisplay
     {
         private readonly Bindable<APISpotlight> selectedSpotlight = new Bindable<APISpotlight>();
         private Bindable<RankingsSortCriteria> sort => selector.Sort;

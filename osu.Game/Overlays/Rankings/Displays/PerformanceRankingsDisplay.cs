@@ -11,7 +11,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class PerformanceDisplay : RankingsDisplay
+    public class PerformanceRankingsDisplay : RankingsDisplay
     {
         public readonly BindableWithCurrent<Country> Country = new BindableWithCurrent<Country>();
         private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();

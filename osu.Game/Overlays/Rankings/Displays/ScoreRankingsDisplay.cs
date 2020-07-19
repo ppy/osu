@@ -9,7 +9,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class ScoresDisplay : RankingsDisplay
+    public class ScoreRankingsDisplay : RankingsDisplay
     {
         private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
 

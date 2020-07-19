@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Online
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Width = 0.8f,
-                Child = new SpotlightsDisplay
+                Child = new SpotlightsRankingsDisplay
                 {
                     Current = ruleset,
                     Spotlights = new[]

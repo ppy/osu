@@ -8,7 +8,7 @@ using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays.Rankings.Displays
 {
-    public class CountriesDisplay : RankingsDisplay
+    public class CountryRankingsDisplay : RankingsDisplay
     {
         protected override void LoadComplete()
         {

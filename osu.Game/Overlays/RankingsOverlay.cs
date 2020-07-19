@@ -113,16 +113,16 @@ namespace osu.Game.Overlays
                 d.FinishLoading = loading.Hide;
             });
 
-            if (display is SpotlightsDisplay)
+            if (display is SpotlightsRankingsDisplay)
             {
-                loadSpotlightsDisplay((SpotlightsDisplay)display);
+                loadSpotlightsDisplay((SpotlightsRankingsDisplay)display);
                 return;
             }
 
             loadDisplayAsync(display);
         }
 
-        private void loadSpotlightsDisplay(SpotlightsDisplay display)
+        private void loadSpotlightsDisplay(SpotlightsRankingsDisplay display)
         {
             spotlightsRequest = new GetSpotlightsRequest();
             spotlightsRequest.Success += response => Schedule(() =>
@@ -146,19 +146,19 @@ namespace osu.Game.Overlays
             switch (Scope.Value)
             {
                 case RankingsScope.Country:
-                    return new CountriesDisplay();
+                    return new CountryRankingsDisplay();
 
                 case RankingsScope.Performance:
-                    return new PerformanceDisplay
+                    return new PerformanceRankingsDisplay
                     {
                         Country = { BindTarget = Country }
                     };
 
                 case RankingsScope.Score:
-                    return new ScoresDisplay();
+                    return new ScoreRankingsDisplay();
 
                 case RankingsScope.Spotlights:
-                    return new SpotlightsDisplay();
+                    return new SpotlightsRankingsDisplay();
             }
 
             throw new NotImplementedException($"Display for {Scope.Value} is not implemented.");
