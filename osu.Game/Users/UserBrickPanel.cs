@@ -16,15 +16,14 @@ namespace osu.Game.Users
         public UserBrickPanel(User user)
             : base(user)
         {
-            AutoSizeAxes = Axes.X;
-            Height = 23;
+            AutoSizeAxes = Axes.Both;
             CornerRadius = 6;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.FadeTo(0.3f);
+            Background.FadeTo(0.2f);
         }
 
         protected override Drawable CreateLayout() => new FillFlowContainer
@@ -34,7 +33,8 @@ namespace osu.Game.Users
             Spacing = new Vector2(5, 0),
             Margin = new MarginPadding
             {
-                Horizontal = 5
+                Horizontal = 10,
+                Vertical = 3,
             },
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
