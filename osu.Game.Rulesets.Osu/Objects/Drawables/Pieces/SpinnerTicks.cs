@@ -20,24 +20,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            const float count = 18;
+            const float count = 8;
 
             for (float i = 0; i < count; i++)
             {
                 Add(new Container
                 {
                     Colour = Color4.Black,
-                    Alpha = 0.4f,
+                    Alpha = 0.2f,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
-                        Radius = 10,
+                        Radius = 20,
                         Colour = Color4.Gray.Opacity(0.2f),
                     },
                     RelativePositionAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = 5,
-                    Size = new Vector2(60, 10),
+                    Size = new Vector2(65, 10),
                     Origin = Anchor.Centre,
                     Position = new Vector2(
                         0.5f + MathF.Sin(i / count * 2 * MathF.PI) / 2 * 0.86f,

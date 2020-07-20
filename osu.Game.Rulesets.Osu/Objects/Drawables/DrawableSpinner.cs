@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         Background = new SpinnerBackground
                         {
-                            Alpha = 0.6f,
+                            Alpha = 1f,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Background.AccentColour = normalColour;
 
-            completeColour = colours.YellowLight.Opacity(0.75f);
+            completeColour = colours.YellowLight;
 
             Disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
@@ -152,8 +152,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 Disc.FadeAccent(completeColour, duration);
 
-                Background.FadeAccent(completeColour, duration);
-                Background.FadeOut(duration);
+                Background.FadeAccent(completeColour.Darken(1), duration);
 
                 circle.FadeColour(completeColour, duration);
                 glow.FadeColour(completeColour, duration);
@@ -204,14 +203,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            circleContainer.ScaleTo(Spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
+            circleContainer.ScaleTo(0);
+            mainContainer.ScaleTo(0);
 
-            mainContainer
-                .ScaleTo(0)
-                .ScaleTo(Spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, HitObject.TimePreempt - 150, Easing.OutQuint)
-                .Then()
-                .ScaleTo(1, 500, Easing.OutQuint);
+            using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
+            {
+                float phaseOneScale = Spinner.Scale * 0.8f;
+
+                circleContainer.ScaleTo(phaseOneScale, HitObject.TimePreempt / 2f, Easing.OutQuint);
+
+                mainContainer
+                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.4f, HitObject.TimePreempt / 2, Easing.OutElasticHalf)
+                    .RotateTo(25, HitObject.TimePreempt + Spinner.Duration);
+
+                using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
+                {
+                    circleContainer.ScaleTo(Spinner.Scale * 1.4f, 400, Easing.OutQuint);
+                    mainContainer.ScaleTo(Spinner.Scale, 400, Easing.OutQuint);
+                }
+            }
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
