@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 circleContainer.ScaleTo(phaseOneScale, HitObject.TimePreempt / 4, Easing.OutQuint);
 
                 mainContainer
-                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.5f, HitObject.TimePreempt / 4, Easing.OutQuint)
+                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.6f, HitObject.TimePreempt / 4, Easing.OutQuint)
                     .RotateTo((float)(25 * Spinner.Duration / 2000), HitObject.TimePreempt + Spinner.Duration);
 
                 using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))

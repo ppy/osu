@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     RelativePositionAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = 5,
-                    Size = new Vector2(65, 10),
+                    Size = new Vector2(60, 10),
                     Origin = Anchor.Centre,
                     Position = new Vector2(
-                        0.5f + MathF.Sin(i / count * 2 * MathF.PI) / 2 * 0.86f,
-                        0.5f + MathF.Cos(i / count * 2 * MathF.PI) / 2 * 0.86f
+                        0.5f + MathF.Sin(i / count * 2 * MathF.PI) / 2 * 0.83f,
+                        0.5f + MathF.Cos(i / count * 2 * MathF.PI) / 2 * 0.83f
                     ),
                     Rotation = -i / count * 360 + 90,
                     Children = new[]
