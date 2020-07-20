@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SpinnerBackground : CircularContainer, IHasAccentColour
     {
-        private readonly Box disc;
+        public readonly Box Disc;
 
         public Color4 AccentColour
         {
-            get => disc.Colour;
+            get => Disc.Colour;
             set
             {
-                disc.Colour = value;
+                Disc.Colour = value;
 
                 EdgeEffect = new EdgeEffectParameters
                 {
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                disc = new Box
+                Disc = new Box
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
