@@ -93,7 +93,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         Background = new SpinnerBackground
                         {
-                            Alpha = 1f,
+                            Disc =
+                            {
+                                Alpha = 0f,
+                            },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -125,10 +128,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load(OsuColour colours)
         {
             normalColour = baseColour;
+            completeColour = colours.YellowLight;
 
             Background.AccentColour = normalColour;
-
-            completeColour = colours.YellowLight;
+            Ticks.AccentColour = normalColour;
 
             Disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
@@ -244,6 +247,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Disc.FadeAccent(colour, duration);
 
             Background.FadeAccent(colour.Darken(1), duration);
+            Ticks.FadeAccent(colour, duration);
 
             circle.FadeColour(colour, duration);
             glow.FadeColour(colour, duration);

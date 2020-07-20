@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,10 +10,11 @@ using osu.Framework.Graphics.Effects;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerTicks : Container
+    public class SpinnerTicks : Container, IHasAccentColour
     {
         public SpinnerTicks()
         {
@@ -26,14 +28,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 Add(new Container
                 {
-                    Colour = Color4.Black,
-                    Alpha = 0.2f,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Radius = 20,
-                        Colour = Color4.Gray.Opacity(0.2f),
-                    },
+                    Alpha = 0.4f,
+                    Blending = BlendingParameters.Additive,
                     RelativePositionAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = 5,
@@ -52,6 +48,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         }
                     }
                 });
+            }
+        }
+
+        public Color4 AccentColour
+        {
+            get => Colour;
+            set
+            {
+                Colour = value;
+
+                foreach (var c in Children.OfType<Container>())
+                {
+                    c.EdgeEffect =
+                        new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Glow,
+                            Radius = 20,
+                            Colour = value.Opacity(0.8f),
+                        };
+                }
             }
         }
     }
