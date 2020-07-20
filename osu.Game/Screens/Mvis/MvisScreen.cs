@@ -94,12 +94,14 @@ namespace osu.Game.Screens
         private BindableBool lockChanges = new BindableBool();
         private BufferedContainer bufferedContentContainer;
         private BufferedContainer background;
+        private Container gameplayBackground;
 
         public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
-        private float SidebarWidth => sidebarContainer.DrawWidth - sidebarContainer.X;
 
         public MvisScreen()
         {
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+
             InternalChildren = new Drawable[]
             {
                 bufferedContentContainer = new BufferedContainer
@@ -140,6 +142,7 @@ namespace osu.Game.Screens
                                     {
                                         bottomBar = new BottomBar
                                         {
+                                            Alpha = 1,
                                             Children = new Drawable[]
                                             {
                                                 new Box
@@ -150,6 +153,7 @@ namespace osu.Game.Screens
                                                 new Container
                                                 {
                                                     Name = "Base Container",
+                                                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     RelativeSizeAxes = Axes.Both,
@@ -293,14 +297,15 @@ namespace osu.Game.Screens
                         new MvisScreenContentContainer
                         {
                             Depth = 1,
+                            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                             GetBottombarHeight = () => BottombarHeight,
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new Container()
+                                gameplayBackground = new Container()
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Name = "Background Elements Container",
+                                    Name = "Gameplay Background Elements Container",
                                     Children = new Drawable[]
                                     {
                                         bgTriangles = new BgTrianglesContainer(),
@@ -316,7 +321,9 @@ namespace osu.Game.Screens
                                 },
                                 gameplayContent = new Container
                                 {
-                                    Name = "Mvis Gameplay Elements Container",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Name = "Gameplay Foreground Elements Container",
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
@@ -345,7 +352,7 @@ namespace osu.Game.Screens
                 {
                     Name = "Sidebar Container",
                     RelativeSizeAxes = Axes.Y,
-                    Width = 400,
+                    Width = 400 + HORIZONTAL_OVERFLOW_PADDING,
                     GetBottombarHeight = () => BottombarHeight,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -370,6 +377,7 @@ namespace osu.Game.Screens
                         },
                         new OsuScrollContainer
                         {
+                            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING },
                             RelativeSizeAxes = Axes.Both,
                             Child = new FillFlowContainer
                             {
@@ -554,7 +562,11 @@ namespace osu.Game.Screens
             var track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : new TrackVirtual(Beatmap.Value.Track.Length);
             track.RestartPoint = 0;
 
-            bufferedContentContainer.FadeInFromZero(300);
+            background.FadeOut().Then().Delay(250).FadeIn(500);
+            gameplayBackground.FadeOut().Then().Delay(250).FadeIn(500);
+            gameplayContent.ScaleTo(0f).Then().ScaleTo(1f, DURATION, Easing.OutQuint);
+            bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, DURATION, Easing.OutQuint);
+
             loadingSpinner.Show();
             updateComponentFromBeatmap(Beatmap.Value, 500);
         }
@@ -565,6 +577,9 @@ namespace osu.Game.Screens
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
             beatmapLogo.Exit();
             bgSB.CancelAllTasks();
+
+            gameplayContent.ScaleTo(0, DURATION, Easing.OutQuint);
+            bottomFillFlow.MoveToY(bottomBar.Height + 30, DURATION, Easing.OutQuint);
 
             this.FadeOut(500, Easing.OutQuint);
             return base.OnExiting(next);

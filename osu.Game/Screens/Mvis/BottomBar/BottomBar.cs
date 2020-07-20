@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Mvis.UI
             Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.X;
             Height = 50;
-            Alpha = 0;
         }
         protected override bool OnHover(Framework.Input.Events.HoverEvent e)
         {
