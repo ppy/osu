@@ -183,10 +183,10 @@ namespace osu.Game.Input.Bindings
         [Description("返回主页")]
         Home,
 
-        [Description("Toggle notifications")]
+        [Description("切换通知栏是否可见")]
         ToggleNotifications,
 
-        [Description("Pause")]
+        [Description("暂停游戏")]
         PauseGameplay,
     }
 }
