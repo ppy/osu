@@ -93,7 +93,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         Background = new SpinnerBackground
                         {
-                            Alpha = 0.6f,
+                            Disc =
+                            {
+                                Alpha = 0f,
+                            },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -125,10 +128,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load(OsuColour colours)
         {
             normalColour = baseColour;
+            completeColour = colours.YellowLight;
 
             Background.AccentColour = normalColour;
-
-            completeColour = colours.YellowLight.Opacity(0.75f);
+            Ticks.AccentColour = normalColour;
 
             Disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
@@ -147,16 +150,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (Progress >= 1 && !Disc.Complete)
             {
                 Disc.Complete = true;
-
-                const float duration = 200;
-
-                Disc.FadeAccent(completeColour, duration);
-
-                Background.FadeAccent(completeColour, duration);
-                Background.FadeOut(duration);
-
-                circle.FadeColour(completeColour, duration);
-                glow.FadeColour(completeColour, duration);
+                transformFillColour(completeColour, 200);
             }
 
             if (userTriggered || Time.Current < Spinner.EndTime)
@@ -204,32 +198,59 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            circleContainer.ScaleTo(Spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
+            circleContainer.ScaleTo(0);
+            mainContainer.ScaleTo(0);
 
-            mainContainer
-                .ScaleTo(0)
-                .ScaleTo(Spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, HitObject.TimePreempt - 150, Easing.OutQuint)
-                .Then()
-                .ScaleTo(1, 500, Easing.OutQuint);
+            using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
+            {
+                float phaseOneScale = Spinner.Scale * 0.7f;
+
+                circleContainer.ScaleTo(phaseOneScale, HitObject.TimePreempt / 4, Easing.OutQuint);
+
+                mainContainer
+                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.6f, HitObject.TimePreempt / 4, Easing.OutQuint)
+                    .RotateTo((float)(25 * Spinner.Duration / 2000), HitObject.TimePreempt + Spinner.Duration);
+
+                using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
+                {
+                    circleContainer.ScaleTo(Spinner.Scale, 400, Easing.OutQuint);
+                    mainContainer.ScaleTo(1, 400, Easing.OutQuint);
+                }
+            }
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
             base.UpdateStateTransforms(state);
 
-            var sequence = this.Delay(Spinner.Duration).FadeOut(160);
-
-            switch (state)
+            using (BeginDelayedSequence(Spinner.Duration, true))
             {
-                case ArmedState.Hit:
-                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
-                    break;
+                this.FadeOut(160);
 
-                case ArmedState.Miss:
-                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
-                    break;
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        transformFillColour(completeColour, 0);
+                        this.ScaleTo(Scale * 1.2f, 320, Easing.Out);
+                        mainContainer.RotateTo(mainContainer.Rotation + 180, 320);
+                        break;
+
+                    case ArmedState.Miss:
+                        this.ScaleTo(Scale * 0.8f, 320, Easing.In);
+                        break;
+                }
             }
+        }
+
+        private void transformFillColour(Colour4 colour, double duration)
+        {
+            Disc.FadeAccent(colour, duration);
+
+            Background.FadeAccent(colour.Darken(1), duration);
+            Ticks.FadeAccent(colour, duration);
+
+            circle.FadeColour(colour, duration);
+            glow.FadeColour(colour, duration);
         }
     }
 }
