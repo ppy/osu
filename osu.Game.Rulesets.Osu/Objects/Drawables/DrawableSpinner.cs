@@ -147,15 +147,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (Progress >= 1 && !Disc.Complete)
             {
                 Disc.Complete = true;
-
-                const float duration = 200;
-
-                Disc.FadeAccent(completeColour, duration);
-
-                Background.FadeAccent(completeColour.Darken(1), duration);
-
-                circle.FadeColour(completeColour, duration);
-                glow.FadeColour(completeColour, duration);
+                transformFillColour(completeColour, 200);
             }
 
             if (userTriggered || Time.Current < Spinner.EndTime)
@@ -208,18 +200,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
             {
-                float phaseOneScale = Spinner.Scale * 0.8f;
+                float phaseOneScale = Spinner.Scale * 0.7f;
 
-                circleContainer.ScaleTo(phaseOneScale, HitObject.TimePreempt / 2f, Easing.OutQuint);
+                circleContainer.ScaleTo(phaseOneScale, HitObject.TimePreempt / 4, Easing.OutQuint);
 
                 mainContainer
-                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.4f, HitObject.TimePreempt / 2, Easing.OutElasticHalf)
-                    .RotateTo(25, HitObject.TimePreempt + Spinner.Duration);
+                    .ScaleTo(phaseOneScale * circle.DrawHeight / DrawHeight * 1.5f, HitObject.TimePreempt / 4, Easing.OutQuint)
+                    .RotateTo((float)(25 * Spinner.Duration / 2000), HitObject.TimePreempt + Spinner.Duration);
 
                 using (BeginDelayedSequence(HitObject.TimePreempt / 2, true))
                 {
-                    circleContainer.ScaleTo(Spinner.Scale * 1.4f, 400, Easing.OutQuint);
-                    mainContainer.ScaleTo(Spinner.Scale, 400, Easing.OutQuint);
+                    circleContainer.ScaleTo(Spinner.Scale, 400, Easing.OutQuint);
+                    mainContainer.ScaleTo(1, 400, Easing.OutQuint);
                 }
             }
         }
@@ -228,18 +220,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateStateTransforms(state);
 
-            var sequence = this.Delay(Spinner.Duration).FadeOut(160);
-
-            switch (state)
+            using (BeginDelayedSequence(Spinner.Duration, true))
             {
-                case ArmedState.Hit:
-                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
-                    break;
+                this.FadeOut(160);
 
-                case ArmedState.Miss:
-                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
-                    break;
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        transformFillColour(completeColour, 0);
+                        this.ScaleTo(Scale * 1.2f, 320, Easing.Out);
+                        mainContainer.RotateTo(mainContainer.Rotation + 180, 320);
+                        break;
+
+                    case ArmedState.Miss:
+                        this.ScaleTo(Scale * 0.8f, 320, Easing.In);
+                        break;
+                }
             }
+        }
+
+        private void transformFillColour(Colour4 colour, double duration)
+        {
+            Disc.FadeAccent(colour, duration);
+
+            Background.FadeAccent(colour.Darken(1), duration);
+
+            circle.FadeColour(colour, duration);
+            glow.FadeColour(colour, duration);
         }
     }
 }
