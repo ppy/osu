@@ -26,6 +26,7 @@ using osuTK;
 using osuTK.Graphics;
 using Humanizer;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -376,7 +377,9 @@ namespace osu.Game.Online.Leaderboards
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                var scoreMods = score.Mods;
+
+                if (scoreMods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null && scoreMods.All(m => m.Type != ModType.System))
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
 
                 if (score.ID != 0)
