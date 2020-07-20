@@ -32,6 +32,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Menu, GlobalAction.MvisTogglePlayList),
             new KeyBinding(InputKey.L, GlobalAction.MvisToggleTrackLoop),
             new KeyBinding(InputKey.Enter, GlobalAction.MvisOpenInSongSelect),
+            new KeyBinding(InputKey.H, GlobalAction.MvisForceLockOverlayChanges),
         };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
@@ -188,5 +189,7 @@ namespace osu.Game.Input.Bindings
 
         [Description("暂停游戏")]
         PauseGameplay,
+        [Description("切换强制锁定")]
+        MvisForceLockOverlayChanges,
     }
 }

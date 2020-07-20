@@ -91,6 +91,7 @@ namespace osu.Game.Screens
         private bool OverlaysHidden = false;
         private Drawable SBOverlayProxy;
         private FillFlowContainer bottomFillFlow;
+        private BindableBool lockChanges = new BindableBool();
 
         public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
 
@@ -548,6 +549,14 @@ namespace osu.Game.Screens
                 case GlobalAction.MvisToggleTrackLoop:
                     loopToggleButton.Click();
                     return true;
+                
+                case GlobalAction.MvisForceLockOverlayChanges:
+                    lockChanges.Toggle();
+                    if (lockChanges.Value == true)
+                        lockButton.FadeColour(Color4.Gray.Opacity(0.6f), 300);
+                    else
+                        lockButton.FadeColour(Color4.White, 300);
+                    return true;
             }
 
             return false;
@@ -612,6 +621,8 @@ namespace osu.Game.Screens
 
         private void HideOverlays()
         {
+            if ( lockChanges.Value ) return;
+
             game?.Toolbar.Hide();
             bottomFillFlow.MoveToY(bottomBar.Height, DURATION, Easing.OutQuint);
             bottomBar.FadeTo(0.01f, DURATION, Easing.OutQuint);
@@ -624,6 +635,8 @@ namespace osu.Game.Screens
 
         private void ShowOverlays(bool Locked = false)
         {
+            if ( lockChanges.Value ) return;
+
             game?.Toolbar.Show();
             gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
             dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
@@ -636,6 +649,7 @@ namespace osu.Game.Screens
             OverlaysHidden = false;
         }
 
+        //下一步优化界面隐藏，显示逻辑
         private void TryHideOverlays()
         {
             if (!canReallyHide || !idleTracker.IsIdle.Value || !idleTracker.ScreenHovered.Value
