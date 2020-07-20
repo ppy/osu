@@ -90,8 +90,9 @@ namespace osu.Game.Screens
         private BindableFloat ContentAlpha = new BindableFloat();
         private bool OverlaysHidden = false;
         private Drawable SBOverlayProxy;
+        private FillFlowContainer bottomFillFlow;
 
-        public float BottombarHeight => bottomBar.Position.Y + bottomBar.DrawHeight;
+        public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
 
         public MvisScreen()
         {
@@ -103,10 +104,13 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        bottomFillFlow = new FillFlowContainer
                         {
                             Name = "Bottom FillFlow",
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
@@ -609,8 +613,9 @@ namespace osu.Game.Screens
         private void HideOverlays()
         {
             game?.Toolbar.Hide();
-            bottomBar.ResizeHeightTo(0, DURATION, Easing.OutQuint)
-                     .FadeOut(DURATION, Easing.OutQuint);
+            bottomFillFlow.MoveToY(bottomBar.Height, DURATION, Easing.OutQuint);
+            bottomBar.FadeTo(0.01f, DURATION, Easing.OutQuint);
+
             AllowBack = false;
             AllowCursor = false;
             OverlaysHidden = true;
@@ -622,8 +627,10 @@ namespace osu.Game.Screens
             game?.Toolbar.Show();
             gameplayContent.FadeTo(1, DURATION, Easing.OutQuint);
             dimBox.FadeTo(0.6f, DURATION, Easing.OutQuint);
-            bottomBar.ResizeHeightTo(BOTTOMPANEL_SIZE.Y, DURATION, Easing.OutQuint)
-                     .FadeIn(DURATION, Easing.OutQuint);
+
+            bottomFillFlow.MoveToY(0, DURATION, Easing.OutQuint);
+            bottomBar.FadeIn(DURATION, Easing.OutQuint);
+
             AllowCursor = true;
             AllowBack = true;
             OverlaysHidden = false;
