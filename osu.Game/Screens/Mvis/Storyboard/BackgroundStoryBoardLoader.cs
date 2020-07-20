@@ -75,11 +75,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
             EnableSB.ValueChanged += _ => UpdateVisuals();
         }
 
-        protected override void Update()
-        {
-            if ( IsReady.Value )
-                sbClock?.Seek(b.Value.Track.CurrentTime);
-        }
 
         public void UpdateVisuals()
         {
@@ -114,8 +109,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 sbClock?.FadeOut(DURATION, Easing.OutQuint);
                 sbClock?.Expire();
 
-                LoadSBTask = LoadComponentAsync(new ClockContainer(beatmap, 0)
+                LoadSBTask = LoadComponentAsync(new ClockContainer(beatmap)
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Name = "ClockContainer",
                     Alpha = 0,
                     Child = SBLayer = new BackgroundStoryboardContainer(),

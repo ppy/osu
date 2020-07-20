@@ -477,6 +477,9 @@ namespace osu.Game.Screens
             Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             if (Track?.IsDummyDevice == false)
             {
+                if ( Track.CurrentTime == 0 )
+                    bgSB?.sbClock?.Seek(Track.CurrentTime);
+
                 TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
             }
