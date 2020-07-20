@@ -51,8 +51,13 @@ namespace osu.Game.Screens.Play
 
         private class EpilepsyWarning : FillFlowContainer
         {
-            public EpilepsyWarning()
+            public EpilepsyWarning(bool warning)
             {
+                if (warning)
+                    this.Show();
+                else
+                    this.Hide();
+
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;
                 Children = new Drawable[]
@@ -62,7 +67,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Icon = FontAwesome.Solid.ExclamationTriangle,
-                        Size = new Vector2(40)
+                        Size = new Vector2(40),
                     },
                     new OsuSpriteText
                     {
@@ -194,7 +199,7 @@ namespace osu.Game.Screens.Play
                             Margin = new MarginPadding { Top = 20 },
                             Current = mods
                         },
-                        new EpilepsyWarning
+                        new EpilepsyWarning(beatmap.BeatmapInfo.EpilepsyWarning)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
