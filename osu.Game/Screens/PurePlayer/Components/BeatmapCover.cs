@@ -63,7 +63,7 @@ namespace osu.Game.Screens.PurePlayer.Components
             }, newCover =>
             {
                 var oldCover = cover ?? null;
-                oldCover?.FadeOut(300);
+                oldCover?.Delay(300).FadeOut(300);
                 oldCover?.Expire();
 
                 cover = newCover;
