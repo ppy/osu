@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             string imageName = GetColumnSkinConfig<string>(skin, LegacyManiaSkinConfigurationLookups.HoldNoteBodyImage)?.Value
                                ?? $"mania-note{FallbackColumnIndex}L";
 
-            sprite = skin.GetAnimation(imageName, true, true).With(d =>
+            sprite = skin.GetAnimation(imageName, WrapMode.ClampToEdge, WrapMode.ClampToEdge, true, true).With(d =>
             {
                 if (d == null)
                     return;

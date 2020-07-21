@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
@@ -25,6 +26,11 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         private RulesetInfo catchRuleset;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private Catcher catcher => this.ChildrenOfType<CatcherArea>().First().MovableCatcher;
+
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
@@ -34,22 +40,41 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddRepeatStep("catch fruit", () => catchFruit(new TestFruit(false)
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X
+                X = catcher.X
             }), 20);
             AddRepeatStep("catch fruit last in combo", () => catchFruit(new TestFruit(false)
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X,
+                X = catcher.X,
                 LastInCombo = true,
             }), 20);
             AddRepeatStep("catch kiai fruit", () => catchFruit(new TestFruit(true)
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X,
+                X = catcher.X
             }), 20);
             AddRepeatStep("miss fruit", () => catchFruit(new Fruit
             {
-                X = this.ChildrenOfType<CatcherArea>().First().MovableCatcher.X + 100,
+                X = catcher.X + 100,
                 LastInCombo = true,
             }, true), 20);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestHitLighting(bool enable)
+        {
+            AddStep("create catcher", () => createCatcher(5));
+
+            AddStep("toggle hit lighting", () => config.Set(OsuSetting.HitLighting, enable));
+            AddStep("catch fruit", () => catchFruit(new TestFruit(false)
+            {
+                X = catcher.X
+            }));
+            AddStep("catch fruit last in combo", () => catchFruit(new TestFruit(false)
+            {
+                X = catcher.X,
+                LastInCombo = true
+            }));
+            AddAssert("check hit explosion", () => catcher.ChildrenOfType<HitExplosion>().Any() == enable);
         }
 
         private void catchFruit(Fruit fruit, bool miss = false)
