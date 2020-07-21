@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Ticks.Rotation = Disc.Rotation;
 
             SpmCounter.SetRotation(Disc.CumulativeRotation);
-            bonusComponent.UpdateRotation(Disc.CumulativeRotation);
+            bonusComponent.SetRotation(Disc.CumulativeRotation);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             float targetScale = relativeCircleScale + (1 - relativeCircleScale) * Progress;
