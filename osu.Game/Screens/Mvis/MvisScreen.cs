@@ -30,6 +30,8 @@ using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.PurePlayer.Components;
+using osu.Game.Graphics.Backgrounds;
+using osu.Game.Screens.Mvis.Objects;
 
 namespace osu.Game.Screens
 {
@@ -93,7 +95,7 @@ namespace osu.Game.Screens
         private FillFlowContainer bottomFillFlow;
         private BindableBool lockChanges = new BindableBool();
         private BufferedContainer bufferedContentContainer;
-        private BufferedContainer background;
+        private BufferedBeatmapCover background;
         private Container gameplayBackground;
 
         public float BottombarHeight => bottomBar.DrawHeight - bottomFillFlow.Y;
@@ -109,20 +111,13 @@ namespace osu.Game.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        background = new BufferedContainer
+                        new ParallaxContainer
                         {
-                            Name = "Beatmap Background Container",
                             Depth = float.MaxValue,
+                            Name = "Beatmap Background Parallax",
                             RelativeSizeAxes = Axes.Both,
-                            Child = new ParallaxContainer
-                            {
-                                ParallaxAmount = 0.02f,
-                                RelativeSizeAxes = Axes.Both,
-                                Child = new BeatmapCover
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                }
-                            },
+                            ParallaxAmount = 0.02f,
+                            Child = background = new BufferedBeatmapCover{ RelativeSizeAxes = Axes.Both }
                         },
                         new Container
                         {
@@ -361,6 +356,7 @@ namespace osu.Game.Screens
                         new BufferedContainer
                         {
                             RelativeSizeAxes = Axes.Both,
+                            FrameBufferScale = new Vector2(0.5f),
                             BlurSigma = new Vector2(15),
                             Child = bufferedContentContainer.CreateView().With(d =>
                             {
