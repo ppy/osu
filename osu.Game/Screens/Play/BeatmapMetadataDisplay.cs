@@ -73,13 +73,15 @@ namespace osu.Game.Screens.Play
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "This beatmap contains scenes with rapidly flashing colours."
+                        Text = "This beatmap contains scenes with rapidly flashing colours.",
+                        Font = OsuFont.GetFont(size: 20),
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "Please take caution if you are affected by epilepsy."
+                        Text = "Please take caution if you are affected by epilepsy.",
+                        Font = OsuFont.GetFont(size: 20),
                     }
                 };
             }
