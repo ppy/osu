@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace osu.Game.Beatmaps
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyManager));
 
         // A cache that keeps references to BeatmapInfos for 60sec.
-        private readonly TimedExpiryCache<DifficultyCacheLookup, StarDifficulty> difficultyCache = new TimedExpiryCache<DifficultyCacheLookup, StarDifficulty> { ExpiryTime = 60000 };
+        private readonly ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty> difficultyCache = new ConcurrentDictionary<DifficultyCacheLookup, StarDifficulty>();
 
         // All bindables that should be updated along with the current ruleset + mods.
         private readonly LockedWeakList<BindableStarDifficulty> trackedBindables = new LockedWeakList<BindableStarDifficulty>();
@@ -91,7 +92,8 @@ namespace osu.Game.Beatmaps
             if (tryGetGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
-            return await Task.Factory.StartNew(() => computeDifficulty(key), cancellationToken, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            return await Task.Factory.StartNew(() => computeDifficulty(key, beatmapInfo, rulesetInfo), cancellationToken,
+                TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
         }
 
         /// <summary>
@@ -106,7 +108,7 @@ namespace osu.Game.Beatmaps
             if (tryGetGetExisting(beatmapInfo, rulesetInfo, mods, out var existing, out var key))
                 return existing;
 
-            return computeDifficulty(key);
+            return computeDifficulty(key, beatmapInfo, rulesetInfo);
         }
 
         private CancellationTokenSource trackedUpdateCancellationSource;
@@ -169,28 +171,24 @@ namespace osu.Game.Beatmaps
         /// Computes the difficulty defined by a <see cref="DifficultyCacheLookup"/> key, and stores it to the timed cache.
         /// </summary>
         /// <param name="key">The <see cref="DifficultyCacheLookup"/> that defines the computation parameters.</param>
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to compute the difficulty of.</param>
+        /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to compute the difficulty with.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        private StarDifficulty computeDifficulty(in DifficultyCacheLookup key)
+        private StarDifficulty computeDifficulty(in DifficultyCacheLookup key, BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo)
         {
             try
             {
-                var ruleset = key.RulesetInfo.CreateInstance();
+                var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
+                var calculator = ruleset.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(beatmapInfo));
                 var attributes = calculator.Calculate(key.Mods);
 
-                var difficulty = new StarDifficulty(attributes.StarRating);
-                difficultyCache.Add(key, difficulty);
-
-                return difficulty;
+                return difficultyCache[key] = new StarDifficulty(attributes.StarRating);
             }
             catch
             {
-                var difficulty = new StarDifficulty(0);
-                difficultyCache.Add(key, difficulty);
-
-                return difficulty;
+                return difficultyCache[key] = new StarDifficulty(0);
             }
         }
 
@@ -208,8 +206,8 @@ namespace osu.Game.Beatmaps
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
 
-            // Difficulty can only be computed if the beatmap is locally available.
-            if (beatmapInfo.ID == 0)
+            // Difficulty can only be computed if the beatmap and ruleset are locally available.
+            if (beatmapInfo.ID == 0 || rulesetInfo.ID == null)
             {
                 existingDifficulty = new StarDifficulty(0);
                 key = default;
@@ -217,33 +215,34 @@ namespace osu.Game.Beatmaps
                 return true;
             }
 
-            key = new DifficultyCacheLookup(beatmapInfo, rulesetInfo, mods);
+            key = new DifficultyCacheLookup(beatmapInfo.ID, rulesetInfo.ID.Value, mods);
             return difficultyCache.TryGetValue(key, out existingDifficulty);
         }
 
         private readonly struct DifficultyCacheLookup : IEquatable<DifficultyCacheLookup>
         {
-            public readonly BeatmapInfo BeatmapInfo;
-            public readonly RulesetInfo RulesetInfo;
+            public readonly int BeatmapId;
+            public readonly int RulesetId;
             public readonly Mod[] Mods;
 
-            public DifficultyCacheLookup(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo, IEnumerable<Mod> mods)
+            public DifficultyCacheLookup(int beatmapId, int rulesetId, IEnumerable<Mod> mods)
             {
-                BeatmapInfo = beatmapInfo;
-                RulesetInfo = rulesetInfo;
+                BeatmapId = beatmapId;
+                RulesetId = rulesetId;
                 Mods = mods?.OrderBy(m => m.Acronym).ToArray() ?? Array.Empty<Mod>();
             }
 
             public bool Equals(DifficultyCacheLookup other)
-                => BeatmapInfo.Equals(other.BeatmapInfo)
+                => BeatmapId == other.BeatmapId
+                   && RulesetId == other.RulesetId
                    && Mods.SequenceEqual(other.Mods);
 
             public override int GetHashCode()
             {
                 var hashCode = new HashCode();
 
-                hashCode.Add(BeatmapInfo.Hash);
-                hashCode.Add(RulesetInfo.GetHashCode());
+                hashCode.Add(BeatmapId);
+                hashCode.Add(RulesetId);
                 foreach (var mod in Mods)
                     hashCode.Add(mod.Acronym);
 
