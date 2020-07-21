@@ -164,13 +164,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             double estimatedSpm = 0;
 
-            addSeekStep(2500);
+            addSeekStep(1000);
             AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
 
-            addSeekStep(5000);
+            addSeekStep(2000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
 
-            addSeekStep(2500);
+            addSeekStep(1000);
             AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
         }
 
