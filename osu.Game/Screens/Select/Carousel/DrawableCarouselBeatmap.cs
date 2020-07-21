@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -23,8 +22,6 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -47,13 +44,10 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapSetOverlay beatmapOverlay { get; set; }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
-        [Resolved]
         private BeatmapDifficultyManager difficultyManager { get; set; }
+
+        private IBindable<StarDifficulty> starDifficultyBindable;
+        private CancellationTokenSource starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
             : base(panel)
@@ -160,36 +154,6 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 }
             };
-
-            ruleset.BindValueChanged(_ => refreshStarCounter());
-            mods.BindValueChanged(_ => refreshStarCounter(), true);
-        }
-
-        private ScheduledDelegate scheduledRefresh;
-        private CancellationTokenSource cancellationSource;
-
-        private void refreshStarCounter()
-        {
-            scheduledRefresh?.Cancel();
-            scheduledRefresh = null;
-
-            cancellationSource?.Cancel();
-            cancellationSource = null;
-
-            // Only want to run the calculation when we become visible.
-            scheduledRefresh = Schedule(() =>
-            {
-                var ourSource = cancellationSource = new CancellationTokenSource();
-                difficultyManager.GetDifficultyAsync(beatmap, ruleset.Value, mods.Value, ourSource.Token).ContinueWith(t =>
-                {
-                    // We're currently on a random threadpool thread which we must exit.
-                    Schedule(() =>
-                    {
-                        if (!ourSource.IsCancellationRequested)
-                            starCounter.Current = (float)t.Result;
-                    });
-                }, ourSource.Token);
-            });
         }
 
         protected override void Selected()
@@ -224,6 +188,17 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item.State.Value != CarouselItemState.Collapsed && Alpha == 0)
                 starCounter.ReplayAnimation();
 
+            if (Item.State.Value == CarouselItemState.Collapsed)
+                starDifficultyCancellationSource?.Cancel();
+            else
+            {
+                starDifficultyCancellationSource?.Cancel();
+
+                // We've potentially cancelled the computation above so a new bindable is required.
+                starDifficultyBindable = difficultyManager.GetTrackedBindable(beatmap, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
+                starDifficultyBindable.BindValueChanged(d => starCounter.Current = (float)d.NewValue.Stars, true);
+            }
+
             base.ApplyState();
         }
 
@@ -247,6 +222,12 @@ namespace osu.Game.Screens.Select.Carousel
 
                 return items.ToArray();
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            starDifficultyCancellationSource?.Cancel();
         }
     }
 }
