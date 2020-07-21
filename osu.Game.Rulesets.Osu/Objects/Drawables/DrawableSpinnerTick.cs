@@ -17,11 +17,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Apply a judgement result.
         /// </summary>
-        /// <param name="hit">Whether to apply a <see cref="HitResult.Great"/> result, <see cref="HitResult.Miss"/> otherwise.</param>
-        internal void TriggerResult(bool hit)
+        /// <param name="result">Whether to apply a <see cref="HitResult.Great"/> result, <see cref="HitResult.Miss"/> otherwise.</param>
+        internal void TriggerResult(HitResult result)
         {
-            HitObject.StartTime = Time.Current;
-            ApplyResult(r => r.Type = hit ? HitResult.Great : HitResult.Miss);
+            ApplyResult(r => r.Type = result);
         }
     }
 }
