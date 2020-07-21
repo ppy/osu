@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
                 }
             });
 
-            ContentSidePadding = 70;
+            ContentSidePadding = 50;
         }
 
         [BackgroundDependencyLoader]
