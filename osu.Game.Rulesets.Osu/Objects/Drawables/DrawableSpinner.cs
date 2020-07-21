@@ -253,25 +253,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             int spins = (int)(Disc.CumulativeRotation / 360);
 
+            if (spins < wholeSpins)
+            {
+                // rewinding, silently handle
+                wholeSpins = spins;
+                return;
+            }
+
             while (wholeSpins != spins)
             {
-                if (wholeSpins < spins)
-                {
-                    var tick = ticks.FirstOrDefault(t => !t.IsHit);
+                var tick = ticks.FirstOrDefault(t => !t.IsHit);
 
-                    if (tick != null)
-                    {
-                        tick.TriggerResult(HitResult.Great);
-                        if (tick is DrawableSpinnerBonusTick)
-                            bonusDisplay.SetBonusCount(spins - Spinner.SpinsRequired);
-                    }
-
-                    wholeSpins++;
-                }
-                else
+                // tick may be null if we've hit the spin limit.
+                if (tick != null)
                 {
-                    wholeSpins--;
+                    tick.TriggerResult(HitResult.Great);
+                    if (tick is DrawableSpinnerBonusTick)
+                        bonusDisplay.SetBonusCount(spins - Spinner.SpinsRequired);
                 }
+
+                wholeSpins++;
             }
         }
 
