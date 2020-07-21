@@ -55,12 +55,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 var tick = ticks[currentSpins];
 
                 if (direction >= 0)
-                {
-                    tick.HasBonusPoints = currentSpins > spinsRequired;
                     tick.TriggerResult(true);
-                }
 
-                if (tick.HasBonusPoints)
+                if (tick is DrawableSpinnerBonusTick)
                 {
                     bonusCounter.Text = $"{1000 * (currentSpins - spinsRequired)}";
                     bonusCounter.FadeOutFromOne(1500);

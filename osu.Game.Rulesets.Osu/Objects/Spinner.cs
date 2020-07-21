@@ -3,13 +3,11 @@
 
 using System;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -28,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public int SpinsRequired { get; protected set; } = 1;
 
+        public int MaximumBonusSpins => SpinsRequired;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -42,9 +42,16 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects();
 
-            var maximumSpins = OsuAutoGeneratorBase.SPIN_RADIUS * (Duration / 1000) / MathHelper.TwoPi;
-            for (int i = 0; i < maximumSpins; i++)
-                AddNested(new SpinnerTick());
+            int totalSpins = MaximumBonusSpins + SpinsRequired;
+
+            for (int i = 0; i < totalSpins; i++)
+            {
+                double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
+
+                AddNested(i < SpinsRequired
+                    ? new SpinnerTick { StartTime = startTime }
+                    : new SpinnerBonusTick { StartTime = startTime });
+            }
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
