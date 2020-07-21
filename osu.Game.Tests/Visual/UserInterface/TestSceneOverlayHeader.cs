@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             addHeader("Orange OverlayHeader (no background, 100 padding)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
-            addHeader("Blue OverlayHeader (default 70 padding)", new TestNoControlHeader(), OverlayColourScheme.Blue);
+            addHeader("Blue OverlayHeader (default 50 padding)", new TestNoControlHeader(), OverlayColourScheme.Blue);
             addHeader("Green TabControlOverlayHeader (string) with ruleset selector", new TestStringTabControlHeader(), OverlayColourScheme.Green);
             addHeader("Pink TabControlOverlayHeader (enum, 30 padding)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
             addHeader("Red BreadcrumbControlOverlayHeader (no background, 10 padding)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);

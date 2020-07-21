@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            ContentSidePadding = 70;
+            ContentSidePadding = UserProfileOverlay.CONTENT_X_MARGIN;
 
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
