@@ -17,6 +17,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
     {
         private const int height = 25;
 
+        [Resolved(canBeNull: true)]
+        private OverlayColourProvider colourProvider { get; set; }
+
         private readonly APIKudosuHistory historyItem;
 
         public DrawableKudosuHistoryItem(APIKudosuHistory historyItem)
@@ -25,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             LinkFlowContainer linkFlowContainer;
 
