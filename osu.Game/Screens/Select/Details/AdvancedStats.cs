@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -149,6 +148,8 @@ namespace osu.Game.Screens.Select.Details
             updateStarDifficulty();
         }
 
+        private IBindable<StarDifficulty> normalStarDifficulty;
+        private IBindable<StarDifficulty> moddedStarDifficulty;
         private CancellationTokenSource starDifficultyCancellationSource;
 
         private void updateStarDifficulty()
@@ -160,15 +161,19 @@ namespace osu.Game.Screens.Select.Details
 
             var ourSource = starDifficultyCancellationSource = new CancellationTokenSource();
 
-            Task.WhenAll(difficultyManager.GetDifficultyAsync(Beatmap, ruleset.Value, cancellationToken: ourSource.Token),
-                difficultyManager.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, ourSource.Token)).ContinueWith(t =>
-            {
-                Schedule(() =>
-                {
-                    if (!ourSource.IsCancellationRequested)
-                        starDifficulty.Value = ((float)t.Result[0], (float)t.Result[1]);
-                });
-            }, ourSource.Token);
+            normalStarDifficulty = difficultyManager.GetUntrackedBindable(Beatmap, ruleset.Value, cancellationToken: ourSource.Token);
+            moddedStarDifficulty = difficultyManager.GetUntrackedBindable(Beatmap, ruleset.Value, mods.Value, ourSource.Token);
+
+            normalStarDifficulty.BindValueChanged(_ => updateDisplay());
+            moddedStarDifficulty.BindValueChanged(_ => updateDisplay(), true);
+
+            void updateDisplay() => starDifficulty.Value = ((float)normalStarDifficulty.Value.Stars, (float)moddedStarDifficulty.Value.Stars);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            starDifficultyCancellationSource?.Cancel();
         }
 
         public class StatisticRow : Container, IHasAccentColour
