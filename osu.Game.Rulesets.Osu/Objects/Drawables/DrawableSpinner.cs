@@ -157,6 +157,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             switch (hitObject)
             {
+                case SpinnerBonusTick bonusTick:
+                    return new DrawableSpinnerBonusTick(bonusTick);
+
                 case SpinnerTick tick:
                     return new DrawableSpinnerTick(tick);
             }
