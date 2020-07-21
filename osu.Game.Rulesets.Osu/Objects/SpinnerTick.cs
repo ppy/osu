@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             protected override int NumericResultFor(HitResult result) => 100;
 
-            protected override double HealthIncreaseFor(HitResult result) => 0;
+            protected override double HealthIncreaseFor(HitResult result) => result == MaxResult ? 0.6 * base.HealthIncreaseFor(result) : 0;
         }
     }
 }
