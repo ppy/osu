@@ -14,8 +14,18 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Wind Down";
         public override string Acronym => "WD";
         public override string Description => "Sloooow doooown...";
-        public override IconUsage Icon => FontAwesome.Solid.ChevronCircleDown;
+        public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleDown;
         public override double ScoreMultiplier => 1.0;
+
+        [SettingSource("Initial rate", "The starting speed of the track")]
+        public override BindableNumber<double> InitialRate { get; } = new BindableDouble
+        {
+            MinValue = 1,
+            MaxValue = 2,
+            Default = 1,
+            Value = 1,
+            Precision = 0.01,
+        };
 
         [SettingSource("Final rate", "The speed increase to ramp towards")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
@@ -25,6 +35,13 @@ namespace osu.Game.Rulesets.Mods
             Default = 0.75,
             Value = 0.75,
             Precision = 0.01,
+        };
+
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        public override BindableBool AdjustPitch { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
         };
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindUp)).ToArray();

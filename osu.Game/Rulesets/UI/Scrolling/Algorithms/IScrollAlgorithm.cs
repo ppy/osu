@@ -6,15 +6,33 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
     public interface IScrollAlgorithm
     {
         /// <summary>
-        /// Given a point in time, computes the time at which it enters the time range.
+        /// Given a point in time associated with an object's origin
+        /// and the spatial distance between the edge and the origin of the object along the scrolling axis,
+        /// computes the time at which the object initially enters the time range.
         /// </summary>
-        /// <remarks>
-        /// E.g. For a constant time range of 5000ms, the time at which t=7000ms enters the time range is 2000ms.
-        /// </remarks>
-        /// <param name="time">The point in time.</param>
+        /// <example>
+        /// Let's assume the following parameters:
+        /// <list type="bullet">
+        ///     <item><paramref name="originTime"/> = 7000ms,</item>
+        ///     <item><paramref name="offset"/> = 100px,</item>
+        ///     <item><paramref name="timeRange"/> = 5000ms,</item>
+        ///     <item><paramref name="scrollLength"/> = 1000px</item>
+        /// </list>
+        /// and a constant scrolling rate.
+        /// To arrive at the end of the scrolling container, the object's origin has to cover
+        /// <code>1000 + 100 = 1100px</code>
+        /// so that the edge starts at the end of the scrolling container.
+        /// One scroll length of 1000px covers 5000ms of time, so the time required to cover 1100px is equal to
+        /// <code>5000 * (1100 / 1000) = 5500ms,</code>
+        /// and therefore the object should start being visible at
+        /// <code>7000 - 5500 = 1500ms.</code>
+        /// </example>
+        /// <param name="originTime">The time point at which the object origin should enter the time range.</param>
+        /// <param name="offset">The spatial distance between the object's edge and its origin along the scrolling axis.</param>
         /// <param name="timeRange">The amount of visible time.</param>
-        /// <returns>The time at which <paramref name="time"/> enters <paramref name="timeRange"/>.</returns>
-        double GetDisplayStartTime(double time, double timeRange);
+        /// <param name="scrollLength">The absolute spatial length through <paramref name="timeRange"/>.</param>
+        /// <returns>The time at which the object should enter the time range.</returns>
+        double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength);
 
         /// <summary>
         /// Computes the spatial length within a start and end time.

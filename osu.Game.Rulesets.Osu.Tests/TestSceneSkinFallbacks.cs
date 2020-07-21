@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Timing;
@@ -18,7 +19,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
@@ -26,13 +26,12 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSkinFallbacks : PlayerTestScene
+    public class TestSceneSkinFallbacks : TestSceneOsuPlayer
     {
         private readonly TestSource testUserSkin;
         private readonly TestSource testBeatmapSkin;
 
         public TestSceneSkinFallbacks()
-            : base(new OsuRuleset())
         {
             testUserSkin = new TestSource("user");
             testBeatmapSkin = new TestSource("beatmap");
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNextHitObject(string skin) =>
             AddUntilStep($"check skin from {skin}", () =>
             {
-                var firstObject = ((TestPlayer)Player).DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
+                var firstObject = Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.OfType<DrawableHitCircle>().FirstOrDefault();
 
                 if (firstObject == null)
                     return false;
@@ -75,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audio { get; set; }
 
-        protected override Player CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, audio, testBeatmapSkin);
 
@@ -133,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
             }
 
-            public Texture GetTexture(string componentName) => null;
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
 

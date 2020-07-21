@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APILegacyUserTopScoreInfo
     {
         [JsonProperty(@"position")]
-        public int Position;
+        public int? Position;
 
         [JsonProperty(@"score")]
         public APILegacyScoreInfo Score;

@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -30,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerLoader : ManualInputManagerTestScene
+    public class TestScenePlayerLoader : OsuManualInputManagerTestScene
     {
         private TestPlayerLoader loader;
         private TestPlayerLoaderContainer container;
@@ -91,8 +90,43 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-            AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
+
+            AddUntilStep("wait for load ready", () =>
+            {
+                moveMouse();
+                return player.LoadState == LoadState.Ready;
+            });
+            AddRepeatStep("move mouse", moveMouse, 20);
+
             AddAssert("loader still active", () => loader.IsCurrentScreen());
+            AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+
+            void moveMouse()
+            {
+                InputManager.MoveMouseTo(
+                    loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft
+                    + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft)
+                    * RNG.NextSingle());
+            }
+        }
+
+        [Test]
+        public void TestBlockLoadViaFocus()
+        {
+            OsuFocusedOverlayContainer overlay = null;
+
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddStep("show focused overlay", () => { container.Add(overlay = new ChangelogOverlay { State = { Value = Visibility.Visible } }); });
+            AddUntilStep("overlay visible", () => overlay.IsPresent);
+
+            AddUntilStep("wait for load ready", () => player.LoadState == LoadState.Ready);
+            AddRepeatStep("twiddle thumbs", () => { }, 20);
+
+            AddAssert("loader still active", () => loader.IsCurrentScreen());
+
+            AddStep("hide overlay", () => overlay.Hide());
             AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
         }
 
@@ -147,13 +181,34 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+        public void TestModDisplayChanges()
+        {
+            var testMod = new TestMod();
+
+            AddStep("load player", () => ResetPlayer(true));
+
+            AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
+            AddStep("set test mod in loader", () => loader.Mods.Value = new[] { testMod });
+            AddAssert("test mod is displayed", () => (TestMod)loader.DisplayedMods.Single() == testMod);
+        }
 
         [Test]
-        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+        public void TestMutedNotificationMasterVolume()
+        {
+            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+        }
 
         [Test]
-        public void TestMutedNotificationMuteButton() => addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+        public void TestMutedNotificationTrackVolume()
+        {
+            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+        }
+
+        [Test]
+        public void TestMutedNotificationMuteButton()
+        {
+            addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+        }
 
         /// <remarks>
         /// Created for avoiding copy pasting code for the same steps.
@@ -167,7 +222,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
             AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
-            AddUntilStep("wait for player", () => player.IsLoaded);
+            AddUntilStep("wait for player", () => player.LoadState == LoadState.Ready);
 
             AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>
@@ -181,6 +236,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("check " + volumeName, assert);
+
+            AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
         private class TestPlayerLoaderContainer : Container
@@ -195,9 +252,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 RelativeSizeAxes = Axes.Both;
 
+                OsuScreenStack stack;
+
                 InternalChildren = new Drawable[]
                 {
-                    new OsuScreenStack(screen)
+                    stack = new OsuScreenStack
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -212,6 +271,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Origin = Anchor.TopLeft,
                     }
                 };
+
+                stack.Push(screen);
             }
         }
 
@@ -220,6 +281,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new VisualSettings VisualSettings => base.VisualSettings;
 
             public new Task DisposalTask => base.DisposalTask;
+
+            public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
@@ -243,17 +306,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
         }
 
-        private class TestPlayer : Visual.TestPlayer
-        {
-            public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
-
-            public TestPlayer(bool allowPause = true, bool showResults = true)
-                : base(allowPause, showResults)
-            {
-            }
-        }
-
-        protected class SlowLoadPlayer : Visual.TestPlayer
+        protected class SlowLoadPlayer : TestPlayer
         {
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim(false);
 

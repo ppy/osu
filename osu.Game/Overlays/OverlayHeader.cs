@@ -2,35 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
+        public const int CONTENT_X_MARGIN = 50;
+
         private readonly Box titleBackground;
-        private readonly Box controlBackground;
-        private readonly Container background;
 
-        protected Color4 TitleBackgroundColour
-        {
-            set => titleBackground.Colour = value;
-        }
-
-        protected Color4 ControlBackgroundColour
-        {
-            set => controlBackground.Colour = value;
-        }
-
-        protected float BackgroundHeight
-        {
-            set => background.Height = value;
-        }
+        protected readonly FillFlowContainer HeaderInfo;
 
         protected OverlayHeader()
         {
@@ -44,47 +30,50 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Vertical,
                 Children = new[]
                 {
-                    background = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 80,
-                        Masking = true,
-                        Child = CreateBackground()
-                    },
-                    new Container
+                    HeaderInfo = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            titleBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
-                            },
-                            CreateTitle().With(title =>
-                            {
-                                title.Margin = new MarginPadding
-                                {
-                                    Vertical = 10,
-                                    Left = UserProfileOverlay.CONTENT_X_MARGIN
-                                };
-                            })
-                        }
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
                         Depth = -float.MaxValue,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
-                            controlBackground = new Box
+                            CreateBackground(),
+                            new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    titleBackground = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.Gray,
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding
+                                        {
+                                            Horizontal = CONTENT_X_MARGIN,
+                                        },
+                                        Children = new[]
+                                        {
+                                            CreateTitle().With(title =>
+                                            {
+                                                title.Anchor = Anchor.CentreLeft;
+                                                title.Origin = Anchor.CentreLeft;
+                                            }),
+                                            CreateTitleContent().With(content =>
+                                            {
+                                                content.Anchor = Anchor.CentreRight;
+                                                content.Origin = Anchor.CentreRight;
+                                            })
+                                        }
+                                    }
+                                }
                             },
-                            CreateTabControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
                         }
                     },
                     CreateContent()
@@ -92,13 +81,24 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected abstract Drawable CreateBackground();
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            titleBackground.Colour = colourProvider.Dark5;
+        }
 
         [NotNull]
-        protected virtual Drawable CreateContent() => new Container();
+        protected virtual Drawable CreateContent() => Empty();
 
-        protected abstract ScreenTitle CreateTitle();
+        [NotNull]
+        protected virtual Drawable CreateBackground() => Empty();
 
-        protected abstract TabControl<string> CreateTabControl();
+        /// <summary>
+        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="OverlayTitle"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
+        /// </summary>
+        [NotNull]
+        protected virtual Drawable CreateTitleContent() => Empty();
+
+        protected abstract OverlayTitle CreateTitle();
     }
 }

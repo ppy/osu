@@ -19,7 +19,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteIcon checkmark;
         private readonly Box background;
 
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public DownloadButton()
         {
@@ -49,10 +50,8 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             State.BindValueChanged(updateState, true);
         }
 
@@ -64,16 +63,19 @@ namespace osu.Game.Graphics.UserInterface
                     background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
                     icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    TooltipText = "Download";
                     break;
 
                 case DownloadState.Downloading:
                     background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
                     icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    TooltipText = "Downloading...";
                     break;
 
                 case DownloadState.Downloaded:
                     background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
+                    TooltipText = "Importing";
                     break;
 
                 case DownloadState.LocallyAvailable:

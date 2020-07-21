@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Overlays.BeatmapSet;
-using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Mania;
@@ -15,16 +15,12 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneLeaderboardModSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(LeaderboardModSelector),
-        };
-
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;
@@ -44,27 +40,31 @@ namespace osu.Game.Tests.Visual.Online
                 Ruleset = { BindTarget = ruleset }
             });
 
-            modSelector.SelectedMods.ItemsAdded += mods =>
+            modSelector.SelectedMods.CollectionChanged += (_, args) =>
             {
-                mods.ForEach(mod => selectedMods.Add(new OsuSpriteText
+                switch (args.Action)
                 {
-                    Text = mod.Acronym,
-                }));
-            };
-
-            modSelector.SelectedMods.ItemsRemoved += mods =>
-            {
-                mods.ForEach(mod =>
-                {
-                    foreach (var selected in selectedMods)
-                    {
-                        if (selected.Text == mod.Acronym)
+                    case NotifyCollectionChangedAction.Add:
+                        args.NewItems.Cast<Mod>().ForEach(mod => selectedMods.Add(new OsuSpriteText
                         {
-                            selectedMods.Remove(selected);
-                            break;
-                        }
-                    }
-                });
+                            Text = mod.Acronym,
+                        }));
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        args.OldItems.Cast<Mod>().ForEach(mod =>
+                        {
+                            foreach (var selected in selectedMods)
+                            {
+                                if (selected.Text == mod.Acronym)
+                                {
+                                    selectedMods.Remove(selected);
+                                    break;
+                                }
+                            }
+                        });
+                        break;
+                }
             };
 
             AddStep("osu ruleset", () => ruleset.Value = new OsuRuleset().RulesetInfo);

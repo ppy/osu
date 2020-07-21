@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osuTK;
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IDistanceSnapProvider SnapProvider { get; private set; }
+        protected IPositionSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private readonly Cached gridCache = new Cached();
+        private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;
 
         /// <summary>
@@ -66,6 +67,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             StartTime = startTime;
 
             RelativeSizeAxes = Axes.Both;
+
+            AddLayout(gridCache);
         }
 
         protected override void LoadComplete()
@@ -91,14 +94,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             gridCache.Invalidate();
         }
 
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
-                gridCache.Invalidate();
-
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -106,7 +101,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!gridCache.IsValid)
             {
                 ClearInternal();
-                CreateContent(StartPosition);
+                CreateContent();
                 gridCache.Validate();
             }
         }
@@ -114,7 +109,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Creates the content which visualises the grid ticks.
         /// </summary>
-        protected abstract void CreateContent(Vector2 startPosition);
+        protected abstract void CreateContent();
 
         /// <summary>
         /// Snaps a position to this grid.
@@ -126,25 +121,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
         /// </summary>
-        /// <param name="index">The 0-based beat index.</param>
+        /// <param name="placementIndex">The 0-based beat index from the point of placement.</param>
         /// <returns>The applicable colour.</returns>
-        protected ColourInfo GetColourForBeatIndex(int index)
+        protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
         {
-            int beat = (index + 1) % beatDivisor.Value;
-            ColourInfo colour = Colours.Gray5;
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
+            var beatLength = timingPoint.BeatLength / beatDivisor.Value;
+            var beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
 
-            for (int i = 0; i < BindableBeatDivisor.VALID_DIVISORS.Length; i++)
-            {
-                int divisor = BindableBeatDivisor.VALID_DIVISORS[i];
+            var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
-                if ((beat * divisor) % beatDivisor.Value == 0)
-                {
-                    colour = BindableBeatDivisor.GetColourFor(divisor, Colours);
-                    break;
-                }
-            }
-
-            int repeatIndex = index / beatDivisor.Value;
+            int repeatIndex = placementIndex / beatDivisor.Value;
             return colour.MultiplyAlpha(0.5f / (repeatIndex + 1));
         }
     }

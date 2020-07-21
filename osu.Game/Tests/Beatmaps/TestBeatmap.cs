@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
 using osu.Game.Rulesets;
@@ -15,7 +17,7 @@ namespace osu.Game.Tests.Beatmaps
     {
         public TestBeatmap(RulesetInfo ruleset)
         {
-            var baseBeatmap = createTestBeatmap();
+            var baseBeatmap = CreateBeatmap();
 
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
@@ -23,6 +25,7 @@ namespace osu.Game.Tests.Beatmaps
             HitObjects = baseBeatmap.HitObjects;
 
             BeatmapInfo.Ruleset = ruleset;
+            BeatmapInfo.RulesetID = ruleset.ID ?? 0;
             BeatmapInfo.BeatmapSet.Metadata = BeatmapInfo.Metadata;
             BeatmapInfo.BeatmapSet.Beatmaps = new List<BeatmapInfo> { BeatmapInfo };
             BeatmapInfo.BeatmapSet.OnlineInfo = new BeatmapSetOnlineInfo
@@ -37,12 +40,29 @@ namespace osu.Game.Tests.Beatmaps
             };
         }
 
+        protected virtual Beatmap CreateBeatmap() => createTestBeatmap();
+
         private static Beatmap createTestBeatmap()
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
-            using (var reader = new LineBufferedReader(stream))
-                return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+            {
+                using (var reader = new LineBufferedReader(stream))
+                {
+                    var b = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+
+                    b.BeatmapInfo.MD5Hash = test_beatmap_hash.Value.md5;
+                    b.BeatmapInfo.Hash = test_beatmap_hash.Value.sha2;
+
+                    return b;
+                }
+            }
         }
+
+        private static readonly Lazy<(string md5, string sha2)> test_beatmap_hash = new Lazy<(string md5, string sha2)>(() =>
+        {
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
+                return (stream.ComputeMD5Hash(), stream.ComputeSHA2Hash());
+        });
 
         private const string test_beatmap_data = @"osu file format v14
 

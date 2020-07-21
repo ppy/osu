@@ -183,11 +183,8 @@ namespace osu.Game.Tests.Scores.IO
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
-            if (score.Beatmap == null)
-                score.Beatmap = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
-
-            if (score.Ruleset == null)
-                score.Ruleset = new OsuRuleset().RulesetInfo;
+            score.Beatmap ??= beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+            score.Ruleset ??= new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             await scoreManager.Import(score, archive);
@@ -236,8 +233,6 @@ namespace osu.Game.Tests.Scores.IO
             }
 
             public override IEnumerable<string> Filenames => new[] { "test_file.osr" };
-
-            public override Stream GetUnderlyingStream() => new MemoryStream();
         }
     }
 }

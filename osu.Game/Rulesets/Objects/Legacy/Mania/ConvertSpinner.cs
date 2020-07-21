@@ -2,21 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
     /// <summary>
     /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSpinner : HitObject, IHasEndTime, IHasXPosition
+    internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration, IHasXPosition
     {
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
 
         public float X { get; set; }
-
-        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

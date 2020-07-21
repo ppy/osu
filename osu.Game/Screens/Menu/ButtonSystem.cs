@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
 
         public Action OnEdit;
         public Action OnExit;
-        public Action OnDirect;
+        public Action OnBeatmapListing;
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMulti;
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Menu
 
             buttonsTopLevel.Add(new Button(@"play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new Button(@"exit", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
@@ -211,7 +211,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private bool goBack()
         {
@@ -299,15 +301,15 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.Initial:
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                        {
-                            logoTrackingContainer.StopTracking();
+                    {
+                        logoTrackingContainer.StopTracking();
 
-                            game?.Toolbar.Hide();
+                        game?.Toolbar.Hide();
 
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                            logo.ScaleTo(1, 800, Easing.OutExpo);
-                        }, buttonArea.Alpha * 150);
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, buttonArea.Alpha * 150);
                     break;
 
                 case ButtonSystemState.TopLevel:

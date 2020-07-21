@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play.Break
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = "current progress".ToUpperInvariant(),
-                        Font = OsuFont.GetFont(weight: FontWeight.Black, size: 15),
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     },
                     new FillFlowContainer
                     {

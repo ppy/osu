@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Beatmaps;
@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Catch.Replays
         public override Replay Generate()
         {
             // todo: add support for HT DT
-            const double dash_speed = CatcherArea.Catcher.BASE_SPEED;
+            const double dash_speed = Catcher.BASE_SPEED;
             const double movement_speed = dash_speed / 2;
-            float lastPosition = 0.5f;
+            float lastPosition = CatchPlayfield.CENTER_X;
             double lastTime = 0;
 
             void moveToNext(CatchHitObject h)
@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Catch.Replays
                 bool impossibleJump = speedRequired > movement_speed * 2;
 
                 // todo: get correct catcher size, based on difficulty CS.
-                const float catcher_width_half = CatcherArea.CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * 0.3f * 0.5f;
+                const float catcher_width_half = CatcherArea.CATCHER_SIZE * 0.3f * 0.5f;
 
                 if (lastPosition - catcher_width_half < h.X && lastPosition + catcher_width_half > h.X)
                 {
-                    //we are already in the correct range.
+                    // we are already in the correct range.
                     lastTime = h.StartTime;
                     addFrame(h.StartTime, lastPosition);
                     return;
@@ -72,14 +72,14 @@ namespace osu.Game.Rulesets.Catch.Replays
                 }
                 else if (dashRequired)
                 {
-                    //we do a movement in two parts - the dash part then the normal part...
+                    // we do a movement in two parts - the dash part then the normal part...
                     double timeAtNormalSpeed = positionChange / movement_speed;
                     double timeWeNeedToSave = timeAtNormalSpeed - timeAvailable;
                     double timeAtDashSpeed = timeWeNeedToSave / 2;
 
                     float midPosition = (float)Interpolation.Lerp(lastPosition, h.X, (float)timeAtDashSpeed / timeAvailable);
 
-                    //dash movement
+                    // dash movement
                     addFrame(h.StartTime - timeAvailable + 1, lastPosition, true);
                     addFrame(h.StartTime - timeAvailable + timeAtDashSpeed, midPosition);
                     addFrame(h.StartTime, h.X);
