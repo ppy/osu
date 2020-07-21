@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointRenderer : CompositeDrawable
+    public class FollowPointRenderer : LifetimeManagementContainer
     {
         /// <summary>
         /// All the <see cref="FollowPointConnection"/>s contained by this <see cref="FollowPointRenderer"/>.
@@ -45,8 +45,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// <returns>The index of <paramref name="connection"/> in <see cref="connections"/>.</returns>
         private void addConnection(FollowPointConnection connection)
         {
-            AddInternal(connection);
-
             // Groups are sorted by their start time when added such that the index can be used to post-process other surrounding connections
             int index = connections.AddInPlace(connection, Comparer<FollowPointConnection>.Create((g1, g2) => g1.StartTime.Value.CompareTo(g2.StartTime.Value)));
 
@@ -74,6 +72,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 FollowPointConnection previousConnection = connections[index - 1];
                 previousConnection.End = connection.Start;
             }
+
+            AddInternal(connection);
         }
 
         /// <summary>

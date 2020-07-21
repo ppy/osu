@@ -27,15 +27,14 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public bool OnReleased(T action, bool forwards)
+        public void OnReleased(T action, bool forwards)
         {
             if (!EqualityComparer<T>.Default.Equals(action, Action))
-                return false;
+                return;
 
             IsLit = false;
             if (!forwards)
                 Decrement();
-            return false;
         }
     }
 }

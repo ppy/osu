@@ -9,12 +9,12 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// A HitObject that spans some length.
     /// </summary>
-    public interface IHasRepeats : IHasEndTime
+    public interface IHasRepeats : IHasDuration
     {
         /// <summary>
         /// The amount of times the HitObject repeats.
         /// </summary>
-        int RepeatCount { get; }
+        int RepeatCount { get; set; }
 
         /// <summary>
         /// The samples to be played when each node of the <see cref="IHasRepeats"/> is hit.<br />

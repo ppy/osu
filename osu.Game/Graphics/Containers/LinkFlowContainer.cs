@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "View Profile");
+            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {

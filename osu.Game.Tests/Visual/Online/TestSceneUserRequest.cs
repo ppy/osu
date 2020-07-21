@@ -12,8 +12,8 @@ using osu.Game.Rulesets.Mania;
 using osu.Game.Users;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Taiko;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private readonly Bindable<User> user = new Bindable<User>();
         private GetUserRequest request;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
 
         public TestSceneUserRequest()
         {
@@ -40,10 +40,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         User = { BindTarget = user }
                     },
-                    loading = new DimmedLoadingLayer
-                    {
-                        Alpha = 0
-                    }
+                    loading = new LoadingLayer()
                 }
             });
         }

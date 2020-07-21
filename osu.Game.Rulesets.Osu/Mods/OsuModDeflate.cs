@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Acronym => "DF";
 
-        public override IconUsage Icon => FontAwesome.Solid.CompressArrowsAlt;
+        public override IconUsage? Icon => FontAwesome.Solid.CompressArrowsAlt;
 
         public override string Description => "Hit them at the right size!";
 

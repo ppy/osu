@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private UserTopScoreContainer topScoreContainer;
 
+        private IBindable<WeakReference<ScoreInfo>> itemRemoved;
+
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
         /// </summary>
@@ -103,6 +105,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 ScoreSelected = s => ScoreSelected?.Invoke(s)
             });
+
+            itemRemoved = scoreManager.ItemRemoved.GetBoundCopy();
+            itemRemoved.BindValueChanged(onScoreRemoved);
         }
 
         protected override void Reset()
@@ -110,6 +115,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             base.Reset();
             TopScore = null;
         }
+
+        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score) => Schedule(RefreshScores);
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 

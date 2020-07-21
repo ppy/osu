@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Easy";
         public override string Acronym => "EZ";
-        public override IconUsage Icon => OsuIcon.ModEasy;
+        public override IconUsage? Icon => OsuIcon.ModEasy;
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
@@ -28,11 +29,15 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 10
         };
 
+        public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{"lives".ToQuantity(Retries.Value)}";
+
         private int retries;
 
         private BindableNumber<double> health;
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        {
+        }
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
@@ -45,17 +50,14 @@ namespace osu.Game.Rulesets.Mods
             retries = Retries.Value;
         }
 
-        public bool AllowFail
+        public bool PerformFail()
         {
-            get
-            {
-                if (retries == 0) return true;
+            if (retries == 0) return true;
 
-                health.Value = health.MaxValue;
-                retries--;
+            health.Value = health.MaxValue;
+            retries--;
 
-                return false;
-            }
+            return false;
         }
 
         public bool RestartOnFail => false;

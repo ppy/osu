@@ -23,18 +23,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
             }
         }
 
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return -0.02;
-
-                case HitResult.Perfect:
-                    return 0.01;
-            }
-        }
-
         /// <summary>
         /// Whether fruit on the platter should explode or drop.
         /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />

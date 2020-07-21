@@ -5,10 +5,9 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Beatmaps;
 
@@ -83,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public float Position
         {
-            get => HitObject?.X * CatchPlayfield.BASE_WIDTH ?? position;
+            get => HitObject?.X ?? position;
             set => position = value;
         }
 

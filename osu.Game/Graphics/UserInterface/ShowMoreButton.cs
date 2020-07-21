@@ -40,13 +40,14 @@ namespace osu.Game.Graphics.UserInterface
 
         public ShowMoreButton()
         {
-            AutoSizeAxes = Axes.Both;
+            Height = 30;
+            Width = 140;
         }
 
         protected override Drawable CreateContent() => new CircularContainer
         {
             Masking = true,
-            Size = new Vector2(140, 30),
+            RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
             {
                 background = new Box

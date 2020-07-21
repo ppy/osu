@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 {
     public abstract class RankingsTable<TModel> : TableContainer
     {
-        protected const int TEXT_SIZE = 14;
+        protected const int TEXT_SIZE = 12;
         private const float horizontal_inset = 20;
         private const float row_height = 25;
         private const int items_per_page = 50;
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private static TableColumn[] mainHeaders => new[]
         {
-            new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
+            new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 40)), // place
             new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username (country name)
         };
 
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         private OsuSpriteText createIndexDrawable(int index) => new OsuSpriteText
         {
             Text = $"#{index + 1}",
-            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
+            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.SemiBold)
         };
 
         private FillFlowContainer createMainContent(TModel item) => new FillFlowContainer
@@ -112,10 +112,10 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
                 if (Text != highlighted)
-                    Colour = colours.GreySeafoamLighter;
+                    Colour = colourProvider.Foreground1;
             }
         }
 
@@ -131,9 +131,9 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected class ColoredRowText : RowText
         {
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                Colour = colours.GreySeafoamLighter;
+                Colour = colourProvider.Foreground1;
             }
         }
     }

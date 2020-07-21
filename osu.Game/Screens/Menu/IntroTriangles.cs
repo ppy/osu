@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -12,8 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -44,17 +42,15 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            if (MenuVoice.Value && !MenuMusic.Value)
-                welcome = audio.Samples.Get(@"welcome");
+            if (MenuVoice.Value && !UsingThemedIntro)
+                welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
-
-            logo.Triangles = true;
 
             if (!resuming)
             {
@@ -63,7 +59,7 @@ namespace osu.Game.Screens.Menu
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(MenuMusic.Value ? Track : null),
+                    Clock = new FramedClock(UsingThemedIntro ? Track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
@@ -90,7 +86,7 @@ namespace osu.Game.Screens.Menu
             private RulesetFlow rulesets;
             private Container rulesetsScale;
             private Container logoContainerSecondary;
-            private Drawable lazerLogo;
+            private LazerLogo lazerLogo;
 
             private GlitchingTriangles triangles;
 
@@ -102,13 +98,12 @@ namespace osu.Game.Screens.Menu
                 this.background = background;
             }
 
-            private OsuGameBase game;
+            [Resolved]
+            private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuGameBase game)
+            private void load(TextureStore textures)
             {
-                this.game = game;
-
                 InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
@@ -142,10 +137,10 @@ namespace osu.Game.Screens.Menu
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Child = lazerLogo = new LazerLogo(textures.GetStream("Menu/logo-triangles.mp4"))
+                        Child = lazerLogo = new LazerLogo
                         {
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Origin = Anchor.Centre
                         }
                     },
                 };
@@ -221,6 +216,9 @@ namespace osu.Game.Screens.Menu
 
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
+
+                        lazerLogo.TransformTo(nameof(LazerLogo.Progress), 1f, logo_scale_duration);
+
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
 
@@ -262,14 +260,40 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
-                public LazerLogo(Stream videoStream)
+                private HueAnimation highlight, background;
+
+                public float Progress
+                {
+                    get => background.AnimationProgress;
+                    set
+                    {
+                        background.AnimationProgress = value;
+                        highlight.AnimationProgress = value;
+                    }
+                }
+
+                public LazerLogo()
                 {
                     Size = new Vector2(960);
+                }
 
-                    InternalChild = new VideoSprite(videoStream)
+                [BackgroundDependencyLoader]
+                private void load(TextureStore textures)
+                {
+                    InternalChildren = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Clock = new FramedOffsetClock(Clock) { Offset = -logo_1 }
+                        highlight = new HueAnimation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Texture = textures.Get(@"Intro/Triangles/logo-highlight"),
+                            Colour = Color4.White,
+                        },
+                        background = new HueAnimation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Texture = textures.Get(@"Intro/Triangles/logo-background"),
+                            Colour = OsuColour.Gray(0.6f),
+                        },
                     };
                 }
             }

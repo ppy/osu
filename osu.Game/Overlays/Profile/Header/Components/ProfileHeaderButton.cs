@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -23,9 +22,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         protected ProfileHeaderButton()
         {
             AutoSizeAxes = Axes.X;
-
-            IdleColour = Color4.Black;
-            HoverColour = OsuColour.Gray(0.1f);
 
             base.Content.Add(new CircularContainer
             {
@@ -46,6 +42,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     }
                 }
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            IdleColour = colourProvider.Background6;
+            HoverColour = colourProvider.Background5;
         }
     }
 }

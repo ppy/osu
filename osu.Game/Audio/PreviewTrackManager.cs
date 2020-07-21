@@ -19,13 +19,15 @@ namespace osu.Game.Audio
     {
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        private AudioManager audio;
+        [Resolved]
+        private AudioManager audio { get; set; }
+
         private PreviewTrackStore trackStore;
 
         protected TrackManagerPreviewTrack CurrentTrack;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
@@ -33,8 +35,6 @@ namespace osu.Game.Audio
 
             audio.AddItem(trackStore);
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
-
-            this.audio = audio;
         }
 
         /// <summary>
@@ -90,6 +90,7 @@ namespace osu.Game.Audio
 
         public class TrackManagerPreviewTrack : PreviewTrack
         {
+            [Resolved]
             public IPreviewTrackOwner Owner { get; private set; }
 
             private readonly BeatmapSetInfo beatmapSetInfo;
@@ -99,12 +100,6 @@ namespace osu.Game.Audio
             {
                 this.beatmapSetInfo = beatmapSetInfo;
                 this.trackManager = trackManager;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(IPreviewTrackOwner owner)
-            {
-                Owner = owner;
             }
 
             protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");

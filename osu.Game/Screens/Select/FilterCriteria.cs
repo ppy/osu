@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
 
+        public BeatmapSetInfo SelectedBeatmapSet;
+
         public OptionalRange<double> StarDifficulty;
         public OptionalRange<float> ApproachRate;
         public OptionalRange<float> DrainRate;
@@ -25,6 +27,12 @@ namespace osu.Game.Screens.Select
         public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
+
+        public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
+        {
+            IsLowerInclusive = true,
+            IsUpperInclusive = true
+        };
 
         public string[] SearchTerms = Array.Empty<string>();
 

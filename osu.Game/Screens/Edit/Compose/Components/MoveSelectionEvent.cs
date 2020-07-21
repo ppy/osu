@@ -7,7 +7,7 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// An event which occurs when a <see cref="SelectionBlueprint"/> is moved.
+    /// An event which occurs when a <see cref="OverlaySelectionBlueprint"/> is moved.
     /// </summary>
     public class MoveSelectionEvent
     {
@@ -17,11 +17,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly SelectionBlueprint Blueprint;
 
         /// <summary>
-        /// The starting screen-space position of the hitobject.
-        /// </summary>
-        public readonly Vector2 ScreenSpaceStartPosition;
-
-        /// <summary>
         /// The expected screen-space position of the hitobject at the current cursor position.
         /// </summary>
         public readonly Vector2 ScreenSpacePosition;
@@ -29,18 +24,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// The distance between <see cref="ScreenSpacePosition"/> and the hitobject's current position, in the coordinate-space of the hitobject's parent.
         /// </summary>
-        /// <remarks>
-        /// This does not use <see cref="ScreenSpaceStartPosition"/> and does not represent the cumulative movement distance.
-        /// </remarks>
         public readonly Vector2 InstantDelta;
 
-        public MoveSelectionEvent(SelectionBlueprint blueprint, Vector2 screenSpaceStartPosition, Vector2 screenSpacePosition)
+        public MoveSelectionEvent(SelectionBlueprint blueprint, Vector2 screenSpacePosition)
         {
             Blueprint = blueprint;
-            ScreenSpaceStartPosition = screenSpaceStartPosition;
             ScreenSpacePosition = screenSpacePosition;
 
-            InstantDelta = Blueprint.DrawableObject.Parent.ToLocalSpace(ScreenSpacePosition) - Blueprint.DrawableObject.Position;
+            InstantDelta = Blueprint.GetInstantDelta(ScreenSpacePosition);
         }
     }
 }

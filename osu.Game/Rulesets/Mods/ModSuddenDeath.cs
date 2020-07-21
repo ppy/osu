@@ -13,14 +13,15 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Sudden Death";
         public override string Acronym => "SD";
-        public override IconUsage Icon => OsuIcon.ModSuddendeath;
+        public override IconUsage? Icon => OsuIcon.ModSuddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Miss and fail.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        public bool AllowFail => true;
+        public bool PerformFail() => true;
+
         public bool RestartOnFail => true;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)

@@ -9,7 +9,7 @@ using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
 {

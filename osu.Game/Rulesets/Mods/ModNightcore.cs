@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
-        public override IconUsage Icon => OsuIcon.ModNightcore;
+        public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mods
 
             private const int bars_per_segment = 4;
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 

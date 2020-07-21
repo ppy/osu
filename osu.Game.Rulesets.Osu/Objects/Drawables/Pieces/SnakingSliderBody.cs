@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private void setRange(double p0, double p1)
         {
             if (p0 > p1)
-                MathHelper.Swap(ref p0, ref p1);
+                (p0, p1) = (p1, p0);
 
             if (SnakedStart == p0 && SnakedEnd == p1) return;
 

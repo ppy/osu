@@ -17,11 +17,18 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Hidden";
         public override string Acronym => "HD";
-        public override IconUsage Icon => OsuIcon.ModHidden;
+        public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;
 
         protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
+
+        /// <summary>
+        /// Check whether the provided hitobject should be considered the "first" hideable object.
+        /// Can be used to skip spinners, for instance.
+        /// </summary>
+        /// <param name="hitObject">The hitobject to check.</param>
+        protected virtual bool IsFirstHideableObject(DrawableHitObject hitObject) => true;
 
         public void ReadFromConfig(OsuConfigManager config)
         {
@@ -30,8 +37,11 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
-                d.ApplyCustomUpdateState += ApplyHiddenState;
+            if (IncreaseFirstObjectVisibility.Value)
+                drawables = drawables.SkipWhile(h => !IsFirstHideableObject(h)).Skip(1);
+
+            foreach (var dho in drawables)
+                dho.ApplyCustomUpdateState += ApplyHiddenState;
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)

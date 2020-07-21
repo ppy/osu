@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -33,23 +33,26 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextBox emailTextBox;
         private OsuPasswordTextBox passwordTextBox;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private ShakeContainer registerShake;
         private IEnumerable<Drawable> characterCheckText;
 
         private OsuTextBox[] textboxes;
-        private ProcessingOverlay processingOverlay;
-        private GameHost host;
+        private LoadingLayer loadingLayer;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api, GameHost host)
+        private void load(OsuColour colours)
         {
-            this.api = api;
-            this.host = host;
+            FillFlowContainer mainContent;
 
             InternalChildren = new Drawable[]
             {
-                new FillFlowContainer
+                mainContent = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -121,7 +124,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                     },
                 },
-                processingOverlay = new ProcessingOverlay { Alpha = 0 }
+                loadingLayer = new LoadingLayer(mainContent)
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
@@ -129,7 +132,7 @@ namespace osu.Game.Overlays.AccountCreation
             usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
 
             emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
-            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold));
+            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
             passwordDescription.AddText("At least ");
             characterCheckText = passwordDescription.AddText("8 characters long");
@@ -141,7 +144,7 @@ namespace osu.Game.Overlays.AccountCreation
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            processingOverlay.Hide();
+            loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)
                 focusNextTextbox();
@@ -159,7 +162,7 @@ namespace osu.Game.Overlays.AccountCreation
             emailAddressDescription.ClearErrors();
             passwordDescription.ClearErrors();
 
-            processingOverlay.Show();
+            loadingLayer.Show();
 
             Task.Run(() =>
             {
@@ -192,11 +195,11 @@ namespace osu.Game.Overlays.AccountCreation
                         }
 
                         registerShake.Shake();
-                        processingOverlay.Hide();
+                        loadingLayer.Hide();
                         return;
                     }
 
-                    api.Login(emailTextBox.Text, passwordTextBox.Text);
+                    api.Login(usernameTextBox.Text, passwordTextBox.Text);
                 });
             });
         }

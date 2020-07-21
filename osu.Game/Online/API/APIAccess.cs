@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -22,6 +23,7 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
         private readonly OAuth authentication;
 
         public string Endpoint => @"https://osu.ppy.sh";
@@ -126,7 +128,7 @@ namespace osu.Game.Online.API
 
                     case APIState.Offline:
                     case APIState.Connecting:
-                        //work to restore a connection...
+                        // work to restore a connection...
                         if (!HasLogin)
                         {
                             State = APIState.Offline;
@@ -179,7 +181,7 @@ namespace osu.Game.Online.API
                         break;
                 }
 
-                //hard bail if we can't get a valid access token.
+                // hard bail if we can't get a valid access token.
                 if (authentication.RequestAccessToken() == null)
                 {
                     Logout();
@@ -249,7 +251,7 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
@@ -273,7 +275,7 @@ namespace osu.Game.Online.API
             {
                 req.Perform(this);
 
-                //we could still be in initialisation, at which point we don't want to say we're Online yet.
+                // we could still be in initialisation, at which point we don't want to say we're Online yet.
                 if (IsLoggedIn) State = APIState.Online;
 
                 failureCount = 0;
@@ -338,7 +340,7 @@ namespace osu.Game.Online.API
                     log.Add($@"API failure count is now {failureCount}");
 
                     if (failureCount < 3)
-                        //we might try again at an api level.
+                        // we might try again at an api level.
                         return false;
 
                     if (State == APIState.Online)

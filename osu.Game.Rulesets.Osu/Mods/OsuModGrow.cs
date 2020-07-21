@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Acronym => "GR";
 
-        public override IconUsage Icon => FontAwesome.Solid.ArrowsAltV;
+        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAltV;
 
         public override string Description => "Hit them at the right size!";
 

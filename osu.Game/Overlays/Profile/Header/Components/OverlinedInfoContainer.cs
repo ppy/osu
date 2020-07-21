@@ -43,7 +43,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     line = new Circle
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 4,
+                        Height = 2,
+                        Margin = new MarginPadding { Bottom = 2 }
                     },
                     title = new OsuSpriteText
                     {
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light)
                     },
-                    new Container //Add a minimum size to the FillFlowContainer
+                    new Container // Add a minimum size to the FillFlowContainer
                     {
                         Width = minimumWidth,
                     }

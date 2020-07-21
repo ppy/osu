@@ -4,23 +4,27 @@
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
+    public class FilterControl : SearchableListFilterControl<RoomStatusFilter, RoomCategoryFilter>
     {
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
-        protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
-        protected override SecondaryFilter DefaultCategory => SecondaryFilter.Public;
+        protected override Color4 BackgroundColour => Color4.Black.Opacity(0.5f);
+        protected override RoomStatusFilter DefaultTab => RoomStatusFilter.Open;
+        protected override RoomCategoryFilter DefaultCategory => RoomCategoryFilter.Any;
 
         protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
 
         public FilterControl()
         {
@@ -30,15 +34,16 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (filter == null)
-                filter = new Bindable<FilterCriteria>();
+            filter ??= new Bindable<FilterCriteria>();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            ruleset.BindValueChanged(_ => updateFilter());
             Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
+            Dropdown.Current.BindValueChanged(_ => updateFilter());
             Tabs.Current.BindValueChanged(_ => updateFilter(), true);
         }
 
@@ -57,25 +62,27 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
-                PrimaryFilter = Tabs.Current.Value,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value
+                StatusFilter = Tabs.Current.Value,
+                RoomCategoryFilter = Dropdown.Current.Value,
+                Ruleset = ruleset.Value
             };
         }
     }
 
-    public enum PrimaryFilter
+    public enum RoomStatusFilter
     {
         Open,
 
         [Description("Recently Ended")]
-        RecentlyEnded,
+        Ended,
         Participated,
         Owned,
     }
 
-    public enum SecondaryFilter
+    public enum RoomCategoryFilter
     {
-        Public,
-        //Private,
+        Any,
+        Normal,
+        Spotlight
     }
 }

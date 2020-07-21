@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Online.API;
 using osu.Framework.Threading;
@@ -17,6 +16,7 @@ using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 
@@ -35,9 +35,10 @@ namespace osu.Game.Screens.Select
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
-        private readonly DimmedLoadingLayer loading;
+        private readonly LoadingLayer loading;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -62,6 +63,8 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
+            Container content;
+
             Children = new Drawable[]
             {
                 new Box
@@ -69,7 +72,7 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                new Container
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = spacing },
@@ -156,14 +159,8 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-                loading = new DimmedLoadingLayer(),
+                loading = new LoadingLayer(content),
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
-        {
-            this.api = api;
         }
 
         protected override void UpdateAfterChildren()
@@ -204,7 +201,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     var b = res.ToBeatmap(rulesets);
@@ -225,7 +222,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     updateMetrics();

@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Scoring
@@ -25,11 +25,6 @@ namespace osu.Game.Rulesets.Scoring
         /// The current health.
         /// </summary>
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
-
-        /// <summary>
-        /// Whether gameplay is currently in a break.
-        /// </summary>
-        public readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.

@@ -10,18 +10,27 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToTrack
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToAudio
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
+        [SettingSource("Initial rate", "The starting speed of the track")]
+        public abstract BindableNumber<double> InitialRate { get; }
+
         [SettingSource("Final rate", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
+
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        public abstract BindableBool AdjustPitch { get; }
+
+        public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
         private double finalRateTime;
         private double beginRampTime;
@@ -38,15 +47,21 @@ namespace osu.Game.Rulesets.Mods
         protected ModTimeRamp()
         {
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
-            FinalRate.BindValueChanged(val => applyAdjustment(1), true);
+            FinalRate.BindValueChanged(val => applyRateAdjustment(1), true);
+            AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
         public void ApplyToTrack(Track track)
         {
             this.track = track;
-            track.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
 
             FinalRate.TriggerChange();
+            AdjustPitch.TriggerChange();
+        }
+
+        public void ApplyToSample(SampleChannel sample)
+        {
+            sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
 
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
@@ -61,14 +76,25 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
+            applyRateAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
         }
 
         /// <summary>
         /// Adjust the rate along the specified ramp
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
-        private void applyAdjustment(double amount) =>
-            SpeedChange.Value = 1 + (FinalRate.Value - 1) * Math.Clamp(amount, 0, 1);
+        private void applyRateAdjustment(double amount) =>
+            SpeedChange.Value = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
+
+        private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
+        {
+            // remove existing old adjustment
+            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+
+            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+        }
+
+        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
     }
 }

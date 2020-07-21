@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.News;
 
 namespace osu.Game.Overlays
@@ -21,6 +20,11 @@ namespace osu.Game.Overlays
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
 
+        public NewsOverlay()
+            : base(OverlayColourScheme.Purple)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -31,7 +35,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.PurpleDarkAlternative
                 },
-                new OsuScrollContainer
+                new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new FillFlowContainer
@@ -55,7 +59,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.Current.BindTo(Current);
+            header.Post.BindTo(Current);
             Current.TriggerChange();
         }
 

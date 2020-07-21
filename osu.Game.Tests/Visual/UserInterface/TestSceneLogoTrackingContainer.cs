@@ -2,17 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,17 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneLogoTrackingContainer : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(PlayerLoader),
-            typeof(Player),
-            typeof(LogoTrackingContainer),
-            typeof(ButtonSystem),
-            typeof(ButtonSystemState),
-            typeof(Menu),
-            typeof(MainMenu)
-        };
-
         private OsuLogo logo;
         private TestLogoTrackingContainer trackingContainer;
         private Container transferContainer;

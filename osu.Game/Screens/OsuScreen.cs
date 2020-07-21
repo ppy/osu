@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -23,14 +23,14 @@ namespace osu.Game.Screens
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
-        /// This allows for the game content to be pushed byt he options/notification overlays without causing black areas to appear.
+        /// This allows for the game content to be pushed by the options/notification overlays without causing black areas to appear.
         /// </summary>
         public const float HORIZONTAL_OVERFLOW_PADDING = 50;
 
         /// <summary>
         /// A user-facing title for this screen.
         /// </summary>
-        public virtual string Title => GetType().ShortDisplayName();
+        public virtual string Title => GetType().Name;
 
         public string Description => Title;
 
@@ -95,15 +95,30 @@ namespace osu.Game.Screens
 
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
+        private OsuScreenDependencies screenDependencies;
+
+        internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
+            if (screenDependencies == null)
+            {
+                if (DisallowExternalBeatmapRulesetChanges)
+                    throw new InvalidOperationException($"Screens that specify {nameof(DisallowExternalBeatmapRulesetChanges)} must be pushed immediately.");
+
+                createDependencies(parent);
+            }
+
+            return base.CreateChildDependencies(screenDependencies);
+        }
+
+        private void createDependencies(IReadOnlyDependencyContainer dependencies)
+        {
+            screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, dependencies);
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
             Mods = screenDependencies.Mods;
-
-            return base.CreateChildDependencies(screenDependencies);
         }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
@@ -243,5 +258,7 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
+
+        public virtual bool OnBackButton() => false;
     }
 }

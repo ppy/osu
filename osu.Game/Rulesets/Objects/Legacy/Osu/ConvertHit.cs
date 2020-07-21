@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Osu
@@ -10,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertHit : HitObject, IHasPosition, IHasCombo
+    internal sealed class ConvertHit : ConvertHitObject, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
 
@@ -21,7 +20,5 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
         public bool NewCombo { get; set; }
 
         public int ComboOffset { get; set; }
-
-        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

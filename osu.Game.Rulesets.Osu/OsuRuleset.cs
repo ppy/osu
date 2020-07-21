@@ -29,9 +29,15 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
+using System.Linq;
+using osu.Framework.Testing;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Statistics;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets.Osu
 {
+    [ExcludeFromDynamicCompile]
     public class OsuRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
@@ -52,7 +58,7 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
             if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
@@ -113,7 +119,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
-                        new OsuModSpunOut(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -139,6 +144,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
+                        new OsuModSpunOut(),
                     };
 
                 case ModType.Fun:
@@ -175,14 +181,42 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Clicking circles";
+
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
 
         public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
+
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
+        {
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList())
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 250
+                    }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
+                    new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 250
+                    }),
+                }
+            }
+        };
     }
 }

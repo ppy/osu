@@ -15,33 +15,37 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         public readonly BindableBool Selected;
 
         /// <summary>
-        /// The text that should be displayed in this button.
+        /// The item related to this button.
         /// </summary>
-        public string Text;
+        public object Item;
 
-        /// <summary>
-        /// The <see cref="Action"/> that should be invoked when this button is selected.
-        /// </summary>
-        public Action Action;
+        private readonly Action action;
 
-        public RadioButton(string text, Action action)
+        public RadioButton(object item, Action action)
         {
-            Text = text;
-            Action = action;
+            Item = item;
+            this.action = action;
             Selected = new BindableBool();
         }
 
-        public RadioButton(string text)
-            : this(text, null)
+        public RadioButton(string item)
+            : this(item, null)
         {
-            Text = text;
-            Action = null;
+            Item = item;
+            action = null;
         }
 
         /// <summary>
         /// Selects this <see cref="RadioButton"/>.
         /// </summary>
-        public void Select() => Selected.Value = true;
+        public void Select()
+        {
+            if (!Selected.Value)
+            {
+                Selected.Value = true;
+                action?.Invoke();
+            }
+        }
 
         /// <summary>
         /// Deselects this <see cref="RadioButton"/>.

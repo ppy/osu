@@ -51,6 +51,9 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
+        [NotMapped]
+        public int? MaxCombo { get; set; }
+
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
         /// </summary>
@@ -146,7 +149,17 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        public override string ToString() => $"{Metadata} [{Version}]".Trim();
+        public string[] SearchableTerms => new[]
+        {
+            Version
+        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public override string ToString()
+        {
+            string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+
+            return $"{Metadata} {version}".Trim();
+        }
 
         public bool Equals(BeatmapInfo other)
         {

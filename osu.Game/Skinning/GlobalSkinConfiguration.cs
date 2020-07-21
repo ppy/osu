@@ -5,6 +5,7 @@ namespace osu.Game.Skinning
 {
     public enum GlobalSkinConfiguration
     {
-        ComboColours
+        AnimationFramerate,
+        LayeredHitSounds,
     }
 }

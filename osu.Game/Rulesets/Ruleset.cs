@@ -21,6 +21,9 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Users;
+using JetBrains.Annotations;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
 {
@@ -41,13 +44,68 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Converts mods from legacy enum values. Do not override if you're not a legacy ruleset.
         /// </summary>
-        /// <param name="mods">The legacy enum which will be converted</param>
-        /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
-        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
+        /// <param name="mods">The legacy enum which will be converted.</param>
+        /// <returns>An enumerable of constructed <see cref="Mod"/>s.</returns>
+        public virtual IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
 
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
+        /// <summary>
+        /// Converts mods to legacy enum values. Do not override if you're not a legacy ruleset.
+        /// </summary>
+        /// <param name="mods">The mods which will be converted.</param>
+        /// <returns>A single bitwise enumerable value representing (to the best of our ability) the mods.</returns>
+        public virtual LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = LegacyMods.None;
 
-        public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case ModNoFail _:
+                        value |= LegacyMods.NoFail;
+                        break;
+
+                    case ModEasy _:
+                        value |= LegacyMods.Easy;
+                        break;
+
+                    case ModHidden _:
+                        value |= LegacyMods.Hidden;
+                        break;
+
+                    case ModHardRock _:
+                        value |= LegacyMods.HardRock;
+                        break;
+
+                    case ModSuddenDeath _:
+                        value |= LegacyMods.SuddenDeath;
+                        break;
+
+                    case ModDoubleTime _:
+                        value |= LegacyMods.DoubleTime;
+                        break;
+
+                    case ModRelax _:
+                        value |= LegacyMods.Relax;
+                        break;
+
+                    case ModHalfTime _:
+                        value |= LegacyMods.HalfTime;
+                        break;
+
+                    case ModFlashlight _:
+                        value |= LegacyMods.Flashlight;
+                        break;
+                }
+            }
+
+            return value;
+        }
+
+        [CanBeNull]
+        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
+
+        public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
@@ -57,7 +115,7 @@ namespace osu.Game.Rulesets
                 ShortName = ShortName,
                 ID = (this as ILegacyRuleset)?.LegacyID,
                 InstantiationInfo = GetType().AssemblyQualifiedName,
-                Available = true
+                Available = true,
             };
         }
 
@@ -104,7 +162,7 @@ namespace osu.Game.Rulesets
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
-        public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly.Location), @"Resources");
+        public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly), @"Resources");
 
         public abstract string Description { get; }
 
@@ -120,6 +178,11 @@ namespace osu.Game.Rulesets
         /// A unique short name to reference this ruleset in online requests.
         /// </summary>
         public abstract string ShortName { get; }
+
+        /// <summary>
+        /// The playing verb to be shown in the <see cref="UserActivity.SoloGame.Status"/>.
+        /// </summary>
+        public virtual string PlayingVerb => "Playing solo";
 
         /// <summary>
         /// A list of available variant ids.
@@ -146,5 +209,14 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
+
+        /// <summary>
+        /// Creates the statistics for a <see cref="ScoreInfo"/> to be displayed in the results screen.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
+        /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
+        /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
+        [NotNull]
+        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
     }
 }

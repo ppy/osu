@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Profile.Header
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDarker,
+                    Colour = colourProvider.Background5,
                 },
                 fillFlow = new FillFlowContainer
                 {
@@ -152,12 +152,12 @@ namespace osu.Game.Overlays.Profile.Header
                                         detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                         {
                                             Title = "Global Ranking",
-                                            LineColour = colours.Yellow,
+                                            LineColour = colourProvider.Highlight1,
                                         },
                                         detailCountryRank = new OverlinedInfoContainer(false, 110)
                                         {
                                             Title = "Country Ranking",
-                                            LineColour = colours.Yellow,
+                                            LineColour = colourProvider.Highlight1,
                                         },
                                     }
                                 }

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Comments
@@ -11,11 +11,14 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly BindableInt Current = new BindableInt();
 
-        public CommentsShowMoreButton()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            IdleColour = OsuColour.Gray(0.3f);
-            HoverColour = OsuColour.Gray(0.4f);
-            ChevronIconColour = OsuColour.Gray(0.5f);
+            Height = 20;
+
+            IdleColour = colourProvider.Background2;
+            HoverColour = colourProvider.Background1;
+            ChevronIconColour = colourProvider.Foreground1;
         }
 
         protected override void LoadComplete()

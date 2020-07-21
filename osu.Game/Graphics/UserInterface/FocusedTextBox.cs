@@ -36,13 +36,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private GameHost host;
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
-            this.host = host;
-
             BackgroundUnfocused = new Color4(10, 10, 10, 255);
             BackgroundFocused = new Color4(10, 10, 10, 255);
         }
@@ -80,7 +79,9 @@ namespace osu.Game.Graphics.UserInterface
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         public override bool RequestsFocus => HoldFocus;
     }

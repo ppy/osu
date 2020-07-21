@@ -13,10 +13,15 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Spinner : OsuHitObject, IHasEndTime
+    public class Spinner : OsuHitObject, IHasDuration
     {
-        public double EndTime { get; set; }
-        public double Duration => EndTime - StartTime;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
+
+        public double Duration { get; set; }
 
         /// <summary>
         /// Number of spins required to finish the spinner without miss.

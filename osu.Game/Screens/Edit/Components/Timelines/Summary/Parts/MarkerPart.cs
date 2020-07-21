@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -20,24 +19,22 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public class MarkerPart : TimelinePart
     {
-        private readonly Drawable marker;
+        private Drawable marker;
 
-        private readonly IAdjustableClock adjustableClock;
+        [Resolved]
+        private EditorClock editorClock { get; set; }
 
-        public MarkerPart(IAdjustableClock adjustableClock)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.adjustableClock = adjustableClock;
-
             Add(marker = new MarkerVisualisation());
         }
 
         protected override bool OnDragStart(DragStartEvent e) => true;
-        protected override bool OnDragEnd(DragEndEvent e) => true;
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             seekToPosition(e.ScreenSpaceMousePosition);
-            return true;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -61,14 +58,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     return;
 
                 float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-                adjustableClock.Seek(markerPos / DrawWidth * Beatmap.Value.Track.Length);
+                editorClock.SeekTo(markerPos / DrawWidth * editorClock.TrackLength);
             });
         }
 
         protected override void Update()
         {
             base.Update();
-            marker.X = (float)adjustableClock.CurrentTime;
+            marker.X = (float)editorClock.CurrentTime;
         }
 
         protected override void LoadBeatmap(WorkingBeatmap beatmap)

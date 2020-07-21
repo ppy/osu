@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 int requested = e.Key - Key.Number1;
 
-                RulesetInfo found = Rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                RulesetInfo found = Rulesets.AvailableRulesets.ElementAtOrDefault(requested);
                 if (found != null)
                     Current.Value = found;
                 return true;

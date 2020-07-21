@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
@@ -30,6 +31,9 @@ namespace osu.Game.Scoring
         [JsonProperty("accuracy")]
         [Column(TypeName = "DECIMAL(1,4)")]
         public double Accuracy { get; set; }
+
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
@@ -111,9 +115,7 @@ namespace osu.Game.Scoring
             get => User?.Username;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Username = value;
             }
         }
@@ -125,9 +127,7 @@ namespace osu.Game.Scoring
             get => User?.Id ?? 1;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Id = value ?? 1;
             }
         }
@@ -147,6 +147,8 @@ namespace osu.Game.Scoring
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
+        public IOrderedEnumerable<KeyValuePair<HitResult, int>> SortedStatistics => Statistics.OrderByDescending(pair => pair.Key);
+
         [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
@@ -163,6 +165,10 @@ namespace osu.Game.Scoring
                 Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(value);
             }
         }
+
+        [NotMapped]
+        [JsonIgnore]
+        public List<HitEvent> HitEvents { get; set; }
 
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }

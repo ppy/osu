@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
@@ -31,8 +32,8 @@ namespace osu.Game.Tournament.Screens.Ladder
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Storage storage)
         {
-            normalPathColour = colours.BlueDarker.Darken(2);
-            losersPathColour = colours.YellowDarker.Darken(2);
+            normalPathColour = Color4Extensions.FromHex("#66D1FF");
+            losersPathColour = Color4Extensions.FromHex("#FFC700");
 
             RelativeSizeAxes = Axes.Both;
 
@@ -41,10 +42,16 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new TourneyVideo(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                    new TourneyVideo("ladder")
                     {
                         RelativeSizeAxes = Axes.Both,
                         Loop = true,
+                    },
+                    new DrawableTournamentHeaderText
+                    {
+                        Y = 100,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                     },
                     ScrollContent = new LadderDragContainer
                     {
@@ -68,22 +75,24 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var match in LadderInfo.Matches)
                 addMatch(match);
 
-            LadderInfo.Rounds.ItemsAdded += _ => layout.Invalidate();
-            LadderInfo.Rounds.ItemsRemoved += _ => layout.Invalidate();
-
-            LadderInfo.Matches.ItemsAdded += matches =>
+            LadderInfo.Rounds.CollectionChanged += (_, __) => layout.Invalidate();
+            LadderInfo.Matches.CollectionChanged += (_, args) =>
             {
-                foreach (var p in matches)
-                    addMatch(p);
-                layout.Invalidate();
-            };
-
-            LadderInfo.Matches.ItemsRemoved += matches =>
-            {
-                foreach (var p in matches)
+                switch (args.Action)
                 {
-                    foreach (var d in MatchesContainer.Where(d => d.Match == p))
-                        d.Expire();
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var p in args.NewItems.Cast<TournamentMatch>())
+                            addMatch(p);
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var p in args.OldItems.Cast<TournamentMatch>())
+                        {
+                            foreach (var d in MatchesContainer.Where(d => d.Match == p))
+                                d.Expire();
+                        }
+
+                        break;
                 }
 
                 layout.Invalidate();

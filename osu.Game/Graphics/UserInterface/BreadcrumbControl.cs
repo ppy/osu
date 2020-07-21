@@ -27,6 +27,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
+            SwitchTabOnRemove = false;
+
             Current.ValueChanged += index =>
             {
                 foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
@@ -34,13 +36,13 @@ namespace osu.Game.Graphics.UserInterface
                     var tIndex = TabContainer.IndexOf(t);
                     var tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
 
-                    t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
-                    t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
+                    t.State = tIndex > tabIndex ? Visibility.Hidden : Visibility.Visible;
+                    t.Chevron.FadeTo(tIndex >= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
                 }
             };
         }
 
-        protected class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
+        public class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
             protected virtual float ChevronSize => 10;
 

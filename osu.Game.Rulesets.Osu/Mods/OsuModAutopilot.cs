@@ -18,13 +18,14 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Autopilot";
         public override string Acronym => "AP";
-        public override IconUsage Icon => OsuIcon.ModAutopilot;
+        public override IconUsage? Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail), typeof(ModAutoplay) };
 
-        public bool AllowFail => false;
+        public bool PerformFail() => false;
+
         public bool RestartOnFail => false;
 
         private OsuInputManager inputManager;

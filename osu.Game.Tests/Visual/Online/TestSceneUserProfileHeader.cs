@@ -2,15 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
-using osu.Game.Overlays.Profile.Header;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -19,17 +15,8 @@ namespace osu.Game.Tests.Visual.Online
     {
         protected override bool UseOnlineAPI => true;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ProfileHeader),
-            typeof(RankGraph),
-            typeof(LineGraph),
-            typeof(TabControlOverlayHeader.OverlayHeaderTabControl),
-            typeof(CentreHeaderContainer),
-            typeof(BottomHeaderContainer),
-            typeof(DetailHeaderContainer),
-            typeof(ProfileHeaderButton)
-        };
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Resolved]
         private IAPIProvider api { get; set; }

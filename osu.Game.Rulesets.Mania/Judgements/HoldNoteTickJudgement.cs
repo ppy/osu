@@ -7,19 +7,17 @@ namespace osu.Game.Rulesets.Mania.Judgements
 {
     public class HoldNoteTickJudgement : ManiaJudgement
     {
-        public override bool AffectsCombo => false;
-
         protected override int NumericResultFor(HitResult result) => 20;
 
         protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
             {
-                case HitResult.Miss:
+                default:
                     return 0;
 
-                default:
-                    return 0.040;
+                case HitResult.Perfect:
+                    return 0.01;
             }
         }
     }

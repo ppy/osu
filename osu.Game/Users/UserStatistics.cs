@@ -4,6 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using static osu.Game.Users.User;
 
 namespace osu.Game.Users
@@ -29,7 +30,7 @@ namespace osu.Game.Users
         public decimal? PP;
 
         [JsonProperty(@"pp_rank")] // the API sometimes only returns this value in condensed user responses
-        private int rank
+        private int? rank
         {
             set => Ranks.Global = value;
         }
@@ -42,6 +43,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"hit_accuracy")]
         public decimal Accuracy;
+
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;
@@ -67,13 +71,13 @@ namespace osu.Game.Users
         public struct Grades
         {
             [JsonProperty(@"ssh")]
-            public int SSPlus;
+            public int? SSPlus;
 
             [JsonProperty(@"ss")]
             public int SS;
 
             [JsonProperty(@"sh")]
-            public int SPlus;
+            public int? SPlus;
 
             [JsonProperty(@"s")]
             public int S;
@@ -88,13 +92,13 @@ namespace osu.Game.Users
                     switch (rank)
                     {
                         case ScoreRank.XH:
-                            return SSPlus;
+                            return SSPlus ?? 0;
 
                         case ScoreRank.X:
                             return SS;
 
                         case ScoreRank.SH:
-                            return SPlus;
+                            return SPlus ?? 0;
 
                         case ScoreRank.S:
                             return S;

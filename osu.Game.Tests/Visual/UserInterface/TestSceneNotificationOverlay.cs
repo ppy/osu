@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -18,16 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneNotificationOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(NotificationSection),
-            typeof(SimpleNotification),
-            typeof(ProgressNotification),
-            typeof(ProgressCompletionNotification),
-            typeof(IHasCompletionTarget),
-            typeof(Notification)
-        };
-
         private NotificationOverlay notificationOverlay;
 
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
