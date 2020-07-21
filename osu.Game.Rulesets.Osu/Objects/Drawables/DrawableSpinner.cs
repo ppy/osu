@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // Trigger a miss result for remaining ticks to avoid infinite gameplay.
             foreach (var tick in ticks.Where(t => !t.IsHit))
-                tick.TriggerResult(HitResult.Miss);
+                tick.TriggerResult(false);
 
             ApplyResult(r =>
             {
@@ -267,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // tick may be null if we've hit the spin limit.
                 if (tick != null)
                 {
-                    tick.TriggerResult(HitResult.Great);
+                    tick.TriggerResult(true);
                     if (tick is DrawableSpinnerBonusTick)
                         bonusDisplay.SetBonusCount(spins - Spinner.SpinsRequired);
                 }
