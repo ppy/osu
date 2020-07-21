@@ -57,17 +57,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                 Text = scorePosition.HasValue ? $"#{scorePosition.Value}" : "-"
                             },
-                            new UpdateableRank(ScoreRank.D)
+                            new UpdateableRank(score.Rank)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(28),
-                                FillMode = FillMode.Fit,
-                                Rank = score.Rank
+                                FillMode = FillMode.Fit
                             },
                         }
                     },
-                    new UpdateableAvatar
+                    new UpdateableAvatar(score.User)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -81,8 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Offset = new Vector2(0, 2),
                             Radius = 1,
                         },
-                        ShowGuestOnNull = false,
-                        User = score.User
+                        ShowGuestOnNull = false
                     },
                     new FillFlowContainer
                     {
@@ -118,14 +116,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     },
                                 }
                             },
-                            new UpdateableFlag
+                            new UpdateableFlag(score.User.Country)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(19, 13),
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
-                                ShowPlaceholderOnNull = false,
-                                Country = score.User.Country
+                                ShowPlaceholderOnNull = false
                             },
                         }
                     }
