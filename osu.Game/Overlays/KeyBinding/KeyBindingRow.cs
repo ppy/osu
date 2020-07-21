@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             if (bindTarget.IsHovered)
                 finalise();
-            else
+            else if (buttons.Any(b => b.IsHovered))
                 updateBindTarget();
         }
 
