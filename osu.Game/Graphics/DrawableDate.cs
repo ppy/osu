@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Utils;
 
 namespace osu.Game.Graphics
@@ -29,8 +30,12 @@ namespace osu.Game.Graphics
             }
         }
 
-        public DrawableDate(DateTimeOffset date, float textSize = OsuFont.DEFAULT_FONT_SIZE, bool italic = true)
+        private readonly OverlayColourProvider colourProvider;
+
+        public DrawableDate(DateTimeOffset date, float textSize = OsuFont.DEFAULT_FONT_SIZE, bool italic = true, OverlayColourProvider colourProvider = null)
         {
+            this.colourProvider = colourProvider;
+
             Font = OsuFont.GetFont(weight: FontWeight.Regular, size: textSize, italics: italic);
             Date = date;
         }
@@ -75,7 +80,7 @@ namespace osu.Game.Graphics
 
         private void updateTime() => Text = Format();
 
-        public ITooltip GetCustomTooltip() => new DateTooltip();
+        public ITooltip GetCustomTooltip() => new DateTooltip(colourProvider);
 
         public object TooltipContent => Date;
     }

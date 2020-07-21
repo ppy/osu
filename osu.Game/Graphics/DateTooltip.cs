@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics
@@ -16,9 +17,12 @@ namespace osu.Game.Graphics
     {
         private readonly OsuSpriteText dateText, timeText;
         private readonly Box background;
+        private readonly OverlayColourProvider colourProvider;
 
-        public DateTooltip()
+        public DateTooltip(OverlayColourProvider colourProvider = null)
         {
+            this.colourProvider = colourProvider;
+
             AutoSizeAxes = Axes.Both;
             Masking = true;
             CornerRadius = 5;
@@ -33,7 +37,11 @@ namespace osu.Game.Graphics
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Padding = new MarginPadding(10),
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 15,
+                        Vertical = 5
+                    },
                     Children = new Drawable[]
                     {
                         dateText = new OsuSpriteText
@@ -56,8 +64,8 @@ namespace osu.Game.Graphics
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoamDarker;
-            timeText.Colour = colours.BlueLighter;
+            background.Colour = colourProvider?.Background6 ?? colours.GreySeafoamDarker;
+            timeText.Colour = colourProvider?.Light1 ?? colours.BlueLighter;
         }
 
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);

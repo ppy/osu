@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.News
                                 {
                                     RelativeSizeAxes = Axes.Both
                                 },
-                                new DateContainer(post.PublishedAt)
+                                new DateContainer(post.PublishedAt, colourProvider)
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
@@ -158,15 +158,17 @@ namespace osu.Game.Overlays.News
 
         private class DateContainer : CircularContainer, IHasCustomTooltip
         {
-            public ITooltip GetCustomTooltip() => new DateTooltip();
+            public ITooltip GetCustomTooltip() => new DateTooltip(overlayColour);
 
             public object TooltipContent => date;
 
             private readonly DateTimeOffset date;
+            private readonly OverlayColourProvider overlayColour;
 
-            public DateContainer(DateTimeOffset date)
+            public DateContainer(DateTimeOffset date, OverlayColourProvider overlayColour)
             {
                 this.date = date;
+                this.overlayColour = overlayColour;
             }
 
             [BackgroundDependencyLoader]
