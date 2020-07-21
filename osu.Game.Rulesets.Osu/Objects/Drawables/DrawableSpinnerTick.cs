@@ -17,10 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Apply a judgement result.
         /// </summary>
-        /// <param name="result">Whether to apply a <see cref="HitResult.Great"/> result, <see cref="HitResult.Miss"/> otherwise.</param>
-        internal void TriggerResult(HitResult result)
-        {
-            ApplyResult(r => r.Type = result);
-        }
+        /// <param name="hit">Whether this tick was reached.</param>
+        internal void TriggerResult(bool hit) => ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : HitResult.Miss);
     }
 }
