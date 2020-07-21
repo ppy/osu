@@ -21,7 +21,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 hasBonusPoints = value;
 
-                Samples.Volume.Value = ((OsuSpinnerTickJudgement)Result.Judgement).HasBonusPoints ? 1 : 0;
+                ((OsuSpinnerTickJudgement)Result.Judgement).HasBonusPoints = value;
+                Samples.Volume.Value = value ? 1 : 0;
             }
         }
 
