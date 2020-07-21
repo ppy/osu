@@ -29,6 +29,7 @@ namespace osu.Game.Screens
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
         public override bool HideOverlaysOnEnter => true;
+        public override bool AllowRateAdjustments => false;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }

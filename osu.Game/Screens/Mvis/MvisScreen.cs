@@ -30,7 +30,6 @@ using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.Mvis.Objects;
-using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens
 {
@@ -42,6 +41,7 @@ namespace osu.Game.Screens
         private bool AllowBack = false;
         public override bool AllowBackButton => AllowBack;
         public override bool CursorVisible => AllowCursor;
+        public override bool AllowRateAdjustments => false;
 
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
