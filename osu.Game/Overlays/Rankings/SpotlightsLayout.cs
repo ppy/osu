@@ -81,8 +81,6 @@ namespace osu.Game.Overlays.Rankings
         {
             base.LoadComplete();
 
-            selector.Show();
-
             selectedSpotlight.BindValueChanged(_ => onSpotlightChanged());
             sort.BindValueChanged(_ => onSpotlightChanged());
             Ruleset.BindValueChanged(onRulesetChanged);
