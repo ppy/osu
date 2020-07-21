@@ -76,11 +76,10 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         },
-                        new DrawableDate(activity.CreatedAt)
+                        new DrawableDate(activity.CreatedAt, colourProvider: colourProvider)
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Colour = colourProvider.Foreground1,
                             Font = OsuFont.GetFont(size: font_size),
                         }
                     }

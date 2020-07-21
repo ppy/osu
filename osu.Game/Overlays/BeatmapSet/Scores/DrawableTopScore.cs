@@ -57,12 +57,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 new Drawable[]
                                 {
-                                    new TopScoreUserSection
+                                    new TopScoreUserSection(score, position)
                                     {
                                         Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Score = score,
-                                        ScorePosition = position,
+                                        Origin = Anchor.CentreLeft
                                     },
                                     null,
                                     new TopScoreStatisticsSection

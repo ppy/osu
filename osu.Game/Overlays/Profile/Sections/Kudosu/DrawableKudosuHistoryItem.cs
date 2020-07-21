@@ -17,16 +17,17 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
     {
         private const int height = 25;
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private readonly APIKudosuHistory historyItem;
-        private readonly LinkFlowContainer linkFlowContainer;
-        private readonly DrawableDate date;
 
         public DrawableKudosuHistoryItem(APIKudosuHistory historyItem)
         {
             this.historyItem = historyItem;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            LinkFlowContainer linkFlowContainer;
 
             Height = height;
             RelativeSizeAxes = Axes.X;
@@ -39,18 +40,13 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(0, 3),
                 },
-                date = new DrawableDate(historyItem.CreatedAt)
+                new DrawableDate(historyItem.CreatedAt, colourProvider: colourProvider)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 }
             });
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            date.Colour = colours.GreySeafoamLighter;
             var formattedSource = MessageFormatter.FormatText(getString(historyItem));
             linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
         }

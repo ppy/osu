@@ -85,7 +85,7 @@ namespace osu.Game.Users
                 if (User.LastVisit.HasValue)
                 {
                     text.AddText(@"Last seen ");
-                    text.AddText(new DrawableDate(User.LastVisit.Value, italic: false)
+                    text.AddText(new DrawableDate(User.LastVisit.Value, italic: false, colourProvider: ColourProvider)
                     {
                         Shadow = false
                     });

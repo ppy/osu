@@ -13,6 +13,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -38,6 +39,9 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         private void updateDisplay()
         {
             avatar.User = BeatmapSet?.Metadata.Author;
@@ -51,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
             fields.Children = new Drawable[]
             {
                 new Field("mapped by", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("submitted", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("submitted", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold), colourProvider)
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -59,11 +63,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field(online.Status.ToString().ToLowerInvariant(), online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field(online.Status.ToString().ToLowerInvariant(), online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold), colourProvider));
             }
             else if (online.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold), colourProvider));
             }
         }
 
@@ -101,6 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
+        [BackgroundDependencyLoader]
         private void load()
         {
             updateDisplay();
@@ -128,7 +133,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 };
             }
 
-            public Field(string first, DateTimeOffset second, FontUsage secondFont)
+            public Field(string first, DateTimeOffset second, FontUsage secondFont, OverlayColourProvider colourProvider)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
@@ -140,7 +145,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Text = $"{first} ",
                         Font = OsuFont.GetFont(size: 13)
                     },
-                    new DrawableDate(second)
+                    new DrawableDate(second, colourProvider: colourProvider)
                     {
                         Font = secondFont.With(size: 13)
                     }

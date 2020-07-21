@@ -92,10 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
-                                                    new DrawableDate(Score.Date, 12)
-                                                    {
-                                                        Colour = colourProvider.Foreground1
-                                                    }
+                                                    new DrawableDate(Score.Date, 12, colourProvider: colourProvider)
                                                 }
                                             }
                                         }

@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -20,14 +19,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class TopScoreUserSection : CompositeDrawable
     {
-        private readonly SpriteText rankText;
-        private readonly UpdateableRank rank;
-        private readonly UpdateableAvatar avatar;
-        private readonly LinkFlowContainer usernameText;
-        private readonly DrawableDate achievedOn;
-        private readonly UpdateableFlag flag;
+        private readonly ScoreInfo score;
+        private readonly int? scorePosition;
 
-        public TopScoreUserSection()
+        private LinkFlowContainer usernameText;
+
+        public TopScoreUserSection(ScoreInfo score, int? scorePosition)
+        {
+            this.score = score;
+            this.scorePosition = scorePosition;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -46,22 +50,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            rankText = new OsuSpriteText
+                            new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                                Text = scorePosition.HasValue ? $"#{scorePosition.Value}" : "-"
                             },
-                            rank = new UpdateableRank(ScoreRank.D)
+                            new UpdateableRank(ScoreRank.D)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(28),
                                 FillMode = FillMode.Fit,
+                                Rank = score.Rank
                             },
                         }
                     },
-                    avatar = new UpdateableAvatar
+                    new UpdateableAvatar
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -76,6 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Radius = 1,
                         },
                         ShowGuestOnNull = false,
+                        User = score.User
                     },
                     new FillFlowContainer
                     {
@@ -105,47 +112,27 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Text = "achieved ",
                                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
                                     },
-                                    achievedOn = new DrawableDate(DateTimeOffset.MinValue)
+                                    new DrawableDate(score.Date, colourProvider: colourProvider)
                                     {
                                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
                                     },
                                 }
                             },
-                            flag = new UpdateableFlag
+                            new UpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Size = new Vector2(19, 13),
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
                                 ShowPlaceholderOnNull = false,
+                                Country = score.User.Country
                             },
                         }
                     }
                 }
             };
-        }
 
-        public int? ScorePosition
-        {
-            set => rankText.Text = value == null ? "-" : $"#{value}";
-        }
-
-        /// <summary>
-        /// Sets the score to be displayed.
-        /// </summary>
-        public ScoreInfo Score
-        {
-            set
-            {
-                avatar.User = value.User;
-                flag.Country = value.User.Country;
-                achievedOn.Date = value.Date;
-
-                usernameText.Clear();
-                usernameText.AddUserLink(value.User);
-
-                rank.Rank = value.Rank;
-            }
+            usernameText.AddUserLink(score.User);
         }
     }
 }

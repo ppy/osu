@@ -22,6 +22,9 @@ namespace osu.Game.Overlays.Profile.Header
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         private LinkFlowContainer topLinkContainer;
         private LinkFlowContainer bottomLinkContainer;
 
@@ -33,7 +36,7 @@ namespace osu.Game.Overlays.Profile.Header
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             iconColour = colourProvider.Foreground1;
 
@@ -82,7 +85,7 @@ namespace osu.Game.Overlays.Profile.Header
             else
             {
                 topLinkContainer.AddText("Joined ");
-                topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false), embolden);
+                topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false, colourProvider: colourProvider), embolden);
             }
 
             addSpacer(topLinkContainer);
@@ -95,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header
             else if (user.LastVisit.HasValue)
             {
                 topLinkContainer.AddText("Last seen ");
-                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false), embolden);
+                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false, colourProvider: colourProvider), embolden);
 
                 addSpacer(topLinkContainer);
             }
