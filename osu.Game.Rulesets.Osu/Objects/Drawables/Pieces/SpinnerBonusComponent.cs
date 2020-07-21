@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private int currentSpins;
 
-        public void UpdateRotation(double rotation)
+        public void SetRotation(double rotation)
         {
             if (ticks.Count == 0)
                 return;
