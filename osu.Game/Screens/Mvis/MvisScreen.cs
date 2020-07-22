@@ -540,7 +540,7 @@ namespace osu.Game.Screens
             sbLoader.CancelAllTasks();
 
             //背景层的动画
-            Background?.FadeIn(250);
+            Background?.Show();
 
             //非背景层的动画
             gameplayContent.ScaleTo(0, DURATION, Easing.OutQuint);
