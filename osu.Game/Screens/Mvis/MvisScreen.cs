@@ -538,9 +538,10 @@ namespace osu.Game.Screens
             Track = new TrackVirtual(Beatmap.Value.Track.Length);
             beatmapLogo.Exit();
             sbLoader.CancelAllTasks();
+            lockChanges.Value = true;
 
             //背景层的动画
-            Background?.Show();
+            Background?.FadeIn(250);
 
             //非背景层的动画
             gameplayContent.ScaleTo(0, DURATION, Easing.OutQuint);
