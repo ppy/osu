@@ -12,14 +12,12 @@ namespace osu.Game.Configuration
         {
             Set(Static.LoginOverlayDisplayed, false);
             Set(Static.MutedAudioNotificationShownOnce, false);
-            Set(Static.DisableWindowsKey, false);
         }
     }
 
     public enum Static
     {
         LoginOverlayDisplayed,
-        MutedAudioNotificationShownOnce,
-        DisableWindowsKey
+        MutedAudioNotificationShownOnce
     }
 }
