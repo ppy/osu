@@ -176,6 +176,9 @@ namespace osu.Game.Beatmaps
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
         private StarDifficulty computeDifficulty(in DifficultyCacheLookup key, BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo)
         {
+            // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
+            rulesetInfo ??= beatmapInfo.Ruleset;
+
             try
             {
                 var ruleset = rulesetInfo.CreateInstance();
