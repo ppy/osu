@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Multi.Ranking
 
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
-            var req = new GetRoomPlaylistScoresRequest(roomId, playlistItem.ID);
+            var req = new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
 
             req.Success += r =>
             {

@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 switch (request)
                 {
-                    case GetRoomPlaylistScoresRequest r:
+                    case IndexPlaylistScoresRequest r:
                         if (delay == 0)
                             success();
                         else
