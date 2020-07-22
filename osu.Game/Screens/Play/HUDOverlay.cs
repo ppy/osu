@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
-        private Bindable<bool> configShowHud;
+        private Bindable<HUDVisibilityMode> configVisibilityMode;
 
         private readonly Container visibilityContainer;
 
@@ -62,6 +62,8 @@ namespace osu.Game.Screens.Play
         public Action<double> RequestSeek;
 
         private readonly Container topScoreContainer;
+
+        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
@@ -139,9 +141,9 @@ namespace osu.Game.Screens.Play
 
             ModDisplay.Current.Value = mods;
 
-            configShowHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
+            configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
 
-            if (!configShowHud.Value && !hasShownNotificationOnce)
+            if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
 
@@ -177,13 +179,31 @@ namespace osu.Game.Screens.Play
                 }
             }, true);
 
-            configShowHud.BindValueChanged(visible =>
-            {
-                if (!ShowHud.Disabled)
-                    ShowHud.Value = visible.NewValue;
-            }, true);
+            IsBreakTime.BindValueChanged(_ => updateVisibility());
+            configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+        }
+
+        private void updateVisibility()
+        {
+            if (ShowHud.Disabled)
+                return;
+
+            switch (configVisibilityMode.Value)
+            {
+                case HUDVisibilityMode.Never:
+                    ShowHud.Value = false;
+                    break;
+
+                case HUDVisibilityMode.DuringGameplay:
+                    ShowHud.Value = replayLoaded.Value || !IsBreakTime.Value;
+                    break;
+
+                case HUDVisibilityMode.Always:
+                    ShowHud.Value = true;
+                    break;
+            }
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
@@ -202,6 +222,8 @@ namespace osu.Game.Screens.Play
                 ModDisplay.Delay(2000).FadeOut(200);
                 KeyCounter.Margin = new MarginPadding(10);
             }
+
+            updateVisibility();
         }
 
         protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
@@ -222,7 +244,9 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        configShowHud.Value = !configShowHud.Value;
+                        configVisibilityMode.Value = configVisibilityMode.Value != HUDVisibilityMode.Never
+                            ? HUDVisibilityMode.Never
+                            : HUDVisibilityMode.DuringGameplay;
                         return true;
                 }
             }
