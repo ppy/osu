@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -21,6 +22,11 @@ namespace osu.Game.Screens.Multi.Ranking
         private readonly PlaylistItem playlistItem;
 
         private LoadingSpinner loadingLayer;
+        private Cursor higherScoresCursor;
+        private Cursor lowerScoresCursor;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public TimeshiftResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry = true)
             : base(score, allowRetry)
@@ -44,17 +50,62 @@ namespace osu.Game.Screens.Multi.Ranking
 
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
-            var req = new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
+            // This performs two requests:
+            // 1. A request to show the user's score.
+            // 2. If (1) fails, a request to index the room.
 
-            req.Success += r =>
+            var userScoreReq = new ShowPlaylistUserScoreRequest(roomId, playlistItem.ID, api.LocalUser.Value.Id);
+
+            userScoreReq.Success += userScore =>
             {
-                scoresCallback?.Invoke(r.Scores.Where(s => s.ID != Score?.OnlineScoreID).Select(s => s.CreateScoreInfo(playlistItem)));
-                loadingLayer.Hide();
+                var allScores = new List<MultiplayerScore> { userScore };
+
+                if (userScore.ScoresAround?.Higher != null)
+                {
+                    allScores.AddRange(userScore.ScoresAround.Higher.Scores);
+                    higherScoresCursor = userScore.ScoresAround.Higher.Cursor;
+                }
+
+                if (userScore.ScoresAround?.Lower != null)
+                {
+                    allScores.AddRange(userScore.ScoresAround.Lower.Scores);
+                    lowerScoresCursor = userScore.ScoresAround.Lower.Cursor;
+                }
+
+                success(allScores);
             };
 
-            req.Failure += _ => loadingLayer.Hide();
+            userScoreReq.Failure += _ =>
+            {
+                // Fallback to a normal index.
+                var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
+                indexReq.Success += r => success(r.Scores);
+                indexReq.Failure += __ => loadingLayer.Hide();
+                api.Queue(indexReq);
+            };
 
-            return req;
+            return userScoreReq;
+
+            void success(List<MultiplayerScore> scores)
+            {
+                var scoreInfos = new List<ScoreInfo>(scores.Select(s => s.CreateScoreInfo(playlistItem)));
+
+                // Select a score if we don't already have one selected.
+                // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
+                if (SelectedScore.Value == null)
+                {
+                    Schedule(() =>
+                    {
+                        // Prefer selecting the local user's score, or otherwise default to the first visible score.
+                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
+                    });
+                }
+
+                // Invoke callback to add the scores. Exclude the user's current score which was added previously.
+                scoresCallback?.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
+
+                loadingLayer.Hide();
+            }
         }
     }
 }
