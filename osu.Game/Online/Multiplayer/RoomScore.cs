@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
-namespace osu.Game.Online.API
+namespace osu.Game.Online.Multiplayer
 {
     public class RoomScore
     {
