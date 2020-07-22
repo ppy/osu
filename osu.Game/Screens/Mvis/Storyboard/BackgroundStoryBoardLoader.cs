@@ -45,18 +45,23 @@ namespace osu.Game.Screens.Mvis.Storyboard
         /// </summary>
         private Task LoadSBTask;
 
-        private readonly Func<BackgroundStoryboardContainer> createSB;
+        /// <summary>
+        /// 当准备的故事版加载完毕时要调用的Action
+        /// </summary>
+        private Action OnComplete;
 
-        private BackgroundStoryboardContainer SBContainer;
         public BackgroundStoryboardContainer SBLayer;
+        public Drawable GetOverlayProxy()
+        {
+            var proxy = SBLayer.dimmableSB.OverlayLayerContainer.CreateProxy();
+            return proxy;
+        }
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
 
         public BackgroundStoryBoardLoader()
         {
-            this.createSB = () => new BackgroundStoryboardContainer();
-
             RelativeSizeAxes = Axes.Both;
             Child = sbContainer = new Container
             {
@@ -104,8 +109,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
-                SBContainer = createSB();
-
                 sbClock?.FadeOut(DURATION, Easing.OutQuint);
                 sbClock?.Expire();
 
@@ -133,6 +136,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
 
                     UpdateVisuals();
+                    OnComplete?.Invoke();
 
                     Logger.Log($"Load Storyboard for Beatmap \"{beatmap.BeatmapSetInfo}\" complete!");
                 }, (ChangeSB = new CancellationTokenSource()).Token);
@@ -155,7 +159,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             LogTask = null;
         }
 
-        public void UpdateStoryBoardAsync( float displayDelay = 0 )
+        public void UpdateStoryBoardAsync( float displayDelay = 0, Action OnComplete = null )
         {
             if ( b == null )
                 return;
@@ -175,6 +179,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             Schedule(() =>
             {
+                this.OnComplete = OnComplete;
                 LoadSBAsyncTask = Task.Run( async () =>
                 {
                     Logger.Log($"Loading Storyboard for Beatmap \"{b.Value.BeatmapSetInfo}\"...");
