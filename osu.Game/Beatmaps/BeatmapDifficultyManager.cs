@@ -209,7 +209,8 @@ namespace osu.Game.Beatmaps
             // Difficulty can only be computed if the beatmap and ruleset are locally available.
             if (beatmapInfo.ID == 0 || rulesetInfo.ID == null)
             {
-                existingDifficulty = new StarDifficulty(0);
+                // If not, fall back to the existing star difficulty (e.g. from an online source).
+                existingDifficulty = new StarDifficulty(beatmapInfo.StarDifficulty);
                 key = default;
 
                 return true;
