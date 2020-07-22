@@ -17,14 +17,12 @@ namespace osu.Game.Tests.Visual.Online
         [Cached(typeof(RankingsOverlay))]
         private readonly RankingsOverlay rankingsOverlay;
 
-        private readonly Bindable<Country> countryBindable = new Bindable<Country>();
         private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
 
         public TestSceneRankingsOverlay()
         {
             Add(rankingsOverlay = new TestRankingsOverlay
             {
-                Country = { BindTarget = countryBindable },
                 Scope = { BindTarget = scope },
             });
         }
@@ -39,15 +37,8 @@ namespace osu.Game.Tests.Visual.Online
         public void TestFlagScopeDependency()
         {
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddAssert("Check country is Null", () => countryBindable.Value == null);
-            AddStep("Set country", () => countryBindable.Value = us_country);
-            AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
-        }
-
-        [Test]
-        public void TestShowCountry()
-        {
             AddStep("Show US", () => rankingsOverlay.ShowCountry(us_country));
+            AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
         }
 
         [Test]
@@ -64,8 +55,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestRankingsOverlay : RankingsOverlay
         {
-            public new Bindable<Country> Country => base.Country;
-
             public new Bindable<RankingsScope> Scope => base.Scope;
         }
     }

@@ -22,8 +22,6 @@ namespace osu.Game.Overlays
     {
         public const float CONTENT_X_MARGIN = 50;
 
-        protected readonly Bindable<Country> Country = new Bindable<Country>();
-
         protected Bindable<RankingsScope> Scope => header.Current;
 
         [Resolved]
@@ -37,6 +35,9 @@ namespace osu.Game.Overlays
 
         private GetSpotlightsRequest spotlightsRequest;
         private CancellationTokenSource cancellationToken;
+
+        private PerformanceRankingsDisplay performanceDisplay;
+        private Country lastRequested;
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -88,16 +89,10 @@ namespace osu.Game.Overlays
 
             header.Ruleset.BindTo(ruleset);
 
-            Country.BindValueChanged(country =>
-            {
-                if (country.NewValue != null)
-                    Scope.Value = RankingsScope.Performance;
-            });
-
             Scope.BindValueChanged(scope =>
             {
                 if (scope.NewValue != RankingsScope.Performance)
-                    Country.Value = null;
+                    lastRequested = null;
 
                 Scheduler.AddOnce(selectDisplayToLoad);
             });
@@ -129,8 +124,12 @@ namespace osu.Game.Overlays
             if (requested == null)
                 return;
 
-            Country.Value = requested;
+            if (performanceDisplay != null)
+                performanceDisplay.Country.Value = requested;
+            else
+                Scope.Value = RankingsScope.Performance;
 
+            lastRequested = requested;
             Show();
         }
 
@@ -142,6 +141,7 @@ namespace osu.Game.Overlays
 
         private void selectDisplayToLoad()
         {
+            performanceDisplay = null;
             cancellationToken?.Cancel();
             spotlightsRequest?.Cancel();
 
@@ -202,9 +202,9 @@ namespace osu.Game.Overlays
                     };
 
                 case RankingsScope.Performance:
-                    return new PerformanceRankingsDisplay
+                    return performanceDisplay = new PerformanceRankingsDisplay
                     {
-                        Country = { BindTarget = Country },
+                        Country = { Value = lastRequested },
                         Current = ruleset,
                         StartLoading = loading.Show,
                         FinishLoading = loading.Hide
