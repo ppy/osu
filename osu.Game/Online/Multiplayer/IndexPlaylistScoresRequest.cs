@@ -7,12 +7,12 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public class GetRoomPlaylistScoresRequest : APIRequest<RoomPlaylistScores>
+    public class IndexPlaylistScoresRequest : APIRequest<RoomPlaylistScores>
     {
         private readonly int roomId;
         private readonly int playlistItemId;
 
-        public GetRoomPlaylistScoresRequest(int roomId, int playlistItemId)
+        public IndexPlaylistScoresRequest(int roomId, int playlistItemId)
         {
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;
