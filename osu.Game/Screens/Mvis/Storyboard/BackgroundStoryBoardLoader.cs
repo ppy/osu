@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
     {
         private const float DURATION = 750;
         public Container sbContainer;
-        public ClockContainer sbClock;
+        private ClockContainer sbClock;
         private CancellationTokenSource ChangeSB;
         private BindableBool EnableSB = new BindableBool();
         ///<summary>
@@ -123,11 +123,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     sbClock = newsbClock;
 
                     sbContainer.Add(sbClock);
-
-                    if ( beatmap.Track.IsRunning == true )
-                        sbClock.Start();
-                    else
-                        sbClock.Stop();
 
                     sbClock.Seek(beatmap.Track.CurrentTime);
 

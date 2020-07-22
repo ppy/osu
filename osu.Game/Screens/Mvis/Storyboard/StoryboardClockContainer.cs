@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public readonly GameplayClock gameplayClock;
 
         private readonly FramedOffsetClock baseOffsetClock;
-        private DecoupleableInterpolatingFramedClock adjustableClock;
+        private CustomedDecoupleableInterpolatingFramedClock adjustableClock;
         private WorkingBeatmap beatmap;
         private BindableBool IsPaused = new BindableBool();
 
@@ -27,7 +27,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             this.beatmap = b;
 
-            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            adjustableClock = new CustomedDecoupleableInterpolatingFramedClock();
+            adjustableClock.ChangeSource(b.Track);
 
             baseOffsetClock = new HardwareCorrectionOffsetClock(adjustableClock) { Offset = 0 };
 
@@ -41,24 +42,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
             baseOffsetClock.ProcessFrame();
         }
 
-        public void Start()
-        {
-            IsPaused.Value = false;
-
-            adjustableClock.Start();
-        }
-
-        public void Stop()
-        {
-            IsPaused.Value = true;
-
-            adjustableClock.Stop();
-        }
-
         protected override void Update()
         {
-            if ( !IsPaused.Value )
-                baseOffsetClock.ProcessFrame();
+            baseOffsetClock.ProcessFrame();
         }
     }
 }
