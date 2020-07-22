@@ -35,11 +35,11 @@ namespace osu.Game.Online.Multiplayer
             switch (sort)
             {
                 case MultiplayerScoresSort.Ascending:
-                    req.AddParameter("sort", "scores_asc");
+                    req.AddParameter("sort", "score_asc");
                     break;
 
                 case MultiplayerScoresSort.Descending:
-                    req.AddParameter("sort", "scores_desc");
+                    req.AddParameter("sort", "score_desc");
                     break;
             }
 
