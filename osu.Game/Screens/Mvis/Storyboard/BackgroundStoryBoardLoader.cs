@@ -6,16 +6,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Mvis.Storyboard
 {
     public class BackgroundStoryBoardLoader : Container
     {
         private const float DURATION = 750;
-        public Container sbContainer;
-        public ClockContainer sbClock;
+        private Container sbClock;
         private CancellationTokenSource ChangeSB;
         private BindableBool EnableSB = new BindableBool();
         ///<summary>
@@ -50,10 +51,12 @@ namespace osu.Game.Screens.Mvis.Storyboard
         /// </summary>
         private Action OnComplete;
 
-        public BackgroundStoryboardContainer SBLayer;
+        private DimmableStoryboard dimmableSB;
+        private CustomedDecoupleableInterpolatingFramedClock DecoupleableClock;
+
         public Drawable GetOverlayProxy()
         {
-            var proxy = SBLayer.dimmableSB.OverlayLayerContainer.CreateProxy();
+            var proxy = dimmableSB.OverlayLayerContainer.CreateProxy();
             return proxy;
         }
 
@@ -63,10 +66,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public BackgroundStoryBoardLoader()
         {
             RelativeSizeAxes = Axes.Both;
-            Child = sbContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -77,9 +76,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         protected override void LoadComplete()
         {
-            EnableSB.ValueChanged += _ => UpdateVisuals();
+            EnableSB.BindValueChanged(_ => UpdateVisuals());
         }
-
 
         public void UpdateVisuals()
         {
@@ -109,27 +107,35 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             try
             {
-                sbClock?.FadeOut(DURATION, Easing.OutQuint);
-                sbClock?.Expire();
+                if ( sbClock != null )
+                {
+                    sbClock.Clock = new ThrottledFrameClock();
+                    sbClock.FadeOut(DURATION, Easing.OutQuint);
+                    sbClock.Expire();
+                }
 
-                LoadSBTask = LoadComponentAsync(new ClockContainer(beatmap)
+                LoadSBTask = LoadComponentAsync(new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Name = "ClockContainer",
+                    Name = "Storyboard Container",
                     Alpha = 0,
-                    Child = SBLayer = new BackgroundStoryboardContainer(),
+                    Child = dimmableSB = new DimmableStoryboard(b.Value.Storyboard)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Name = "Storyboard"
+                    }
                 }, newsbClock =>
                 {
                     sbClock = newsbClock;
 
-                    sbContainer.Add(sbClock);
+                    dimmableSB.IgnoreUserSettings.Value = true;
+                    dimmableSB.EnableUserDim.Value = false;
 
-                    if ( beatmap.Track.IsRunning == true )
-                        sbClock.Start();
-                    else
-                        sbClock.Stop();
+                    DecoupleableClock =  new CustomedDecoupleableInterpolatingFramedClock();
+                    sbClock.Clock = DecoupleableClock;
+                    DecoupleableClock.ChangeSource(beatmap.Track);
 
-                    sbClock.Seek(beatmap.Track.CurrentTime);
+                    this.Add(sbClock);
 
                     SBLoaded.Value = true;
                     IsReady.Value = true;
@@ -169,7 +175,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             SBLoaded.Value = false;
             NeedToHideTriangles.Value = false;
 
-            SBLayer = null;
+            dimmableSB = null;
 
             if ( !EnableSB.Value )
             {
