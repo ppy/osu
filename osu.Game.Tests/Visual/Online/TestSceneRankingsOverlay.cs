@@ -15,38 +15,45 @@ namespace osu.Game.Tests.Visual.Online
         protected override bool UseOnlineAPI => true;
 
         [Cached(typeof(RankingsOverlay))]
-        private readonly TestRankingsOverlay rankings;
+        private readonly RankingsOverlay rankingsOverlay;
+
+        private readonly Bindable<Country> countryBindable = new Bindable<Country>();
+        private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
 
         public TestSceneRankingsOverlay()
         {
-            Add(rankings = new TestRankingsOverlay());
+            Add(rankingsOverlay = new TestRankingsOverlay
+            {
+                Country = { BindTarget = countryBindable },
+                Scope = { BindTarget = scope },
+            });
         }
 
         [Test]
         public void TestShow()
         {
-            AddStep("Show", rankings.Show);
+            AddStep("Show", rankingsOverlay.Show);
         }
 
         [Test]
         public void TestFlagScopeDependency()
         {
-            AddStep("Set scope to Score", () => rankings.Scope.Value = RankingsScope.Score);
-            AddAssert("Check country is Null", () => rankings.Country.Value == null);
-            AddStep("Set country", () => rankings.Country.Value = us_country);
-            AddAssert("Check scope is Performance", () => rankings.Scope.Value == RankingsScope.Performance);
+            AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
+            AddAssert("Check country is Null", () => countryBindable.Value == null);
+            AddStep("Set country", () => countryBindable.Value = us_country);
+            AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
         }
 
         [Test]
         public void TestShowCountry()
         {
-            AddStep("Show US", () => rankings.ShowCountry(us_country));
+            AddStep("Show US", () => rankingsOverlay.ShowCountry(us_country));
         }
 
         [Test]
         public void TestHide()
         {
-            AddStep("Hide", rankings.Hide);
+            AddStep("Hide", rankingsOverlay.Hide);
         }
 
         private static readonly Country us_country = new Country
