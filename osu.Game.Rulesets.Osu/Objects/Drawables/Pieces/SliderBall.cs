@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             lastPosition = newPos;
         }
 
-        private class FollowCircleContainer : Container
+        private class FollowCircleContainer : CircularContainer
         {
             public override bool HandlePositionalInput => true;
         }
