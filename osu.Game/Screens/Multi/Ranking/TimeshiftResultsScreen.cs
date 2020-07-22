@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -72,40 +73,93 @@ namespace osu.Game.Screens.Multi.Ranking
                     lowerScoresCursor = userScore.ScoresAround.Lower.Cursor;
                 }
 
-                success(allScores);
+                performSuccessCallback(scoresCallback, allScores);
             };
 
             userScoreReq.Failure += _ =>
             {
                 // Fallback to a normal index.
                 var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID);
-                indexReq.Success += r => success(r.Scores);
+
+                indexReq.Success += r =>
+                {
+                    performSuccessCallback(scoresCallback, r.Scores);
+                    lowerScoresCursor = r.Cursor;
+                };
+
                 indexReq.Failure += __ => loadingLayer.Hide();
+
                 api.Queue(indexReq);
             };
 
             return userScoreReq;
+        }
 
-            void success(List<MultiplayerScore> scores)
+        protected override APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback)
+        {
+            Debug.Assert(direction == 1 || direction == -1);
+
+            Cursor cursor;
+            MultiplayerScoresSort sort;
+
+            switch (direction)
             {
-                var scoreInfos = new List<ScoreInfo>(scores.Select(s => s.CreateScoreInfo(playlistItem)));
+                case -1:
+                    cursor = higherScoresCursor;
+                    sort = MultiplayerScoresSort.Ascending;
+                    break;
 
-                // Select a score if we don't already have one selected.
-                // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
-                if (SelectedScore.Value == null)
+                default:
+                    cursor = lowerScoresCursor;
+                    sort = MultiplayerScoresSort.Descending;
+                    break;
+            }
+
+            if (cursor == null)
+                return null;
+
+            var indexReq = new IndexPlaylistScoresRequest(roomId, playlistItem.ID, cursor, sort);
+
+            indexReq.Success += r =>
+            {
+                switch (direction)
                 {
-                    Schedule(() =>
-                    {
-                        // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
-                    });
+                    case -1:
+                        higherScoresCursor = r.Cursor;
+                        break;
+
+                    default:
+                        lowerScoresCursor = r.Cursor;
+                        break;
                 }
 
-                // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-                scoresCallback?.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
+                performSuccessCallback(scoresCallback, r.Scores);
+            };
 
-                loadingLayer.Hide();
+            indexReq.Failure += _ => loadingLayer.Hide();
+
+            return indexReq;
+        }
+
+        private void performSuccessCallback(Action<IEnumerable<ScoreInfo>> callback, List<MultiplayerScore> scores)
+        {
+            var scoreInfos = new List<ScoreInfo>(scores.Select(s => s.CreateScoreInfo(playlistItem)));
+
+            // Select a score if we don't already have one selected.
+            // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).
+            if (SelectedScore.Value == null)
+            {
+                Schedule(() =>
+                {
+                    // Prefer selecting the local user's score, or otherwise default to the first visible score.
+                    SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
+                });
             }
+
+            // Invoke callback to add the scores. Exclude the user's current score which was added previously.
+            callback?.Invoke(scoreInfos.Where(s => s.ID != Score?.OnlineScoreID));
+
+            loadingLayer.Hide();
         }
     }
 }

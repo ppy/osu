@@ -26,6 +26,10 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         private const float expanded_panel_spacing = 15;
 
+        public bool IsScrolledToStart => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.Current <= 100;
+
+        public bool IsScrolledToEnd => flow.Count > 0 && scroll.ScrollableExtent > 0 && scroll.IsScrolledToEnd(100);
+
         /// <summary>
         /// An action to be invoked if a <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
