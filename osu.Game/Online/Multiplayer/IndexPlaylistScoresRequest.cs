@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -13,7 +11,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// Returns a list of scores for the specified playlist item.
     /// </summary>
-    public class IndexPlaylistScoresRequest : APIRequest<RoomPlaylistScores>
+    public class IndexPlaylistScoresRequest : APIRequest<MultiplayerScores>
     {
         private readonly int roomId;
         private readonly int playlistItemId;
@@ -49,11 +47,5 @@ namespace osu.Game.Online.Multiplayer
         }
 
         protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores";
-    }
-
-    public class RoomPlaylistScores
-    {
-        [JsonProperty("scores")]
-        public List<MultiplayerScore> Scores { get; set; }
     }
 }
