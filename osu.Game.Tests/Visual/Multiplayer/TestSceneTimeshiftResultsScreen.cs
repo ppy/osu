@@ -64,11 +64,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void bindHandler(double delay = 0)
         {
-            var roomScores = new List<RoomScore>();
+            var roomScores = new List<MultiplayerScore>();
 
             for (int i = 0; i < 10; i++)
             {
-                roomScores.Add(new RoomScore
+                roomScores.Add(new MultiplayerScore
                 {
                     ID = i,
                     Accuracy = 0.9 - 0.01 * i,
