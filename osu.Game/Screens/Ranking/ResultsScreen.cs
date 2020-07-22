@@ -164,16 +164,35 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            var req = FetchScores(scores => Schedule(() =>
-            {
-                foreach (var s in scores)
-                    addScore(s);
-            }));
+            var req = FetchScores(fetchScoresCallback);
 
             if (req != null)
                 api.Queue(req);
 
             statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
+        }
+
+        private APIRequest nextPageRequest;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (hasAnyScores && nextPageRequest == null)
+            {
+                if (scorePanelList.IsScrolledToStart)
+                    nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
+                else if (scorePanelList.IsScrolledToEnd)
+                    nextPageRequest = FetchNextPage(1, fetchScoresCallback);
+
+                if (nextPageRequest != null)
+                {
+                    nextPageRequest.Success += () => nextPageRequest = null;
+                    nextPageRequest.Failure += _ => nextPageRequest = null;
+
+                    api.Queue(nextPageRequest);
+                }
+            }
         }
 
         /// <summary>
@@ -182,6 +201,18 @@ namespace osu.Game.Screens.Ranking
         /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         protected virtual APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+
+        protected virtual APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
+
+        private bool hasAnyScores;
+
+        private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
+        {
+            foreach (var s in scores)
+                addScore(s);
+
+            hasAnyScores = true;
+        });
 
         public override void OnEntering(IScreen last)
         {
