@@ -24,6 +24,6 @@ namespace osu.Game.Online.Multiplayer
     public class RoomPlaylistScores
     {
         [JsonProperty("scores")]
-        public List<RoomScore> Scores { get; set; }
+        public List<MultiplayerScore> Scores { get; set; }
     }
 }
