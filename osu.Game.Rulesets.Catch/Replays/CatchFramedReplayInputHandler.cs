@@ -35,11 +35,11 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public override void GetPendingInputs(List<IInput> input)
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
             if (!Position.HasValue) return;
 
-            input.Add(new CatchReplayState
+            inputs.Add(new CatchReplayState
             {
                 PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
                 CatcherX = Position.Value
