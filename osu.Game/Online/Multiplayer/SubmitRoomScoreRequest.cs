@@ -4,9 +4,10 @@
 using System.Net.Http;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
+using osu.Game.Online.API;
 using osu.Game.Scoring;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
     public class SubmitRoomScoreRequest : APIRequest<RoomScore>
     {

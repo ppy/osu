@@ -3,8 +3,9 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Online.API;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
     public class GetRoomPlaylistScoresRequest : APIRequest<RoomPlaylistScores>
     {
