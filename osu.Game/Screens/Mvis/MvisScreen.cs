@@ -485,8 +485,11 @@ namespace osu.Game.Screens
             }
         }
 
-        private void SeekTo(double position) =>
+        private void SeekTo(double position)
+        {
             musicController?.SeekTo(position);
+            sbLoader?.sbClock?.Seek(position);
+        }
 
         protected override void Update()
         {
@@ -495,6 +498,9 @@ namespace osu.Game.Screens
             Track = Beatmap.Value?.TrackLoaded ?? false ? Beatmap.Value.Track : null;
             if (Track?.IsDummyDevice == false)
             {
+                if (Track.CurrentTime == 0)
+                    sbLoader?.sbClock?.Seek(Track.CurrentTime);
+
                 TrackRunning.Value = Track.IsRunning;
                 progressBarContainer.progressBar.CurrentTime = Track.CurrentTime;
             }
@@ -678,9 +684,15 @@ namespace osu.Game.Screens
         private void TogglePause()
         {
             if (Track?.IsRunning == true)
+            {
+                sbLoader?.sbClock?.Stop();
                 musicController?.Stop();
+            }
             else
+            {
+                sbLoader?.sbClock?.Start();
                 musicController?.Play();
+            }
         }
 
         private void UpdateIdleVisuals()
