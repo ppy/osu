@@ -10,14 +10,8 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// An object which contains scores and related data for fetching next pages.
     /// </summary>
-    public class MultiplayerScores
+    public class MultiplayerScores : ResponseWithCursor
     {
-        /// <summary>
-        /// To be used for fetching the next page.
-        /// </summary>
-        [JsonProperty("cursor")]
-        public Cursor Cursor { get; set; }
-
         /// <summary>
         /// The scores.
         /// </summary>
