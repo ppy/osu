@@ -85,7 +85,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.HitLighting, true);
 
-            Set(OsuSetting.ShowInterface, true);
+            Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.DuringGameplay);
             Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
@@ -184,7 +184,7 @@ namespace osu.Game.Configuration
         AlwaysPlayFirstComboBreak,
         ScoreMeter,
         FloatingComments,
-        ShowInterface,
+        HUDVisibilityMode,
         ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
