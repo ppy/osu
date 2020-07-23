@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Multi
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 24),
+                                Font = OsuFont.GetFont(size: 30),
                                 Text = "·"
                             },
                             pageTitle = new OsuSpriteText

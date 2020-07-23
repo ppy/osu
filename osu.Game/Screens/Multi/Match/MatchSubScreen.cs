@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Multi.Match
                                         new Drawable[] { new Components.Header() },
                                         new Drawable[]
                                         {
-                                            participantsHeader = new OverlinedHeader("Participants")
+                                            participantsHeader = new OverlinedHeader("参与人数")
                                             {
                                                 ShowLine = false
                                             }
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Content = new[]
                                                                 {
-                                                                    new Drawable[] { new OverlinedHeader("Playlist"), },
+                                                                    new Drawable[] { new OverlinedHeader("游玩列表"), },
                                                                     new Drawable[]
                                                                     {
                                                                         new DrawableRoomPlaylistWithResults
@@ -162,9 +162,9 @@ namespace osu.Game.Screens.Multi.Match
                                                             RelativeSizeAxes = Axes.Both,
                                                             Content = new[]
                                                             {
-                                                                new Drawable[] { new OverlinedHeader("Leaderboard"), },
+                                                                new Drawable[] { new OverlinedHeader("排行榜"), },
                                                                 new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
-                                                                new Drawable[] { new OverlinedHeader("Chat"), },
+                                                                new Drawable[] { new OverlinedHeader("聊天"), },
                                                                 new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
                                                             },
                                                             RowDimensions = new[]
