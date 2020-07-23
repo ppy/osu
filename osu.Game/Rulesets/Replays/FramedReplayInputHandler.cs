@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 
@@ -68,8 +67,6 @@ namespace osu.Game.Rulesets.Replays
             currentFrameIndex = newFrame;
             return true;
         }
-
-        public override List<IInput> GetPendingInputs() => new List<IInput>();
 
         private const double sixty_frame_time = 1000.0 / 60;
 

@@ -2,9 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
-using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Online.API.Requests.Responses
+namespace osu.Game.Online.Multiplayer
 {
     public class APICreatedRoom : Room
     {
