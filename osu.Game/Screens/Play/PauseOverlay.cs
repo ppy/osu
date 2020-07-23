@@ -39,10 +39,6 @@ namespace osu.Game.Screens.Play
                 Looping = true,
             });
 
-            // PopIn is called before updating the skin, and when a sample is updated, its "playing" value is reset
-            // the sample must be played again
-            pauseLoop.OnSkinChanged += () => pauseLoop.Play();
-
             // SkinnableSound only plays a sound if its aggregate volume is > 0, so the volume must be turned up before playing it
             pauseLoop.VolumeTo(minimum_volume);
         }
