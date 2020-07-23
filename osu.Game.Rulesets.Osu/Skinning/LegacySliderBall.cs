@@ -15,6 +15,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         private readonly Drawable animationContent;
 
+        private Sprite layerNd;
+        private Sprite layerSpec;
+
         public LegacySliderBall(Drawable animationContent)
         {
             this.animationContent = animationContent;
@@ -29,18 +32,37 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             InternalChildren = new[]
             {
-                new Sprite
+                layerNd = new Sprite
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Texture = skin.GetTexture("sliderb-nd"),
                     Colour = new Color4(5, 5, 5, 255),
                 },
-                animationContent,
-                new Sprite
+                animationContent.With(d =>
                 {
+                    d.Anchor = Anchor.Centre;
+                    d.Origin = Anchor.Centre;
+                }),
+                layerSpec = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Texture = skin.GetTexture("sliderb-spec"),
                     Blending = BlendingParameters.Additive,
                 },
             };
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            //undo rotation on layers which should not be rotated.
+            float appliedRotation = Parent.Rotation;
+
+            layerNd.Rotation = -appliedRotation;
+            layerSpec.Rotation = -appliedRotation;
         }
     }
 }
