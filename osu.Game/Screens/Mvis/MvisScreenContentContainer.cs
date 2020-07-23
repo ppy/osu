@@ -6,7 +6,7 @@ namespace osu.Game.Screens.Mvis
 {
     public class MvisScreenContentContainer : Container
     {
-        public Func<float> GetBottombarHeight;
+        public Func<float> SetBottomPadding;
 
         public MvisScreenContentContainer()
         {
@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Mvis
         {
             base.UpdateAfterChildren();
 
-            Padding = new MarginPadding { Bottom = GetBottombarHeight?.Invoke() ?? 0 };
+            Padding = new MarginPadding { Bottom = SetBottomPadding?.Invoke() ?? 0, Horizontal = 50};
         }
     }
 }

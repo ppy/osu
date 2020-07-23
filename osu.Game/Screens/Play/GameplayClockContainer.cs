@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class HardwareCorrectionOffsetClock : FramedOffsetClock
+        public class HardwareCorrectionOffsetClock : FramedOffsetClock
         {
             // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
             // base implementation already adds offset at 1.0 rate, so we only add the difference from that here.

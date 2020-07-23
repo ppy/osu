@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,16 +11,17 @@ using System.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
+using osuTK;
 
-namespace osu.Game.Screens.PurePlayer.Components
+namespace osu.Game.Screens.Mvis.Objects
 {
-    public class BeatmapCover : Container
+    public class BufferedBeatmapCover : Container
     {
 
         [Resolved]
         private IBindable<WorkingBeatmap> b { get; set; }
 
-        private Container coverContainer;
+        private BufferedContainer coverContainer;
 
         private BeatmapBackground cover;
 
@@ -36,7 +40,7 @@ namespace osu.Game.Screens.PurePlayer.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#444")),
                 },
-                coverContainer = new Container
+                coverContainer = new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -73,6 +77,13 @@ namespace osu.Game.Screens.PurePlayer.Components
                 oldCover = null;
             },
             (ChangeCoverTask = new CancellationTokenSource()).Token);
+        }
+
+        public void BlurTo(Vector2 BlurSigma, double Duration = 0, Easing easing = Easing.None)
+        {
+            coverContainer.FrameBufferScale = BlurSigma == Vector2.Zero ? Vector2.One : new Vector2(0.5f);
+
+            coverContainer?.BlurTo(BlurSigma * 0.5f, Duration, easing);
         }
     }
 }

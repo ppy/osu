@@ -4,10 +4,10 @@
 using System.Collections.Generic;
 using Humanizer;
 using osu.Framework.IO.Network;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.API;
 using osu.Game.Screens.Multi.Lounge.Components;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
     public class GetRoomsRequest : APIRequest<List<Room>>
     {
