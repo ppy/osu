@@ -188,12 +188,11 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item.State.Value != CarouselItemState.Collapsed && Alpha == 0)
                 starCounter.ReplayAnimation();
 
-            if (Item.State.Value == CarouselItemState.Collapsed)
-                starDifficultyCancellationSource?.Cancel();
-            else
-            {
-                starDifficultyCancellationSource?.Cancel();
+            starDifficultyCancellationSource?.Cancel();
 
+            // Only compute difficulty when the item is visible.
+            if (Item.State.Value != CarouselItemState.Collapsed)
+            {
                 // We've potentially cancelled the computation above so a new bindable is required.
                 starDifficultyBindable = difficultyManager.GetTrackedBindable(beatmap, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
                 starDifficultyBindable.BindValueChanged(d => starCounter.Current = (float)d.NewValue.Stars, true);
