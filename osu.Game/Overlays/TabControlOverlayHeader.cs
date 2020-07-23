@@ -22,12 +22,23 @@ namespace osu.Game.Overlays
         protected OsuTabControl<T> TabControl;
 
         private readonly Box controlBackground;
+        private readonly Container tabControlContainer;
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
         {
             get => current.Current;
             set => current.Current = value;
+        }
+
+        protected new float ContentSidePadding
+        {
+            get => base.ContentSidePadding;
+            set
+            {
+                base.ContentSidePadding = value;
+                tabControlContainer.Padding = new MarginPadding { Horizontal = value };
+            }
         }
 
         protected TabControlOverlayHeader()
@@ -42,11 +53,16 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    TabControl = CreateTabControl().With(control =>
+                    tabControlContainer = new Container
                     {
-                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
-                        control.Current = Current;
-                    })
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = ContentSidePadding },
+                        Child = TabControl = CreateTabControl().With(control =>
+                        {
+                            control.Current = Current;
+                        })
+                    }
                 }
             });
         }
