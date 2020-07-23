@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
     public class GetRoomScoresRequest : APIRequest<List<APIUserScoreAggregate>>
     {

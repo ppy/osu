@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Result == null)
                 throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
-            loadSamples();
+            LoadSamples();
         }
 
         protected override void LoadComplete()
@@ -150,14 +150,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
-            samplesBindable.CollectionChanged += (_, __) => loadSamples();
+            samplesBindable.CollectionChanged += (_, __) => LoadSamples();
 
             apply(HitObject);
 
             updateState(ArmedState.Idle, true);
         }
 
-        private void loadSamples()
+        protected virtual void LoadSamples()
         {
             if (Samples != null)
             {
@@ -359,16 +359,31 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private GameplayClock gameplayClock { get; set; }
 
         /// <summary>
+        /// Calculate the position to be used for sample playback at a specified X position (0..1).
+        /// </summary>
+        /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
+        /// <returns></returns>
+        protected double CalculateSamplePlaybackBalance(double position)
+        {
+            const float balance_adjust_amount = 0.4f;
+
+            return balance_adjust_amount * (userPositionalHitSounds.Value ? position - 0.5f : 0) * PositionGain.Value;
+        }
+
+        /// <summary>
+        /// Whether samples should currently be playing. Will be false during seek operations.
+        /// </summary>
+        protected bool ShouldPlaySamples => gameplayClock?.IsSeeking != true;
+
+        /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
         public virtual void PlaySamples()
         {
-            const float balance_adjust_amount = 0.4f;
-
-            if (Samples != null && gameplayClock?.IsSeeking != true)
+            if (Samples != null && ShouldPlaySamples)
             {
-                Samples.Balance.Value = balance_adjust_amount * (userPositionalHitSounds.Value ? SamplePlaybackPosition - 0.5f : 0) * PositionGain.Value;
+                Samples.Balance.Value = CalculateSamplePlaybackBalance(SamplePlaybackPosition);
                 Samples.Play();
             }
         }

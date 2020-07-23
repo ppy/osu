@@ -21,14 +21,14 @@ namespace osu.Game.Rulesets.Tau.Replays
 
         protected override bool IsImportant(TauReplayFrame frame) => frame.Actions.Any();
 
-        protected Vector2 Position
+        protected Vector2? Position
         {
             get
             {
                 var frame = CurrentFrame;
 
                 if (frame == null)
-                    return Vector2.Zero;
+                    return null;
 
                 Debug.Assert(CurrentTime != null);
 
@@ -36,19 +36,10 @@ namespace osu.Game.Rulesets.Tau.Replays
             }
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            return new List<IInput>
-            {
-                new MousePositionAbsoluteInput
-                {
-                    Position = GamefieldToScreenSpace(Position),
-                },
-                new ReplayState<TauAction>
-                {
-                    PressedActions = CurrentFrame?.Actions ?? new List<TauAction>(),
-                }
-            };
+            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(Position ?? Vector2.Zero) });
+            inputs.Add(new ReplayState<TauAction> { PressedActions = CurrentFrame?.Actions ?? new List<TauAction>() });
         }
     }
 }
