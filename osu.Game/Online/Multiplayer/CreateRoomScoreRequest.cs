@@ -3,9 +3,9 @@
 
 using System.Net.Http;
 using osu.Framework.IO.Network;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.Multiplayer
 {
     public class CreateRoomScoreRequest : APIRequest<APIScoreToken>
     {
