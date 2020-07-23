@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
@@ -52,7 +51,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private Action OnComplete;
 
         private DimmableStoryboard dimmableSB;
-        private CustomedDecoupleableInterpolatingFramedClock DecoupleableClock;
+        private StoryboardClock StoryboardClock;
 
         public Drawable GetOverlayProxy()
         {
@@ -109,19 +108,20 @@ namespace osu.Game.Screens.Mvis.Storyboard
             {
                 if ( sbClock != null )
                 {
-                    sbClock.Clock = new ThrottledFrameClock();
+                    StoryboardClock?.Stop();
                     sbClock.FadeOut(DURATION, Easing.OutQuint);
                     sbClock.Expire();
                 }
 
                 LoadSBTask = LoadComponentAsync(new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Name = "Storyboard Container",
+                    RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                     Child = dimmableSB = new DimmableStoryboard(b.Value.Storyboard)
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Clock = StoryboardClock = new StoryboardClock(),
                         Name = "Storyboard"
                     }
                 }, newsbClock =>
@@ -131,9 +131,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     dimmableSB.IgnoreUserSettings.Value = true;
                     dimmableSB.EnableUserDim.Value = false;
 
-                    DecoupleableClock =  new CustomedDecoupleableInterpolatingFramedClock();
-                    sbClock.Clock = DecoupleableClock;
-                    DecoupleableClock.ChangeSource(beatmap.Track);
+                    StoryboardClock.ChangeSource(beatmap.Track);
 
                     this.Add(sbClock);
 

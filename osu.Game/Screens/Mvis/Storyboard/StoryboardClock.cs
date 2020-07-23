@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
     /// If a <see cref="InterpolatingFramedClock.Source"/> is set, it is presumed that we have exclusive control over operations on it.
     /// This is used to our advantage to allow correct <see cref="IsRunning"/> state tracking in the event of cross-thread communication delays (with an audio thread, for instance).
     /// </summary>
-    public class CustomedDecoupleableInterpolatingFramedClock : InterpolatingFramedClock, IAdjustableClock
+    public class StoryboardClock : InterpolatingFramedClock, IAdjustableClock
     {
         /// <summary>
         /// Specify whether we are coupled 1:1 to SourceClock. If not, we can independently continue operation.
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
         public void ResetSpeedAdjustments() => Rate = 1;
 
-        public CustomedDecoupleableInterpolatingFramedClock()
+        public StoryboardClock()
         {
             decoupledClock = new FramedClock(decoupledStopwatch = new StopwatchClock());
         }
