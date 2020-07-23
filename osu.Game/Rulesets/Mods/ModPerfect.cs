@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Mods
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
             => !(result.Judgement is IgnoreJudgement)
+               && result.Judgement.AffectsCombo
                && result.Type != result.Judgement.MaxResult;
     }
 }
