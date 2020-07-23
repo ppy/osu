@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.LoadSamples();
 
             slidingSample?.Expire();
+            slidingSample = null;
 
             var firstSample = HitObject.Samples.FirstOrDefault();
 
