@@ -16,14 +16,14 @@ using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneSpotlightsLayout : OsuTestScene
+    public class TestSceneSpotlightsRankingsDisplay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Green);
 
-        public TestSceneSpotlightsLayout()
+        public TestSceneSpotlightsRankingsDisplay()
         {
             var ruleset = new Bindable<RulesetInfo>(new OsuRuleset().RulesetInfo);
 
