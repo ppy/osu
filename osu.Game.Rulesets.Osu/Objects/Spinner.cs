@@ -26,7 +26,10 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public int SpinsRequired { get; protected set; } = 1;
 
-        public int MaximumBonusSpins => SpinsRequired;
+        /// <summary>
+        /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
+        /// </summary>
+        public int MaximumBonusSpins => (int)(SpinsRequired * 1.8f); // roughly matches stable
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
